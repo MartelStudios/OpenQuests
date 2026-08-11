@@ -1,0 +1,21 @@
+{
+  "Type": "Gather",
+  "TitleKey": "quest.collectWood.title",
+  "DescriptionKey": "quest.collectWood.description",
+  "AutoStart": false,
+  "AutoClaim": true,
+  "ItemToGather": "Ingredient_Stick",
+  "Count": 20,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Plant_Fruit_Berries_Red",
+      "Quantity": 5
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Furniture_Christmas_Chest_Small_RedDotted",
+      "Quantity": 10
+    }
+  ]
+}

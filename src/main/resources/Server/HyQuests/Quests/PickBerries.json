@@ -1,0 +1,16 @@
+{
+  "Type": "InteractivelyPickup",
+  "TitleKey": "quest.pickBerries.title",
+  "DescriptionKey": "quest.pickBerries.description",
+  "AutoStart": true,
+  "AutoClaim": false,
+  "ItemToPickup": "Plant_Fruit_Berries_Red",
+  "Count": 7,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Stick",
+      "Quantity": 10
+    }
+  ]
+}

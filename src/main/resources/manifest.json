@@ -1,0 +1,24 @@
+{
+    "Group": "MartelStudios",
+    "Name": "hyquests",
+    "Version": "0.0.0",
+    "Description": "A standalone, extensible quest system for Hytale",
+    "Authors": [
+        {
+            "Name": "Hazard4U"
+        }
+    ],
+    "Website": "https://github.com/MartelStudios/HyQuests",
+    "ServerVersion": "0.6.0-pre.11",
+    "Dependencies": {
+        "Hytale:AssetModule": "*"
+    },
+    "OptionalDependencies": {
+    },
+    "DisabledByDefault": false,
+    "Main": "com.martelstudios.hyquests.HyQuestsPlugin",
+    "IncludesAssetPack": true,
+    "UpdateChecker": {
+        "CurseForge": ""
+    }
+}

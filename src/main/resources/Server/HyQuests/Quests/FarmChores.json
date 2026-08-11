@@ -1,0 +1,11 @@
+{
+  "Type": "General",
+  "TitleKey": "quest.farmChores.title",
+  "DescriptionKey": "quest.farmChores.description",
+  "AutoStart": false,
+  "AutoClaim": true,
+  "Assets": [
+    "PickBerries",
+    "CollectWood"
+  ]
+}
