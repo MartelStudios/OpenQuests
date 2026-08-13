@@ -5,9 +5,6 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.martelstudios.hyquests.models.GeneralQuest;
-import com.martelstudios.hyquests.services.QuestService;
-
-import java.util.UUID;
 
 /**
  * Config for a composite quest: the ids of the {@link QuestAsset}s its children are created

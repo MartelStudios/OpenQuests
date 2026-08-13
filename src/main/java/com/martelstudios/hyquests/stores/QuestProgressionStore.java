@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class QuestDataStore {
+public class QuestProgressionStore {
     @Nonnull
     private final static HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
@@ -21,9 +21,9 @@ public class QuestDataStore {
     private final Map<Class<?>, Set<UUID>> idsByType = new ConcurrentHashMap<>();
 
     @Nonnull
-    public final DataStore<QuestRecord> dataStore;
+    public final DataStore<QuestProgressionRecord> dataStore;
 
-    public QuestDataStore(@Nonnull DataStore<QuestRecord> dataStore) {
+    public QuestProgressionStore(@Nonnull DataStore<QuestProgressionRecord> dataStore) {
         this.dataStore = dataStore;
     }
 
@@ -92,7 +92,7 @@ public class QuestDataStore {
     public void saveToDisk(@Nonnull AbstractQuest<?> quest) {
         if (!quest.consumeChanges()) return;
 
-        dataStore.save(quest.getId().toString(), new QuestRecord(quest));
+        dataStore.save(quest.getId().toString(), new QuestProgressionRecord(quest));
     }
 
     /**
@@ -108,7 +108,7 @@ public class QuestDataStore {
         AbstractQuest<?> quest = quests.get(id);
         if (quest != null) return quest;
 
-        QuestRecord record;
+        QuestProgressionRecord record;
         try {
             record = dataStore.load(id.toString());
         } catch (IOException e) {
@@ -126,7 +126,7 @@ public class QuestDataStore {
      * Loads every persisted quest from disk into memory, rebuilding the type index.
      */
     public void loadAllFromDisk() {
-        Map<String, QuestRecord> records;
+        Map<String, QuestProgressionRecord> records;
         try {
             records = dataStore.loadAll();
         } catch (IOException e) {
@@ -134,7 +134,7 @@ public class QuestDataStore {
             return;
         }
 
-        for (QuestRecord record : records.values()) {
+        for (QuestProgressionRecord record : records.values()) {
             if (record == null || record.quest == null) continue;
             add(record.quest);
         }

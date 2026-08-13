@@ -9,11 +9,12 @@ import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.hyquests.assets.GeneralQuestAsset;
 import com.martelstudios.hyquests.assets.QuestAsset;
 import com.martelstudios.hyquests.events.QuestCompletedEvent;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
 import com.martelstudios.hyquests.visitors.GeneralQuestVisitor;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,20 +45,20 @@ public class GeneralQuest extends AbstractQuest<GeneralQuest> {
     }
 
     @Override
-    public void addToPlayer(@Nonnull UUID playerId) {
-        super.addToPlayer(playerId);
+    public void addPlayer(@Nonnull UUID playerId) {
+        super.addPlayer(playerId);
 
         for (UUID questId : questIds) {
-            QuestService.get().addQuestToPlayer(questId, playerId);
+            QuestProgressionService.get().getQuest(questId).addPlayer(playerId);
         }
     }
 
     @Override
-    public void removeFromPlayer(@Nonnull UUID playerId) {
-        super.removeFromPlayer(playerId);
+    public void removePlayer(@Nonnull UUID playerId) {
+        super.removePlayer(playerId);
 
         for (UUID questId : questIds) {
-            QuestService.get().removeQuestFromPlayer(questId, playerId);
+            QuestProgressionService.get().getQuest(questId).removePlayer(playerId);
         }
     }
 
@@ -73,7 +74,7 @@ public class GeneralQuest extends AbstractQuest<GeneralQuest> {
 
         for (int i = 0; i < assetIds.length; i++) {
             QuestAsset childAsset = QuestAsset.getAsset(assetIds[i]);
-            questIds[i] = QuestService.get().registerQuest(childAsset).getId();
+            questIds[i] = QuestProgressionService.get().registerQuest(childAsset).getId();
         }
 
         setQuestIds(questIds).markDirty();
@@ -87,7 +88,7 @@ public class GeneralQuest extends AbstractQuest<GeneralQuest> {
         releaseChildListeners();
 
         for (UUID questId : questIds) {
-            QuestService.get().unregisterQuest(questId);
+            QuestProgressionService.get().unregisterQuest(questId);
         }
     }
 
@@ -124,7 +125,7 @@ public class GeneralQuest extends AbstractQuest<GeneralQuest> {
      */
     public boolean allQuestsCompleted() {
         for (UUID childId : questIds) {
-            AbstractQuest<?> child = QuestService.get().getQuest(childId);
+            AbstractQuest<?> child = QuestProgressionService.get().getQuest(childId);
             if (child == null) continue;
 
             if (!child.isCompleted()) return false;

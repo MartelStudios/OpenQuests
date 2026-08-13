@@ -6,7 +6,7 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.martelstudios.hyquests.assets.QuestAsset;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
 
@@ -35,8 +35,8 @@ public class CreatePlayerQuestCommand extends CommandBase {
             return;
         }
 
-        var quest = QuestService.get().registerQuest(asset);
-        QuestService.get().addQuestToPlayer(quest.getId(), profile.getUuid());
+        var quest = QuestProgressionService.get().registerQuest(asset);
+        quest.addPlayer(profile.getUuid());
         context.sendMessage(Message.raw("Created quest " + quest.getId() + " from asset '" + assetId + "'."));
     }
 }

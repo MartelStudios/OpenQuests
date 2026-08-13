@@ -15,7 +15,7 @@ progression.
 | `AbstractQuest` | Runtime instance holding state, assignees and progression. Polymorphic on `"Type"`. |
 | `QuestVisitor` | Carries the context of an event to the quests it can progress. |
 | `QuestReward` | What a terminal state grants. Polymorphic on `"Type"`. |
-| `QuestService` | Entry point: register, assign, progress, complete, claim. |
+| `QuestProgressionService` | Entry point: register, assign, progress, complete, claim. |
 | `QuestHistoryStore` | Per-player record of completed quests, with claim state and date. |
 
 ### Scopes

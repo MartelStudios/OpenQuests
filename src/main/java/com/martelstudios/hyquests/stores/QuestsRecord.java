@@ -5,7 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.set.SetCodec;
 import com.martelstudios.hyquests.models.AbstractQuest;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
 
 import javax.annotation.Nullable;
 import java.util.HashSet;
@@ -14,21 +14,21 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class QuestStore {
-    public static final BuilderCodec<QuestStore> CODEC = BuilderCodec.builder(QuestStore.class, QuestStore::new)
-                                                                     .append(new KeyedCodec<>("Quests", new SetCodec<>(Codec.UUID_BINARY, HashSet<UUID>::new, false)), (questStore, uuids) -> questStore.questIds.addAll(uuids), (questStore) -> questStore.questIds)
-                                                                     .add()
-                                                                     .build();
+public class QuestsRecord {
+    public static final BuilderCodec<QuestsRecord> CODEC = BuilderCodec.builder(QuestsRecord.class, QuestsRecord::new)
+                                                                       .append(new KeyedCodec<>("Quests", new SetCodec<>(Codec.UUID_BINARY, HashSet<UUID>::new, false)), (questSet, uuids) -> questSet.questIds.addAll(uuids), (questSet) -> questSet.questIds)
+                                                                       .add()
+                                                                       .build();
 
     private final Set<UUID> questIds = ConcurrentHashMap.newKeySet();
 
     private boolean loaded;
 
-    public QuestStore() {
+    public QuestsRecord() {
 
     }
 
-    public QuestStore(QuestStore other) {
+    public QuestsRecord(QuestsRecord other) {
         this.questIds.addAll(other.questIds);
         this.loaded = other.loaded;
     }
@@ -55,12 +55,12 @@ public class QuestStore {
     public List<? extends AbstractQuest<?>> getAllQuests() {
         if (!loaded) loadAll();
 
-        return this.questIds.stream().map(QuestService.get()::getQuest).toList();
+        return this.questIds.stream().map(QuestProgressionService.get()::getQuest).toList();
     }
 
     /**
      * @return {@code true} the first time this is called for this resource instance, {@code false}
-     * afterward. Used to lazily load this world's quests into the {@link QuestDataStore} exactly once.
+     * afterward. Used to lazily load this world's quests into the {@link QuestProgressionStore} exactly once.
      */
     public boolean consumeNeedsLoad() {
         if (loaded) return false;
@@ -72,13 +72,13 @@ public class QuestStore {
         if (!consumeNeedsLoad()) return;
 
         for (UUID questId : questIds) {
-            QuestService.get().loadQuest(questId);
+            QuestProgressionService.get().loadQuest(questId);
         }
     }
 
     @Nullable
     @Override
-    public QuestStore clone() {
-        return new QuestStore(this);
+    public QuestsRecord clone() {
+        return new QuestsRecord(this);
     }
 }

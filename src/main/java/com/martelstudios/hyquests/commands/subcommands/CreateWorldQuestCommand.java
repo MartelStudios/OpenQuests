@@ -6,7 +6,7 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.hyquests.assets.QuestAsset;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
 
@@ -35,8 +35,9 @@ public class CreateWorldQuestCommand extends CommandBase {
             return;
         }
 
-        var quest = QuestService.get().registerQuest(asset);
-        QuestService.get().addQuestToWorld(quest.getId(), world.getWorldConfig().getUuid());
+        var quest = QuestProgressionService.get().registerQuest(asset);
         context.sendMessage(Message.raw("Created quest " + quest.getId() + " from asset '" + assetId + "'."));
+
+        quest.addWorld(world);
     }
 }

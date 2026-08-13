@@ -8,7 +8,7 @@ import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.server.core.event.events.ecs.InteractivelyPickupItemEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
 import com.martelstudios.hyquests.visitors.InteractivelyPickupQuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -26,7 +26,7 @@ public class InteractivelyPickupItemEventSystem extends EntityEventSystem<Entity
         var playerRef = store.getComponent(ref, PlayerRef.getComponentType());
         if (playerRef == null) return;
 
-        QuestService.get().progress(new InteractivelyPickupQuestVisitor(playerRef.getUuid(), event));
+        QuestProgressionService.get().progress(new InteractivelyPickupQuestVisitor(playerRef.getUuid(), event));
     }
 
     @Override

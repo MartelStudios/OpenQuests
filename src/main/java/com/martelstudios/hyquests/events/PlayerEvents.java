@@ -1,7 +1,8 @@
 package com.martelstudios.hyquests.events;
 
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.PlayerQuestService;
+import com.martelstudios.hyquests.services.UniverseQuestService;
 import com.martelstudios.hyquests.stores.QuestStoreComponent;
 
 public class PlayerEvents {
@@ -11,6 +12,6 @@ public class PlayerEvents {
         questStoreComponent.loadQuests();
 
         // Universe-scope quests are assigned to every player on connection.
-        QuestService.get().addQuestsToPlayerStore(QuestService.get().universeStore.getAllIds(), holder);
+        PlayerQuestService.get().addQuestsToPlayerStore(UniverseQuestService.get().universeQuests.getAllIds(), holder);
     }
 }

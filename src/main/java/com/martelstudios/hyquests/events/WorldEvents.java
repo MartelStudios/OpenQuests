@@ -4,7 +4,8 @@ import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.RemovedPlayerFromWorldEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.hyquests.PlayerAccess;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.PlayerQuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
 import com.martelstudios.hyquests.stores.QuestStoreComponent;
 import com.martelstudios.hyquests.stores.WorldQuestStoreResource;
 
@@ -22,11 +23,11 @@ public class WorldEvents {
         var worldQuestStore = store.getResource(WorldQuestStoreResource.getResourceType());
         worldQuestStore.loadQuests();
 
-        QuestService.get().addQuestsToPlayerStore(worldQuestStore.questStore.getAllIds(), holder);
+        PlayerQuestService.get().addQuestsToPlayerStore(worldQuestStore.questsRecord.getAllIds(), holder);
 
         // Safe to re-run on every world change: a granted record is no longer claimable
         var playerId = holder.getComponent(PlayerRef.getComponentType()).getUuid();
-        QuestService.get().claimAutoRewards(playerId, PlayerAccess.of(holder));
+        QuestProgressionService.get().claimAutoRewards(playerId, PlayerAccess.of(holder));
     }
 
     /**
@@ -42,18 +43,18 @@ public class WorldEvents {
         var store = removedPlayerFromWorldEvent.getWorld().getEntityStore().getStore();
         var worldQuestStore = store.getResource(WorldQuestStoreResource.getResourceType());
 
-        for (UUID questId : worldQuestStore.questStore.getAllIds()) {
-            var quest = QuestService.get().getQuest(questId);
+        for (UUID questId : worldQuestStore.questsRecord.getAllIds()) {
+            var quest = QuestProgressionService.get().getQuest(questId);
 
             if (quest == null) {
-                worldQuestStore.questStore.unregister(questId);
+                worldQuestStore.questsRecord.unregister(questId);
                 continue;
             }
 
             // Do not unregister quest from player store if the player is directly registered in the quest
             if (quest.getPlayers().contains(playerRef.getUuid())) continue;
 
-            playerQuestStore.questStore.unregister(questId);
+            playerQuestStore.questsRecord.unregister(questId);
         }
     }
 }

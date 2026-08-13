@@ -4,14 +4,14 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
-import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.hyquests.assets.QuestAsset;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.PlayerQuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
+import com.martelstudios.hyquests.services.UniverseQuestService;
 
 import javax.annotation.Nonnull;
 
 import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes.STRING;
-import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes.WORLD;
 
 public class CreateUniverseQuestCommand extends CommandBase {
 
@@ -32,8 +32,8 @@ public class CreateUniverseQuestCommand extends CommandBase {
             return;
         }
 
-        var quest = QuestService.get().registerQuest(asset);
-        QuestService.get().addQuestToUniverse(quest.getId());
+        var quest = QuestProgressionService.get().registerQuest(asset);
+        UniverseQuestService.get().addQuestToUniverse(quest.getId());
         context.sendMessage(Message.raw("Created quest " + quest.getId() + " from asset '" + assetId + "'."));
     }
 }

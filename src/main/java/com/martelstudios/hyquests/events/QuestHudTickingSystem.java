@@ -11,7 +11,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.hud.QuestTrackerHud;
 import com.martelstudios.hyquests.models.AbstractQuest;
 import com.martelstudios.hyquests.models.QuestState;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
 import com.martelstudios.hyquests.stores.QuestStoreComponent;
 
 import javax.annotation.Nonnull;
@@ -42,8 +42,8 @@ public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
         if (playerRef == null || player == null || questStoreComponent == null) return;
 
         List<AbstractQuest<?>> inProgress = new ArrayList<>();
-        for (UUID questId : questStoreComponent.questStore.getAllIds()) {
-            var quest = QuestService.get().getQuest(questId);
+        for (UUID questId : questStoreComponent.questsRecord.getAllIds()) {
+            var quest = QuestProgressionService.get().getQuest(questId);
             if (quest != null && quest.getState() == QuestState.IN_PROGRESS) {
                 inProgress.add(quest);
             }

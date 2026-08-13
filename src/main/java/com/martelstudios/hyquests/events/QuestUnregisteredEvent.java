@@ -2,12 +2,13 @@ package com.martelstudios.hyquests.events;
 
 import com.hypixel.hytale.event.IEvent;
 import com.martelstudios.hyquests.models.AbstractQuest;
+import com.martelstudios.hyquests.stores.QuestProgressionStore;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * Fired once a quest instance has been added to the {@link com.martelstudios.hyquests.stores.QuestDataStore}.
+ * Fired once a quest instance has been added to the {@link QuestProgressionStore}.
  */
 public class QuestUnregisteredEvent implements IEvent<UUID> {
     @Nonnull

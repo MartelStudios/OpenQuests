@@ -5,7 +5,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
 
 import javax.annotation.Nullable;
 
@@ -30,6 +30,6 @@ public class QuestHistoryStoreComponent implements Component<EntityStore> {
     }
 
     public static ComponentType<EntityStore, QuestHistoryStoreComponent> getComponentType() {
-        return QuestService.get().getPlayerHistoryStoreComponentType();
+        return QuestProgressionService.get().getPlayerHistoryStoreComponentType();
     }
 }

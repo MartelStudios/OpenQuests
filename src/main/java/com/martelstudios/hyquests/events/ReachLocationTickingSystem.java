@@ -8,7 +8,7 @@ import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
 import com.martelstudios.hyquests.visitors.ReachLocationQuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -32,6 +32,6 @@ public class ReachLocationTickingSystem extends EntityTickingSystem<EntityStore>
 
         if (playerRef == null || transform == null) return;
 
-        QuestService.get().progress(new ReachLocationQuestVisitor(playerRef.getUuid(), transform.getPosition()));
+        QuestProgressionService.get().progress(new ReachLocationQuestVisitor(playerRef.getUuid(), transform.getPosition()));
     }
 }

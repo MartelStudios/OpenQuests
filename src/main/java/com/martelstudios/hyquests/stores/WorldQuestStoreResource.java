@@ -6,7 +6,7 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.Resource;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.hyquests.services.QuestService;
+import com.martelstudios.hyquests.HyQuestsPlugin;
 
 import javax.annotation.Nullable;
 
@@ -17,17 +17,17 @@ import javax.annotation.Nullable;
  */
 public class WorldQuestStoreResource implements Resource<EntityStore> {
     public static final BuilderCodec<WorldQuestStoreResource> CODEC = BuilderCodec.builder(WorldQuestStoreResource.class, WorldQuestStoreResource::new)
-                                                                                  .append(new KeyedCodec<>("QuestStore", QuestStore.CODEC), (resource, quests) -> resource.questStore = quests, (resource) -> resource.questStore)
+                                                                                  .append(new KeyedCodec<>("QuestStore", QuestsRecord.CODEC), (resource, quests) -> resource.questsRecord = quests, (resource) -> resource.questsRecord)
                                                                                   .add()
                                                                                   .build();
 
-    public QuestStore questStore = new QuestStore();
+    public QuestsRecord questsRecord = new QuestsRecord();
 
     public WorldQuestStoreResource() {
     }
 
     public WorldQuestStoreResource(WorldQuestStoreResource other) {
-        this.questStore = other.questStore.clone();
+        this.questsRecord = other.questsRecord.clone();
     }
 
     @Nullable
@@ -37,10 +37,10 @@ public class WorldQuestStoreResource implements Resource<EntityStore> {
     }
 
     public static ResourceType<EntityStore, WorldQuestStoreResource> getResourceType() {
-        return QuestService.get().getWorldStoreResourceType();
+        return HyQuestsPlugin.get().getWorldStoreResourceType();
     }
 
     public void loadQuests() {
-        questStore.loadAll();
+        questsRecord.loadAll();
     }
 }

@@ -14,44 +14,25 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.datastore.DataStore;
 import com.hypixel.hytale.server.core.universe.datastore.DiskDataStoreProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.hyquests.assets.GatherQuestAsset;
-import com.martelstudios.hyquests.assets.GeneralQuestAsset;
-import com.martelstudios.hyquests.assets.InteractivelyPickupQuestAsset;
-import com.martelstudios.hyquests.assets.QuestAsset;
-import com.martelstudios.hyquests.assets.QuestAssetValidator;
-import com.martelstudios.hyquests.assets.ReachLocationQuestAsset;
+import com.martelstudios.hyquests.assets.*;
 import com.martelstudios.hyquests.commands.QuestCommand;
-import com.martelstudios.hyquests.events.GatherItemEventSystem;
-import com.martelstudios.hyquests.events.InteractivelyPickupItemEventSystem;
-import com.martelstudios.hyquests.events.PlayerEvents;
-import com.martelstudios.hyquests.events.QuestAssignedToPlayerEvent;
-import com.martelstudios.hyquests.events.QuestEvents;
-import com.martelstudios.hyquests.events.QuestHudTickingSystem;
-import com.martelstudios.hyquests.events.QuestRegisteredEvent;
-import com.martelstudios.hyquests.events.QuestUnregisteredEvent;
-import com.martelstudios.hyquests.events.ReachLocationTickingSystem;
-import com.martelstudios.hyquests.events.WorldEvents;
+import com.martelstudios.hyquests.events.*;
 import com.martelstudios.hyquests.models.GatherQuest;
 import com.martelstudios.hyquests.models.GeneralQuest;
 import com.martelstudios.hyquests.models.InteractivelyPickupQuest;
 import com.martelstudios.hyquests.models.ReachLocationQuest;
 import com.martelstudios.hyquests.rewards.ItemQuestReward;
 import com.martelstudios.hyquests.rewards.QuestReward;
-import com.martelstudios.hyquests.services.QuestService;
-import com.martelstudios.hyquests.stores.QuestDataStore;
-import com.martelstudios.hyquests.stores.QuestHistoryStoreComponent;
-import com.martelstudios.hyquests.stores.QuestRecord;
-import com.martelstudios.hyquests.stores.QuestStore;
-import com.martelstudios.hyquests.stores.QuestStoreComponent;
-import com.martelstudios.hyquests.stores.WorldQuestStoreResource;
+import com.martelstudios.hyquests.services.PlayerQuestService;
+import com.martelstudios.hyquests.services.QuestProgressionService;
+import com.martelstudios.hyquests.services.UniverseQuestService;
+import com.martelstudios.hyquests.services.WorldQuestService;
+import com.martelstudios.hyquests.stores.*;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 /**
  * Standalone quest system: quest definitions live as assets, their runtime progression is
@@ -60,15 +41,17 @@ import java.util.logging.Level;
  */
 public class HyQuestsPlugin extends JavaPlugin {
     public static final Path questProgressionsPath = Paths.get("quests", "progressions");
-    public static final Path questStoresPath = Paths.get("quests", "stores");
+    public static final Path questSetStorePath = Paths.get("quests", "stores");
 
-    private static final String UNIVERSE_QUEST_INDEX_KEY = "universe";
     private static final long SAVE_INTERVAL_MINUTES = 5;
 
     private static HyQuestsPlugin instance;
 
-    private QuestDataStore questDataStore;
-    private DataStore<QuestStore> universeQuestIndexStore;
+    private QuestProgressionStore questProgressionStore;
+    private QuestsStore questsStore;
+    private ComponentType<EntityStore, QuestStoreComponent> questStoreComponentType;
+    private ResourceType<EntityStore, WorldQuestStoreResource> worldStoreResourceType;
+    private DataStore<QuestsRecord> questSetStore;
 
     public HyQuestsPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -79,17 +62,26 @@ public class HyQuestsPlugin extends JavaPlugin {
         return instance;
     }
 
+    public UniverseQuestService universeQuestService;
+    public WorldQuestService worldQuestService;
+    public PlayerQuestService playerQuestService;
+
+    public QuestProgressionService questProgressionService;
+
     @Override
     protected void setup() {
         super.setup();
+        questProgressionStore = new QuestProgressionStore(new DiskDataStoreProvider(questProgressionsPath.toString()).create(QuestProgressionRecord.CODEC));
+        questsStore = new QuestsStore(new DiskDataStoreProvider(questSetStorePath.toString()).create(QuestsRecord.CODEC));
 
-        questDataStore = new QuestDataStore(new DiskDataStoreProvider(questProgressionsPath.toString()).create(QuestRecord.CODEC));
-        universeQuestIndexStore = new DiskDataStoreProvider(questStoresPath.toString()).create(QuestStore.CODEC);
+        universeQuestService = new UniverseQuestService(questsStore);
+        worldQuestService = new WorldQuestService();
+        playerQuestService = new PlayerQuestService();
 
-        ComponentType<EntityStore, QuestStoreComponent> questStoreComponentType = getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, "QuestStore", QuestStoreComponent.CODEC);
+        questStoreComponentType = getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, "QuestStore", QuestStoreComponent.CODEC);
+        worldStoreResourceType = getEntityStoreRegistry().registerResource(WorldQuestStoreResource.class, "QuestStore", WorldQuestStoreResource.CODEC);
         ComponentType<EntityStore, QuestHistoryStoreComponent> questHistoryStoreComponentType = getEntityStoreRegistry().registerComponent(QuestHistoryStoreComponent.class, "QuestHistoryStore", QuestHistoryStoreComponent.CODEC);
-        ResourceType<EntityStore, WorldQuestStoreResource> worldQuestStoreResourceType = getEntityStoreRegistry().registerResource(WorldQuestStoreResource.class, "QuestStore", WorldQuestStoreResource.CODEC);
-        QuestService.get().init(questDataStore, questStoreComponentType, questHistoryStoreComponentType, worldQuestStoreResourceType);
+        questProgressionService = new QuestProgressionService(questProgressionStore, questHistoryStoreComponentType);
 
         registerQuestTypes();
         QuestReward.CODEC.register("Item", ItemQuestReward.class, ItemQuestReward.CODEC);
@@ -118,59 +110,44 @@ public class HyQuestsPlugin extends JavaPlugin {
 
     /**
      * The quest types shipped by default. Other plugins add theirs the same way, through
-     * {@link QuestService#registerQuestType}.
+     * {@link QuestProgressionService#registerQuestType}.
      */
     private void registerQuestTypes() {
-        QuestService.get().registerQuestType("Gather", GatherQuestAsset.class, GatherQuestAsset.CODEC, GatherQuest.class, GatherQuest.CODEC);
-        QuestService.get().registerQuestType("InteractivelyPickup", InteractivelyPickupQuestAsset.class, InteractivelyPickupQuestAsset.CODEC, InteractivelyPickupQuest.class, InteractivelyPickupQuest.CODEC);
-        QuestService.get().registerQuestType("General", GeneralQuestAsset.class, GeneralQuestAsset.CODEC, GeneralQuest.class, GeneralQuest.CODEC);
-        QuestService.get().registerQuestType("ReachLocation", ReachLocationQuestAsset.class, ReachLocationQuestAsset.CODEC, ReachLocationQuest.class, ReachLocationQuest.CODEC);
+        QuestProgressionService.get()
+                               .registerQuestType("Gather", GatherQuestAsset.class, GatherQuestAsset.CODEC, GatherQuest.class, GatherQuest.CODEC);
+        QuestProgressionService.get()
+                               .registerQuestType("InteractivelyPickup", InteractivelyPickupQuestAsset.class, InteractivelyPickupQuestAsset.CODEC, InteractivelyPickupQuest.class, InteractivelyPickupQuest.CODEC);
+        QuestProgressionService.get()
+                               .registerQuestType("General", GeneralQuestAsset.class, GeneralQuestAsset.CODEC, GeneralQuest.class, GeneralQuest.CODEC);
+        QuestProgressionService.get()
+                               .registerQuestType("ReachLocation", ReachLocationQuestAsset.class, ReachLocationQuestAsset.CODEC, ReachLocationQuest.class, ReachLocationQuest.CODEC);
     }
 
     @Override
     protected void start() {
-        loadUniverseQuests();
+        universeQuestService.loadQuests();
 
         HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(() -> {
-            questDataStore.saveAllToDisk();
-            saveUniverseQuestIndex();
+            questProgressionStore.saveAllToDisk();
+            universeQuestService.saveUniverseQuestIndex();
         }, SAVE_INTERVAL_MINUTES, SAVE_INTERVAL_MINUTES, TimeUnit.MINUTES);
     }
 
     @Override
     protected void shutdown() {
-        if (questDataStore != null) {
-            questDataStore.saveAllToDisk();
-        }
-        saveUniverseQuestIndex();
+        questProgressionStore.saveAllToDisk();
+        universeQuestService.saveUniverseQuestIndex();
     }
 
-    /**
-     * Loads the universe-scope quest index and pulls every quest it lists into the datastore.
-     */
-    private void loadUniverseQuests() {
-        QuestStore universeIndex;
-        try {
-            universeIndex = universeQuestIndexStore.load(UNIVERSE_QUEST_INDEX_KEY);
-        } catch (IOException e) {
-            getLogger().at(Level.WARNING).withCause(e).log("Failed to load universe quest index");
-            return;
-        }
-
-        if (universeIndex == null) return;
-
-        QuestService.get().universeStore = universeIndex;
-        for (UUID questId : universeIndex.getAllIds()) {
-            questDataStore.load(questId);
-        }
+    public QuestProgressionStore getQuestDataStore() {
+        return questProgressionStore;
     }
 
-    private void saveUniverseQuestIndex() {
-        if (universeQuestIndexStore == null) return;
-        universeQuestIndexStore.save(UNIVERSE_QUEST_INDEX_KEY, QuestService.get().universeStore);
+    public ComponentType<EntityStore, QuestStoreComponent> getQuestStoreComponentType() {
+        return questStoreComponentType;
     }
 
-    public QuestDataStore getQuestDataStore() {
-        return questDataStore;
+    public ResourceType<EntityStore, WorldQuestStoreResource> getWorldStoreResourceType() {
+        return worldStoreResourceType;
     }
 }
