@@ -33,7 +33,7 @@ public class WorldQuestService {
     private final ConcurrentHashMap<UUID, Set<UUID>> questsToWorlds = new ConcurrentHashMap<>();
 
     public static WorldQuestService get() {
-        return HyQuestsPlugin.get().worldQuestService;
+        return HyQuestsPlugin.get().getWorldQuestService();
     }
 
     public static WorldQuestStoreResource getWorldQuestStoreFromWorld(@Nonnull World world) {

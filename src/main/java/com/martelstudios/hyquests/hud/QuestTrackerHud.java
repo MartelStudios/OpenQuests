@@ -46,6 +46,14 @@ public class QuestTrackerHud extends CustomUIHud {
     }
 
     /**
+     * @return {@code true} if the throttling window elapsed. Lets a caller skip gathering the
+     * quests at all, since {@link #pushUpdate} would discard them anyway.
+     */
+    public boolean shouldUpdate() {
+        return System.currentTimeMillis() - lastPushedMs.get() >= UPDATE_INTERVAL_MS;
+    }
+
+    /**
      * Pushes at most {@link #MAX_QUESTS} quests to the panel, throttled to
      * {@link #UPDATE_INTERVAL_MS}. Extra slots are hidden.
      */

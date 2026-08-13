@@ -8,7 +8,9 @@ import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.server.core.event.events.ecs.InventoryChangeEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.hyquests.PlayerAccess;
 import com.martelstudios.hyquests.services.QuestProgressionService;
+import com.martelstudios.hyquests.stores.QuestStoreComponent;
 import com.martelstudios.hyquests.visitors.GatherQuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -29,14 +31,16 @@ public class GatherItemEventSystem extends EntityEventSystem<EntityStore, Invent
         var ref = chunk.getReferenceTo(index);
 
         var playerRef = store.getComponent(ref, PlayerRef.getComponentType());
-        if (playerRef == null) return;
+        var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
+        if (playerRef == null || questStoreComponent == null) return;
 
-        QuestProgressionService.get().progress(new GatherQuestVisitor(playerRef.getUuid(), ref, store));
+        QuestProgressionService.get()
+                               .progress(new GatherQuestVisitor(playerRef.getUuid(), PlayerAccess.of(ref)), questStoreComponent.questsRecord.getAllIds());
     }
 
     @Nullable
     @Override
     public Query<EntityStore> getQuery() {
-        return PlayerRef.getComponentType();
+        return Query.and(PlayerRef.getComponentType(), QuestStoreComponent.getComponentType());
     }
 }

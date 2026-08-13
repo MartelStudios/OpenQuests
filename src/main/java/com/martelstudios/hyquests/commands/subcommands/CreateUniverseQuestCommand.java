@@ -15,7 +15,7 @@ import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgT
 public class CreateUniverseQuestCommand extends CommandBase {
 
     @Nonnull
-    private final RequiredArg<String> assetIdArg = withRequiredArg("assetId", "server.commands.quest.create.assetId.desc", STRING);
+    private final RequiredArg<String> assetIdArg = withRequiredArg("assetId", "server.commands.hyquests.quest.create.assetId.desc", STRING);
 
     public CreateUniverseQuestCommand() {
         super("universe", "Creates a new quest progression and adds it to the universe's store");

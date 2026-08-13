@@ -17,9 +17,9 @@ import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgT
 public class CreateWorldQuestCommand extends CommandBase {
 
     @Nonnull
-    private final RequiredArg<String> assetIdArg = withRequiredArg("assetId", "server.commands.quest.create.assetId.desc", STRING);
+    private final RequiredArg<String> assetIdArg = withRequiredArg("assetId", "server.commands.hyquests.quest.create.assetId.desc", STRING);
 
-    private final RequiredArg<World> worldArg = withRequiredArg("player", "server.commands.quest.create.world.desc", WORLD);
+    private final RequiredArg<World> worldArg = withRequiredArg("world", "server.commands.hyquests.quest.create.world.desc", WORLD);
 
     public CreateWorldQuestCommand() {
         super("world", "Creates a new quest progression and adds it to the given world's store");

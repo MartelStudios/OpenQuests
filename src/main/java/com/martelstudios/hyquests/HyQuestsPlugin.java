@@ -11,7 +11,6 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.RemovedPlayerFromWorldEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
-import com.hypixel.hytale.server.core.universe.datastore.DataStore;
 import com.hypixel.hytale.server.core.universe.datastore.DiskDataStoreProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.assets.*;
@@ -51,7 +50,11 @@ public class HyQuestsPlugin extends JavaPlugin {
     private QuestsStore questsStore;
     private ComponentType<EntityStore, QuestStoreComponent> questStoreComponentType;
     private ResourceType<EntityStore, WorldQuestStoreResource> worldStoreResourceType;
-    private DataStore<QuestsRecord> questSetStore;
+
+    private UniverseQuestService universeQuestService;
+    private WorldQuestService worldQuestService;
+    private PlayerQuestService playerQuestService;
+    private QuestProgressionService questProgressionService;
 
     public HyQuestsPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -61,12 +64,6 @@ public class HyQuestsPlugin extends JavaPlugin {
     public static HyQuestsPlugin get() {
         return instance;
     }
-
-    public UniverseQuestService universeQuestService;
-    public WorldQuestService worldQuestService;
-    public PlayerQuestService playerQuestService;
-
-    public QuestProgressionService questProgressionService;
 
     @Override
     protected void setup() {
@@ -142,8 +139,24 @@ public class HyQuestsPlugin extends JavaPlugin {
         universeQuestService.saveUniverseQuestIndex();
     }
 
-    public QuestProgressionStore getQuestDataStore() {
+    public QuestProgressionStore getQuestProgressionStore() {
         return questProgressionStore;
+    }
+
+    public UniverseQuestService getUniverseQuestService() {
+        return universeQuestService;
+    }
+
+    public WorldQuestService getWorldQuestService() {
+        return worldQuestService;
+    }
+
+    public PlayerQuestService getPlayerQuestService() {
+        return playerQuestService;
+    }
+
+    public QuestProgressionService getQuestProgressionService() {
+        return questProgressionService;
     }
 
     public ComponentType<EntityStore, QuestStoreComponent> getQuestStoreComponentType() {

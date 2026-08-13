@@ -1,14 +1,22 @@
 package com.martelstudios.hyquests.visitors;
 
-import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.console.ConsoleSender;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.ecs.InteractivelyPickupItemEvent;
 import com.martelstudios.hyquests.models.InteractivelyPickupQuest;
 import com.martelstudios.hyquests.models.QuestState;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
+import java.util.logging.Level;
 
+/**
+ * Progresses {@link InteractivelyPickupQuest}s by accumulating what a single harvest interaction
+ * yielded, unlike gather quests which recount the whole inventory.
+ */
 public class InteractivelyPickupQuestVisitor implements QuestVisitor<InteractivelyPickupQuest> {
+    @Nonnull
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
     private final UUID playerId;
     private final InteractivelyPickupItemEvent event;
 
@@ -30,8 +38,8 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
         quest.setCount(quest.getCount() + event.getItemStack().getQuantity())
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
-        ConsoleSender.INSTANCE.sendMessage(Message.raw("Quest progress: " + quest.getCount() + "/" + quest.getAsset()
-                                                                                                          .getCount()));
+
+        LOGGER.at(Level.FINE).log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCount(), asset.getCount());
     }
 
     @Override

@@ -31,7 +31,7 @@ public class UniverseQuestService {
     }
 
     public static UniverseQuestService get() {
-        return HyQuestsPlugin.get().universeQuestService;
+        return HyQuestsPlugin.get().getUniverseQuestService();
     }
 
     /**

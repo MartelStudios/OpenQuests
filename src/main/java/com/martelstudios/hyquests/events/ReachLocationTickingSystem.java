@@ -9,6 +9,7 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.services.QuestProgressionService;
+import com.martelstudios.hyquests.stores.QuestStoreComponent;
 import com.martelstudios.hyquests.visitors.ReachLocationQuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -22,16 +23,18 @@ public class ReachLocationTickingSystem extends EntityTickingSystem<EntityStore>
     @Nonnull
     @Override
     public Query<EntityStore> getQuery() {
-        return Query.and(PlayerRef.getComponentType(), TransformComponent.getComponentType());
+        return Query.and(PlayerRef.getComponentType(), TransformComponent.getComponentType(), QuestStoreComponent.getComponentType());
     }
 
     @Override
     public void tick(float dt, int index, @Nonnull ArchetypeChunk<EntityStore> archetypeChunk, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         var playerRef = archetypeChunk.getComponent(index, PlayerRef.getComponentType());
         var transform = archetypeChunk.getComponent(index, TransformComponent.getComponentType());
+        var questStoreComponent = archetypeChunk.getComponent(index, QuestStoreComponent.getComponentType());
 
-        if (playerRef == null || transform == null) return;
+        if (playerRef == null || transform == null || questStoreComponent == null) return;
 
-        QuestProgressionService.get().progress(new ReachLocationQuestVisitor(playerRef.getUuid(), transform.getPosition()));
+        QuestProgressionService.get()
+                               .progress(new ReachLocationQuestVisitor(playerRef.getUuid(), transform.getPosition()), questStoreComponent.questsRecord.getAllIds());
     }
 }

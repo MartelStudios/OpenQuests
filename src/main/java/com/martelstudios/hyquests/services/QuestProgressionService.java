@@ -2,7 +2,6 @@ package com.martelstudios.hyquests.services;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
@@ -21,7 +20,7 @@ import com.martelstudios.hyquests.stores.*;
 import com.martelstudios.hyquests.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -36,10 +35,8 @@ import java.util.function.Consumer;
  * and unassign them on the events that concern them.
  */
 public class QuestProgressionService {
-    private static QuestProgressionService instance;
-
-    private QuestProgressionStore dataStore;
-    private ComponentType<EntityStore, QuestHistoryStoreComponent> playerHistoryStoreComponentType;
+    private final QuestProgressionStore dataStore;
+    private final ComponentType<EntityStore, QuestHistoryStoreComponent> playerHistoryStoreComponentType;
 
     public QuestProgressionService(QuestProgressionStore questProgressionStore, @Nonnull ComponentType<EntityStore, QuestHistoryStoreComponent> playerHistoryStoreComponentType) {
         this.dataStore = questProgressionStore;
@@ -47,7 +44,7 @@ public class QuestProgressionService {
     }
 
     public static QuestProgressionService get() {
-        return HyQuestsPlugin.get().questProgressionService;
+        return HyQuestsPlugin.get().getQuestProgressionService();
     }
 
     public ComponentType<EntityStore, QuestHistoryStoreComponent> getPlayerHistoryStoreComponentType() {
@@ -228,11 +225,26 @@ public class QuestProgressionService {
         return dataStore.get(questId);
     }
 
+    /**
+     * Progresses every quest of the visitor's type on the server. Prefer the overload taking a
+     * player's own quest ids: a visitor built for one player discards all the others anyway.
+     */
+    public <Q extends AbstractQuest<Q>> void progress(@Nonnull QuestVisitor<Q> visitor) {
+        progress(visitor, dataStore.getForType(visitor.getQuestType()));
+    }
+
+    /**
+     * Progresses only the given quests, skipping those of another type. The collection may be a
+     * live index: completing a quest unregisters it, and the sets involved tolerate that.
+     */
     @SuppressWarnings("unchecked")
-    public <Q extends AbstractQuest<Q>> void progress(QuestVisitor<Q> visitor) {
-        for (UUID id : dataStore.getForType(visitor.getQuestType())) {
+    public <Q extends AbstractQuest<Q>> void progress(@Nonnull QuestVisitor<Q> visitor, @Nonnull Collection<UUID> questIds) {
+        Class<Q> questType = visitor.getQuestType();
+
+        for (UUID id : questIds) {
             AbstractQuest<?> quest = dataStore.get(id);
-            if (quest == null) continue;
+            if (!questType.isInstance(quest)) continue;
+
             ((Q) quest).update(visitor);
         }
     }

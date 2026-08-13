@@ -41,6 +41,10 @@ public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
         var questStoreComponent = archetypeChunk.getComponent(index, QuestStoreComponent.getComponentType());
         if (playerRef == null || player == null || questStoreComponent == null) return;
 
+        // Gathering is pointless while the HUD would throttle the push away
+        QuestTrackerHud hud = QuestTrackerHud.get(player, playerRef);
+        if (!hud.shouldUpdate()) return;
+
         List<AbstractQuest<?>> inProgress = new ArrayList<>();
         for (UUID questId : questStoreComponent.questsRecord.getAllIds()) {
             var quest = QuestProgressionService.get().getQuest(questId);
@@ -49,6 +53,6 @@ public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
             }
         }
 
-        QuestTrackerHud.get(player, playerRef).pushUpdate(inProgress);
+        hud.pushUpdate(inProgress);
     }
 }

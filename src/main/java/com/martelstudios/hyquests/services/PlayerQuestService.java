@@ -22,7 +22,7 @@ import java.util.UUID;
 public class PlayerQuestService {
 
     public static PlayerQuestService get() {
-        return HyQuestsPlugin.get().playerQuestService;
+        return HyQuestsPlugin.get().getPlayerQuestService();
     }
 
     /**
