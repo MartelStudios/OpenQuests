@@ -1,10 +1,13 @@
 package com.martelstudios.hyquests.visitors;
 
+import com.hypixel.hytale.component.Holder;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
-import com.martelstudios.hyquests.PlayerAccess;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.models.GatherQuest;
 import com.martelstudios.hyquests.models.QuestState;
 
@@ -31,12 +34,25 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuest> {
      * which only exists on a live entity: this way an online and an offline player are counted
      * exactly the same way.
      */
-    public GatherQuestVisitor(@Nonnull UUID playerId, @Nonnull PlayerAccess access) {
-        this.playerId = playerId;
+    public GatherQuestVisitor(Ref<EntityStore> playerRef) {
+        var store = playerRef.getStore();
+        this.playerId = store.getComponent(playerRef, UUIDComponent.getComponentType()).getUuid();
 
         List<ItemContainer> containers = new ArrayList<>(InventoryComponent.EVERYTHING.length);
         for (var inventoryType : InventoryComponent.EVERYTHING) {
-            var inventory = access.getComponent(inventoryType);
+            var inventory = store.getComponent(playerRef, inventoryType);
+            if (inventory != null) containers.add(inventory.getInventory());
+        }
+
+        this.combinedItemContainer = new CombinedItemContainer(containers.toArray(new ItemContainer[0]));
+    }
+
+    public GatherQuestVisitor(Holder<EntityStore> playerHolder) {
+        this.playerId = playerHolder.getComponent(UUIDComponent.getComponentType()).getUuid();
+
+        List<ItemContainer> containers = new ArrayList<>(InventoryComponent.EVERYTHING.length);
+        for (var inventoryType : InventoryComponent.EVERYTHING) {
+            var inventory = playerHolder.getComponent(inventoryType);
             if (inventory != null) containers.add(inventory.getInventory());
         }
 
@@ -56,7 +72,8 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuest> {
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
 
-        LOGGER.at(Level.FINE).log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCount(), asset.getCount());
+        LOGGER.at(Level.FINE)
+              .log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCount(), asset.getCount());
     }
 
     @Override

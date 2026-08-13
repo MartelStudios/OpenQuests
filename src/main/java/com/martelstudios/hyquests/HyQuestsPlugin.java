@@ -22,10 +22,7 @@ import com.martelstudios.hyquests.models.InteractivelyPickupQuest;
 import com.martelstudios.hyquests.models.ReachLocationQuest;
 import com.martelstudios.hyquests.rewards.ItemQuestReward;
 import com.martelstudios.hyquests.rewards.QuestReward;
-import com.martelstudios.hyquests.services.PlayerQuestService;
-import com.martelstudios.hyquests.services.QuestProgressionService;
-import com.martelstudios.hyquests.services.UniverseQuestService;
-import com.martelstudios.hyquests.services.WorldQuestService;
+import com.martelstudios.hyquests.services.*;
 import com.martelstudios.hyquests.stores.*;
 
 import javax.annotation.Nonnull;
@@ -50,11 +47,13 @@ public class HyQuestsPlugin extends JavaPlugin {
     private QuestsStore questsStore;
     private ComponentType<EntityStore, QuestStoreComponent> questStoreComponentType;
     private ResourceType<EntityStore, WorldQuestStoreResource> worldStoreResourceType;
+    private ComponentType<EntityStore, QuestHistoryStoreComponent> questHistoryStoreComponentType;
 
+    private QuestProgressionService questProgressionService;
+    private QuestHistoryService questHistoryService;
     private UniverseQuestService universeQuestService;
     private WorldQuestService worldQuestService;
     private PlayerQuestService playerQuestService;
-    private QuestProgressionService questProgressionService;
 
     public HyQuestsPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -71,14 +70,16 @@ public class HyQuestsPlugin extends JavaPlugin {
         questProgressionStore = new QuestProgressionStore(new DiskDataStoreProvider(questProgressionsPath.toString()).create(QuestProgressionRecord.CODEC));
         questsStore = new QuestsStore(new DiskDataStoreProvider(questSetStorePath.toString()).create(QuestsRecord.CODEC));
 
+        questProgressionService = new QuestProgressionService(questProgressionStore);
+        questHistoryService = new QuestHistoryService();
+
         universeQuestService = new UniverseQuestService(questsStore);
         worldQuestService = new WorldQuestService();
         playerQuestService = new PlayerQuestService();
 
         questStoreComponentType = getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, "QuestStore", QuestStoreComponent.CODEC);
         worldStoreResourceType = getEntityStoreRegistry().registerResource(WorldQuestStoreResource.class, "QuestStore", WorldQuestStoreResource.CODEC);
-        ComponentType<EntityStore, QuestHistoryStoreComponent> questHistoryStoreComponentType = getEntityStoreRegistry().registerComponent(QuestHistoryStoreComponent.class, "QuestHistoryStore", QuestHistoryStoreComponent.CODEC);
-        questProgressionService = new QuestProgressionService(questProgressionStore, questHistoryStoreComponentType);
+        questHistoryStoreComponentType = getEntityStoreRegistry().registerComponent(QuestHistoryStoreComponent.class, "QuestHistoryStore", QuestHistoryStoreComponent.CODEC);
 
         registerQuestTypes();
         QuestReward.CODEC.register("Item", ItemQuestReward.class, ItemQuestReward.CODEC);
@@ -100,7 +101,7 @@ public class HyQuestsPlugin extends JavaPlugin {
         getEventRegistry().registerGlobal(QuestAssignedToPlayerEvent.class, QuestEvents::handleQuestAssignedToPlayer);
         getEventRegistry().registerGlobal(QuestRegisteredEvent.class, QuestEvents::handleQuestRegistered);
         getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, QuestEvents::handleQuestUnregistered);
-
+        getEventRegistry().registerGlobal(QuestCompletedEvent.class, questHistoryService::handleQuestCompletedEvent);
         getAssetRegistry().register(HytaleAssetStore.builder(QuestAsset.class, new DefaultAssetMap<>())
                                                     .setPath("HyQuests/Quests/")
                                                     .setCodec(QuestAsset.CODEC)
@@ -159,6 +160,10 @@ public class HyQuestsPlugin extends JavaPlugin {
         return questProgressionService;
     }
 
+    public QuestHistoryService getQuestHistoryService() {
+        return questHistoryService;
+    }
+
     public ComponentType<EntityStore, QuestStoreComponent> getQuestStoreComponentType() {
         return questStoreComponentType;
     }
@@ -166,4 +171,10 @@ public class HyQuestsPlugin extends JavaPlugin {
     public ResourceType<EntityStore, WorldQuestStoreResource> getWorldStoreResourceType() {
         return worldStoreResourceType;
     }
+
+    public ComponentType<EntityStore, QuestHistoryStoreComponent> getQuestHistoryStoreComponentType() {
+        return questHistoryStoreComponentType;
+    }
+
+
 }

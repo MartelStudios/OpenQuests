@@ -2,8 +2,7 @@ package com.martelstudios.hyquests.events;
 
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.hyquests.PlayerAccess;
-import com.martelstudios.hyquests.services.QuestProgressionService;
+import com.martelstudios.hyquests.services.QuestHistoryService;
 
 public class WorldEvents {
     /**
@@ -13,9 +12,9 @@ public class WorldEvents {
      */
     public static void handleAddPlayerToWorldEvent(AddPlayerToWorldEvent addPlayerToWorldEvent) {
         var holder = addPlayerToWorldEvent.getHolder();
+        var playerRef = holder.getComponent(PlayerRef.getComponentType());
+        if (playerRef == null || playerRef.getReference() == null) return;
 
-        // Safe to re-run on every world change: a granted record is no longer claimable
-        var playerId = holder.getComponent(PlayerRef.getComponentType()).getUuid();
-        QuestProgressionService.get().claimAutoRewards(playerId, PlayerAccess.of(holder));
+        QuestHistoryService.get().claimAutoRewards(playerRef.getReference());
     }
 }

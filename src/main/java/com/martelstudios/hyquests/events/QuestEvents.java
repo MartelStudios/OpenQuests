@@ -1,9 +1,7 @@
 package com.martelstudios.hyquests.events;
 
 import com.hypixel.hytale.server.core.universe.Universe;
-import com.martelstudios.hyquests.PlayerAccess;
 import com.martelstudios.hyquests.models.GatherQuest;
-import com.martelstudios.hyquests.services.QuestProgressionService;
 import com.martelstudios.hyquests.visitors.GatherQuestVisitor;
 
 import java.util.UUID;
@@ -18,14 +16,15 @@ public class QuestEvents {
 
         UUID playerId = event.getPlayerId();
 
-        // Stored data is stale for an online player, so only fall back to it when they are away
-        boolean online = QuestProgressionService.get()
-                                                .withOnlinePlayer(playerId, access -> gatherQuest.update(new GatherQuestVisitor(playerId, access)));
-        if (online) return;
+        var playerRef = Universe.get().getPlayer(playerId);
 
-        Universe.get()
-                .getPlayerStorage()
-                .update(playerId, holder -> gatherQuest.update(new GatherQuestVisitor(playerId, PlayerAccess.of(holder))));
+        if (playerRef != null && playerRef.getReference() != null) {
+            gatherQuest.update(new GatherQuestVisitor(playerRef.getReference()));
+        } else {
+            Universe.get()
+                    .getPlayerStorage()
+                    .update(playerId, holder -> gatherQuest.update(new GatherQuestVisitor(holder)));
+        }
     }
 
     public static void handleQuestRegistered(QuestRegisteredEvent questRegisteredEvent) {

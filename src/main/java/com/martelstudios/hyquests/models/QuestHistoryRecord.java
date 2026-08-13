@@ -56,6 +56,10 @@ public class QuestHistoryRecord {
         return questAssetId;
     }
 
+    public QuestAsset getAsset() {
+        return QuestAsset.getAsset(questAssetId);
+    }
+
     public QuestState getState() {
         return state;
     }

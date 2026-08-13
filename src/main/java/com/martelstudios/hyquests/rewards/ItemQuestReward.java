@@ -3,11 +3,14 @@ package com.martelstudios.hyquests.rewards;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.hyquests.assets.QuestAsset;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -33,11 +36,11 @@ public class ItemQuestReward extends QuestReward {
     private ItemQuestReward() {}
 
     @Override
-    public void grant(@Nonnull QuestRewardContext context) {
+    public void grant(@Nonnull QuestAsset questAsset, @Nonnull Ref<EntityStore> playerRef) {
         List<ItemContainer> containers = new ArrayList<>(InventoryComponent.HOTBAR_FIRST.length);
 
         for (var inventoryType : InventoryComponent.HOTBAR_FIRST) {
-            var inventory = context.access().getComponent(inventoryType);
+            var inventory = playerRef.getStore().getComponent(playerRef, inventoryType);
             if (inventory != null) containers.add(inventory.getInventory());
         }
 

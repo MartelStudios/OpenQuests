@@ -4,6 +4,8 @@ import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.HyQuestsPlugin;
@@ -23,6 +25,32 @@ public class PlayerQuestService {
 
     public static PlayerQuestService get() {
         return HyQuestsPlugin.get().getPlayerQuestService();
+    }
+
+    public void addQuestToPlayerStore(@Nonnull UUID questId, @Nonnull UUID playerId) {
+        PlayerRef online = Universe.get().getPlayer(playerId);
+        if (online != null) {
+            var ref = online.getReference();
+            if (ref != null) {
+                var world = ref.getStore().getExternalData().getWorld();
+                world.execute(() -> addQuestToPlayerStore(questId, ref));
+            }
+        } else {
+            Universe.get().getPlayerStorage().update(playerId, holder -> addQuestToPlayerStore(questId, holder));
+        }
+    }
+
+    public void removeQuestFromPlayerStore(@Nonnull UUID questId, @Nonnull UUID playerId) {
+        PlayerRef online = Universe.get().getPlayer(playerId);
+        if (online != null) {
+            var ref = online.getReference();
+            if (ref != null) {
+                var world = ref.getStore().getExternalData().getWorld();
+                world.execute(() -> removeQuestFromPlayerStore(questId, ref));
+            }
+        } else {
+            Universe.get().getPlayerStorage().update(playerId, holder -> removeQuestFromPlayerStore(questId, holder));
+        }
     }
 
     /**

@@ -1,8 +1,12 @@
 package com.martelstudios.hyquests.rewards;
 
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.hyquests.assets.QuestAsset;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 /**
  * Something handed to a player when a quest reaches a terminal state. Which rewards apply is
@@ -18,5 +22,5 @@ public abstract class QuestReward {
     /**
      * Grants this reward. Called once per player, and never twice for the same completion.
      */
-    public abstract void grant(@Nonnull QuestRewardContext context);
+    public abstract void grant(@Nonnull QuestAsset questAsset, @Nonnull Ref<EntityStore> playerRef);
 }

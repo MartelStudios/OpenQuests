@@ -1,29 +1,20 @@
 package com.martelstudios.hyquests.services;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.HyQuestsPlugin;
-import com.martelstudios.hyquests.PlayerAccess;
 import com.martelstudios.hyquests.assets.QuestAsset;
 import com.martelstudios.hyquests.events.QuestCompletedEvent;
 import com.martelstudios.hyquests.events.QuestRegisteredEvent;
 import com.martelstudios.hyquests.events.QuestUnregisteredEvent;
 import com.martelstudios.hyquests.models.AbstractQuest;
-import com.martelstudios.hyquests.models.QuestHistoryRecord;
-import com.martelstudios.hyquests.rewards.QuestReward;
-import com.martelstudios.hyquests.rewards.QuestRewardContext;
-import com.martelstudios.hyquests.stores.*;
+import com.martelstudios.hyquests.stores.QuestProgressionStore;
+import com.martelstudios.hyquests.stores.QuestStoreComponent;
 import com.martelstudios.hyquests.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
-import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * Owns the lifecycle of quest instances: registration, progression, completion and rewards.
@@ -36,19 +27,13 @@ import java.util.function.Consumer;
  */
 public class QuestProgressionService {
     private final QuestProgressionStore dataStore;
-    private final ComponentType<EntityStore, QuestHistoryStoreComponent> playerHistoryStoreComponentType;
 
-    public QuestProgressionService(QuestProgressionStore questProgressionStore, @Nonnull ComponentType<EntityStore, QuestHistoryStoreComponent> playerHistoryStoreComponentType) {
+    public QuestProgressionService(QuestProgressionStore questProgressionStore) {
         this.dataStore = questProgressionStore;
-        this.playerHistoryStoreComponentType = playerHistoryStoreComponentType;
     }
 
     public static QuestProgressionService get() {
         return HyQuestsPlugin.get().getQuestProgressionService();
-    }
-
-    public ComponentType<EntityStore, QuestHistoryStoreComponent> getPlayerHistoryStoreComponentType() {
-        return playerHistoryStoreComponentType;
     }
 
     /**
@@ -118,13 +103,7 @@ public class QuestProgressionService {
         AbstractQuest<?> quest = getQuest(questId);
         if (quest == null) return null;
 
-        Set<UUID> players = Set.copyOf(quest.getPlayers());
-
         unregisterQuest(questId);
-
-        for (UUID playerId : players) {
-            archiveForPlayer(quest, playerId);
-        }
 
         HytaleServer.get()
                     .getEventBus()
@@ -132,93 +111,6 @@ public class QuestProgressionService {
                     .dispatch(new QuestCompletedEvent(quest));
 
         return quest;
-    }
-
-    /**
-     * Runs an action against a live player's components, on their world thread.
-     *
-     * @return {@code false} if the player is offline, in which case nothing ran: rewards must
-     * never be written to stored data, which their entity overwrites on disconnect.
-     */
-    public boolean withOnlinePlayer(@Nonnull UUID playerId, @Nonnull Consumer<PlayerAccess> action) {
-        PlayerRef online = Universe.get().getPlayer(playerId);
-        if (online == null) return false;
-
-        var ref = online.getReference();
-        if (ref == null) return false;
-
-        var world = ref.getStore().getExternalData().getWorld();
-        world.execute(() -> action.accept(PlayerAccess.of(ref)));
-        return true;
-    }
-
-    /**
-     * Writes the quest's completion record into a player's history, online or not. Rewards are
-     * only granted to a player who is there to receive them; an offline player keeps a claimable
-     * record, collected by {@link #claimAutoRewards} on their next connection.
-     */
-    private void archiveForPlayer(@Nonnull AbstractQuest<?> quest, @Nonnull UUID playerId) {
-        var record = new QuestHistoryRecord(quest);
-        var asset = quest.getAsset();
-        boolean autoClaim = asset != null && asset.isAutoClaim();
-
-        boolean online = withOnlinePlayer(playerId, access -> {
-            if (autoClaim) {
-                grantRewards(asset.getRewards(quest.getState()), new QuestRewardContext(playerId, access));
-                record.setClaimed(true);
-            }
-
-            access.ensureAndGetComponent(playerHistoryStoreComponentType).questHistoryStore.register(record);
-        });
-
-        if (online) return;
-
-        Universe.get()
-                .getPlayerStorage()
-                .update(playerId, holder -> holder.ensureAndGetComponent(playerHistoryStoreComponentType).questHistoryStore.register(record));
-    }
-
-    /**
-     * Grants what a player earned while they were away. Called once they are connected, since
-     * completions that happened offline could not hand their rewards over at the time.
-     */
-    public void claimAutoRewards(@Nonnull UUID playerId, @Nonnull PlayerAccess access) {
-        var history = access.ensureAndGetComponent(playerHistoryStoreComponentType).questHistoryStore;
-
-        for (QuestHistoryRecord record : history.getAll()) {
-            if (!record.isClaimable()) continue;
-
-            QuestAsset asset = QuestAsset.getAsset(record.getQuestAssetId());
-            if (asset == null || !asset.isAutoClaim()) continue;
-
-            grantRewards(asset.getRewards(record.getState()), new QuestRewardContext(playerId, access));
-            record.setClaimed(true);
-        }
-    }
-
-    /**
-     * Claims a completion's rewards, if it is still claimable. Marks the record as claimed, so
-     * rewards can never be granted twice.
-     */
-    public void claimRewards(@Nonnull UUID questId, @Nonnull UUID playerId) {
-        withOnlinePlayer(playerId, access -> {
-            var history = access.ensureAndGetComponent(playerHistoryStoreComponentType).questHistoryStore;
-
-            QuestHistoryRecord record = history.get(questId);
-            if (record == null || !record.isClaimable()) return;
-
-            QuestAsset asset = QuestAsset.getAsset(record.getQuestAssetId());
-            if (asset == null) return;
-
-            grantRewards(asset.getRewards(record.getState()), new QuestRewardContext(playerId, access));
-            record.setClaimed(true);
-        });
-    }
-
-    private void grantRewards(@Nonnull QuestReward[] rewards, @Nonnull QuestRewardContext context) {
-        for (QuestReward reward : rewards) {
-            reward.grant(context);
-        }
     }
 
     public AbstractQuest<?> getQuest(UUID questId) {

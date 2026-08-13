@@ -10,7 +10,6 @@ import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.assets.QuestAsset;
 import com.martelstudios.hyquests.events.QuestUpdatedEvent;
@@ -93,9 +92,7 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
      * Called by {@link QuestProgressionService#unregisterQuest}; implementations must stay safe to
      * call on an already-unregistered quest.
      */
-    public void onUnregistered() {
-        removeAllPlayers();
-    }
+    public void onUnregistered() {}
 
     public void addPlayersFromPlayerRef(@Nonnull Collection<PlayerRef> playerRefs) {
         playerRefs.forEach(this::addPlayer);
@@ -109,18 +106,7 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
         if (!getPlayers().add(playerId)) return;
         markDirty();
 
-        PlayerRef online = Universe.get().getPlayer(playerId);
-        if (online != null) {
-            var ref = online.getReference();
-            if (ref != null) {
-                var world = ref.getStore().getExternalData().getWorld();
-                world.execute(() -> PlayerQuestService.get().addQuestToPlayerStore(getId(), ref));
-            }
-        } else {
-            Universe.get()
-                    .getPlayerStorage()
-                    .update(playerId, holder -> PlayerQuestService.get().addQuestToPlayerStore(getId(), holder));
-        }
+        PlayerQuestService.get().addQuestToPlayerStore(getId(), playerId);
 
         onPlayerAdded(playerId);
     }
@@ -142,24 +128,8 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
         if (!getPlayers().remove(playerId)) return;
         markDirty();
 
-        PlayerRef online = Universe.get().getPlayer(playerId);
-        if (online != null) {
-            var ref = online.getReference();
-            if (ref != null) {
-                var world = ref.getStore().getExternalData().getWorld();
-                world.execute(() -> PlayerQuestService.get().removeQuestFromPlayerStore(getId(), ref));
-            }
-        } else {
-            Universe.get()
-                    .getPlayerStorage()
-                    .update(playerId, holder -> PlayerQuestService.get().removeQuestFromPlayerStore(getId(), holder));
-        }
-
+        PlayerQuestService.get().removeQuestFromPlayerStore(getId(), playerId);
         onPlayerRemoved(playerId);
-    }
-
-    public void removeAllPlayers() {
-        new ArrayList<>(getPlayers()).forEach(this::removePlayer);
     }
 
     /**
