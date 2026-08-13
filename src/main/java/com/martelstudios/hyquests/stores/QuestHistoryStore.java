@@ -47,6 +47,10 @@ public class QuestHistoryStore {
         return this.records.putIfAbsent(record.getId(), record) == null;
     }
 
+    public boolean unregister(@Nonnull QuestHistoryRecord record) {
+        return this.records.remove(record.getId(), record);
+    }
+
     /**
      * @param questId the id the quest had while it was live
      */

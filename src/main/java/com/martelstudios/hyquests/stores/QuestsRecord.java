@@ -49,6 +49,22 @@ public class QuestsRecord {
     }
 
     /**
+     * Resolves every registered id, loading them first if needed.
+     *
+     * @return the quests of this scope, without the ids that no longer resolve.
+     */
+    public List<AbstractQuest<?>> getAllQuests() {
+        loadAll();
+
+        List<AbstractQuest<?>> quests = new ArrayList<>(questIds.size());
+        for (UUID questId : questIds) {
+            AbstractQuest<?> quest = QuestProgressionService.get().getQuest(questId);
+            if (quest != null) quests.add(quest);
+        }
+        return quests;
+    }
+
+    /**
      * @return the live set of registered quest ids.
      */
     public Set<UUID> getAllIds() {

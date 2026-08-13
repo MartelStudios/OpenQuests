@@ -6,7 +6,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.assets.QuestAsset;
 
 import javax.annotation.Nonnull;
-import java.util.UUID;
 
 /**
  * Something handed to a player when a quest reaches a terminal state. Which rewards apply is

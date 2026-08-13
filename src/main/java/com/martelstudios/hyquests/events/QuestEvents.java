@@ -6,6 +6,10 @@ import com.martelstudios.hyquests.visitors.GatherQuestVisitor;
 
 import java.util.UUID;
 
+/**
+ * Handlers tied to a concrete quest type rather than to a service, kept out of the core services
+ * so those stay agnostic of the quest types shipped on top of them.
+ */
 public class QuestEvents {
     /**
      * Catches a freshly assigned {@link GatherQuest} up with what the player already holds, so
@@ -27,11 +31,4 @@ public class QuestEvents {
         }
     }
 
-    public static void handleQuestRegistered(QuestRegisteredEvent questRegisteredEvent) {
-        questRegisteredEvent.getQuest().onRegistered();
-    }
-
-    public static void handleQuestUnregistered(QuestUnregisteredEvent questUnregisteredEvent) {
-        questUnregisteredEvent.getQuest().onUnregistered();
-    }
 }

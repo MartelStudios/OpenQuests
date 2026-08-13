@@ -93,14 +93,12 @@ public class HyQuestsPlugin extends JavaPlugin {
 
         // All wiring lives here, so the plugin registry unregisters it on disable
         getEventRegistry().registerGlobal(LoadAssetEvent.PRIORITY_LOAD_LATE, LoadAssetEvent.class, QuestAssetValidator::handleLoadAsset);
-        getEventRegistry().registerGlobal(PlayerConnectEvent.class, PlayerEvents::handlePlayerConnectEvent);
+        getEventRegistry().registerGlobal(PlayerConnectEvent.class, playerQuestService::handlePlayerConnectEvent);
         getEventRegistry().registerGlobal(PlayerConnectEvent.class, universeQuestService::handlePlayerConnectEvent);
         getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, worldQuestService::handleAddPlayerToWorldEvent);
-        getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, WorldEvents::handleAddPlayerToWorldEvent);
+        getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, questHistoryService::handleAddPlayerToWorldEvent);
         getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, worldQuestService::handleRemovedPlayerFromWorldEvent);
         getEventRegistry().registerGlobal(QuestPlayerAddedEvent.class, QuestEvents::handleQuestAssignedToPlayer);
-        getEventRegistry().registerGlobal(QuestRegisteredEvent.class, QuestEvents::handleQuestRegistered);
-        getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, QuestEvents::handleQuestUnregistered);
         getEventRegistry().registerGlobal(QuestCompletedEvent.class, questHistoryService::handleQuestCompletedEvent);
         getAssetRegistry().register(HytaleAssetStore.builder(QuestAsset.class, new DefaultAssetMap<>())
                                                     .setPath("HyQuests/Quests/")

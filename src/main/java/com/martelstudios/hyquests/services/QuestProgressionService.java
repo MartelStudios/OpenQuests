@@ -14,6 +14,7 @@ import com.martelstudios.hyquests.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -68,6 +69,8 @@ public class QuestProgressionService {
      */
     public void registerQuest(@Nonnull AbstractQuest<?> quest) {
         dataStore.add(quest);
+        quest.onRegistered();
+
         HytaleServer.get()
                     .getEventBus()
                     .dispatchFor(QuestRegisteredEvent.class, quest.getId())
@@ -84,6 +87,7 @@ public class QuestProgressionService {
         if (quest == null) return null;
 
         AbstractQuest<?> removed = dataStore.removeAndDeleteFromDisk(questId);
+        quest.onUnregistered();
 
         HytaleServer.get()
                     .getEventBus()
@@ -115,6 +119,30 @@ public class QuestProgressionService {
 
     public AbstractQuest<?> getQuest(UUID questId) {
         return dataStore.get(questId);
+    }
+
+    /**
+     * @return every quest currently loaded, whatever its scope or type.
+     */
+    @Nonnull
+    public Collection<AbstractQuest<?>> getAllQuests() {
+        return dataStore.getAll();
+    }
+
+    /**
+     * @return the ids of every loaded quest of a concrete type, empty if none.
+     */
+    @Nonnull
+    public Set<UUID> getQuestIdsForType(@Nonnull Class<? extends AbstractQuest<?>> questClass) {
+        return dataStore.getForType(questClass);
+    }
+
+    /**
+     * Pulls every persisted quest into memory. Not needed in normal operation, where quests are
+     * loaded on demand through the scope that references them.
+     */
+    public void loadAllQuests() {
+        dataStore.loadAllFromDisk();
     }
 
     /**

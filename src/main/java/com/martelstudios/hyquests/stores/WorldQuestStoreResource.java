@@ -40,4 +40,10 @@ public class WorldQuestStoreResource implements Resource<EntityStore> {
         return HyQuestsPlugin.get().getWorldStoreResourceType();
     }
 
+    /**
+     * Pulls this world's quests into the datastore. Mirrors {@link QuestStoreComponent#loadQuests()}.
+     */
+    public void loadQuests() {
+        questsRecord.loadAll();
+    }
 }

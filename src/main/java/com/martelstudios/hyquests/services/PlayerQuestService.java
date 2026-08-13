@@ -4,6 +4,7 @@ import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
+import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -13,6 +14,7 @@ import com.martelstudios.hyquests.events.QuestPlayerAddedEvent;
 import com.martelstudios.hyquests.events.QuestPlayerRemovedEvent;
 import com.martelstudios.hyquests.models.AbstractQuest;
 import com.martelstudios.hyquests.stores.QuestStoreComponent;
+import com.martelstudios.hyquests.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -26,6 +28,30 @@ public class PlayerQuestService {
 
     public static PlayerQuestService get() {
         return HyQuestsPlugin.get().getPlayerQuestService();
+    }
+
+    /**
+     * @return the quest index of a live player, created if they have none yet.
+     */
+    @Nonnull
+    public QuestsRecord getQuests(@Nonnull Ref<EntityStore> ref) {
+        return ref.getStore().ensureAndGetComponent(ref, QuestStoreComponent.getComponentType()).questsRecord;
+    }
+
+    /**
+     * @return the quest index of a player loaded from storage, created if they have none yet.
+     */
+    @Nonnull
+    public QuestsRecord getQuests(@Nonnull Holder<EntityStore> holder) {
+        return holder.ensureAndGetComponent(QuestStoreComponent.getComponentType()).questsRecord;
+    }
+
+    /**
+     * Pulls the player's own quests into the datastore. Scope services assign theirs separately,
+     * each on the event that concerns it.
+     */
+    public void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
+        getQuests(playerConnectEvent.getHolder()).loadAll();
     }
 
     public void addQuestToPlayerStore(@Nonnull UUID questId, @Nonnull UUID playerId) {

@@ -104,6 +104,24 @@ public class QuestProgressionStore {
         }
     }
 
+    /**
+     * Loads every persisted quest from disk into memory, rebuilding the type index.
+     */
+    public void loadAllFromDisk() {
+        Map<String, QuestProgressionRecord> records;
+        try {
+            records = dataStore.loadAll();
+        } catch (IOException e) {
+            LOGGER.atWarning().withCause(e).log("Failed to load quests from disk");
+            return;
+        }
+
+        for (QuestProgressionRecord record : records.values()) {
+            if (record == null || record.quest == null) continue;
+            add(record.quest);
+        }
+    }
+
     public AbstractQuest<?> load(UUID id) {
         AbstractQuest<?> quest = quests.get(id);
         if (quest != null) return quest;

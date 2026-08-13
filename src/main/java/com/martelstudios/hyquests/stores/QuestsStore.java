@@ -56,4 +56,11 @@ public class QuestsStore {
 
         dataStore.save(scope, record);
     }
+
+    /**
+     * Persists every known scope, for plugins that keep several of their own.
+     */
+    public void saveAll() {
+        quests.forEach(dataStore::save);
+    }
 }
