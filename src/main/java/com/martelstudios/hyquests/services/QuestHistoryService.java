@@ -60,7 +60,7 @@ public class QuestHistoryService {
     }
 
     private void grantRewards(@Nonnull QuestHistoryRecord record, @Nonnull Ref<EntityStore> playerRef) {
-        if (!record.isClaimed()) return;
+        if (record.isClaimed()) return;
 
         if (!record.isClaimable()) {
             record.setClaimed(true);

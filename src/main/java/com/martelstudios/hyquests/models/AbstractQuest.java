@@ -6,11 +6,8 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
-import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.assets.QuestAsset;
 import com.martelstudios.hyquests.events.QuestUpdatedEvent;
 import com.martelstudios.hyquests.services.PlayerQuestService;
@@ -18,7 +15,9 @@ import com.martelstudios.hyquests.services.QuestProgressionService;
 import com.martelstudios.hyquests.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -92,14 +91,10 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
      * Called by {@link QuestProgressionService#unregisterQuest}; implementations must stay safe to
      * call on an already-unregistered quest.
      */
-    public void onUnregistered() {}
-
-    public void addPlayersFromPlayerRef(@Nonnull Collection<PlayerRef> playerRefs) {
-        playerRefs.forEach(this::addPlayer);
-    }
-
-    public void addPlayer(@Nonnull PlayerRef playerRef) {
-        addPlayer(playerRef.getUuid());
+    public void onUnregistered() {
+        for (UUID playerId : players) {
+            PlayerQuestService.get().removeQuestFromPlayerStore(getId(), playerId);
+        }
     }
 
     public void addPlayer(@Nonnull UUID playerId) {
@@ -107,20 +102,6 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
         markDirty();
 
         PlayerQuestService.get().addQuestToPlayerStore(getId(), playerId);
-
-        onPlayerAdded(playerId);
-    }
-
-    /**
-     * Assigns this quest through an already-resolved holder, for callers that hold one. A
-     * connecting player is neither online yet nor safe to reach through stored data, so their
-     * incoming holder is the only handle that sticks.
-     */
-    public void addPlayer(@Nonnull UUID playerId, @Nonnull Holder<EntityStore> holder) {
-        if (!getPlayers().add(playerId)) return;
-        markDirty();
-
-        PlayerQuestService.get().addQuestToPlayerStore(getId(), holder);
         onPlayerAdded(playerId);
     }
 

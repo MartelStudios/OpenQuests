@@ -40,8 +40,8 @@ public class QuestsRecord {
         return this.questIds.add(questId);
     }
 
-    public void unregister(UUID questId) {
-        this.questIds.remove(questId);
+    public boolean unregister(UUID questId) {
+        return this.questIds.remove(questId);
     }
 
     public boolean contains(UUID questId) {

@@ -98,7 +98,7 @@ public class HyQuestsPlugin extends JavaPlugin {
         getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, worldQuestService::handleAddPlayerToWorldEvent);
         getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, WorldEvents::handleAddPlayerToWorldEvent);
         getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, worldQuestService::handleRemovedPlayerFromWorldEvent);
-        getEventRegistry().registerGlobal(QuestAssignedToPlayerEvent.class, QuestEvents::handleQuestAssignedToPlayer);
+        getEventRegistry().registerGlobal(QuestPlayerAddedEvent.class, QuestEvents::handleQuestAssignedToPlayer);
         getEventRegistry().registerGlobal(QuestRegisteredEvent.class, QuestEvents::handleQuestRegistered);
         getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, QuestEvents::handleQuestUnregistered);
         getEventRegistry().registerGlobal(QuestCompletedEvent.class, questHistoryService::handleQuestCompletedEvent);

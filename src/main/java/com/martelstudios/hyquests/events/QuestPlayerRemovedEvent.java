@@ -11,13 +11,13 @@ import java.util.UUID;
  * player, world, or universe). Unlike {@link QuestRegisteredEvent} (fired once per quest instance),
  * this fires once per (quest, player) pair — the right hook for per-player catch-up logic.
  */
-public class QuestAssignedToPlayerEvent implements IEvent<UUID> {
+public class QuestPlayerRemovedEvent implements IEvent<UUID> {
     @Nonnull
     private final AbstractQuest<?> quest;
     @Nonnull
     private final UUID playerId;
 
-    public QuestAssignedToPlayerEvent(@Nonnull AbstractQuest<?> quest, @Nonnull UUID playerId) {
+    public QuestPlayerRemovedEvent(@Nonnull AbstractQuest<?> quest, @Nonnull UUID playerId) {
         this.quest = quest;
         this.playerId = playerId;
     }

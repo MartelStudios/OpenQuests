@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * service assigns them on world entry and takes them back on world exit.
  */
 public class WorldQuestService {
-    @Nonnull
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     private final ConcurrentHashMap<UUID, EventRegistration<UUID, QuestUnregisteredEvent>> questUnregisteredListeners = new ConcurrentHashMap<>();
@@ -49,7 +48,10 @@ public class WorldQuestService {
         LOGGER.atInfo().log("Added quest %s to world %s", questId, world.getName());
 
         trackQuestForWorld(world, questId);
-        quest.addPlayersFromPlayerRef(world.getPlayerRefs());
+
+        for (PlayerRef playerRef : world.getPlayerRefs()) {
+            quest.addPlayer(playerRef.getUuid());
+        }
     }
 
     public void removeQuest(@Nonnull World world, @Nonnull UUID questId) {
@@ -127,8 +129,8 @@ public class WorldQuestService {
                       .add(world.getWorldConfig().getUuid());
 
         questUnregisteredListeners.computeIfAbsent(questId, id -> HytaleServer.get()
-                                                                             .getEventBus()
-                                                                             .register(QuestUnregisteredEvent.class, id, this::handleQuestUnregisteredEvent));
+                                                                              .getEventBus()
+                                                                              .register(QuestUnregisteredEvent.class, id, this::handleQuestUnregisteredEvent));
     }
 
     private void untrackQuestForWorld(World world, UUID questId) {

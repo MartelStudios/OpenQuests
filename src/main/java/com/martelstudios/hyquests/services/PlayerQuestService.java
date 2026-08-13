@@ -9,7 +9,8 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.HyQuestsPlugin;
-import com.martelstudios.hyquests.events.QuestAssignedToPlayerEvent;
+import com.martelstudios.hyquests.events.QuestPlayerAddedEvent;
+import com.martelstudios.hyquests.events.QuestPlayerRemovedEvent;
 import com.martelstudios.hyquests.models.AbstractQuest;
 import com.martelstudios.hyquests.stores.QuestStoreComponent;
 
@@ -40,6 +41,33 @@ public class PlayerQuestService {
         }
     }
 
+    /**
+     * Must be called on the world thread the given ref belongs to (e.g. inside {@link World#execute}).
+     */
+    public void addQuestToPlayerStore(@Nonnull UUID questId, @Nonnull Ref<EntityStore> ref) {
+        var questStoreComponent = ref.getStore().ensureAndGetComponent(ref, QuestStoreComponent.getComponentType());
+        var playerId = ref.getStore().getComponent(ref, UUIDComponent.getComponentType()).getUuid();
+        addQuestToPlayerStore(questStoreComponent, questId, playerId);
+    }
+
+    public void addQuestToPlayerStore(@Nonnull UUID questId, @Nonnull Holder<EntityStore> holder) {
+        var questStoreComponent = holder.ensureAndGetComponent(QuestStoreComponent.getComponentType());
+        var playerId = holder.getComponent(UUIDComponent.getComponentType()).getUuid();
+        addQuestToPlayerStore(questStoreComponent, questId, playerId);
+    }
+
+    public void addQuestToPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull UUID questId, @Nonnull UUID playerId) {
+        AbstractQuest<?> quest = QuestProgressionService.get().getQuest(questId);
+        if (quest == null) return;
+
+        if (!playerStore.questsRecord.register(questId)) return;
+
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestPlayerAddedEvent.class, playerId)
+                    .dispatch(new QuestPlayerAddedEvent(quest, playerId));
+    }
+
     public void removeQuestFromPlayerStore(@Nonnull UUID questId, @Nonnull UUID playerId) {
         PlayerRef online = Universe.get().getPlayer(playerId);
         if (online != null) {
@@ -56,43 +84,27 @@ public class PlayerQuestService {
     /**
      * Must be called on the world thread the given ref belongs to (e.g. inside {@link World#execute}).
      */
-    public void addQuestToPlayerStore(@Nonnull UUID questId, @Nonnull Ref<EntityStore> ref) {
+    public void removeQuestFromPlayerStore(@Nonnull UUID questId, @Nonnull Ref<EntityStore> ref) {
         var questStoreComponent = ref.getStore().ensureAndGetComponent(ref, QuestStoreComponent.getComponentType());
         var playerId = ref.getStore().getComponent(ref, UUIDComponent.getComponentType()).getUuid();
-        addQuestToPlayerStore(questStoreComponent, questId, playerId);
-    }
-
-    public void addQuestToPlayerStore(@Nonnull UUID questId, @Nonnull Holder<EntityStore> holder) {
-        var questStoreComponent = holder.ensureAndGetComponent(QuestStoreComponent.getComponentType());
-        var playerId = holder.getComponent(UUIDComponent.getComponentType()).getUuid();
-        addQuestToPlayerStore(questStoreComponent, questId, playerId);
-    }
-
-    /**
-     * Fires {@link QuestAssignedToPlayerEvent} only when the quest was not already indexed, so
-     * handlers do not re-run on every world re-entry.
-     */
-    public void addQuestToPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull UUID questId, @Nonnull UUID playerId) {
-        AbstractQuest<?> quest = QuestProgressionService.get().getQuest(questId);
-        if (quest == null) return;
-
-        if (!playerStore.questsRecord.register(questId)) return;
-
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestAssignedToPlayerEvent.class, playerId)
-                    .dispatch(new QuestAssignedToPlayerEvent(quest, playerId));
-    }
-
-    /**
-     * Must be called on the world thread the given ref belongs to (e.g. inside {@link World#execute}).
-     */
-    public void removeQuestFromPlayerStore(@Nonnull UUID questId, @Nonnull Ref<EntityStore> ref) {
-        ref.getStore()
-           .ensureAndGetComponent(ref, QuestStoreComponent.getComponentType()).questsRecord.unregister(questId);
+        removeQuestFromPlayerStore(questStoreComponent, questId, playerId);
     }
 
     public void removeQuestFromPlayerStore(@Nonnull UUID questId, @Nonnull Holder<EntityStore> holder) {
-        holder.ensureAndGetComponent(QuestStoreComponent.getComponentType()).questsRecord.unregister(questId);
+        var questStoreComponent = holder.ensureAndGetComponent(QuestStoreComponent.getComponentType());
+        var playerId = holder.getComponent(UUIDComponent.getComponentType()).getUuid();
+        removeQuestFromPlayerStore(questStoreComponent, questId, playerId);
+    }
+
+    public void removeQuestFromPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull UUID questId, @Nonnull UUID playerId) {
+        AbstractQuest<?> quest = QuestProgressionService.get().getQuest(questId);
+        if (quest == null) return;
+
+        if (!playerStore.questsRecord.unregister(questId)) return;
+
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestPlayerRemovedEvent.class, playerId)
+                    .dispatch(new QuestPlayerRemovedEvent(quest, playerId));
     }
 }

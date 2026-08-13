@@ -1,6 +1,7 @@
 package com.martelstudios.hyquests.services;
 
 import com.hypixel.hytale.event.EventRegistration;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -21,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * scope: the service assigns them to whoever is online, and to whoever connects later.
  */
 public class UniverseQuestService {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
     private static final String UNIVERSE_QUEST_INDEX_KEY = "universe";
 
     private final QuestsStore questsStore;
@@ -49,11 +52,18 @@ public class UniverseQuestService {
 
         if (!getQuests().register(questId)) return;
 
+        LOGGER.atInfo().log("Added quest %s to universe", questId);
+
         trackQuest(questId);
-        quest.addPlayersFromPlayerRef(Universe.get().getPlayers());
+
+        for (PlayerRef playerRef : Universe.get().getPlayers()) {
+            quest.addPlayer(playerRef.getUuid());
+        }
     }
 
     public void removeQuest(@Nonnull UUID questId) {
+        LOGGER.atInfo().log("Removing quest %s from universe", questId);
+
         getQuests().unregister(questId);
         untrackQuest(questId);
     }
@@ -97,7 +107,7 @@ public class UniverseQuestService {
                 continue;
             }
 
-            quest.addPlayer(playerRef.getUuid(), holder);
+            quest.addPlayer(playerRef.getUuid());
         }
     }
 
@@ -110,8 +120,8 @@ public class UniverseQuestService {
      */
     private void trackQuest(UUID questId) {
         questUnregisteredListeners.computeIfAbsent(questId, id -> HytaleServer.get()
-                                                                             .getEventBus()
-                                                                             .register(QuestUnregisteredEvent.class, id, this::handleQuestUnregisteredEvent));
+                                                                              .getEventBus()
+                                                                              .register(QuestUnregisteredEvent.class, id, this::handleQuestUnregisteredEvent));
     }
 
     private void untrackQuest(UUID questId) {
