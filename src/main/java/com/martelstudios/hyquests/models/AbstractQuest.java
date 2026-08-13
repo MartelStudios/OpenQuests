@@ -6,23 +6,20 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
+import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
-import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.assets.QuestAsset;
 import com.martelstudios.hyquests.events.QuestUpdatedEvent;
 import com.martelstudios.hyquests.services.PlayerQuestService;
 import com.martelstudios.hyquests.services.QuestProgressionService;
-import com.martelstudios.hyquests.services.WorldQuestService;
 import com.martelstudios.hyquests.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -38,10 +35,6 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
     private static final BiConsumer<AbstractQuest, UUID[]> PLAYERS_SETTER = (quest, uuids) -> ((AbstractQuest<?>) quest).players.addAll(List.of(uuids));
     private static final Function<AbstractQuest, UUID[]> PLAYERS_GETTER = (quest) -> ((AbstractQuest<?>) quest).players.toArray(new UUID[0]);
 
-    private static final KeyedCodec<UUID[]> WORLDS_CODEC = new KeyedCodec<>("Worlds", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
-    private static final BiConsumer<AbstractQuest, UUID[]> WORLDS_SETTER = (quest, uuids) -> ((AbstractQuest<?>) quest).worlds.addAll(List.of(uuids));
-    private static final Function<AbstractQuest, UUID[]> WORLDS_GETTER = (quest) -> ((AbstractQuest<?>) quest).worlds.toArray(new UUID[0]);
-
     /**
      * Serializes the fields shared by every quest; concrete codecs chain from this.
      */
@@ -53,8 +46,6 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
                                                                              .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.state = state, quest -> quest.state)
                                                                              .add()
                                                                              .append(PLAYERS_CODEC, PLAYERS_SETTER, PLAYERS_GETTER)
-                                                                             .add()
-                                                                             .append(WORLDS_CODEC, WORLDS_SETTER, WORLDS_GETTER)
                                                                              .add()
                                                                              .build();
 
@@ -68,10 +59,6 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
      */
     protected Set<UUID> players = ConcurrentHashMap.newKeySet();
 
-    /**
-     * Names of the worlds this quest is assigned to.
-     */
-    protected Set<UUID> worlds = ConcurrentHashMap.newKeySet();
     protected String questAssetId;
     protected QuestState state = QuestState.IN_PROGRESS;
 
@@ -96,90 +83,91 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
     }
 
     /**
-     * Releases anything this quest owns beyond its own state, just after it leaves the store.
-     * Called by {@link QuestProgressionService#unregisterQuest}; implementations must stay safe to call
-     * on an already-unregistered quest.
+     * Sets up whatever this quest owns beyond its own state, just after it entered the store.
+     * Called by {@link QuestProgressionService#registerQuest}.
      */
     public void onRegistered() {}
 
     /**
      * Releases anything this quest owns beyond its own state, just after it leaves the store.
-     * Called by {@link QuestProgressionService#unregisterQuest}; implementations must stay safe to call
-     * on an already-unregistered quest.
+     * Called by {@link QuestProgressionService#unregisterQuest}; implementations must stay safe to
+     * call on an already-unregistered quest.
      */
-    public void onUnregistered() {}
+    public void onUnregistered() {
+        removeAllPlayers();
+    }
 
-    /**
-     * Registers this quest in the player's index, online or not, and adds them to its player list.
-     */
+    public void addPlayersFromPlayerRef(@Nonnull Collection<PlayerRef> playerRefs) {
+        playerRefs.forEach(this::addPlayer);
+    }
+
+    public void addPlayer(@Nonnull PlayerRef playerRef) {
+        addPlayer(playerRef.getUuid());
+    }
+
     public void addPlayer(@Nonnull UUID playerId) {
-        getPlayers().add(playerId);
+        if (!getPlayers().add(playerId)) return;
         markDirty();
 
         PlayerRef online = Universe.get().getPlayer(playerId);
         if (online != null) {
             var ref = online.getReference();
-            if (ref == null) return;
-            var world = ref.getStore().getExternalData().getWorld();
-            world.execute(() -> PlayerQuestService.get().addQuestToPlayerStore(getId(), ref));
-            return;
+            if (ref != null) {
+                var world = ref.getStore().getExternalData().getWorld();
+                world.execute(() -> PlayerQuestService.get().addQuestToPlayerStore(getId(), ref));
+            }
+        } else {
+            Universe.get()
+                    .getPlayerStorage()
+                    .update(playerId, holder -> PlayerQuestService.get().addQuestToPlayerStore(getId(), holder));
         }
 
-        Universe.get()
-                .getPlayerStorage()
-                .update(playerId, holder -> PlayerQuestService.get().addQuestToPlayerStore(getId(), holder));
+        onPlayerAdded(playerId);
     }
 
     /**
-     * Removes this quest from the player's index and removes them from its player list.
+     * Assigns this quest through an already-resolved holder, for callers that hold one. A
+     * connecting player is neither online yet nor safe to reach through stored data, so their
+     * incoming holder is the only handle that sticks.
      */
+    public void addPlayer(@Nonnull UUID playerId, @Nonnull Holder<EntityStore> holder) {
+        if (!getPlayers().add(playerId)) return;
+        markDirty();
+
+        PlayerQuestService.get().addQuestToPlayerStore(getId(), holder);
+        onPlayerAdded(playerId);
+    }
+
     public void removePlayer(@Nonnull UUID playerId) {
-        getPlayers().remove(playerId);
+        if (!getPlayers().remove(playerId)) return;
         markDirty();
 
         PlayerRef online = Universe.get().getPlayer(playerId);
         if (online != null) {
             var ref = online.getReference();
-            if (ref == null) return;
-            var world = ref.getStore().getExternalData().getWorld();
-            world.execute(() -> PlayerQuestService.get().removeQuestFromPlayerStore(getId(), ref));
-            return;
+            if (ref != null) {
+                var world = ref.getStore().getExternalData().getWorld();
+                world.execute(() -> PlayerQuestService.get().removeQuestFromPlayerStore(getId(), ref));
+            }
+        } else {
+            Universe.get()
+                    .getPlayerStorage()
+                    .update(playerId, holder -> PlayerQuestService.get().removeQuestFromPlayerStore(getId(), holder));
         }
 
-        Universe.get()
-                .getPlayerStorage()
-                .update(playerId, holder -> PlayerQuestService.get().removeQuestFromPlayerStore(getId(), holder));
+        onPlayerRemoved(playerId);
     }
 
     public void removeAllPlayers() {
         new ArrayList<>(getPlayers()).forEach(this::removePlayer);
     }
 
-    public void addWorld(@Nonnull UUID worldId) {
-        var world = Universe.get().getWorld(worldId);
-        if (world == null) return;
+    /**
+     * Hooks for composite quests to propagate an assignment they do not own directly.
+     */
+    protected void onPlayerAdded(@Nonnull UUID playerId) {}
 
-        addWorld(world);
-    }
-
-    public void addWorld(World world) {
-        getWorlds().add(world.getWorldConfig().getUuid());
-
-        world.execute(() -> WorldQuestService.get().addQuestToWorldStore(getId(), world));
-    }
-
-    public void removeWorld(@Nonnull UUID worldId) {
-        var world = Universe.get().getWorld(worldId);
-        if (world == null) return;
-
-        getWorlds().remove(worldId);
-
-        world.execute(() -> WorldQuestService.get().removeQuestFromWorldStore(getId(), world));
-    }
-
-    public void removeAllWorlds() {
-        new ArrayList<>(getWorlds()).forEach(this::removeWorld);
-    }
+    protected void onPlayerRemoved(@Nonnull UUID playerId) {}
 
     public boolean isSuccessful() {
         return state == QuestState.SUCCESSFUL;
@@ -219,13 +207,6 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
      */
     public Set<UUID> getPlayers() {
         return players;
-    }
-
-    /**
-     * @return the live, mutable set of ids of the worlds this quest is assigned to.
-     */
-    public Set<UUID> getWorlds() {
-        return worlds;
     }
 
     public QuestState getState() {

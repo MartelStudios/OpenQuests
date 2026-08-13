@@ -6,9 +6,12 @@ import com.hypixel.hytale.server.core.universe.datastore.DataStore;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Persists a {@link QuestsRecord} per named scope. Holding the record here rather than in the
+ * caller keeps a single source of truth: mutating what {@link #get} returns is what gets saved.
+ */
 public class QuestsStore {
     @Nonnull
     private final static HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -23,44 +26,34 @@ public class QuestsStore {
         this.dataStore = dataStore;
     }
 
-    public QuestsRecord add(String scope, UUID questId) {
-        quests.computeIfAbsent(scope, _ -> new QuestsRecord()).register(questId);
-        return quests.get(scope);
+    /**
+     * @return the live record of a scope, empty if it has none yet. Never {@code null}.
+     */
+    @Nonnull
+    public QuestsRecord get(@Nonnull String scope) {
+        return quests.computeIfAbsent(scope, _ -> new QuestsRecord());
     }
 
-    public QuestsRecord remove(String scope, UUID questId) {
-        quests.computeIfPresent(scope, (_, record) -> {
-            record.unregister(questId);
-            return record;
-        });
-        return quests.get(scope);
-    }
-
-    public QuestsRecord load(String scope) {
+    /**
+     * Reads a scope back from disk. A missing file is the normal first-run case and yields an
+     * empty record, since a {@code ConcurrentHashMap} would reject the null.
+     */
+    @Nonnull
+    public QuestsRecord load(@Nonnull String scope) {
         try {
-            quests.put(scope, dataStore.load(scope));
+            QuestsRecord record = dataStore.load(scope);
+            if (record != null) quests.put(scope, record);
         } catch (IOException e) {
             LOGGER.atWarning().withCause(e).log("Failed to load %s quests from disk", scope);
         }
 
-        return quests.get(scope);
+        return get(scope);
     }
 
-    public Map<String, QuestsRecord> loadAll() {
-        try {
-            quests.putAll(dataStore.loadAll());
-        } catch (IOException e) {
-            LOGGER.atWarning().withCause(e).log("Failed to load quests from disk");
-        }
+    public void save(@Nonnull String scope) {
+        QuestsRecord record = quests.get(scope);
+        if (record == null) return;
 
-        return quests;
-    }
-
-    public void save(String scope) {
-        dataStore.save(scope, quests.get(scope));
-    }
-
-    public void saveAll() {
-        quests.forEach(dataStore::save);
+        dataStore.save(scope, record);
     }
 }

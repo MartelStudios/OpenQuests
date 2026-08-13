@@ -40,7 +40,4 @@ public class WorldQuestStoreResource implements Resource<EntityStore> {
         return HyQuestsPlugin.get().getWorldStoreResourceType();
     }
 
-    public void loadQuests() {
-        questsRecord.loadAll();
-    }
 }

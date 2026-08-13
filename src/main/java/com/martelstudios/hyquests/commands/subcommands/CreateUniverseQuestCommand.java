@@ -5,7 +5,6 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
 import com.martelstudios.hyquests.assets.QuestAsset;
-import com.martelstudios.hyquests.services.PlayerQuestService;
 import com.martelstudios.hyquests.services.QuestProgressionService;
 import com.martelstudios.hyquests.services.UniverseQuestService;
 
@@ -33,7 +32,7 @@ public class CreateUniverseQuestCommand extends CommandBase {
         }
 
         var quest = QuestProgressionService.get().registerQuest(asset);
-        UniverseQuestService.get().addQuestToUniverse(quest.getId());
+        UniverseQuestService.get().addQuest(quest.getId());
         context.sendMessage(Message.raw("Created quest " + quest.getId() + " from asset '" + assetId + "'."));
     }
 }

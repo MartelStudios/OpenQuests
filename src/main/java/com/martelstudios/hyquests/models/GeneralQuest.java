@@ -13,10 +13,7 @@ import com.martelstudios.hyquests.services.QuestProgressionService;
 import com.martelstudios.hyquests.visitors.GeneralQuestVisitor;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Composite quest whose objective is that other quests complete. Children are
@@ -45,21 +42,19 @@ public class GeneralQuest extends AbstractQuest<GeneralQuest> {
     }
 
     @Override
-    public void addPlayer(@Nonnull UUID playerId) {
-        super.addPlayer(playerId);
-
-        for (UUID questId : questIds) {
-            QuestProgressionService.get().getQuest(questId).addPlayer(playerId);
-        }
+    protected void onPlayerAdded(@Nonnull UUID playerId) {
+        Arrays.stream(questIds)
+              .map(QuestProgressionService.get()::getQuest)
+              .filter(Objects::nonNull)
+              .forEach(child -> child.addPlayer(playerId));
     }
 
     @Override
-    public void removePlayer(@Nonnull UUID playerId) {
-        super.removePlayer(playerId);
-
-        for (UUID questId : questIds) {
-            QuestProgressionService.get().getQuest(questId).removePlayer(playerId);
-        }
+    protected void onPlayerRemoved(@Nonnull UUID playerId) {
+        Arrays.stream(questIds)
+              .map(QuestProgressionService.get()::getQuest)
+              .filter(Objects::nonNull)
+              .forEach(child -> child.removePlayer(playerId));
     }
 
     /**
@@ -69,6 +64,7 @@ public class GeneralQuest extends AbstractQuest<GeneralQuest> {
      */
     @Override
     public void onRegistered() {
+        super.onRegistered();
         var assetIds = getAsset().getAssetIds();
         UUID[] questIds = new UUID[assetIds.length];
 
@@ -85,11 +81,16 @@ public class GeneralQuest extends AbstractQuest<GeneralQuest> {
      */
     @Override
     public void onUnregistered() {
+        super.onUnregistered();
         releaseChildListeners();
 
         for (UUID questId : questIds) {
             QuestProgressionService.get().unregisterQuest(questId);
         }
+    }
+
+    public UUID[] getQuestIds() {
+        return questIds;
     }
 
     @Override

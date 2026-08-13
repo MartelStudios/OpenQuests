@@ -27,20 +27,13 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Entry point used by event handlers to make quests progress and by anything that wants to
- * hand out quests. Every quest instance lives in the single {@link QuestProgressionStore} regardless
- * of scope. {@link AbstractQuest#getPlayers()}/{@link AbstractQuest#getWorlds()} are the source
- * of truth for who a quest is assigned to; {@link QuestStoreComponent}/{@link WorldQuestStoreResource}
- * are the reverse index (which quests a player/world has) used to know what to load, and are
- * kept in sync with the quest by every method below.
- * <ul>
- *     <li>Universe scope — shared by everyone. Assigned to every connected player immediately,
- *     and to every future player on connection.</li>
- *     <li>World scope — shared by every player of that world. Assigned to every present player
- *     immediately, and to every future player on entering the world; removed when they leave
- *     unless they also hold the quest directly.</li>
- *     <li>Player scope — belongs to one player, online or not.</li>
- * </ul>
+ * Owns the lifecycle of quest instances: registration, progression, completion and rewards.
+ * Every instance lives in the single {@link QuestProgressionStore}, and {@link AbstractQuest#getPlayers()}
+ * is the source of truth for who holds it — {@link QuestStoreComponent} being the reverse index
+ * used to know what to load.
+ * <p>
+ * Quests are agnostic of scope: {@code UniverseQuestService} and {@code WorldQuestService} assign
+ * and unassign them on the events that concern them.
  */
 public class QuestProgressionService {
     private static QuestProgressionService instance;
@@ -107,10 +100,6 @@ public class QuestProgressionService {
     public AbstractQuest<?> unregisterQuest(@Nonnull UUID questId) {
         AbstractQuest<?> quest = dataStore.get(questId);
         if (quest == null) return null;
-
-        UniverseQuestService.get().removeQuestFromUniverse(questId);
-        quest.removeAllWorlds();
-        quest.removeAllPlayers();
 
         AbstractQuest<?> removed = dataStore.removeAndDeleteFromDisk(questId);
 
@@ -233,15 +222,6 @@ public class QuestProgressionService {
         for (QuestReward reward : rewards) {
             reward.grant(context);
         }
-    }
-
-    /**
-     * @return the completion history of a player, or {@code null} if they have none yet.
-     */
-    @Nullable
-    public QuestHistoryStore getHistory(@Nonnull Holder<EntityStore> holder) {
-        var component = holder.getComponent(playerHistoryStoreComponentType);
-        return component == null ? null : component.questHistoryStore;
     }
 
     public AbstractQuest<?> getQuest(UUID questId) {

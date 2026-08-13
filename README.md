@@ -20,9 +20,10 @@ progression.
 
 ### Scopes
 
-A quest is assigned to a player, a world, or the whole universe. `AbstractQuest#getPlayers()` and
-`getWorlds()` are the source of truth; the per-scope stores are the reverse index used to know what
-to load.
+A quest only ever knows its players: `AbstractQuest#getPlayers()` is the single source of truth,
+and `QuestStoreComponent` is the reverse index used to know what to load. Scope is applied from
+the outside — `UniverseQuestService` and `WorldQuestService` assign and unassign quests on the
+events that concern them, so a quest itself stays agnostic of how it was handed out.
 
 ### Lifecycle
 
