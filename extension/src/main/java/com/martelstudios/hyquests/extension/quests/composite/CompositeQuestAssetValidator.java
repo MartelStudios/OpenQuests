@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.quests.general;
+package com.martelstudios.hyquests.extension.quests.composite;
 
 import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
@@ -11,20 +11,20 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Validates the {@link GeneralQuestAsset} graph at boot, since both problems it catches are
+ * Validates the {@link CompositeQuestAsset} graph at boot, since both problems it catches are
  * authoring mistakes that would otherwise only surface when a quest is created: an unknown child
  * id (NPE) or a reference cycle (endless recursion through {@code onRegistered}).
  */
-public final class GeneralQuestAssetValidator {
+public final class CompositeQuestAssetValidator {
 
-    private GeneralQuestAssetValidator() {}
+    private CompositeQuestAssetValidator() {}
 
     public static void handleLoadAsset(@Nonnull LoadAssetEvent event) {
         List<String> errors = new ArrayList<>();
 
         Set<String> validated = new HashSet<>();
         for (QuestAsset asset : QuestAsset.getAssetMap().getAssetMap().values()) {
-            if (!(asset instanceof GeneralQuestAsset generalQuestAsset)) continue;
+            if (!(asset instanceof CompositeQuestAsset generalQuestAsset)) continue;
 
             visit(generalQuestAsset, new LinkedHashSet<>(), validated, errors);
         }
@@ -41,7 +41,7 @@ public final class GeneralQuestAssetValidator {
      *
      * @param path ordered so it doubles as the cycle message, and a set so the lookup stays O(1)
      */
-    private static void visit(@Nonnull GeneralQuestAsset asset, @Nonnull LinkedHashSet<String> path, @Nonnull Set<String> validated, @Nonnull List<String> errors) {
+    private static void visit(@Nonnull CompositeQuestAsset asset, @Nonnull LinkedHashSet<String> path, @Nonnull Set<String> validated, @Nonnull List<String> errors) {
         String assetId = asset.getId();
 
         if (!path.add(assetId)) {
@@ -58,7 +58,7 @@ public final class GeneralQuestAssetValidator {
                     continue;
                 }
 
-                if (child instanceof GeneralQuestAsset generalChild) {
+                if (child instanceof CompositeQuestAsset generalChild) {
                     visit(generalChild, path, validated, errors);
                 }
             }

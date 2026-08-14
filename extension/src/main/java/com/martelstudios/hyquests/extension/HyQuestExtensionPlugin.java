@@ -3,7 +3,7 @@ package com.martelstudios.hyquests.extension;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.hyquests.extension.quests.gather.GatherFeature;
-import com.martelstudios.hyquests.extension.quests.general.GeneralFeature;
+import com.martelstudios.hyquests.extension.quests.composite.CompositeFeature;
 import com.martelstudios.hyquests.extension.hud.HudFeature;
 import com.martelstudios.hyquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
 import com.martelstudios.hyquests.extension.quests.reachlocation.ReachLocationFeature;
@@ -28,7 +28,7 @@ public class HyQuestExtensionPlugin extends JavaPlugin {
         GatherFeature.register(this);
         InteractivelyPickupFeature.register(this);
         ReachLocationFeature.register(this);
-        GeneralFeature.register(this);
+        CompositeFeature.register(this);
         HudFeature.register(this);
         ItemRewardFeature.register(this);
     }

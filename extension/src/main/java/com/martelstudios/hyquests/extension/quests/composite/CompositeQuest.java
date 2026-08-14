@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.quests.general;
+package com.martelstudios.hyquests.extension.quests.composite;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -21,10 +21,10 @@ import javax.annotation.Nonnull;
  * top-level quest. This quest's own progression is delegated to a visitor, which
  * typically derives its state from its children.
  */
-public class GeneralQuest extends AbstractQuest<GeneralQuest> {
+public class CompositeQuest extends AbstractQuest<CompositeQuest> {
 
-    public static final BuilderCodec<GeneralQuest> CODEC = BuilderCodec.builder(GeneralQuest.class, GeneralQuest::new, AbstractQuest.BASE_CODEC)
-                                                                       .append(new KeyedCodec<>("QuestIds", new ArrayCodec<>(Codec.UUID_BINARY, UUID[]::new)), GeneralQuest::setQuestIds, quest -> quest.questIds)
+    public static final BuilderCodec<CompositeQuest> CODEC = BuilderCodec.builder(CompositeQuest.class, CompositeQuest::new, AbstractQuest.BASE_CODEC)
+                                                                       .append(new KeyedCodec<>("QuestIds", new ArrayCodec<>(Codec.UUID_BINARY, UUID[]::new)), CompositeQuest::setQuestIds, quest -> quest.questIds)
                                                                        .add()
                                                                        .build();
 
@@ -37,7 +37,7 @@ public class GeneralQuest extends AbstractQuest<GeneralQuest> {
     private final transient List<EventRegistration<UUID, QuestCompletedEvent>> childListeners = new ArrayList<>();
 
     private void handleQuestCompleted(QuestCompletedEvent ignored) {
-        update(new GeneralQuestVisitor());
+        update(new CompositeQuestVisitor());
     }
 
     @Override
@@ -93,15 +93,15 @@ public class GeneralQuest extends AbstractQuest<GeneralQuest> {
     }
 
     @Override
-    public GeneralQuestAsset getAsset() {
-        return (GeneralQuestAsset) super.getAsset();
+    public CompositeQuestAsset getAsset() {
+        return (CompositeQuestAsset) super.getAsset();
     }
 
     /**
      * Also the codec setter, hence the release first: decoding an already-armed quest would
      * otherwise subscribe a second time to every child.
      */
-    public GeneralQuest setQuestIds(UUID[] questIds) {
+    public CompositeQuest setQuestIds(UUID[] questIds) {
         releaseChildListeners();
         this.questIds = questIds;
 

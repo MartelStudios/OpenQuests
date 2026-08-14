@@ -46,7 +46,7 @@ are granted immediately if the player is online, otherwise on their next world e
 - `Gather` — hold a given quantity of an item, recounted on every inventory change.
 - `InteractivelyPickup` — pick up a given quantity through the harvest interaction.
 - `ReachLocation` — enter a radius around a position.
-- `General` — completes once all of its child quests have.
+- `Composite` — completes once all of its child quests have.
 
 ## Built-in rewards
 
@@ -79,8 +79,8 @@ A reward type is registered the same way:
 QuestReward.CODEC.register("MyReward", MyQuestReward.class, MyQuestReward.CODEC);
 ```
 
-Anything a type needs beyond the core contract stays in its own package — `General` validates its
-asset graph at boot from `GeneralFeature`, the tracker HUD renders counted quests from its own
+Anything a type needs beyond the core contract stays in its own package — `Composite` validates its
+asset graph at boot from `CompositeFeature`, the tracker HUD renders counted quests from its own
 package. The core never learns about them.
 
 ## Example asset

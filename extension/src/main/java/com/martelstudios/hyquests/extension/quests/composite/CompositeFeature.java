@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.quests.general;
+package com.martelstudios.hyquests.extension.quests.composite;
 
 import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -10,17 +10,17 @@ import javax.annotation.Nonnull;
  * Composite quest that succeeds once all of its children have completed. Needs no system of its
  * own: it reacts to its children through the events the core already publishes.
  */
-public final class GeneralFeature {
-    public static final String TYPE_ID = "General";
+public final class CompositeFeature {
+    public static final String TYPE_ID = "Composite";
 
-    private GeneralFeature() {}
+    private CompositeFeature() {}
 
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, GeneralQuestAsset.class, GeneralQuestAsset.CODEC, GeneralQuest.class, GeneralQuest.CODEC);
+                               .registerQuestType(TYPE_ID, CompositeQuestAsset.class, CompositeQuestAsset.CODEC, CompositeQuest.class, CompositeQuest.CODEC);
 
         // Referencing other assets is what makes this type able to loop, so it validates its own graph
         plugin.getEventRegistry()
-              .registerGlobal(LoadAssetEvent.PRIORITY_LOAD_LATE, LoadAssetEvent.class, GeneralQuestAssetValidator::handleLoadAsset);
+              .registerGlobal(LoadAssetEvent.PRIORITY_LOAD_LATE, LoadAssetEvent.class, CompositeQuestAssetValidator::handleLoadAsset);
     }
 }

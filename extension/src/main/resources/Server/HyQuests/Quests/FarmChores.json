@@ -1,5 +1,5 @@
 {
-  "Type": "General",
+  "Type": "Composite",
   "TitleKey": "quest.farmChores.title",
   "DescriptionKey": "quest.farmChores.description",
   "AutoStart": false,
