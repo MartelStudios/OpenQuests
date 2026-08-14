@@ -12,6 +12,7 @@
     "ServerVersion": "0.6.0-pre.12.1",
     "Dependencies": {
         "Hytale:AssetModule": "*",
+        "Hytale:Objectives": "*",
         "MartelStudios:HyQuestCore": "*"
     },
     "OptionalDependencies": {

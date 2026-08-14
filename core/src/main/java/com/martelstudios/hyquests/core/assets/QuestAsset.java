@@ -1,6 +1,7 @@
 package com.martelstudios.hyquests.core.assets;
 
 import com.hypixel.hytale.assetstore.AssetExtraInfo;
+import com.hypixel.hytale.assetstore.AssetKeyValidator;
 import com.hypixel.hytale.assetstore.AssetRegistry;
 import com.hypixel.hytale.assetstore.AssetStore;
 import com.hypixel.hytale.assetstore.codec.AssetCodecMapCodec;
@@ -10,6 +11,8 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
+import com.hypixel.hytale.codec.validation.ValidatorCache;
+import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.hyquests.core.models.AbstractQuest;
 import com.martelstudios.hyquests.core.models.QuestState;
 import com.martelstudios.hyquests.core.rewards.QuestReward;
@@ -28,13 +31,18 @@ import javax.annotation.Nonnull;
  * the fields common to every quest asset so concrete codecs can chain from it.
  */
 public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, QuestAsset>> {
+    public static final ValidatorCache<String> VALIDATOR_CACHE = new ValidatorCache<>(new AssetKeyValidator<>(QuestAsset::getAssetStore));
 
     public static final AssetCodecMapCodec<String, QuestAsset> CODEC = new AssetCodecMapCodec<>(Codec.STRING, (asset, value) -> asset.id = value, asset -> asset.id, (asset, value) -> asset.data = value, asset -> asset.data);
 
     public static final BuilderCodec<QuestAsset> BASE_CODEC = BuilderCodec.abstractBuilder(QuestAsset.class)
-                                                                          .append(new KeyedCodec<>("TitleKey", Codec.STRING), (asset, key) -> asset.titleKey = key, asset -> asset.titleKey)
+                                                                          .append(new KeyedCodec<>("TitleKey", Codec.STRING, true), (asset, key) -> asset.titleKey = key, asset -> asset.titleKey)
+                                                                          .addValidator(Validators.nonNull())
+                                                                          .addValidator(Validators.nonEmptyString())
                                                                           .add()
-                                                                          .append(new KeyedCodec<>("DescriptionKey", Codec.STRING), (asset, key) -> asset.descriptionKey = key, asset -> asset.descriptionKey)
+                                                                          .append(new KeyedCodec<>("DescriptionKey", Codec.STRING, true), (asset, key) -> asset.descriptionKey = key, asset -> asset.descriptionKey)
+                                                                          .addValidator(Validators.nonNull())
+                                                                          .addValidator(Validators.nonEmptyString())
                                                                           .add()
                                                                           .append(new KeyedCodec<>("AutoStart", Codec.BOOLEAN), (asset, value) -> asset.autoStart = value, asset -> Boolean.valueOf(asset.autoStart))
                                                                           .add()
@@ -47,6 +55,7 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .append(new KeyedCodec<>("AbandonedRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (asset, rewards) -> asset.abandonedRewards = rewards, asset -> asset.abandonedRewards)
                                                                           .add()
                                                                           .build();
+
 
     private static final QuestReward[] NO_REWARDS = new QuestReward[0];
 

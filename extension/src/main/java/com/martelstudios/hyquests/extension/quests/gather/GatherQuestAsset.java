@@ -1,6 +1,6 @@
 package com.martelstudios.hyquests.extension.quests.gather;
 
-import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.hyquests.core.models.AbstractQuest;
@@ -10,11 +10,11 @@ public class GatherQuestAsset extends CountQuestAsset {
 
     public static final BuilderCodec<GatherQuestAsset> CODEC =
         BuilderCodec.builder(GatherQuestAsset.class, GatherQuestAsset::new, CountQuestAsset.BASE_CODEC)
-            .append(new KeyedCodec<>("ItemToGather", Codec.STRING), (asset, item) -> asset.itemToGather = item, asset -> asset.itemToGather)
+            .append(new KeyedCodec<>("ItemToGather", BlockTagOrItemIdField.CODEC), (asset, item) -> asset.itemToGather = item, asset -> asset.itemToGather)
             .add()
             .build();
 
-    protected String itemToGather;
+    protected BlockTagOrItemIdField itemToGather;
 
     private GatherQuestAsset() {}
 
@@ -23,7 +23,7 @@ public class GatherQuestAsset extends CountQuestAsset {
         return new GatherQuest().setQuestAssetId(getId());
     }
 
-    public String getItemToGather() {
+    public BlockTagOrItemIdField getItemToGather() {
         return itemToGather;
     }
 }

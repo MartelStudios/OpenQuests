@@ -4,7 +4,7 @@
   "DescriptionKey": "quest.collectWood.description",
   "AutoStart": false,
   "AutoClaim": true,
-  "ItemToGather": "Ingredient_Stick",
+  "ItemToGather": { "ItemId": "Ingredient_Stick" },
   "Count": 20,
   "SuccessfulRewards": [
     {

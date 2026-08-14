@@ -65,8 +65,8 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuest> {
         if (quest.getState() == QuestState.SUCCESSFUL) return;
 
         var asset = quest.getAsset();
-        int count = combinedItemContainer.countItemStacks(itemStack -> itemStack.getItemId()
-                                                                                .equals(asset.getItemToGather()));
+        int count = combinedItemContainer.countItemStacks(itemStack -> asset.getItemToGather()
+                                                                                     .isBlockTypeIncluded(itemStack.getItemId()));
 
         quest.setCount(count)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)

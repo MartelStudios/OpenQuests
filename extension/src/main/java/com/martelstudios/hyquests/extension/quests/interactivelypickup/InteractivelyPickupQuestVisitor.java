@@ -31,7 +31,7 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
         if (quest.getState() == QuestState.SUCCESSFUL) return;
 
         var asset = quest.getAsset();
-        if (!asset.getItemToPickup().equals(event.getItemStack().getItemId())) {
+        if (!asset.getItemToPickup().isBlockTypeIncluded(event.getItemStack().getItemId())) {
             return;
         }
 

@@ -4,7 +4,7 @@
   "DescriptionKey": "quest.farmChores.description",
   "AutoStart": false,
   "AutoClaim": true,
-  "Assets": [
+  "QuestAssetIds": [
     "PickBerries",
     "CollectWood"
   ]

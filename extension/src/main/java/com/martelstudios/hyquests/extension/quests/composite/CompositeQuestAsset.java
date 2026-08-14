@@ -3,7 +3,7 @@ package com.martelstudios.hyquests.extension.quests.composite;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
+import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
 
 /**
@@ -14,7 +14,10 @@ import com.martelstudios.hyquests.core.assets.QuestAsset;
 public class CompositeQuestAsset extends QuestAsset {
 
     public static final BuilderCodec<CompositeQuestAsset> CODEC = BuilderCodec.builder(CompositeQuestAsset.class, CompositeQuestAsset::new, QuestAsset.BASE_CODEC)
-                                                                            .append(new KeyedCodec<>("Assets", new ArrayCodec<>(Codec.STRING, String[]::new)), (asset, ids) -> asset.assetIds = ids, asset -> asset.assetIds)
+                                                                            .append(new KeyedCodec<>("QuestAssetIds", Codec.STRING_ARRAY), (asset, ids) -> asset.assetIds = ids, asset -> asset.assetIds)
+                                                                            .addValidator(Validators.nonEmptyArray())
+                                                                            .addValidator(Validators.uniqueInArray())
+                                                                            .addValidatorLate(() -> QuestAsset.VALIDATOR_CACHE.getArrayValidator().late())
                                                                             .add()
                                                                             .build();
 

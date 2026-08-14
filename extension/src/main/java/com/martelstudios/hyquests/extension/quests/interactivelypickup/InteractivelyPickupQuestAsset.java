@@ -1,6 +1,6 @@
 package com.martelstudios.hyquests.extension.quests.interactivelypickup;
 
-import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.hyquests.core.models.AbstractQuest;
@@ -10,11 +10,11 @@ public class InteractivelyPickupQuestAsset extends CountQuestAsset {
 
     public static final BuilderCodec<InteractivelyPickupQuestAsset> CODEC =
         BuilderCodec.builder(InteractivelyPickupQuestAsset.class, InteractivelyPickupQuestAsset::new, CountQuestAsset.BASE_CODEC)
-            .append(new KeyedCodec<>("ItemToPickup", Codec.STRING), (asset, item) -> asset.itemToPickup = item, asset -> asset.itemToPickup)
+            .append(new KeyedCodec<>("ItemToPickup", BlockTagOrItemIdField.CODEC), (asset, item) -> asset.itemToPickup = item, asset -> asset.itemToPickup)
             .add()
             .build();
 
-    protected String itemToPickup;
+    protected BlockTagOrItemIdField itemToPickup;
 
     private InteractivelyPickupQuestAsset() {}
 
@@ -23,7 +23,7 @@ public class InteractivelyPickupQuestAsset extends CountQuestAsset {
         return new InteractivelyPickupQuest().setQuestAssetId(getId());
     }
 
-    public String getItemToPickup() {
+    public BlockTagOrItemIdField getItemToPickup() {
         return itemToPickup;
     }
 }
