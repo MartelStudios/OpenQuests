@@ -14,3 +14,4 @@ plugins {
 }
 
 rootProject.name = "HyQuests"
+include("core", "extension")

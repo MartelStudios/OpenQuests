@@ -1,0 +1,26 @@
+{
+    "Group": "MartelStudios",
+    "Name": "HyQuestExtension",
+    "Version": "0.0.0",
+    "Description": "The quest and reward types shipped on top of HyQuestCore",
+    "Authors": [
+        {
+            "Name": "Hazard4U"
+        }
+    ],
+    "Website": "https://github.com/MartelStudios/HyQuests",
+    "ServerVersion": "0.6.0-pre.11",
+    "Dependencies": {
+        "Hytale:AssetModule": "*",
+        "MartelStudios:HyQuestCore": "*"
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "com.martelstudios.hyquests.extension.HyQuestExtensionPlugin",
+    "IncludesAssetPack": true,
+    "UpdateChecker": {
+        "CurseForge": ""
+    }
+}

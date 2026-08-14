@@ -1,9 +1,7 @@
 plugins {
     idea
-    java
-    id("com.azuredoom.hytale-tools") version "1.+"
+    id("com.azuredoom.hytale-workspace") version "1.+"
 }
-
 
 tasks.withType<Javadoc>().configureEach {
     (options as org.gradle.external.javadoc.StandardJavadocDocletOptions).addStringOption("Xdoclint:-missing", "-quiet")
@@ -11,38 +9,18 @@ tasks.withType<Javadoc>().configureEach {
 
 group = project.property("group").toString()
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(property("java_version").toString().toInt()))
-}
+hytaleWorkspace {
+    modProjects = listOf(":core", ":extension")
+    hostProject = ":extension"
 
-hytaleTools {
-    javaVersion = property("java_version").toString().toInt()
-    hytaleVersion = property("hytale_version").toString()
-    manifestServerVersion = property("manifestServerVersion").toString()
+    // Shared
     manifestGroup = property("manifest_group").toString()
-    modId = property("mod_id").toString()
-    modDescription = property("mod_description").toString()
-    modUrl = property("mod_url").toString()
-    mainClass = property("main_class").toString()
-    modCredits = property("mod_author").toString()
-    manifestDependencies = property("manifest_dependencies").toString()
-    manifestOptionalDependencies = property("manifest_opt_dependencies").toString()
-    curseforgeId = property("curseforgeID").toString()
-    disabledByDefault = property("disabled_by_default").toString().toBoolean()
-    includesPack = property("includes_pack").toString().toBoolean()
+    hytaleVersion = property("hytale_version").toString()
     patchline = property("patchline").toString()
-    injectServerJavadocsIntoSources = property("injectServerJavadocsIntoSources").toString().toBoolean()
-    generateAssetsBinary = property("generateAssetsBinary").toString().toBoolean()
-    // hytaleHomeOverride = property("hytaleHomeOverride").toString()
 }
 
 repositories {
     mavenCentral()
-}
-
-tasks.named<Jar>("jar") {
-    archiveBaseName.set(project.property("mod_name").toString())
-    archiveVersion.set(project.property("version").toString())
 }
 
 idea {

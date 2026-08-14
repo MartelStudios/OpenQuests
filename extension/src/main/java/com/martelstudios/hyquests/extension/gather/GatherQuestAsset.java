@@ -1,0 +1,29 @@
+package com.martelstudios.hyquests.extension.gather;
+
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.extension.count.CountQuestAsset;
+
+public class GatherQuestAsset extends CountQuestAsset {
+
+    public static final BuilderCodec<GatherQuestAsset> CODEC =
+        BuilderCodec.builder(GatherQuestAsset.class, GatherQuestAsset::new, CountQuestAsset.BASE_CODEC)
+            .append(new KeyedCodec<>("ItemToGather", Codec.STRING), (asset, item) -> asset.itemToGather = item, asset -> asset.itemToGather)
+            .add()
+            .build();
+
+    protected String itemToGather;
+
+    private GatherQuestAsset() {}
+
+    @Override
+    public AbstractQuest<?> create() {
+        return new GatherQuest().setQuestAssetId(getId());
+    }
+
+    public String getItemToGather() {
+        return itemToGather;
+    }
+}

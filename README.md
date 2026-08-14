@@ -7,6 +7,16 @@ is authored as JSON, while a **runtime quest** carries one player's progression 
 on its own. The two are linked by the asset id, so editing a quest definition never touches saved
 progression.
 
+## Modules
+
+| Module | Plugin | Role |
+| --- | --- | --- |
+| `core` | `HyQuestCore` | The system itself. Ships no quest type: assets, progression, scopes, history, rewards. |
+| `extension` | `HyQuestExtension` | The quest types, rewards and tracker HUD shipped on top, one package per feature. |
+
+Depending on `HyQuestCore` alone is enough to build your own quest types;
+`HyQuestExtension` is both a set of ready-made types and the reference for how to add one.
+
 ## Concepts
 
 | Piece | Role |
@@ -44,21 +54,34 @@ are granted immediately if the player is online, otherwise on their next world e
 
 ## Extending
 
-Another plugin adds its own quest type by registering both halves under the same id:
+Group everything a type needs in one package — asset, quest, visitor, systems — and give it a
+single entry point, the way each package of `hyQuestExtension` does:
 
 ```java
-QuestService.get().registerQuestType(
-    "MyType",
-    MyQuestAsset.class, MyQuestAsset.CODEC,
-    MyQuest.class, MyQuest.CODEC
-);
+public final class MyFeature {
+    public static void register(@Nonnull JavaPlugin plugin) {
+        QuestProgressionService.get().registerQuestType(
+            "MyType",
+            MyQuestAsset.class, MyQuestAsset.CODEC,
+            MyQuest.class, MyQuest.CODEC
+        );
+
+        plugin.getEntityStoreRegistry().registerSystem(new MyEventSystem());
+    }
+}
 ```
 
-and its own reward type with:
+Your plugin's `setup()` then only lists its features, and never grows past that.
+
+A reward type is registered the same way:
 
 ```java
 QuestReward.CODEC.register("MyReward", MyQuestReward.class, MyQuestReward.CODEC);
 ```
+
+Anything a type needs beyond the core contract stays in its own package — `General` validates its
+asset graph at boot from `GeneralFeature`, the tracker HUD renders counted quests from its own
+package. The core never learns about them.
 
 ## Example asset
 

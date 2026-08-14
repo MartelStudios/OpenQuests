@@ -1,0 +1,25 @@
+{
+    "Group": "MartelStudios",
+    "Name": "HyQuestCore",
+    "Version": "0.0.0",
+    "Description": "An extensible quest system for Hytale: assets, progression, scopes and rewards",
+    "Authors": [
+        {
+            "Name": "Hazard4U"
+        }
+    ],
+    "Website": "https://github.com/MartelStudios/HyQuests",
+    "ServerVersion": "0.6.0-pre.11",
+    "Dependencies": {
+        "Hytale:AssetModule": "*"
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "com.martelstudios.hyquests.core.HyQuestCorePlugin",
+    "IncludesAssetPack": true,
+    "UpdateChecker": {
+        "CurseForge": ""
+    }
+}
