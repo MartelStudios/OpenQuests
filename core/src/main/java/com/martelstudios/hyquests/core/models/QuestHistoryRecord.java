@@ -4,7 +4,9 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
+import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
+import com.martelstudios.hyquests.core.rewards.QuestReward;
 
 import javax.annotation.Nonnull;
 import java.time.Instant;
@@ -24,7 +26,7 @@ public class QuestHistoryRecord {
                                                                              .add()
                                                                              .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (record, state) -> record.state = state, record -> record.state)
                                                                              .add()
-                                                                             .append(new KeyedCodec<>("Claimed", Codec.BOOLEAN), (record, claimed) -> record.claimed = claimed, record -> Boolean.valueOf(record.claimed))
+                                                                             .append(new KeyedCodec<>("PendingRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (record, rewards) -> record.pendingRewards = rewards, record -> record.pendingRewards)
                                                                              .add()
                                                                              .append(new KeyedCodec<>("CompletedAt", Codec.LONG), (record, millis) -> record.completedAt = Instant.ofEpochMilli(millis), record -> record.completedAt == null ? null : Long.valueOf(record.completedAt.toEpochMilli()))
                                                                              .add()
@@ -36,8 +38,10 @@ public class QuestHistoryRecord {
     protected UUID id;
     protected String questAssetId;
     protected QuestState state;
-    protected boolean claimed;
+    protected QuestReward[] pendingRewards = NO_REWARDS;
     protected Instant completedAt;
+
+    private static final QuestReward[] NO_REWARDS = new QuestReward[0];
 
     private QuestHistoryRecord() {}
 
@@ -46,6 +50,9 @@ public class QuestHistoryRecord {
         this.questAssetId = quest.getQuestAssetId();
         this.state = quest.getState();
         this.completedAt = Instant.now();
+
+        QuestAsset asset = quest.getAsset();
+        if (asset != null) this.pendingRewards = asset.getRewards(state).clone();
     }
 
     public UUID getId() {
@@ -64,12 +71,16 @@ public class QuestHistoryRecord {
         return state;
     }
 
-    public boolean isClaimed() {
-        return claimed;
+    /**
+     * @return what this completion still owes, empty once everything was handed over.
+     */
+    @Nonnull
+    public QuestReward[] getPendingRewards() {
+        return pendingRewards;
     }
 
-    public void setClaimed(boolean claimed) {
-        this.claimed = claimed;
+    public void setPendingRewards(@Nonnull QuestReward[] pendingRewards) {
+        this.pendingRewards = pendingRewards;
     }
 
     public Instant getCompletedAt() {
@@ -80,17 +91,31 @@ public class QuestHistoryRecord {
         return state == QuestState.SUCCESSFUL;
     }
 
+    public boolean isFailed() {
+        return state == QuestState.FAILED;
+    }
+
+    public boolean isAbandoned() {
+        return state == QuestState.ABANDONED;
+    }
+
+    public boolean isCompleted() {
+        return isSuccessful() || isFailed() || isAbandoned();
+    }
+
     /**
-     * Driven by the outcome's rewards rather than by success, since failing or abandoning a
-     * quest may also grant something.
-     *
+     * @return {@code true} once nothing is left to hand over, whether there was anything to give
+     * in the first place or everything was granted.
+     */
+    public boolean isClaimed() {
+        return pendingRewards.length == 0;
+    }
+
+    /**
      * @return {@code true} if rewards are still available to collect for this completion.
      */
     public boolean isClaimable() {
-        if (claimed) return false;
-
-        QuestAsset asset = QuestAsset.getAsset(questAssetId);
-        return asset != null && asset.hasRewards(state);
+        return pendingRewards.length > 0;
     }
 
     /**

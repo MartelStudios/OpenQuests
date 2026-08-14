@@ -16,6 +16,8 @@ import com.martelstudios.hyquests.core.stores.QuestHistoryStore;
 import com.martelstudios.hyquests.core.stores.QuestHistoryStoreComponent;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -53,8 +55,7 @@ public class QuestHistoryService {
     }
 
     /**
-     * Hands over what completions that happened while the player was away could not grant. Done
-     * on world entry rather than on connection so they are there to be shown the reward.
+     * On world entry rather than on connection, so the player is there to be shown the reward.
      */
     public void handleAddPlayerToWorldEvent(@Nonnull AddPlayerToWorldEvent addPlayerToWorldEvent) {
         var playerRef = addPlayerToWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
@@ -92,15 +93,13 @@ public class QuestHistoryService {
     }
 
     /**
-     * Grants what a player earned while they were away. Called once they are connected, since
-     * completions that happened offline could not hand their rewards over at the time.
+     * Claim all completed quests that are auto-claimable
      */
     public void claimAutoRewards(@Nonnull Ref<EntityStore> playerRef) {
         var history = getHistory(playerRef);
         for (QuestHistoryRecord record : history.getAll()) {
             QuestAsset asset = record.getAsset();
 
-            // The asset is gone, so nothing can ever be granted for it: settle the record
             if (asset == null) {
                 history.unregister(record);
                 continue;
@@ -127,22 +126,19 @@ public class QuestHistoryService {
     }
 
     /**
-     * Marks the record either way it ends, so rewards can never be granted twice.
+     * Updates the record after each success, so a reward sees what the previous ones granted.
      */
     private void grantRewards(@Nonnull QuestHistoryRecord record, @Nonnull Ref<EntityStore> playerRef) {
         if (record.isClaimed()) return;
 
-        // Nothing to hand over for this outcome, but the record is settled all the same
-        if (!record.isClaimable()) {
-            record.setClaimed(true);
-            return;
-        }
+        QuestReward[] pending = record.getPendingRewards();
+        List<QuestReward> remaining = Arrays.asList(pending);
 
-        var asset = record.getAsset();
-        for (QuestReward reward : asset.getRewards(record.getState())) {
-            reward.grant(asset, playerRef);
-        }
+        for (QuestReward reward : pending) {
+            if (!reward.grant(record, playerRef)) continue;
 
-        record.setClaimed(true);
+            remaining.remove(reward);
+            record.setPendingRewards(remaining.toArray(new QuestReward[0]));
+        }
     }
 }

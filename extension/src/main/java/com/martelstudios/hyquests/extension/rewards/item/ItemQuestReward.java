@@ -10,12 +10,12 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.hyquests.core.assets.QuestAsset;
+import com.martelstudios.hyquests.core.models.QuestHistoryRecord;
 import com.martelstudios.hyquests.core.rewards.QuestReward;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 
 /**
  * Gives items to the player, hotbar first then storage. The item id is validated at asset load,
@@ -37,7 +37,7 @@ public class ItemQuestReward extends QuestReward {
     private ItemQuestReward() {}
 
     @Override
-    public void grant(@Nonnull QuestAsset questAsset, @Nonnull Ref<EntityStore> playerRef) {
+    public boolean grant(@Nonnull QuestHistoryRecord questHistoryRecord, @Nonnull Ref<EntityStore> playerRef) {
         List<ItemContainer> containers = new ArrayList<>(InventoryComponent.HOTBAR_FIRST.length);
 
         for (var inventoryType : InventoryComponent.HOTBAR_FIRST) {
@@ -45,9 +45,14 @@ public class ItemQuestReward extends QuestReward {
             if (inventory != null) containers.add(inventory.getInventory());
         }
 
-        if (containers.isEmpty()) return;
+        if (containers.isEmpty()) return false;
 
-        new CombinedItemContainer(containers.toArray(new ItemContainer[0])).addItemStack(new ItemStack(itemId, quantity));
+        var combined = new CombinedItemContainer(containers.toArray(new ItemContainer[0]));
+
+        // Add with allOrNothing
+        var transaction = combined.addItemStack(new ItemStack(itemId, quantity), true, false, ItemContainer.DEFAULT_FILTER);
+
+        return transaction.succeeded();
     }
 
     public String getItemId() {
