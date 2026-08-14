@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.gather;
+package com.martelstudios.hyquests.extension.quests.gather;
 
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;

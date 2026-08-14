@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.interactivelypickup;
+package com.martelstudios.hyquests.extension.quests.interactivelypickup;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.ecs.InteractivelyPickupItemEvent;

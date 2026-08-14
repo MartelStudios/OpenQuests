@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.count;
+package com.martelstudios.hyquests.extension.quests.count;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;

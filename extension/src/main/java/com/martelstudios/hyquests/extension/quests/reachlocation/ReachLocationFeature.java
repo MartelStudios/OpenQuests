@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.reachlocation;
+package com.martelstudios.hyquests.extension.quests.reachlocation;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;

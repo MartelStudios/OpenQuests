@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.general;
+package com.martelstudios.hyquests.extension.quests.general;
 
 import com.martelstudios.hyquests.core.models.QuestState;
 import com.martelstudios.hyquests.core.visitors.QuestVisitor;

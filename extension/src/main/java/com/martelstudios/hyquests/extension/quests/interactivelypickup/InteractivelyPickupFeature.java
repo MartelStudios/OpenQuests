@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.interactivelypickup;
+package com.martelstudios.hyquests.extension.quests.interactivelypickup;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;

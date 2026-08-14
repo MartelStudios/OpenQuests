@@ -1,7 +1,7 @@
-package com.martelstudios.hyquests.extension.gather;
+package com.martelstudios.hyquests.extension.quests.gather;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.hyquests.extension.count.CountQuest;
+import com.martelstudios.hyquests.extension.quests.count.CountQuest;
 
 /**
  * Quest whose progress is however many of a given item the player currently holds, rechecked

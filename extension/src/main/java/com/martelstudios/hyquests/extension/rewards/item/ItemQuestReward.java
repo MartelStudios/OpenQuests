@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.rewards;
+package com.martelstudios.hyquests.extension.rewards.item;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;

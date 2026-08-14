@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.gather;
+package com.martelstudios.hyquests.extension.quests.gather;
 
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.hyquests.core.events.QuestPlayerAddedEvent;

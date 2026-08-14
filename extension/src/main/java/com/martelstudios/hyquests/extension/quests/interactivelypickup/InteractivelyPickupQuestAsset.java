@@ -1,10 +1,10 @@
-package com.martelstudios.hyquests.extension.interactivelypickup;
+package com.martelstudios.hyquests.extension.quests.interactivelypickup;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.hyquests.core.models.AbstractQuest;
-import com.martelstudios.hyquests.extension.count.CountQuestAsset;
+import com.martelstudios.hyquests.extension.quests.count.CountQuestAsset;
 
 public class InteractivelyPickupQuestAsset extends CountQuestAsset {
 

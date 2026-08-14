@@ -1,8 +1,7 @@
-package com.martelstudios.hyquests.extension.interactivelypickup;
+package com.martelstudios.hyquests.extension.quests.interactivelypickup;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.hyquests.core.visitors.QuestVisitor;
-import com.martelstudios.hyquests.extension.count.CountQuest;
+import com.martelstudios.hyquests.extension.quests.count.CountQuest;
 
 public class InteractivelyPickupQuest extends CountQuest<InteractivelyPickupQuest> {
 

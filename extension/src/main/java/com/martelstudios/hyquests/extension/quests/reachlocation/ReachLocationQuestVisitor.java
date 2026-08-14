@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.reachlocation;
+package com.martelstudios.hyquests.extension.quests.reachlocation;
 
 import com.martelstudios.hyquests.core.models.QuestState;
 import com.martelstudios.hyquests.core.visitors.QuestVisitor;

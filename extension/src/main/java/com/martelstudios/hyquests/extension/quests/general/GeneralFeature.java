@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.general;
+package com.martelstudios.hyquests.extension.quests.general;
 
 import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;

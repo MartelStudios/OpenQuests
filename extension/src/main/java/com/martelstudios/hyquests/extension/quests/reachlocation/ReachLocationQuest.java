@@ -1,9 +1,8 @@
-package com.martelstudios.hyquests.extension.reachlocation;
+package com.martelstudios.hyquests.extension.quests.reachlocation;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.hyquests.core.models.AbstractQuest;
-import com.martelstudios.hyquests.core.visitors.QuestVisitor;
-import com.martelstudios.hyquests.extension.count.CountQuest;
+import com.martelstudios.hyquests.extension.quests.count.CountQuest;
 
 /**
  * Quest completed by a player simply being within the asset's radius of its target position.

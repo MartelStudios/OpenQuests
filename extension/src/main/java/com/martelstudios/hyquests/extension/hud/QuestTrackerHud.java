@@ -5,7 +5,7 @@ import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.hyquests.core.models.AbstractQuest;
-import com.martelstudios.hyquests.extension.count.CountQuest;
+import com.martelstudios.hyquests.extension.quests.count.CountQuest;
 
 import javax.annotation.Nonnull;
 import java.util.List;

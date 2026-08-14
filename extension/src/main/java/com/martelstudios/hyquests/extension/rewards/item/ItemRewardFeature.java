@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.rewards;
+package com.martelstudios.hyquests.extension.rewards.item;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.hyquests.core.rewards.QuestReward;

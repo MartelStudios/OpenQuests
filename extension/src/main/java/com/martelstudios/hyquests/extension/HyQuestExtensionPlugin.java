@@ -2,12 +2,12 @@ package com.martelstudios.hyquests.extension;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
-import com.martelstudios.hyquests.extension.gather.GatherFeature;
-import com.martelstudios.hyquests.extension.general.GeneralFeature;
+import com.martelstudios.hyquests.extension.quests.gather.GatherFeature;
+import com.martelstudios.hyquests.extension.quests.general.GeneralFeature;
 import com.martelstudios.hyquests.extension.hud.HudFeature;
-import com.martelstudios.hyquests.extension.interactivelypickup.InteractivelyPickupFeature;
-import com.martelstudios.hyquests.extension.reachlocation.ReachLocationFeature;
-import com.martelstudios.hyquests.extension.rewards.ItemRewardFeature;
+import com.martelstudios.hyquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
+import com.martelstudios.hyquests.extension.quests.reachlocation.ReachLocationFeature;
+import com.martelstudios.hyquests.extension.rewards.item.ItemRewardFeature;
 
 import javax.annotation.Nonnull;
 
