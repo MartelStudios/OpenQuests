@@ -13,13 +13,19 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.datastore.DiskDataStoreProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
+import com.martelstudios.hyquests.core.assignment.assets.QuestAssignmentAsset;
 import com.martelstudios.hyquests.core.commands.QuestCommand;
 import com.martelstudios.hyquests.core.events.QuestCompletedEvent;
 import com.martelstudios.hyquests.core.services.PlayerQuestService;
+import com.martelstudios.hyquests.core.assignment.services.QuestAssignmentService;
+import com.martelstudios.hyquests.core.assignment.services.QuestAutoAssignmentService;
 import com.martelstudios.hyquests.core.services.QuestHistoryService;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
 import com.martelstudios.hyquests.core.services.UniverseQuestService;
 import com.martelstudios.hyquests.core.services.WorldQuestService;
+import com.martelstudios.hyquests.core.assignment.stores.QuestAssignmentRecord;
+import com.martelstudios.hyquests.core.assignment.stores.QuestAssignmentStore;
+import com.martelstudios.hyquests.core.assignment.stores.QuestAssignmentStoreComponent;
 import com.martelstudios.hyquests.core.stores.QuestHistoryStoreComponent;
 import com.martelstudios.hyquests.core.stores.QuestProgressionRecord;
 import com.martelstudios.hyquests.core.stores.QuestProgressionStore;
@@ -41,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 public class HyQuestCorePlugin extends JavaPlugin {
     public static final Path questProgressionsPath = Paths.get("quests", "progressions");
     public static final Path questSetStorePath = Paths.get("quests", "stores");
+    public static final Path questAssignmentsPath = Paths.get("quests", "assignments");
 
     private static final long SAVE_INTERVAL_MINUTES = 5;
 
@@ -51,9 +58,13 @@ public class HyQuestCorePlugin extends JavaPlugin {
     private ComponentType<EntityStore, QuestStoreComponent> questStoreComponentType;
     private ResourceType<EntityStore, WorldQuestStoreResource> worldStoreResourceType;
     private ComponentType<EntityStore, QuestHistoryStoreComponent> questHistoryStoreComponentType;
+    private ComponentType<EntityStore, QuestAssignmentStoreComponent> questAssignmentStoreComponentType;
+    private QuestAssignmentStore questAssignmentStore;
 
     private QuestProgressionService questProgressionService;
     private QuestHistoryService questHistoryService;
+    private QuestAssignmentService questAssignmentService;
+    private QuestAutoAssignmentService questAutoAssignmentService;
     private UniverseQuestService universeQuestService;
     private WorldQuestService worldQuestService;
     private PlayerQuestService playerQuestService;
@@ -75,6 +86,9 @@ public class HyQuestCorePlugin extends JavaPlugin {
 
         questProgressionService = new QuestProgressionService(questProgressionStore);
         questHistoryService = new QuestHistoryService();
+        questAssignmentStore = new QuestAssignmentStore(new DiskDataStoreProvider(questAssignmentsPath.toString()).create(QuestAssignmentRecord.CODEC));
+        questAssignmentService = new QuestAssignmentService(questAssignmentStore);
+        questAutoAssignmentService = new QuestAutoAssignmentService();
         universeQuestService = new UniverseQuestService(questsStore);
         worldQuestService = new WorldQuestService();
         playerQuestService = new PlayerQuestService();
@@ -82,6 +96,7 @@ public class HyQuestCorePlugin extends JavaPlugin {
         questStoreComponentType = getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, "QuestStore", QuestStoreComponent.CODEC);
         worldStoreResourceType = getEntityStoreRegistry().registerResource(WorldQuestStoreResource.class, "QuestStore", WorldQuestStoreResource.CODEC);
         questHistoryStoreComponentType = getEntityStoreRegistry().registerComponent(QuestHistoryStoreComponent.class, "QuestHistoryStore", QuestHistoryStoreComponent.CODEC);
+        questAssignmentStoreComponentType = getEntityStoreRegistry().registerComponent(QuestAssignmentStoreComponent.class, "QuestAssignmentStore", QuestAssignmentStoreComponent.CODEC);
 
         getCommandRegistry().registerCommand(new QuestCommand());
 
@@ -92,20 +107,29 @@ public class HyQuestCorePlugin extends JavaPlugin {
         getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, questHistoryService::handleAddPlayerToWorldEvent);
         getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, worldQuestService::handleRemovedPlayerFromWorldEvent);
         getEventRegistry().registerGlobal(QuestCompletedEvent.class, questHistoryService::handleQuestCompletedEvent);
+        getEventRegistry().registerGlobal(PlayerConnectEvent.class, questAutoAssignmentService::handlePlayerConnectEvent);
 
         getAssetRegistry().register(HytaleAssetStore.builder(QuestAsset.class, new DefaultAssetMap<>())
                                                     .setPath("HyQuests/Quests/")
                                                     .setCodec(QuestAsset.CODEC)
                                                     .setKeyFunction(QuestAsset::getId)
                                                     .build());
+
+        getAssetRegistry().register(HytaleAssetStore.builder(QuestAssignmentAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("HyQuests/QuestAssignments/")
+                                                    .setCodec(QuestAssignmentAsset.CODEC)
+                                                    .setKeyFunction(QuestAssignmentAsset::getId)
+                                                    .build());
     }
 
     @Override
     protected void start() {
         universeQuestService.loadQuests();
+        questAssignmentService.registerAllAssignmentsToItsConditions();
 
         HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(() -> {
             questProgressionStore.saveAllToDisk();
+            questAssignmentStore.saveAllToDisk();
             universeQuestService.saveUniverseQuestIndex();
         }, SAVE_INTERVAL_MINUTES, SAVE_INTERVAL_MINUTES, TimeUnit.MINUTES);
     }
@@ -113,6 +137,7 @@ public class HyQuestCorePlugin extends JavaPlugin {
     @Override
     protected void shutdown() {
         questProgressionStore.saveAllToDisk();
+        questAssignmentStore.saveAllToDisk();
         universeQuestService.saveUniverseQuestIndex();
     }
 
@@ -146,6 +171,22 @@ public class HyQuestCorePlugin extends JavaPlugin {
 
     public ResourceType<EntityStore, WorldQuestStoreResource> getWorldStoreResourceType() {
         return worldStoreResourceType;
+    }
+
+    public QuestAssignmentService getQuestAssignmentService() {
+        return questAssignmentService;
+    }
+
+    public QuestAutoAssignmentService getQuestAutoAssignmentService() {
+        return questAutoAssignmentService;
+    }
+
+    public QuestAssignmentStore getQuestAssignmentStore() {
+        return questAssignmentStore;
+    }
+
+    public ComponentType<EntityStore, QuestAssignmentStoreComponent> getQuestAssignmentStoreComponentType() {
+        return questAssignmentStoreComponentType;
     }
 
     public ComponentType<EntityStore, QuestHistoryStoreComponent> getQuestHistoryStoreComponentType() {

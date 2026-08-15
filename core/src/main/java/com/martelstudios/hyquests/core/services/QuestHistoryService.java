@@ -16,6 +16,7 @@ import com.martelstudios.hyquests.core.stores.QuestHistoryStore;
 import com.martelstudios.hyquests.core.stores.QuestHistoryStoreComponent;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -132,7 +133,7 @@ public class QuestHistoryService {
         if (record.isClaimed()) return;
 
         QuestReward[] pending = record.getPendingRewards();
-        List<QuestReward> remaining = Arrays.asList(pending);
+        List<QuestReward> remaining = new ArrayList<>(Arrays.asList(pending));
 
         for (QuestReward reward : pending) {
             if (!reward.grant(record, playerRef)) continue;

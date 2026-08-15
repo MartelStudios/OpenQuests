@@ -25,7 +25,7 @@ public class ReachLocationQuestAsset extends QuestAsset {
 
     @Override
     public AbstractQuest<?> create() {
-        return new ReachLocationQuest().setQuestAssetId(getId());
+        return new ReachLocationQuest().setAssetId(getId());
     }
 
     public Vector3d getPosition() {

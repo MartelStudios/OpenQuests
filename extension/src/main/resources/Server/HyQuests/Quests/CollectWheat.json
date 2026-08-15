@@ -1,0 +1,9 @@
+{
+  "Type": "Gather",
+  "TitleKey": "CollectWheat",
+  "DescriptionKey": "CollectWheatDescription",
+  "ItemToGather": {
+    "ItemId": "Ingredient_Fibre"
+  },
+  "Count": 15
+}

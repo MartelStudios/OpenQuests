@@ -20,7 +20,7 @@ public class InteractivelyPickupQuestAsset extends CountQuestAsset {
 
     @Override
     public AbstractQuest<?> create() {
-        return new InteractivelyPickupQuest().setQuestAssetId(getId());
+        return new InteractivelyPickupQuest().setAssetId(getId());
     }
 
     public BlockTagOrItemIdField getItemToPickup() {

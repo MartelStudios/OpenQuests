@@ -15,6 +15,7 @@ import com.martelstudios.hyquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.hyquests.core.models.AbstractQuest;
 import com.martelstudios.hyquests.core.stores.QuestStoreComponent;
 import com.martelstudios.hyquests.core.stores.QuestsRecord;
+import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -55,31 +56,7 @@ public class PlayerQuestService {
     }
 
     public void addQuestToPlayerStore(@Nonnull UUID questId, @Nonnull UUID playerId) {
-        PlayerRef online = Universe.get().getPlayer(playerId);
-        if (online != null) {
-            var ref = online.getReference();
-            if (ref != null) {
-                var world = ref.getStore().getExternalData().getWorld();
-                world.execute(() -> addQuestToPlayerStore(questId, ref));
-            }
-        } else {
-            Universe.get().getPlayerStorage().update(playerId, holder -> addQuestToPlayerStore(questId, holder));
-        }
-    }
-
-    /**
-     * Must be called on the world thread the given ref belongs to (e.g. inside {@link World#execute}).
-     */
-    public void addQuestToPlayerStore(@Nonnull UUID questId, @Nonnull Ref<EntityStore> ref) {
-        var questStoreComponent = ref.getStore().ensureAndGetComponent(ref, QuestStoreComponent.getComponentType());
-        var playerId = ref.getStore().getComponent(ref, UUIDComponent.getComponentType()).getUuid();
-        addQuestToPlayerStore(questStoreComponent, questId, playerId);
-    }
-
-    public void addQuestToPlayerStore(@Nonnull UUID questId, @Nonnull Holder<EntityStore> holder) {
-        var questStoreComponent = holder.ensureAndGetComponent(QuestStoreComponent.getComponentType());
-        var playerId = holder.getComponent(UUIDComponent.getComponentType()).getUuid();
-        addQuestToPlayerStore(questStoreComponent, questId, playerId);
+        EntityComponents.update(playerId, components -> addQuestToPlayerStore(components.ensureAndGetComponent(QuestStoreComponent.getComponentType()), questId, playerId));
     }
 
     public void addQuestToPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull UUID questId, @Nonnull UUID playerId) {
@@ -95,31 +72,7 @@ public class PlayerQuestService {
     }
 
     public void removeQuestFromPlayerStore(@Nonnull UUID questId, @Nonnull UUID playerId) {
-        PlayerRef online = Universe.get().getPlayer(playerId);
-        if (online != null) {
-            var ref = online.getReference();
-            if (ref != null) {
-                var world = ref.getStore().getExternalData().getWorld();
-                world.execute(() -> removeQuestFromPlayerStore(questId, ref));
-            }
-        } else {
-            Universe.get().getPlayerStorage().update(playerId, holder -> removeQuestFromPlayerStore(questId, holder));
-        }
-    }
-
-    /**
-     * Must be called on the world thread the given ref belongs to (e.g. inside {@link World#execute}).
-     */
-    public void removeQuestFromPlayerStore(@Nonnull UUID questId, @Nonnull Ref<EntityStore> ref) {
-        var questStoreComponent = ref.getStore().ensureAndGetComponent(ref, QuestStoreComponent.getComponentType());
-        var playerId = ref.getStore().getComponent(ref, UUIDComponent.getComponentType()).getUuid();
-        removeQuestFromPlayerStore(questStoreComponent, questId, playerId);
-    }
-
-    public void removeQuestFromPlayerStore(@Nonnull UUID questId, @Nonnull Holder<EntityStore> holder) {
-        var questStoreComponent = holder.ensureAndGetComponent(QuestStoreComponent.getComponentType());
-        var playerId = holder.getComponent(UUIDComponent.getComponentType()).getUuid();
-        removeQuestFromPlayerStore(questStoreComponent, questId, playerId);
+        EntityComponents.update(playerId, components -> removeQuestFromPlayerStore(components.ensureAndGetComponent(QuestStoreComponent.getComponentType()), questId, playerId));
     }
 
     public void removeQuestFromPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull UUID questId, @Nonnull UUID playerId) {

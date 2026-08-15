@@ -1,0 +1,19 @@
+{
+  "QuestAssetIds": [
+    "PickBerries"
+  ],
+  "AutoAssign": true,
+  "Conditions": [
+    {
+      "Type": "Operator",
+      "Conditions": [
+        {
+          "Type": "QuestState",
+          "QuestAssetId": "CollectWood",
+          "QuestStateRequirement": "Completed"
+        }
+      ],
+      "Operator": "Or"
+    }
+  ]
+}

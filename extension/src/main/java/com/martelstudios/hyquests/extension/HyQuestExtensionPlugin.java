@@ -3,6 +3,8 @@ package com.martelstudios.hyquests.extension;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.hyquests.extension.quests.gather.GatherFeature;
+import com.martelstudios.hyquests.extension.conditions.operator.OperatorConditionFeature;
+import com.martelstudios.hyquests.extension.conditions.queststate.QuestStateConditionFeature;
 import com.martelstudios.hyquests.extension.quests.composite.CompositeFeature;
 import com.martelstudios.hyquests.extension.hud.HudFeature;
 import com.martelstudios.hyquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
@@ -31,5 +33,8 @@ public class HyQuestExtensionPlugin extends JavaPlugin {
         CompositeFeature.register(this);
         HudFeature.register(this);
         ItemRewardFeature.register(this);
+
+        OperatorConditionFeature.register(this);
+        QuestStateConditionFeature.register(this);
     }
 }

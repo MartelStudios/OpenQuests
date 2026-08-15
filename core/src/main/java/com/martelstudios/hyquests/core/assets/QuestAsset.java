@@ -80,12 +80,12 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
         return AssetRegistry.getAssetStore(QuestAsset.class);
     }
 
-    public static QuestAsset getAsset(String assetId) {
-        return getAssetMap().getAsset(assetId);
-    }
-
     public static DefaultAssetMap<String, QuestAsset> getAssetMap() {
         return getAssetStore().getAssetMap();
+    }
+
+    public static QuestAsset getAsset(String assetId) {
+        return getAssetMap().getAsset(assetId);
     }
 
     public String getTitleKey() {

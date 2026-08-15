@@ -20,7 +20,7 @@ public class GatherQuestAsset extends CountQuestAsset {
 
     @Override
     public AbstractQuest<?> create() {
-        return new GatherQuest().setQuestAssetId(getId());
+        return new GatherQuest().setAssetId(getId());
     }
 
     public BlockTagOrItemIdField getItemToGather() {

@@ -47,7 +47,7 @@ public class QuestHistoryRecord {
 
     public QuestHistoryRecord(@Nonnull AbstractQuest<?> quest) {
         this.id = quest.getId();
-        this.questAssetId = quest.getQuestAssetId();
+        this.questAssetId = quest.getAssetId();
         this.state = quest.getState();
         this.completedAt = Instant.now();
 

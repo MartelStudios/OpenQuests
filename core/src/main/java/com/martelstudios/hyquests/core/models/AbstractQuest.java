@@ -39,7 +39,7 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
     public static final BuilderCodec<AbstractQuest> BASE_CODEC = BuilderCodec.abstractBuilder(AbstractQuest.class)
                                                                              .append(new KeyedCodec<>("Id", Codec.UUID_BINARY), (quest, uuid) -> quest.id = uuid, quest -> quest.id)
                                                                              .add()
-                                                                             .append(new KeyedCodec<>("QuestAssetId", Codec.STRING), (quest, assetId) -> quest.questAssetId = assetId, quest -> quest.questAssetId)
+                                                                             .append(new KeyedCodec<>("AssetId", Codec.STRING), (quest, assetId) -> quest.assetId = assetId, quest -> quest.assetId)
                                                                              .add()
                                                                              .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.state = state, quest -> quest.state)
                                                                              .add()
@@ -57,7 +57,7 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
      */
     protected Set<UUID> players = ConcurrentHashMap.newKeySet();
 
-    protected String questAssetId;
+    protected String assetId;
     protected QuestState state = QuestState.IN_PROGRESS;
 
     /**
@@ -137,19 +137,19 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
     }
 
     public QuestAsset getAsset() {
-        return QuestAsset.getAsset(questAssetId);
+        return QuestAsset.getAsset(assetId);
     }
 
     public UUID getId() {
         return id;
     }
 
-    public String getQuestAssetId() {
-        return questAssetId;
+    public String getAssetId() {
+        return assetId;
     }
 
-    public Q setQuestAssetId(String questAssetId) {
-        this.questAssetId = questAssetId;
+    public Q setAssetId(String assetId) {
+        this.assetId = assetId;
         return self();
     }
 

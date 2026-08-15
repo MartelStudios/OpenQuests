@@ -27,7 +27,7 @@ public class CompositeQuestAsset extends QuestAsset {
 
     @Override
     public CompositeQuest create() {
-        return new CompositeQuest().setQuestAssetId(getId());
+        return new CompositeQuest().setAssetId(getId());
     }
 
     public String[] getAssetIds() {
