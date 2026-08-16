@@ -11,8 +11,8 @@ import com.martelstudios.hyquests.core.events.QuestCompletedEvent;
 import com.martelstudios.hyquests.core.models.AbstractQuest;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
 
-import java.util.*;
 import javax.annotation.Nonnull;
+import java.util.*;
 
 /**
  * Composite quest whose objective is that other quests complete. Children are
@@ -41,19 +41,27 @@ public class CompositeQuest extends AbstractQuest<CompositeQuest> {
     }
 
     @Override
-    protected void onPlayerAdded(@Nonnull UUID playerId) {
+    public boolean addPlayer(@Nonnull UUID playerId) {
+        if (!super.addPlayer(playerId)) return false;
+
         Arrays.stream(questIds)
               .map(QuestProgressionService.get()::getQuest)
               .filter(Objects::nonNull)
               .forEach(child -> child.addPlayer(playerId));
+
+        return true;
     }
 
     @Override
-    protected void onPlayerRemoved(@Nonnull UUID playerId) {
+    public boolean removePlayer(@Nonnull UUID playerId) {
+        if (!super.removePlayer(playerId)) return false;
+
         Arrays.stream(questIds)
               .map(QuestProgressionService.get()::getQuest)
               .filter(Objects::nonNull)
               .forEach(child -> child.removePlayer(playerId));
+
+        return true;
     }
 
     /**

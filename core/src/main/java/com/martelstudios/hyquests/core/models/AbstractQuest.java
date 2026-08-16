@@ -94,8 +94,12 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
      */
     public void onUnregistered() {}
 
-    public void addPlayer(@Nonnull UUID playerId) {
-        if (!getPlayers().add(playerId)) return;
+    /**
+     * @return {@code false} if the player already held this quest, so an override can stop there
+     * rather than repeat whatever it does on top.
+     */
+    public boolean addPlayer(@Nonnull UUID playerId) {
+        if (!getPlayers().add(playerId)) return false;
         markDirty();
 
         HytaleServer.get()
@@ -103,11 +107,14 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
                     .dispatchFor(QuestPlayerAddedEvent.class, playerId)
                     .dispatch(new QuestPlayerAddedEvent(this, playerId));
 
-        onPlayerAdded(playerId);
+        return true;
     }
 
-    public void removePlayer(@Nonnull UUID playerId) {
-        if (!getPlayers().remove(playerId)) return;
+    /**
+     * @return {@code false} if the player did not hold this quest.
+     */
+    public boolean removePlayer(@Nonnull UUID playerId) {
+        if (!getPlayers().remove(playerId)) return false;
         markDirty();
 
         HytaleServer.get()
@@ -115,15 +122,8 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
                     .dispatchFor(QuestPlayerRemovedEvent.class, playerId)
                     .dispatch(new QuestPlayerRemovedEvent(this, playerId));
 
-        onPlayerRemoved(playerId);
+        return true;
     }
-
-    /**
-     * Hooks for composite quests to propagate an assignment they do not own directly.
-     */
-    protected void onPlayerAdded(@Nonnull UUID playerId) {}
-
-    protected void onPlayerRemoved(@Nonnull UUID playerId) {}
 
     public boolean isSuccessful() {
         return state == QuestState.SUCCESSFUL;
