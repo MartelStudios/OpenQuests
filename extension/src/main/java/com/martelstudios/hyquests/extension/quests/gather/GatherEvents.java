@@ -1,6 +1,6 @@
 package com.martelstudios.hyquests.extension.quests.gather;
 
-import com.martelstudios.hyquests.core.events.QuestAddedToPlayerStoreEvent;
+import com.martelstudios.hyquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 /**

@@ -1,6 +1,7 @@
-package com.martelstudios.hyquests.core.events;
+package com.martelstudios.hyquests.core.scopes.player.events;
 
 import com.hypixel.hytale.event.IEvent;
+import com.martelstudios.hyquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.hyquests.core.models.AbstractQuest;
 
 import javax.annotation.Nonnull;
