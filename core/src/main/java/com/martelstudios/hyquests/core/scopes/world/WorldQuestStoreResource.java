@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.core.stores;
+package com.martelstudios.hyquests.core.scopes.world;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -7,6 +7,7 @@ import com.hypixel.hytale.component.Resource;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.core.HyQuestCorePlugin;
+import com.martelstudios.hyquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nullable;
 

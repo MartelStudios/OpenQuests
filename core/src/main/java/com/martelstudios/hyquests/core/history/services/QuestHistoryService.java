@@ -1,14 +1,14 @@
-package com.martelstudios.hyquests.core.services;
+package com.martelstudios.hyquests.core.history.services;
 
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.hyquests.core.HyQuestCorePlugin;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
 import com.martelstudios.hyquests.core.events.QuestCompletedEvent;
-import com.martelstudios.hyquests.core.models.QuestHistoryRecord;
+import com.martelstudios.hyquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.hyquests.core.rewards.QuestReward;
-import com.martelstudios.hyquests.core.stores.QuestHistoryStore;
-import com.martelstudios.hyquests.core.stores.QuestHistoryStoreComponent;
+import com.martelstudios.hyquests.core.history.stores.QuestHistoryStore;
+import com.martelstudios.hyquests.core.history.stores.QuestHistoryStoreComponent;
 import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;

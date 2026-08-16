@@ -14,25 +14,28 @@ import com.hypixel.hytale.server.core.universe.datastore.DiskDataStoreProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
 import com.martelstudios.hyquests.core.assignment.assets.QuestAssignmentAsset;
-import com.martelstudios.hyquests.core.commands.QuestCommand;
-import com.martelstudios.hyquests.core.events.QuestCompletedEvent;
-import com.martelstudios.hyquests.core.services.PlayerQuestService;
 import com.martelstudios.hyquests.core.assignment.services.QuestAssignmentService;
 import com.martelstudios.hyquests.core.assignment.services.QuestAutoAssignmentService;
-import com.martelstudios.hyquests.core.services.QuestHistoryService;
-import com.martelstudios.hyquests.core.services.QuestProgressionService;
-import com.martelstudios.hyquests.core.services.UniverseQuestService;
-import com.martelstudios.hyquests.core.services.WorldQuestService;
 import com.martelstudios.hyquests.core.assignment.stores.QuestAssignmentRecord;
 import com.martelstudios.hyquests.core.assignment.stores.QuestAssignmentStore;
 import com.martelstudios.hyquests.core.assignment.stores.QuestAssignmentStoreComponent;
-import com.martelstudios.hyquests.core.stores.QuestHistoryStoreComponent;
+import com.martelstudios.hyquests.core.commands.QuestCommand;
+import com.martelstudios.hyquests.core.events.QuestCompletedEvent;
+import com.martelstudios.hyquests.core.events.QuestPlayerAddedEvent;
+import com.martelstudios.hyquests.core.events.QuestPlayerRemovedEvent;
+import com.martelstudios.hyquests.core.events.QuestUnregisteredEvent;
+import com.martelstudios.hyquests.core.history.services.QuestHistoryService;
+import com.martelstudios.hyquests.core.history.stores.QuestHistoryStoreComponent;
+import com.martelstudios.hyquests.core.scopes.player.PlayerQuestService;
+import com.martelstudios.hyquests.core.scopes.universe.QuestsStore;
+import com.martelstudios.hyquests.core.scopes.universe.UniverseQuestService;
+import com.martelstudios.hyquests.core.scopes.world.WorldQuestService;
+import com.martelstudios.hyquests.core.scopes.world.WorldQuestStoreResource;
+import com.martelstudios.hyquests.core.services.QuestProgressionService;
 import com.martelstudios.hyquests.core.stores.QuestProgressionRecord;
 import com.martelstudios.hyquests.core.stores.QuestProgressionStore;
 import com.martelstudios.hyquests.core.stores.QuestStoreComponent;
 import com.martelstudios.hyquests.core.stores.QuestsRecord;
-import com.martelstudios.hyquests.core.stores.QuestsStore;
-import com.martelstudios.hyquests.core.stores.WorldQuestStoreResource;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
@@ -102,6 +105,9 @@ public class HyQuestCorePlugin extends JavaPlugin {
 
         // All wiring lives here, so the plugin registry unregisters it on disable
         getEventRegistry().registerGlobal(PlayerConnectEvent.class, playerQuestService::handlePlayerConnectEvent);
+        getEventRegistry().registerGlobal(QuestPlayerAddedEvent.class, playerQuestService::handleQuestPlayerAddedEvent);
+        getEventRegistry().registerGlobal(QuestPlayerRemovedEvent.class, playerQuestService::handleQuestPlayerRemovedEvent);
+        getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, playerQuestService::handleQuestUnregisteredEvent);
         getEventRegistry().registerGlobal(PlayerConnectEvent.class, universeQuestService::handlePlayerConnectEvent);
         getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, worldQuestService::handleAddPlayerToWorldEvent);
         getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, questHistoryService::handleAddPlayerToWorldEvent);

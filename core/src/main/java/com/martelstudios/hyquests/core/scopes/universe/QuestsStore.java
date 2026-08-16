@@ -1,7 +1,8 @@
-package com.martelstudios.hyquests.core.stores;
+package com.martelstudios.hyquests.core.scopes.universe;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.datastore.DataStore;
+import com.martelstudios.hyquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;

@@ -1,34 +1,33 @@
-package com.martelstudios.hyquests.core.commands.subcommands;
+package com.martelstudios.hyquests.core.scopes.player;
 
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.auth.ProfileServiceClient;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
-import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
-import com.martelstudios.hyquests.core.services.WorldQuestService;
 
 import javax.annotation.Nonnull;
 
+import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes.GAME_PROFILE_LOOKUP;
 import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes.STRING;
-import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes.WORLD;
 
-public class CreateWorldQuestCommand extends CommandBase {
+public class CreatePlayerQuestCommand extends CommandBase {
 
     @Nonnull
     private final RequiredArg<String> assetIdArg = withRequiredArg("assetId", "server.commands.hyquests.quest.create.assetId.desc", STRING);
 
-    private final RequiredArg<World> worldArg = withRequiredArg("world", "server.commands.hyquests.quest.create.world.desc", WORLD);
+    private final RequiredArg<ProfileServiceClient.PublicGameProfile> playerArg = withRequiredArg("player", "server.commands.argtype.player.desc", GAME_PROFILE_LOOKUP);
 
-    public CreateWorldQuestCommand() {
-        super("world", "Creates a new quest progression and adds it to the given world's store");
+    public CreatePlayerQuestCommand() {
+        super("player", "Creates a new quest progression and adds it to the given player's store");
     }
 
     @Override
     protected void executeSync(@Nonnull CommandContext context) {
         String assetId = context.get(assetIdArg);
-        World world = context.get(worldArg);
+        ProfileServiceClient.PublicGameProfile profile = context.get(playerArg);
 
         QuestAsset asset = QuestAsset.getAsset(assetId);
         if (asset == null) {
@@ -37,7 +36,7 @@ public class CreateWorldQuestCommand extends CommandBase {
         }
 
         var quest = QuestProgressionService.get().registerQuest(asset);
+        quest.addPlayer(profile.getUuid());
         context.sendMessage(Message.raw("Created quest " + quest.getId() + " from asset '" + assetId + "'."));
-        WorldQuestService.get().addQuest(world, quest.getId());
     }
 }

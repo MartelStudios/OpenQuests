@@ -9,8 +9,9 @@ import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
+import com.martelstudios.hyquests.core.events.QuestPlayerAddedEvent;
+import com.martelstudios.hyquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.hyquests.core.events.QuestUpdatedEvent;
-import com.martelstudios.hyquests.core.services.PlayerQuestService;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
 import com.martelstudios.hyquests.core.visitors.QuestVisitor;
 
@@ -91,17 +92,17 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
      * Called by {@link QuestProgressionService#unregisterQuest}; implementations must stay safe to
      * call on an already-unregistered quest.
      */
-    public void onUnregistered() {
-        for (UUID playerId : players) {
-            PlayerQuestService.get().removeQuestFromPlayerStore(getId(), playerId);
-        }
-    }
+    public void onUnregistered() {}
 
     public void addPlayer(@Nonnull UUID playerId) {
         if (!getPlayers().add(playerId)) return;
         markDirty();
 
-        PlayerQuestService.get().addQuestToPlayerStore(getId(), playerId);
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestPlayerAddedEvent.class, playerId)
+                    .dispatch(new QuestPlayerAddedEvent(this, playerId));
+
         onPlayerAdded(playerId);
     }
 
@@ -109,7 +110,11 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
         if (!getPlayers().remove(playerId)) return;
         markDirty();
 
-        PlayerQuestService.get().removeQuestFromPlayerStore(getId(), playerId);
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestPlayerRemovedEvent.class, playerId)
+                    .dispatch(new QuestPlayerRemovedEvent(this, playerId));
+
         onPlayerRemoved(playerId);
     }
 

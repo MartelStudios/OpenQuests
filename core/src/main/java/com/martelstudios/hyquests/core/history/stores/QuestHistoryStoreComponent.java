@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.core.stores;
+package com.martelstudios.hyquests.core.history.stores;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;

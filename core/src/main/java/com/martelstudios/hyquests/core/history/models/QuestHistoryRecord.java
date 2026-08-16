@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.core.models;
+package com.martelstudios.hyquests.core.history.models;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -6,6 +6,8 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
+import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.QuestState;
 import com.martelstudios.hyquests.core.rewards.QuestReward;
 
 import javax.annotation.Nonnull;

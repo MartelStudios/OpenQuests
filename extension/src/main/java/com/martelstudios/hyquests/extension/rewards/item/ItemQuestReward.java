@@ -8,7 +8,7 @@ import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
-import com.martelstudios.hyquests.core.models.QuestHistoryRecord;
+import com.martelstudios.hyquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.hyquests.core.rewards.QuestReward;
 import com.martelstudios.hyquests.core.utils.EntityComponents;
 

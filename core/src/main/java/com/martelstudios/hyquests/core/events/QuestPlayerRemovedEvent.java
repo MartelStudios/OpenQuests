@@ -7,9 +7,9 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * Fired when a quest leaves a specific player's store, whatever the scope it came from. Fires
- * once per (quest, player) pair, unlike {@link QuestUnregisteredEvent} which fires once for the
- * whole instance.
+ * Fired by {@link AbstractQuest#removePlayer}, and for every player when the quest is unregistered.
+ * The counterpart of {@link QuestPlayerAddedEvent}: what each scope listens to in order to undo
+ * whatever it recorded.
  */
 public class QuestPlayerRemovedEvent implements IEvent<UUID> {
     @Nonnull

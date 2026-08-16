@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.core.services;
+package com.martelstudios.hyquests.core.scopes.world;
 
 import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.logger.HytaleLogger;
@@ -11,8 +11,8 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.hyquests.core.HyQuestCorePlugin;
 import com.martelstudios.hyquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.services.QuestProgressionService;
 import com.martelstudios.hyquests.core.stores.QuestsRecord;
-import com.martelstudios.hyquests.core.stores.WorldQuestStoreResource;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

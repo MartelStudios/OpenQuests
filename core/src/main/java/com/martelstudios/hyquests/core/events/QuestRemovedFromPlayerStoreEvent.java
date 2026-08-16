@@ -7,17 +7,17 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * Fired by {@link AbstractQuest#addPlayer} once the quest holds the player. Nothing has been
- * written to the player yet — {@link QuestAddedToPlayerStoreEvent} announces that — so this is
- * what any scope listens to in order to record the assignment on its side.
+ * Fired when a quest leaves a specific player's store, whatever the scope it came from. Fires
+ * once per (quest, player) pair, unlike {@link QuestUnregisteredEvent} which fires once for the
+ * whole instance.
  */
-public class QuestPlayerAddedEvent implements IEvent<UUID> {
+public class QuestRemovedFromPlayerStoreEvent implements IEvent<UUID> {
     @Nonnull
     private final AbstractQuest<?> quest;
     @Nonnull
     private final UUID playerId;
 
-    public QuestPlayerAddedEvent(@Nonnull AbstractQuest<?> quest, @Nonnull UUID playerId) {
+    public QuestRemovedFromPlayerStoreEvent(@Nonnull AbstractQuest<?> quest, @Nonnull UUID playerId) {
         this.quest = quest;
         this.playerId = playerId;
     }

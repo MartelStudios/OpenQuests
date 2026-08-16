@@ -1,9 +1,9 @@
-package com.martelstudios.hyquests.core.stores;
+package com.martelstudios.hyquests.core.history.stores;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.set.SetCodec;
-import com.martelstudios.hyquests.core.models.QuestHistoryRecord;
+import com.martelstudios.hyquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.hyquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;

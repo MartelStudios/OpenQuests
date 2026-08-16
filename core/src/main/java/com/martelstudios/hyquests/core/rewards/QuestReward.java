@@ -1,7 +1,7 @@
 package com.martelstudios.hyquests.core.rewards;
 
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
-import com.martelstudios.hyquests.core.models.QuestHistoryRecord;
+import com.martelstudios.hyquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
