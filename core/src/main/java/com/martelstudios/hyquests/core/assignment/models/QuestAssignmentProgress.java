@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.hyquests.core.assignment.assets.QuestAssignmentAsset;
 import com.martelstudios.hyquests.core.assignment.conditions.QuestAssignmentCondition;
+import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -51,16 +52,18 @@ public class QuestAssignmentProgress {
         QuestAssignmentCondition<?>[] conditions = asset.getConditions();
         boolean allSatisfied = true;
 
-        for (int i = 0; i < conditions.length; i++) {
-            if (isConditionCompleted(i)) continue;
+        try (var _ = EntityComponents.cache()) {
+            for (int i = 0; i < conditions.length; i++) {
+                if (isConditionCompleted(i)) continue;
 
-            QuestAssignmentCondition<?> condition = conditions[i];
-            if (!condition.evaluate(playerId)) {
-                allSatisfied = false;
-                continue;
+                QuestAssignmentCondition<?> condition = conditions[i];
+                if (!condition.evaluate(playerId)) {
+                    allSatisfied = false;
+                    continue;
+                }
+
+                if (condition.useCache()) setConditionCompleted(i);
             }
-
-            if (condition.useCache()) setConditionCompleted(i);
         }
 
         return allSatisfied;

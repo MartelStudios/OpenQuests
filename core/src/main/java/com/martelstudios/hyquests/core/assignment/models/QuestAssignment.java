@@ -6,13 +6,10 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.martelstudios.hyquests.core.assignment.assets.QuestAssignmentAsset;
 import com.martelstudios.hyquests.core.assignment.conditions.QuestAssignmentCondition;
+import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -78,16 +75,18 @@ public class QuestAssignment {
      * @param enableUseCache whether a satisfied condition is dropped. Pass {@code false} to probe
      *                       without committing — a shared assignment tested against one player
      *                       would otherwise settle conditions on behalf of the whole group.
-     * @return {@code true} when nothing is left unsatisfied, so the quests can be handed over.
+     * @return {@code true} when all conditions are met and the assignment can be completed.
      */
     public boolean evaluate(@Nonnull UUID playerId, boolean enableUseCache) {
         boolean allSatisfied = true;
 
-        for (var condition : pendingConditions) {
-            if (condition.evaluate(playerId)) {
-                if (enableUseCache) setConditionCompleted(condition);
-            } else {
-                allSatisfied = false;
+        try (var _ = EntityComponents.cache()) {
+            for (var condition : pendingConditions) {
+                if (condition.evaluate(playerId)) {
+                    if (enableUseCache) setConditionCompleted(condition);
+                } else {
+                    allSatisfied = false;
+                }
             }
         }
 

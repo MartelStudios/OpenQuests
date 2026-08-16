@@ -10,6 +10,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -71,8 +73,53 @@ public interface EntityComponents {
      */
     @Nonnull
     static EntityComponents of(@Nonnull UUID playerId) {
+        EntityComponents cached = PlayerComponentsCache.get(playerId);
+        if (cached != null) return cached;
+
         EntityComponents online = ofOnline(playerId);
-        return online != null ? online : of(Universe.get().getPlayerStorage().load(playerId).join());
+        EntityComponents components = online != null ? online : of(Universe.get().getPlayerStorage().load(playerId).join());
+
+        PlayerComponentsCache.put(playerId, components);
+        return components;
+    }
+
+    /**
+     * Caches {@link #of(UUID)} if needed to often avoid disk loads.
+     */
+    @Nonnull
+    static PlayerComponentsCache cache() {
+        return new PlayerComponentsCache();
+    }
+
+    /**
+     * Opened with try-with-resources. Caches can be nested, only the outermost one clears.
+     */
+    final class PlayerComponentsCache implements AutoCloseable {
+
+        private static final ThreadLocal<Map<UUID, EntityComponents>> ACTIVE = new ThreadLocal<>();
+
+        private final boolean outermost;
+
+        private PlayerComponentsCache() {
+            this.outermost = ACTIVE.get() == null;
+            if (outermost) ACTIVE.set(new HashMap<>());
+        }
+
+        @Nullable
+        private static EntityComponents get(@Nonnull UUID playerId) {
+            Map<UUID, EntityComponents> active = ACTIVE.get();
+            return active == null ? null : active.get(playerId);
+        }
+
+        private static void put(@Nonnull UUID playerId, @Nonnull EntityComponents components) {
+            Map<UUID, EntityComponents> active = ACTIVE.get();
+            if (active != null) active.put(playerId, components);
+        }
+
+        @Override
+        public void close() {
+            if (outermost) ACTIVE.remove();
+        }
     }
 
     /**

@@ -97,8 +97,10 @@ public class QuestAssignmentService {
     private boolean isSatisfiedByAllPlayers(@Nonnull QuestAssignment assignment) {
         boolean enableUseCache = !assignment.isShared();
 
-        for (UUID playerId : assignment.getPlayers()) {
-            if (!assignment.evaluate(playerId, enableUseCache)) return false;
+        try (var _ = EntityComponents.cache()) {
+            for (UUID playerId : assignment.getPlayers()) {
+                if (!assignment.evaluate(playerId, enableUseCache)) return false;
+            }
         }
 
         return true;

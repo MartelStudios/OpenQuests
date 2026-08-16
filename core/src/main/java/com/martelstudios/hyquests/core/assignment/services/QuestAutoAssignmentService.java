@@ -31,15 +31,17 @@ public class QuestAutoAssignmentService {
                                                 .ensureAndGetComponent(QuestAssignmentStoreComponent.getComponentType());
         UUID playerId = playerConnectEvent.getPlayerRef().getUuid();
 
-        for (QuestAssignmentAsset asset : QuestAssignmentAsset.getAssetMap().getAssetMap().values()) {
-            if (!asset.isAutoAssign()) continue;
-            if (assignmentStore.getCompletedAssignments().contains(asset.getId())) continue;
-            if (assignmentStore.getAutoProgress().containsKey(asset.getId())) continue;
+        try (var _ = EntityComponents.cache()) {
+            for (QuestAssignmentAsset asset : QuestAssignmentAsset.getAssetMap().getAssetMap().values()) {
+                if (!asset.isAutoAssign()) continue;
+                if (assignmentStore.getCompletedAssignments().contains(asset.getId())) continue;
+                if (assignmentStore.getAutoProgress().containsKey(asset.getId())) continue;
 
-            var progress = new QuestAssignmentProgress(asset.getId());
-            assignmentStore.getAutoProgress().put(asset.getId(), progress);
+                var progress = new QuestAssignmentProgress(asset.getId());
+                assignmentStore.getAutoProgress().put(asset.getId(), progress);
 
-            if (progress.evaluate(asset, playerId)) completeAssignment(asset, assignmentStore, playerId);
+                if (progress.evaluate(asset, playerId)) completeAssignment(asset, assignmentStore, playerId);
+            }
         }
     }
 
