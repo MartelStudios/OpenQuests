@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
 import com.martelstudios.hyquests.core.stores.QuestStoreComponent;
+import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,7 +33,7 @@ public class GatherItemEventSystem extends EntityEventSystem<EntityStore, Invent
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
 
         QuestProgressionService.get()
-                               .progress(new GatherQuestVisitor(playerRef.getReference()), questStoreComponent.questsRecord.getAllIds());
+                               .progress(new GatherQuestVisitor(EntityComponents.of(playerRef.getReference())), questStoreComponent.questsRecord.getAllIds());
     }
 
     @Nullable

@@ -1,9 +1,7 @@
 package com.martelstudios.hyquests.extension.quests.gather;
 
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.hyquests.core.events.QuestPlayerAddedEvent;
-
-import java.util.UUID;
+import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 /**
  * Handlers tied to a concrete quest type rather than to a service, kept out of the core services
@@ -17,17 +15,7 @@ public class GatherEvents {
     public static void handleQuestAssignedToPlayer(QuestPlayerAddedEvent event) {
         if (!(event.getQuest() instanceof GatherQuest gatherQuest)) return;
 
-        UUID playerId = event.getPlayerId();
-
-        var playerRef = Universe.get().getPlayer(playerId);
-
-        if (playerRef != null && playerRef.getReference() != null) {
-            gatherQuest.update(new GatherQuestVisitor(playerRef.getReference()));
-        } else {
-            Universe.get()
-                    .getPlayerStorage()
-                    .update(playerId, holder -> gatherQuest.update(new GatherQuestVisitor(holder)));
-        }
+        EntityComponents.update(event.getPlayerId(), components -> gatherQuest.update(new GatherQuestVisitor(components)));
     }
 
 }

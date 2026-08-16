@@ -3,15 +3,14 @@ package com.martelstudios.hyquests.extension.rewards.item;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.core.models.QuestHistoryRecord;
 import com.martelstudios.hyquests.core.rewards.QuestReward;
+import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -37,11 +36,11 @@ public class ItemQuestReward extends QuestReward {
     private ItemQuestReward() {}
 
     @Override
-    public boolean grant(@Nonnull QuestHistoryRecord questHistoryRecord, @Nonnull Ref<EntityStore> playerRef) {
+    public boolean grant(@Nonnull QuestHistoryRecord questHistoryRecord, @Nonnull EntityComponents playerComponents) {
         List<ItemContainer> containers = new ArrayList<>(InventoryComponent.HOTBAR_FIRST.length);
 
         for (var inventoryType : InventoryComponent.HOTBAR_FIRST) {
-            var inventory = playerRef.getStore().getComponent(playerRef, inventoryType);
+            var inventory = playerComponents.getComponent(inventoryType);
             if (inventory != null) containers.add(inventory.getInventory());
         }
 

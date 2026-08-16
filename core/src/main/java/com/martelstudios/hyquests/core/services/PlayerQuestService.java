@@ -32,19 +32,11 @@ public class PlayerQuestService {
     }
 
     /**
-     * @return the quest index of a live player, created if they have none yet.
+     * @return the quest index of a player, created if they have none yet.
      */
     @Nonnull
-    public QuestsRecord getQuests(@Nonnull Ref<EntityStore> ref) {
-        return ref.getStore().ensureAndGetComponent(ref, QuestStoreComponent.getComponentType()).questsRecord;
-    }
-
-    /**
-     * @return the quest index of a player loaded from storage, created if they have none yet.
-     */
-    @Nonnull
-    public QuestsRecord getQuests(@Nonnull Holder<EntityStore> holder) {
-        return holder.ensureAndGetComponent(QuestStoreComponent.getComponentType()).questsRecord;
+    public QuestsRecord getQuests(@Nonnull EntityComponents playerComponents) {
+        return playerComponents.ensureAndGetComponent(QuestStoreComponent.getComponentType()).questsRecord;
     }
 
     /**
@@ -52,7 +44,7 @@ public class PlayerQuestService {
      * each on the event that concerns it.
      */
     public void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
-        getQuests(playerConnectEvent.getHolder()).loadAll();
+        getQuests(EntityComponents.of(playerConnectEvent.getHolder())).loadAll();
     }
 
     public void addQuestToPlayerStore(@Nonnull UUID questId, @Nonnull UUID playerId) {

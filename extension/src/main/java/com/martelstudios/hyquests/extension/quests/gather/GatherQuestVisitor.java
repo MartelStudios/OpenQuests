@@ -1,21 +1,19 @@
 package com.martelstudios.hyquests.extension.quests.gather;
 
-import com.hypixel.hytale.component.Holder;
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.core.models.QuestState;
+import com.martelstudios.hyquests.core.utils.EntityComponents;
 import com.martelstudios.hyquests.core.visitors.QuestVisitor;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
-import javax.annotation.Nonnull;
 
 /**
  * Progresses {@link GatherQuest}s on inventory change, mirroring Hytale's {@code GatherObjectiveTask}:
@@ -34,25 +32,12 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuest> {
      * which only exists on a live entity: this way an online and an offline player are counted
      * exactly the same way.
      */
-    public GatherQuestVisitor(Ref<EntityStore> playerRef) {
-        var store = playerRef.getStore();
-        this.playerId = store.getComponent(playerRef, UUIDComponent.getComponentType()).getUuid();
+    public GatherQuestVisitor(@Nonnull EntityComponents playerComponents) {
+        this.playerId = playerComponents.getComponent(UUIDComponent.getComponentType()).getUuid();
 
         List<ItemContainer> containers = new ArrayList<>(InventoryComponent.EVERYTHING.length);
         for (var inventoryType : InventoryComponent.EVERYTHING) {
-            var inventory = store.getComponent(playerRef, inventoryType);
-            if (inventory != null) containers.add(inventory.getInventory());
-        }
-
-        this.combinedItemContainer = new CombinedItemContainer(containers.toArray(new ItemContainer[0]));
-    }
-
-    public GatherQuestVisitor(Holder<EntityStore> playerHolder) {
-        this.playerId = playerHolder.getComponent(UUIDComponent.getComponentType()).getUuid();
-
-        List<ItemContainer> containers = new ArrayList<>(InventoryComponent.EVERYTHING.length);
-        for (var inventoryType : InventoryComponent.EVERYTHING) {
-            var inventory = playerHolder.getComponent(inventoryType);
+            var inventory = playerComponents.getComponent(inventoryType);
             if (inventory != null) containers.add(inventory.getInventory());
         }
 
