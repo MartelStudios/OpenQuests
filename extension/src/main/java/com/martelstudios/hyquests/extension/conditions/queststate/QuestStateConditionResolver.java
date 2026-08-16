@@ -56,10 +56,8 @@ public class QuestStateConditionResolver implements QuestAssignmentConditionReso
         var historyStore = components.getComponent(QuestHistoryStoreComponent.getComponentType());
         if (historyStore == null) return false;
 
-        for (QuestHistoryRecord record : historyStore.history.getAll()) {
-            if (questAssetId.equals(record.getQuestAssetId()) && matches(stateCondition, record.getState())) {
-                return true;
-            }
+        for (QuestHistoryRecord record : historyStore.history.getForAsset(questAssetId)) {
+            if (matches(stateCondition, record.getState())) return true;
         }
 
         return false;

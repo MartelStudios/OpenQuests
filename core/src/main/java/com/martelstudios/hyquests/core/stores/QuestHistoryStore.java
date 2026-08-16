@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,21 +35,36 @@ public class QuestHistoryStore {
 
     private final Map<UUID, QuestHistoryRecord> records = new ConcurrentHashMap<>();
 
+    /**
+     * Secondary index: asking what became of one quest asset must not walk a lifetime of records.
+     * Never serialized — {@link #register} rebuilds it, which the codec already goes through.
+     */
+    private final Map<String, Set<QuestHistoryRecord>> recordsByAssetId = new ConcurrentHashMap<>();
+
     public QuestHistoryStore() {}
 
     public QuestHistoryStore(QuestHistoryStore other) {
-        this.records.putAll(other.records);
+        other.records.values().forEach(this::register);
     }
 
     /**
      * @return {@code true} if that completion was not already recorded.
      */
     public boolean register(@Nonnull QuestHistoryRecord record) {
-        return this.records.putIfAbsent(record.getId(), record) == null;
+        if (this.records.putIfAbsent(record.getId(), record) != null) return false;
+
+        this.recordsByAssetId.computeIfAbsent(record.getQuestAssetId(), _ -> ConcurrentHashMap.newKeySet()).add(record);
+        return true;
     }
 
     public boolean unregister(@Nonnull QuestHistoryRecord record) {
-        return this.records.remove(record.getId(), record);
+        if (!this.records.remove(record.getId(), record)) return false;
+
+        // The emptied set is left in place: pruning it would race against a concurrent register
+        Set<QuestHistoryRecord> forAsset = this.recordsByAssetId.get(record.getQuestAssetId());
+        if (forAsset != null) forAsset.remove(record);
+
+        return true;
     }
 
     /**
@@ -68,23 +84,19 @@ public class QuestHistoryStore {
         return this.records.values();
     }
 
+    /**
+     * @return every completion of one quest asset, one record per run. Empty if never completed.
+     */
     @Nonnull
-    public List<QuestHistoryRecord> getForAsset(@Nonnull String questAssetId) {
-        List<QuestHistoryRecord> matches = new ArrayList<>();
-        for (QuestHistoryRecord record : records.values()) {
-            if (record.getQuestAssetId().equals(questAssetId)) matches.add(record);
-        }
-        return matches;
+    public Collection<QuestHistoryRecord> getForAsset(@Nonnull String questAssetId) {
+        return this.recordsByAssetId.getOrDefault(questAssetId, Set.of());
     }
 
     /**
      * @return {@code true} if the given quest was ever completed, whatever the outcome.
      */
     public boolean hasCompleted(@Nonnull String questAssetId) {
-        for (QuestHistoryRecord record : records.values()) {
-            if (record.getQuestAssetId().equals(questAssetId)) return true;
-        }
-        return false;
+        return !getForAsset(questAssetId).isEmpty();
     }
 
     /**
@@ -92,8 +104,8 @@ public class QuestHistoryStore {
      */
     public int count(@Nonnull String questAssetId, @Nonnull QuestState state) {
         int count = 0;
-        for (QuestHistoryRecord record : records.values()) {
-            if (record.getQuestAssetId().equals(questAssetId) && record.getState() == state) count++;
+        for (QuestHistoryRecord record : getForAsset(questAssetId)) {
+            if (record.getState() == state) count++;
         }
         return count;
     }
