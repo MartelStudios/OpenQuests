@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.quests.kill;
+package com.martelstudios.hyquests.extension.quests.kill.player;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.PlayerRef;

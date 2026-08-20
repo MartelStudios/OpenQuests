@@ -9,10 +9,12 @@
         }
     ],
     "Website": "https://github.com/MartelStudios/HyQuests",
-    "ServerVersion": "0.6.0-pre.12.2",
+    "ServerVersion": "0.6.0-pre.13",
     "Dependencies": {
         "Hytale:AssetModule": "*",
         "Hytale:Objectives": "*",
+        "Hytale:NPC": "*",
+        "Hytale:TagSet": "*",
         "MartelStudios:HyQuestCore": "*"
     },
     "OptionalDependencies": {

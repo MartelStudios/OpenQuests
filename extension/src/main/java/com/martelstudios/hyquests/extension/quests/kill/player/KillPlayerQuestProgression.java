@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.quests.kill;
+package com.martelstudios.hyquests.extension.quests.kill.player;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;

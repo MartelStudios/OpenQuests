@@ -1,4 +1,4 @@
-package com.martelstudios.hyquests.extension.quests.kill;
+package com.martelstudios.hyquests.extension.quests.kill.player;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -7,6 +7,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
 import com.martelstudios.hyquests.core.stores.QuestStoreComponent;
+import com.martelstudios.hyquests.extension.quests.kill.KillDeathSystem;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
