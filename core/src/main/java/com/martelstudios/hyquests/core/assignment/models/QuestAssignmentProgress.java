@@ -54,7 +54,7 @@ public class QuestAssignmentProgress {
 
         try (var _ = EntityComponents.cache()) {
             for (int i = 0; i < conditions.length; i++) {
-                if (isConditionCompleted(i)) continue;
+                if (isConditionSatisfied(i)) continue;
 
                 QuestAssignmentCondition<?> condition = conditions[i];
                 if (!condition.evaluate(playerId)) {
@@ -62,7 +62,7 @@ public class QuestAssignmentProgress {
                     continue;
                 }
 
-                if (condition.useCache()) setConditionCompleted(i);
+                if (condition.useCache()) setConditionSatisfied(i);
             }
         }
 
@@ -74,13 +74,13 @@ public class QuestAssignmentProgress {
      * condition nested in an operator has no bit of its own and simply falls through, the operator
      * answering for it from its children.
      */
-    public void setConditionCompleted(@Nonnull QuestAssignmentAsset asset, @Nonnull QuestAssignmentCondition<?> condition) {
+    public void setConditionSatisfied(@Nonnull QuestAssignmentAsset asset, @Nonnull QuestAssignmentCondition<?> condition) {
         QuestAssignmentCondition<?>[] conditions = asset.getConditions();
 
         for (int i = 0; i < conditions.length; i++) {
             if (conditions[i] != condition) continue;
 
-            if (condition.useCache()) setConditionCompleted(i);
+            if (condition.useCache()) setConditionSatisfied(i);
             break;
         }
     }
@@ -88,17 +88,17 @@ public class QuestAssignmentProgress {
     /**
      * @throws IndexOutOfBoundsException past the bitmask width, rather than latching nothing.
      */
-    public void setConditionCompleted(int conditionIndex) {
+    public void setConditionSatisfied(int conditionIndex) {
         if (conditionIndex >= MAX_CONDITIONS) {
             throw new IndexOutOfBoundsException("Condition index " + conditionIndex + " is out of bounds for " + MAX_CONDITIONS + " conditions");
         }
 
-        if (isConditionCompleted(conditionIndex)) return;
+        if (isConditionSatisfied(conditionIndex)) return;
 
         completion |= 1L << conditionIndex;
     }
 
-    public boolean isConditionCompleted(int conditionIndex) {
+    public boolean isConditionSatisfied(int conditionIndex) {
         return conditionIndex < MAX_CONDITIONS && (completion & (1L << conditionIndex)) != 0;
     }
 

@@ -81,7 +81,7 @@ public class QuestAssignment {
         try (var _ = EntityComponents.cache()) {
             for (var condition : pendingConditions) {
                 if (condition.evaluate(playerId)) {
-                    if (enableUseCache) setConditionCompleted(condition);
+                    if (enableUseCache) setConditionSatisfied(condition);
                 } else {
                     allSatisfied = false;
                 }
@@ -94,7 +94,7 @@ public class QuestAssignment {
     /**
      * Removes the condition from {@link pendingConditions} if {@link QuestAssignmentCondition#useCache()} is {@code true}.
      */
-    public void setConditionCompleted(@Nonnull QuestAssignmentCondition<?> condition) {
+    public void setConditionSatisfied(@Nonnull QuestAssignmentCondition<?> condition) {
         if (!condition.useCache()) return;
 
         var remaining = new ArrayList<>(Arrays.asList(pendingConditions));

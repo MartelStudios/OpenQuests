@@ -60,7 +60,7 @@ public class QuestAutoAssignmentService {
             QuestAssignmentProgress progress = assignmentStore.getAutoProgress(asset.getId());
             if (progress == null) return;
 
-            progress.setConditionCompleted(asset, condition);
+            progress.setConditionSatisfied(asset, condition);
             if (progress.evaluate(asset, playerId)) completeAssignment(asset, assignmentStore, playerId);
         });
     }

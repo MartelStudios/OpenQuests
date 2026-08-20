@@ -83,7 +83,7 @@ public class QuestAssignmentService {
             QuestAssignmentStoreComponent assignmentStore = components.ensureAndGetComponent(QuestAssignmentStoreComponent.getComponentType());
             for (QuestAssignment assignment : assignmentStore.getAssignmentsOf(asset)) {
                 // On a shared assignment this player's word settles nothing for the others
-                if (!assignment.isShared()) assignment.setConditionCompleted(condition);
+                if (!assignment.isShared()) assignment.setConditionSatisfied(condition);
 
                 if (isSatisfiedByAllPlayers(assignment)) completeAssignment(assignment);
             }
