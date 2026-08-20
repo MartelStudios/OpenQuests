@@ -19,9 +19,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A player's assignment data. An offer made explicitly is held whole; one that comes from an
- * {@code AutoAssign} asset is not stored at all, only the conditions it has already
- * completed — auto-assigning a whole catalog then costs nothing until a player makes headway.
+ * A player's quest assignments data.
+ * An assignment made explicitly to one player is held whole in the player's store;
+ * One that is shared between players is held in a dedicated file;
+ * One that comes from an {@code AutoAssign} asset is not stored at all, only the satisfied conditions are stored
+ * Auto-assigning 1000 quests then costs nothing until a player makes condition progressions.
  */
 public class QuestAssignmentStoreComponent implements Component<EntityStore> {
 
@@ -37,7 +39,7 @@ public class QuestAssignmentStoreComponent implements Component<EntityStore> {
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("AutoProgress", new ArrayCodec<>(QuestAssignmentProgress.CODEC, QuestAssignmentProgress[]::new)), QuestAssignmentStoreComponent::setAutoProgress, QuestAssignmentStoreComponent::getAutoProgressArray)
                                                                                         .add()
-                                                                                        .append(new KeyedCodec<>("CompletedAssignments", new SetCodec<>(Codec.STRING, HashSet<String>::new, false)), (component, ids) -> component.completedAssignments.addAll(ids), component -> component.completedAssignments)
+                                                                                        .append(new KeyedCodec<>("SatisfiedAssignments", new SetCodec<>(Codec.STRING, HashSet<String>::new, false)), (component, ids) -> component.satisfiedAssignments.addAll(ids), component -> component.satisfiedAssignments)
                                                                                         .add()
                                                                                         .build();
 
@@ -52,9 +54,9 @@ public class QuestAssignmentStoreComponent implements Component<EntityStore> {
     private final Set<UUID> sharedAssignments = ConcurrentHashMap.newKeySet();
 
     /**
-     * Set of completed {@link QuestAssignmentAsset} Ids.
+     * Set of satisfied {@link QuestAssignmentAsset} Ids.
      */
-    private final Set<String> completedAssignments = ConcurrentHashMap.newKeySet();
+    private final Set<String> satisfiedAssignments = ConcurrentHashMap.newKeySet();
 
     /**
      * Map of {@link QuestAssignmentAsset} Ids to {@link QuestAssignmentProgress} instances.
@@ -67,7 +69,7 @@ public class QuestAssignmentStoreComponent implements Component<EntityStore> {
         this.ownAssignments.putAll(other.ownAssignments);
         this.sharedAssignments.addAll(other.sharedAssignments);
         this.autoProgress.putAll(other.autoProgress);
-        this.completedAssignments.addAll(other.completedAssignments);
+        this.satisfiedAssignments.addAll(other.satisfiedAssignments);
     }
 
     public static ComponentType<EntityStore, QuestAssignmentStoreComponent> getComponentType() {
@@ -118,8 +120,9 @@ public class QuestAssignmentStoreComponent implements Component<EntityStore> {
         for (UUID assignmentId : getSharedAssignments()) {
             QuestAssignment assignment = store.get(assignmentId);
             // The shared assignment is gone once someone in the group satisfied it
-            if (assignment == null) sharedAssignments.remove(assignmentId);
-            else if (assignment.getAssetId().equals(asset.getId())) assignments.add(assignment);
+            if (assignment == null) {
+                sharedAssignments.remove(assignmentId);
+            } else if (assignment.getAssetId().equals(asset.getId())) assignments.add(assignment);
         }
 
         return assignments;
@@ -150,8 +153,8 @@ public class QuestAssignmentStoreComponent implements Component<EntityStore> {
      * @return the asset ids already granted, so an offer is not made again on every connection.
      */
     @Nonnull
-    public Set<String> getCompletedAssignments() {
-        return completedAssignments;
+    public Set<String> getSatisfiedAssignments() {
+        return satisfiedAssignments;
     }
 
     private void setAutoProgress(@Nonnull QuestAssignmentProgress[] progresses) {

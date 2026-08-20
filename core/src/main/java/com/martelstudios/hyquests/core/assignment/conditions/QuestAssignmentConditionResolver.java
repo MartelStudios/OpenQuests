@@ -11,7 +11,7 @@ import java.util.UUID;
  * Filters which assignments are worth re-evaluating when something happens.
  * <p>
  * A resolver watches its own events and reports a satisfied condition to
- * {@link QuestAssignmentService#completeAssignmentCondition(QuestAssignmentAsset, QuestAssignmentCondition, UUID)};
+ * {@link QuestAssignmentService#setAssignmentConditionSatisfied(QuestAssignmentAsset, QuestAssignmentCondition, UUID)};
  * the assignment decides what that means for the whole.
  */
 public interface QuestAssignmentConditionResolver<C extends QuestAssignmentCondition<C>> {

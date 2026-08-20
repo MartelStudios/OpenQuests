@@ -72,7 +72,7 @@ public class QuestStateConditionResolver implements QuestAssignmentConditionReso
             if (!matches(listener.condition(), quest.getState())) continue;
 
             for (UUID playerId : quest.getPlayers()) {
-                QuestAssignmentService.get().completeAssignmentCondition(listener.asset(), listener.condition(), playerId);
+                QuestAssignmentService.get().setAssignmentConditionSatisfied(listener.asset(), listener.condition(), playerId);
             }
         }
     }

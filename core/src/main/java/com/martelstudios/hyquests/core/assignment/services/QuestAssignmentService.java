@@ -11,7 +11,9 @@ import com.martelstudios.hyquests.core.services.QuestProgressionService;
 import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.UUID;
 
 /**
  * Handles the assignments a player was explicitly offered, private or shared. The catalog handed
@@ -40,7 +42,7 @@ public class QuestAssignmentService {
 
         // Nothing left to wait on: the quests go out without the assignment ever being stored
         if (isSatisfiedByAllPlayers(assignment)) {
-            completeAssignment(assignment);
+            setAssignmentSatisfied(assignment);
             return assignment;
         }
 
@@ -73,10 +75,9 @@ public class QuestAssignmentService {
     }
 
     /**
-     * Relays a resolver's finding: this condition just became satisfied for the player, and is not
-     * checked again. Also the single entry point for the auto-assign catalog.
+     * Set for the given player the given condition as satisfied for all {@link QuestAssignment} of the given {@link QuestAssignmentAsset}.
      */
-    public void completeAssignmentCondition(@Nonnull QuestAssignmentAsset asset, @Nonnull QuestAssignmentCondition<?> condition, @Nonnull UUID playerId) {
+    public void setAssignmentConditionSatisfied(@Nonnull QuestAssignmentAsset asset, @Nonnull QuestAssignmentCondition<?> condition, @Nonnull UUID playerId) {
         QuestAutoAssignmentService.get().completeAssignmentCondition(asset, condition, playerId);
 
         EntityComponents.update(playerId, components -> {
@@ -85,7 +86,7 @@ public class QuestAssignmentService {
                 // On a shared assignment this player's word settles nothing for the others
                 if (!assignment.isShared()) assignment.setConditionSatisfied(condition);
 
-                if (isSatisfiedByAllPlayers(assignment)) completeAssignment(assignment);
+                if (isSatisfiedByAllPlayers(assignment)) setAssignmentSatisfied(assignment);
             }
         });
     }
@@ -122,7 +123,7 @@ public class QuestAssignmentService {
         }
     }
 
-    private void completeAssignment(@Nonnull QuestAssignment assignment) {
+    private void setAssignmentSatisfied(@Nonnull QuestAssignment assignment) {
         QuestAssignmentAsset asset = assignment.getAsset();
         if (asset == null) return;
 
@@ -133,7 +134,7 @@ public class QuestAssignmentService {
             EntityComponents.update(playerId, components -> {
                 QuestAssignmentStoreComponent assignmentStore = components.ensureAndGetComponent(QuestAssignmentStoreComponent.getComponentType());
                 assignmentStore.removeAssignment(assignment.getId());
-                assignmentStore.getCompletedAssignments().add(assignment.getAssetId());
+                assignmentStore.getSatisfiedAssignments().add(assignment.getAssetId());
             });
         }
 

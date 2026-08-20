@@ -38,7 +38,7 @@ public class QuestAutoAssignmentService {
         try (var _ = EntityComponents.cache()) {
             for (QuestAssignmentAsset asset : QuestAssignmentAsset.getAssetMap().getAssetMap().values()) {
                 if (!asset.isAutoAssign()) continue;
-                if (assignmentStore.getCompletedAssignments().contains(asset.getId())) continue;
+                if (assignmentStore.getSatisfiedAssignments().contains(asset.getId())) continue;
                 if (assignmentStore.getAutoProgress().containsKey(asset.getId())) continue;
 
                 var progress = new QuestAssignmentProgress(asset.getId());
@@ -51,7 +51,7 @@ public class QuestAutoAssignmentService {
 
     /**
      * Relays a resolver's finding for one asset. Called through
-     * {@link QuestAssignmentService#completeAssignmentCondition}, which is the single entry point resolvers use.
+     * {@link QuestAssignmentService#setAssignmentConditionSatisfied}, which is the single entry point resolvers use.
      */
     public void completeAssignmentCondition(@Nonnull QuestAssignmentAsset asset, @Nonnull QuestAssignmentCondition<?> condition, @Nonnull UUID playerId) {
         EntityComponents.update(playerId, components -> {
@@ -69,7 +69,7 @@ public class QuestAutoAssignmentService {
      * Dropping the progress is what takes the asset off the work list.
      */
     private void completeAssignment(@Nonnull QuestAssignmentAsset asset, @Nonnull QuestAssignmentStoreComponent assignmentStore, @Nonnull UUID playerId) {
-        assignmentStore.getCompletedAssignments().add(asset.getId());
+        assignmentStore.getSatisfiedAssignments().add(asset.getId());
         assignmentStore.clearAutoProgress(asset.getId());
 
         QuestAssignmentService.get().assignQuests(asset, List.of(playerId));
