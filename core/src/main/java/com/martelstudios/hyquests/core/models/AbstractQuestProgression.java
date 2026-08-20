@@ -23,42 +23,46 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
-
-    /**
-     * Polymorphic dispatcher: concrete quest codecs register under a {@code "Type"} tag.
-     */
-    public static final CodecMapCodec<AbstractQuest<?>> CODEC = new CodecMapCodec<>("Type");
+/**
+ * Defines the quest progression. Extend it to create new quest types or to add runtime progression data.
+ * Avoid using it to declare static serialized data. Look at {@link QuestAsset} for static serialized data declaration.
+ */
+public abstract class AbstractQuestProgression<Q extends AbstractQuestProgression<Q>> {
+    public static final CodecMapCodec<AbstractQuestProgression<?>> CODEC = new CodecMapCodec<>("Type");
 
     private static final KeyedCodec<UUID[]> PLAYERS_CODEC = new KeyedCodec<>("Players", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
-    private static final BiConsumer<AbstractQuest, UUID[]> PLAYERS_SETTER = (quest, uuids) -> ((AbstractQuest<?>) quest).players.addAll(List.of(uuids));
-    private static final Function<AbstractQuest, UUID[]> PLAYERS_GETTER = (quest) -> ((AbstractQuest<?>) quest).players.toArray(new UUID[0]);
+    private static final BiConsumer<AbstractQuestProgression, UUID[]> PLAYERS_SETTER = (quest, uuids) -> ((AbstractQuestProgression<?>) quest).players.addAll(List.of(uuids));
+    private static final Function<AbstractQuestProgression, UUID[]> PLAYERS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).players.toArray(new UUID[0]);
 
     /**
-     * Serializes the fields shared by every quest; concrete codecs chain from this.
+     * Serializes the fields shared by every quest progression; concrete codecs chain from this.
      */
-    public static final BuilderCodec<AbstractQuest> BASE_CODEC = BuilderCodec.abstractBuilder(AbstractQuest.class)
-                                                                             .append(new KeyedCodec<>("Id", Codec.UUID_BINARY), (quest, uuid) -> quest.id = uuid, quest -> quest.id)
-                                                                             .add()
-                                                                             .append(new KeyedCodec<>("AssetId", Codec.STRING), (quest, assetId) -> quest.assetId = assetId, quest -> quest.assetId)
-                                                                             .add()
-                                                                             .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.state = state, quest -> quest.state)
-                                                                             .add()
-                                                                             .append(PLAYERS_CODEC, PLAYERS_SETTER, PLAYERS_GETTER)
-                                                                             .add()
-                                                                             .build();
+    public static final BuilderCodec<AbstractQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(AbstractQuestProgression.class)
+                                                                                        .append(new KeyedCodec<>("Id", Codec.UUID_BINARY), (quest, uuid) -> quest.id = uuid, quest -> quest.id)
+                                                                                        .add()
+                                                                                        .append(new KeyedCodec<>("AssetId", Codec.STRING), (quest, assetId) -> quest.assetId = assetId, quest -> quest.assetId)
+                                                                                        .add()
+                                                                                        .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.state = state, quest -> quest.state)
+                                                                                        .add()
+                                                                                        .append(PLAYERS_CODEC, PLAYERS_SETTER, PLAYERS_GETTER)
+                                                                                        .add()
+                                                                                        .build();
 
     /**
      * Unique identity used to reference and persist this quest. Overwritten on load.
      */
-    protected UUID id = UUID.randomUUID();
+    protected UUID id;
 
     /**
      * Ids of the players this quest is assigned to.
      */
     protected Set<UUID> players = ConcurrentHashMap.newKeySet();
 
+    /**
+     * The {@link QuestAsset#getId()}
+     */
     protected String assetId;
+
     protected QuestState state = QuestState.IN_PROGRESS;
 
     /**
@@ -66,6 +70,12 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
      */
     private transient boolean dirty;
 
+    /**
+     * Updates the quest progression by applying the visitor to it.
+     * After the visitor's pass, it looks for changes to notify and for quest completion.
+     *
+     * @param visitor the visitor to apply
+     */
     public void update(QuestVisitor<Q> visitor) {
         visitor.progress(self());
 
@@ -82,21 +92,19 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
     }
 
     /**
-     * Sets up whatever this quest owns beyond its own state, just after it entered the store.
-     * Called by {@link QuestProgressionService#registerQuest}.
+     * Called just after the quest progression entered the quest store.
+     * Called by {@link QuestProgressionService#registerQuest(AbstractQuestProgression)}.
      */
     public void onRegistered() {}
 
     /**
-     * Releases anything this quest owns beyond its own state, just after it leaves the store.
-     * Called by {@link QuestProgressionService#unregisterQuest}; implementations must stay safe to
-     * call on an already-unregistered quest.
+     * Called just after the quest progression leaves the quest store.
+     * Called by {@link QuestProgressionService#unregisterQuest}.
      */
     public void onUnregistered() {}
 
     /**
-     * @return {@code false} if the player already held this quest, so an override can stop there
-     * rather than repeat whatever it does on top.
+     * @return {@code false} if the player already held this quest.
      */
     public boolean addPlayer(@Nonnull UUID playerId) {
         if (!getPlayers().add(playerId)) return false;
@@ -169,17 +177,17 @@ public abstract class AbstractQuest<Q extends AbstractQuest<Q>> {
         return state;
     }
 
+    public Q setState(QuestState state) {
+        this.state = state;
+        return self();
+    }
+
     public Message getTitle() {
         return Message.translation(getAsset().getTitleKey());
     }
 
     public Message getDescription() {
         return Message.translation(getAsset().getDescriptionKey());
-    }
-
-    public Q setState(QuestState state) {
-        this.state = state;
-        return self();
     }
 
     @SuppressWarnings("unchecked")

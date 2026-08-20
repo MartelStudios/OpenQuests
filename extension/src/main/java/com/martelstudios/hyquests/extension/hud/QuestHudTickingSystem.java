@@ -8,7 +8,7 @@ import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import com.martelstudios.hyquests.core.models.QuestState;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
 import com.martelstudios.hyquests.core.stores.QuestStoreComponent;
@@ -44,7 +44,7 @@ public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
         QuestTrackerHud hud = QuestTrackerHud.get(player, playerRef);
         if (!hud.shouldUpdate()) return;
 
-        List<AbstractQuest<?>> inProgress = new ArrayList<>();
+        List<AbstractQuestProgression<?>> inProgress = new ArrayList<>();
         for (UUID questId : questStoreComponent.questsRecord.getAllIds()) {
             var quest = QuestProgressionService.get().getQuest(questId);
             if (quest != null && quest.getState() == QuestState.IN_PROGRESS) {

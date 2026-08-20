@@ -2,7 +2,7 @@ package com.martelstudios.hyquests.core.stores;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.datastore.DataStore;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,7 +15,7 @@ public class QuestProgressionStore {
     private final static HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     @Nonnull
-    private final Map<UUID, AbstractQuest<?>> quests = new ConcurrentHashMap<>();
+    private final Map<UUID, AbstractQuestProgression<?>> quests = new ConcurrentHashMap<>();
 
     @Nonnull
     private final Map<Class<?>, Set<UUID>> idsByType = new ConcurrentHashMap<>();
@@ -27,17 +27,17 @@ public class QuestProgressionStore {
         this.dataStore = dataStore;
     }
 
-    public void add(@Nonnull AbstractQuest<?> quest) {
+    public void add(@Nonnull AbstractQuestProgression<?> quest) {
         if (quests.containsKey(quest.getId())) return;
 
         quests.put(quest.getId(), quest);
         idsByType.computeIfAbsent(quest.getClass(), k -> ConcurrentHashMap.newKeySet()).add(quest.getId());
     }
 
-    public AbstractQuest<?> remove(@Nonnull UUID id) {
+    public AbstractQuestProgression<?> remove(@Nonnull UUID id) {
         if (!quests.containsKey(id)) return null;
 
-        AbstractQuest<?> quest = quests.remove(id);
+        AbstractQuestProgression<?> quest = quests.remove(id);
 
         Set<UUID> ids = idsByType.get(quest.getClass());
         if (ids != null) ids.remove(id);
@@ -48,8 +48,8 @@ public class QuestProgressionStore {
     /**
      * Removes a quest from memory and deletes its persisted file, if any.
      */
-    public AbstractQuest<?> removeAndDeleteFromDisk(@Nonnull UUID id) {
-        AbstractQuest<?> quest = remove(id);
+    public AbstractQuestProgression<?> removeAndDeleteFromDisk(@Nonnull UUID id) {
+        AbstractQuestProgression<?> quest = remove(id);
         if (quest == null) return null;
 
         try {
@@ -66,13 +66,13 @@ public class QuestProgressionStore {
      * yet. A genuinely deleted quest costs one {@code Files.exists} check and returns {@code null}.
      */
     @Nullable
-    public AbstractQuest<?> get(@Nonnull UUID id) {
-        AbstractQuest<?> quest = quests.get(id);
+    public AbstractQuestProgression<?> get(@Nonnull UUID id) {
+        AbstractQuestProgression<?> quest = quests.get(id);
         return quest != null ? quest : load(id);
     }
 
     @Nonnull
-    public Collection<AbstractQuest<?>> getAll() {
+    public Collection<AbstractQuestProgression<?>> getAll() {
         return quests.values();
     }
 
@@ -89,7 +89,7 @@ public class QuestProgressionStore {
     /**
      * Persists a single quest, but only if it changed since the last save.
      */
-    public void saveToDisk(@Nonnull AbstractQuest<?> quest) {
+    public void saveToDisk(@Nonnull AbstractQuestProgression<?> quest) {
         if (!quest.consumeChanges()) return;
 
         dataStore.save(quest.getId().toString(), new QuestProgressionRecord(quest));
@@ -99,7 +99,7 @@ public class QuestProgressionStore {
      * Persists every quest that changed since the last pass.
      */
     public void saveAllToDisk() {
-        for (AbstractQuest<?> quest : quests.values()) {
+        for (AbstractQuestProgression<?> quest : quests.values()) {
             saveToDisk(quest);
         }
     }
@@ -122,8 +122,8 @@ public class QuestProgressionStore {
         }
     }
 
-    public AbstractQuest<?> load(UUID id) {
-        AbstractQuest<?> quest = quests.get(id);
+    public AbstractQuestProgression<?> load(UUID id) {
+        AbstractQuestProgression<?> quest = quests.get(id);
         if (quest != null) return quest;
 
         QuestProgressionRecord record;

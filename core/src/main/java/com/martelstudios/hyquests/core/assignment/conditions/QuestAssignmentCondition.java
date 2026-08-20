@@ -9,18 +9,21 @@ import java.util.UUID;
 
 /**
  * A prerequisite guarding a {@link QuestAssignmentAsset}.
- * Subclasses implement {@link #evaluate0}; negation is handled here once.
  */
 public abstract class QuestAssignmentCondition<C extends QuestAssignmentCondition<C>> {
-
-    /**
-     * Polymorphic dispatcher: concrete condition codecs register under a {@code "Type"} tag.
-     */
     public static final CodecMapCodec<QuestAssignmentCondition<?>> CODEC = new CodecMapCodec<>("Type");
 
+    /**
+     * Serializes the fields shared by every quest assignment condition; concrete codecs chain from this.
+     */
     public static final BuilderCodec<QuestAssignmentCondition> BASE_CODEC = BuilderCodec.abstractBuilder(QuestAssignmentCondition.class)
                                                                                         .build();
 
+    /**
+     * Evaluates the assignment condition by delegating to its {@link QuestAssignmentConditionResolver}
+     * @param playerId the player's id to evaluate
+     * @return {@code true} if the condition is met
+     */
     public boolean evaluate(@Nonnull UUID playerId) {
         return getResolver().evaluate(self(), playerId);
     }
@@ -35,7 +38,7 @@ public abstract class QuestAssignmentCondition<C extends QuestAssignmentConditio
     }
 
     /**
-     * Registers the {@link QuestAssignmentAsset} to its own resolver by calling {@link QuestAssignmentConditionResolver#register(QuestAssignmentAsset, QuestAssignmentCondition)}.
+     * Registers the {@link QuestAssignmentAsset} to the implemented {@link QuestAssignmentConditionResolver}.
      *
      * @param asset the {@link QuestAssignmentAsset} to register.
      */

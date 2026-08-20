@@ -16,7 +16,7 @@ public final class InteractivelyPickupFeature {
 
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, InteractivelyPickupQuestAsset.class, InteractivelyPickupQuestAsset.CODEC, InteractivelyPickupQuest.class, InteractivelyPickupQuest.CODEC);
+                               .registerQuestType(TYPE_ID, InteractivelyPickupQuestAsset.class, InteractivelyPickupQuestAsset.CODEC, InteractivelyPickupQuestProgression.class, InteractivelyPickupQuestProgression.CODEC);
 
         plugin.getEntityStoreRegistry().registerSystem(new InteractivelyPickupItemEventSystem());
     }

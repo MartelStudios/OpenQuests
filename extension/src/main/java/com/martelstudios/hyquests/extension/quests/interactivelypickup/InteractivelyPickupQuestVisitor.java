@@ -10,10 +10,10 @@ import java.util.logging.Level;
 import javax.annotation.Nonnull;
 
 /**
- * Progresses {@link InteractivelyPickupQuest}s by accumulating what a single harvest interaction
+ * Progresses {@link InteractivelyPickupQuestProgression}s by accumulating what a single harvest interaction
  * yielded, unlike gather quests which recount the whole inventory.
  */
-public class InteractivelyPickupQuestVisitor implements QuestVisitor<InteractivelyPickupQuest> {
+public class InteractivelyPickupQuestVisitor implements QuestVisitor<InteractivelyPickupQuestProgression> {
     @Nonnull
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
@@ -26,7 +26,7 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
     }
 
     @Override
-    public void progress(InteractivelyPickupQuest quest) {
+    public void progress(InteractivelyPickupQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
         if (quest.getState() == QuestState.SUCCESSFUL) return;
 
@@ -43,7 +43,7 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
     }
 
     @Override
-    public Class<InteractivelyPickupQuest> getQuestType() {
-        return InteractivelyPickupQuest.class;
+    public Class<InteractivelyPickupQuestProgression> getQuestType() {
+        return InteractivelyPickupQuestProgression.class;
     }
 }

@@ -1,7 +1,7 @@
 package com.martelstudios.hyquests.extension.quests.gather;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.hyquests.extension.quests.count.CountQuest;
+import com.martelstudios.hyquests.extension.quests.count.CountQuestProgression;
 
 /**
  * Quest whose progress is however many of a given item the player currently holds, rechecked
@@ -10,10 +10,10 @@ import com.martelstudios.hyquests.extension.quests.count.CountQuest;
  * traded, picked up off the ground, ... Mirrors Hytale's {@code GatherObjectiveTask}, which is
  * driven by {@code InventoryChangeEvent} and recounts matching items rather than accumulating them.
  */
-public class GatherQuest extends CountQuest<GatherQuest> {
+public class GatherQuestProgression extends CountQuestProgression<GatherQuestProgression> {
 
-    public static final BuilderCodec<GatherQuest> CODEC = BuilderCodec.builder(GatherQuest.class, GatherQuest::new, CountQuest.BASE_CODEC)
-                                                                      .build();
+    public static final BuilderCodec<GatherQuestProgression> CODEC = BuilderCodec.builder(GatherQuestProgression.class, GatherQuestProgression::new, CountQuestProgression.BASE_CODEC)
+                                                                                 .build();
 
     @Override
     public GatherQuestAsset getAsset() {

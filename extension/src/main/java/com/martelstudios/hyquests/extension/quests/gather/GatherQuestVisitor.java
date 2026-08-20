@@ -16,11 +16,11 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 /**
- * Progresses {@link GatherQuest}s on inventory change, mirroring Hytale's {@code GatherObjectiveTask}:
+ * Progresses {@link GatherQuestProgression}s on inventory change, mirroring Hytale's {@code GatherObjectiveTask}:
  * rather than accumulating a specific pickup event, it recounts how many of the target item the
  * player currently holds and compares that to the asset's target quantity.
  */
-public class GatherQuestVisitor implements QuestVisitor<GatherQuest> {
+public class GatherQuestVisitor implements QuestVisitor<GatherQuestProgression> {
     @Nonnull
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
@@ -45,7 +45,7 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuest> {
     }
 
     @Override
-    public void progress(GatherQuest quest) {
+    public void progress(GatherQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
         if (quest.getState() == QuestState.SUCCESSFUL) return;
 
@@ -62,7 +62,7 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuest> {
     }
 
     @Override
-    public Class<GatherQuest> getQuestType() {
-        return GatherQuest.class;
+    public Class<GatherQuestProgression> getQuestType() {
+        return GatherQuestProgression.class;
     }
 }

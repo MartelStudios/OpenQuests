@@ -6,7 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import com.martelstudios.hyquests.core.models.QuestState;
 import com.martelstudios.hyquests.core.rewards.QuestReward;
 
@@ -47,7 +47,7 @@ public class QuestHistoryRecord {
 
     private QuestHistoryRecord() {}
 
-    public QuestHistoryRecord(@Nonnull AbstractQuest<?> quest) {
+    public QuestHistoryRecord(@Nonnull AbstractQuestProgression<?> quest) {
         this.id = quest.getId();
         this.questAssetId = quest.getAssetId();
         this.state = quest.getState();

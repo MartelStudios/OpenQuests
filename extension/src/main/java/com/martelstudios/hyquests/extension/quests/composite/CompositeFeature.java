@@ -17,7 +17,7 @@ public final class CompositeFeature {
 
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, CompositeQuestAsset.class, CompositeQuestAsset.CODEC, CompositeQuest.class, CompositeQuest.CODEC);
+                               .registerQuestType(TYPE_ID, CompositeQuestAsset.class, CompositeQuestAsset.CODEC, CompositeQuestProgression.class, CompositeQuestProgression.CODEC);
 
         // Referencing other assets is what makes this type able to loop, so it validates its own graph
         plugin.getEventRegistry()

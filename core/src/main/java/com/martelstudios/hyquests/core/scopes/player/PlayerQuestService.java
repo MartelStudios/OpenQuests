@@ -7,7 +7,7 @@ import com.martelstudios.hyquests.core.HyQuestCorePlugin;
 import com.martelstudios.hyquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.hyquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.hyquests.core.events.QuestUnregisteredEvent;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import com.martelstudios.hyquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.hyquests.core.scopes.player.events.QuestRemovedFromPlayerStoreEvent;
 import com.martelstudios.hyquests.core.stores.QuestStoreComponent;
@@ -18,8 +18,8 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * Keeps a player's quest index in sync. Meant to be driven by {@link AbstractQuest#addPlayer} and
- * {@link AbstractQuest#removePlayer}, which own the other half of the relation: calling these
+ * Keeps a player's quest index in sync. Meant to be driven by {@link AbstractQuestProgression#addPlayer} and
+ * {@link AbstractQuestProgression#removePlayer}, which own the other half of the relation: calling these
  * methods directly leaves the quest's own player list stale.
  */
 public class PlayerQuestService {
@@ -64,18 +64,18 @@ public class PlayerQuestService {
      * removed from it individually.
      */
     private void handleQuestUnregisteredEvent(@Nonnull QuestUnregisteredEvent questUnregisteredEvent) {
-        AbstractQuest<?> quest = questUnregisteredEvent.getQuest();
+        AbstractQuestProgression<?> quest = questUnregisteredEvent.getQuest();
 
         for (UUID playerId : quest.getPlayers()) {
             removeQuestFromPlayerStore(quest, playerId);
         }
     }
 
-    public void addQuestToPlayerStore(@Nonnull AbstractQuest<?> quest, @Nonnull UUID playerId) {
+    public void addQuestToPlayerStore(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         EntityComponents.update(playerId, components -> addQuestToPlayerStore(components.ensureAndGetComponent(QuestStoreComponent.getComponentType()), quest, playerId));
     }
 
-    public void addQuestToPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull AbstractQuest<?> quest, @Nonnull UUID playerId) {
+    public void addQuestToPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         if (!playerStore.questsRecord.register(quest.getId())) return;
 
         HytaleServer.get()
@@ -84,7 +84,7 @@ public class PlayerQuestService {
                     .dispatch(new QuestAddedToPlayerStoreEvent(quest, playerId));
     }
 
-    public void removeQuestFromPlayerStore(@Nonnull AbstractQuest<?> quest, @Nonnull UUID playerId) {
+    public void removeQuestFromPlayerStore(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         EntityComponents.update(playerId, components -> removeQuestFromPlayerStore(components.ensureAndGetComponent(QuestStoreComponent.getComponentType()), quest, playerId));
     }
 
@@ -92,7 +92,7 @@ public class PlayerQuestService {
      * Takes the quest rather than its id: it is unregistered by the time this runs on the player's
      * world thread, so looking it back up would find nothing and leave a stale id behind.
      */
-    public void removeQuestFromPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull AbstractQuest<?> quest, @Nonnull UUID playerId) {
+    public void removeQuestFromPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         if (!playerStore.questsRecord.unregister(quest.getId())) return;
 
         HytaleServer.get()

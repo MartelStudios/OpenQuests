@@ -5,7 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.math.vector.Vector3dUtil;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import org.joml.Vector3d;
 
 public class ReachLocationQuestAsset extends QuestAsset {
@@ -24,8 +24,8 @@ public class ReachLocationQuestAsset extends QuestAsset {
     private ReachLocationQuestAsset() {}
 
     @Override
-    public AbstractQuest<?> create() {
-        return new ReachLocationQuest().setAssetId(getId());
+    public AbstractQuestProgression<?> create() {
+        return new ReachLocationQuestProgression().setAssetId(getId());
     }
 
     public Vector3d getPosition() {

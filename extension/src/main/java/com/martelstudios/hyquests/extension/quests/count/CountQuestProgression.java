@@ -3,7 +3,7 @@ package com.martelstudios.hyquests.extension.quests.count;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 
 /**
  * Runtime state shared by every quest whose completion is "reach a target count of something" —
@@ -13,12 +13,12 @@ import com.martelstudios.hyquests.core.models.AbstractQuest;
  *
  * @param <Q> the concrete quest type extending this class
  */
-public abstract class CountQuest<Q extends CountQuest<Q>> extends AbstractQuest<Q> {
+public abstract class CountQuestProgression<Q extends CountQuestProgression<Q>> extends AbstractQuestProgression<Q> {
 
-    public static final BuilderCodec<CountQuest> BASE_CODEC = BuilderCodec.abstractBuilder(CountQuest.class, AbstractQuest.BASE_CODEC)
-                                                                           .append(new KeyedCodec<>("Count", Codec.INTEGER), (quest, count) -> quest.count = count, quest -> Integer.valueOf(quest.count))
-                                                                           .add()
-                                                                           .build();
+    public static final BuilderCodec<CountQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(CountQuestProgression.class, AbstractQuestProgression.BASE_CODEC)
+                                                                                     .append(new KeyedCodec<>("Count", Codec.INTEGER), (quest, count) -> quest.count = count, quest -> Integer.valueOf(quest.count))
+                                                                                     .add()
+                                                                                     .build();
 
     protected int count;
 

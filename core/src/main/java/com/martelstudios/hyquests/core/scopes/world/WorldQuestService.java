@@ -11,7 +11,7 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.hyquests.core.HyQuestCorePlugin;
 import com.martelstudios.hyquests.core.events.QuestUnregisteredEvent;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
 import com.martelstudios.hyquests.core.stores.QuestsRecord;
 
@@ -46,7 +46,7 @@ public class WorldQuestService {
     }
 
     public void addQuest(@Nonnull World world, @Nonnull UUID questId) {
-        AbstractQuest<?> quest = QuestProgressionService.get().getQuest(questId);
+        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
         if (quest == null) return;
 
         if (!getWorldQuestStoreFromWorld(world).questsRecord.register(questId)) return;

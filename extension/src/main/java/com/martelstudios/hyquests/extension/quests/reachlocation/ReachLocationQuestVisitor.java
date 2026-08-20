@@ -7,10 +7,10 @@ import org.joml.Vector3d;
 import java.util.UUID;
 
 /**
- * Progresses {@link ReachLocationQuest}s by checking the player's current position against the
+ * Progresses {@link ReachLocationQuestProgression}s by checking the player's current position against the
  * asset's target position and radius.
  */
-public class ReachLocationQuestVisitor implements QuestVisitor<ReachLocationQuest> {
+public class ReachLocationQuestVisitor implements QuestVisitor<ReachLocationQuestProgression> {
     private final UUID playerId;
     private final Vector3d position;
 
@@ -20,7 +20,7 @@ public class ReachLocationQuestVisitor implements QuestVisitor<ReachLocationQues
     }
 
     @Override
-    public void progress(ReachLocationQuest quest) {
+    public void progress(ReachLocationQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
         if (quest.getState() == QuestState.SUCCESSFUL) return;
 
@@ -33,7 +33,7 @@ public class ReachLocationQuestVisitor implements QuestVisitor<ReachLocationQues
     }
 
     @Override
-    public Class<ReachLocationQuest> getQuestType() {
-        return ReachLocationQuest.class;
+    public Class<ReachLocationQuestProgression> getQuestType() {
+        return ReachLocationQuestProgression.class;
     }
 }

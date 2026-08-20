@@ -4,8 +4,8 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
-import com.martelstudios.hyquests.extension.quests.count.CountQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
+import com.martelstudios.hyquests.extension.quests.count.CountQuestProgression;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -57,7 +57,7 @@ public class QuestTrackerHud extends CustomUIHud {
      * Pushes at most {@link #MAX_QUESTS} quests to the panel, throttled to
      * {@link #UPDATE_INTERVAL_MS}. Extra slots are hidden.
      */
-    public void pushUpdate(@Nonnull List<AbstractQuest<?>> quests) {
+    public void pushUpdate(@Nonnull List<AbstractQuestProgression<?>> quests) {
         long now = System.currentTimeMillis();
         long last = lastPushedMs.get();
         if (now - last < UPDATE_INTERVAL_MS) return;
@@ -83,8 +83,8 @@ public class QuestTrackerHud extends CustomUIHud {
 
 
     @Nonnull
-    private static String progressFor(@Nonnull AbstractQuest<?> quest) {
-        if (quest instanceof CountQuest<?> countQuest) {
+    private static String progressFor(@Nonnull AbstractQuestProgression<?> quest) {
+        if (quest instanceof CountQuestProgression<?> countQuest) {
             return countQuest.getCount() + "/" + countQuest.getAsset().getCount();
         }
         return quest.getState().name();

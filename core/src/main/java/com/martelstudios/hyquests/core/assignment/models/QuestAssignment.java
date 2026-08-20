@@ -15,8 +15,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
- * A pending offer of quests, waiting on its conditions. Holds its own players, so the same
- * instance can gate a group: everyone listed gets the quests on the pass that satisfies it.
+ * Defines a quest assignment satisfied when all conditions are satisfied.
+ * When the assignment is satisfied a new quest progression instance is added to all listed players.
+ * When a condition is satisfied, if {@link QuestAssignmentCondition#useCache()} is {@code true}, the condition is dropped to avoid processing it again later.
  */
 public class QuestAssignment {
 
@@ -41,8 +42,7 @@ public class QuestAssignment {
     protected String assetId;
 
     /**
-     * Snapshotted at creation. A latching condition is dropped once satisfied, which is what
-     * caches it; a momentary one stays and is re-checked on every pass.
+     * Conditions still not satisfied, or conditions with {@link QuestAssignmentCondition#useCache()} as {@code false}
      */
     protected QuestAssignmentCondition<?>[] pendingConditions = NO_CONDITIONS;
 
@@ -70,12 +70,10 @@ public class QuestAssignment {
     }
 
     /**
-     * Checks everything still pending and records what is now met.
+     * Checks {@link pendingConditions} records what is now met if {@link QuestAssignmentCondition#useCache()} is {@code true}.
      *
-     * @param enableUseCache whether a satisfied condition is dropped. Pass {@code false} to probe
-     *                       without committing — a shared assignment tested against one player
-     *                       would otherwise settle conditions on behalf of the whole group.
-     * @return {@code true} when all conditions are met and the assignment can be completed.
+     * @param enableUseCache make use of {@link QuestAssignmentCondition#useCache()} or not.
+     * @return {@code true} when all conditions are met and the assignment can be considered as satisfied.
      */
     public boolean evaluate(@Nonnull UUID playerId, boolean enableUseCache) {
         boolean allSatisfied = true;
@@ -94,8 +92,7 @@ public class QuestAssignment {
     }
 
     /**
-     * A latching condition is dropped, which is what caches it; a momentary one stays and is
-     * checked again on every pass.
+     * Removes the condition from {@link pendingConditions} if {@link QuestAssignmentCondition#useCache()} is {@code true}.
      */
     public void setConditionCompleted(@Nonnull QuestAssignmentCondition<?> condition) {
         if (!condition.useCache()) return;

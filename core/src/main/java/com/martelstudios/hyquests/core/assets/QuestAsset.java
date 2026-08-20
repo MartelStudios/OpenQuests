@@ -13,28 +13,24 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.ValidatorCache;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import com.martelstudios.hyquests.core.models.QuestState;
 import com.martelstudios.hyquests.core.rewards.QuestReward;
 
 import javax.annotation.Nonnull;
 
 /**
- * Config template a runtime {@link com.martelstudios.hyquests.core.models.AbstractQuest}
- * looks up by id ({@code questAssetId}) to read its immutable definition (title, description,
- * type-specific parameters, ...). Assets live in their own top-level {@link AssetStore}
- * (JSON files under {@code HyQuests/Quests/}), separate from runtime quest state, so editing
- * an asset does not require touching persisted quest saves.
- * <p>
- * {@link #CODEC} is the polymorphic dispatcher (mirrors {@link com.hypixel.hytale.builtin.hytalegenerator.assets.worldstructures.WorldStructureAsset}):
- * each concrete asset type registers under a {@code "Type"} tag. {@link #BASE_CODEC} serializes
- * the fields common to every quest asset so concrete codecs can chain from it.
+ * Defines the generic quest template configuration. Extend it to create new quest types or to add new serialized data.
+ * Do not use it to declare runtime data. Look at {@link AbstractQuestProgression} for runtime data declaration.
  */
 public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, QuestAsset>> {
     public static final ValidatorCache<String> VALIDATOR_CACHE = new ValidatorCache<>(new AssetKeyValidator<>(QuestAsset::getAssetStore));
 
     public static final AssetCodecMapCodec<String, QuestAsset> CODEC = new AssetCodecMapCodec<>(Codec.STRING, (asset, value) -> asset.id = value, asset -> asset.id, (asset, value) -> asset.data = value, asset -> asset.data);
 
+    /**
+     * Serializes the fields shared by every quest asset; concrete codecs chain from this.
+     */
     public static final BuilderCodec<QuestAsset> BASE_CODEC = BuilderCodec.abstractBuilder(QuestAsset.class)
                                                                           .append(new KeyedCodec<>("TitleKey", Codec.STRING, true), (asset, key) -> asset.titleKey = key, asset -> asset.titleKey)
                                                                           .addValidator(Validators.nonNull())
@@ -43,8 +39,6 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .append(new KeyedCodec<>("DescriptionKey", Codec.STRING, true), (asset, key) -> asset.descriptionKey = key, asset -> asset.descriptionKey)
                                                                           .addValidator(Validators.nonNull())
                                                                           .addValidator(Validators.nonEmptyString())
-                                                                          .add()
-                                                                          .append(new KeyedCodec<>("AutoStart", Codec.BOOLEAN), (asset, value) -> asset.autoStart = value, asset -> Boolean.valueOf(asset.autoStart))
                                                                           .add()
                                                                           .append(new KeyedCodec<>("AutoClaim", Codec.BOOLEAN), (asset, value) -> asset.autoClaim = value, asset -> Boolean.valueOf(asset.autoClaim))
                                                                           .add()
@@ -63,7 +57,6 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     protected AssetExtraInfo.Data data;
     protected String titleKey;
     protected String descriptionKey;
-    protected boolean autoStart;
     protected boolean autoClaim;
     protected QuestReward[] successfulRewards = NO_REWARDS;
     protected QuestReward[] failedRewards = NO_REWARDS;
@@ -76,18 +69,6 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
         return id;
     }
 
-    public static AssetStore<String, QuestAsset, DefaultAssetMap<String, QuestAsset>> getAssetStore() {
-        return AssetRegistry.getAssetStore(QuestAsset.class);
-    }
-
-    public static DefaultAssetMap<String, QuestAsset> getAssetMap() {
-        return getAssetStore().getAssetMap();
-    }
-
-    public static QuestAsset getAsset(String assetId) {
-        return getAssetMap().getAsset(assetId);
-    }
-
     public String getTitleKey() {
         return titleKey;
     }
@@ -96,17 +77,12 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
         return descriptionKey;
     }
 
-    public boolean isAutoStart() {
-        return autoStart;
-    }
-
     public boolean isAutoClaim() {
         return autoClaim;
     }
 
     /**
-     * @return the rewards matching a terminal state, empty for a quest still in progress. Single
-     * entry point so callers never have to switch on the outcome themselves.
+     * @return the rewards matching a terminal state, empty for a quest still in progress.
      */
     @Nonnull
     public QuestReward[] getRewards(@Nonnull QuestState state) {
@@ -125,5 +101,20 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
         return getRewards(state).length > 0;
     }
 
-    public abstract AbstractQuest<?> create();
+    /**
+     * Factory to instantiate the associated QuestProgression
+     */
+    public abstract AbstractQuestProgression<?> create();
+
+    public static AssetStore<String, QuestAsset, DefaultAssetMap<String, QuestAsset>> getAssetStore() {
+        return AssetRegistry.getAssetStore(QuestAsset.class);
+    }
+
+    public static DefaultAssetMap<String, QuestAsset> getAssetMap() {
+        return getAssetStore().getAssetMap();
+    }
+
+    public static QuestAsset getAsset(String assetId) {
+        return getAssetMap().getAsset(assetId);
+    }
 }

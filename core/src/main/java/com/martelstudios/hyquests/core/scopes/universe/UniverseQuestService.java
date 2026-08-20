@@ -9,7 +9,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.hyquests.core.HyQuestCorePlugin;
 import com.martelstudios.hyquests.core.events.QuestUnregisteredEvent;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
 import com.martelstudios.hyquests.core.stores.QuestsRecord;
 
@@ -49,7 +49,7 @@ public class UniverseQuestService {
     }
 
     public void addQuest(@Nonnull UUID questId) {
-        AbstractQuest<?> quest = QuestProgressionService.get().getQuest(questId);
+        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
         if (quest == null) return;
 
         if (!getQuests().register(questId)) return;
@@ -103,7 +103,7 @@ public class UniverseQuestService {
 
         QuestsRecord quests = getQuests();
         for (UUID questId : new ArrayList<>(quests.getAllIds())) {
-            AbstractQuest<?> quest = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
             if (quest == null) {
                 quests.unregister(questId);
                 continue;

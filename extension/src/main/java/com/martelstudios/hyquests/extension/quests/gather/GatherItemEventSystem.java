@@ -16,7 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Re-checks {@link GatherQuest} progress whenever a
+ * Re-checks {@link GatherQuestProgression} progress whenever a
  * player's inventory changes, regardless of how the item got there (unlike interactive-pickup
  * quests, this isn't tied to a specific harvest/pickup interaction).
  */

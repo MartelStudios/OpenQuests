@@ -9,11 +9,11 @@ import com.martelstudios.hyquests.core.utils.EntityComponents;
  */
 public class GatherEvents {
     /**
-     * Catches a freshly assigned {@link GatherQuest} up with what the player already holds, so
+     * Catches a freshly assigned {@link GatherQuestProgression} up with what the player already holds, so
      * they do not have to touch their inventory again for progress to show.
      */
     public static void handleQuestAssignedToPlayer(QuestAddedToPlayerStoreEvent event) {
-        if (!(event.getQuest() instanceof GatherQuest gatherQuest)) return;
+        if (!(event.getQuest() instanceof GatherQuestProgression gatherQuest)) return;
 
         EntityComponents.update(event.getPlayerId(), components -> gatherQuest.update(new GatherQuestVisitor(components)));
     }

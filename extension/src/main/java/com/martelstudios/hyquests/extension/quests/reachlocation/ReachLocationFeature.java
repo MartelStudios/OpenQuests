@@ -15,7 +15,7 @@ public final class ReachLocationFeature {
 
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, ReachLocationQuestAsset.class, ReachLocationQuestAsset.CODEC, ReachLocationQuest.class, ReachLocationQuest.CODEC);
+                               .registerQuestType(TYPE_ID, ReachLocationQuestAsset.class, ReachLocationQuestAsset.CODEC, ReachLocationQuestProgression.class, ReachLocationQuestProgression.CODEC);
 
         plugin.getEntityStoreRegistry().registerSystem(new ReachLocationTickingSystem());
     }

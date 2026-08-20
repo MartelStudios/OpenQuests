@@ -2,7 +2,7 @@ package com.martelstudios.hyquests.core.scopes.player.events;
 
 import com.hypixel.hytale.event.IEvent;
 import com.martelstudios.hyquests.core.events.QuestRegisteredEvent;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -14,17 +14,17 @@ import java.util.UUID;
  */
 public class QuestAddedToPlayerStoreEvent implements IEvent<UUID> {
     @Nonnull
-    private final AbstractQuest<?> quest;
+    private final AbstractQuestProgression<?> quest;
     @Nonnull
     private final UUID playerId;
 
-    public QuestAddedToPlayerStoreEvent(@Nonnull AbstractQuest<?> quest, @Nonnull UUID playerId) {
+    public QuestAddedToPlayerStoreEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         this.quest = quest;
         this.playerId = playerId;
     }
 
     @Nonnull
-    public AbstractQuest<?> getQuest() {
+    public AbstractQuestProgression<?> getQuest() {
         return quest;
     }
 

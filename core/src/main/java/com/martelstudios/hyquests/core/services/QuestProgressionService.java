@@ -7,7 +7,7 @@ import com.martelstudios.hyquests.core.assets.QuestAsset;
 import com.martelstudios.hyquests.core.events.QuestCompletedEvent;
 import com.martelstudios.hyquests.core.events.QuestRegisteredEvent;
 import com.martelstudios.hyquests.core.events.QuestUnregisteredEvent;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import com.martelstudios.hyquests.core.stores.QuestProgressionStore;
 import com.martelstudios.hyquests.core.stores.QuestStoreComponent;
 import com.martelstudios.hyquests.core.visitors.QuestVisitor;
@@ -19,7 +19,7 @@ import java.util.UUID;
 
 /**
  * Owns the lifecycle of quest instances: registration, progression, completion and rewards.
- * Every instance lives in the single {@link QuestProgressionStore}, and {@link AbstractQuest#getPlayers()}
+ * Every instance lives in the single {@link QuestProgressionStore}, and {@link AbstractQuestProgression#getPlayers()}
  * is the source of truth for who holds it — {@link QuestStoreComponent} being the reverse index
  * used to know what to load.
  * <p>
@@ -41,12 +41,12 @@ public class QuestProgressionService {
      * Registers a concrete quest type's polymorphic serialization tag, for both its asset and
      * its runtime form, under the same id. Mirrors {@code ObjectivePlugin.registerTask}.
      */
-    public <Q extends AbstractQuest<Q>, QAsset extends QuestAsset> void registerQuestType(String id, Class<QAsset> questAssetClass, BuilderCodec<QAsset> questAssetCodec, Class<Q> questClass, BuilderCodec<Q> questCodec) {
+    public <Q extends AbstractQuestProgression<Q>, QAsset extends QuestAsset> void registerQuestType(String id, Class<QAsset> questAssetClass, BuilderCodec<QAsset> questAssetCodec, Class<Q> questClass, BuilderCodec<Q> questCodec) {
         QuestAsset.CODEC.register(id, questAssetClass, questAssetCodec);
-        AbstractQuest.CODEC.register(id, questClass, questCodec);
+        AbstractQuestProgression.CODEC.register(id, questClass, questCodec);
     }
 
-    public AbstractQuest<?> loadQuest(UUID questId) {
+    public AbstractQuestProgression<?> loadQuest(UUID questId) {
         return dataStore.load(questId);
     }
 
@@ -55,7 +55,7 @@ public class QuestProgressionService {
      *
      * @param questAsset the quest asset to create the quest from
      */
-    public AbstractQuest<?> registerQuest(@Nonnull QuestAsset questAsset) {
+    public AbstractQuestProgression<?> registerQuest(@Nonnull QuestAsset questAsset) {
         var quest = questAsset.create();
         quest.markDirty();
         registerQuest(quest);
@@ -67,7 +67,7 @@ public class QuestProgressionService {
      *
      * @param quest the quest to register
      */
-    public void registerQuest(@Nonnull AbstractQuest<?> quest) {
+    public void registerQuest(@Nonnull AbstractQuestProgression<?> quest) {
         dataStore.add(quest);
         quest.onRegistered();
 
@@ -82,11 +82,11 @@ public class QuestProgressionService {
      *
      * @param questId the id of the quest to unregister
      */
-    public AbstractQuest<?> unregisterQuest(@Nonnull UUID questId) {
-        AbstractQuest<?> quest = dataStore.get(questId);
+    public AbstractQuestProgression<?> unregisterQuest(@Nonnull UUID questId) {
+        AbstractQuestProgression<?> quest = dataStore.get(questId);
         if (quest == null) return null;
 
-        AbstractQuest<?> removed = dataStore.removeAndDeleteFromDisk(questId);
+        AbstractQuestProgression<?> removed = dataStore.removeAndDeleteFromDisk(questId);
         quest.onUnregistered();
 
         HytaleServer.get()
@@ -98,13 +98,13 @@ public class QuestProgressionService {
     }
 
     /**
-     * Called by {@link AbstractQuest#update} when a quest reaches a terminal state: archives it
+     * Called by {@link AbstractQuestProgression#update} when a quest reaches a terminal state: archives it
      * for every assigned player, then unregisters the instance.
      *
      * @param questId the id of the quest that just completed
      */
-    public AbstractQuest<?> completeQuest(@Nonnull UUID questId) {
-        AbstractQuest<?> quest = getQuest(questId);
+    public AbstractQuestProgression<?> completeQuest(@Nonnull UUID questId) {
+        AbstractQuestProgression<?> quest = getQuest(questId);
         if (quest == null) return null;
 
         unregisterQuest(questId);
@@ -117,7 +117,7 @@ public class QuestProgressionService {
         return quest;
     }
 
-    public AbstractQuest<?> getQuest(UUID questId) {
+    public AbstractQuestProgression<?> getQuest(UUID questId) {
         return dataStore.get(questId);
     }
 
@@ -125,7 +125,7 @@ public class QuestProgressionService {
      * @return every quest currently loaded, whatever its scope or type.
      */
     @Nonnull
-    public Collection<AbstractQuest<?>> getAllQuests() {
+    public Collection<AbstractQuestProgression<?>> getAllQuests() {
         return dataStore.getAll();
     }
 
@@ -133,7 +133,7 @@ public class QuestProgressionService {
      * @return the ids of every loaded quest of a concrete type, empty if none.
      */
     @Nonnull
-    public Set<UUID> getQuestIdsForType(@Nonnull Class<? extends AbstractQuest<?>> questClass) {
+    public Set<UUID> getQuestIdsForType(@Nonnull Class<? extends AbstractQuestProgression<?>> questClass) {
         return dataStore.getForType(questClass);
     }
 
@@ -149,7 +149,7 @@ public class QuestProgressionService {
      * Progresses every quest of the visitor's type on the server. Prefer the overload taking a
      * player's own quest ids: a visitor built for one player discards all the others anyway.
      */
-    public <Q extends AbstractQuest<Q>> void progress(@Nonnull QuestVisitor<Q> visitor) {
+    public <Q extends AbstractQuestProgression<Q>> void progress(@Nonnull QuestVisitor<Q> visitor) {
         progress(visitor, dataStore.getForType(visitor.getQuestType()));
     }
 
@@ -158,11 +158,11 @@ public class QuestProgressionService {
      * live index: completing a quest unregisters it, and the sets involved tolerate that.
      */
     @SuppressWarnings("unchecked")
-    public <Q extends AbstractQuest<Q>> void progress(@Nonnull QuestVisitor<Q> visitor, @Nonnull Collection<UUID> questIds) {
+    public <Q extends AbstractQuestProgression<Q>> void progress(@Nonnull QuestVisitor<Q> visitor, @Nonnull Collection<UUID> questIds) {
         Class<Q> questType = visitor.getQuestType();
 
         for (UUID id : questIds) {
-            AbstractQuest<?> quest = dataStore.get(id);
+            AbstractQuestProgression<?> quest = dataStore.get(id);
             if (!questType.isInstance(quest)) continue;
 
             ((Q) quest).update(visitor);

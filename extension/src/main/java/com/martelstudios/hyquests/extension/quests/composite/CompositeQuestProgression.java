@@ -8,7 +8,7 @@ import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
 import com.martelstudios.hyquests.core.events.QuestCompletedEvent;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
@@ -21,12 +21,12 @@ import java.util.*;
  * top-level quest. This quest's own progression is delegated to a visitor, which
  * typically derives its state from its children.
  */
-public class CompositeQuest extends AbstractQuest<CompositeQuest> {
+public class CompositeQuestProgression extends AbstractQuestProgression<CompositeQuestProgression> {
 
-    public static final BuilderCodec<CompositeQuest> CODEC = BuilderCodec.builder(CompositeQuest.class, CompositeQuest::new, AbstractQuest.BASE_CODEC)
-                                                                       .append(new KeyedCodec<>("QuestIds", new ArrayCodec<>(Codec.UUID_BINARY, UUID[]::new)), CompositeQuest::setQuestIds, quest -> quest.questIds)
-                                                                       .add()
-                                                                       .build();
+    public static final BuilderCodec<CompositeQuestProgression> CODEC = BuilderCodec.builder(CompositeQuestProgression.class, CompositeQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
+                                                                                    .append(new KeyedCodec<>("QuestIds", new ArrayCodec<>(Codec.UUID_BINARY, UUID[]::new)), CompositeQuestProgression::setQuestIds, quest -> quest.questIds)
+                                                                                    .add()
+                                                                                    .build();
 
     protected UUID[] questIds = new UUID[0];
 
@@ -109,7 +109,7 @@ public class CompositeQuest extends AbstractQuest<CompositeQuest> {
      * Also the codec setter, hence the release first: decoding an already-armed quest would
      * otherwise subscribe a second time to every child.
      */
-    public CompositeQuest setQuestIds(UUID[] questIds) {
+    public CompositeQuestProgression setQuestIds(UUID[] questIds) {
         releaseChildListeners();
         this.questIds = questIds;
 
@@ -133,7 +133,7 @@ public class CompositeQuest extends AbstractQuest<CompositeQuest> {
      */
     public boolean allQuestsCompleted() {
         for (UUID childId : questIds) {
-            AbstractQuest<?> child = QuestProgressionService.get().getQuest(childId);
+            AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(childId);
             if (child == null) continue;
 
             if (!child.isCompleted()) return false;

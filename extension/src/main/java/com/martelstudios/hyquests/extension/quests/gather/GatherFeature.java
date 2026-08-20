@@ -17,7 +17,7 @@ public final class GatherFeature {
 
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, GatherQuestAsset.class, GatherQuestAsset.CODEC, GatherQuest.class, GatherQuest.CODEC);
+                               .registerQuestType(TYPE_ID, GatherQuestAsset.class, GatherQuestAsset.CODEC, GatherQuestProgression.class, GatherQuestProgression.CODEC);
 
         plugin.getEntityStoreRegistry().registerSystem(new GatherItemEventSystem());
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, GatherEvents::handleQuestAssignedToPlayer);

@@ -3,7 +3,7 @@ package com.martelstudios.hyquests.extension.quests.gather;
 import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import com.martelstudios.hyquests.extension.quests.count.CountQuestAsset;
 
 public class GatherQuestAsset extends CountQuestAsset {
@@ -19,8 +19,8 @@ public class GatherQuestAsset extends CountQuestAsset {
     private GatherQuestAsset() {}
 
     @Override
-    public AbstractQuest<?> create() {
-        return new GatherQuest().setAssetId(getId());
+    public AbstractQuestProgression<?> create() {
+        return new GatherQuestProgression().setAssetId(getId());
     }
 
     public BlockTagOrItemIdField getItemToGather() {

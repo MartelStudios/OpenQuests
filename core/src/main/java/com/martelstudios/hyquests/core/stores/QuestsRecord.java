@@ -5,7 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.set.SetCodec;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.martelstudios.hyquests.core.models.AbstractQuest;
+import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 import com.martelstudios.hyquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nullable;
@@ -53,12 +53,12 @@ public class QuestsRecord {
      *
      * @return the quests of this scope, without the ids that no longer resolve.
      */
-    public List<AbstractQuest<?>> getAllQuests() {
+    public List<AbstractQuestProgression<?>> getAllQuests() {
         loadAll();
 
-        List<AbstractQuest<?>> quests = new ArrayList<>(questIds.size());
+        List<AbstractQuestProgression<?>> quests = new ArrayList<>(questIds.size());
         for (UUID questId : questIds) {
-            AbstractQuest<?> quest = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
             if (quest != null) quests.add(quest);
         }
         return quests;

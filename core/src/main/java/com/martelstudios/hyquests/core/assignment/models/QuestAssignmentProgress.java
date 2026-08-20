@@ -11,14 +11,14 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * What a player has already satisfied on an assignment that is never materialised, as a bit per
- * condition. Positional, so reordering an asset's conditions invalidates the progress cached for
- * it — cheap enough to re-earn, and it keeps conditions free of any identity contract.
+ * What a player has already satisfied on an assignment that is not instantiated, as a bit per
+ * condition. Reordering an asset's conditions invalidates the progress cached for
+ * it.
+ * The main purpose of this, is to avoid instantiating every {@link QuestAssignmentAsset#isAutoAssign()}. It allows to only persists auto assigned assignments currently in progress.
  */
 public class QuestAssignmentProgress {
-
     /**
-     * A bitmask caps how many conditions one assignment can latch.
+     * A bitmask caps how many conditions one assignment can have.
      */
     public static final int MAX_CONDITIONS = Long.SIZE;
 

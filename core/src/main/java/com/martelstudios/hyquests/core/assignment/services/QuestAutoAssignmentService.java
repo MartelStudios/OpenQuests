@@ -22,7 +22,6 @@ public class QuestAutoAssignmentService {
         plugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
     }
 
-
     public static QuestAutoAssignmentService get() {
         return HyQuestCorePlugin.get().getQuestAutoAssignmentService();
     }

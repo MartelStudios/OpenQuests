@@ -4,13 +4,13 @@ import com.martelstudios.hyquests.core.models.QuestState;
 import com.martelstudios.hyquests.core.visitors.QuestVisitor;
 
 /**
- * Succeeds a {@link CompositeQuest} once all of its child quests have completed. Carries no
+ * Succeeds a {@link CompositeQuestProgression} once all of its child quests have completed. Carries no
  * context: the quest's progress is entirely derived from its children.
  */
-public class CompositeQuestVisitor implements QuestVisitor<CompositeQuest> {
+public class CompositeQuestVisitor implements QuestVisitor<CompositeQuestProgression> {
 
     @Override
-    public void progress(CompositeQuest quest) {
+    public void progress(CompositeQuestProgression quest) {
         if (quest.isCompleted()) return;
 
         if (quest.allQuestsCompleted()) {
@@ -19,7 +19,7 @@ public class CompositeQuestVisitor implements QuestVisitor<CompositeQuest> {
     }
 
     @Override
-    public Class<CompositeQuest> getQuestType() {
-        return CompositeQuest.class;
+    public Class<CompositeQuestProgression> getQuestType() {
+        return CompositeQuestProgression.class;
     }
 }

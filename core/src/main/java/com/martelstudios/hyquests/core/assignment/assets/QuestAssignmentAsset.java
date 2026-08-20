@@ -18,8 +18,7 @@ import com.martelstudios.hyquests.core.assignment.conditions.QuestAssignmentCond
 import javax.annotation.Nonnull;
 
 /**
- * Binds quests to the conditions a player must meet before they are handed out. Kept apart from
- * {@link QuestAsset} so the same quest can be reached through different prerequisites.
+ * Binds quests to the conditions a player must meet before they are handed out.
  */
 public class QuestAssignmentAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, QuestAssignmentAsset>> {
 
@@ -48,18 +47,6 @@ public class QuestAssignmentAsset implements JsonAssetWithMap<String, DefaultAss
 
     private QuestAssignmentAsset() {}
 
-    public static AssetStore<String, QuestAssignmentAsset, DefaultAssetMap<String, QuestAssignmentAsset>> getAssetStore() {
-        return AssetRegistry.getAssetStore(QuestAssignmentAsset.class);
-    }
-
-    public static DefaultAssetMap<String, QuestAssignmentAsset> getAssetMap() {
-        return getAssetStore().getAssetMap();
-    }
-
-    public static QuestAssignmentAsset getAsset(String assetId) {
-        return getAssetMap().getAsset(assetId);
-    }
-
     @Override
     public String getId() {
         return id;
@@ -81,4 +68,17 @@ public class QuestAssignmentAsset implements JsonAssetWithMap<String, DefaultAss
     public boolean isAutoAssign() {
         return autoAssign;
     }
+
+    public static AssetStore<String, QuestAssignmentAsset, DefaultAssetMap<String, QuestAssignmentAsset>> getAssetStore() {
+        return AssetRegistry.getAssetStore(QuestAssignmentAsset.class);
+    }
+
+    public static DefaultAssetMap<String, QuestAssignmentAsset> getAssetMap() {
+        return getAssetStore().getAssetMap();
+    }
+
+    public static QuestAssignmentAsset getAsset(String assetId) {
+        return getAssetMap().getAsset(assetId);
+    }
+
 }
