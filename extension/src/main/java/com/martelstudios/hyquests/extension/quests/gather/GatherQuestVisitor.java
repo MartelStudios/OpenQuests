@@ -40,17 +40,17 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuestProgression> 
     @Override
     public void progress(GatherQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.getState() == QuestState.SUCCESSFUL) return;
+        if (quest.isCompleted()) return;
 
         int count = combinedItemContainer.countItemStacks(itemStack -> quest.getItemToGather()
                                                                             .isBlockTypeIncluded(itemStack.getItemId()));
 
-        quest.setCount(count)
+        quest.setCurrentQuantity(count)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
 
         LOGGER.at(Level.FINE)
-              .log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCount(), quest.getTargetCount());
+              .log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCurrentQuantity(), quest.getTargetQuantity());
     }
 
     @Override

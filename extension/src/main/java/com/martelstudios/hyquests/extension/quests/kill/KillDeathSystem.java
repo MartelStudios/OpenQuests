@@ -34,8 +34,5 @@ public abstract class KillDeathSystem extends DeathSystems.OnDeathSystem {
         onKill(store, victimRef, killerPlayerRef.getUuid(), killerQuests);
     }
 
-    /**
-     * @param killerId the player credited with the kill, already known to hold quests
-     */
     protected abstract void onKill(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> victimRef, @Nonnull UUID killerId, @Nonnull QuestStoreComponent killerQuests);
 }

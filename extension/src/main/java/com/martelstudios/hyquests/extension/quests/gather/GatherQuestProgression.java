@@ -3,7 +3,7 @@ package com.martelstudios.hyquests.extension.quests.gather;
 import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.hyquests.extension.quests.count.CountQuestProgression;
+import com.martelstudios.hyquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,9 +12,9 @@ import javax.annotation.Nullable;
  * Quest whose progress is however many of a given item the player currently holds, rechecked
  * on every inventory change.
  */
-public class GatherQuestProgression extends CountQuestProgression<GatherQuestProgression> {
+public class GatherQuestProgression extends QuantityQuestProgression<GatherQuestProgression> {
 
-    public static final BuilderCodec<GatherQuestProgression> CODEC = BuilderCodec.builder(GatherQuestProgression.class, GatherQuestProgression::new, CountQuestProgression.BASE_CODEC)
+    public static final BuilderCodec<GatherQuestProgression> CODEC = BuilderCodec.builder(GatherQuestProgression.class, GatherQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                  .append(new KeyedCodec<>("ItemToGather", BlockTagOrItemIdField.CODEC), (quest, item) -> quest.itemToGather = item, quest -> quest.itemToGather)
                                                                                  .add()
                                                                                  .build();

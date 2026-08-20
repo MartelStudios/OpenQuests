@@ -4,18 +4,18 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
-import com.martelstudios.hyquests.extension.quests.count.CountQuestAsset;
+import com.martelstudios.hyquests.extension.quests.quantity.QuantityQuestAsset;
 
 import javax.annotation.Nullable;
 
 /**
- * Kill a number of players, optionally a designated one. The target is a username or a uuid, the
- * same thing the player commands accept, and is left out to mean "anyone".
+ * Kill a number of players, optionally a designated one. The target is a username or a uuid, and
+ * is left out to mean any player.
  */
-public class KillPlayerQuestAsset extends CountQuestAsset {
+public class KillPlayerQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<KillPlayerQuestAsset> CODEC =
-        BuilderCodec.builder(KillPlayerQuestAsset.class, KillPlayerQuestAsset::new, CountQuestAsset.BASE_CODEC)
+        BuilderCodec.builder(KillPlayerQuestAsset.class, KillPlayerQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("PlayerToKill", Codec.STRING), (asset, player) -> asset.playerToKill = player, asset -> asset.playerToKill)
                     .add()
                     .build();

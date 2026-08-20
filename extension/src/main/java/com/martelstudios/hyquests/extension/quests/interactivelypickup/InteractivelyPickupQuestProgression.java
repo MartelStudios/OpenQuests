@@ -3,14 +3,14 @@ package com.martelstudios.hyquests.extension.quests.interactivelypickup;
 import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.hyquests.extension.quests.count.CountQuestProgression;
+import com.martelstudios.hyquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class InteractivelyPickupQuestProgression extends CountQuestProgression<InteractivelyPickupQuestProgression> {
+public class InteractivelyPickupQuestProgression extends QuantityQuestProgression<InteractivelyPickupQuestProgression> {
 
-    public static final BuilderCodec<InteractivelyPickupQuestProgression> CODEC = BuilderCodec.builder(InteractivelyPickupQuestProgression.class, InteractivelyPickupQuestProgression::new, CountQuestProgression.BASE_CODEC)
+    public static final BuilderCodec<InteractivelyPickupQuestProgression> CODEC = BuilderCodec.builder(InteractivelyPickupQuestProgression.class, InteractivelyPickupQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                               .append(new KeyedCodec<>("ItemToPickup", BlockTagOrItemIdField.CODEC), (quest, item) -> quest.itemToPickup = item, quest -> quest.itemToPickup)
                                                                                               .add()
                                                                                               .build();

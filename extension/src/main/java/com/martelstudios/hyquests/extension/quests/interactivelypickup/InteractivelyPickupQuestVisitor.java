@@ -10,8 +10,7 @@ import java.util.logging.Level;
 import javax.annotation.Nonnull;
 
 /**
- * Progresses {@link InteractivelyPickupQuestProgression}s by accumulating what a single harvest interaction
- * yielded, unlike gather quests which recount the whole inventory.
+ * Accumulates what a single harvest interaction yielded.
  */
 public class InteractivelyPickupQuestVisitor implements QuestVisitor<InteractivelyPickupQuestProgression> {
     @Nonnull
@@ -28,18 +27,18 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
     @Override
     public void progress(InteractivelyPickupQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.getState() == QuestState.SUCCESSFUL) return;
+        if (quest.isCompleted()) return;
 
 
         if (!quest.getItemToPickup().isBlockTypeIncluded(event.getItemStack().getItemId())) {
             return;
         }
 
-        quest.setCount(quest.getCount() + event.getItemStack().getQuantity())
+        quest.setCurrentQuantity(quest.getCurrentQuantity() + event.getItemStack().getQuantity())
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
 
-        LOGGER.at(Level.FINE).log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCount(), quest.getTargetCount());
+        LOGGER.at(Level.FINE).log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCurrentQuantity(), quest.getTargetQuantity());
     }
 
     @Override

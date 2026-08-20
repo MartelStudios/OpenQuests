@@ -114,10 +114,6 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
         return (CompositeQuestAsset) super.getAsset();
     }
 
-    /**
-     * Also the codec setter, hence the release first: decoding an already-armed quest would
-     * otherwise subscribe a second time to every child.
-     */
     public CompositeQuestProgression setQuestIds(UUID[] questIds) {
         releaseChildListeners();
         this.questIds = questIds;

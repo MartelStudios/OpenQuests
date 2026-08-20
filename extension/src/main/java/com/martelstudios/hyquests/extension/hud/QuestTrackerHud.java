@@ -5,7 +5,7 @@ import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
-import com.martelstudios.hyquests.extension.quests.count.CountQuestProgression;
+import com.martelstudios.hyquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -84,8 +84,8 @@ public class QuestTrackerHud extends CustomUIHud {
 
     @Nonnull
     private static String progressFor(@Nonnull AbstractQuestProgression<?> quest) {
-        if (quest instanceof CountQuestProgression<?> countQuest) {
-            return countQuest.getCount() + "/" + countQuest.getAsset().getCount();
+        if (quest instanceof QuantityQuestProgression<?> quantityQuest) {
+            return quantityQuest.getCurrentQuantity() + "/" + quantityQuest.getTargetQuantity();
         }
         return quest.getState().name();
     }

@@ -4,18 +4,14 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.hyquests.extension.quests.count.CountQuestProgression;
+import com.martelstudios.hyquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/**
- * Runtime side of a kill-player quest. The target lives here as well as on the asset, so a quest
- * handed out from a shared template can be pointed at someone chosen when it was handed out.
- */
-public class KillPlayerQuestProgression extends CountQuestProgression<KillPlayerQuestProgression> {
+public class KillPlayerQuestProgression extends QuantityQuestProgression<KillPlayerQuestProgression> {
 
-    public static final BuilderCodec<KillPlayerQuestProgression> CODEC = BuilderCodec.builder(KillPlayerQuestProgression.class, KillPlayerQuestProgression::new, CountQuestProgression.BASE_CODEC)
+    public static final BuilderCodec<KillPlayerQuestProgression> CODEC = BuilderCodec.builder(KillPlayerQuestProgression.class, KillPlayerQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                      .append(new KeyedCodec<>("PlayerToKill", Codec.STRING), (quest, player) -> quest.playerToKill = player, quest -> quest.playerToKill)
                                                                                      .add()
                                                                                      .build();
@@ -46,7 +42,7 @@ public class KillPlayerQuestProgression extends CountQuestProgression<KillPlayer
     }
 
     /**
-     * Matches on username or uuid, whichever the target was written as.
+     * @return {@code true} when the victim is the target, or when no target was set.
      */
     public boolean matchesVictim(@Nonnull PlayerRef victim) {
         String target = getPlayerToKill();

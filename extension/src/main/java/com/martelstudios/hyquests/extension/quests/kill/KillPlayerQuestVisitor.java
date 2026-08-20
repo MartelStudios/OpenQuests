@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 /**
- * Counts one kill against the killer's quests, for the quests that were after this victim.
+ * Counts one kill against the killer's quests that target this victim.
  */
 public class KillPlayerQuestVisitor implements QuestVisitor<KillPlayerQuestProgression> {
     @Nonnull
@@ -30,11 +30,11 @@ public class KillPlayerQuestVisitor implements QuestVisitor<KillPlayerQuestProgr
         if (quest.isCompleted()) return;
         if (!quest.matchesVictim(victim)) return;
 
-        quest.setCount(quest.getCount() + 1)
+        quest.setCurrentQuantity(quest.getCurrentQuantity() + 1)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
 
-        LOGGER.at(Level.FINE).log("Quest %s progress for %s: %d/%d", quest.getId(), killerId, quest.getCount(), quest.getTargetCount());
+        LOGGER.at(Level.FINE).log("Quest %s progress for %s: %d/%d", quest.getId(), killerId, quest.getCurrentQuantity(), quest.getTargetQuantity());
     }
 
     @Override

@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * Watches players dying, so only a player kill can progress a {@link KillPlayerQuestProgression}.
+ * Restricts {@link KillPlayerQuestProgression} to player deaths.
  */
 public class KillPlayerDeathSystem extends KillDeathSystem {
 

@@ -4,12 +4,12 @@ import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrIte
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
-import com.martelstudios.hyquests.extension.quests.count.CountQuestAsset;
+import com.martelstudios.hyquests.extension.quests.quantity.QuantityQuestAsset;
 
-public class GatherQuestAsset extends CountQuestAsset {
+public class GatherQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<GatherQuestAsset> CODEC =
-        BuilderCodec.builder(GatherQuestAsset.class, GatherQuestAsset::new, CountQuestAsset.BASE_CODEC)
+        BuilderCodec.builder(GatherQuestAsset.class, GatherQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
             .append(new KeyedCodec<>("ItemToGather", BlockTagOrItemIdField.CODEC), (asset, item) -> asset.itemToGather = item, asset -> asset.itemToGather)
             .add()
             .build();

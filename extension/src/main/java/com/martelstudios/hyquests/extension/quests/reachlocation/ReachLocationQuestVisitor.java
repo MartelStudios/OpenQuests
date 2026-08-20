@@ -22,7 +22,7 @@ public class ReachLocationQuestVisitor implements QuestVisitor<ReachLocationQues
     @Override
     public void progress(ReachLocationQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.getState() == QuestState.SUCCESSFUL) return;
+        if (quest.isCompleted()) return;
 
         var asset = quest.getAsset();
         double radius = asset.getRadius();
