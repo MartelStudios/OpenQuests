@@ -2,7 +2,6 @@ package com.martelstudios.hyquests.extension.conditions.operator;
 
 import com.martelstudios.hyquests.core.assignment.assets.QuestAssignmentAsset;
 import com.martelstudios.hyquests.core.assignment.conditions.QuestAssignmentConditionResolver;
-import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -20,7 +19,6 @@ public class OperatorConditionResolver implements QuestAssignmentConditionResolv
         var operatorValue = switch (operatorCondition.operator) {
             case AND -> checkAnd(operatorCondition, playerId);
             case OR -> checkOr(operatorCondition, playerId);
-            case XOR -> checkXor(operatorCondition, playerId);
         };
 
         return operatorCondition.not != operatorValue;
@@ -38,17 +36,5 @@ public class OperatorConditionResolver implements QuestAssignmentConditionResolv
             if (condition.evaluate(playerId)) return true;
         }
         return false;
-    }
-
-    /**
-     * Odd-parity fold, so it degrades to "one or the other" for two conditions. Cannot
-     * short-circuit: every child has to be evaluated.
-     */
-    private boolean checkXor(OperatorCondition operatorCondition, @Nonnull UUID playerId) {
-        boolean result = false;
-        for (var condition : operatorCondition.getConditions()) {
-            result ^= condition.evaluate(playerId);
-        }
-        return result;
     }
 }

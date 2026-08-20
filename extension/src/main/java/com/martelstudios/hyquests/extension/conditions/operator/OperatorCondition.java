@@ -52,6 +52,6 @@ public class OperatorCondition extends QuestAssignmentCondition<OperatorConditio
     }
 
     public enum Operator {
-        AND, OR, XOR
+        AND, OR
     }
 }
