@@ -51,7 +51,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     /**
      * Unique identity used to reference and persist this quest. Overwritten on load.
      */
-    protected UUID id;
+    protected UUID id = UUID.randomUUID();
 
     /**
      * Ids of the players this quest is assigned to.
