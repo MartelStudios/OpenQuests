@@ -1,6 +1,7 @@
 package com.martelstudios.hyquests.core.assignment.services;
 
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.hyquests.core.HyQuestCorePlugin;
 import com.martelstudios.hyquests.core.assignment.assets.QuestAssignmentAsset;
 import com.martelstudios.hyquests.core.assignment.conditions.QuestAssignmentCondition;
@@ -17,6 +18,10 @@ import java.util.UUID;
  * in for the assignment, and only the conditions already met are kept on the player.
  */
 public class QuestAutoAssignmentService {
+    public QuestAutoAssignmentService(JavaPlugin plugin) {
+        plugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
+    }
+
 
     public static QuestAutoAssignmentService get() {
         return HyQuestCorePlugin.get().getQuestAutoAssignmentService();
@@ -26,7 +31,7 @@ public class QuestAutoAssignmentService {
      * The one pass over the catalog, offering whatever the player has never been offered. Each asset
      * is evaluated on the spot, as it is added, and left to its resolvers afterwards.
      */
-    public void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
+    private void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
         var assignmentStore = playerConnectEvent.getHolder()
                                                 .ensureAndGetComponent(QuestAssignmentStoreComponent.getComponentType());
         UUID playerId = playerConnectEvent.getPlayerRef().getUuid();

@@ -2,6 +2,7 @@ package com.martelstudios.hyquests.core.scopes.player;
 
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.hyquests.core.HyQuestCorePlugin;
 import com.martelstudios.hyquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.hyquests.core.events.QuestPlayerRemovedEvent;
@@ -23,6 +24,13 @@ import java.util.UUID;
  */
 public class PlayerQuestService {
 
+    public PlayerQuestService(JavaPlugin plugin) {
+        plugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
+        plugin.getEventRegistry().registerGlobal(QuestPlayerAddedEvent.class, this::handleQuestPlayerAddedEvent);
+        plugin.getEventRegistry().registerGlobal(QuestPlayerRemovedEvent.class, this::handleQuestPlayerRemovedEvent);
+        plugin.getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, this::handleQuestUnregisteredEvent);
+    }
+
     public static PlayerQuestService get() {
         return HyQuestCorePlugin.get().getPlayerQuestService();
     }
@@ -39,15 +47,15 @@ public class PlayerQuestService {
      * Pulls the player's own quests into the datastore. Scope services assign theirs separately,
      * each on the event that concerns it.
      */
-    public void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
+    private void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
         getQuests(EntityComponents.of(playerConnectEvent.getHolder())).loadAll();
     }
 
-    public void handleQuestPlayerAddedEvent(@Nonnull QuestPlayerAddedEvent questPlayerAddedEvent) {
+    private void handleQuestPlayerAddedEvent(@Nonnull QuestPlayerAddedEvent questPlayerAddedEvent) {
         addQuestToPlayerStore(questPlayerAddedEvent.getQuest(), questPlayerAddedEvent.getPlayerId());
     }
 
-    public void handleQuestPlayerRemovedEvent(@Nonnull QuestPlayerRemovedEvent questPlayerRemovedEvent) {
+    private void handleQuestPlayerRemovedEvent(@Nonnull QuestPlayerRemovedEvent questPlayerRemovedEvent) {
         removeQuestFromPlayerStore(questPlayerRemovedEvent.getQuest(), questPlayerRemovedEvent.getPlayerId());
     }
 
@@ -55,7 +63,7 @@ public class PlayerQuestService {
      * A quest leaving the store has to leave every holder's index too, and none of them was
      * removed from it individually.
      */
-    public void handleQuestUnregisteredEvent(@Nonnull QuestUnregisteredEvent questUnregisteredEvent) {
+    private void handleQuestUnregisteredEvent(@Nonnull QuestUnregisteredEvent questUnregisteredEvent) {
         AbstractQuest<?> quest = questUnregisteredEvent.getQuest();
 
         for (UUID playerId : quest.getPlayers()) {

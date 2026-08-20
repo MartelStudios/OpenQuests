@@ -88,13 +88,13 @@ public class HyQuestCorePlugin extends JavaPlugin {
         questsStore = new QuestsStore(new DiskDataStoreProvider(questSetStorePath.toString()).create(QuestsRecord.CODEC));
 
         questProgressionService = new QuestProgressionService(questProgressionStore);
-        questHistoryService = new QuestHistoryService();
+        questHistoryService = new QuestHistoryService(this);
         questAssignmentStore = new QuestAssignmentStore(new DiskDataStoreProvider(questAssignmentsPath.toString()).create(QuestAssignmentRecord.CODEC));
         questAssignmentService = new QuestAssignmentService(questAssignmentStore);
-        questAutoAssignmentService = new QuestAutoAssignmentService();
-        universeQuestService = new UniverseQuestService(questsStore);
-        worldQuestService = new WorldQuestService();
-        playerQuestService = new PlayerQuestService();
+        questAutoAssignmentService = new QuestAutoAssignmentService(this);
+        universeQuestService = new UniverseQuestService(this, questsStore);
+        worldQuestService = new WorldQuestService(this);
+        playerQuestService = new PlayerQuestService(this);
 
         questStoreComponentType = getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, "QuestStore", QuestStoreComponent.CODEC);
         worldStoreResourceType = getEntityStoreRegistry().registerResource(WorldQuestStoreResource.class, "QuestStore", WorldQuestStoreResource.CODEC);
@@ -102,18 +102,6 @@ public class HyQuestCorePlugin extends JavaPlugin {
         questAssignmentStoreComponentType = getEntityStoreRegistry().registerComponent(QuestAssignmentStoreComponent.class, "QuestAssignmentStore", QuestAssignmentStoreComponent.CODEC);
 
         getCommandRegistry().registerCommand(new QuestCommand());
-
-        // All wiring lives here, so the plugin registry unregisters it on disable
-        getEventRegistry().registerGlobal(PlayerConnectEvent.class, playerQuestService::handlePlayerConnectEvent);
-        getEventRegistry().registerGlobal(QuestPlayerAddedEvent.class, playerQuestService::handleQuestPlayerAddedEvent);
-        getEventRegistry().registerGlobal(QuestPlayerRemovedEvent.class, playerQuestService::handleQuestPlayerRemovedEvent);
-        getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, playerQuestService::handleQuestUnregisteredEvent);
-        getEventRegistry().registerGlobal(PlayerConnectEvent.class, universeQuestService::handlePlayerConnectEvent);
-        getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, worldQuestService::handleAddPlayerToWorldEvent);
-        getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, questHistoryService::handleAddPlayerToWorldEvent);
-        getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, worldQuestService::handleRemovedPlayerFromWorldEvent);
-        getEventRegistry().registerGlobal(QuestCompletedEvent.class, questHistoryService::handleQuestCompletedEvent);
-        getEventRegistry().registerGlobal(PlayerConnectEvent.class, questAutoAssignmentService::handlePlayerConnectEvent);
 
         getAssetRegistry().register(HytaleAssetStore.builder(QuestAsset.class, new DefaultAssetMap<>())
                                                     .setPath("HyQuests/Quests/")

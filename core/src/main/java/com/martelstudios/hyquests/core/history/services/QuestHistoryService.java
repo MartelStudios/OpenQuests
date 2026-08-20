@@ -1,6 +1,7 @@
 package com.martelstudios.hyquests.core.history.services;
 
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.hyquests.core.HyQuestCorePlugin;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
@@ -23,6 +24,11 @@ import java.util.UUID;
  */
 public class QuestHistoryService {
 
+    public QuestHistoryService(JavaPlugin plugin) {
+        plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
+        plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+    }
+
     public static QuestHistoryService get() {
         return HyQuestCorePlugin.get().getQuestHistoryService();
     }
@@ -35,7 +41,7 @@ public class QuestHistoryService {
         return playerComponents.ensureAndGetComponent(QuestHistoryStoreComponent.getComponentType()).history;
     }
 
-    public void handleQuestCompletedEvent(QuestCompletedEvent questCompletedEvent) {
+    private void handleQuestCompletedEvent(QuestCompletedEvent questCompletedEvent) {
         var quest = questCompletedEvent.getQuest();
         var asset = quest.getAsset();
         boolean autoClaim = asset != null && asset.isAutoClaim();
@@ -53,7 +59,7 @@ public class QuestHistoryService {
     /**
      * On world entry rather than on connection, so the player is there to be shown the reward.
      */
-    public void handleAddPlayerToWorldEvent(@Nonnull AddPlayerToWorldEvent addPlayerToWorldEvent) {
+    private void handleAddPlayerToWorldEvent(@Nonnull AddPlayerToWorldEvent addPlayerToWorldEvent) {
         var playerRef = addPlayerToWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
         if (playerRef == null || playerRef.getReference() == null) return;
 

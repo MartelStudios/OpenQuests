@@ -4,6 +4,7 @@ import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.hyquests.core.HyQuestCorePlugin;
@@ -29,8 +30,9 @@ public class UniverseQuestService {
     private final QuestsStore questsStore;
     private final ConcurrentHashMap<UUID, EventRegistration<UUID, QuestUnregisteredEvent>> questUnregisteredListeners = new ConcurrentHashMap<>();
 
-    public UniverseQuestService(QuestsStore questsStore) {
+    public UniverseQuestService(JavaPlugin javaPlugin, QuestsStore questsStore) {
         this.questsStore = questsStore;
+        javaPlugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
     }
 
     public static UniverseQuestService get() {
@@ -94,7 +96,7 @@ public class UniverseQuestService {
      * Assigns every universe quest to a connecting player, through their incoming holder rather
      * than their id: they are not online yet, and stored data would be overwritten.
      */
-    public void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
+    private void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
         var holder = playerConnectEvent.getHolder();
         var playerRef = holder.getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;
