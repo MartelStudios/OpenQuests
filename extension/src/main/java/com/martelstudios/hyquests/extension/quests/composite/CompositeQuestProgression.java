@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
+import com.hypixel.hytale.codec.codecs.set.SetCodec;
 import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
@@ -13,9 +14,10 @@ import com.martelstudios.hyquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Composite quest whose objective is that other quests complete. Children are
+ * Composite quest whose objective is that other quests complete successfully. Children are
  * not embedded: they are ordinary quests referenced by {@link #questIds}, so each
  * child gets the exact same resolution, storage and progression treatment as any
  * top-level quest. This quest's own progression is delegated to a visitor, which
@@ -26,17 +28,24 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
     public static final BuilderCodec<CompositeQuestProgression> CODEC = BuilderCodec.builder(CompositeQuestProgression.class, CompositeQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("QuestIds", new ArrayCodec<>(Codec.UUID_BINARY, UUID[]::new)), CompositeQuestProgression::setQuestIds, quest -> quest.questIds)
                                                                                     .add()
+                                                                                    .append(new KeyedCodec<>("SuccessfulQuestIds", new SetCodec<>(Codec.UUID_BINARY, HashSet<UUID>::new, false)), (quest, ids) -> quest.successfulQuestIds.addAll(ids), quest -> quest.successfulQuestIds)
+                                                                                    .add()
                                                                                     .build();
 
     protected UUID[] questIds = new UUID[0];
 
     /**
-     * Live subscriptions to the children's completion, kept so they can be released. Not
-     * serialized: they are rebuilt by {@link #setQuestIds} whenever the quest is decoded.
+     * Which children succeeded, captured as they complete: the instance is unregistered right
+     * after, so its outcome cannot be read back later.
      */
+    protected Set<UUID> successfulQuestIds = ConcurrentHashMap.newKeySet();
+
     private final transient List<EventRegistration<UUID, QuestCompletedEvent>> childListeners = new ArrayList<>();
 
-    private void handleQuestCompleted(QuestCompletedEvent ignored) {
+    private void handleQuestCompleted(QuestCompletedEvent questCompletedEvent) {
+        var child = questCompletedEvent.getQuest();
+        if (child.isSuccessful() && successfulQuestIds.add(child.getId())) markDirty();
+
         update(new CompositeQuestVisitor());
     }
 
@@ -139,5 +148,16 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
             if (!child.isCompleted()) return false;
         }
         return true;
+    }
+
+    /**
+     * {@code AND} needs every quests child to have succeeded,
+     * {@code OR} needs one quest child to have succeeded. Reads {@link successfulQuestIds}.
+     */
+    public boolean isOperatorSatisfied() {
+        return switch (getAsset().getOperator()) {
+            case AND -> successfulQuestIds.size() >= questIds.length;
+            case OR -> !successfulQuestIds.isEmpty();
+        };
     }
 }
