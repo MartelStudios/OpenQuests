@@ -8,6 +8,7 @@ import com.martelstudios.hyquests.extension.conditions.queststate.QuestStateCond
 import com.martelstudios.hyquests.extension.quests.composite.CompositeFeature;
 import com.martelstudios.hyquests.extension.hud.HudFeature;
 import com.martelstudios.hyquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
+import com.martelstudios.hyquests.extension.quests.kill.KillFeature;
 import com.martelstudios.hyquests.extension.quests.reachlocation.ReachLocationFeature;
 import com.martelstudios.hyquests.extension.rewards.item.ItemRewardFeature;
 
@@ -33,6 +34,7 @@ public class HyQuestExtensionPlugin extends JavaPlugin {
         CompositeFeature.register(this);
         HudFeature.register(this);
         ItemRewardFeature.register(this);
+        KillFeature.register(this);
 
         OperatorConditionFeature.register(this);
         QuestStateConditionFeature.register(this);
