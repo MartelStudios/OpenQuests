@@ -16,9 +16,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 /**
- * Progresses {@link GatherQuestProgression}s on inventory change, mirroring Hytale's {@code GatherObjectiveTask}:
- * rather than accumulating a specific pickup event, it recounts how many of the target item the
- * player currently holds and compares that to the asset's target quantity.
+ * Progresses {@link GatherQuestProgression}s on inventory change.
  */
 public class GatherQuestVisitor implements QuestVisitor<GatherQuestProgression> {
     @Nonnull
@@ -27,11 +25,6 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuestProgression> 
     private final UUID playerId;
     private final CombinedItemContainer combinedItemContainer;
 
-    /**
-     * Reads the inventories one by one rather than through {@code InventoryComponent.Combined},
-     * which only exists on a live entity: this way an online and an offline player are counted
-     * exactly the same way.
-     */
     public GatherQuestVisitor(@Nonnull EntityComponents playerComponents) {
         this.playerId = playerComponents.getComponent(UUIDComponent.getComponentType()).getUuid();
 
@@ -49,16 +42,15 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuestProgression> 
         if (!quest.getPlayers().contains(playerId)) return;
         if (quest.getState() == QuestState.SUCCESSFUL) return;
 
-        var asset = quest.getAsset();
-        int count = combinedItemContainer.countItemStacks(itemStack -> asset.getItemToGather()
-                                                                                     .isBlockTypeIncluded(itemStack.getItemId()));
+        int count = combinedItemContainer.countItemStacks(itemStack -> quest.getItemToGather()
+                                                                            .isBlockTypeIncluded(itemStack.getItemId()));
 
         quest.setCount(count)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
 
         LOGGER.at(Level.FINE)
-              .log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCount(), asset.getCount());
+              .log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCount(), quest.getTargetCount());
     }
 
     @Override

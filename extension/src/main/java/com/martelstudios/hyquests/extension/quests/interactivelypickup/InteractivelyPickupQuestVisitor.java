@@ -30,8 +30,8 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
         if (!quest.getPlayers().contains(playerId)) return;
         if (quest.getState() == QuestState.SUCCESSFUL) return;
 
-        var asset = quest.getAsset();
-        if (!asset.getItemToPickup().isBlockTypeIncluded(event.getItemStack().getItemId())) {
+
+        if (!quest.getItemToPickup().isBlockTypeIncluded(event.getItemStack().getItemId())) {
             return;
         }
 
@@ -39,7 +39,7 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
 
-        LOGGER.at(Level.FINE).log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCount(), asset.getCount());
+        LOGGER.at(Level.FINE).log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCount(), quest.getTargetCount());
     }
 
     @Override
