@@ -7,9 +7,9 @@ import com.martelstudios.hyquests.core.HyQuestCorePlugin;
 import com.martelstudios.hyquests.core.assets.QuestAsset;
 import com.martelstudios.hyquests.core.events.QuestCompletedEvent;
 import com.martelstudios.hyquests.core.history.models.QuestHistoryRecord;
-import com.martelstudios.hyquests.core.rewards.QuestReward;
 import com.martelstudios.hyquests.core.history.stores.QuestHistoryStore;
 import com.martelstudios.hyquests.core.history.stores.QuestHistoryStoreComponent;
+import com.martelstudios.hyquests.core.rewards.QuestReward;
 import com.martelstudios.hyquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
@@ -45,11 +45,12 @@ public class QuestHistoryService {
         var quest = questCompletedEvent.getQuest();
         var asset = quest.getAsset();
         boolean autoClaim = asset != null && asset.isAutoClaim();
+        boolean persistHistory = asset == null || asset.isPersistHistory();
 
         for (UUID playerId : quest.getPlayers()) {
             EntityComponents.update(playerId, components -> {
                 var record = new QuestHistoryRecord(quest);
-                getHistory(components).register(record);
+                if (persistHistory) getHistory(components).register(record);
 
                 if (autoClaim) grantRewards(record, components);
             });

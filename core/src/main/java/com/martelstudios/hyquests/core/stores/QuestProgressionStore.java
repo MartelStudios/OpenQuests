@@ -2,6 +2,7 @@ package com.martelstudios.hyquests.core.stores;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.datastore.DataStore;
+import com.martelstudios.hyquests.core.assets.QuestAsset;
 import com.martelstudios.hyquests.core.models.AbstractQuestProgression;
 
 import javax.annotation.Nonnull;
@@ -87,10 +88,13 @@ public class QuestProgressionStore {
     }
 
     /**
-     * Persists a single quest, but only if it changed since the last save.
+     * Persists a single quest, but only if {@link AbstractQuestProgression#hasChanges()} and {@link QuestAsset#isPersistProgression()}
      */
     public void saveToDisk(@Nonnull AbstractQuestProgression<?> quest) {
         if (!quest.consumeChanges()) return;
+
+        QuestAsset asset = quest.getAsset();
+        if (asset != null && !asset.isPersistProgression()) return;
 
         dataStore.save(quest.getId().toString(), new QuestProgressionRecord(quest));
     }

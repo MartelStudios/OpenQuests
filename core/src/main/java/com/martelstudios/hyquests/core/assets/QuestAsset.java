@@ -42,6 +42,10 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .add()
                                                                           .append(new KeyedCodec<>("AutoClaim", Codec.BOOLEAN), (asset, value) -> asset.autoClaim = value, asset -> Boolean.valueOf(asset.autoClaim))
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("PersistProgression", Codec.BOOLEAN), (asset, value) -> asset.persistProgression = value, asset -> Boolean.valueOf(asset.persistProgression))
+                                                                          .add()
+                                                                          .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (asset, value) -> asset.persistHistory = value, asset -> Boolean.valueOf(asset.persistHistory))
+                                                                          .add()
                                                                           .append(new KeyedCodec<>("SuccessfulRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (asset, rewards) -> asset.successfulRewards = rewards, asset -> asset.successfulRewards)
                                                                           .add()
                                                                           .append(new KeyedCodec<>("FailedRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (asset, rewards) -> asset.failedRewards = rewards, asset -> asset.failedRewards)
@@ -58,6 +62,8 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     protected String titleKey;
     protected String descriptionKey;
     protected boolean autoClaim;
+    protected boolean persistProgression = true;
+    protected boolean persistHistory = true;
     protected QuestReward[] successfulRewards = NO_REWARDS;
     protected QuestReward[] failedRewards = NO_REWARDS;
     protected QuestReward[] abandonedRewards = NO_REWARDS;
@@ -79,6 +85,21 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
 
     public boolean isAutoClaim() {
         return autoClaim;
+    }
+
+    /**
+     * @return {@code false} to keep this quest's progression in memory only, so a restart forgets it.
+     */
+    public boolean isPersistProgression() {
+        return persistProgression;
+    }
+
+    /**
+     * @return {@code false} to leave no trace once the quest completed. AutoClaim must be enabled to allow rewards.
+     * Failed rewards cannot be retried on reconnection, so rewards requiring online players will be lost for offline players.
+     */
+    public boolean isPersistHistory() {
+        return persistHistory;
     }
 
     /**
