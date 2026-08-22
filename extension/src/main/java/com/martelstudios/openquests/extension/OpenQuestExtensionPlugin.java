@@ -3,8 +3,6 @@ package com.martelstudios.openquests.extension;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.openquests.extension.quests.gather.GatherFeature;
-import com.martelstudios.openquests.extension.conditions.operator.OperatorConditionFeature;
-import com.martelstudios.openquests.extension.conditions.queststate.QuestStateConditionFeature;
 import com.martelstudios.openquests.extension.quests.composite.CompositeFeature;
 import com.martelstudios.openquests.extension.hud.HudFeature;
 import com.martelstudios.openquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
@@ -48,9 +46,5 @@ public class OpenQuestExtensionPlugin extends JavaPlugin {
         // Rewards
         ItemRewardFeature.register(this);
         GrantQuestRewardFeature.register(this);
-
-        // Conditions
-        OperatorConditionFeature.register(this);
-        QuestStateConditionFeature.register(this);
     }
 }

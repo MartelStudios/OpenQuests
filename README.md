@@ -11,8 +11,8 @@ definition never touches saved progression.
 
 | Module | Plugin | Role |
 | --- | --- | --- |
-| `core` | `OpenQuestCore` | The system itself. Ships no quest type, only the core system: assets, progression, assignments, scopes, history, rewards. |
-| `extension` | `OpenQuestExtension` | The implementation: quest types, assignment conditions, rewards and tracker HUD shipped on top, one package per feature. |
+| `core` | `OpenQuestCore` | The system itself. Ships no quest type, only the core system: assets, progression, scopes, history, rewards. |
+| `extension` | `OpenQuestExtension` | The implementation: quest types, rewards and tracker HUD shipped on top, one package per feature. |
 
 Depending on `OpenQuestCore` alone is enough to build your own quest types;
 `OpenQuestExtension` is both a set of ready-made types and the reference for how to add one.
@@ -25,29 +25,24 @@ Depending on `OpenQuestCore` alone is enough to build your own quest types;
 | `AbstractQuestProgression` | Runtime instance holding state, assignees and progression. Polymorphic on `"Type"`. |
 | `QuestVisitor` | Carries the context of an event to the quests it can progress. |
 | `QuestReward` | What a terminal state grants. Polymorphic on `"Type"`. |
-| `QuestAssignmentAsset` | Which quests to hand out, and the conditions guarding them. |
-| `QuestAssignmentCondition` | A prerequisite, evaluated per player. Polymorphic on `"Type"`. |
 | `QuestProgressionService` | Entry point: register, progress, complete, unregister. |
 | `QuestHistoryStore` | Per-player record of completed quests, with claim state and date. |
 
-### Assignments
+### Handing quests out
 
-An assignment binds a set of quests to the conditions a player must meet before they are handed
-out. Two paths lead to one:
+There is no separate assignment concept: a quest is handed out in one of three ways, and the
+prerequisites of a quest are other quests.
 
-- **Auto-assign** — `"AutoAssign": true` offers the asset to every player. Nothing is materialised:
-  the asset stands in for the assignment and only the conditions already met are kept on the player,
-  so a catalogue of thousands costs nothing until someone makes headway.
-- **Explicit** — `QuestAssignmentService.addToPlayers(asset, playerIds...)` offers it to named
-  players. More than one makes it shared: everyone receives the quests once every member satisfies
-  it, so nobody is carried by the group.
+- **On connection** — `"StartOnConnection": true` gives the quest to every player, once. Only the
+  ids already handed out are kept between sessions, so a quest nobody took costs one string.
+- **As a reward** — the `GrantQuest` reward hands further quests over when a quest completes. This
+  is how a chain is written: finishing A grants B.
+- **Explicitly** — `QuestProgressionService.registerQuest(asset).addPlayer(playerId)`, from a
+  command or from your own plugin.
 
-Conditions are re-checked when a player connects, and afterwards only when a **resolver** says so.
-A resolver indexes the assignments watching a given thing and reports back when it changes, so
-completing a quest touches only the assignments that mention it rather than the whole catalogue.
-
-A condition that is only true at an instant — standing on a trap, facing a door — returns `false`
-from `useCache()` and is re-checked on every pass instead of being latched.
+A quest gating on another one is a `QuestState` quest, usually as the child of a composite. Since a
+quest holds a state rather than a boolean, "not yet" and "failed" stay distinct — which is what
+lets a composite fail rather than hang.
 
 ### Scopes
 
@@ -99,22 +94,17 @@ Three asset flags change what a quest does when it completes:
 | `KillPlayer` | Killing players, optionally a designated one. |
 | `ReachLocation` | Entering a radius around a position. |
 | `Composite` | Its children, combined with `AND` or `OR`. |
+| `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
 
 Every counted type extends `QuantityQuestAsset`, which carries `TargetQuantity`. The parameter and
 the target can both be overridden on the progression itself, serialized only when set and falling
 back to the asset otherwise — so a quest handed out from a shared template can still target
 something of its own.
 
-## Built-in assignment conditions
-
-| Type | Satisfied when |
-| --- | --- |
-| `QuestState` | The player holds, or once held, a quest in a matching state. |
-| `Operator` | Its children, combined with `AND` or `OR`, optionally negated with `Not`. |
-
 ## Built-in rewards
 
 - `Item` — gives items, hotbar first, all or nothing.
+- `GrantQuest` — hands further quests over, linked by id or written inline.
 
 ## Extending
 
@@ -143,13 +133,6 @@ A reward type is registered the same way:
 QuestReward.CODEC.register("MyReward", MyQuestReward.class, MyQuestReward.CODEC);
 ```
 
-An assignment condition brings its own resolver, which decides when the condition is worth
-re-checking:
-
-```java
-QuestAssignmentCondition.CODEC.register("MyCondition", MyCondition.class, MyCondition.CODEC);
-```
-
 Anything a type needs beyond the core contract stays in its own package — `Composite` validates its
 asset graph at boot from `CompositeFeature`, the tracker HUD renders counted quests from its own
 package. The core never learns about them.
@@ -172,30 +155,28 @@ A quest, in `OpenQuests/Quests/CollectStick.json`:
 }
 ```
 
-An assignment handing it to everyone on connection, in `OpenQuests/QuestAssignments/Starter.json`:
+A quest chain, in `OpenQuests/Quests/StartHatchet.json`. It reaches every player on connection and
+hands the next one over when it completes:
 
 ```json
 {
-  "QuestAssetIds": ["CollectStick"],
-  "AutoAssign": true
-}
-```
-
-And one gated on the first being finished:
-
-```json
-{
-  "QuestAssetIds": ["PickBerries"],
-  "AutoAssign": true,
-  "Conditions": [
-    {
-      "Type": "QuestState",
-      "QuestAssetId": "CollectStick",
-      "QuestStateRequirement": "Successfully"
-    }
+  "Type": "Composite",
+  "TitleKey": "quest.start-hatchet.title",
+  "DescriptionKey": "quest.start-hatchet.description",
+  "StartOnConnection": true,
+  "AutoClaim": true,
+  "QuestAssetIds": [
+    "CollectStick",
+    { "Type": "Gather", "TitleKey": "…", "DescriptionKey": "…", "ItemToGather": { "ItemId": "Ingredient_Fibre" }, "TargetQuantity": 5 }
+  ],
+  "SuccessfulRewards": [
+    { "Type": "GrantQuest", "QuestAssetIds": ["PickBerries"] }
   ]
 }
 ```
+
+Each entry of `QuestAssetIds` is either the id of an existing asset or an inline definition, which
+is registered as an asset of its own under a generated id. The same goes for `GrantQuest`.
 
 Enum values are written in CamelCase: `Successfully`, `InProgress`, `And`, `Or`.
 
