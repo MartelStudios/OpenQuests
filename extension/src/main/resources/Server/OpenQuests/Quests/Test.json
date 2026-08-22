@@ -1,0 +1,17 @@
+{
+  "Type": "KillNpc",
+  "NpcGroupId": "Skeleton",
+  "TargetQuantity": 10,
+  "AutoClaim": true,
+  "TitleKey": "BOnjour",
+  "DescriptionKey": "aurevoir",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence_100",
+      "Quantity": 1
+    }
+  ],
+  "PersistProgression": true,
+  "PersistHistory": true
+}

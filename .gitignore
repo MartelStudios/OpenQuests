@@ -2,7 +2,6 @@
 build/
 out/
 run/*
-!run/universe
 .idea/
 *.iml
 *.ipr

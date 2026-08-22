@@ -1,0 +1,38 @@
+package com.martelstudios.openquests.extension.quests.reachlocation;
+
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.math.vector.Vector3dUtil;
+import com.martelstudios.openquests.core.assets.QuestAsset;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import org.joml.Vector3d;
+
+public class ReachLocationQuestAsset extends QuestAsset {
+
+    public static final BuilderCodec<ReachLocationQuestAsset> CODEC =
+        BuilderCodec.builder(ReachLocationQuestAsset.class, ReachLocationQuestAsset::new, QuestAsset.BASE_CODEC)
+            .append(new KeyedCodec<>("Position", Vector3dUtil.CODEC), (asset, position) -> asset.position = position, asset -> asset.position)
+            .add()
+            .append(new KeyedCodec<>("Radius", Codec.DOUBLE), (asset, radius) -> asset.radius = radius, asset -> Double.valueOf(asset.radius))
+            .add()
+            .build();
+
+    protected Vector3d position;
+    protected double radius;
+
+    private ReachLocationQuestAsset() {}
+
+    @Override
+    public AbstractQuestProgression<?> create() {
+        return new ReachLocationQuestProgression().setAssetId(getId());
+    }
+
+    public Vector3d getPosition() {
+        return position;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+}

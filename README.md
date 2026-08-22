@@ -1,4 +1,4 @@
-# HyQuests
+# OpenQuests
 
 An extensible quest system for Hytale server plugins.
 
@@ -11,17 +11,17 @@ progression.
 
 | Module | Plugin | Role                                                                                                         |
 | --- | --- |--------------------------------------------------------------------------------------------------------------|
-| `core` | `HyQuestCore` | The system itself. Ships no quest type, only the core system: assets, progression, scopes, history, rewards. |
-| `extension` | `HyQuestExtension` | The implementation, quest types, rewards and tracker HUD shipped on top, one package per feature.            |
+| `core` | `OpenQuestCore` | The system itself. Ships no quest type, only the core system: assets, progression, scopes, history, rewards. |
+| `extension` | `OpenQuestExtension` | The implementation, quest types, rewards and tracker HUD shipped on top, one package per feature.            |
 
-Depending on `HyQuestCore` alone is enough to build your own quest types;
-`HyQuestExtension` is both a set of ready-made types and the reference for how to add one.
+Depending on `OpenQuestCore` alone is enough to build your own quest types;
+`OpenQuestExtension` is both a set of ready-made types and the reference for how to add one.
 
 ## Concepts
 
 | Piece | Role |
 | --- | --- |
-| `QuestAsset` | Immutable definition loaded from `HyQuests/Quests/*.json`. Polymorphic on `"Type"`. |
+| `QuestAsset` | Immutable definition loaded from `OpenQuests/Quests/*.json`. Polymorphic on `"Type"`. |
 | `AbstractQuestProgression` | Runtime instance holding state, assignees and progression. Polymorphic on `"Type"`. |
 | `QuestVisitor` | Carries the context of an event to the quests it can progress. |
 | `QuestReward` | What a terminal state grants. Polymorphic on `"Type"`. |
@@ -67,7 +67,7 @@ are granted immediately if possible and `autoClaim` is set. Some rewards could n
 ## Extending
 
 Group everything a type needs in one package — asset, quest, visitor, systems — and give it a
-single entry point, the way each package of `hyQuestExtension` does:
+single entry point, the way each package of `OpenQuestExtension` does:
 
 ```java
 public final class MyFeature {

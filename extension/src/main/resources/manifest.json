@@ -1,27 +1,27 @@
 {
     "Group": "MartelStudios",
-    "Name": "HyQuestExtension",
+    "Name": "OpenQuestExtension",
     "Version": "0.0.0",
-    "Description": "The quest and reward types shipped on top of HyQuestCore",
+    "Description": "The quest and reward types shipped on top of OpenQuestCore",
     "Authors": [
         {
             "Name": "Hazard4U"
         }
     ],
-    "Website": "https://github.com/MartelStudios/HyQuests",
+    "Website": "https://github.com/MartelStudios/OpenQuests",
     "ServerVersion": "0.6.0-pre.13",
     "Dependencies": {
         "Hytale:AssetModule": "*",
         "Hytale:Objectives": "*",
         "Hytale:NPC": "*",
         "Hytale:TagSet": "*",
-        "MartelStudios:HyQuestCore": "*"
+        "MartelStudios:OpenQuestCore": "*"
     },
     "OptionalDependencies": {
         
     },
     "DisabledByDefault": false,
-    "Main": "com.martelstudios.hyquests.extension.HyQuestExtensionPlugin",
+    "Main": "com.martelstudios.openquests.extension.OpenQuestExtensionPlugin",
     "IncludesAssetPack": true,
     "UpdateChecker": {
         "CurseForge": ""

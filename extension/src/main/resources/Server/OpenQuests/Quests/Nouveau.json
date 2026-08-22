@@ -1,0 +1,15 @@
+{
+  "Type": "UseEntity",
+  "TitleKey": "test",
+  "DescriptionKey": "test",
+  "NpcGroupId": "Rabbit",
+  "TargetQuantity": 1,
+  "AutoClaim": true,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Weapon_Longsword_Spectral",
+      "Quantity": 1
+    }
+  ]
+}

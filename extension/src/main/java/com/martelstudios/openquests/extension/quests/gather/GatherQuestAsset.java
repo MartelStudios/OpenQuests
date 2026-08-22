@@ -1,0 +1,29 @@
+package com.martelstudios.openquests.extension.quests.gather;
+
+import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
+import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
+
+public class GatherQuestAsset extends QuantityQuestAsset {
+
+    public static final BuilderCodec<GatherQuestAsset> CODEC =
+        BuilderCodec.builder(GatherQuestAsset.class, GatherQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
+            .append(new KeyedCodec<>("ItemToGather", BlockTagOrItemIdField.CODEC), (asset, item) -> asset.itemToGather = item, asset -> asset.itemToGather)
+            .add()
+            .build();
+
+    protected BlockTagOrItemIdField itemToGather;
+
+    private GatherQuestAsset() {}
+
+    @Override
+    public AbstractQuestProgression<?> create() {
+        return new GatherQuestProgression().setAssetId(getId());
+    }
+
+    public BlockTagOrItemIdField getItemToGather() {
+        return itemToGather;
+    }
+}

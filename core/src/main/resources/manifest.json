@@ -1,6 +1,6 @@
 {
     "Group": "MartelStudios",
-    "Name": "HyQuestCore",
+    "Name": "OpenQuestCore",
     "Version": "0.0.0",
     "Description": "An extensible quest system for Hytale: assets, progression, scopes and rewards",
     "Authors": [
@@ -8,7 +8,7 @@
             "Name": "Hazard4U"
         }
     ],
-    "Website": "https://github.com/MartelStudios/HyQuests",
+    "Website": "https://github.com/MartelStudios/OpenQuests",
     "ServerVersion": "0.6.0-pre.13",
     "Dependencies": {
         "Hytale:AssetModule": "*"
@@ -17,7 +17,7 @@
         
     },
     "DisabledByDefault": false,
-    "Main": "com.martelstudios.hyquests.core.HyQuestCorePlugin",
+    "Main": "com.martelstudios.openquests.core.OpenQuestCorePlugin",
     "IncludesAssetPack": true,
     "UpdateChecker": {
         "CurseForge": ""
