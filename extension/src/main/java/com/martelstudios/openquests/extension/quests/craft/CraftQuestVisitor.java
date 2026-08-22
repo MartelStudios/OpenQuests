@@ -24,7 +24,7 @@ public class CraftQuestVisitor implements QuestVisitor<CraftQuestProgression> {
     @Override
     public void progress(CraftQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.isCompleted()) return;
+        if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
         int crafted = countMatchingOutputs(quest);
         if (crafted == 0) return;

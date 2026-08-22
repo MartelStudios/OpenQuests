@@ -23,7 +23,7 @@ public class UseEntityQuestVisitor implements QuestVisitor<UseEntityQuestProgres
     @Override
     public void progress(UseEntityQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.isCompleted()) return;
+        if (quest.isCompleted() && quest.isStopOnComplete()) return;
         if (!quest.matchesTarget(target)) return;
 
         quest.setCurrentQuantity(quest.getCurrentQuantity() + 1)

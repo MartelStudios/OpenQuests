@@ -10,7 +10,7 @@ public class CompositeQuestVisitor implements QuestVisitor<CompositeQuestProgres
 
     @Override
     public void progress(CompositeQuestProgression quest) {
-        if (quest.isCompleted()) return;
+        if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
         if (quest.isOperatorSatisfied()) {
             quest.setState(QuestState.SUCCESSFUL).markDirty();

@@ -71,6 +71,15 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     private transient boolean dirty;
 
     /**
+     * @return whether reaching a terminal state ends this quest. One that says {@code false} keeps
+     * running and being re-evaluated, so its state can still change.
+     */
+    public boolean isStopOnComplete() {
+        QuestAsset asset = getAsset();
+        return asset == null || asset.isStopOnComplete();
+    }
+
+    /**
      * Updates the quest progression by applying the visitor to it.
      * After the visitor's pass, it looks for changes to notify and for quest completion.
      *
@@ -86,7 +95,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                         .dispatch(new QuestUpdatedEvent(this));
         }
 
-        if (isCompleted()) {
+        if (isCompleted() && isStopOnComplete()) {
             QuestProgressionService.get().completeQuest(getId());
         }
     }

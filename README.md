@@ -78,10 +78,11 @@ Rewards are granted immediately when `AutoClaim` is set; one that could not be g
 inventory, an offline player — stays pending on the history record and is retried on the next
 world entry.
 
-Two asset flags opt out of persistence:
+Three asset flags change what a quest does when it completes:
 
 | Flag | Default | Effect when `false` |
 | --- | --- | --- |
+| `StopOnComplete` | `true` | The quest keeps running once complete, staying re-evaluable, so its state can still change. Nothing is recorded and no reward is granted until it stops. |
 | `PersistProgression` | `true` | Progression is never written to disk; a restart forgets it. |
 | `PersistHistory` | `true` | Nothing is recorded on completion. Rewards not granted on the spot are lost, since nothing is left to retry them from. |
 

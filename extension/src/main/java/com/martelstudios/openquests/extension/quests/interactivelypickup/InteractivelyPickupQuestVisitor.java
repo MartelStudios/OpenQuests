@@ -27,7 +27,7 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
     @Override
     public void progress(InteractivelyPickupQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.isCompleted()) return;
+        if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
 
         if (!quest.getItemToPickup().isBlockTypeIncluded(event.getItemStack().getItemId())) {

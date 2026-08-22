@@ -42,6 +42,8 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .add()
                                                                           .append(new KeyedCodec<>("AutoClaim", Codec.BOOLEAN), (asset, value) -> asset.autoClaim = value, asset -> Boolean.valueOf(asset.autoClaim))
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("StopOnComplete", Codec.BOOLEAN), (asset, value) -> asset.stopOnComplete = value, asset -> Boolean.valueOf(asset.stopOnComplete))
+                                                                          .add()
                                                                           .append(new KeyedCodec<>("PersistProgression", Codec.BOOLEAN), (asset, value) -> asset.persistProgression = value, asset -> Boolean.valueOf(asset.persistProgression))
                                                                           .add()
                                                                           .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (asset, value) -> asset.persistHistory = value, asset -> Boolean.valueOf(asset.persistHistory))
@@ -62,6 +64,7 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     protected String titleKey;
     protected String descriptionKey;
     protected boolean autoClaim;
+    protected boolean stopOnComplete = true;
     protected boolean persistProgression = true;
     protected boolean persistHistory = true;
     protected QuestReward[] successfulRewards = NO_REWARDS;
@@ -85,6 +88,14 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
 
     public boolean isAutoClaim() {
         return autoClaim;
+    }
+
+    /**
+     * @return {@code false} to keep the quest running once it completed, so its state stays
+     * readable and can still change. Nothing is recorded and no reward is granted until it stops.
+     */
+    public boolean isStopOnComplete() {
+        return stopOnComplete;
     }
 
     /**
