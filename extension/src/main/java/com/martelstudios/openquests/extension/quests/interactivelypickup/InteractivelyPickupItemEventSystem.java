@@ -28,7 +28,7 @@ public class InteractivelyPickupItemEventSystem extends EntityEventSystem<Entity
         if (playerRef == null || questStoreComponent == null) return;
 
         QuestProgressionService.get()
-                               .progress(new InteractivelyPickupQuestVisitor(playerRef.getUuid(), event), questStoreComponent.questsRecord.getAllIds());
+                               .progress(new InteractivelyPickupQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
     }
 
     @Override

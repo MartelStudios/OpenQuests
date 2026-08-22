@@ -28,7 +28,7 @@ public class CraftRecipeEventSystem extends EntityEventSystem<EntityStore, Craft
         if (playerRef == null || questStoreComponent == null) return;
 
         QuestProgressionService.get()
-                               .progress(new CraftQuestVisitor(playerRef.getUuid(), event), questStoreComponent.questsRecord.getAllIds());
+                               .progress(new CraftQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
     }
 
     @Override

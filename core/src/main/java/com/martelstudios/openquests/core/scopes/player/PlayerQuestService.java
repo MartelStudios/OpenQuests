@@ -41,13 +41,9 @@ public class PlayerQuestService {
      */
     @Nonnull
     public QuestsRecord getQuests(@Nonnull EntityComponents playerComponents) {
-        return playerComponents.ensureAndGetComponent(QuestStoreComponent.getComponentType()).questsRecord;
+        return playerComponents.ensureAndGetComponent(QuestStoreComponent.getComponentType()).getQuests();
     }
 
-    /**
-     * Pulls the player's own quests into the datastore. Scope services assign theirs separately,
-     * each on the event that concerns it.
-     */
     /**
      * The quests kept with the player are already decoded: they only have to enter the store. The
      * rest is loaded from its own files afterwards.
@@ -87,7 +83,7 @@ public class PlayerQuestService {
     }
 
     public void addQuestToPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        if (!playerStore.questsRecord.register(quest.getId())) return;
+        if (!playerStore.getQuests().register(quest.getId())) return;
 
         playerStore.addOwnQuest(quest);
 
@@ -106,7 +102,7 @@ public class PlayerQuestService {
      * world thread, so looking it back up would find nothing and leave a stale id behind.
      */
     public void removeQuestFromPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        if (!playerStore.questsRecord.unregister(quest.getId())) return;
+        if (!playerStore.getQuests().unregister(quest.getId())) return;
 
         playerStore.removeOwnQuest(quest.getId());
 

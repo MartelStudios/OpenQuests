@@ -38,7 +38,7 @@ public class UseEntityEventSystem extends EntityEventSystem<EntityStore, UseEnti
         if (target == null) return;
 
         QuestProgressionService.get()
-                               .progress(new UseEntityQuestVisitor(playerRef.getUuid(), target), questStoreComponent.questsRecord.getAllIds());
+                               .progress(new UseEntityQuestVisitor(playerRef.getUuid(), target), questStoreComponent.getQuestIds());
     }
 
     @Override

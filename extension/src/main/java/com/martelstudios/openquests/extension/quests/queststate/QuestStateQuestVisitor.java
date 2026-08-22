@@ -38,7 +38,7 @@ public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgr
 
         var questStore = components.getComponent(QuestStoreComponent.getComponentType());
         if (questStore != null) {
-            for (UUID questId : questStore.questsRecord.getAllIds()) {
+            for (UUID questId : questStore.getQuestIds()) {
                 var watched = QuestProgressionService.get().getQuest(questId);
                 if (watched != null && watchedAssetId.equals(watched.getAssetId()) && matchesState(quest, watched.getState())) {
                     return true;

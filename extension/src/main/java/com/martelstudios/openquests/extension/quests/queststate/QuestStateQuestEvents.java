@@ -45,6 +45,6 @@ public final class QuestStateQuestEvents {
         if (questStore == null) return;
 
         QuestProgressionService.get()
-                               .progress(new QuestStateQuestVisitor(playerId), questStore.questsRecord.getAllIds());
+                               .progress(new QuestStateQuestVisitor(playerId), questStore.getQuestIds());
     }
 }

@@ -29,6 +29,6 @@ public class KillNpcDeathSystem extends KillDeathSystem {
         if (victim == null) return;
 
         QuestProgressionService.get()
-                               .progress(new KillNpcQuestVisitor(killerId, victim), killerQuests.questsRecord.getAllIds());
+                               .progress(new KillNpcQuestVisitor(killerId, victim), killerQuests.getQuestIds());
     }
 }

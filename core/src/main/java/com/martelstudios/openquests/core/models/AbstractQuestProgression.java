@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
+import javax.annotation.Nullable;
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Set;
@@ -69,6 +70,18 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Set when the runtime state changed; drives incremental disk saves. Not serialized.
      */
     private transient boolean dirty;
+
+    /**
+     * Set on a quest just handed out and cleared by the first change. Not serialized: a decoded
+     * quest was persisted, so it has progressed by definition.
+     */
+    private transient boolean pristine;
+
+    /**
+     * The quest that handed this one out, if any. Only ever set while both are still at their
+     * baseline, which is the only time it decides anything.
+     */
+    private transient AbstractQuestProgression<?> parent;
 
     /**
      * @return whether reaching a terminal state ends this quest. One that says {@code false} keeps
@@ -209,6 +222,38 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     public void markDirty() {
         this.dirty = true;
+        if (pristine) leaveBaseline();
+    }
+
+    /**
+     * Takes the current state as the baseline and discards the changes recorded so far. Meant for
+     * a quest just handed out: being assigned is not progressing.
+     */
+    public void markPristine() {
+        this.pristine = true;
+        this.dirty = false;
+    }
+
+    /**
+     * @return {@code true} if this quest has not changed since it was handed out, and so is not
+     * worth persisting: it is cheaper to hand out again next session.
+     */
+    public boolean isPristine() {
+        return pristine;
+    }
+
+    public void setParent(@Nullable AbstractQuestProgression<?> parent) {
+        this.parent = parent;
+    }
+
+    /**
+     * Leaves the baseline, taking along everything handed out with this quest: a subtree is
+     * persisted whole or not at all, half of it referencing children no store would write back.
+     */
+    protected void leaveBaseline() {
+        this.pristine = false;
+
+        if (parent != null) parent.leaveBaseline();
     }
 
     /**

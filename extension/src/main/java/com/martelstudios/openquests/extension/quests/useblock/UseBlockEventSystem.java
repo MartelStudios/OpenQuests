@@ -28,7 +28,7 @@ public class UseBlockEventSystem extends EntityEventSystem<EntityStore, UseBlock
         if (playerRef == null || questStoreComponent == null) return;
 
         QuestProgressionService.get()
-                               .progress(new UseBlockQuestVisitor(playerRef.getUuid(), event), questStoreComponent.questsRecord.getAllIds());
+                               .progress(new UseBlockQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
     }
 
     @Override

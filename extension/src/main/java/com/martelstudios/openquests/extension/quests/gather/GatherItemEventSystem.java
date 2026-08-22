@@ -33,7 +33,7 @@ public class GatherItemEventSystem extends EntityEventSystem<EntityStore, Invent
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
 
         QuestProgressionService.get()
-                               .progress(new GatherQuestVisitor(EntityComponents.of(playerRef.getReference())), questStoreComponent.questsRecord.getAllIds());
+                               .progress(new GatherQuestVisitor(EntityComponents.of(playerRef.getReference())), questStoreComponent.getQuestIds());
     }
 
     @Nullable

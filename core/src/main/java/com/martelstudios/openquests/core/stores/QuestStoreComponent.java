@@ -9,7 +9,9 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.OpenQuestCorePlugin;
+import com.martelstudios.openquests.core.assets.QuestAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,27 +21,35 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The quests of one player. Every quest they take part in is indexed here; those they are alone in
+ * are also held whole, so they need no file of their own.
+ */
 public class QuestStoreComponent implements Component<EntityStore> {
     public static final BuilderCodec<QuestStoreComponent> CODEC = BuilderCodec.builder(QuestStoreComponent.class, QuestStoreComponent::new)
-                                                                              .append(new KeyedCodec<>("QuestStore", QuestsRecord.CODEC), (questStoreComponent, quests) -> questStoreComponent.questsRecord = quests, (questStoreComponent) -> questStoreComponent.questsRecord)
+                                                                              .append(new KeyedCodec<>("SharedQuests", QuestsRecord.CODEC), (component, quests) -> component.quests = quests, QuestStoreComponent::getSharedQuests)
                                                                               .add()
                                                                               .append(new KeyedCodec<>("OwnQuests", new ArrayCodec<>(AbstractQuestProgression.CODEC, AbstractQuestProgression<?>[]::new)), QuestStoreComponent::setOwnQuests, QuestStoreComponent::getOwnQuestsArray)
                                                                               .add()
-                                                                              .append(new KeyedCodec<>("StartedOnConnection", new SetCodec<>(Codec.STRING, HashSet<String>::new, false)), (component, ids) -> component.startedOnConnection.addAll(ids), component -> component.startedOnConnection)
+                                                                              .append(new KeyedCodec<>("StartedOnConnection", new SetCodec<>(Codec.STRING, HashSet<String>::new, false)), (component, ids) -> component.startedOnConnection.addAll(ids), QuestStoreComponent::getRememberedStartedOnConnection)
                                                                               .add()
                                                                               .build();
-    public QuestsRecord questsRecord = new QuestsRecord();
+
+    /**
+     * Every quest of this player, whichever store holds it. Decoded from the shared half alone,
+     * the own quests putting their ids back as they are read.
+     */
+    private QuestsRecord quests = new QuestsRecord();
 
     /**
      * Progressions this player is responsible for persisting, kept whole rather than as a file of
-     * their own. Only those still held by this player alone are written back.
+     * their own.
      */
     private final Map<UUID, AbstractQuestProgression<?>> ownQuests = new ConcurrentHashMap<>();
 
     /**
-     * Asset ids already handed to this player by {@code StartOnConnection}. Only this set is kept
-     * between sessions, not the quests themselves, so a catalogue offered to everyone costs one
-     * string per quest actually taken.
+     * Asset ids handed to this player by {@code StartOnConnection}, kept so they are handed out
+     * once. Only those whose quest is worth persisting survive the session.
      */
     private final Set<String> startedOnConnection = ConcurrentHashMap.newKeySet();
 
@@ -48,7 +58,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
     }
 
     public QuestStoreComponent(QuestStoreComponent other) {
-        this.questsRecord = other.questsRecord.clone();
+        this.quests = other.quests.clone();
         this.ownQuests.putAll(other.ownQuests);
         this.startedOnConnection.addAll(other.startedOnConnection);
     }
@@ -63,8 +73,24 @@ public class QuestStoreComponent implements Component<EntityStore> {
         return OpenQuestCorePlugin.get().getQuestStoreComponentType();
     }
 
+    /**
+     * @return the index of every quest of this player, own ones included.
+     */
+    @Nonnull
+    public QuestsRecord getQuests() {
+        return quests;
+    }
+
+    /**
+     * @return the live set of ids of every quest of this player.
+     */
+    @Nonnull
+    public Set<UUID> getQuestIds() {
+        return quests.getAllIds();
+    }
+
     public void loadQuests() {
-        questsRecord.loadAll();
+        quests.loadAll();
     }
 
     /**
@@ -79,6 +105,9 @@ public class QuestStoreComponent implements Component<EntityStore> {
         ownQuests.remove(questId);
     }
 
+    /**
+     * @return the progressions this player persists, by id.
+     */
     @Nonnull
     public Map<UUID, AbstractQuestProgression<?>> getOwnQuests() {
         return ownQuests;
@@ -89,22 +118,73 @@ public class QuestStoreComponent implements Component<EntityStore> {
         return startedOnConnection;
     }
 
-    private void setOwnQuests(@Nonnull AbstractQuestProgression<?>[] quests) {
-        for (AbstractQuestProgression<?> quest : quests) {
-            ownQuests.put(quest.getId(), quest);
-            questsRecord.register(quest.getId());
+    /**
+     * Forgets the quests still untouched. They are not written either, so remembering the hand-out
+     * would keep them from being handed out again next session.
+     */
+    @Nonnull
+    private Set<String> getRememberedStartedOnConnection() {
+        Set<String> remembered = new HashSet<>(startedOnConnection);
+
+        for (AbstractQuestProgression<?> quest : ownQuests.values()) {
+            if (quest.isPristine()) remembered.remove(quest.getAssetId());
         }
+        return remembered;
     }
 
     /**
-     * Writes back only what this player still holds alone. A quest that gained a second player is
-     * dropped here and picked up by the quest store's own files, which is the whole migration.
+     * Writes back only what this player holds alone. A quest that gained a second player is dropped
+     * here and picked up by the quest store's own files, which is the whole migration.
      */
     @Nonnull
     private AbstractQuestProgression<?>[] getOwnQuestsArray() {
         return ownQuests.values()
                         .stream()
-                        .filter(quest -> quest.getPlayers().size() == 1)
+                        .filter(p -> shouldBeHeldByOwner(p) && isWorthPersisting(p))
                         .toArray(AbstractQuestProgression<?>[]::new);
+    }
+
+    private void setOwnQuests(@Nonnull AbstractQuestProgression<?>[] quests) {
+        for (AbstractQuestProgression<?> quest : quests) {
+            ownQuests.put(quest.getId(), quest);
+            this.quests.register(quest.getId());
+        }
+    }
+
+    /**
+     * The ids left to resolve from elsewhere. Quests written whole below are left out, and so are
+     * the ones no store will write: their id would only resolve to nothing next session.
+     */
+    @Nonnull
+    private QuestsRecord getSharedQuests() {
+        QuestsRecord shared = new QuestsRecord();
+
+        for (UUID questId : quests.getAllIds()) {
+            AbstractQuestProgression<?> quest = ownQuests.get(questId);
+            if (quest == null) quest = QuestProgressionService.get().getQuest(questId);
+
+            if (quest != null && (shouldBeHeldByOwner(quest) || !isWorthPersisting(quest))) continue;
+
+            shared.register(questId);
+        }
+        return shared;
+    }
+
+    /**
+     * @return {@code true} if this quest is written with its only player rather than in a file.
+     */
+    private static boolean shouldBeHeldByOwner(@Nonnull AbstractQuestProgression<?> quest) {
+        return quest.getPlayers().size() <= 1;
+    }
+
+    /**
+     * A quest still in its initial state is worth neither a file nor a line. We consider creating it
+     * again next session costs less than keeping it.
+     */
+    private static boolean isWorthPersisting(@Nonnull AbstractQuestProgression<?> quest) {
+        QuestAsset asset = quest.getAsset();
+        if (asset != null && !asset.isPersistProgression()) return false;
+
+        return !quest.isPristine();
     }
 }

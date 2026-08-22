@@ -45,7 +45,7 @@ public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
         if (!hud.shouldUpdate()) return;
 
         List<AbstractQuestProgression<?>> inProgress = new ArrayList<>();
-        for (UUID questId : questStoreComponent.questsRecord.getAllIds()) {
+        for (UUID questId : questStoreComponent.getQuestIds()) {
             var quest = QuestProgressionService.get().getQuest(questId);
             if (quest != null && quest.getState() == QuestState.IN_PROGRESS) {
                 inProgress.add(quest);

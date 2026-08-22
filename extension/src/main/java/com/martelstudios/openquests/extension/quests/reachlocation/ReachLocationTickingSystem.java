@@ -34,6 +34,6 @@ public class ReachLocationTickingSystem extends EntityTickingSystem<EntityStore>
         if (playerRef == null || transform == null || questStoreComponent == null) return;
 
         QuestProgressionService.get()
-                               .progress(new ReachLocationQuestVisitor(playerRef.getUuid(), transform.getPosition()), questStoreComponent.questsRecord.getAllIds());
+                               .progress(new ReachLocationQuestVisitor(playerRef.getUuid(), transform.getPosition()), questStoreComponent.getQuestIds());
     }
 }

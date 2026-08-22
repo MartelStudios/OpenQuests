@@ -109,6 +109,34 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
         return questIds;
     }
 
+    /**
+     * Children are handed out with their parent, so they share its baseline.
+     */
+    @Override
+    public void markPristine() {
+        super.markPristine();
+
+        Arrays.stream(questIds)
+              .map(QuestProgressionService.get()::getQuest)
+              .filter(Objects::nonNull)
+              .forEach(AbstractQuestProgression::markPristine);
+    }
+
+    /**
+     * Children are handed out with their parent and leave the baseline with it, so the composite
+     * is never written back referencing a child no store keeps.
+     */
+    @Override
+    protected void leaveBaseline() {
+        if (!isPristine()) return;
+        super.leaveBaseline();
+
+        Arrays.stream(questIds)
+              .map(QuestProgressionService.get()::getQuest)
+              .filter(Objects::nonNull)
+              .forEach(AbstractQuestProgression::markDirty);
+    }
+
     @Override
     public CompositeQuestAsset getAsset() {
         return (CompositeQuestAsset) super.getAsset();
@@ -123,6 +151,9 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
                                            .getEventBus()
                                            .register(QuestCompletedEvent.class, questId, this::handleQuestCompleted);
             if (registration != null) childListeners.add(registration);
+
+            AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(questId);
+            if (child != null) child.setParent(this);
         }
         return this;
     }
