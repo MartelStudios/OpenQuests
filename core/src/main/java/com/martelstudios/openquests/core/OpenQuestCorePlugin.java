@@ -13,7 +13,9 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.datastore.DiskDataStoreProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.assets.QuestAsset;
+import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
 import com.martelstudios.openquests.core.assignment.assets.QuestAssignmentAsset;
+import com.martelstudios.openquests.core.assignment.assets.QuestAssignmentAssetValidator;
 import com.martelstudios.openquests.core.assignment.services.QuestAssignmentService;
 import com.martelstudios.openquests.core.assignment.services.QuestAutoAssignmentService;
 import com.martelstudios.openquests.core.assignment.stores.QuestAssignmentRecord;
@@ -102,6 +104,8 @@ public class OpenQuestCorePlugin extends JavaPlugin {
         questAssignmentStoreComponentType = getEntityStoreRegistry().registerComponent(QuestAssignmentStoreComponent.class, "QuestAssignmentStore", QuestAssignmentStoreComponent.CODEC);
 
         getCommandRegistry().registerCommand(new QuestCommand());
+
+        getEventRegistry().registerGlobal(LoadAssetEvent.PRIORITY_LOAD_LATE, LoadAssetEvent.class, QuestAssignmentAssetValidator::handleLoadAsset);
 
         getAssetRegistry().register(HytaleAssetStore.builder(QuestAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenQuests/Quests/")
