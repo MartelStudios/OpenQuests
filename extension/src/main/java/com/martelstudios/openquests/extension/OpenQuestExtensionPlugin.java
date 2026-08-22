@@ -14,6 +14,7 @@ import com.martelstudios.openquests.extension.quests.useblock.UseBlockFeature;
 import com.martelstudios.openquests.extension.quests.queststate.QuestStateFeature;
 import com.martelstudios.openquests.extension.quests.useentity.UseEntityFeature;
 import com.martelstudios.openquests.extension.quests.reachlocation.ReachLocationFeature;
+import com.martelstudios.openquests.extension.rewards.grantquest.GrantQuestRewardFeature;
 import com.martelstudios.openquests.extension.rewards.item.ItemRewardFeature;
 
 import javax.annotation.Nonnull;
@@ -32,18 +33,23 @@ public class OpenQuestExtensionPlugin extends JavaPlugin {
     protected void setup() {
         super.setup();
 
+        // Quests
         GatherFeature.register(this);
         InteractivelyPickupFeature.register(this);
         ReachLocationFeature.register(this);
         CompositeFeature.register(this);
         HudFeature.register(this);
-        ItemRewardFeature.register(this);
         KillFeature.register(this);
         CraftFeature.register(this);
         UseBlockFeature.register(this);
         UseEntityFeature.register(this);
         QuestStateFeature.register(this);
 
+        // Rewards
+        ItemRewardFeature.register(this);
+        GrantQuestRewardFeature.register(this);
+
+        // Conditions
         OperatorConditionFeature.register(this);
         QuestStateConditionFeature.register(this);
     }
