@@ -2,13 +2,21 @@
   "Type": "Composite",
   "TitleKey": "quest.start-hatchet.title",
   "DescriptionKey": "quest.start-hatchet.description",
-  "AutoStart": false,
+  "StartOnConnection": true,
   "AutoClaim": true,
   "QuestAssetIds": [
     "CollectStick",
     "CollectFibre",
     "CollectRubble",
     "CraftCrudeHatchet"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "Nouveau"
+      ]
+    }
   ],
   "PersistProgression": true,
   "PersistHistory": true
