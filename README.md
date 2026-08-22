@@ -1,18 +1,18 @@
 # HyQuests
 
-A standalone, extensible quest system for Hytale server plugins.
+An extensible quest system for Hytale server plugins.
 
-Quests are split in two: a **asset** describes a quest (its title, its parameters, its rewards) and
-is authored as JSON, while a **runtime quest** carries one player's progression and is persisted
+Quests are split in two: an **asset** describes a quest (its title, its parameters, its rewards) and
+is authored as JSON and editable in the AssetEditor, while a **runtime quest** carries players progression and is persisted
 on its own. The two are linked by the asset id, so editing a quest definition never touches saved
 progression.
 
 ## Modules
 
-| Module | Plugin | Role |
-| --- | --- | --- |
-| `core` | `HyQuestCore` | The system itself. Ships no quest type: assets, progression, scopes, history, rewards. |
-| `extension` | `HyQuestExtension` | The quest types, rewards and tracker HUD shipped on top, one package per feature. |
+| Module | Plugin | Role                                                                                                         |
+| --- | --- |--------------------------------------------------------------------------------------------------------------|
+| `core` | `HyQuestCore` | The system itself. Ships no quest type, only the core system: assets, progression, scopes, history, rewards. |
+| `extension` | `HyQuestExtension` | The implementation, quest types, rewards and tracker HUD shipped on top, one package per feature.            |
 
 Depending on `HyQuestCore` alone is enough to build your own quest types;
 `HyQuestExtension` is both a set of ready-made types and the reference for how to add one.
@@ -30,16 +30,28 @@ Depending on `HyQuestCore` alone is enough to build your own quest types;
 
 ### Scopes
 
-A quest only ever knows its players: `AbstractQuest#getPlayers()` is the single source of truth,
+A quest only ever knows its players: `AbstractQuestProgression` is the single source of truth,
 and `QuestStoreComponent` is the reverse index used to know what to load. Scope is applied from
 the outside — `UniverseQuestService` and `WorldQuestService` assign and unassign quests on the
 events that concern them, so a quest itself stays agnostic of how it was handed out.
 
+#### Universe Scope
+The Universe scope are quests assigned to all server's players. It can be useful for community quests :
+- Reach 100 unique players
+- Reach 1000 followers on social media
+- Kill 1 000 000 Skeletons
+
+#### World Scope
+The world scope are quests assigned to every players entering the world and removed when they leave.
+It can be useful for instantiated events :
+- Slay the Devil Boss
+- Reach the 10th zombie vague
+- 
 ### Lifecycle
 
 A quest is created from its asset, progresses through visitors, and on reaching a terminal state
 (`SUCCESSFUL`, `FAILED`, `ABANDONED`) is archived into each assignee's history and deleted. Rewards
-are granted immediately if the player is online, otherwise on their next world entry.
+are granted immediately if possible and `autoClaim` is set. Some rewards could not be granted offline for instance and so will be granted on their next world entry.
 
 ## Built-in quest types
 
