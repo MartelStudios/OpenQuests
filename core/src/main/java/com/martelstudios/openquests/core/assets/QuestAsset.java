@@ -42,6 +42,8 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .add()
                                                                           .append(new KeyedCodec<>("AutoClaim", Codec.BOOLEAN), (asset, value) -> asset.autoClaim = value, asset -> Boolean.valueOf(asset.autoClaim))
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("StartOnConnection", Codec.BOOLEAN), (asset, value) -> asset.startOnConnection = value, asset -> Boolean.valueOf(asset.startOnConnection))
+                                                                          .add()
                                                                           .append(new KeyedCodec<>("StopOnComplete", Codec.BOOLEAN), (asset, value) -> asset.stopOnComplete = value, asset -> Boolean.valueOf(asset.stopOnComplete))
                                                                           .add()
                                                                           .append(new KeyedCodec<>("PersistProgression", Codec.BOOLEAN), (asset, value) -> asset.persistProgression = value, asset -> Boolean.valueOf(asset.persistProgression))
@@ -64,6 +66,7 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     protected String titleKey;
     protected String descriptionKey;
     protected boolean autoClaim;
+    protected boolean startOnConnection;
     protected boolean stopOnComplete = true;
     protected boolean persistProgression = true;
     protected boolean persistHistory = true;
@@ -88,6 +91,14 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
 
     public boolean isAutoClaim() {
         return autoClaim;
+    }
+
+    /**
+     * @return {@code true} to hand this quest to every player on connection, once. A player who
+     * already received it is not given it again, whatever became of it.
+     */
+    public boolean isStartOnConnection() {
+        return startOnConnection;
     }
 
     /**

@@ -33,6 +33,7 @@ import com.martelstudios.openquests.core.scopes.universe.QuestsStore;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestStoreResource;
+import com.martelstudios.openquests.core.services.QuestAutoStartService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestProgressionRecord;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
@@ -67,6 +68,7 @@ public class OpenQuestCorePlugin extends JavaPlugin {
     private QuestAssignmentStore questAssignmentStore;
 
     private QuestProgressionService questProgressionService;
+    private QuestAutoStartService questAutoStartService;
     private QuestHistoryService questHistoryService;
     private QuestAssignmentService questAssignmentService;
     private QuestAutoAssignmentService questAutoAssignmentService;
@@ -97,6 +99,7 @@ public class OpenQuestCorePlugin extends JavaPlugin {
         universeQuestService = new UniverseQuestService(this, questsStore);
         worldQuestService = new WorldQuestService(this);
         playerQuestService = new PlayerQuestService(this);
+        questAutoStartService = new QuestAutoStartService(this);
 
         questStoreComponentType = getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, "QuestStore", QuestStoreComponent.CODEC);
         worldStoreResourceType = getEntityStoreRegistry().registerResource(WorldQuestStoreResource.class, "QuestStore", WorldQuestStoreResource.CODEC);
@@ -153,6 +156,10 @@ public class OpenQuestCorePlugin extends JavaPlugin {
 
     public PlayerQuestService getPlayerQuestService() {
         return playerQuestService;
+    }
+
+    public QuestAutoStartService getQuestAutoStartService() {
+        return questAutoStartService;
     }
 
     public QuestProgressionService getQuestProgressionService() {
