@@ -63,6 +63,14 @@ public class QuestProgressionService {
     }
 
     /**
+     * Puts a quest that was decoded elsewhere — a player's own store — back into the registry,
+     * without the registration events: it is not new, it is coming back.
+     */
+    public void registerLoadedQuest(@Nonnull AbstractQuestProgression<?> quest) {
+        dataStore.add(quest);
+    }
+
+    /**
      * Registers a new quest in the store, so it gets persisted.
      *
      * @param quest the quest to register

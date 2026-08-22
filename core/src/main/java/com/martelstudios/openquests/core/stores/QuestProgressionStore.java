@@ -21,6 +21,13 @@ public class QuestProgressionStore {
     @Nonnull
     private final Map<Class<?>, Set<UUID>> idsByType = new ConcurrentHashMap<>();
 
+    /**
+     * Quests that have a file of their own. A quest earns one by being shared, and keeps it even if
+     * it later drops back to a single player.
+     */
+    @Nonnull
+    private final Set<UUID> fileBacked = ConcurrentHashMap.newKeySet();
+
     @Nonnull
     public final DataStore<QuestProgressionRecord> dataStore;
 
@@ -42,6 +49,8 @@ public class QuestProgressionStore {
 
         Set<UUID> ids = idsByType.get(quest.getClass());
         if (ids != null) ids.remove(id);
+
+        fileBacked.remove(id);
 
         return quest;
     }
@@ -95,8 +104,18 @@ public class QuestProgressionStore {
 
         QuestAsset asset = quest.getAsset();
         if (asset != null && !asset.isPersistProgression()) return;
+        if (!isFileBacked(quest)) return;
 
         dataStore.save(quest.getId().toString(), new QuestProgressionRecord(quest));
+        fileBacked.add(quest.getId());
+    }
+
+    /**
+     * A quest held by a single player is written with that player instead, which is what keeps the
+     * quest directory from growing with one file per player and per quest.
+     */
+    public boolean isFileBacked(@Nonnull AbstractQuestProgression<?> quest) {
+        return quest.getPlayers().size() > 1 || fileBacked.contains(quest.getId());
     }
 
     /**
@@ -141,6 +160,7 @@ public class QuestProgressionStore {
         if (record == null || record.quest == null) return null;
 
         add(record.quest);
+        fileBacked.add(id);
         return quests.get(id);
     }
 

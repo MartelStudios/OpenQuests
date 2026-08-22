@@ -9,6 +9,7 @@ import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
+import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.scopes.player.events.QuestRemovedFromPlayerStoreEvent;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
@@ -47,8 +48,18 @@ public class PlayerQuestService {
      * Pulls the player's own quests into the datastore. Scope services assign theirs separately,
      * each on the event that concerns it.
      */
+    /**
+     * The quests kept with the player are already decoded: they only have to enter the store. The
+     * rest is loaded from its own files afterwards.
+     */
     private void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
-        getQuests(EntityComponents.of(playerConnectEvent.getHolder())).loadAll();
+        var questStore = playerConnectEvent.getHolder().ensureAndGetComponent(QuestStoreComponent.getComponentType());
+
+        for (AbstractQuestProgression<?> quest : questStore.getOwnQuests().values()) {
+            QuestProgressionService.get().registerLoadedQuest(quest);
+        }
+
+        questStore.loadQuests();
     }
 
     private void handleQuestPlayerAddedEvent(@Nonnull QuestPlayerAddedEvent questPlayerAddedEvent) {
@@ -78,6 +89,8 @@ public class PlayerQuestService {
     public void addQuestToPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         if (!playerStore.questsRecord.register(quest.getId())) return;
 
+        playerStore.addOwnQuest(quest);
+
         HytaleServer.get()
                     .getEventBus()
                     .dispatchFor(QuestAddedToPlayerStoreEvent.class, playerId)
@@ -94,6 +107,8 @@ public class PlayerQuestService {
      */
     public void removeQuestFromPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         if (!playerStore.questsRecord.unregister(quest.getId())) return;
+
+        playerStore.removeOwnQuest(quest.getId());
 
         HytaleServer.get()
                     .getEventBus()
