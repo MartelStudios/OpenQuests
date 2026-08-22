@@ -143,6 +143,12 @@ public class QuestProgressionStore {
             if (record == null || record.quest == null) continue;
             add(record.quest);
         }
+
+        // Second pass: a quest coming back may need its neighbours already in the store
+        for (QuestProgressionRecord record : records.values()) {
+            if (record == null || record.quest == null) continue;
+            record.quest.onLoaded();
+        }
     }
 
     public AbstractQuestProgression<?> load(UUID id) {
@@ -161,6 +167,8 @@ public class QuestProgressionStore {
 
         add(record.quest);
         fileBacked.add(id);
+        record.quest.onLoaded();
+
         return quests.get(id);
     }
 

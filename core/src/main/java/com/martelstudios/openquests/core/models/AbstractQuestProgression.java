@@ -114,6 +114,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public void onRegistered() {}
 
     /**
+     * Called just after a quest that already existed re-entered the store, however it came back.
+     * Called by {@link QuestProgressionService#registerLoadedQuest} and by the disk store.
+     */
+    public void onLoaded() {}
+
+    /**
      * Called just after the quest progression leaves the quest store.
      * Called by {@link QuestProgressionService#unregisterQuest}.
      */

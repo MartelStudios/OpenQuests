@@ -73,6 +73,9 @@ that player's own file; one shared by several gets a file of its own. A quest th
 player moves from the first to the second and stays there, and a quest still untouched since it
 was handed out is written to neither.
 
+A composite applies this child by child: only the children actually played are written, the
+others are rebuilt from their asset the next time the composite is loaded.
+
 None of this is visible from the outside: `QuestProgressionService` resolves a quest by id
 whichever store holds it.
 
