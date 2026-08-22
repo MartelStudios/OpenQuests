@@ -9,6 +9,7 @@ import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.assets.QuestAsset;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
+import com.martelstudios.openquests.core.events.QuestDirtyChangedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 
@@ -40,13 +41,27 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
      */
     protected Set<UUID> successfulQuestIds = ConcurrentHashMap.newKeySet();
 
-    private final transient List<EventRegistration<UUID, QuestCompletedEvent>> childListeners = new ArrayList<>();
+    private final transient List<EventRegistration<UUID, ?>> childListeners = new ArrayList<>();
 
     private void handleQuestCompleted(QuestCompletedEvent questCompletedEvent) {
         var child = questCompletedEvent.getQuest();
         if (child.isSuccessful() && successfulQuestIds.add(child.getId())) markDirty();
 
         update(new CompositeQuestVisitor());
+    }
+
+    /**
+     * A child that has to be persisted drags the whole family along: writing back a composite whose
+     * siblings no store keeps would leave it referencing children that no longer exist.
+     */
+    private void handleChildDirtyChanged(QuestDirtyChangedEvent questDirtyChangedEvent) {
+        if (!isPristine()) return;
+        markDirty();
+
+        Arrays.stream(questIds)
+              .map(QuestProgressionService.get()::getQuest)
+              .filter(Objects::nonNull)
+              .forEach(AbstractQuestProgression::markDirty);
     }
 
     @Override
@@ -122,21 +137,6 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
               .forEach(AbstractQuestProgression::markPristine);
     }
 
-    /**
-     * Children are handed out with their parent and leave the baseline with it, so the composite
-     * is never written back referencing a child no store keeps.
-     */
-    @Override
-    protected void leaveBaseline() {
-        if (!isPristine()) return;
-        super.leaveBaseline();
-
-        Arrays.stream(questIds)
-              .map(QuestProgressionService.get()::getQuest)
-              .filter(Objects::nonNull)
-              .forEach(AbstractQuestProgression::markDirty);
-    }
-
     @Override
     public CompositeQuestAsset getAsset() {
         return (CompositeQuestAsset) super.getAsset();
@@ -152,8 +152,10 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
                                            .register(QuestCompletedEvent.class, questId, this::handleQuestCompleted);
             if (registration != null) childListeners.add(registration);
 
-            AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(questId);
-            if (child != null) child.setParent(this);
+            var dirtyRegistration = HytaleServer.get()
+                                                .getEventBus()
+                                                .register(QuestDirtyChangedEvent.class, questId, this::handleChildDirtyChanged);
+            if (dirtyRegistration != null) childListeners.add(dirtyRegistration);
         }
         return this;
     }

@@ -9,13 +9,13 @@ import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.assets.QuestAsset;
+import com.martelstudios.openquests.core.events.QuestDirtyChangedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
-import javax.annotation.Nullable;
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Set;
@@ -76,12 +76,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * quest was persisted, so it has progressed by definition.
      */
     private transient boolean pristine;
-
-    /**
-     * The quest that handed this one out, if any. Only ever set while both are still at their
-     * baseline, which is the only time it decides anything.
-     */
-    private transient AbstractQuestProgression<?> parent;
 
     /**
      * @return whether reaching a terminal state ends this quest. One that says {@code false} keeps
@@ -221,8 +215,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Marks this quest as needing to be persisted on the next save pass.
      */
     public void markDirty() {
+        boolean wasClean = !dirty;
         this.dirty = true;
-        if (pristine) leaveBaseline();
+        this.pristine = false;
+
+        if (wasClean) onDirtyChanged();
     }
 
     /**
@@ -242,18 +239,15 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return pristine;
     }
 
-    public void setParent(@Nullable AbstractQuestProgression<?> parent) {
-        this.parent = parent;
-    }
-
     /**
-     * Leaves the baseline, taking along everything handed out with this quest: a subtree is
-     * persisted whole or not at all, half of it referencing children no store would write back.
+     * Announces that this quest started needing to be persisted. Fired on the transition only, so a
+     * listener realigning others cannot bounce back onto itself.
      */
-    protected void leaveBaseline() {
-        this.pristine = false;
-
-        if (parent != null) parent.leaveBaseline();
+    protected void onDirtyChanged() {
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestDirtyChangedEvent.class, getId())
+                    .dispatch(new QuestDirtyChangedEvent(this));
     }
 
     /**
