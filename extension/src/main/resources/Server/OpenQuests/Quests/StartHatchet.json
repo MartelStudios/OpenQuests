@@ -1,0 +1,15 @@
+{
+  "Type": "Composite",
+  "TitleKey": "quest.start-hatchet.title",
+  "DescriptionKey": "quest.start-hatchet.description",
+  "AutoStart": false,
+  "AutoClaim": true,
+  "QuestAssetIds": [
+    "CollectStick",
+    "CollectFibre",
+    "CollectRubble",
+    "CraftCrudeHatchet"
+  ],
+  "PersistProgression": true,
+  "PersistHistory": true
+}
