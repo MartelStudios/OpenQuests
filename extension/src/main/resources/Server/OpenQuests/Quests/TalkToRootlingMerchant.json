@@ -1,8 +1,7 @@
 {
   "Type": "UseEntity",
-  "TitleKey": "test",
-  "DescriptionKey": "test",
-  "NpcGroupId": "Rabbit",
+  "TitleKey": "quest.talk-merchant.title",
+  "DescriptionKey": "quest.talk-merchant.description",
   "TargetQuantity": 1,
   "AutoClaim": true,
   "SuccessfulRewards": [
@@ -11,5 +10,10 @@
       "ItemId": "Weapon_Longsword_Spectral",
       "Quantity": 1
     }
-  ]
+  ],
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Temple_Kweebec_Merchant"
+    ]
+  }
 }

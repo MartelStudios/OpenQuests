@@ -46,7 +46,7 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "Nouveau"
+        "DefeatForgottenTempleGuardian"
       ]
     }
   ],

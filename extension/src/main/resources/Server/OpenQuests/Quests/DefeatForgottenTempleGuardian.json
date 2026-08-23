@@ -1,0 +1,20 @@
+{
+  "Type": "KillNpc",
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Golem_Crystal_Earth"
+    ]
+  },
+  "TitleKey": "quest.defeat-guardian.title",
+  "DescriptionKey": "quest.defeat-guardian.description",
+  "TargetQuantity": 1,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "TalkToRootlingMerchant"
+      ]
+    }
+  ],
+  "AutoClaim": true
+}
