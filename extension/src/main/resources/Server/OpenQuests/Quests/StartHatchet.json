@@ -5,10 +5,42 @@
   "StartOnConnection": true,
   "AutoClaim": true,
   "QuestAssetIds": [
-    "CollectStick",
-    "CollectFibre",
-    "CollectRubble",
-    "CraftCrudeHatchet"
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-stick.title",
+      "DescriptionKey": "quest.gather-stick.description",
+      "ItemToGather": {
+        "ItemId": "Ingredient_Stick"
+      },
+      "TargetQuantity": 2
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-fibre.title",
+      "DescriptionKey": "quest.gather-fibre.description",
+      "ItemToGather": {
+        "ItemId": "Ingredient_Fibre"
+      },
+      "TargetQuantity": 2
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-rubble.title",
+      "DescriptionKey": "quest.gather-rubble.description",
+      "TargetQuantity": 2,
+      "ItemToGather": {
+        "ItemId": "Rubble_Stone"
+      }
+    },
+    {
+      "Type": "Craft",
+      "TitleKey": "quest.craft-hatchet.title",
+      "DescriptionKey": "quest.craft-hatchet.description",
+      "TargetQuantity": 1,
+      "ItemToCraft": {
+        "ItemId": "Tool_Hatchet_Crude"
+      }
+    }
   ],
   "SuccessfulRewards": [
     {
