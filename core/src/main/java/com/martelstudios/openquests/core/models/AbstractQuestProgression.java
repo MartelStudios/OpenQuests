@@ -9,7 +9,6 @@ import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.assets.QuestAsset;
-import com.martelstudios.openquests.core.events.QuestDirtyChangedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
@@ -72,12 +71,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     private transient boolean dirty;
 
     /**
-     * Set on a quest just handed out and cleared by the first change. Not serialized: a decoded
-     * quest was persisted, so it has progressed by definition.
-     */
-    private transient boolean pristine;
-
-    /**
      * @return whether reaching a terminal state ends this quest. One that says {@code false} keeps
      * running and being re-evaluated, so its state can still change.
      */
@@ -112,12 +105,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Called by {@link QuestProgressionService#registerQuest(AbstractQuestProgression)}.
      */
     public void onRegistered() {}
-
-    /**
-     * Called just after a quest that already existed re-entered the store, however it came back.
-     * Called by {@link QuestProgressionService#registerLoadedQuest} and by the disk store.
-     */
-    public void onLoaded() {}
 
     /**
      * Called just after the quest progression leaves the quest store.
@@ -221,39 +208,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Marks this quest as needing to be persisted on the next save pass.
      */
     public void markDirty() {
-        boolean wasClean = !dirty;
         this.dirty = true;
-        this.pristine = false;
-
-        if (wasClean) onDirtyChanged();
-    }
-
-    /**
-     * Takes the current state as the baseline and discards the changes recorded so far. Meant for
-     * a quest just handed out: being assigned is not progressing.
-     */
-    public void markPristine() {
-        this.pristine = true;
-        this.dirty = false;
-    }
-
-    /**
-     * @return {@code true} if this quest has not changed since it was handed out, and so is not
-     * worth persisting: it is cheaper to hand out again next session.
-     */
-    public boolean isPristine() {
-        return pristine;
-    }
-
-    /**
-     * Announces that this quest started needing to be persisted. Fired on the transition only, so a
-     * listener realigning others cannot bounce back onto itself.
-     */
-    protected void onDirtyChanged() {
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestDirtyChangedEvent.class, getId())
-                    .dispatch(new QuestDirtyChangedEvent(this));
     }
 
     /**

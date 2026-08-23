@@ -33,9 +33,8 @@ Depending on `OpenQuestCore` alone is enough to build your own quest types;
 There is no separate assignment concept: a quest is handed out in one of three ways, and the
 prerequisites of a quest are other quests.
 
-- **On connection** — `"StartOnConnection": true` gives the quest to every player, once. A quest
-  nobody touched is persisted nowhere and simply handed out again next session, so a catalogue
-  of thousands costs nothing until it is played.
+- **On connection** — `"StartOnConnection": true` gives the quest to every player, once. Only the
+  ids already handed out are kept between sessions, so a quest nobody took costs one string.
 - **As a reward** — the `GrantQuest` reward hands further quests over when a quest completes. This
   is how a chain is written: finishing A grants B.
 - **Explicitly** — `QuestProgressionService.registerQuest(asset).addPlayer(playerId)`, from a
@@ -70,11 +69,8 @@ instanced events:
 
 Progression is written where it costs least. A quest with a single player is held whole inside
 that player's own file; one shared by several gets a file of its own. A quest that gains a second
-player moves from the first to the second and stays there, and a quest still untouched since it
-was handed out is written to neither.
-
-A composite applies this child by child: only the children actually played are written, the
-others are rebuilt from their asset the next time the composite is loaded.
+player moves from the first to the second and stays there: moving it back would lose it on the
+way.
 
 None of this is visible from the outside: `QuestProgressionService` resolves a quest by id
 whichever store holds it.

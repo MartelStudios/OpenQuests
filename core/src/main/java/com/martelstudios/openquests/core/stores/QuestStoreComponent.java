@@ -31,7 +31,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
                                                                               .add()
                                                                               .append(new KeyedCodec<>("OwnQuests", new ArrayCodec<>(AbstractQuestProgression.CODEC, AbstractQuestProgression<?>[]::new)), QuestStoreComponent::setOwnQuests, QuestStoreComponent::getOwnQuestsArray)
                                                                               .add()
-                                                                              .append(new KeyedCodec<>("StartedOnConnection", new SetCodec<>(Codec.STRING, HashSet<String>::new, false)), (component, ids) -> component.startedOnConnection.addAll(ids), QuestStoreComponent::getRememberedStartedOnConnection)
+                                                                              .append(new KeyedCodec<>("StartedOnConnection", new SetCodec<>(Codec.STRING, HashSet<String>::new, false)), (component, ids) -> component.startedOnConnection.addAll(ids), component -> component.startedOnConnection)
                                                                               .add()
                                                                               .build();
 
@@ -48,8 +48,9 @@ public class QuestStoreComponent implements Component<EntityStore> {
     private final Map<UUID, AbstractQuestProgression<?>> ownQuests = new ConcurrentHashMap<>();
 
     /**
-     * Asset ids handed to this player by {@code StartOnConnection}, kept so they are handed out
-     * once. Only those whose quest is worth persisting survive the session.
+     * Asset ids already handed to this player by {@code StartOnConnection}. Only this set is kept
+     * between sessions, not the quests themselves, so a catalogue offered to everyone costs one
+     * string per quest actually taken.
      */
     private final Set<String> startedOnConnection = ConcurrentHashMap.newKeySet();
 
@@ -119,20 +120,6 @@ public class QuestStoreComponent implements Component<EntityStore> {
     }
 
     /**
-     * Forgets the quests still untouched. They are not written either, so remembering the hand-out
-     * would keep them from being handed out again next session.
-     */
-    @Nonnull
-    private Set<String> getRememberedStartedOnConnection() {
-        Set<String> remembered = new HashSet<>(startedOnConnection);
-
-        for (AbstractQuestProgression<?> quest : ownQuests.values()) {
-            if (quest.isPristine()) remembered.remove(quest.getAssetId());
-        }
-        return remembered;
-    }
-
-    /**
      * Writes back only what this player holds alone. A quest that gained a second player is dropped
      * here and picked up by the quest store's own files, which is the whole migration.
      */
@@ -140,7 +127,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
     private AbstractQuestProgression<?>[] getOwnQuestsArray() {
         return ownQuests.values()
                         .stream()
-                        .filter(p -> shouldBeHeldByOwner(p) && isWorthPersisting(p))
+                        .filter(p -> shouldBeHeldByOwner(p) && isPersisted(p))
                         .toArray(AbstractQuestProgression<?>[]::new);
     }
 
@@ -163,7 +150,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
             AbstractQuestProgression<?> quest = ownQuests.get(questId);
             if (quest == null) quest = QuestProgressionService.get().getQuest(questId);
 
-            if (quest != null && (shouldBeHeldByOwner(quest) || !isWorthPersisting(quest))) continue;
+            if (quest != null && (shouldBeHeldByOwner(quest) || !isPersisted(quest))) continue;
 
             shared.register(questId);
         }
@@ -178,13 +165,10 @@ public class QuestStoreComponent implements Component<EntityStore> {
     }
 
     /**
-     * A quest still in its initial state is worth neither a file nor a line. We consider creating it
-     * again next session costs less than keeping it.
+     * @return {@code true} if this quest is meant to survive a restart at all.
      */
-    private static boolean isWorthPersisting(@Nonnull AbstractQuestProgression<?> quest) {
+    private static boolean isPersisted(@Nonnull AbstractQuestProgression<?> quest) {
         QuestAsset asset = quest.getAsset();
-        if (asset != null && !asset.isPersistProgression()) return false;
-
-        return !quest.isPristine();
+        return asset == null || asset.isPersistProgression();
     }
 }

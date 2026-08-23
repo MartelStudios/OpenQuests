@@ -68,7 +68,6 @@ public class QuestProgressionService {
      */
     public void registerLoadedQuest(@Nonnull AbstractQuestProgression<?> quest) {
         dataStore.add(quest);
-        quest.onLoaded();
     }
 
     /**
