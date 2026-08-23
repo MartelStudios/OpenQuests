@@ -105,7 +105,7 @@ that could not be granted on the spot has nowhere to wait.
 | `Craft` | Crafting a quantity of an item, whatever the recipe. |
 | `UseBlock` | Interacting with a block a number of times. |
 | `UseEntity` | Interacting with NPCs of a group a number of times. |
-| `KillNpc` | Killing NPCs of a group. |
+| `KillNpc` | Killing NPCs of a group, either an existing one or one written inline. |
 | `KillPlayer` | Killing players, optionally a designated one. |
 | `ReachLocation` | Entering a radius around a position. |
 | `Composite` | Its children, combined with `AND` or `OR`. |
@@ -188,6 +188,13 @@ hands the next one over when it completes:
     { "Type": "GrantQuest", "QuestAssetIds": ["PickBerries"] }
   ]
 }
+```
+
+A quest targeting NPCs takes an `NPCGroup` the same way, so a single role does not need a group
+asset of its own:
+
+```json
+{ "Type": "KillNpc", "NpcGroupId": { "IncludeRoles": ["Golem_Crystal_*"] }, "TargetQuantity": 3 }
 ```
 
 Each entry of `QuestAssetIds` is either the id of an existing asset or an inline definition, which

@@ -1,7 +1,6 @@
 package com.martelstudios.openquests.extension.quests.useentity;
 
 import com.hypixel.hytale.builtin.tagset.config.NPCGroup;
-import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
@@ -16,9 +15,8 @@ public class UseEntityQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<UseEntityQuestAsset> CODEC =
         BuilderCodec.builder(UseEntityQuestAsset.class, UseEntityQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
-                    .append(new KeyedCodec<>("NpcGroupId", Codec.STRING, true), (asset, groupId) -> asset.npcGroupId = groupId, asset -> asset.npcGroupId)
+                    .append(new KeyedCodec<>("NpcGroupId", NPCGroup.CHILD_ASSET_CODEC, true), (asset, groupId) -> asset.npcGroupId = groupId, asset -> asset.npcGroupId)
                     .addValidator(Validators.nonNull())
-                    .addValidator(NPCGroup.VALIDATOR_CACHE.getValidator())
                     .add()
                     .build();
 
