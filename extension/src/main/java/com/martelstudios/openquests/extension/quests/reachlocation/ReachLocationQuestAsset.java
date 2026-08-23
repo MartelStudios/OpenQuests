@@ -4,7 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.math.vector.Vector3dUtil;
-import com.martelstudios.openquests.core.assets.QuestAsset;
+import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import org.joml.Vector3d;
 

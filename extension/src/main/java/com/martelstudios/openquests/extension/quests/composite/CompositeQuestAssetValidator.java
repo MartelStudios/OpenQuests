@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
 import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
-import com.martelstudios.openquests.core.assets.QuestAsset;
+import com.martelstudios.openquests.core.models.QuestAsset;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

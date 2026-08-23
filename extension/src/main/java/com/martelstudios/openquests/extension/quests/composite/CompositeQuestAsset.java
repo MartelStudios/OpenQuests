@@ -6,7 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.openquests.core.assets.QuestAsset;
+import com.martelstudios.openquests.core.models.QuestAsset;
 
 /**
  * Config for a composite quest: the {@link QuestAsset}s its children are created from, and how

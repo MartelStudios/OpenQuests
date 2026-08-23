@@ -3,7 +3,7 @@ package com.martelstudios.openquests.core.services;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.OpenQuestCorePlugin;
-import com.martelstudios.openquests.core.assets.QuestAsset;
+import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 
 import javax.annotation.Nonnull;

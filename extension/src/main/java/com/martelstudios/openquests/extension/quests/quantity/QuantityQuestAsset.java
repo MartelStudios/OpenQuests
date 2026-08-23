@@ -3,7 +3,7 @@ package com.martelstudios.openquests.extension.quests.quantity;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.assets.QuestAsset;
+import com.martelstudios.openquests.core.models.QuestAsset;
 
 /**
  * Config shared by every quest whose completion is "reach a target quantity of something".

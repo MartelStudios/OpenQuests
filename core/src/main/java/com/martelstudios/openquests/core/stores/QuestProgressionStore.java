@@ -2,7 +2,7 @@ package com.martelstudios.openquests.core.stores;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.datastore.DataStore;
-import com.martelstudios.openquests.core.assets.QuestAsset;
+import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 
 import javax.annotation.Nonnull;
