@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -43,6 +44,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.state = state, quest -> quest.state)
                                                                                         .add()
+                                                                                        .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (quest, value) -> quest.persistHistory = value, quest -> quest.persistHistory)
+                                                                                        .add()
                                                                                         .append(PLAYERS_CODEC, PLAYERS_SETTER, PLAYERS_GETTER)
                                                                                         .add()
                                                                                         .build();
@@ -65,6 +68,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     protected QuestState state = QuestState.IN_PROGRESS;
 
     /**
+     * Overrides the asset for this instance alone. Boxed so that "not overridden" is a state of
+     * its own, and so the codec leaves it out entirely.
+     */
+    @Nullable
+    protected Boolean persistHistory;
+
+    /**
      * Set when the runtime state changed; drives incremental disk saves. Not serialized.
      */
     private transient boolean dirty;
@@ -76,6 +86,22 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public boolean isStopOnComplete() {
         QuestAsset asset = getAsset();
         return asset == null || asset.isStopOnComplete();
+    }
+
+    /**
+     * @return whether completing this quest is recorded in its players history. A quest handed out
+     * as part of another one can be told not to, whatever its asset says.
+     */
+    public boolean isPersistHistory() {
+        if (persistHistory != null) return persistHistory;
+
+        QuestAsset asset = getAsset();
+        return asset == null || asset.isPersistHistory();
+    }
+
+    public Q setPersistHistory(@Nullable Boolean persistHistory) {
+        this.persistHistory = persistHistory;
+        return self();
     }
 
     /**

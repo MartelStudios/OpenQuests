@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
 import com.hypixel.hytale.assetstore.codec.ContainedAssetCodec;
+import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
@@ -22,10 +23,19 @@ public class CompositeQuestAsset extends QuestAsset {
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Operator", new EnumCodec<>(Operator.class)), (asset, operator) -> asset.operator = operator, asset -> asset.operator)
                                                                             .add()
+                                                                            .append(new KeyedCodec<>("PersistChildrenHistory", Codec.BOOLEAN), (asset, value) -> asset.persistChildrenHistory = value, asset -> Boolean.valueOf(asset.persistChildrenHistory))
+                                                                            .add()
                                                                             .build();
 
     protected String[] assetIds = new String[0];
     protected Operator operator = Operator.AND;
+
+    /**
+     * Whether each child completing is recorded in the players history. Off by default: the
+     * composite already records the outcome of the whole chain, and its steps would only
+     * accumulate there.
+     */
+    protected boolean persistChildrenHistory;
 
     private CompositeQuestAsset() {}
 
@@ -36,6 +46,10 @@ public class CompositeQuestAsset extends QuestAsset {
 
     public String[] getAssetIds() {
         return assetIds;
+    }
+
+    public boolean isPersistChildrenHistory() {
+        return persistChildrenHistory;
     }
 
     public Operator getOperator() {

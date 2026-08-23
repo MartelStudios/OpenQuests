@@ -86,7 +86,10 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
 
         for (int i = 0; i < assetIds.length; i++) {
             QuestAsset childAsset = QuestAsset.getAsset(assetIds[i]);
-            questIds[i] = QuestProgressionService.get().registerQuest(childAsset).getId();
+            AbstractQuestProgression<?> child = QuestProgressionService.get().registerQuest(childAsset);
+            if (!getAsset().isPersistChildrenHistory()) child.setPersistHistory(false);
+
+            questIds[i] = child.getId();
         }
 
         setQuestIds(questIds).markDirty();

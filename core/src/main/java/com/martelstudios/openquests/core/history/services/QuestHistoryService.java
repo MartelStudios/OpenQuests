@@ -45,7 +45,7 @@ public class QuestHistoryService {
         var quest = questCompletedEvent.getQuest();
         var asset = quest.getAsset();
         boolean autoClaim = asset != null && asset.isAutoClaim();
-        boolean persistHistory = asset == null || asset.isPersistHistory();
+        boolean persistHistory = quest.isPersistHistory();
 
         for (UUID playerId : quest.getPlayers()) {
             EntityComponents.update(playerId, components -> {

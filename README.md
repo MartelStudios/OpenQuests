@@ -91,6 +91,11 @@ Three asset flags change what a quest does when it completes:
 | `PersistProgression` | `true` | Progression is never written to disk; a restart forgets it. |
 | `PersistHistory` | `true` | Nothing is recorded on completion. Rewards not granted on the spot are lost, since nothing is left to retry them from. |
 
+`PersistHistory` can also be set on a running quest, which is how a composite applies its
+`PersistChildrenHistory` flag — off by default, so the steps of a chain do not pile up in the
+log next to the chain itself. Turn it on for children carrying rewards of their own: a reward
+that could not be granted on the spot has nowhere to wait.
+
 ## Built-in quest types
 
 | Type | Completes on |
