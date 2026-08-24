@@ -7,8 +7,8 @@
   "SuccessfulRewards": [
     {
       "Type": "Item",
-      "ItemId": "Weapon_Longsword_Spectral",
-      "Quantity": 1
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 100
     }
   ],
   "NpcGroupId": {

@@ -1,7 +1,7 @@
 {
   "Type": "Composite",
-  "TitleKey": "quest.start-hatchet.title",
-  "DescriptionKey": "quest.start-hatchet.description",
+  "TitleKey": "quest.start-sword.title",
+  "DescriptionKey": "quest.start-sword.description",
   "StartOnConnection": true,
   "AutoClaim": true,
   "QuestAssetIds": [
@@ -34,11 +34,11 @@
     },
     {
       "Type": "Craft",
-      "TitleKey": "quest.craft-hatchet.title",
-      "DescriptionKey": "quest.craft-hatchet.description",
+      "TitleKey": "quest.craft-sword.title",
+      "DescriptionKey": "quest.craft-sword.description",
       "TargetQuantity": 1,
       "ItemToCraft": {
-        "ItemId": "Tool_Hatchet_Crude"
+        "ItemId": "Weapon_Sword_Crude"
       }
     }
   ],
