@@ -108,6 +108,7 @@ that could not be granted on the spot has nowhere to wait.
 | `KillNpc` | Killing NPCs of a group, either an existing one or one written inline. |
 | `KillPlayer` | Killing players, optionally a designated one. |
 | `ReachLocation` | Entering a radius around a position. |
+| `EnterWorld` | Entering a world whose name matches a regular expression. |
 | `Composite` | Its children, combined with `AND` or `OR`. |
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
 
