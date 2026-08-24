@@ -1,0 +1,15 @@
+{
+  "Type": "EnterWorld",
+  "TitleKey": "quest.enter-forgotten-temple.title",
+  "DescriptionKey": "quest.enter-forgotten-temple.description",
+  "AutoClaim": true,
+  "WorldNamePattern": "instance-Forgotten_Temple.*",
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "TalkToRootlingMerchant"
+      ]
+    }
+  ]
+}

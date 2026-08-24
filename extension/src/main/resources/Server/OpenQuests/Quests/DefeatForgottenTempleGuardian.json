@@ -12,7 +12,7 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "TalkToRootlingMerchant"
+        "EnterForgottenTemple"
       ]
     }
   ],
