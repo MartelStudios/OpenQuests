@@ -20,20 +20,20 @@ import java.util.List;
  * Gives items to the player, hotbar first then storage. The item id is validated at asset load,
  * so a typo fails the boot rather than the reward.
  */
-public class ItemQuestReward extends QuestReward {
+public class ItemReward extends QuestReward {
 
-    public static final BuilderCodec<ItemQuestReward> CODEC = BuilderCodec.builder(ItemQuestReward.class, ItemQuestReward::new)
-                                                                          .append(new KeyedCodec<>("ItemId", Codec.STRING), (reward, itemId) -> reward.itemId = itemId, reward -> reward.itemId)
-                                                                          .addValidator(Item.VALIDATOR_CACHE.getValidator())
-                                                                          .add()
-                                                                          .append(new KeyedCodec<>("Quantity", Codec.INTEGER), (reward, quantity) -> reward.quantity = quantity, reward -> Integer.valueOf(reward.quantity))
-                                                                          .add()
-                                                                          .build();
+    public static final BuilderCodec<ItemReward> CODEC = BuilderCodec.builder(ItemReward.class, ItemReward::new)
+                                                                     .append(new KeyedCodec<>("ItemId", Codec.STRING), (reward, itemId) -> reward.itemId = itemId, reward -> reward.itemId)
+                                                                     .addValidator(Item.VALIDATOR_CACHE.getValidator())
+                                                                     .add()
+                                                                     .append(new KeyedCodec<>("Quantity", Codec.INTEGER), (reward, quantity) -> reward.quantity = quantity, reward -> Integer.valueOf(reward.quantity))
+                                                                     .add()
+                                                                     .build();
 
     protected String itemId;
     protected int quantity = 1;
 
-    private ItemQuestReward() {}
+    private ItemReward() {}
 
     @Override
     public boolean grant(@Nonnull QuestHistoryRecord questHistoryRecord, @Nonnull EntityComponents playerComponents) {

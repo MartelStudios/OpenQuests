@@ -14,6 +14,6 @@ public final class ItemRewardFeature {
     private ItemRewardFeature() {}
 
     public static void register(@Nonnull JavaPlugin plugin) {
-        QuestReward.CODEC.register(TYPE_ID, ItemQuestReward.class, ItemQuestReward.CODEC);
+        QuestReward.CODEC.register(TYPE_ID, ItemReward.class, ItemReward.CODEC);
     }
 }
