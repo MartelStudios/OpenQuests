@@ -13,6 +13,7 @@ import com.martelstudios.openquests.extension.quests.queststate.QuestStateFeatur
 import com.martelstudios.openquests.extension.quests.useentity.UseEntityFeature;
 import com.martelstudios.openquests.extension.quests.enterworld.EnterWorldFeature;
 import com.martelstudios.openquests.extension.quests.reachlocation.ReachLocationFeature;
+import com.martelstudios.openquests.extension.rewards.command.CommandRewardFeature;
 import com.martelstudios.openquests.extension.rewards.grantquest.GrantQuestRewardFeature;
 import com.martelstudios.openquests.extension.rewards.item.ItemRewardFeature;
 
@@ -48,5 +49,6 @@ public class OpenQuestExtensionPlugin extends JavaPlugin {
         // Rewards
         ItemRewardFeature.register(this);
         GrantQuestRewardFeature.register(this);
+        CommandRewardFeature.register(this);
     }
 }
