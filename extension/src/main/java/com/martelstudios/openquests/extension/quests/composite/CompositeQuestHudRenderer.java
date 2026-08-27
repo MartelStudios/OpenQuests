@@ -1,0 +1,78 @@
+package com.martelstudios.openquests.extension.quests.composite;
+
+import com.hypixel.hytale.server.core.Message;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.extension.hud.QuestHudContext;
+import com.martelstudios.openquests.extension.hud.QuestHudRenderer;
+import com.martelstudios.openquests.extension.hud.QuestHudRows;
+
+import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * A title carrying the group, then its children one level in. The composite shows no progress of
+ * its own: what it is worth is what its children show.
+ */
+public final class CompositeQuestHudRenderer implements QuestHudRenderer {
+
+    @Nonnull
+    @Override
+    public Class<?> getQuestType() {
+        return CompositeQuestProgression.class;
+    }
+
+    @Nonnull
+    @Override
+    public Set<UUID> getOwnedQuestIds(@Nonnull AbstractQuestProgression<?> quest) {
+        return new HashSet<>(Arrays.asList(((CompositeQuestProgression) quest).getQuestIds()));
+    }
+
+    @Override
+    public void render(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest, boolean indented) {
+        var composite = (CompositeQuestProgression) quest;
+
+        QuestHudRows.appendRow(context, quest, indented);
+        renderChildren(context, composite);
+    }
+
+    /**
+     * Walks the children by index, since {@code questIds} and the asset ids are built together and
+     * a child archived on completion is only nameable through its asset.
+     */
+    private static void renderChildren(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite) {
+        CompositeQuestAsset asset = composite.getAsset();
+        if (asset == null) return;
+
+        UUID[] questIds = composite.getQuestIds();
+        String[] assetIds = asset.getAssetIds();
+
+        for (int i = 0; i < questIds.length; i++) {
+            AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(questIds[i]);
+
+            if (child == null) {
+                renderArchivedChild(context, i < assetIds.length ? assetIds[i] : null);
+                continue;
+            }
+
+            QuestHudRows.render(context, child, true);
+        }
+    }
+
+    /**
+     * A completed child leaves the store, so nothing is left to draw it. Leaving a hole where it
+     * was would read as if it had never been asked for.
+     */
+    private static void renderArchivedChild(@Nonnull QuestHudContext context, String assetId) {
+        if (assetId == null) return;
+
+        QuestAsset asset = QuestAsset.getAsset(assetId);
+        if (asset == null) return;
+
+        QuestHudRows.appendRow(context, Message.translation(asset.getTitleKey()), true, true);
+    }
+}

@@ -1,65 +1,15 @@
-// Persistent top-right quest tracker, studied from MMOSkillTree's QuestTrackerHud (mmoskilltree:quest_tracker)
-// and Hytale's native ObjectivePanel. Simplified: one title + one progress line per quest (our quest
-// types are single-objective, unlike Hytale's multi-task ObjectiveTask), 5 pre-declared slots toggled
-// via ".Visible" rather than created/destroyed dynamically.
-
-@QuestTitleStyle = (FontSize: 15, RenderBold: true, RenderUppercase: true, TextColor: #b7b8b9, LetterSpacing: 1, VerticalAlignment: Center);
-@QuestProgressStyle = (FontSize: 13, TextColor: #ca9f37, VerticalAlignment: Center);
-
-// The #QuestTrackerParent wrapper MUST carry LayoutMode: Top: it's what makes the inner
-// heightless-anchored panel size to its content instead of stretching to the screen bottom.
 Group #QuestTrackerParent {
   LayoutMode: Top;
 
   Group #QuestTrackerPanel {
-    Anchor: (Width: 300, Right: 24, Top: 120);
-    Padding: (Full: 16);
-    Background: #0a1119(0.85);
+    Anchor: (Width: 350, Right: 24, Top: 120);
+    Padding: (Horizontal: 20, Top: 20, Bottom: 20);
+    Background: (TexturePath: "ObjectivePanelContainer.png", Border: 15);
     LayoutMode: Top;
+    Visible: false;
 
-    Group #TrackedQuest0 {
+    Group #QuestList {
       LayoutMode: Top;
-      Padding: (Bottom: 12);
-      Visible: false;
-
-      Label #Title { Text: ""; Style: @QuestTitleStyle; }
-      Label #Progress { Text: ""; Style: @QuestProgressStyle; }
-    }
-
-    Group #TrackedQuest1 {
-      LayoutMode: Top;
-      Padding: (Bottom: 12);
-      Visible: false;
-
-      Label #Title { Text: ""; Style: @QuestTitleStyle; }
-      Label #Progress { Text: ""; Style: @QuestProgressStyle; }
-    }
-
-    Group #TrackedQuest2 {
-      LayoutMode: Top;
-      Padding: (Bottom: 12);
-      Visible: false;
-
-      Label #Title { Text: ""; Style: @QuestTitleStyle; }
-      Label #Progress { Text: ""; Style: @QuestProgressStyle; }
-    }
-
-    Group #TrackedQuest3 {
-      LayoutMode: Top;
-      Padding: (Bottom: 12);
-      Visible: false;
-
-      Label #Title { Text: ""; Style: @QuestTitleStyle; }
-      Label #Progress { Text: ""; Style: @QuestProgressStyle; }
-    }
-
-    Group #TrackedQuest4 {
-      LayoutMode: Top;
-      Padding: (Bottom: 12);
-      Visible: false;
-
-      Label #Title { Text: ""; Style: @QuestTitleStyle; }
-      Label #Progress { Text: ""; Style: @QuestProgressStyle; }
     }
   }
 }

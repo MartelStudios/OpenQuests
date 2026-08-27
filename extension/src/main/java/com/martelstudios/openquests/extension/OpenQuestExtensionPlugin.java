@@ -9,6 +9,7 @@ import com.martelstudios.openquests.extension.quests.interactivelypickup.Interac
 import com.martelstudios.openquests.extension.quests.craft.CraftFeature;
 import com.martelstudios.openquests.extension.quests.kill.KillFeature;
 import com.martelstudios.openquests.extension.quests.useblock.UseBlockFeature;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityFeature;
 import com.martelstudios.openquests.extension.quests.queststate.QuestStateFeature;
 import com.martelstudios.openquests.extension.quests.useentity.UseEntityFeature;
 import com.martelstudios.openquests.extension.quests.enterworld.EnterWorldFeature;
@@ -45,6 +46,7 @@ public class OpenQuestExtensionPlugin extends JavaPlugin {
         UseBlockFeature.register(this);
         UseEntityFeature.register(this);
         QuestStateFeature.register(this);
+        QuantityFeature.register(this);
 
         // Rewards
         ItemRewardFeature.register(this);

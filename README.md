@@ -152,6 +152,18 @@ A reward type is registered the same way:
 QuestReward.CODEC.register("MyReward", MyQuestReward.class, MyQuestReward.CODEC);
 ```
 
+A quest type also says how it shows itself in the tracker, by registering a `QuestHudRenderer`:
+
+```java
+QuestHudService.register(new MyQuestHudRenderer());
+```
+
+The panel picks which five quests get in and stops there; everything past that is the renderer's:
+lines, colours, progress. `QuestHudRows` holds the plain look and the fallback for a type that
+registered nothing, so a quest listing others delegates each one back to it and only says whether
+it is indented. Registering on a base type covers every type built on it, which is how one
+renderer draws the counter of every counted quest.
+
 Anything a type needs beyond the core contract stays in its own package — `Composite` validates its
 asset graph at boot from `CompositeFeature`, the tracker HUD renders counted quests from its own
 package. The core never learns about them.
