@@ -1,0 +1,19 @@
+// Shared by the tracker documents. An appended document is parsed on its own, so each one imports
+// what it needs from here rather than the panel declaring it once for everybody.
+
+$Common = "../Common.ui";
+
+@ColorQuestTitle = $Common.@ColorGoldHighlight;
+@ColorQuestProgress = $Common.@ColorButtonText;
+@ColorQuestComplete = $Common.@ColorDisabled;
+
+@QuestTitleStyle = (FontSize: 15, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestTitle, VerticalAlignment: Center, Wrap: true);
+
+@QuestProgressStyle = (FontSize: 15, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestProgress, HorizontalAlignment: End, VerticalAlignment: Center);
+
+@SeparatorLabelStyle = (FontSize: 12, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestProgress, HorizontalAlignment: Center, VerticalAlignment: Center);
+
+// Paths resolve against this file, which sits next to the textures
+@QuestIconDefault = PatchStyle(TexturePath: "ObjectiveTaskIconDefault.png");
+
+@QuestIconComplete = PatchStyle(TexturePath: "ObjectiveTaskIconComplete.png");

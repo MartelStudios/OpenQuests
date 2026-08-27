@@ -1,0 +1,15 @@
+// Drawn between the children of an OR composite, where only one of them has to succeed.
+// Mirrors @PanelSeparatorFancy from Common.ui — two flexed lines around a fixed middle — and
+// borrows its line texture, so the rule reads like every other separator in the game.
+$Rows = "QuestTrackerCommon.ui";
+
+Group #Separator {
+  LayoutMode: Left;
+  Anchor: (Top: 8, Height: 8);
+
+  Group { FlexWeight: 1; Background: "../Common/ContainerPanelSeparatorFancyLine.png"; }
+
+  Label #Label { Text: %openquests.hud.or; Anchor: (Width: 32); Style: $Rows.@SeparatorLabelStyle; }
+
+  Group { FlexWeight: 1; Background: "../Common/ContainerPanelSeparatorFancyLine.png"; }
+}

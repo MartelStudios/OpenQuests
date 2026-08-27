@@ -109,7 +109,7 @@ that could not be granted on the spot has nowhere to wait.
 | `KillPlayer` | Killing players, optionally a designated one. |
 | `ReachLocation` | Entering a radius around a position. |
 | `EnterWorld` | Entering a world whose name matches a regular expression. |
-| `Composite` | Its children, combined with `AND` or `OR`. |
+| `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
 
 Every counted type extends `QuantityQuestAsset`, which carries `TargetQuantity`. The parameter and
@@ -218,6 +218,9 @@ Each entry of `QuestAssetIds` is either the id of an existing asset or an inline
 is registered as an asset of its own under a generated id. The same goes for `GrantQuest`.
 
 Enum values are written in CamelCase: `Successfully`, `InProgress`, `And`, `Or`.
+
+Text shown by the extension lives in `Common/Languages/en-US/openquests.lang`, reached from markup
+as `%openquests.hud.or` and from code as `Message.translation(...)`.
 
 Quest asset graphs are validated at boot: an unknown reference or a cycle between composite quests
 stops the server with an explicit reason rather than failing later at runtime.

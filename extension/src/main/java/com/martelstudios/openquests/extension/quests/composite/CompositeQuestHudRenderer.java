@@ -23,6 +23,9 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
     /** Carries the composite line and, under it, the container its children draw into. */
     private static final String GROUP_DOCUMENT = "Hud/QuestTrackerGroup.ui";
 
+    /** Between the children of an OR composite: only one of them has to succeed. */
+    private static final String SEPARATOR_DOCUMENT = "Hud/QuestTrackerSeparator.ui";
+
     @Nonnull
     @Override
     public Class<?> getQuestType() {
@@ -55,7 +58,11 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
         UUID[] questIds = composite.getQuestIds();
         String[] assetIds = asset.getAssetIds();
 
+        boolean separated = asset.getOperator() == CompositeQuestAsset.Operator.OR;
+
         for (int i = 0; i < questIds.length; i++) {
+            if (separated && i > 0) context.appendRow(SEPARATOR_DOCUMENT);
+
             AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(questIds[i]);
 
             if (child == null) {

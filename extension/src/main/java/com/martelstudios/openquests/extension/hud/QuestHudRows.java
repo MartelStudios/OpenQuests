@@ -12,8 +12,9 @@ import javax.annotation.Nonnull;
 public final class QuestHudRows {
     public static final String ROW_DOCUMENT = "Hud/QuestTrackerRow.ui";
 
-    // Kept in step with the row documents, which name where each one comes from. A .ui variable
-    // is out of reach here: the completed switch happens at runtime, not at parse time.
+    // The values of @ColorGoldHighlight, @ColorButtonText and @ColorDisabled, which the documents
+    // import from Common.ui. Repeated here because the completed switch happens at runtime, and a
+    // .ui named expression only exists at parse time.
     public static final String COLOR_TITLE = "#E8A93B";
     public static final String COLOR_PROGRESS = "#bfcdd5";
     public static final String COLOR_COMPLETE = "#797b7c";

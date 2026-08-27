@@ -1,31 +1,17 @@
 // A quest that lists others: its own line, then the container its children draw into. The indent
 // lives here, on #SubList, so a child knows nothing about where it ended up.
-
-// Taken from the shared palette in Common/UI/Custom/Common.ui, kept as values rather than as a
-// $C import: a document appended by the server is parsed on its own, and reaching another pack
-// from there is unverified. The names say where each one comes from.
-@ColorQuestTitle = #E8A93B;      // @ColorGoldHighlight
-@ColorQuestProgress = #bfcdd5;   // @ColorButtonText
-@ColorQuestComplete = #797b7c;   // @ColorDisabled
-
-@QuestTitleStyle = (FontSize: 15, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestTitle, VerticalAlignment: Center, Wrap: true);
-
-@QuestProgressStyle = (FontSize: 15, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestProgress, HorizontalAlignment: End, VerticalAlignment: Center);
-
-@QuestIconDefault = PatchStyle(TexturePath: "ObjectiveTaskIconDefault.png");
-
-@QuestIconComplete = PatchStyle(TexturePath: "ObjectiveTaskIconComplete.png");
+$Rows = "QuestTrackerCommon.ui";
 
 Group #QuestGroup {
   Anchor: (Top: 12);
   LayoutMode: Top;
 
   Group #Header {
-    Group #IconDefault { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: @QuestIconDefault; }
-    Group #IconComplete { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: @QuestIconComplete; Visible: false; }
+    Group #IconDefault { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: $Rows.@QuestIconDefault; }
+    Group #IconComplete { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: $Rows.@QuestIconComplete; Visible: false; }
 
-    Label #Title { Text: ""; Anchor: (Left: 20, Width: 230); Style: @QuestTitleStyle; }
-    Label #Progress { Text: ""; Style: @QuestProgressStyle; }
+    Label #Title { Text: ""; Anchor: (Left: 20, Width: 230); Style: $Rows.@QuestTitleStyle; }
+    Label #Progress { Text: ""; Style: $Rows.@QuestProgressStyle; }
   }
 
   Group #SubList {
