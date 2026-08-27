@@ -29,11 +29,9 @@ public interface QuestHudRenderer {
     }
 
     /**
-     * Draws the quest, as many lines as it takes. {@link QuestHudRows} holds the plain look for
-     * whoever only wants to add to it.
-     *
-     * @param indented whether another quest is drawing this one under itself. Forward it to
-     *                 {@link QuestHudRows}, which picks the line accordingly.
+     * Draws the quest, as many lines as it takes. Where those lines end up is the context's
+     * business, so the same renderer serves a quest at the top of the panel and one listed under
+     * another. {@link QuestHudRows} holds the plain look for whoever only wants to add to it.
      */
-    void render(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest, boolean indented);
+    void render(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest);
 }

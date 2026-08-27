@@ -20,9 +20,9 @@ public final class QuantityQuestHudRenderer implements QuestHudRenderer {
     }
 
     @Override
-    public void render(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest, boolean indented) {
+    public void render(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest) {
         var quantityQuest = (QuantityQuestProgression<?>) quest;
-        String rowSelector = QuestHudRows.appendRow(context, quest, indented);
+        String rowSelector = QuestHudRows.appendRow(context, quest);
 
         context.getBuilder()
                .set(rowSelector + "#Progress.Text", quantityQuest.getCurrentQuantity() + "/" + quantityQuest.getTargetQuantity());

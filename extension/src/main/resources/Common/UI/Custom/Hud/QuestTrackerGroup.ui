@@ -1,5 +1,5 @@
-// One sub-quest, shifted right. There is only ever one level of nesting: a sub-quest of a
-// sub-quest is shown here too, since a deeper indent would say nothing more.
+// A quest that lists others: its own line, then the container its children draw into. The indent
+// lives here, on #SubList, so a child knows nothing about where it ended up.
 
 // Taken from the shared palette in Common/UI/Custom/Common.ui, kept as values rather than as a
 // $C import: a document appended by the server is parsed on its own, and reaching another pack
@@ -16,12 +16,20 @@
 
 @QuestIconComplete = PatchStyle(TexturePath: "ObjectiveTaskIconComplete.png");
 
-Group #QuestRow {
-  Anchor: (Top: 8);
+Group #QuestGroup {
+  Anchor: (Top: 12);
+  LayoutMode: Top;
 
-  Group #IconDefault { Anchor: (Width: 14, Height: 14, Top: 4, Left: 20); Background: @QuestIconDefault; }
-  Group #IconComplete { Anchor: (Width: 14, Height: 14, Top: 4, Left: 20); Background: @QuestIconComplete; Visible: false; }
+  Group #Header {
+    Group #IconDefault { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: @QuestIconDefault; }
+    Group #IconComplete { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: @QuestIconComplete; Visible: false; }
 
-  Label #Title { Text: ""; Anchor: (Left: 40, Width: 210); Style: @QuestTitleStyle; }
-  Label #Progress { Text: ""; Style: @QuestProgressStyle; }
+    Label #Title { Text: ""; Anchor: (Left: 20, Width: 230); Style: @QuestTitleStyle; }
+    Label #Progress { Text: ""; Style: @QuestProgressStyle; }
+  }
+
+  Group #SubList {
+    Padding: (Left: 20);
+    LayoutMode: Top;
+  }
 }

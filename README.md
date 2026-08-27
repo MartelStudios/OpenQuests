@@ -159,9 +159,10 @@ QuestHudService.register(new MyQuestHudRenderer());
 ```
 
 The panel picks which five quests get in and stops there; everything past that is the renderer's:
-lines, colours, progress. `QuestHudRows` holds the plain look and the fallback for a type that
-registered nothing, so a quest listing others delegates each one back to it and only says whether
-it is indented. Registering on a base type covers every type built on it, which is how one
+lines, colours, progress. A renderer never knows where its lines land: a quest listing others opens
+a container and draws them into it, so the same renderer serves a quest at the top of the panel and
+one listed under another. `QuestHudRows` holds the plain look and the fallback for a type that
+registered nothing. Registering on a base type covers every type built on it, which is how one
 renderer draws the counter of every counted quest.
 
 Anything a type needs beyond the core contract stays in its own package — `Composite` validates its

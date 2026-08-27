@@ -20,6 +20,9 @@ import java.util.UUID;
  */
 public final class CompositeQuestHudRenderer implements QuestHudRenderer {
 
+    /** Carries the composite line and, under it, the container its children draw into. */
+    private static final String GROUP_DOCUMENT = "Hud/QuestTrackerGroup.ui";
+
     @Nonnull
     @Override
     public Class<?> getQuestType() {
@@ -33,11 +36,12 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
     }
 
     @Override
-    public void render(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest, boolean indented) {
+    public void render(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest) {
         var composite = (CompositeQuestProgression) quest;
 
-        QuestHudRows.appendRow(context, quest, indented);
-        renderChildren(context, composite);
+        String rowSelector = QuestHudRows.appendRow(context, GROUP_DOCUMENT, quest.getTitle(), quest.isCompleted());
+
+        context.into(rowSelector + "#SubList", () -> renderChildren(context, composite));
     }
 
     /**
@@ -59,7 +63,7 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
                 continue;
             }
 
-            QuestHudRows.render(context, child, true);
+            QuestHudRows.render(context, child);
         }
     }
 
@@ -73,6 +77,6 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
         QuestAsset asset = QuestAsset.getAsset(assetId);
         if (asset == null) return;
 
-        QuestHudRows.appendRow(context, Message.translation(asset.getTitleKey()), true, true);
+        QuestHudRows.appendRow(context, Message.translation(asset.getTitleKey()), true);
     }
 }

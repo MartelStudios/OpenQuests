@@ -78,7 +78,7 @@ public class QuestTrackerHud extends CustomUIHud {
             if (quest.getState() != QuestState.IN_PROGRESS) continue;
             if (owned.contains(quest.getId())) continue;
 
-            QuestHudRows.render(context, quest, false);
+            QuestHudRows.render(context, quest);
             shown++;
         }
 

@@ -12,10 +12,6 @@ import javax.annotation.Nonnull;
 public final class QuestHudRows {
     public static final String ROW_DOCUMENT = "Hud/QuestTrackerRow.ui";
 
-    /** The same line shifted right. Two documents rather than a runtime offset: nothing in Hytale
-     * sets an anchor from code, only {@code .Background.Color} and {@code .Style.*}. */
-    public static final String SUB_ROW_DOCUMENT = "Hud/QuestTrackerSubRow.ui";
-
     // Kept in step with the row documents, which name where each one comes from. A .ui variable
     // is out of reach here: the completed switch happens at runtime, not at parse time.
     public static final String COLOR_TITLE = "#E8A93B";
@@ -28,21 +24,22 @@ public final class QuestHudRows {
      * Draws a quest through its renderer, or as a plain title line if its type registered none: an
      * unknown type is worth less on screen than nothing at all.
      */
-    public static void render(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest, boolean indented) {
+    public static void render(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest) {
         QuestHudRenderer renderer = QuestHudService.resolve(quest);
 
-        if (renderer == null) appendRow(context, quest, indented);
-        else renderer.render(context, quest, indented);
+        if (renderer == null) appendRow(context, quest);
+        else renderer.render(context, quest);
     }
 
     /**
-     * Appends a title line.
+     * Appends a title line, using any document that carries the same {@code #Title}, {@code
+     * #Progress} and icon names.
      *
      * @return the selector of the line, for whatever the caller wants to add to it.
      */
     @Nonnull
-    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull Message title, boolean completed, boolean indented) {
-        String rowSelector = context.appendRow(indented ? SUB_ROW_DOCUMENT : ROW_DOCUMENT);
+    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull String documentPath, @Nonnull Message title, boolean completed) {
+        String rowSelector = context.appendRow(documentPath);
 
         context.getBuilder()
                .set(rowSelector + "#Title.Text", title)
@@ -55,7 +52,12 @@ public final class QuestHudRows {
     }
 
     @Nonnull
-    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest, boolean indented) {
-        return appendRow(context, quest.getTitle(), quest.isCompleted(), indented);
+    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull Message title, boolean completed) {
+        return appendRow(context, ROW_DOCUMENT, title, completed);
+    }
+
+    @Nonnull
+    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest) {
+        return appendRow(context, ROW_DOCUMENT, quest.getTitle(), quest.isCompleted());
     }
 }
