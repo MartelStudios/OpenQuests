@@ -1,15 +1,14 @@
 name: Release
 
+# Run this from the Actions tab: it writes the version down, commits, tags and publishes.
+# There is no tag trigger on purpose — the push below is made with a token that does start
+# workflows, so a tag pushed here would fire a second, duplicate run.
 on:
-  # Run this from the Actions tab and it writes the version down, commits, tags and publishes.
   workflow_dispatch:
     inputs:
       version:
         description: 'Version to release, without the leading v — 1.0.0'
         required: true
-  # A tag pushed by hand is published too, from the version it already carries.
-  push:
-    tags: [ 'v*' ]
 
 permissions:
   contents: write
@@ -19,8 +18,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # An app installed on the repository is an actor the ruleset can name, which GITHUB_TOKEN
+      # is not — and the version commit lands on main, so it needs that exception.
+      - name: Mint a token for the release app
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -31,37 +41,25 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Resolve the version
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "VERSION=${{ inputs.version }}" >> "$GITHUB_ENV"
-          else
-            echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
-          fi
-
       - name: Write the version down
-        if: github.event_name == 'workflow_dispatch'
-        run: sed -i "s/^version = .*/version = $VERSION/" gradle.properties
+        run: sed -i "s/^version = .*/version = ${{ inputs.version }}/" gradle.properties
 
       # Regenerates every manifest.json from the property, so the tag carries a coherent tree
       - name: Build
-        run: ./gradlew build -Pversion=$VERSION
+        run: ./gradlew build -Pversion=${{ inputs.version }}
 
       - name: Commit and tag
-        if: github.event_name == 'workflow_dispatch'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "chore: release $VERSION"
-          git tag "v$VERSION"
-          git push origin HEAD "v$VERSION"
+          git config user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
+          git config user.email "${{ steps.app-token.outputs.installation-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+          git commit -am "chore: release ${{ inputs.version }}"
+          git tag "v${{ inputs.version }}"
+          git push origin HEAD "v${{ inputs.version }}"
 
-      # Everything happens in this one run: a push made with GITHUB_TOKEN starts no workflow,
-      # so a tag pushed above would never wake a second one.
       - name: Publish the release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ env.VERSION }}
+          tag_name: v${{ inputs.version }}
           files: |
             core/build/libs/*.jar
             extension/build/libs/*.jar
