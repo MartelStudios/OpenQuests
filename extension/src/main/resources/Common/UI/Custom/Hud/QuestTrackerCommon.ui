@@ -9,6 +9,8 @@ $Common = "../Common.ui";
 
 @QuestTitleStyle = (FontSize: 15, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestTitle, VerticalAlignment: Center, Wrap: true);
 
+@QuestDescriptionStyle = (FontSize: 12, LetterSpacing: 1, TextColor: @ColorQuestProgress, VerticalAlignment: Center, Wrap: true);
+
 @QuestProgressStyle = (FontSize: 15, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestProgress, HorizontalAlignment: End, VerticalAlignment: Center);
 
 @SeparatorLabelStyle = (FontSize: 12, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestProgress, HorizontalAlignment: Center, VerticalAlignment: Center);

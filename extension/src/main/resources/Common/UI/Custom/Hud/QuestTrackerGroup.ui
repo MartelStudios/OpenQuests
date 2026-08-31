@@ -14,6 +14,9 @@ Group #QuestGroup {
     Label #Progress { Text: ""; Style: $Rows.@QuestProgressStyle; }
   }
 
+  // Shown only for an asset tagged HUD_DESC
+  Label #Description { Text: ""; Anchor: (Left: 20, Width: 230, Top: 2); Style: $Rows.@QuestDescriptionStyle; Visible: false; }
+
   Group #SubList {
     Padding: (Left: 20);
     LayoutMode: Top;
