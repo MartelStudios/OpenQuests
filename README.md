@@ -124,6 +124,11 @@ something of its own.
 id or an asset id — the second reaches every quest they hold from it. They go through the ordinary
 progression path, so `StopOnComplete` still decides whether the quest stops there.
 
+Permissions are generated from the plugin and the command path, so `/quest complete` answers to
+`martelstudios.openquestcore.command.quest.complete`. The whole tree is granted to
+`hytale:WorldEditor` except `/quest abandon` granted to `hytale:Adventurer`. A player can give up a quest of their own. Each command only ever
+reaches the sender's quests, so the wider group grants nothing over anybody else.
+
 ## Built-in rewards
 
 - `Item` — gives items, hotbar first, all or nothing.
