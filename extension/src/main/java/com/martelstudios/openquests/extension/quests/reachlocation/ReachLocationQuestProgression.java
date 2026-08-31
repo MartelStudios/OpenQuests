@@ -1,5 +1,8 @@
 package com.martelstudios.openquests.extension.quests.reachlocation;
 
+import com.hypixel.hytale.server.core.Message;
+
+import javax.annotation.Nonnull;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 
@@ -14,5 +17,18 @@ public class ReachLocationQuestProgression extends AbstractQuestProgression<Reac
     @Override
     public ReachLocationQuestAsset getAsset() {
         return (ReachLocationQuestAsset) super.getAsset();
+    }
+
+    @Nonnull
+    @Override
+    public Message getDefaultTitle() {
+        var asset = getAsset();
+        if (asset == null || asset.getPosition() == null) return super.getDefaultTitle();
+
+        var position = asset.getPosition();
+        return Message.translation("openquests.quest.default.reach-location")
+                      .param("x", position.x())
+                      .param("y", position.y())
+                      .param("z", position.z());
     }
 }

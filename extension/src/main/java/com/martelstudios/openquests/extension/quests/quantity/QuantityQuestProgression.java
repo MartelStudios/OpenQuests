@@ -3,7 +3,11 @@ package com.martelstudios.openquests.extension.quests.quantity;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+
+import javax.annotation.Nonnull;
 
 import javax.annotation.Nullable;
 
@@ -56,6 +60,25 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     public Q setTargetQuantity(@Nullable Integer targetQuantity) {
         this.targetQuantity = targetQuantity;
         return self();
+    }
+
+    /**
+     * A default title built from the target and what is being counted.
+     *
+     * @param itemId the item counted, or {@code null} when the quest names a block tag instead
+     */
+    @Nonnull
+    protected Message countedTitle(@Nonnull String messageKey, @Nullable String itemId) {
+        Item asset = itemId == null ? null : Item.getAssetMap().getAsset(itemId);
+
+        // Item resolves its own name: it may carry a translation key of its own, and arguments
+        Message item = asset == null
+            ? Message.translation("openquests.quest.default.something")
+            : asset.getTranslationMessage();
+
+        return Message.translation(messageKey)
+                      .param("quantity", getTargetQuantity())
+                      .param("item", item);
     }
 
     /**

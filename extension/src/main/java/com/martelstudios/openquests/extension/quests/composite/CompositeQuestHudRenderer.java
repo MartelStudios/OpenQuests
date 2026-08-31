@@ -1,6 +1,5 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
-import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -84,6 +83,6 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
         QuestAsset asset = QuestAsset.getAsset(assetId);
         if (asset == null) return;
 
-        QuestHudRows.appendRow(context, Message.translation(asset.getTitleKey()), true);
+        QuestHudRows.appendRow(context, AbstractQuestProgression.titleOf(asset), true);
     }
 }

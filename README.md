@@ -231,10 +231,16 @@ is registered as an asset of its own under a generated id. The same goes for `Gr
 
 Enum values are written in CamelCase: `Successfully`, `InProgress`, `And`, `Or`.
 
-Text lives in `Server/Languages/en-US/*.lang`, whose file name is the first segment of every key it
-holds — `hud.or` in `openquests.lang` answers to `openquests.hud.or`. The server loads them and
+Text lives in `Server/Languages/<locale>/*.lang`, whose file name is the first segment of every key
+it holds — `hud.or` in `openquests.lang` answers to `openquests.hud.or`. The server loads them and
 pushes them to clients, so they resolve from markup as `%openquests.hud.or` and from code as
-`Message.translation(...)` alike.
+`Message.translation(...)` alike. `en-US` and `fr-FR` ship.
+
+`TitleKey` and `DescriptionKey` are optional. Without them a quest falls back to
+`getDefaultTitle()`, which a type overrides to describe itself from its own parameters — a `Gather`
+quest reads "Gather 2 Sticks" on its own, the item naming itself through Hytale's own
+`Item.getTranslationMessage()`. The templates live in the same files and use ICU, so a locale
+pluralises where it needs to.
 
 Quest asset graphs are validated at boot: an unknown reference or a cycle between composite quests
 stops the server with an explicit reason rather than failing later at runtime.

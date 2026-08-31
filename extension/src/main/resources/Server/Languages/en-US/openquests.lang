@@ -1,1 +1,8 @@
 hud.or = OR
+
+quest.default.something = something
+quest.default.gather = Gather {quantity, plural, one {a {item}} other {{quantity, number} {item}}}
+quest.default.pickup = Pick up {quantity, plural, one {a {item}} other {{quantity, number} {item}}}
+quest.default.craft = Craft {quantity, plural, one {a {item}} other {{quantity, number} {item}}}
+quest.default.reach-location = Reach {x, number}, {y, number}, {z, number}
+quest.default.enter-world = Enter a world matching {world}

@@ -1,5 +1,8 @@
 package com.martelstudios.openquests.extension.quests.interactivelypickup;
 
+import com.hypixel.hytale.server.core.Message;
+
+import javax.annotation.Nonnull;
 import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -34,5 +37,14 @@ public class InteractivelyPickupQuestProgression extends QuantityQuestProgressio
     public InteractivelyPickupQuestProgression setItemToPickup(@Nullable BlockTagOrItemIdField itemToPickup) {
         this.itemToPickup = itemToPickup;
         return this;
+    }
+
+    @Nonnull
+    @Override
+    public Message getDefaultTitle() {
+        var asset = getAsset();
+        if (asset == null || asset.getItemToPickup() == null) return super.getDefaultTitle();
+
+        return countedTitle("openquests.quest.default.pickup", asset.getItemToPickup().getItemId());
     }
 }

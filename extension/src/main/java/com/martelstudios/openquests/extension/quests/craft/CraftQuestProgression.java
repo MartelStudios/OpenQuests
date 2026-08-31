@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.quests.craft;
 
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -37,5 +38,14 @@ public class CraftQuestProgression extends QuantityQuestProgression<CraftQuestPr
     public CraftQuestProgression setItemToCraft(@Nullable BlockTagOrItemIdField itemToCraft) {
         this.itemToCraft = itemToCraft;
         return this;
+    }
+
+    @Nonnull
+    @Override
+    public Message getDefaultTitle() {
+        var asset = getAsset();
+        if (asset == null || asset.getItemToCraft() == null) return super.getDefaultTitle();
+
+        return countedTitle("openquests.quest.default.craft", asset.getItemToCraft().getItemId());
     }
 }

@@ -43,7 +43,7 @@ public final class QuestHudRows {
         String rowSelector = context.appendRow(documentPath);
 
         context.getBuilder()
-               .set(rowSelector + "#Title.Text", title)
+               .set(rowSelector + "#Title.TextSpans", title)
                .set(rowSelector + "#Title.Style.TextColor", completed ? COLOR_COMPLETE : COLOR_TITLE)
                .set(rowSelector + "#Progress.Style.TextColor", completed ? COLOR_COMPLETE : COLOR_PROGRESS)
                .set(rowSelector + "#IconDefault.Visible", !completed)

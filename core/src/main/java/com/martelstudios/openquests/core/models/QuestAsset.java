@@ -12,10 +12,10 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.ValidatorCache;
-import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Defines the generic quest template configuration. Extend it to create new quest types or to add new serialized data.
@@ -30,13 +30,9 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
      * Serializes the fields shared by every quest asset; concrete codecs chain from this.
      */
     public static final BuilderCodec<QuestAsset> BASE_CODEC = BuilderCodec.abstractBuilder(QuestAsset.class)
-                                                                          .append(new KeyedCodec<>("TitleKey", Codec.STRING, true), (asset, key) -> asset.titleKey = key, asset -> asset.titleKey)
-                                                                          .addValidator(Validators.nonNull())
-                                                                          .addValidator(Validators.nonEmptyString())
+                                                                          .append(new KeyedCodec<>("TitleKey", Codec.STRING), (asset, key) -> asset.titleKey = key, asset -> asset.titleKey)
                                                                           .add()
-                                                                          .append(new KeyedCodec<>("DescriptionKey", Codec.STRING, true), (asset, key) -> asset.descriptionKey = key, asset -> asset.descriptionKey)
-                                                                          .addValidator(Validators.nonNull())
-                                                                          .addValidator(Validators.nonEmptyString())
+                                                                          .append(new KeyedCodec<>("DescriptionKey", Codec.STRING), (asset, key) -> asset.descriptionKey = key, asset -> asset.descriptionKey)
                                                                           .add()
                                                                           .append(new KeyedCodec<>("AutoClaim", Codec.BOOLEAN), (asset, value) -> asset.autoClaim = value, asset -> Boolean.valueOf(asset.autoClaim))
                                                                           .add()
@@ -79,10 +75,16 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
         return id;
     }
 
+    /**
+     * @return the translation key of the title, or {@code null} when the asset leaves the type to
+     * name itself.
+     */
+    @Nullable
     public String getTitleKey() {
         return titleKey;
     }
 
+    @Nullable
     public String getDescriptionKey() {
         return descriptionKey;
     }

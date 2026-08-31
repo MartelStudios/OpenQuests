@@ -216,12 +216,40 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return self();
     }
 
+    /**
+     * @return the title of the asset, or what the type makes of itself when the asset names none.
+     */
+    @Nonnull
     public Message getTitle() {
-        return Message.translation(getAsset().getTitleKey());
+        QuestAsset asset = getAsset();
+        String titleKey = asset == null ? null : asset.getTitleKey();
+
+        return titleKey != null ? Message.translation(titleKey) : getDefaultTitle();
     }
 
+    @Nonnull
     public Message getDescription() {
-        return Message.translation(getAsset().getDescriptionKey());
+        QuestAsset asset = getAsset();
+        String descriptionKey = asset == null ? null : asset.getDescriptionKey();
+
+        return descriptionKey != null ? Message.translation(descriptionKey) : getDefaultDescription();
+    }
+
+    /**
+     * Stands in when the asset names no title. A type that can describe itself from its own
+     * parameters overrides this, so an unnamed quest still reads as something.
+     */
+    @Nonnull
+    public Message getDefaultTitle() {
+        return Message.translation("openquests.quest.default.title");
+    }
+
+    /**
+     * Empty rather than a stand-in.
+     */
+    @Nonnull
+    public Message getDefaultDescription() {
+        return Message.raw("");
     }
 
     @SuppressWarnings("unchecked")
@@ -251,5 +279,15 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         if (!dirty) return false;
         dirty = false;
         return true;
+    }
+
+    /**
+     * The title of a quest asset. If the asset has no title, the quest is instantiated to read the default one.
+     */
+    @Nonnull
+    public static Message titleOf(@Nonnull QuestAsset asset) {
+        String titleKey = asset.getTitleKey();
+
+        return titleKey != null ? Message.translation(titleKey) : asset.create().getDefaultTitle();
     }
 }

@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.quests.enterworld;
 
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -61,5 +62,12 @@ public class EnterWorldQuestProgression extends AbstractQuestProgression<EnterWo
             compiledFrom = pattern;
         }
         return compiled.matcher(worldName).matches();
+    }
+
+    @Nonnull
+    @Override
+    public Message getDefaultTitle() {
+        return Message.translation("openquests.quest.default.enter-world")
+                      .param("world", getWorldNamePattern());
     }
 }

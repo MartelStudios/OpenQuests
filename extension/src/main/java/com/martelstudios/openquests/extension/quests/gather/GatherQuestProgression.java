@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.quests.gather;
 
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
@@ -38,5 +39,14 @@ public class GatherQuestProgression extends QuantityQuestProgression<GatherQuest
     public GatherQuestProgression setItemToGather(@Nullable BlockTagOrItemIdField itemToGather) {
         this.itemToGather = itemToGather;
         return this;
+    }
+
+    @Nonnull
+    @Override
+    public Message getDefaultTitle() {
+        var asset = getAsset();
+        if (asset == null || asset.getItemToGather() == null) return super.getDefaultTitle();
+
+        return countedTitle("openquests.quest.default.gather", asset.getItemToGather().getItemId());
     }
 }

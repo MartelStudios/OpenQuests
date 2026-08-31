@@ -1,1 +1,8 @@
 hud.or = OU
+
+quest.default.something = quelque chose
+quest.default.gather = Récupérez {quantity, number} {item}
+quest.default.pickup = Ramassez {quantity, number} {item}
+quest.default.craft = Fabriquez {quantity, number} {item}
+quest.default.reach-location = Rendez-vous en {x, number}, {y, number}, {z, number}
+quest.default.enter-world = Entrez dans un monde correspondant à {world}
