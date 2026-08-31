@@ -6,6 +6,13 @@ OpenQuests ships as two plugins. **OpenQuestCore** is the system itself — asse
 
 Depending on the core alone is enough to build a quest system of your own.
 
+![The quest tracker showing a composite quest: Introduction, holding Master the basics with its four gathering and crafting steps, an OR rule, and Skip Intro](https://github.com/MartelStudios/OpenQuests/blob/5298250c8df70e71b1956ce65d5b56d24f3eae3f/docs/images/quest-tracker.png?raw=true)
+
+*One quest, as the tracker draws it. **Introduction** combines its two children with `OR`, so either
+branch ends it — hence the rule between them. **Master the basics** combines its own four with `AND`
+and nests a level further. **Gather fibre** is done: complete icon, greyed, counter dropped. The two
+grey lines are descriptions, shown because their assets ask for them.*
+
 ---
 
 ## Highlights
