@@ -2,7 +2,7 @@ intro.title=Introduction
 intro.description=Terminez les quêtes pour maîtriser les bases du jeu.
 
 skip-intro.title=Passer l'introduction
-skip-intro.description=Passez l'introduction et commencez à jouer.
+skip-intro.description=Passez le tutoriel avec /quest abandon Intro
 
 basics.title=Maîtriser les bases
 basics.description=Récoltez des ressources et fabriquez une épée.

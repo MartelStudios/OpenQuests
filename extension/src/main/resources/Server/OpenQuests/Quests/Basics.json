@@ -49,5 +49,8 @@
         "DefeatForgottenTempleGuardian"
       ]
     }
-  ]
+  ],
+  "Tags": {
+    "HUD_DESC": []
+  }
 }
