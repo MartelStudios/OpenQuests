@@ -1,6 +1,13 @@
 name: Release
 
 on:
+  # Run this from the Actions tab and it writes the version down, commits, tags and publishes.
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, without the leading v — 1.0.0'
+        required: true
+  # A tag pushed by hand is published too, from the version it already carries.
   push:
     tags: [ 'v*' ]
 
@@ -24,16 +31,37 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # The tag is the version, so gradle.properties never has to be edited to release
-      - name: Read the version from the tag
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - name: Resolve the version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ inputs.version }}" >> "$GITHUB_ENV"
+          else
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          fi
 
+      - name: Write the version down
+        if: github.event_name == 'workflow_dispatch'
+        run: sed -i "s/^version = .*/version = $VERSION/" gradle.properties
+
+      # Regenerates every manifest.json from the property, so the tag carries a coherent tree
       - name: Build
-        run: ./gradlew build -Pversion=${{ env.VERSION }}
+        run: ./gradlew build -Pversion=$VERSION
 
+      - name: Commit and tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore: release $VERSION"
+          git tag "v$VERSION"
+          git push origin HEAD "v$VERSION"
+
+      # Everything happens in this one run: a push made with GITHUB_TOKEN starts no workflow,
+      # so a tag pushed above would never wake a second one.
       - name: Publish the release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ env.VERSION }}
           files: |
             core/build/libs/*.jar
             extension/build/libs/*.jar
