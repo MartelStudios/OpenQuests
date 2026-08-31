@@ -117,6 +117,13 @@ the target can both be overridden on the progression itself, serialized only whe
 back to the asset otherwise — so a quest handed out from a shared template can still target
 something of its own.
 
+### Commands
+
+`/quest create player|world|universe <assetId> …` hands a quest out. `/quest complete`,
+`/quest fail` and `/quest abandon` write that state onto the sender's quests, taking either one quest
+id or an asset id — the second reaches every quest they hold from it. They go through the ordinary
+progression path, so `StopOnComplete` still decides whether the quest stops there.
+
 ## Built-in rewards
 
 - `Item` — gives items, hotbar first, all or nothing.
