@@ -157,7 +157,7 @@ public class QuestProgressionService {
      * Progresses every quest of the visitor's type on the server. Prefer the overload taking a
      * player's own quest ids: a visitor built for one player discards all the others anyway.
      */
-    public <Q extends AbstractQuestProgression<Q>> void progress(@Nonnull QuestVisitor<Q> visitor) {
+    public <Q extends AbstractQuestProgression<?>> void progress(@Nonnull QuestVisitor<Q> visitor) {
         progress(visitor, dataStore.getForType(visitor.getQuestType()));
     }
 
@@ -165,15 +165,16 @@ public class QuestProgressionService {
      * Progresses only the given quests, skipping those of another type. The collection may be a
      * live index: completing a quest unregisters it, and the sets involved tolerate that.
      */
-    @SuppressWarnings("unchecked")
-    public <Q extends AbstractQuestProgression<Q>> void progress(@Nonnull QuestVisitor<Q> visitor, @Nonnull Collection<UUID> questIds) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public <Q extends AbstractQuestProgression<?>> void progress(@Nonnull QuestVisitor<Q> visitor, @Nonnull Collection<UUID> questIds) {
         Class<Q> questType = visitor.getQuestType();
 
         for (UUID id : questIds) {
             AbstractQuestProgression<?> quest = dataStore.get(id);
             if (!questType.isInstance(quest)) continue;
 
-            ((Q) quest).update(visitor);
+            // Raw on purpose: isInstance already proved the pairing, and the self-type cannot say it
+            ((AbstractQuestProgression) quest).update(visitor);
         }
     }
 }
