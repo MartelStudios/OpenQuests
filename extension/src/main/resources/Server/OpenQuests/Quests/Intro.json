@@ -1,0 +1,15 @@
+{
+  "Type": "Composite",
+  "StartOnConnection": true,
+  "AutoClaim": true,
+  "TitleKey": "quest.intro.title",
+  "DescriptionKey": "quest.intro.description",
+  "PersistProgression": true,
+  "PersistHistory": true,
+  "Operator": "Or",
+  "PersistChildrenHistory": true,
+  "QuestAssetIds": [
+    "StartSword",
+    "SkipIntro"
+  ]
+}
