@@ -1,0 +1,29 @@
+intro.title=Introduction
+intro.description=Complete the quests to master the basics of the game.
+
+skip-intro.title=Skip Intro
+skip-intro.description=Skip the introduction and start playing.
+
+basics.title=Master the basics
+basics.description=Harvest resources and craft a sword.
+
+gather-stick.title=Gather sticks
+gather-stick.description=Pick up sticks from the ground and from bushes.
+
+gather-fibre.title=Gather fibre
+gather-fibre.description=Pull fibre from the tall grass around you.
+
+gather-rubble.title=Gather stone rubble
+gather-rubble.description=Break rocks to collect stone rubble.
+
+craft-sword.title=Craft a sword
+craft-sword.description=Turn your resources into a crude sword.
+
+defeat-guardian.title=Defeat the Guardian
+defeat-guardian.description=Bring down the crystal golem watching over the temple.
+
+enter-forgotten-temple.title=Enter the Forgotten Temple
+enter-forgotten-temple.description=Find your way inside the temple the guardian was protecting.
+
+talk-merchant.title=Talk to the merchant
+talk-merchant.description=Meet the Kweebec merchant waiting in the temple.

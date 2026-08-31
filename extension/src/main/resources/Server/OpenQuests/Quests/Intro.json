@@ -9,7 +9,7 @@
   "Operator": "Or",
   "PersistChildrenHistory": true,
   "QuestAssetIds": [
-    "StartSword",
+    "Basics",
     "SkipIntro"
   ]
 }

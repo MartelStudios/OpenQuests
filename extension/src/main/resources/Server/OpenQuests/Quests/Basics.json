@@ -1,7 +1,7 @@
 {
   "Type": "Composite",
-  "TitleKey": "quest.start-sword.title",
-  "DescriptionKey": "quest.start-sword.description",
+  "TitleKey": "quest.basics.title",
+  "DescriptionKey": "quest.basics.description",
   "StartOnConnection": false,
   "AutoClaim": true,
   "QuestAssetIds": [

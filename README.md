@@ -226,8 +226,10 @@ is registered as an asset of its own under a generated id. The same goes for `Gr
 
 Enum values are written in CamelCase: `Successfully`, `InProgress`, `And`, `Or`.
 
-Text shown by the extension lives in `Common/Languages/en-US/openquests.lang`, reached from markup
-as `%openquests.hud.or` and from code as `Message.translation(...)`.
+Text lives in `Server/Languages/en-US/*.lang`, whose file name is the first segment of every key it
+holds — `hud.or` in `openquests.lang` answers to `openquests.hud.or`. The server loads them and
+pushes them to clients, so they resolve from markup as `%openquests.hud.or` and from code as
+`Message.translation(...)` alike.
 
 Quest asset graphs are validated at boot: an unknown reference or a cycle between composite quests
 stops the server with an explicit reason rather than failing later at runtime.

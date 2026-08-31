@@ -1,0 +1,29 @@
+intro.title=Introduction
+intro.description=Terminez les quêtes pour maîtriser les bases du jeu.
+
+skip-intro.title=Passer l'introduction
+skip-intro.description=Passez l'introduction et commencez à jouer.
+
+basics.title=Maîtriser les bases
+basics.description=Récoltez des ressources et fabriquez une épée.
+
+gather-stick.title=Ramasser des bâtons
+gather-stick.description=Ramassez des bâtons au sol et dans les buissons.
+
+gather-fibre.title=Récolter de la fibre
+gather-fibre.description=Arrachez de la fibre dans les hautes herbes autour de vous.
+
+gather-rubble.title=Récolter des gravats
+gather-rubble.description=Brisez des rochers pour récupérer des gravats de pierre.
+
+craft-sword.title=Fabriquer une épée
+craft-sword.description=Transformez vos ressources en une épée rudimentaire.
+
+defeat-guardian.title=Vaincre le Gardien
+defeat-guardian.description=Terrassez le golem de cristal qui veille sur le temple.
+
+enter-forgotten-temple.title=Entrer dans le Temple Oublié
+enter-forgotten-temple.description=Trouvez le chemin vers l'intérieur du temple que gardait le golem.
+
+talk-merchant.title=Parler au marchand
+talk-merchant.description=Rencontrez le marchand Kweebec qui attend dans le temple.
