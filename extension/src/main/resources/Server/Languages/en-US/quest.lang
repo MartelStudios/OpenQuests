@@ -2,7 +2,7 @@ intro.title=Introduction
 intro.description=Complete the quests to master the basics of the game.
 
 skip-intro.title=Skip Intro
-skip-intro.description=Skip the introduction and start playing.
+skip-intro.description=Skip the tutorial with /quest abandon Intro
 
 basics.title=Master the basics
 basics.description=Harvest resources and craft a sword.

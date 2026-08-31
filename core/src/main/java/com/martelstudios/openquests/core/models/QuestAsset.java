@@ -16,6 +16,7 @@ import com.martelstudios.openquests.core.rewards.QuestReward;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Map;
 
 /**
  * Defines the generic quest template configuration. Extend it to create new quest types or to add new serialized data.
@@ -87,6 +88,18 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     @Nullable
     public String getDescriptionKey() {
         return descriptionKey;
+    }
+
+    /**
+     * Tags are how an asset says something no field covers, and they carry down from a parent asset.
+     *
+     * @return {@code true} if this asset declares the tag, whatever values it holds.
+     */
+    public boolean hasTag(@Nonnull String tag) {
+        if (data == null) return false;
+
+        Map<String, String[]> tags = data.getRawTags();
+        return tags != null && tags.containsKey(tag);
     }
 
     public boolean isAutoClaim() {

@@ -1,12 +1,19 @@
 // One quest. Appended into whatever container is being filled, addressed as "<container>[i] #Title".
+// The header is a group of its own so a description can sit under it rather than beside it.
 $Rows = "QuestTrackerCommon.ui";
 
 Group #QuestRow {
   Anchor: (Top: 12);
+  LayoutMode: Top;
 
-  Group #IconDefault { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: $Rows.@QuestIconDefault; }
-  Group #IconComplete { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: $Rows.@QuestIconComplete; Visible: false; }
+  Group #Header {
+    Group #IconDefault { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: $Rows.@QuestIconDefault; }
+    Group #IconComplete { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: $Rows.@QuestIconComplete; Visible: false; }
 
-  Label #Title { Text: ""; Anchor: (Left: 20, Width: 230); Style: $Rows.@QuestTitleStyle; }
-  Label #Progress { Text: ""; Style: $Rows.@QuestProgressStyle; }
+    Label #Title { Text: ""; Anchor: (Left: 20, Width: 230); Style: $Rows.@QuestTitleStyle; }
+    Label #Progress { Text: ""; Style: $Rows.@QuestProgressStyle; }
+  }
+
+  // Shown only for an asset tagged HUD_DESC
+  Label #Description { Text: ""; Anchor: (Left: 20, Width: 230, Top: 2); Style: $Rows.@QuestDescriptionStyle; Visible: false; }
 }

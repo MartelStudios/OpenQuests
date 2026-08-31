@@ -112,6 +112,12 @@ that could not be granted on the spot has nowhere to wait.
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
 
+An asset tagged `HUD_DESC` shows its description under its title in the tracker, greyed and smaller:
+
+```json
+{ "Type": "Composite", "TitleKey": "…", "Tags": { "HUD_DESC": [] } }
+```
+
 Every counted type extends `QuantityQuestAsset`, which carries `TargetQuantity`. The parameter and
 the target can both be overridden on the progression itself, serialized only when set and falling
 back to the asset otherwise — so a quest handed out from a shared template can still target
