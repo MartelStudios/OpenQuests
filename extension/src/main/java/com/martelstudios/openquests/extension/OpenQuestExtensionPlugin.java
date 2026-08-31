@@ -2,18 +2,19 @@ package com.martelstudios.openquests.extension;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
-import com.martelstudios.openquests.extension.quests.gather.GatherFeature;
-import com.martelstudios.openquests.extension.quests.composite.CompositeFeature;
 import com.martelstudios.openquests.extension.hud.HudFeature;
-import com.martelstudios.openquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
+import com.martelstudios.openquests.extension.quests.composite.CompositeFeature;
 import com.martelstudios.openquests.extension.quests.craft.CraftFeature;
+import com.martelstudios.openquests.extension.quests.enterworld.EnterWorldFeature;
+import com.martelstudios.openquests.extension.quests.gather.GatherFeature;
+import com.martelstudios.openquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
 import com.martelstudios.openquests.extension.quests.kill.KillFeature;
-import com.martelstudios.openquests.extension.quests.useblock.UseBlockFeature;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityFeature;
 import com.martelstudios.openquests.extension.quests.queststate.QuestStateFeature;
-import com.martelstudios.openquests.extension.quests.useentity.UseEntityFeature;
-import com.martelstudios.openquests.extension.quests.enterworld.EnterWorldFeature;
 import com.martelstudios.openquests.extension.quests.reachlocation.ReachLocationFeature;
+import com.martelstudios.openquests.extension.quests.script.ScriptFeature;
+import com.martelstudios.openquests.extension.quests.useblock.UseBlockFeature;
+import com.martelstudios.openquests.extension.quests.useentity.UseEntityFeature;
 import com.martelstudios.openquests.extension.rewards.command.CommandRewardFeature;
 import com.martelstudios.openquests.extension.rewards.grantquest.GrantQuestRewardFeature;
 import com.martelstudios.openquests.extension.rewards.item.ItemRewardFeature;
@@ -47,6 +48,7 @@ public class OpenQuestExtensionPlugin extends JavaPlugin {
         UseEntityFeature.register(this);
         QuestStateFeature.register(this);
         QuantityFeature.register(this);
+        ScriptFeature.register(this);
 
         // Rewards
         ItemRewardFeature.register(this);
