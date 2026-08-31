@@ -7,6 +7,13 @@ is authored as JSON and editable in the AssetEditor, while a **quest progression
 progression and is persisted on its own. The two are linked by the asset id, so editing a quest
 definition never touches saved progression.
 
+<img src="docs/images/quest-tracker.png" alt="The quest tracker showing a composite quest: Introduction, holding Master the basics with its four gathering and crafting steps, an OR rule, and Skip Intro" width="420">
+
+One quest, as the tracker draws it. *Introduction* combines its two children with `OR`, so either
+branch ends it — hence the rule between them. *Master the basics* combines its own four with `AND`,
+and nests one level further. *Gather fibre* is done: complete icon, greyed, counter dropped. The two
+grey lines are descriptions, shown because their assets carry the `HUD_DESC` tag.
+
 ## Modules
 
 | Module | Plugin | Role |
