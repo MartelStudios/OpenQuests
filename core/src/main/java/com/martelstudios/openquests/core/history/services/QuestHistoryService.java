@@ -3,7 +3,7 @@ package com.martelstudios.openquests.core.history.services;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.openquests.core.OpenQuestCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.history.models.QuestHistoryRecord;
@@ -30,7 +30,7 @@ public class QuestHistoryService {
     }
 
     public static QuestHistoryService get() {
-        return OpenQuestCorePlugin.get().getQuestHistoryService();
+        return OpenQuestsCorePlugin.get().getQuestHistoryService();
     }
 
     /**

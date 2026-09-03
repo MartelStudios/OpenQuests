@@ -1,8 +1,8 @@
 {
     "Group": "MartelStudios",
-    "Name": "OpenQuestExtension",
+    "Name": "OpenQuests",
     "Version": "1.0.1",
-    "Description": "The quest and reward types shipped on top of OpenQuestCore",
+    "Description": "The quest and reward types shipped on top of OpenQuestsCore",
     "Authors": [
         {
             "Name": "Hazard4U"
@@ -15,13 +15,13 @@
         "Hytale:Objectives": "*",
         "Hytale:NPC": "*",
         "Hytale:TagSet": "*",
-        "MartelStudios:OpenQuestCore": "*"
+        "MartelStudios:OpenQuestsCore": "*"
     },
     "OptionalDependencies": {
         
     },
     "DisabledByDefault": false,
-    "Main": "com.martelstudios.openquests.extension.OpenQuestExtensionPlugin",
+    "Main": "com.martelstudios.openquests.extension.OpenQuestsPlugin",
     "IncludesAssetPack": true,
     "UpdateChecker": {
         "CurseForge": ""

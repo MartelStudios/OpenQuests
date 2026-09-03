@@ -1,6 +1,6 @@
 {
     "Group": "MartelStudios",
-    "Name": "OpenQuestCore",
+    "Name": "OpenQuestsCore",
     "Version": "1.0.1",
     "Description": "An extensible quest system for Hytale: assets, progression, scopes and rewards",
     "Authors": [
@@ -17,7 +17,7 @@
         
     },
     "DisabledByDefault": false,
-    "Main": "com.martelstudios.openquests.core.OpenQuestCorePlugin",
+    "Main": "com.martelstudios.openquests.core.OpenQuestsCorePlugin",
     "IncludesAssetPack": true,
     "UpdateChecker": {
         "CurseForge": ""

@@ -33,15 +33,15 @@ import java.util.concurrent.TimeUnit;
 /**
  * The quest system itself: definitions as assets, per-instance runtime progression, scopes and
  * rewards. Ships no quest type of its own — those are registered on top, by
- * {@code OpenQuestExtensionPlugin} or by any other plugin.
+ * {@code OpenQuestsPlugin} or by any other plugin.
  */
-public class OpenQuestCorePlugin extends JavaPlugin {
+public class OpenQuestsCorePlugin extends JavaPlugin {
     public static final Path questProgressionsPath = Paths.get("quests", "progressions");
     public static final Path questSetStorePath = Paths.get("quests", "stores");
 
     private static final long SAVE_INTERVAL_MINUTES = 5;
 
-    private static OpenQuestCorePlugin instance;
+    private static OpenQuestsCorePlugin instance;
 
     private QuestProgressionStore questProgressionStore;
     private QuestsStore questsStore;
@@ -56,12 +56,12 @@ public class OpenQuestCorePlugin extends JavaPlugin {
     private WorldQuestService worldQuestService;
     private PlayerQuestService playerQuestService;
 
-    public OpenQuestCorePlugin(@Nonnull JavaPluginInit init) {
+    public OpenQuestsCorePlugin(@Nonnull JavaPluginInit init) {
         super(init);
         instance = this;
     }
 
-    public static OpenQuestCorePlugin get() {
+    public static OpenQuestsCorePlugin get() {
         return instance;
     }
 

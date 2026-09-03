@@ -2,7 +2,7 @@ package com.martelstudios.openquests.core.services;
 
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.OpenQuestCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 
@@ -21,7 +21,7 @@ public class QuestAutoStartService {
     }
 
     public static QuestAutoStartService get() {
-        return OpenQuestCorePlugin.get().getQuestAutoStartService();
+        return OpenQuestsCorePlugin.get().getQuestAutoStartService();
     }
 
     private void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {

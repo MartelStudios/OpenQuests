@@ -22,12 +22,12 @@ import com.martelstudios.openquests.extension.rewards.item.ItemRewardFeature;
 import javax.annotation.Nonnull;
 
 /**
- * The quest and reward types shipped on top of OpenQuestCore. Each feature registers itself, so
+ * The quest and reward types shipped on top of OpenQuestsCore. Each feature registers itself, so
  * this class only lists them — which is also the shape another plugin should copy to add its own.
  */
-public class OpenQuestExtensionPlugin extends JavaPlugin {
+public class OpenQuestsPlugin extends JavaPlugin {
 
-    public OpenQuestExtensionPlugin(@Nonnull JavaPluginInit init) {
+    public OpenQuestsPlugin(@Nonnull JavaPluginInit init) {
         super(init);
     }
 

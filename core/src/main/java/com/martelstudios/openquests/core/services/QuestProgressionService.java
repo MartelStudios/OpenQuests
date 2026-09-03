@@ -2,7 +2,7 @@ package com.martelstudios.openquests.core.services;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.martelstudios.openquests.core.OpenQuestCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestRegisteredEvent;
@@ -34,7 +34,7 @@ public class QuestProgressionService {
     }
 
     public static QuestProgressionService get() {
-        return OpenQuestCorePlugin.get().getQuestProgressionService();
+        return OpenQuestsCorePlugin.get().getQuestProgressionService();
     }
 
     /**
