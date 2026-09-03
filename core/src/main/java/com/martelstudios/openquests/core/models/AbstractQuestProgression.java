@@ -99,6 +99,16 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return asset == null || asset.isPersistHistory();
     }
 
+    /**
+     * @return whether a player may give this quest up. Falls back to allowing it when the asset
+     * is gone, so a quest nobody can name is not also one nobody can be rid of.
+     */
+    public boolean canBeAbandoned() {
+        QuestAsset asset = getAsset();
+
+        return asset == null || asset.canBeAbandoned();
+    }
+
     public Q setPersistHistory(@Nullable Boolean persistHistory) {
         this.persistHistory = persistHistory;
         return self();

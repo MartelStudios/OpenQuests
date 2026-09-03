@@ -68,6 +68,11 @@ public class QuestStateCommand extends AbstractPlayerCommand {
         var visitor = new QuestStateVisitor(playerRef.getUuid(), questRef, state);
         QuestProgressionService.get().progress(visitor, questStore.getQuestIds());
 
+        if (visitor.getMatched() == 0 && visitor.getRefused() > 0) {
+            context.sendMessage(Message.raw("'" + questRef + "' cannot be abandoned."));
+            return;
+        }
+
         if (visitor.getMatched() == 0) {
             context.sendMessage(Message.raw("No quest of yours matches '" + questRef + "'."));
             return;

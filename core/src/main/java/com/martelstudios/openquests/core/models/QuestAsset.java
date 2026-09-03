@@ -45,6 +45,8 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .add()
                                                                           .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (asset, value) -> asset.persistHistory = value, asset -> Boolean.valueOf(asset.persistHistory))
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("CanBeAbandoned", Codec.BOOLEAN), (asset, value) -> asset.canBeAbandoned = value, asset -> Boolean.valueOf(asset.canBeAbandoned))
+                                                                          .add()
                                                                           .append(new KeyedCodec<>("SuccessfulRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (asset, rewards) -> asset.successfulRewards = rewards, asset -> asset.successfulRewards)
                                                                           .add()
                                                                           .append(new KeyedCodec<>("FailedRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (asset, rewards) -> asset.failedRewards = rewards, asset -> asset.failedRewards)
@@ -65,6 +67,7 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     protected boolean stopOnComplete = true;
     protected boolean persistProgression = true;
     protected boolean persistHistory = true;
+    protected boolean canBeAbandoned = true;
     protected QuestReward[] successfulRewards = NO_REWARDS;
     protected QuestReward[] failedRewards = NO_REWARDS;
     protected QuestReward[] abandonedRewards = NO_REWARDS;
@@ -135,6 +138,15 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
      */
     public boolean isPersistHistory() {
         return persistHistory;
+    }
+
+    /**
+     * @return {@code false} to refuse a player giving this quest up. Written on a step of a
+     * chain, which abandoned on its own would leave the group asking for something that can
+     * no longer be finished — the chain is what the player gives up, not one of its parts.
+     */
+    public boolean canBeAbandoned() {
+        return canBeAbandoned;
     }
 
     /**

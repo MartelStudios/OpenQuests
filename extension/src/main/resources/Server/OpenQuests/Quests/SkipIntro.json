@@ -2,6 +2,7 @@
   "Type": "Script",
   "TitleKey": "quest.skip-intro.title",
   "DescriptionKey": "quest.skip-intro.description",
+  "CanBeAbandoned": false,
   "Tags": {
     "HUD_DESC": []
   }
