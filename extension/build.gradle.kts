@@ -1,3 +1,5 @@
+import java.util.zip.ZipFile
+
 plugins {
     id("com.azuredoom.hytale-tools")
 }
@@ -36,4 +38,146 @@ dependencies {
 tasks.named<Jar>("jar") {
     archiveBaseName.set(project.property("mod_id").toString())
     archiveVersion.set(project.property("version").toString())
+}
+
+// The ship quests as content. They leave the jar and travel as an asset pack of
+// their own, so a server owner keeps the quest types and drops the example chain by deleting one file.
+val questContent = listOf("Server/OpenQuests/**", "Server/Languages/*/quest.lang")
+
+// Only the published jar loses them: stageAllModAssets and prepareRunServer link the dev run
+// against src/main/resources rather than this output, so runAllMods keeps the quests, and keeps
+// them editable live. Installing the pack into run/mods would just load the same assets twice.
+tasks.named<Copy>("processResources") {
+    exclude(questContent)
+}
+
+val questContentManifest by tasks.registering {
+    val manifest = layout.buildDirectory.file("questContent/manifest.json")
+    outputs.file(manifest)
+
+    val group = project.property("manifest_group").toString()
+    val modVersion = project.property("version").toString()
+    val author = project.property("mod_author").toString()
+    val url = project.property("mod_url").toString()
+    val serverVersion = project.property("manifestServerVersion").toString()
+
+    doLast {
+        val file = manifest.get().asFile
+        file.parentFile.mkdirs()
+        file.writeText(
+            """
+            {
+                "Group": "$group",
+                "Name": "OpenQuestContent",
+                "Version": "$modVersion",
+                "Description": "The quest line shipped with OpenQuestExtension. Delete to start from an empty quest list.",
+                "Authors": [
+                    {
+                        "Name": "$author"
+                    }
+                ],
+                "Website": "$url",
+                "ServerVersion": "$serverVersion",
+                "Dependencies": {
+                    "$group:OpenQuestExtension": "*"
+                },
+                "DisabledByDefault": false,
+                "IncludesAssetPack": true
+            }
+            """.trimIndent() + "\n"
+        )
+    }
+}
+
+val questContentZip by tasks.registering(Zip::class) {
+    archiveBaseName.set("OpenQuestContent")
+    archiveVersion.set(project.property("version").toString())
+
+    // Manifest at the root, the rest keeping the paths it has under src/main/resources
+    from(questContentManifest)
+    from("src/main/resources") {
+        include(questContent)
+    }
+}
+
+tasks.named("assemble") {
+    dependsOn(questContentZip)
+}
+
+fun archiveEntries(archive: File): Set<String> =
+    ZipFile(archive).use { zip -> zip.entries().asSequence().map { it.name }.toSet() }
+
+// Check the shipped content before releasing
+val verifyReleaseArtifacts by tasks.registering {
+    group = "verification"
+    description = "Checks the two jars and the quest content pack that the release publishes."
+
+    dependsOn(":core:jar", tasks.named("jar"), questContentZip)
+
+    val modVersion = project.property("version").toString()
+    val coreJars = fileTree(project(":core").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
+    val extensionJars = fileTree(layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
+    val contentPacks = fileTree(layout.buildDirectory.dir("distributions").get().asFile) { include("*.zip") }
+    val published = mapOf(
+        "core/build/libs/*.jar" to coreJars,
+        "extension/build/libs/*.jar" to extensionJars,
+        "extension/build/distributions/*.zip" to contentPacks
+    )
+
+    val resourcesRoot = file("src/main/resources")
+    val questSources = fileTree(resourcesRoot) { include(questContent) }
+
+    doLast {
+        published.forEach { (glob, tree) ->
+            val matched = tree.files.sortedBy { it.name }
+
+            if (matched.isEmpty()) {
+                throw GradleException("Nothing matches $glob, the release would fail on it.")
+            }
+
+            // A jar left over from an earlier version is matched by the same glob and shipped too
+            if (matched.size > 1) {
+                throw GradleException(
+                    "$glob matches ${matched.joinToString { it.name }} and the release would " +
+                        "publish them all. Run clean."
+                )
+            }
+
+            val artifact = matched.single()
+            if (!artifact.name.contains(modVersion)) {
+                throw GradleException(
+                    "$glob matches ${artifact.name}, not version $modVersion. Run clean."
+                )
+            }
+
+            logger.lifecycle("Release artefact: ${artifact.name} (${artifact.length() / 1024} KiB)")
+        }
+
+        val quests = questSources.files
+            .map { it.toRelativeString(resourcesRoot).replace(File.separatorChar, '/') }
+            .toSet()
+
+        val jar = extensionJars.singleFile
+        val leaked = quests.intersect(archiveEntries(jar)).sorted()
+        if (leaked.isNotEmpty()) {
+            throw GradleException("${jar.name} still carries quest content: ${leaked.joinToString()}")
+        }
+
+        val pack = contentPacks.singleFile
+        val packed = archiveEntries(pack)
+
+        // AssetModule skips a pack with no manifest.json of its own, and only warns about it
+        if (!packed.contains("manifest.json")) {
+            throw GradleException("${pack.name} has no manifest.json, the server would skip it.")
+        }
+
+        val absent = (quests - packed).sorted()
+        if (absent.isNotEmpty()) {
+            throw GradleException("${pack.name} is missing quest content: ${absent.joinToString()}")
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn(verifyReleaseArtifacts)
 }

@@ -63,5 +63,6 @@ jobs:
           files: |
             core/build/libs/*.jar
             extension/build/libs/*.jar
+            extension/build/distributions/*.zip
           generate_release_notes: true
           fail_on_unmatched_files: true
