@@ -8,7 +8,7 @@ import com.hypixel.hytale.codec.codecs.set.SetCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -71,7 +71,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
     }
 
     public static ComponentType<EntityStore, QuestStoreComponent> getComponentType() {
-        return OpenQuestCorePlugin.get().getQuestStoreComponentType();
+        return OpenQuestsCorePlugin.get().getQuestStoreComponentType();
     }
 
     /**

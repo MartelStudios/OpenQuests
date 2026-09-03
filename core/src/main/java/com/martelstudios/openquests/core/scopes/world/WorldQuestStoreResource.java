@@ -6,7 +6,7 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.Resource;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nullable;
@@ -38,7 +38,7 @@ public class WorldQuestStoreResource implements Resource<EntityStore> {
     }
 
     public static ResourceType<EntityStore, WorldQuestStoreResource> getResourceType() {
-        return OpenQuestCorePlugin.get().getWorldStoreResourceType();
+        return OpenQuestsCorePlugin.get().getWorldStoreResourceType();
     }
 
     /**

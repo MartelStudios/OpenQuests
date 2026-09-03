@@ -42,17 +42,17 @@ tasks.named<Jar>("jar") {
 
 // The ship quests as content. They leave the jar and travel as an asset pack of
 // their own, so a server owner keeps the quest types and drops the example chain by deleting one file.
-val questContent = listOf("Server/OpenQuests/**", "Server/Languages/*/quest.lang")
+val questExamples = listOf("Server/OpenQuests/**", "Server/Languages/*/quest.lang")
 
 // Only the published jar loses them: stageAllModAssets and prepareRunServer link the dev run
 // against src/main/resources rather than this output, so runAllMods keeps the quests, and keeps
 // them editable live. Installing the pack into run/mods would just load the same assets twice.
 tasks.named<Copy>("processResources") {
-    exclude(questContent)
+    exclude(questExamples)
 }
 
-val questContentManifest by tasks.registering {
-    val manifest = layout.buildDirectory.file("questContent/manifest.json")
+val questExamplesManifest by tasks.registering {
+    val manifest = layout.buildDirectory.file("questExamples/manifest.json")
     outputs.file(manifest)
 
     val group = project.property("manifest_group").toString()
@@ -68,9 +68,9 @@ val questContentManifest by tasks.registering {
             """
             {
                 "Group": "$group",
-                "Name": "OpenQuestContent",
+                "Name": "OpenQuestsExamples",
                 "Version": "$modVersion",
-                "Description": "The quest line shipped with OpenQuestExtension. Delete to start from an empty quest list.",
+                "Description": "The quest line shipped with OpenQuests. Delete to start from an empty quest list.",
                 "Authors": [
                     {
                         "Name": "$author"
@@ -79,7 +79,7 @@ val questContentManifest by tasks.registering {
                 "Website": "$url",
                 "ServerVersion": "$serverVersion",
                 "Dependencies": {
-                    "$group:OpenQuestExtension": "*"
+                    "$group:OpenQuests": "*"
                 },
                 "DisabledByDefault": false,
                 "IncludesAssetPack": true
@@ -89,19 +89,19 @@ val questContentManifest by tasks.registering {
     }
 }
 
-val questContentZip by tasks.registering(Zip::class) {
-    archiveBaseName.set("OpenQuestContent")
+val questExamplesZip by tasks.registering(Zip::class) {
+    archiveBaseName.set("OpenQuestsExamples")
     archiveVersion.set(project.property("version").toString())
 
     // Manifest at the root, the rest keeping the paths it has under src/main/resources
-    from(questContentManifest)
+    from(questExamplesManifest)
     from("src/main/resources") {
-        include(questContent)
+        include(questExamples)
     }
 }
 
 tasks.named("assemble") {
-    dependsOn(questContentZip)
+    dependsOn(questExamplesZip)
 }
 
 fun archiveEntries(archive: File): Set<String> =
@@ -112,7 +112,7 @@ val verifyReleaseArtifacts by tasks.registering {
     group = "verification"
     description = "Checks the two jars and the quest content pack that the release publishes."
 
-    dependsOn(":core:jar", tasks.named("jar"), questContentZip)
+    dependsOn(":core:jar", tasks.named("jar"), questExamplesZip)
 
     val modVersion = project.property("version").toString()
     val coreJars = fileTree(project(":core").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
@@ -125,7 +125,7 @@ val verifyReleaseArtifacts by tasks.registering {
     )
 
     val resourcesRoot = file("src/main/resources")
-    val questSources = fileTree(resourcesRoot) { include(questContent) }
+    val questSources = fileTree(resourcesRoot) { include(questExamples) }
 
     doLast {
         published.forEach { (glob, tree) ->

@@ -3,7 +3,7 @@ package com.martelstudios.openquests.core.scopes.player;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.OpenQuestCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
@@ -33,7 +33,7 @@ public class PlayerQuestService {
     }
 
     public static PlayerQuestService get() {
-        return OpenQuestCorePlugin.get().getPlayerQuestService();
+        return OpenQuestsCorePlugin.get().getPlayerQuestService();
     }
 
     /**

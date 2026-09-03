@@ -9,7 +9,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.martelstudios.openquests.core.OpenQuestCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -38,7 +38,7 @@ public class WorldQuestService {
     }
 
     public static WorldQuestService get() {
-        return OpenQuestCorePlugin.get().getWorldQuestService();
+        return OpenQuestsCorePlugin.get().getWorldQuestService();
     }
 
     public static WorldQuestStoreResource getWorldQuestStoreFromWorld(@Nonnull World world) {

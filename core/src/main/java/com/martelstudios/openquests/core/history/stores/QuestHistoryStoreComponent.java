@@ -5,7 +5,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 
 import javax.annotation.Nullable;
 
@@ -30,6 +30,6 @@ public class QuestHistoryStoreComponent implements Component<EntityStore> {
     }
 
     public static ComponentType<EntityStore, QuestHistoryStoreComponent> getComponentType() {
-        return OpenQuestCorePlugin.get().getQuestHistoryStoreComponentType();
+        return OpenQuestsCorePlugin.get().getQuestHistoryStoreComponentType();
     }
 }

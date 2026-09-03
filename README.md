@@ -18,11 +18,11 @@ grey lines are descriptions, shown because their assets carry the `HUD_DESC` tag
 
 | Module | Plugin | Role |
 | --- | --- | --- |
-| `core` | `OpenQuestCore` | The system itself. Ships no quest type, only the core system: assets, progression, scopes, history, rewards. |
-| `extension` | `OpenQuestExtension` | The implementation: quest types, rewards and tracker HUD shipped on top, one package per feature. |
+| `core` | `OpenQuestsCore` | The system itself. Ships no quest type, only the core system: assets, progression, scopes, history, rewards. |
+| `extension` | `OpenQuests` | The implementation: quest types, rewards and tracker HUD shipped on top, one package per feature. |
 
-Depending on `OpenQuestCore` alone is enough to build your own quest types;
-`OpenQuestExtension` is both a set of ready-made types and the reference for how to add one.
+Depending on `OpenQuestsCore` alone is enough to build your own quest types;
+`OpenQuests` is both a set of ready-made types and the reference for how to add one.
 
 ## Concepts
 
@@ -153,7 +153,7 @@ reaches the sender's quests, so the wider group grants nothing over anybody else
 ## Extending
 
 Group everything a type needs in one package — asset, progression, visitor, systems — and give it a
-single entry point, the way each package of `OpenQuestExtension` does:
+single entry point, the way each package of `OpenQuests` does:
 
 ```java
 public final class MyFeature {
