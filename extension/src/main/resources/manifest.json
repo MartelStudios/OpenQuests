@@ -1,7 +1,7 @@
 {
     "Group": "MartelStudios",
     "Name": "OpenQuests",
-    "Version": "1.0.1",
+    "Version": "1.0.2",
     "Description": "The quest and reward types shipped on top of OpenQuestsCore",
     "Authors": [
         {
