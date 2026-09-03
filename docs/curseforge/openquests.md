@@ -2,7 +2,7 @@
 
 **A modular quest system for Hytale servers. Compose quests from the Asset Editor, extend them from code.**
 
-OpenQuests ships as two plugins. **OpenQuestCore** is the system itself — assets, progression, persistence, scopes, history and rewards — and deliberately ships no quest type of its own. **OpenQuestExtension** is the content layered on top: twelve quest types, three reward types and a tracker HUD. It is also the reference for writing your own, one package per feature.
+OpenQuests ships as two plugins. **OpenQuestsCore** owns the system — assets, progression, persistence, scopes, history and rewards — and deliberately ships no quest type of its own. **OpenQuests**, this project, layers the content on top: twelve quest types, three reward types and a tracker HUD. It is also the reference for writing your own, one package per feature.
 
 Depending on the core alone is enough to build a quest system of your own.
 
@@ -12,6 +12,11 @@ Depending on the core alone is enough to build a quest system of your own.
 branch ends it — hence the rule between them. **Master the basics** combines its own four with `AND`
 and nests a level further. **Gather fibre** is done: complete icon, greyed, counter dropped. The two
 grey lines are descriptions, shown because their assets ask for them.*
+
+> **That quest line is not in this plugin.** OpenQuests installs empty, deliberately — your server,
+> your quests. The chain above ships separately as **OpenQuests Examples**: install it to start with
+> something that already works, read it as a worked example, delete it the day your own chain
+> replaces it.
 
 ---
 
@@ -151,11 +156,21 @@ Progression is delivered by **visitors**: an event builds one, the service carri
 
 Registering a reward or a HUD renderer is a single line each. Everything a type needs beyond that contract stays in its own package.
 
+Declare what you build on in your own `manifest.json`: `"MartelStudios:OpenQuestsCore": "*"` for the system alone, `"MartelStudios:OpenQuests": "*"` if you also want the shipped types.
+
 ---
 
 ## Installing
 
-Drop both plugins in `mods/`. `OpenQuestExtension` depends on `OpenQuestCore`; the core works on its own if you only want the system.
+Three parts, two of them required:
+
+| | |
+| --- | --- |
+| **OpenQuests** | this project: the quest types, the rewards and the tracker HUD |
+| **OpenQuests Core** | the system underneath — pulled in with it, and usable on its own |
+| **OpenQuests Examples** | optional: the quest line from the screenshot, yours to read and to delete |
+
+Drop them in `mods/`.
 
 Ships with English and French translations.
 
