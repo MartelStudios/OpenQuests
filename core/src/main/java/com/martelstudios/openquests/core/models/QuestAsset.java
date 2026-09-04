@@ -119,7 +119,8 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
 
     /**
      * @return {@code false} to keep the quest running once it completed, so its state stays
-     * readable and can still change. Nothing is recorded and no reward is granted until it stops.
+     * readable and can still change. Every outcome it reaches is paid, which is how a repeatable
+     * quest is written; the history keeps the last outcome, filed under the quest own id.
      */
     public boolean isStopOnComplete() {
         return stopOnComplete;

@@ -122,7 +122,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @param visitor the visitor to apply
      */
     public void update(QuestVisitor<Q> visitor) {
-        var wasCompleted = isCompleted();
+        QuestState previousState = getState();
         visitor.progress(self());
 
         if (hasChanges()) {
@@ -132,7 +132,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                         .dispatch(new QuestUpdatedEvent(this));
         }
 
-        if (!wasCompleted && isCompleted()) {
+        // The outcome, not merely the first end: a quest kept alive by StopOnComplete:false can
+        // still change its mind, and whoever listens to it has to hear that too.
+        if (isCompleted() && getState() != previousState) {
             HytaleServer.get()
                         .getEventBus()
                         .dispatchFor(QuestCompletedEvent.class, getId())
