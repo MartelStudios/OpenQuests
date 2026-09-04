@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.core.history.services;
 
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
+import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
@@ -26,7 +27,8 @@ public class QuestHistoryService {
 
     public QuestHistoryService(JavaPlugin plugin) {
         plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
-        plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+        // EventPriority.FIRST, to grant rewards earlier
+        plugin.getEventRegistry().registerGlobal(EventPriority.FIRST, QuestCompletedEvent.class, this::handleQuestCompletedEvent);
     }
 
     public static QuestHistoryService get() {
