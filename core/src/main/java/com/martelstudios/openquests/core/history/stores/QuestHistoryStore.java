@@ -8,13 +8,7 @@ import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -39,7 +33,7 @@ public class QuestHistoryStore {
      * Secondary index: asking what became of one quest asset must not walk a lifetime of records.
      * Never serialized — {@link #register} rebuilds it, which the codec already goes through.
      */
-    private final Map<String, Set<QuestHistoryRecord>> recordsByAssetId = new ConcurrentHashMap<>();
+    private final Map<String, Map<UUID, QuestHistoryRecord>> recordsByAssetId = new ConcurrentHashMap<>();
 
     public QuestHistoryStore() {}
 
@@ -50,19 +44,18 @@ public class QuestHistoryStore {
     /**
      * @return {@code true} if that completion was not already recorded.
      */
-    public boolean register(@Nonnull QuestHistoryRecord record) {
-        if (this.records.putIfAbsent(record.getId(), record) != null) return false;
-
-        this.recordsByAssetId.computeIfAbsent(record.getQuestAssetId(), _ -> ConcurrentHashMap.newKeySet()).add(record);
-        return true;
+    public void register(@Nonnull QuestHistoryRecord record) {
+        this.records.put(record.getId(), record);
+        this.recordsByAssetId.computeIfAbsent(record.getQuestAssetId(), _ -> new ConcurrentHashMap<>())
+                             .put(record.getId(), record);
     }
 
     public boolean unregister(@Nonnull QuestHistoryRecord record) {
         if (!this.records.remove(record.getId(), record)) return false;
 
         // The emptied set is left in place: pruning it would race against a concurrent register
-        Set<QuestHistoryRecord> forAsset = this.recordsByAssetId.get(record.getQuestAssetId());
-        if (forAsset != null) forAsset.remove(record);
+        Map<UUID, QuestHistoryRecord> forAsset = this.recordsByAssetId.get(record.getQuestAssetId());
+        if (forAsset != null) forAsset.remove(record.getId());
 
         return true;
     }
@@ -89,7 +82,7 @@ public class QuestHistoryStore {
      */
     @Nonnull
     public Collection<QuestHistoryRecord> getForAsset(@Nonnull String questAssetId) {
-        return this.recordsByAssetId.getOrDefault(questAssetId, Set.of());
+        return this.recordsByAssetId.getOrDefault(questAssetId, Map.of()).values();
     }
 
     /**

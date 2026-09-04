@@ -1,13 +1,15 @@
 package com.martelstudios.openquests.core.services;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.HytaleServer;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
-import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestRegisteredEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
@@ -29,8 +31,12 @@ import java.util.UUID;
 public class QuestProgressionService {
     private final QuestProgressionStore dataStore;
 
-    public QuestProgressionService(QuestProgressionStore questProgressionStore) {
+    public QuestProgressionService(@Nonnull JavaPlugin plugin, QuestProgressionStore questProgressionStore) {
         this.dataStore = questProgressionStore;
+
+        // EventPriority.LAST, to unregister the quest safely
+        plugin.getEventRegistry()
+              .registerGlobal(EventPriority.LAST, QuestCompletedEvent.class, this::handleQuestCompleted);
     }
 
     public static QuestProgressionService get() {
@@ -94,7 +100,19 @@ public class QuestProgressionService {
         AbstractQuestProgression<?> quest = dataStore.get(questId);
         if (quest == null) return null;
 
-        AbstractQuestProgression<?> removed = dataStore.removeAndDeleteFromDisk(questId);
+        return unregisterQuest(quest);
+    }
+
+    /**
+     * Unregisters a quest from the store and deletes its persisted file. Clean up all references left in any player/world/universe index.
+     *
+     * @param quest the quest to unregister
+     */
+    public AbstractQuestProgression<?> unregisterQuest(@Nonnull AbstractQuestProgression<?> quest) {
+        AbstractQuestProgression<?> removed = dataStore.removeAndDeleteFromDisk(quest.getId());
+
+        if (removed == null) return null;
+
         quest.onUnregistered();
 
         HytaleServer.get()
@@ -105,24 +123,10 @@ public class QuestProgressionService {
         return removed;
     }
 
-    /**
-     * Called by {@link AbstractQuestProgression#update} when a quest reaches a terminal state: archives it
-     * for every assigned player, then unregisters the instance.
-     *
-     * @param questId the id of the quest that just completed
-     */
-    public AbstractQuestProgression<?> completeQuest(@Nonnull UUID questId) {
-        AbstractQuestProgression<?> quest = getQuest(questId);
-        if (quest == null) return null;
+    private void handleQuestCompleted(QuestCompletedEvent event) {
+        if (!event.getQuest().isStopOnComplete()) return;
 
-        unregisterQuest(questId);
-
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestCompletedEvent.class, questId)
-                    .dispatch(new QuestCompletedEvent(quest));
-
-        return quest;
+        unregisterQuest(event.getQuest());
     }
 
     public AbstractQuestProgression<?> getQuest(UUID questId) {

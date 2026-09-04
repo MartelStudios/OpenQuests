@@ -4,11 +4,13 @@
   "DescriptionKey": "quest.basics.description",
   "StartOnConnection": false,
   "AutoClaim": true,
+  "CanBeAbandoned": false,
   "QuestAssetIds": [
     {
       "Type": "Gather",
       "TitleKey": "quest.gather-stick.title",
       "DescriptionKey": "quest.gather-stick.description",
+      "CanBeAbandoned": false,
       "ItemToGather": {
         "ItemId": "Ingredient_Stick"
       },
@@ -18,6 +20,7 @@
       "Type": "Gather",
       "TitleKey": "quest.gather-fibre.title",
       "DescriptionKey": "quest.gather-fibre.description",
+      "CanBeAbandoned": false,
       "ItemToGather": {
         "ItemId": "Ingredient_Fibre"
       },
@@ -27,6 +30,7 @@
       "Type": "Gather",
       "TitleKey": "quest.gather-rubble.title",
       "DescriptionKey": "quest.gather-rubble.description",
+      "CanBeAbandoned": false,
       "TargetQuantity": 2,
       "ItemToGather": {
         "ItemId": "Rubble_Stone"
@@ -36,6 +40,7 @@
       "Type": "Craft",
       "TitleKey": "quest.craft-sword.title",
       "DescriptionKey": "quest.craft-sword.description",
+      "CanBeAbandoned": false,
       "TargetQuantity": 1,
       "ItemToCraft": {
         "ItemId": "Weapon_Sword_Crude"

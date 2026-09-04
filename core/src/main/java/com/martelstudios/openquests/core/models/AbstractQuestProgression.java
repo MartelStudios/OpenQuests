@@ -8,6 +8,7 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
+import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
@@ -99,6 +100,16 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return asset == null || asset.isPersistHistory();
     }
 
+    /**
+     * @return whether a player may give this quest up. Falls back to allowing it when the asset
+     * is gone, so a quest nobody can name is not also one nobody can be rid of.
+     */
+    public boolean canBeAbandoned() {
+        QuestAsset asset = getAsset();
+
+        return asset == null || asset.canBeAbandoned();
+    }
+
     public Q setPersistHistory(@Nullable Boolean persistHistory) {
         this.persistHistory = persistHistory;
         return self();
@@ -106,11 +117,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     /**
      * Updates the quest progression by applying the visitor to it.
-     * After the visitor's pass, it looks for changes to notify and for quest completion.
+     * After the visitor's pass, the quest settles before anyone hears about it.
      *
      * @param visitor the visitor to apply
      */
     public void update(QuestVisitor<Q> visitor) {
+        QuestState previousState = getState();
         visitor.progress(self());
 
         if (hasChanges()) {
@@ -120,8 +132,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                         .dispatch(new QuestUpdatedEvent(this));
         }
 
-        if (isCompleted() && isStopOnComplete()) {
-            QuestProgressionService.get().completeQuest(getId());
+        // The outcome, not merely the first end: a quest kept alive by StopOnComplete:false can
+        // still change its mind, and whoever listens to it has to hear that too.
+        if (isCompleted() && getState() != previousState) {
+            HytaleServer.get()
+                        .getEventBus()
+                        .dispatchFor(QuestCompletedEvent.class, getId())
+                        .dispatch(new QuestCompletedEvent(this));
         }
     }
 

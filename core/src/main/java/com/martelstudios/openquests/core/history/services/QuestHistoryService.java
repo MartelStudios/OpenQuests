@@ -1,14 +1,15 @@
 package com.martelstudios.openquests.core.history.services;
 
+import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
-import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.openquests.core.history.stores.QuestHistoryStore;
 import com.martelstudios.openquests.core.history.stores.QuestHistoryStoreComponent;
+import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
@@ -26,7 +27,9 @@ public class QuestHistoryService {
 
     public QuestHistoryService(JavaPlugin plugin) {
         plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
-        plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+        // EventPriority.FIRST, to grant rewards earlier
+        plugin.getEventRegistry()
+              .registerGlobal(EventPriority.FIRST, QuestCompletedEvent.class, this::handleQuestCompletedEvent);
     }
 
     public static QuestHistoryService get() {
@@ -50,6 +53,7 @@ public class QuestHistoryService {
         for (UUID playerId : quest.getPlayers()) {
             EntityComponents.update(playerId, components -> {
                 var record = new QuestHistoryRecord(quest);
+
                 if (persistHistory) getHistory(components).register(record);
 
                 if (autoClaim) grantRewards(record, components);

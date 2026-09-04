@@ -21,6 +21,9 @@ public class QuestStateVisitor implements QuestVisitor<AbstractQuestProgression<
 
     private int matched;
 
+    /** Quests this one matched but was not allowed to abandon, so a caller can say which it was. */
+    private int refused;
+
     public QuestStateVisitor(@Nonnull UUID playerId, @Nonnull String questRef, @Nonnull QuestState state) {
         this.playerId = playerId;
         this.questRef = questRef;
@@ -31,6 +34,13 @@ public class QuestStateVisitor implements QuestVisitor<AbstractQuestProgression<
     public void progress(AbstractQuestProgression<?> quest) {
         if (!quest.getPlayers().contains(playerId)) return;
         if (!questRef.equals(quest.getAssetId()) && !questRef.equals(quest.getId().toString())) return;
+
+        // Refused here rather than only where the journal hides its button, so the rule holds
+        // wherever a player gives up. Forcing another outcome stays an administrator matter.
+        if (state == QuestState.ABANDONED && !quest.canBeAbandoned()) {
+            refused++;
+            return;
+        }
 
         quest.setState(state).markDirty();
         matched++;
@@ -47,5 +57,13 @@ public class QuestStateVisitor implements QuestVisitor<AbstractQuestProgression<
      */
     public int getMatched() {
         return matched;
+    }
+
+    /**
+     * @return how many it matched but was not allowed to abandon, so a caller can tell a quest it
+     * could not find from one it may not give up.
+     */
+    public int getRefused() {
+        return refused;
     }
 }

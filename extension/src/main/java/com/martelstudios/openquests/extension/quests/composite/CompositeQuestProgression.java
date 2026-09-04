@@ -7,9 +7,9 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.codecs.set.SetCodec;
 import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
@@ -30,23 +30,26 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
                                                                                     .add()
                                                                                     .append(new KeyedCodec<>("SuccessfulQuestIds", new SetCodec<>(Codec.UUID_BINARY, HashSet<UUID>::new, false)), (quest, ids) -> quest.successfulQuestIds.addAll(ids), quest -> quest.successfulQuestIds)
                                                                                     .add()
+                                                                                    .append(new KeyedCodec<>("FailedQuestIds", new SetCodec<>(Codec.UUID_BINARY, HashSet<UUID>::new, false)), (quest, ids) -> quest.failedQuestIds.addAll(ids), quest -> quest.failedQuestIds)
+                                                                                    .add()
+                                                                                    .append(new KeyedCodec<>("AbandonedQuestIds", new SetCodec<>(Codec.UUID_BINARY, HashSet<UUID>::new, false)), (quest, ids) -> quest.abandonedQuestIds.addAll(ids), quest -> quest.abandonedQuestIds)
+                                                                                    .add()
                                                                                     .build();
 
     protected UUID[] questIds = new UUID[0];
 
     /**
-     * Which children succeeded, captured as they complete: the instance is unregistered right
-     * after, so its outcome cannot be read back later.
+     * What became of each child, recorded as it changes state. Kept here rather than read back
+     * from the children, since a child that completed is be default unregistered along with the group.
      */
     protected Set<UUID> successfulQuestIds = ConcurrentHashMap.newKeySet();
+    protected Set<UUID> failedQuestIds = ConcurrentHashMap.newKeySet();
+    protected Set<UUID> abandonedQuestIds = ConcurrentHashMap.newKeySet();
 
     private final transient List<EventRegistration<UUID, QuestCompletedEvent>> childListeners = new ArrayList<>();
 
     private void handleQuestCompleted(QuestCompletedEvent questCompletedEvent) {
-        var child = questCompletedEvent.getQuest();
-        if (child.isSuccessful() && successfulQuestIds.add(child.getId())) markDirty();
-
-        update(new CompositeQuestVisitor());
+        update(new CompositeQuestVisitor(questCompletedEvent.getQuest()));
     }
 
     @Override
@@ -75,8 +78,7 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
 
     /**
      * Creates and registers one child quest per referenced asset. Unknown ids are left to fail
-     * loudly here, as {@link com.martelstudios.openquests.core.assets.QuestAssetValidator}
-     * already rejects them at boot.
+     * loudly here, as {@link CompositeQuestAssetValidator} already rejects them at boot.
      */
     @Override
     public void onRegistered() {
@@ -133,30 +135,5 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
     private void releaseChildListeners() {
         childListeners.forEach(EventRegistration::unregister);
         childListeners.clear();
-    }
-
-    /**
-     * @return {@code true} once every referenced child quest has completed. A child that no
-     * longer resolves has already been completed and deleted, so it counts as complete.
-     */
-    public boolean allQuestsCompleted() {
-        for (UUID childId : questIds) {
-            AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(childId);
-            if (child == null) continue;
-
-            if (!child.isCompleted()) return false;
-        }
-        return true;
-    }
-
-    /**
-     * {@code AND} needs every quests child to have succeeded,
-     * {@code OR} needs one quest child to have succeeded. Reads {@link successfulQuestIds}.
-     */
-    public boolean isOperatorSatisfied() {
-        return switch (getAsset().getOperator()) {
-            case AND -> successfulQuestIds.size() >= questIds.length;
-            case OR -> !successfulQuestIds.isEmpty();
-        };
     }
 }

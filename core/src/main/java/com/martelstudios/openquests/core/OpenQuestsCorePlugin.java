@@ -71,7 +71,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questProgressionStore = new QuestProgressionStore(new DiskDataStoreProvider(questProgressionsPath.toString()).create(QuestProgressionRecord.CODEC));
         questsStore = new QuestsStore(new DiskDataStoreProvider(questSetStorePath.toString()).create(QuestsRecord.CODEC));
 
-        questProgressionService = new QuestProgressionService(questProgressionStore);
+        questProgressionService = new QuestProgressionService(this, questProgressionStore);
         questHistoryService = new QuestHistoryService(this);
         universeQuestService = new UniverseQuestService(this, questsStore);
         worldQuestService = new WorldQuestService(this);
