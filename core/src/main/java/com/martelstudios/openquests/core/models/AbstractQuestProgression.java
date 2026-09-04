@@ -8,6 +8,7 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
+import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
@@ -116,11 +117,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     /**
      * Updates the quest progression by applying the visitor to it.
-     * After the visitor's pass, it looks for changes to notify and for quest completion.
+     * After the visitor's pass, the quest settles before anyone hears about it.
      *
      * @param visitor the visitor to apply
      */
     public void update(QuestVisitor<Q> visitor) {
+        var wasCompleted = isCompleted();
         visitor.progress(self());
 
         if (hasChanges()) {
@@ -130,8 +132,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                         .dispatch(new QuestUpdatedEvent(this));
         }
 
-        if (isCompleted() && isStopOnComplete()) {
-            QuestProgressionService.get().completeQuest(getId());
+        if (!wasCompleted && isCompleted()) {
+            HytaleServer.get()
+                        .getEventBus()
+                        .dispatchFor(QuestCompletedEvent.class, getId())
+                        .dispatch(new QuestCompletedEvent(this));
         }
     }
 
