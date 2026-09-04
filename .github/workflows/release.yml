@@ -66,3 +66,107 @@ jobs:
             extension/build/distributions/*.zip
           generate_release_notes: true
           fail_on_unmatched_files: true
+
+      # Handed to the CurseForge job rather than rebuilt there: what is published has to be the
+      # very same file the release carries, not one built again from the same sources.
+      - name: Keep the artefacts for CurseForge
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: |
+            core/build/libs/*.jar
+            extension/build/libs/*.jar
+            extension/build/distributions/*.zip
+          if-no-files-found: error
+
+  # A job of its own rather than a step of the release: it runs as soon as the release job
+  # succeeds, so both land together, but a refusal from CurseForge leaves a complete GitHub
+  # release behind and a job to re-run instead of a half-published version.
+  curseforge:
+    needs: release
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: OpenQuests
+            relations: openquests-core:requiredDependency,openquests-examples:optionalDependency
+            project_id: '1678106'
+            file: extension/build/libs/OpenQuests-*.jar
+          - name: OpenQuests Core
+            relations: ''
+            project_id: '1678101'
+            file: core/build/libs/OpenQuestsCore-*.jar
+          - name: OpenQuests Examples
+            relations: openquests:requiredDependency
+            project_id: '1680200'
+            file: extension/build/distributions/OpenQuestsExamples-*.zip
+
+    steps:
+      - name: Fetch the artefacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+
+      - name: Upload ${{ matrix.name }}
+        env:
+          TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          GAME_VERSION: ${{ vars.CURSEFORGE_GAME_VERSION }}
+          VERSION: ${{ inputs.version }}
+          NAME: ${{ matrix.name }}
+          PROJECT_ID: ${{ matrix.project_id }}
+          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ inputs.version }}
+          RELATIONS: ${{ matrix.relations }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$TOKEN" ]]; then
+            echo "::error::CURSEFORGE_TOKEN is not set."
+            exit 1
+          fi
+
+          if [[ -z "$GAME_VERSION" ]]; then
+            echo "::error::Set the CURSEFORGE_GAME_VERSION variable to the Hytale version id this release targets."
+            exit 1
+          fi
+
+          # Matched by name, so it does not matter how the download laid the tree out
+          FILE=$(find . -type f -name "$(basename '${{ matrix.file }}')" -print -quit)
+
+          if [[ -z "$FILE" ]]; then
+            echo "::error::No artefact matching ${{ matrix.file }}"
+            find . -type f \( -name '*.jar' -o -name '*.zip' \) -print
+            exit 1
+          fi
+
+          jq -n --arg changelog "Released as [v$VERSION]($RELEASE_URL)." \
+                --arg displayName "$NAME $VERSION" \
+                --argjson versions "[$GAME_VERSION]" \
+                '{changelog: $changelog, changelogType: "markdown", displayName: $displayName, releaseType: "release", gameVersions: $versions}' \
+            > metadata.json
+
+          # slug:type pairs, the way CurseForge names a dependency: by project, never by version
+          if [[ -n "$RELATIONS" ]]; then
+            jq --argjson projects "$(jq -nc --arg r "$RELATIONS" '$r | split(",") | map(split(":") | {slug: .[0], type: .[1]})')" \
+               '. + {relations: {projects: $projects}}' metadata.json > metadata.tmp
+            mv metadata.tmp metadata.json
+          fi
+
+          echo "Uploading $FILE to project $PROJECT_ID"
+          cat metadata.json
+
+          # A project is addressed by id on www, the host CurseForge documents for the auto-packager.
+          # There is no per-game subdomain to pick: Hytale is not on the old Curse network.
+          STATUS=$(curl -sS -o response.json -w '%{http_code}' -X POST \
+            "https://www.curseforge.com/api/projects/$PROJECT_ID/upload-file" \
+            -H "X-Api-Token: $TOKEN" \
+            -F "metadata=<metadata.json" \
+            -F "file=@$FILE")
+
+          cat response.json
+
+          if [[ "$STATUS" -lt 200 || "$STATUS" -ge 300 ]]; then
+            echo "::error::CurseForge refused $NAME (HTTP $STATUS)"
+            exit 1
+          fi
