@@ -7,7 +7,7 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.codecs.set.SetCodec;
 import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
+import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -46,10 +46,10 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
     protected Set<UUID> failedQuestIds = ConcurrentHashMap.newKeySet();
     protected Set<UUID> abandonedQuestIds = ConcurrentHashMap.newKeySet();
 
-    private final transient List<EventRegistration<UUID, QuestUpdatedEvent>> childListeners = new ArrayList<>();
+    private final transient List<EventRegistration<UUID, QuestCompletedEvent>> childListeners = new ArrayList<>();
 
-    private void handleQuestUpdated(QuestUpdatedEvent questUpdatedEvent) {
-        update(new CompositeQuestVisitor(questUpdatedEvent.getQuest()));
+    private void handleQuestCompleted(QuestCompletedEvent questCompletedEvent) {
+        update(new CompositeQuestVisitor(questCompletedEvent.getQuest()));
     }
 
     @Override
@@ -126,7 +126,7 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
         for (UUID questId : questIds) {
             var registration = HytaleServer.get()
                                            .getEventBus()
-                                           .register(QuestUpdatedEvent.class, questId, this::handleQuestUpdated);
+                                           .register(QuestCompletedEvent.class, questId, this::handleQuestCompleted);
             if (registration != null) childListeners.add(registration);
         }
         return this;
