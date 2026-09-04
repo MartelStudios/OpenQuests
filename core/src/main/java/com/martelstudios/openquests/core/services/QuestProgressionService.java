@@ -109,6 +109,9 @@ public class QuestProgressionService {
      */
     public AbstractQuestProgression<?> unregisterQuest(@Nonnull AbstractQuestProgression<?> quest) {
         AbstractQuestProgression<?> removed = dataStore.removeAndDeleteFromDisk(quest.getId());
+
+        if (removed == null) return null;
+
         quest.onUnregistered();
 
         HytaleServer.get()
