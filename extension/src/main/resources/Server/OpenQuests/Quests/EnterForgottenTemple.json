@@ -11,5 +11,8 @@
         "TalkToRootlingMerchant"
       ]
     }
-  ]
+  ],
+  "Tags": {
+    "HUD_TRACK": []
+  }
 }

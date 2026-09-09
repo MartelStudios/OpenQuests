@@ -15,5 +15,8 @@
     "IncludeRoles": [
       "Temple_Kweebec_Merchant"
     ]
+  },
+  "Tags": {
+    "HUD_TRACK": []
   }
 }
