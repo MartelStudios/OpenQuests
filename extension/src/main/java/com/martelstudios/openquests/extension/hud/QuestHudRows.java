@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.hud;
 
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
 
 import javax.annotation.Nonnull;
 
@@ -13,7 +12,7 @@ import javax.annotation.Nonnull;
 public final class QuestHudRows {
     public static final String ROW_DOCUMENT = "Hud/QuestTrackerRow.ui";
 
-    /** An asset carrying this tag shows its description under the title. */
+    /** A quest carrying this tag, or made from an asset carrying it, shows its description under the title. */
     public static final String DESCRIPTION_TAG = "HUD_DESC";
 
     // The values of @ColorGoldHighlight, @ColorButtonText and @ColorDisabled, which the documents
@@ -75,8 +74,7 @@ public final class QuestHudRows {
      * where the line goes.
      */
     public static void appendDescription(@Nonnull QuestHudContext context, @Nonnull String rowSelector, @Nonnull AbstractQuestProgression<?> quest) {
-        QuestAsset asset = quest.getAsset();
-        if (asset == null || !asset.hasTag(DESCRIPTION_TAG)) return;
+        if (!quest.hasTag(DESCRIPTION_TAG)) return;
 
         context.getBuilder()
                .set(rowSelector + "#Description.TextSpans", quest.getDescription())

@@ -15,11 +15,17 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Top-right panel listing the quests a player is running. Decides which five get in and hands each
- * one to its {@link QuestHudRenderer}, which draws it however its type sees fit.
+ * Top-right panel listing the quests a player is tracking. Decides which five get in and hands
+ * each one to its {@link QuestHudRenderer}, which draws it however its type sees fit.
  */
 public class QuestTrackerHud extends CustomUIHud {
     public static final String KEY = "openquests:quest_tracker";
+
+    /** What puts a quest on the panel at all. */
+    public static final String TRACK_TAG = "HUD_TRACK";
+
+    /** Outranks {@link #TRACK_TAG}, since a tag can only ever be added to a running quest. */
+    public static final String UNTRACK_TAG = "HUD_UNTRACK";
 
     private static final int MAX_QUESTS = 5;
     private static final long UPDATE_INTERVAL_MS = 1000;
@@ -77,6 +83,7 @@ public class QuestTrackerHud extends CustomUIHud {
             if (shown >= MAX_QUESTS) break;
             if (quest.getState() != QuestState.IN_PROGRESS) continue;
             if (owned.contains(quest.getId())) continue;
+            if (!isTracked(quest)) continue;
 
             QuestHudRows.render(context, quest);
             shown++;
@@ -87,8 +94,16 @@ public class QuestTrackerHud extends CustomUIHud {
     }
 
     /**
-     * One pass to find the quests another quest already draws. They never reach the panel on their
-     * own, whatever state they are in.
+     * @return whether the quest asked to be on the panel. Both tags are read through the quest, so
+     * the asset answers for everything made from it unless the quest itself was tagged.
+     */
+    public static boolean isTracked(@Nonnull AbstractQuestProgression<?> quest) {
+        return !quest.hasTag(UNTRACK_TAG) && quest.hasTag(TRACK_TAG);
+    }
+
+    /**
+     * One pass to find the quests another quest already draws. They never reach the panel on
+     * their own, whatever state they are in.
      */
     @Nonnull
     private static Set<UUID> getAllOwnedQuestIds(@Nonnull Collection<AbstractQuestProgression<?>> quests) {

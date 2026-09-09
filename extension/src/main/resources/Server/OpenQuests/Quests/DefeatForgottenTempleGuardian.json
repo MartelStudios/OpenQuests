@@ -16,5 +16,8 @@
       ]
     }
   ],
-  "AutoClaim": true
+  "AutoClaim": true,
+  "Tags": {
+    "HUD_TRACK": []
+  }
 }

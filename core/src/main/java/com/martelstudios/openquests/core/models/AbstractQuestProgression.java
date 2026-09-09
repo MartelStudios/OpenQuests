@@ -35,6 +35,10 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     private static final BiConsumer<AbstractQuestProgression, UUID[]> PLAYERS_SETTER = (quest, uuids) -> ((AbstractQuestProgression<?>) quest).players.addAll(List.of(uuids));
     private static final Function<AbstractQuestProgression, UUID[]> PLAYERS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).players.toArray(new UUID[0]);
 
+    private static final KeyedCodec<String[]> TAGS_CODEC = new KeyedCodec<>("Tags", new ArrayCodec<>(Codec.STRING, String[]::new));
+    private static final BiConsumer<AbstractQuestProgression, String[]> TAGS_SETTER = (quest, tags) -> ((AbstractQuestProgression<?>) quest).tags.addAll(List.of(tags));
+    private static final Function<AbstractQuestProgression, String[]> TAGS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).tags.toArray(new String[0]);
+
     /**
      * Serializes the fields shared by every quest progression; concrete codecs chain from this.
      */
@@ -49,6 +53,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(PLAYERS_CODEC, PLAYERS_SETTER, PLAYERS_GETTER)
                                                                                         .add()
+                                                                                        .append(TAGS_CODEC, TAGS_SETTER, TAGS_GETTER)
+                                                                                        .add()
                                                                                         .build();
 
     /**
@@ -60,6 +66,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Ids of the players this quest is assigned to.
      */
     protected Set<UUID> players = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Tags written on this instance, on top of those its asset declares. What became of this one
+     * quest belongs here, since an asset is shared by everyone holding it.
+     */
+    protected Set<String> tags = ConcurrentHashMap.newKeySet();
 
     /**
      * The {@link QuestAsset#getId()}
@@ -215,6 +227,44 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public Q setAssetId(String assetId) {
         this.assetId = assetId;
         return self();
+    }
+
+    /**
+     * @return {@code true} if this quest carries the tag, falling back to its asset when the
+     * instance says nothing of it.
+     */
+    public boolean hasTag(@Nonnull String tag) {
+        if (tags.contains(tag)) return true;
+
+        QuestAsset asset = getAsset();
+        return asset != null && asset.hasTag(tag);
+    }
+
+    /**
+     * @return {@code false} if the quest already carried the tag.
+     */
+    public boolean addTag(@Nonnull String tag) {
+        if (!tags.add(tag)) return false;
+        markDirty();
+
+        return true;
+    }
+
+    /**
+     * @return {@code false} if the quest did not carry the tag.
+     */
+    public boolean removeTag(@Nonnull String tag) {
+        if (!tags.remove(tag)) return false;
+        markDirty();
+
+        return true;
+    }
+
+    /**
+     * @return the live, mutable set of tags written on this quest alone, without those of its asset.
+     */
+    public Set<String> getTags() {
+        return tags;
     }
 
     /**

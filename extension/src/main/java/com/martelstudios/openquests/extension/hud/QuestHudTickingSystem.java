@@ -18,12 +18,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Pushes each player's in-progress quests to their {@link QuestTrackerHud} every tick (the HUD
- * itself throttles how often it actually sends an update to the client).
- * <p>
- * For now "shown on the HUD" just means "in progress" — there's no explicit tracked-quest
- * selection yet (see {@link QuestStoreComponent}); that can replace this filter later without
- * touching the HUD itself.
+ * Pushes each player's quests to their {@link QuestTrackerHud} every tick (the HUD itself
+ * throttles how often it actually sends an update to the client). Hands over all of them: which
+ * ones earn a line is the panel's to decide.
  */
 public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
     @Nonnull

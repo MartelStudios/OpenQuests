@@ -119,11 +119,20 @@ that could not be granted on the spot has nowhere to wait.
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
 
-An asset tagged `HUD_DESC` shows its description under its title in the tracker, greyed and smaller:
+The tracker only lists quests that asked for it. An asset tagged `HUD_TRACK` puts every quest made
+from it on the panel; `HUD_DESC` shows its description under its title, greyed and smaller:
 
 ```json
-{ "Type": "Composite", "TitleKey": "…", "Tags": { "HUD_DESC": [] } }
+{ "Type": "Composite", "TitleKey": "…", "Tags": { "HUD_TRACK": [], "HUD_DESC": [] } }
 ```
+
+A running quest carries tags of its own, through `addTag` and `removeTag`, and is asked before its
+asset — the same override as `PersistHistory`, so one quest can answer differently from everything
+sharing its template. A tag can only be added there, never taken off, which is what `HUD_UNTRACK`
+is for: it outranks `HUD_TRACK` and takes the quest off the panel although its asset asked for it.
+
+A quest drawn under another one — the steps of a chain — is drawn by its parent and never asks on
+its own behalf, so tagging a step changes nothing.
 
 Every counted type extends `QuantityQuestAsset`, which carries `TargetQuantity`. The parameter and
 the target can both be overridden on the progression itself, serialized only when set and falling

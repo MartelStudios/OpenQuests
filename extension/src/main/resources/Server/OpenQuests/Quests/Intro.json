@@ -11,5 +11,8 @@
   "QuestAssetIds": [
     "Basics",
     "SkipIntro"
-  ]
+  ],
+  "Tags": {
+    "HUD_TRACK": []
+  }
 }
