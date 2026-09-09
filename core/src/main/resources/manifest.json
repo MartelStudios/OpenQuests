@@ -20,6 +20,6 @@
     "Main": "com.martelstudios.openquests.core.OpenQuestsCorePlugin",
     "IncludesAssetPack": true,
     "UpdateChecker": {
-        "CurseForge": ""
+        "CurseForge": "1678101"
     }
 }
