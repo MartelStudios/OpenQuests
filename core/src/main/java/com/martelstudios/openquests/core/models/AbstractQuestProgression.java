@@ -9,6 +9,7 @@ import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
+import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
@@ -17,6 +18,7 @@ import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -51,6 +53,10 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (quest, value) -> quest.persistHistory = value, quest -> quest.persistHistory)
                                                                                         .add()
+                                                                                        .append(new KeyedCodec<>("StartedAt", Codec.LONG), (quest, millis) -> quest.startedAt = Instant.ofEpochMilli(millis), quest -> quest.startedAt == null ? null : Long.valueOf(quest.startedAt.toEpochMilli()))
+                                                                                        .add()
+                                                                                        .append(new KeyedCodec<>("CompletedAt", Codec.LONG), (quest, millis) -> quest.completedAt = Instant.ofEpochMilli(millis), quest -> quest.completedAt == null ? null : Long.valueOf(quest.completedAt.toEpochMilli()))
+                                                                                        .add()
                                                                                         .append(PLAYERS_CODEC, PLAYERS_SETTER, PLAYERS_GETTER)
                                                                                         .add()
                                                                                         .append(TAGS_CODEC, TAGS_SETTER, TAGS_GETTER)
@@ -63,7 +69,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     protected UUID id = UUID.randomUUID();
 
     /**
-     * Ids of the players this quest is assigned to.
+     * Ids of the players still running the quest progression.
      */
     protected Set<UUID> players = ConcurrentHashMap.newKeySet();
 
@@ -86,6 +92,21 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nullable
     protected Boolean persistHistory;
+
+    /**
+     * When the player was handed this quest, written once as it enters the store. Null for a quest
+     * registered before this was kept, which is a date nobody can invent after the fact.
+     */
+    @Nullable
+    protected Instant startedAt;
+
+    /**
+     * When it reached the outcome it now carries. Rewritten whenever that outcome changes, and
+     * struck out if the quest goes back to running — a quest kept alive by {@code StopOnComplete:
+     * false} can, and a date left standing would say it ended when it did not.
+     */
+    @Nullable
+    protected Instant completedAt;
 
     /**
      * Set when the runtime state changed; drives incremental disk saves. Not serialized.
@@ -135,6 +156,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     public void update(QuestVisitor<Q> visitor) {
         QuestState previousState = getState();
+
         visitor.progress(self());
 
         if (hasChanges()) {
@@ -144,9 +166,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                         .dispatch(new QuestUpdatedEvent(this));
         }
 
-        // The outcome, not merely the first end: a quest kept alive by StopOnComplete:false can
-        // still change its mind, and whoever listens to it has to hear that too.
+        // The outcome, not merely the first end: a quest kept alive by StopOnComplete:false can change.
         if (isCompleted() && getState() != previousState) {
+            completedAt = isCompleted() ? Instant.now() : null;
+            markDirty();
+
             HytaleServer.get()
                         .getEventBus()
                         .dispatchFor(QuestCompletedEvent.class, getId())
@@ -157,11 +181,26 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     /**
      * Called just after the quest progression entered the quest store.
      * Called by {@link QuestProgressionService#registerQuest(AbstractQuestProgression)}.
+     *
+     * <p>Runs once, when the quest is first handed out, and not when one is read back from disk —
+     * which is what makes it the moment the quest started.
      */
-    public void onRegistered() {}
+    public void onRegistered() {
+        startedAt = Instant.now();
+        markDirty();
+    }
 
     /**
-     * Called just after the quest progression leaves the quest store.
+     * Called just after the quest ended and was set aside, still answerable by id but no longer
+     * running. Called by {@link QuestProgressionService#archiveQuest}.
+     *
+     * <p>Where a quest made of others settles them: they cannot get anywhere once it is over, and
+     * the archive is meant to be read whole.
+     */
+    public void onArchived() {}
+
+    /**
+     * Called just after the quest progression leaves the quest store for good.
      * Called by {@link QuestProgressionService#unregisterQuest}.
      */
     public void onUnregistered() {}
@@ -210,6 +249,23 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     public boolean isCompleted() {
         return isSuccessful() || isFailed() || isAbandoned();
+    }
+
+    /**
+     * @return when the player was handed this quest, or {@code null} for one they were holding
+     * before it was written down.
+     */
+    @Nullable
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
+    /**
+     * @return when it reached the outcome it carries, or {@code null} while it is still running.
+     */
+    @Nullable
+    public Instant getCompletedAt() {
+        return completedAt;
     }
 
     public QuestAsset getAsset() {
@@ -356,5 +412,16 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         String titleKey = asset.getTitleKey();
 
         return titleKey != null ? Message.translation(titleKey) : asset.create().getDefaultTitle();
+    }
+
+    /**
+     * The description of a quest asset, for a quest that no longer has a progression to ask. Empty
+     * when the asset names none, since a description is optional.
+     */
+    @Nonnull
+    public static Message descriptionOf(@Nonnull QuestAsset asset) {
+        String descriptionKey = asset.getDescriptionKey();
+
+        return descriptionKey != null ? Message.translation(descriptionKey) : asset.create().getDefaultDescription();
     }
 }

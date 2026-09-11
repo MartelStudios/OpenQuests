@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension.hud;
 
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
 
@@ -37,32 +38,35 @@ public final class QuestHudRows {
 
     /**
      * Appends a title line, using any document that carries the same {@code #Title}, {@code
-     * #Progress} and icon names.
+     * #Progress} and icon names. A quest that ended greys out either way; which mark it takes is
+     * what says whether it was worth anything.
      *
      * @return the selector of the line, for whatever the caller wants to add to it.
      */
     @Nonnull
-    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull String documentPath, @Nonnull Message title, boolean completed) {
+    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull String documentPath, @Nonnull Message title, @Nonnull QuestState state) {
         String rowSelector = context.appendRow(documentPath);
+        boolean completed = state != QuestState.IN_PROGRESS;
 
         context.getBuilder()
                .set(rowSelector + "#Title.TextSpans", title)
                .set(rowSelector + "#Title.Style.TextColor", completed ? COLOR_COMPLETE : COLOR_TITLE)
                .set(rowSelector + "#Progress.Style.TextColor", completed ? COLOR_COMPLETE : COLOR_PROGRESS)
                .set(rowSelector + "#IconDefault.Visible", !completed)
-               .set(rowSelector + "#IconComplete.Visible", completed);
+               .set(rowSelector + "#IconComplete.Visible", state == QuestState.SUCCESSFUL)
+               .set(rowSelector + "#IconFailed.Visible", state == QuestState.FAILED || state == QuestState.ABANDONED);
 
         return rowSelector;
     }
 
     @Nonnull
-    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull Message title, boolean completed) {
-        return appendRow(context, ROW_DOCUMENT, title, completed);
+    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull Message title, @Nonnull QuestState state) {
+        return appendRow(context, ROW_DOCUMENT, title, state);
     }
 
     @Nonnull
     public static String appendRow(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest) {
-        String rowSelector = appendRow(context, ROW_DOCUMENT, quest.getTitle(), quest.isCompleted());
+        String rowSelector = appendRow(context, ROW_DOCUMENT, quest.getTitle(), quest.getState());
         appendDescription(context, rowSelector, quest);
 
         return rowSelector;

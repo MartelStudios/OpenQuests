@@ -1,7 +1,6 @@
 package com.martelstudios.openquests.core.rewards;
 
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
-import com.martelstudios.openquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
@@ -23,5 +22,5 @@ public abstract class QuestReward {
      *
      * @return {@code false} if it could not be granted right now, e.g. a full inventory
      */
-    public abstract boolean grant(@Nonnull QuestHistoryRecord questHistoryRecord, @Nonnull EntityComponents playerComponents);
+    public abstract boolean grant(@Nonnull EntityComponents playerComponents);
 }

@@ -1,7 +1,5 @@
 package com.martelstudios.openquests.extension.quests.queststate;
 
-import com.martelstudios.openquests.core.history.stores.QuestHistoryStoreComponent;
-import com.martelstudios.openquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
@@ -30,29 +28,23 @@ public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgr
     }
 
     /**
-     * Live quests first, then the history: a quest that stopped no longer has an instance.
+     * One pass over what the player holds, running and finished alike: a quest that ended is set
+     * aside rather than deleted, so it answers here the same way it did while it was running.
      */
     private boolean matches(@Nonnull QuestStateQuestProgression quest) {
         var components = EntityComponents.of(playerId);
         String watchedAssetId = quest.getQuestAssetId();
 
         var questStore = components.getComponent(QuestStoreComponent.getComponentType());
-        if (questStore != null) {
-            for (UUID questId : questStore.getQuestIds()) {
-                var watched = QuestProgressionService.get().getQuest(questId);
-                if (watched != null && watchedAssetId.equals(watched.getAssetId()) && matchesState(quest, watched.getState())) {
-                    return true;
-                }
+        if (questStore == null) return false;
+
+        for (UUID questId : questStore.getQuestIds()) {
+            var watched = QuestProgressionService.get().getQuest(questId);
+
+            if (watched != null && watchedAssetId.equals(watched.getAssetId()) && matchesState(quest, watched.getState())) {
+                return true;
             }
         }
-
-        var historyStore = components.getComponent(QuestHistoryStoreComponent.getComponentType());
-        if (historyStore == null) return false;
-
-        for (QuestHistoryRecord record : historyStore.history.getForAsset(watchedAssetId)) {
-            if (matchesState(quest, record.getState())) return true;
-        }
-
         return false;
     }
 

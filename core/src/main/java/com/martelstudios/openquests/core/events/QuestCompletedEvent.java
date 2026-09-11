@@ -2,6 +2,7 @@ package com.martelstudios.openquests.core.events;
 
 import com.hypixel.hytale.event.IEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -14,12 +15,21 @@ public class QuestCompletedEvent implements IEvent<UUID> {
     @Nonnull
     private final AbstractQuestProgression<?> quest;
 
+    @Nonnull
+    private final QuestState state;
+
     public QuestCompletedEvent(@Nonnull AbstractQuestProgression<?> quest) {
         this.quest = quest;
+        this.state = quest.getState();
     }
 
     @Nonnull
     public AbstractQuestProgression<?> getQuest() {
         return quest;
+    }
+
+    @Nonnull
+    public QuestState getState() {
+        return state;
     }
 }

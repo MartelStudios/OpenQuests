@@ -19,3 +19,5 @@ $Common = "../Common.ui";
 @QuestIconDefault = PatchStyle(TexturePath: "ObjectiveTaskIconDefault.png");
 
 @QuestIconComplete = PatchStyle(TexturePath: "ObjectiveTaskIconComplete.png");
+
+@QuestIconFailed = PatchStyle(TexturePath: "ObjectiveTaskIconFailed.png");

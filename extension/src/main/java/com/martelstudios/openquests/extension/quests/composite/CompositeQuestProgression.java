@@ -3,16 +3,21 @@ package com.martelstudios.openquests.extension.quests.composite;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
-import com.hypixel.hytale.codec.codecs.set.SetCodec;
+import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.event.EventRegistration;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,14 +30,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CompositeQuestProgression extends AbstractQuestProgression<CompositeQuestProgression> {
 
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
     public static final BuilderCodec<CompositeQuestProgression> CODEC = BuilderCodec.builder(CompositeQuestProgression.class, CompositeQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
-                                                                                    .append(new KeyedCodec<>("QuestIds", new ArrayCodec<>(Codec.UUID_BINARY, UUID[]::new)), CompositeQuestProgression::setQuestIds, quest -> quest.questIds)
+                                                                                    .append(new KeyedCodec<>("QuestIds", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new)), CompositeQuestProgression::setQuestIds, quest -> quest.questIds)
                                                                                     .add()
-                                                                                    .append(new KeyedCodec<>("SuccessfulQuestIds", new SetCodec<>(Codec.UUID_BINARY, HashSet<UUID>::new, false)), (quest, ids) -> quest.successfulQuestIds.addAll(ids), quest -> quest.successfulQuestIds)
-                                                                                    .add()
-                                                                                    .append(new KeyedCodec<>("FailedQuestIds", new SetCodec<>(Codec.UUID_BINARY, HashSet<UUID>::new, false)), (quest, ids) -> quest.failedQuestIds.addAll(ids), quest -> quest.failedQuestIds)
-                                                                                    .add()
-                                                                                    .append(new KeyedCodec<>("AbandonedQuestIds", new SetCodec<>(Codec.UUID_BINARY, HashSet<UUID>::new, false)), (quest, ids) -> quest.abandonedQuestIds.addAll(ids), quest -> quest.abandonedQuestIds)
+                                                                                    .append(new KeyedCodec<>("ChildOutcomes", new MapCodec<>(new EnumCodec<>(QuestState.class), HashMap<String, QuestState>::new)), CompositeQuestProgression::decodeOutcomes, CompositeQuestProgression::encodeOutcomes)
                                                                                     .add()
                                                                                     .build();
 
@@ -40,16 +43,19 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
 
     /**
      * What became of each child, recorded as it changes state. Kept here rather than read back
-     * from the children, since a child that completed is be default unregistered along with the group.
+     * from the children, since a child that completed is by default unregistered along with the
+     * group.
+     *
+     * <p>One entry per child rather than one set per outcome: a child ends one way, and a shape
+     * that cannot say otherwise saves everyone reading it from wondering what two sets holding the
+     * same id would have meant.
      */
-    protected Set<UUID> successfulQuestIds = ConcurrentHashMap.newKeySet();
-    protected Set<UUID> failedQuestIds = ConcurrentHashMap.newKeySet();
-    protected Set<UUID> abandonedQuestIds = ConcurrentHashMap.newKeySet();
+    protected final Map<UUID, QuestState> childOutcomes = new ConcurrentHashMap<>();
 
     private final transient List<EventRegistration<UUID, QuestCompletedEvent>> childListeners = new ArrayList<>();
 
     private void handleQuestCompleted(QuestCompletedEvent questCompletedEvent) {
-        update(new CompositeQuestVisitor(questCompletedEvent.getQuest()));
+        update(new CompositeQuestVisitor(questCompletedEvent.getQuest(), questCompletedEvent.getState()));
     }
 
     @Override
@@ -76,6 +82,18 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
         return true;
     }
 
+    @Override
+    public boolean abandonPlayer(@Nonnull UUID playerId) {
+        if (!super.abandonPlayer(playerId)) return false;
+
+        Arrays.stream(questIds)
+              .map(QuestProgressionService.get()::getQuest)
+              .filter(Objects::nonNull)
+              .forEach(child -> child.abandonPlayer(playerId));
+
+        return true;
+    }
+
     /**
      * Creates and registers one child quest per referenced asset. Unknown ids are left to fail
      * loudly here, as {@link CompositeQuestAssetValidator} already rejects them at boot.
@@ -98,20 +116,105 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
     }
 
     /**
-     * Children have no meaning without their parent, so they are unregistered along with it.
+     * Children have no meaning without their parent, so they end along with it. One still running
+     * is called off rather than dropped: this is where the losing branches of an OR are settled,
+     * and where a chain the player gave up gives up every step under it.
+     *
+     * <p>Called off means heard to end, which is the whole reason to do it here — each child writes
+     * its record, pays what that outcome pays, and releases whoever was waiting on it. A child that
+     * is itself a chain does the same to its own, so an abandoned tree settles all the way down.
+     *
+     * <p>The listeners go first: the group has already settled on an outcome, and hearing its own
+     * children end while taking them off the board could only talk it out of one it already reached.
      */
+    @Override
+    public void onArchived() {
+        super.onArchived();
+        settleChildren();
+    }
+
     @Override
     public void onUnregistered() {
         super.onUnregistered();
+        settleChildren();
+    }
+
+    /**
+     * Abandon remaining children in progress.
+     */
+    private void settleChildren() {
         releaseChildListeners();
 
         for (UUID questId : questIds) {
-            QuestProgressionService.get().unregisterQuest(questId);
+            AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(questId);
+            if (child == null || child.isCompleted()) continue;
+
+            QuestProgressionService.get().progress(new SetStateVisitor(QuestState.ABANDONED), List.of(questId));
         }
     }
 
     public UUID[] getQuestIds() {
         return questIds;
+    }
+
+    /**
+     * @return what became of a child that already ended, or {@code null} while it is still running
+     * and for one this group never heard about. A child leaves the store once it completes, so the
+     * group is the only thing left that knows which way it went.
+     */
+    @Nullable
+    public QuestState outcomeOf(@Nonnull UUID childId) {
+        return childOutcomes.get(childId);
+    }
+
+    /**
+     * Writes down how a child ended. A child that is running again — which one kept alive by
+     * {@code StopOnComplete:false} can be — has its outcome struck out rather than left standing:
+     * the group would otherwise keep counting an end the child has moved past.
+     *
+     * @return {@code true} when this changed anything, so the group is only marked dirty on news.
+     */
+    public boolean recordOutcome(@Nonnull UUID childId, @Nonnull QuestState state) {
+        if (state == QuestState.IN_PROGRESS) return childOutcomes.remove(childId) != null;
+
+        return childOutcomes.put(childId, state) != state;
+    }
+
+    /**
+     * @return how many children ended that way, which is what the group's own rule is written in.
+     */
+    public int countOutcomes(@Nonnull QuestState state) {
+        int count = 0;
+        for (QuestState outcome : childOutcomes.values()) {
+            if (outcome == state) count++;
+        }
+        return count;
+    }
+
+    /**
+     * Ids are written out as text: the map codec keys on strings, and an id that is readable in a
+     * saved file is worth more here than the handful of bytes packing it would save.
+     */
+    @Nonnull
+    private Map<String, QuestState> encodeOutcomes() {
+        Map<String, QuestState> encoded = new HashMap<>(childOutcomes.size());
+        childOutcomes.forEach((childId, state) -> encoded.put(childId.toString(), state));
+
+        return encoded;
+    }
+
+    /**
+     * An id that no longer reads as one is dropped rather than thrown over: it names a child that
+     * cannot be looked up either way, and refusing the whole group would cost the rest of them.
+     */
+    private void decodeOutcomes(@Nonnull Map<String, QuestState> encoded) {
+        encoded.forEach((childId, state) -> {
+            try {
+                childOutcomes.put(UUID.fromString(childId), state);
+            } catch (IllegalArgumentException e) {
+                LOGGER.atWarning().log("Dropping the outcome of '%s' on quest %s: not a quest id.", childId, getId());
+            }
+        });
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.command.system.CommandManager;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.console.ConsoleSender;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.openquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
@@ -33,7 +32,7 @@ public class CommandReward extends QuestReward {
     private CommandReward() {}
 
     @Override
-    public boolean grant(@Nonnull QuestHistoryRecord questHistoryRecord, @Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull EntityComponents playerComponents) {
         PlayerRef playerRef = playerComponents.getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return false;
 

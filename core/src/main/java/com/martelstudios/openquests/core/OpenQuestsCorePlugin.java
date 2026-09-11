@@ -11,8 +11,8 @@ import com.hypixel.hytale.server.core.universe.datastore.DiskDataStoreProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.commands.QuestCommand;
-import com.martelstudios.openquests.core.history.services.QuestHistoryService;
-import com.martelstudios.openquests.core.history.stores.QuestHistoryStoreComponent;
+import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
+import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.scopes.universe.QuestsStore;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
@@ -47,11 +47,11 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     private QuestsStore questsStore;
     private ComponentType<EntityStore, QuestStoreComponent> questStoreComponentType;
     private ResourceType<EntityStore, WorldQuestStoreResource> worldStoreResourceType;
-    private ComponentType<EntityStore, QuestHistoryStoreComponent> questHistoryStoreComponentType;
+    private ComponentType<EntityStore, PendingRewardStoreComponent> pendingRewardStoreComponentType;
 
     private QuestProgressionService questProgressionService;
     private QuestAutoStartService questAutoStartService;
-    private QuestHistoryService questHistoryService;
+    private QuestRewardService questRewardService;
     private UniverseQuestService universeQuestService;
     private WorldQuestService worldQuestService;
     private PlayerQuestService playerQuestService;
@@ -72,7 +72,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questsStore = new QuestsStore(new DiskDataStoreProvider(questSetStorePath.toString()).create(QuestsRecord.CODEC));
 
         questProgressionService = new QuestProgressionService(this, questProgressionStore);
-        questHistoryService = new QuestHistoryService(this);
+        questRewardService = new QuestRewardService(this);
         universeQuestService = new UniverseQuestService(this, questsStore);
         worldQuestService = new WorldQuestService(this);
         playerQuestService = new PlayerQuestService(this);
@@ -80,7 +80,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
         questStoreComponentType = getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, "QuestStore", QuestStoreComponent.CODEC);
         worldStoreResourceType = getEntityStoreRegistry().registerResource(WorldQuestStoreResource.class, "QuestStore", WorldQuestStoreResource.CODEC);
-        questHistoryStoreComponentType = getEntityStoreRegistry().registerComponent(QuestHistoryStoreComponent.class, "QuestHistoryStore", QuestHistoryStoreComponent.CODEC);
+        pendingRewardStoreComponentType = getEntityStoreRegistry().registerComponent(PendingRewardStoreComponent.class, "PendingRewardStore", PendingRewardStoreComponent.CODEC);
 
         getCommandRegistry().registerCommand(new QuestCommand());
 
@@ -132,9 +132,10 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         return questProgressionService;
     }
 
-    public QuestHistoryService getQuestHistoryService() {
-        return questHistoryService;
+    public QuestRewardService getQuestRewardService() {
+        return questRewardService;
     }
+
 
     public ComponentType<EntityStore, QuestStoreComponent> getQuestStoreComponentType() {
         return questStoreComponentType;
@@ -143,7 +144,8 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     public ResourceType<EntityStore, WorldQuestStoreResource> getWorldStoreResourceType() {
         return worldStoreResourceType;
     }
-    public ComponentType<EntityStore, QuestHistoryStoreComponent> getQuestHistoryStoreComponentType() {
-        return questHistoryStoreComponentType;
+    public ComponentType<EntityStore, PendingRewardStoreComponent> getPendingRewardStoreComponentType() {
+        return pendingRewardStoreComponentType;
     }
+
 }
