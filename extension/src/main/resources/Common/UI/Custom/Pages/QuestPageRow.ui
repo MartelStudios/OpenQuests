@@ -1,0 +1,75 @@
+// One quest, collapsed to a header until its toggle is pressed. Appended into #QuestList and
+// addressed as "#QuestList[i] #Title".
+$P = "QuestPageCommon.ui";
+$C = "../Common.ui";
+
+Group #QuestPageRow {
+  LayoutMode: Top;
+  Background: #1a2233;
+  Padding: (Full: 12);
+  Anchor: (Bottom: 4);
+
+  Group #Header {
+    LayoutMode: Left;
+    Anchor: (Height: 24);
+
+    TextButton #Toggle {
+      Text: "+";
+      Anchor: (Width: 28, Height: 24);
+      Style: $P.@ToggleStyle;
+    }
+
+    Group { Anchor: (Width: 8); }
+
+    // Same mark the objectives carry, so the eye reads a quest and its steps the same way
+    Group #Icon { Anchor: (Width: 12, Height: 12, Top: 6, Right: 8); }
+
+    Label #Title { Text: ""; FlexWeight: 1; Style: $P.@RowTitleStyle; }
+
+    // Filled by the quest own renderer, and only by it: a type with nothing to count leaves it
+    // empty rather than the row pretending to a figure
+    Label #Progress { Text: ""; Anchor: (Width: 90, Right: 16); Style: $P.@ProgressStyle; }
+
+    Label #Status { Text: ""; Anchor: (Width: 140); Style: $P.@RowStatusStyle; }
+  }
+
+  Label #Description { Text: ""; Anchor: (Top: 4); Style: $P.@RowTextStyle; Visible: false; }
+
+  Group #Details {
+    LayoutMode: Top;
+    Visible: false;
+
+    Group { Anchor: (Height: 6); }
+
+    Label #ObjectivesHeader { Text: ""; Anchor: (Height: 16); Style: $P.@SectionStyle; Visible: false; }
+    Group #Objectives { LayoutMode: Top; }
+
+    Group { Anchor: (Height: 6); }
+
+    Label #RewardsHeader { Text: ""; Anchor: (Height: 16); Style: $P.@SectionStyle; Visible: false; }
+    Group #Rewards { LayoutMode: Top; }
+
+    Group { Anchor: (Height: 8); }
+
+    Group #Actions {
+      LayoutMode: Left;
+      Anchor: (Height: 26);
+
+      $C.@SmallTertiaryTextButton #Claim {
+        Text: "";
+        Anchor: (Width: 110, Height: $C.@SmallButtonHeight);
+        Visible: false;
+      }
+
+      Group { Anchor: (Width: 8); }
+
+      $C.@SmallSecondaryTextButton #Abandon {
+        Text: "";
+        Anchor: (Width: 110, Height: $C.@SmallButtonHeight);
+        Visible: false;
+      }
+
+      Group { FlexWeight: 1; }
+    }
+  }
+}

@@ -71,17 +71,18 @@ public class QuestTrackerHud extends CustomUIHud {
         if (now - last < UPDATE_INTERVAL_MS) return;
         if (!lastPushedMs.compareAndSet(last, now)) return;
 
+        UUID viewer = getPlayerRef().getUuid();
         Set<UUID> owned = getAllOwnedQuestIds(quests);
 
         var builder = new UICommandBuilder();
         builder.clear("#QuestList");
 
-        var context = new QuestHudContext(builder);
+        var context = new QuestHudContext(builder, getPlayerRef().getUuid());
         int shown = 0;
 
         for (AbstractQuestProgression<?> quest : quests) {
             if (shown >= MAX_QUESTS) break;
-            if (quest.getState() != QuestState.IN_PROGRESS) continue;
+            if (quest.getStateFor(viewer) != QuestState.IN_PROGRESS) continue;
             if (owned.contains(quest.getId())) continue;
             if (!isTracked(quest)) continue;
 

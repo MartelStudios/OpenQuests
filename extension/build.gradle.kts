@@ -33,6 +33,8 @@ repositories {
 dependencies {
     // Loaded as a separate plugin at runtime, so it is never bundled in
     compileOnly(project(":core"))
+
+    vineImplementation("curse.maven:opennavigation-1692713:8865131")
 }
 
 tasks.named<Jar>("jar") {

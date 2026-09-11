@@ -1,0 +1,14 @@
+// Drawn between the children of an OR composite, where only one of them has to succeed. Same rule
+// as the tracker draws, borrowing the game's own separator line so it reads like every other one.
+$P = "QuestPageCommon.ui";
+
+Group #Separator {
+  LayoutMode: Left;
+  Anchor: (Top: 4, Bottom: 4, Height: 8);
+
+  Group { FlexWeight: 1; Background: "../Common/ContainerPanelSeparatorFancyLine.png"; }
+
+  Label #Label { Text: %openquests.page.or; Anchor: (Width: 32); Style: $P.@SeparatorLabelStyle; }
+
+  Group { FlexWeight: 1; Background: "../Common/ContainerPanelSeparatorFancyLine.png"; }
+}

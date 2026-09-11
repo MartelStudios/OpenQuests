@@ -91,7 +91,7 @@ jobs:
       matrix:
         include:
           - name: OpenQuests
-            relations: openquests-core:requiredDependency,openquests-examples:optionalDependency
+            relations: openquests-core:requiredDependency,opennavigation:requiredDependency,openquests-examples:optionalDependency
             project_id: '1678106'
             file: extension/build/libs/OpenQuests-*.jar
           - name: OpenQuests Core

@@ -5,6 +5,7 @@ import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.extension.journal.QuestPageService;
 
 import javax.annotation.Nonnull;
 
@@ -19,6 +20,8 @@ public final class QuestStateFeature {
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestProgressionService.get()
                                .registerQuestType(TYPE_ID, QuestStateQuestAsset.class, QuestStateQuestAsset.CODEC, QuestStateQuestProgression.class, QuestStateQuestProgression.CODEC);
+
+        QuestPageService.register(new QuestStateQuestPageRenderer());
 
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, QuestStateQuestEvents::handleQuestAddedToPlayerStore);
         plugin.getEventRegistry().registerGlobal(QuestUpdatedEvent.class, QuestStateQuestEvents::handleQuestUpdated);

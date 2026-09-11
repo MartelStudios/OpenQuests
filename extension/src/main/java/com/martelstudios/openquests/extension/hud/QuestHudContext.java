@@ -3,6 +3,7 @@ package com.martelstudios.openquests.extension.hud;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 /**
  * What a renderer needs to draw into the panel: the builder, and the only thing it cannot work out
@@ -17,8 +18,20 @@ public final class QuestHudContext {
     private String container = ROOT_CONTAINER;
     private int rowCount;
 
-    QuestHudContext(@Nonnull UICommandBuilder builder) {
+    /**
+     * Who is looking. A quest several players share can have ended for this one and still be
+     * running for the others, so what it is worth is only ever asked on their behalf.
+     */
+    private final UUID viewer;
+
+    QuestHudContext(@Nonnull UICommandBuilder builder, @Nonnull UUID viewer) {
         this.builder = builder;
+        this.viewer = viewer;
+    }
+
+    @Nonnull
+    public UUID getViewer() {
+        return viewer;
     }
 
     @Nonnull

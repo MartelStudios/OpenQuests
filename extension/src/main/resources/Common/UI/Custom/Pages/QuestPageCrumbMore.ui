@@ -1,0 +1,12 @@
+// The mark standing for the steps the trail left out. Its own document rather than a crumb with a
+// short name, so it takes only the width of the mark: a full trail is five crumbs wide, and giving
+// this one a quest title's width is what would push the last of them off the page.
+$P = "QuestPageCommon.ui";
+
+Group #CrumbMore {
+  LayoutMode: Left;
+  Anchor: (Width: 34, Height: 20);
+
+  Label #Separator { Text: ">"; Anchor: (Width: 14); Style: (...$P.@RowStatusStyle, HorizontalAlignment: Center); }
+  Label #Here { Text: "..."; FlexWeight: 1; Style: (...$P.@RowStatusStyle, HorizontalAlignment: Start); }
+}

@@ -1,0 +1,8 @@
+// One tab of the journal. Appended into #Tabs by the page, which disables the one already open:
+// the disabled look is what marks the current tab, and it stops a click that would do nothing.
+$C = "../Common.ui";
+
+$C.@SmallSecondaryTextButton #Tab {
+  @Text = "";
+  Anchor: (Width: 104, Height: 30, Right: 4);
+}
