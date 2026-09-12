@@ -113,6 +113,7 @@ that could not be granted on the spot has nowhere to wait.
 | `UseBlock` | Interacting with a block a number of times. |
 | `BreakBlock` | Breaking a number of blocks, named by id or by block tag. |
 | `PlaceBlock` | Placing a number of blocks, matched on the item they are placed from. |
+| `Consume` | Eating or drinking a quantity of an item. |
 | `UseEntity` | Interacting with NPCs of a group a number of times. |
 | `KillNpc` | Killing NPCs of a group, either an existing one or one written inline. |
 | `KillPlayer` | Killing players, optionally a designated one. |

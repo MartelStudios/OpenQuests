@@ -5,6 +5,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.openquests.extension.hud.HudFeature;
 import com.martelstudios.openquests.extension.journal.JournalFeature;
 import com.martelstudios.openquests.extension.quests.composite.CompositeFeature;
+import com.martelstudios.openquests.extension.quests.consumeitem.ConsumeItemFeature;
 import com.martelstudios.openquests.extension.quests.craft.CraftFeature;
 import com.martelstudios.openquests.extension.quests.enterworld.EnterWorldFeature;
 import com.martelstudios.openquests.extension.quests.gather.GatherFeature;
@@ -51,6 +52,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         UseBlockFeature.register(this);
         BreakBlockFeature.register(this);
         PlaceBlockFeature.register(this);
+        ConsumeItemFeature.register(this);
         UseEntityFeature.register(this);
         QuestStateFeature.register(this);
         QuantityFeature.register(this);
