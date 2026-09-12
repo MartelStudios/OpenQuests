@@ -598,7 +598,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                                                                                                                                                       .toString()));
         }
 
-        if (entry.quest() == null || !entry.quest().canBeAbandoned()) return entry.claimable();
+        if (entry.quest() == null || entry.mark() != QuestMark.IN_PROGRESS) return entry.claimable();
+
+        if (!entry.quest().canBeAbandoned()) return entry.claimable();
 
         context.getBuilder()
                .set(rowSelector + "#Abandon.Visible", true)
