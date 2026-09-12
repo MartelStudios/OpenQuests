@@ -14,6 +14,8 @@ import com.martelstudios.openquests.extension.quests.quantity.QuantityFeature;
 import com.martelstudios.openquests.extension.quests.queststate.QuestStateFeature;
 import com.martelstudios.openquests.extension.quests.reachlocation.ReachLocationFeature;
 import com.martelstudios.openquests.extension.quests.script.ScriptFeature;
+import com.martelstudios.openquests.extension.quests.breakblock.BreakBlockFeature;
+import com.martelstudios.openquests.extension.quests.placeblock.PlaceBlockFeature;
 import com.martelstudios.openquests.extension.quests.useblock.UseBlockFeature;
 import com.martelstudios.openquests.extension.quests.useentity.UseEntityFeature;
 import com.martelstudios.openquests.extension.rewards.command.CommandRewardFeature;
@@ -47,6 +49,8 @@ public class OpenQuestsPlugin extends JavaPlugin {
         KillFeature.register(this);
         CraftFeature.register(this);
         UseBlockFeature.register(this);
+        BreakBlockFeature.register(this);
+        PlaceBlockFeature.register(this);
         UseEntityFeature.register(this);
         QuestStateFeature.register(this);
         QuantityFeature.register(this);

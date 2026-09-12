@@ -111,6 +111,8 @@ that could not be granted on the spot has nowhere to wait.
 | `InteractivelyPickup` | Picking up a quantity through the harvest interaction. |
 | `Craft` | Crafting a quantity of an item, whatever the recipe. |
 | `UseBlock` | Interacting with a block a number of times. |
+| `BreakBlock` | Breaking a number of blocks, named by id or by block tag. |
+| `PlaceBlock` | Placing a number of blocks, matched on the item they are placed from. |
 | `UseEntity` | Interacting with NPCs of a group a number of times. |
 | `KillNpc` | Killing NPCs of a group, either an existing one or one written inline. |
 | `KillPlayer` | Killing players, optionally a designated one. |
