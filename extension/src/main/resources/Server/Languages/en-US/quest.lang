@@ -66,3 +66,20 @@ enter-forgotten-temple.description=Find your way inside the temple the guardian 
 
 talk-merchant.title=Talk to the merchant
 talk-merchant.description=Meet the Kweebec merchant waiting in the temple.
+
+gather-meat.title=Gather meat
+gather-meat.description=Whatever you bring down, carry a cut of it home.
+
+gather-wildmeat.title=Gather raw wild meat
+gather-beef.title=Gather raw beef
+gather-chicken.title=Gather raw chicken
+gather-pork.title=Gather raw pork
+
+craft-campfire.title=Craft a campfire
+craft-campfire.description=Four sticks and some rubble. Raw meat makes no dinner.
+
+cook-meat.title=Cook your meat
+cook-meat.description=Lay the meat in the fire, feed it fuel, and take back what comes out.
+
+eat-meat.title=Eat your meat
+eat-meat.description=The fire did its part. Now eat.

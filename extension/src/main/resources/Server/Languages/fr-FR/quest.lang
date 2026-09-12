@@ -66,3 +66,20 @@ enter-forgotten-temple.description=Trouvez le chemin vers l'intérieur du temple
 
 talk-merchant.title=Parler au marchand
 talk-merchant.description=Rencontrez le marchand Kweebec qui attend dans le temple.
+
+gather-meat.title=Récupérez de la viande
+gather-meat.description=Quoi que vous abattiez, rapportez-en un morceau.
+
+gather-wildmeat.title=Récupérer de la viande sauvage crue
+gather-beef.title=Récupérer du bœuf cru
+gather-chicken.title=Récupérer du poulet cru
+gather-pork.title=Récupérer du porc cru
+
+craft-campfire.title=Fabriquez un feu de camp
+craft-campfire.description=Quatre bâtons et des gravats. La viande crue ne fait pas un repas.
+
+cook-meat.title=Faites cuire votre viande
+cook-meat.description=Posez la viande dans le feu, donnez-lui du combustible, et reprenez ce qui en sort.
+
+eat-meat.title=Mangez votre viande
+eat-meat.description=Le feu a fait sa part. À vous de manger.
