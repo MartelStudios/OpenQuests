@@ -24,8 +24,11 @@ public final class JournalRoutes {
     public static final String TAB_DONE = "journal/done";
     public static final String TAB_ALL = "journal/all";
 
+    /** What the player is still owed, whether or not the quest that owes it is still listed. */
+    public static final String TAB_PENDING = "journal/pending";
+
     /** Declaration order, which is the order the tab buttons are drawn in. */
-    private static final List<String> TABS = List.of(TAB_ACTIVE, TAB_DONE, TAB_ALL);
+    private static final List<String> TABS = List.of(TAB_ACTIVE, TAB_DONE, TAB_ALL, TAB_PENDING);
 
     private JournalRoutes() {}
 

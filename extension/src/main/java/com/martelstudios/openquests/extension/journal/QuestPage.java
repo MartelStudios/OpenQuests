@@ -26,6 +26,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.QuestReward;
+import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
@@ -144,7 +145,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         // Standing on a quest is reading that one quest; standing on the journal is reading a list
         boolean alone = route instanceof QuestRoute;
-        List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : collect(playerComponents, filter);
+        List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : list(playerComponents, filter);
 
         QuestShape shape = alone ? QuestShape.PAGE : QuestShape.CARD;
 
@@ -233,6 +234,32 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                 return quest == null ? null : QuestMark.of(quest.getStateFor(playerRef.getUuid()));
             }
         };
+    }
+
+    /**
+     * What the open tab lists. Every tab but one reads the quests the player holds; that one reads
+     * what they are still owed, which is not the same list — a quest told to keep no trace of
+     * itself is gone from the journal with its debt still standing.
+     */
+    @Nonnull
+    private List<Entry> list(@Nonnull EntityComponents playerComponents, @Nonnull Filter filter) {
+        return filter == Filter.PENDING ? collectOwed(playerComponents) : collect(playerComponents, filter);
+    }
+
+    /**
+     * One row per debt, named after the quest that owes it wherever that quest can still be found.
+     * The rewards shown are what is left to hand over rather than what the outcome was worth, so a
+     * row that pays out in part is honest about what is still on it.
+     */
+    @Nonnull
+    private List<Entry> collectOwed(@Nonnull EntityComponents playerComponents) {
+        UUID viewer = playerRef.getUuid();
+        List<Entry> entries = new ArrayList<>();
+
+        for (PendingRewards owed : QuestRewardService.get().getPending(playerComponents).getAll()) {
+            entries.add(Entry.owed(owed, QuestProgressionService.get().getQuest(owed.getQuestId()), viewer));
+        }
+        return entries;
     }
 
     /**
@@ -788,6 +815,20 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         }
 
         /**
+         * A debt, for the tab that lists them. Named after the quest wherever it can still be found
+         * and left unnamed where it cannot: a quest that kept no trace of itself leaves an id, and
+         * an id is not a name. Always claimable, since a settled debt is not kept.
+         */
+        @Nonnull
+        static Entry owed(@Nonnull PendingRewards owed, @Nullable AbstractQuestProgression<?> quest, @Nonnull UUID viewer) {
+            if (quest == null) {
+                return of(owed.getQuestId().toString(), null, null, Message.translation("openquests.page.reward.unknown"), Message.raw(""), QuestMark.LOST, null, owed.getRewards(), true);
+            }
+
+            return of(quest.getId().toString(), quest.getAssetId(), quest.getAsset(), quest.getTitle(), quest.getDescription(), QuestMark.of(quest.getStateFor(viewer)), quest, owed.getRewards(), true);
+        }
+
+        /**
          * A quest read from its asset alone, for one the journal cannot place: never handed out, or
          * ended and kept no record — a step of a chain, which by default keeps none.
          *
@@ -836,7 +877,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * hiding rows the client already has.
      */
     private enum Filter {
-        ACTIVE(JournalRoutes.TAB_ACTIVE, "openquests.page.filter.active"), DONE(JournalRoutes.TAB_DONE, "openquests.page.filter.done"), ALL(JournalRoutes.TAB_ALL, "openquests.page.filter.all");
+        ACTIVE(JournalRoutes.TAB_ACTIVE, "openquests.page.filter.active"), DONE(JournalRoutes.TAB_DONE, "openquests.page.filter.done"), ALL(JournalRoutes.TAB_ALL, "openquests.page.filter.all"), PENDING(JournalRoutes.TAB_PENDING, "openquests.page.filter.pending");
 
         private final String tabName;
 
@@ -864,6 +905,10 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                 case ACTIVE -> state == QuestState.IN_PROGRESS;
                 case DONE -> state != QuestState.IN_PROGRESS;
                 case ALL -> true;
+
+                // Never asked: what is owed is read off the debts rather than off the quests, which
+                // is the whole reason this tab exists
+                case PENDING -> false;
             };
         }
 
