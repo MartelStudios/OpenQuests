@@ -76,6 +76,10 @@ public class PlayerQuestService {
         for (UUID playerId : quest.getPlayers()) {
             removeQuestFromPlayerStore(quest, playerId);
         }
+
+        for (UUID playerId : quest.getAbandonedPlayers()) {
+            removeQuestFromPlayerStore(quest, playerId);
+        }
     }
 
     public void addQuestToPlayerStore(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {

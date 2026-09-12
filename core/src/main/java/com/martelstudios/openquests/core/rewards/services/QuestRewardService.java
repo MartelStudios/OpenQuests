@@ -6,8 +6,10 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
+import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStore;
@@ -34,6 +36,8 @@ public class QuestRewardService {
         // EventPriority.FIRST, to grant rewards earlier
         plugin.getEventRegistry()
               .registerGlobal(EventPriority.FIRST, QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+        plugin.getEventRegistry()
+              .registerGlobal(EventPriority.FIRST, QuestPlayerAbandonedEvent.class, this::handleQuestPlayerAbandonedEvent);
     }
 
     public static QuestRewardService get() {
@@ -79,6 +83,27 @@ public class QuestRewardService {
                 if (autoClaim) grant(pending, components);
             });
         }
+    }
+
+    /**
+     * Pays one player for giving up, at the moment they do.
+     */
+    private void handleQuestPlayerAbandonedEvent(QuestPlayerAbandonedEvent questPlayerAbandonedEvent) {
+        AbstractQuestProgression<?> quest = questPlayerAbandonedEvent.getQuest();
+
+        QuestAsset asset = quest.getAsset();
+        if (asset == null) return;
+
+        QuestReward[] rewards = asset.getRewards(QuestState.ABANDONED);
+        if (rewards.length == 0) return;
+
+        EntityComponents.update(questPlayerAbandonedEvent.getPlayerId(), components -> {
+            var pending = new PendingRewards(quest, rewards);
+
+            getPending(components).owe(pending);
+
+            if (asset.isAutoClaim()) grant(pending, components);
+        });
     }
 
     /**

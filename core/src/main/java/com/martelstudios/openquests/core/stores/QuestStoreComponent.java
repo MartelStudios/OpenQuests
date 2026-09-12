@@ -161,7 +161,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
      * @return {@code true} if this quest is written with its only player rather than in a file.
      */
     private static boolean shouldBeHeldByOwner(@Nonnull AbstractQuestProgression<?> quest) {
-        return quest.getPlayers().size() <= 1;
+        return quest.getHolderCount() <= 1;
     }
 
     /**

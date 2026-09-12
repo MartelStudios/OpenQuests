@@ -7,24 +7,26 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * Forces the state of the quests a player holds from one reference. Visits every type, since what
- * it writes is the state each of them already carries.
+ * Update the state of the quests a player holds from one reference.
  */
-public class QuestStateVisitor implements QuestVisitor<AbstractQuestProgression<?>> {
-
+public class PlayerSetStateVisitor implements QuestVisitor<AbstractQuestProgression<?>> {
     private final UUID playerId;
 
-    /** A quest id or an asset id: the second matches every quest the player holds from it. */
+    /**
+     * A quest id or an asset id: the second matches every quest the player holds from it.
+     */
     private final String questRef;
 
     private final QuestState state;
 
     private int matched;
 
-    /** Quests this one matched but was not allowed to abandon, so a caller can say which it was. */
+    /**
+     * Quests this one matched but was not allowed to update.
+     */
     private int refused;
 
-    public QuestStateVisitor(@Nonnull UUID playerId, @Nonnull String questRef, @Nonnull QuestState state) {
+    public PlayerSetStateVisitor(@Nonnull UUID playerId, @Nonnull String questRef, @Nonnull QuestState state) {
         this.playerId = playerId;
         this.questRef = questRef;
         this.state = state;
@@ -35,15 +37,20 @@ public class QuestStateVisitor implements QuestVisitor<AbstractQuestProgression<
         if (!quest.getPlayers().contains(playerId)) return;
         if (!questRef.equals(quest.getAssetId()) && !questRef.equals(quest.getId().toString())) return;
 
-        // Refused here rather than only where the journal hides its button, so the rule holds
-        // wherever a player gives up. Forcing another outcome stays an administrator matter.
-        if (state == QuestState.ABANDONED && !quest.canBeAbandoned()) {
-            refused++;
-            return;
+        switch (state) {
+            case ABANDONED -> {
+                if (quest.canBeAbandoned()) {
+                    quest.abandonPlayer(playerId);
+                    matched++;
+                } else {
+                    refused++;
+                }
+            }
+            default -> {
+                quest.setState(state).markDirty();
+                matched++;
+            }
         }
-
-        quest.setState(state).markDirty();
-        matched++;
     }
 
     @Override
@@ -60,8 +67,7 @@ public class QuestStateVisitor implements QuestVisitor<AbstractQuestProgression<
     }
 
     /**
-     * @return how many it matched but was not allowed to abandon, so a caller can tell a quest it
-     * could not find from one it may not give up.
+     * @return how many it matched but was not allowed update.
      */
     public int getRefused() {
         return refused;

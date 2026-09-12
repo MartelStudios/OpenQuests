@@ -170,7 +170,7 @@ public class QuestProgressionStore {
      * quest directory from growing with one file per player and per quest.
      */
     public boolean isFileBacked(@Nonnull AbstractQuestProgression<?> quest) {
-        return quest.getPlayers().size() > 1 || fileBacked.contains(quest.getId());
+        return quest.getHolderCount() > 1 || fileBacked.contains(quest.getId());
     }
 
     /**

@@ -13,7 +13,7 @@ import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
-import com.martelstudios.openquests.core.visitors.QuestStateVisitor;
+import com.martelstudios.openquests.core.visitors.PlayerSetStateVisitor;
 
 import javax.annotation.Nonnull;
 
@@ -34,7 +34,9 @@ public class QuestStateCommand extends AbstractPlayerCommand {
     @Nonnull
     private final QuestState state;
 
-    /** Runs under the permission group of {@code /quest}. */
+    /**
+     * Runs under the permission group of {@code /quest}.
+     */
     public QuestStateCommand(@Nonnull String name, @Nonnull String description, @Nonnull QuestState state) {
         super(name, description);
         this.state = state;
@@ -65,16 +67,16 @@ public class QuestStateCommand extends AbstractPlayerCommand {
             return;
         }
 
-        var visitor = new QuestStateVisitor(playerRef.getUuid(), questRef, state);
+        var visitor = new PlayerSetStateVisitor(playerRef.getUuid(), questRef, state);
         QuestProgressionService.get().progress(visitor, questStore.getQuestIds());
 
         if (visitor.getMatched() == 0 && visitor.getRefused() > 0) {
-            context.sendMessage(Message.raw("'" + questRef + "' cannot be abandoned."));
+            context.sendMessage(Message.raw(String.format("'%s' cannot be set to %s.", questRef, state)));
             return;
         }
 
         if (visitor.getMatched() == 0) {
-            context.sendMessage(Message.raw("No quest of yours matches '" + questRef + "'."));
+            context.sendMessage(Message.raw(String.format("No quest of yours matches '%s'.", questRef)));
             return;
         }
 

@@ -37,6 +37,10 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     private static final BiConsumer<AbstractQuestProgression, UUID[]> PLAYERS_SETTER = (quest, uuids) -> ((AbstractQuestProgression<?>) quest).players.addAll(List.of(uuids));
     private static final Function<AbstractQuestProgression, UUID[]> PLAYERS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).players.toArray(new UUID[0]);
 
+    private static final KeyedCodec<UUID[]> ABANDONED_PLAYERS_CODEC = new KeyedCodec<>("AbandonedPlayers", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
+    private static final BiConsumer<AbstractQuestProgression, UUID[]> ABANDONED_PLAYERS_SETTER = (quest, uuids) -> ((AbstractQuestProgression<?>) quest).abandonedPlayers.addAll(List.of(uuids));
+    private static final Function<AbstractQuestProgression, UUID[]> ABANDONED_PLAYERS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).abandonedPlayers.toArray(new UUID[0]);
+
     private static final KeyedCodec<String[]> TAGS_CODEC = new KeyedCodec<>("Tags", new ArrayCodec<>(Codec.STRING, String[]::new));
     private static final BiConsumer<AbstractQuestProgression, String[]> TAGS_SETTER = (quest, tags) -> ((AbstractQuestProgression<?>) quest).tags.addAll(List.of(tags));
     private static final Function<AbstractQuestProgression, String[]> TAGS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).tags.toArray(new String[0]);
@@ -59,6 +63,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(PLAYERS_CODEC, PLAYERS_SETTER, PLAYERS_GETTER)
                                                                                         .add()
+                                                                                        .append(ABANDONED_PLAYERS_CODEC, ABANDONED_PLAYERS_SETTER, ABANDONED_PLAYERS_GETTER)
+                                                                                        .add()
                                                                                         .append(TAGS_CODEC, TAGS_SETTER, TAGS_GETTER)
                                                                                         .add()
                                                                                         .build();
@@ -72,6 +78,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Ids of the players still running the quest progression.
      */
     protected Set<UUID> players = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Ids of the players who have left the quest progression.
+     */
+    protected Set<UUID> abandonedPlayers = ConcurrentHashMap.newKeySet();
 
     /**
      * Tags written on this instance, on top of those its asset declares. What became of this one
@@ -159,6 +170,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
         visitor.progress(self());
 
+        // If no player remains and some has abandoned set the quest as abandoned
+        if (!isCompleted() && players.isEmpty() && !abandonedPlayers.isEmpty()) {
+            setState(QuestState.ABANDONED).markDirty();
+        }
+
         if (hasChanges()) {
             HytaleServer.get()
                         .getEventBus()
@@ -206,10 +222,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public void onUnregistered() {}
 
     /**
+     * Add the player to the quest progression
      * @return {@code false} if the player already held this quest.
      */
     public boolean addPlayer(@Nonnull UUID playerId) {
         if (!getPlayers().add(playerId)) return false;
+
+        // Handed the quest again after walking away from it: they are running it, not done with it
+        abandonedPlayers.remove(playerId);
         markDirty();
 
         HytaleServer.get()
@@ -221,6 +241,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
+     * Removes the player from the quest progression.
      * @return {@code false} if the player did not hold this quest.
      */
     public boolean removePlayer(@Nonnull UUID playerId) {
@@ -231,6 +252,26 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                     .getEventBus()
                     .dispatchFor(QuestPlayerRemovedEvent.class, playerId)
                     .dispatch(new QuestPlayerRemovedEvent(this, playerId));
+
+        return true;
+    }
+
+    /**
+     * Moves a player from those running this quest to those who left it. The player will still be linked to the quest
+     * but will not receive completion rewards.
+     *
+     * @return {@code false} if the player was not running this quest.
+     */
+    public boolean abandonPlayer(@Nonnull UUID playerId) {
+        if (!players.remove(playerId)) return false;
+
+        abandonedPlayers.add(playerId);
+        markDirty();
+
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestPlayerAbandonedEvent.class, playerId)
+                    .dispatch(new QuestPlayerAbandonedEvent(this, playerId));
 
         return true;
     }
@@ -249,6 +290,36 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     public boolean isCompleted() {
         return isSuccessful() || isFailed() || isAbandoned();
+    }
+
+    /**
+     * @return {@code true} if this player gave the quest up.
+     */
+    public boolean isAbandonedBy(@Nonnull UUID playerId) {
+        return abandonedPlayers.contains(playerId);
+    }
+
+    /**
+     * @return {@code ABANDONED} for players that have left the quest progression and the quest state for others.
+     */
+    @Nonnull
+    public QuestState getStateFor(@Nonnull UUID playerId) {
+        return isAbandonedBy(playerId) ? QuestState.ABANDONED : getState();
+    }
+
+    /**
+     * @return the live, mutable set of ids of the players who gave this quest up.
+     */
+    @Nonnull
+    public Set<UUID> getAbandonedPlayers() {
+        return abandonedPlayers;
+    }
+
+    /**
+     * @return how many players held the quest progression.
+     */
+    public int getHolderCount() {
+        return players.size() + abandonedPlayers.size();
     }
 
     /**
