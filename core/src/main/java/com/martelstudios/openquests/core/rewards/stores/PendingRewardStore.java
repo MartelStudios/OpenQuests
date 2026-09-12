@@ -26,44 +26,36 @@ public class PendingRewardStore {
      * from it on decode, which avoids storing the key twice and the deprecated map codecs.
      */
     public static final BuilderCodec<PendingRewardStore> CODEC = BuilderCodec.builder(PendingRewardStore.class, PendingRewardStore::new)
-                                                                            .append(new KeyedCodec<>("Pending", new SetCodec<>(PendingRewards.CODEC, HashSet<PendingRewards>::new, false)), (store, owed) -> owed.forEach(store::owe), store -> new HashSet<>(store.owed.values()))
-                                                                            .add()
-                                                                            .build();
+                                                                             .append(new KeyedCodec<>("Pending", new SetCodec<>(PendingRewards.CODEC, HashSet<PendingRewards>::new, false)), (store, owed) -> owed.forEach(store::add), store -> new HashSet<>(store.pending.values()))
+                                                                             .add()
+                                                                             .build();
 
-    private final Map<UUID, PendingRewards> owed = new ConcurrentHashMap<>();
+    private final Map<UUID, PendingRewards> pending = new ConcurrentHashMap<>();
 
     public PendingRewardStore() {}
 
     public PendingRewardStore(@Nonnull PendingRewardStore other) {
-        this.owed.putAll(other.owed);
+        this.pending.putAll(other.pending);
     }
 
-    /**
-     * Writes down a debt. An entry owing nothing is not kept: nothing to collect is the same as no
-     * entry at all, and a store of settled debts would only grow.
-     */
-    public void owe(@Nonnull PendingRewards pending) {
-        if (pending.isSettled()) {
-            this.owed.remove(pending.getQuestId());
-            return;
-        }
-        this.owed.put(pending.getQuestId(), pending);
+    public void add(@Nonnull PendingRewards pending) {
+        this.pending.put(pending.getQuestId(), pending);
+    }
+
+    public boolean remove(@Nonnull UUID questId) {
+        return this.pending.remove(questId) != null;
     }
 
     @Nullable
     public PendingRewards get(@Nonnull UUID questId) {
-        return this.owed.get(questId);
+        return this.pending.get(questId);
     }
 
     /**
      * @return whether that completion still has anything to hand over.
      */
     public boolean isOwed(@Nonnull UUID questId) {
-        return this.owed.containsKey(questId);
-    }
-
-    public boolean settle(@Nonnull UUID questId) {
-        return this.owed.remove(questId) != null;
+        return this.pending.containsKey(questId);
     }
 
     /**
@@ -72,12 +64,12 @@ public class PendingRewardStore {
      */
     @Nonnull
     public Collection<PendingRewards> getAll() {
-        return List.copyOf(this.owed.values());
+        return List.copyOf(this.pending.values());
     }
 
     @Nonnull
     public List<UUID> getQuestIds() {
-        return new ArrayList<>(this.owed.keySet());
+        return new ArrayList<>(this.pending.keySet());
     }
 
     @Nonnull

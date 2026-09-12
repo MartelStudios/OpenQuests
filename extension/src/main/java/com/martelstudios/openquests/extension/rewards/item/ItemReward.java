@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class ItemReward extends QuestReward {
 
-    public static final BuilderCodec<ItemReward> CODEC = BuilderCodec.builder(ItemReward.class, ItemReward::new)
+    public static final BuilderCodec<ItemReward> CODEC = BuilderCodec.builder(ItemReward.class, ItemReward::new, QuestReward.BASE_CODEC)
                                                                      .append(new KeyedCodec<>("ItemId", Codec.STRING), (reward, itemId) -> reward.itemId = itemId, reward -> reward.itemId)
                                                                      .addValidator(Item.VALIDATOR_CACHE.getValidator())
                                                                      .add()

@@ -3,7 +3,6 @@
   "TitleKey": "quest.basics.title",
   "DescriptionKey": "quest.basics.description",
   "StartOnConnection": false,
-  "AutoClaim": true,
   "PersistChildrenHistory": true,
   "QuestAssetIds": [
     {
@@ -48,7 +47,8 @@
       "Type": "GrantQuest",
       "QuestAssetIds": [
         "DefeatForgottenTempleGuardian"
-      ]
+      ],
+      "AutoClaim": true
     }
   ],
   "Tags": {

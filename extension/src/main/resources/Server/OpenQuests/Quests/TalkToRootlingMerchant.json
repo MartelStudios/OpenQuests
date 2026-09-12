@@ -3,12 +3,12 @@
   "TitleKey": "quest.talk-merchant.title",
   "DescriptionKey": "quest.talk-merchant.description",
   "TargetQuantity": 1,
-  "AutoClaim": true,
   "SuccessfulRewards": [
     {
       "Type": "Item",
       "ItemId": "Ingredient_Life_Essence",
-      "Quantity": 100
+      "Quantity": 100,
+      "AutoClaim": true
     }
   ],
   "NpcGroupId": {

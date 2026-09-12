@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
  * Runs a server or player command on completion.
  */
 public class CommandReward extends QuestReward {
-    public static final BuilderCodec<CommandReward> CODEC = BuilderCodec.builder(CommandReward.class, CommandReward::new)
+    public static final BuilderCodec<CommandReward> CODEC = BuilderCodec.builder(CommandReward.class, CommandReward::new, QuestReward.BASE_CODEC)
                                                                         .append(new KeyedCodec<>("Command", Codec.STRING, true), (reward, command) -> reward.command = command, reward -> reward.command)
                                                                         .addValidator(Validators.nonNull())
                                                                         .add()

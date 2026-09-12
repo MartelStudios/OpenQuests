@@ -21,7 +21,7 @@ import java.util.UUID;
 public class GrantQuestReward extends QuestReward {
 
     public static final BuilderCodec<GrantQuestReward> CODEC =
-        BuilderCodec.builder(GrantQuestReward.class, GrantQuestReward::new)
+        BuilderCodec.builder(GrantQuestReward.class, GrantQuestReward::new, QuestReward.BASE_CODEC)
                     .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(new ContainedAssetCodec<>(QuestAsset.class, QuestAsset.CODEC), String[]::new)), (reward, ids) -> reward.questAssetIds = ids, reward -> reward.questAssetIds)
                     .addValidator(Validators.nonEmptyArray())
                     .addValidator(Validators.uniqueInArray())

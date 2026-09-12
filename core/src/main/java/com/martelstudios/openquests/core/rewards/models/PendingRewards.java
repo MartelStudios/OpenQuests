@@ -11,34 +11,23 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * What one completed quest still owes one player. Kept per player rather than on the quest: a
- * quest is shared by everyone holding it, and a debt is not.
- *
- * <p>The rewards themselves are held rather than a place in the asset's list. What was owed stays
- * owed even if the asset is rewritten between the moment the quest ended and the moment the player
- * comes to collect.
+ * Rewards that have not yet been claimed by a player.
  */
 public class PendingRewards {
 
     public static final BuilderCodec<PendingRewards> CODEC = BuilderCodec.builder(PendingRewards.class, PendingRewards::new)
-                                                                        .append(new KeyedCodec<>("QuestId", Codec.UUID_BINARY), (owed, questId) -> owed.questId = questId, owed -> owed.questId)
-                                                                        .add()
-                                                                        .append(new KeyedCodec<>("QuestAssetId", Codec.STRING), (owed, assetId) -> owed.questAssetId = assetId, owed -> owed.questAssetId)
-                                                                        .add()
-                                                                        .append(new KeyedCodec<>("Rewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (owed, rewards) -> owed.rewards = rewards, owed -> owed.rewards)
-                                                                        .add()
-                                                                        .build();
+                                                                         .append(new KeyedCodec<>("QuestId", Codec.UUID_BINARY), (owed, questId) -> owed.questId = questId, owed -> owed.questId)
+                                                                         .add()
+                                                                         .append(new KeyedCodec<>("Rewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (owed, rewards) -> owed.rewards = rewards, owed -> owed.rewards)
+                                                                         .add()
+                                                                         .build();
 
-    private static final QuestReward[] NO_REWARDS = new QuestReward[0];
-
-    /** The id the quest had while it was live, which is what a claim names. */
-    protected UUID questId;
+    public static final QuestReward[] NO_REWARDS = new QuestReward[0];
 
     /**
-     * What the quest was built from, kept here rather than looked up through the quest: a quest
-     * that ended has left the store, and a debt that cannot say what it is for cannot be read.
+     * The id the quest had while it was live
      */
-    protected String questAssetId;
+    protected UUID questId;
 
     protected QuestReward[] rewards = NO_REWARDS;
 
@@ -46,17 +35,12 @@ public class PendingRewards {
 
     public PendingRewards(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestReward[] rewards) {
         this.questId = quest.getId();
-        this.questAssetId = quest.getAssetId();
         this.rewards = rewards.clone();
     }
 
     @Nonnull
     public UUID getQuestId() {
         return questId;
-    }
-
-    public String getQuestAssetId() {
-        return questAssetId;
     }
 
     @Nonnull
@@ -71,7 +55,7 @@ public class PendingRewards {
     /**
      * @return {@code true} once nothing is left to hand over.
      */
-    public boolean isSettled() {
+    public boolean isEmpty() {
         return rewards.length == 0;
     }
 

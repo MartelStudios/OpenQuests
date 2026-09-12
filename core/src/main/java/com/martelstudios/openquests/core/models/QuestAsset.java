@@ -35,8 +35,6 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .add()
                                                                           .append(new KeyedCodec<>("DescriptionKey", Codec.STRING), (asset, key) -> asset.descriptionKey = key, asset -> asset.descriptionKey)
                                                                           .add()
-                                                                          .append(new KeyedCodec<>("AutoClaim", Codec.BOOLEAN), (asset, value) -> asset.autoClaim = value, asset -> Boolean.valueOf(asset.autoClaim))
-                                                                          .add()
                                                                           .append(new KeyedCodec<>("StartOnConnection", Codec.BOOLEAN), (asset, value) -> asset.startOnConnection = value, asset -> Boolean.valueOf(asset.startOnConnection))
                                                                           .add()
                                                                           .append(new KeyedCodec<>("StopOnComplete", Codec.BOOLEAN), (asset, value) -> asset.stopOnComplete = value, asset -> Boolean.valueOf(asset.stopOnComplete))
@@ -62,7 +60,6 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     protected AssetExtraInfo.Data data;
     protected String titleKey;
     protected String descriptionKey;
-    protected boolean autoClaim;
     protected boolean startOnConnection;
     protected boolean stopOnComplete = true;
     protected boolean persistProgression = true;
@@ -103,10 +100,6 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
 
         Map<String, String[]> tags = data.getRawTags();
         return tags != null && tags.containsKey(tag);
-    }
-
-    public boolean isAutoClaim() {
-        return autoClaim;
     }
 
     /**

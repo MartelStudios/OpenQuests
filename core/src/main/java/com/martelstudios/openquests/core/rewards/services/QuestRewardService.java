@@ -19,7 +19,6 @@ import com.martelstudios.openquests.core.utils.EntityComponents;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -72,15 +71,13 @@ public class QuestRewardService {
         QuestReward[] rewards = asset.getRewards(questCompletedEvent.getState());
         if (rewards.length == 0) return;
 
-        boolean autoClaim = asset.isAutoClaim();
-
         for (UUID playerId : quest.getPlayers()) {
             EntityComponents.update(playerId, components -> {
                 var pending = new PendingRewards(quest, rewards);
 
-                getPending(components).owe(pending);
+                getPending(components).add(pending);
 
-                if (autoClaim) grant(pending, components);
+                grantAuto(pending, components);
             });
         }
     }
@@ -100,9 +97,9 @@ public class QuestRewardService {
         EntityComponents.update(questPlayerAbandonedEvent.getPlayerId(), components -> {
             var pending = new PendingRewards(quest, rewards);
 
-            getPending(components).owe(pending);
+            getPending(components).add(pending);
 
-            if (asset.isAutoClaim()) grant(pending, components);
+            grantAuto(pending, components);
         });
     }
 
@@ -124,14 +121,7 @@ public class QuestRewardService {
         PendingRewardStore store = getPending(playerComponents);
 
         for (PendingRewards pending : store.getAll()) {
-            QuestAsset asset = QuestAsset.getAsset(pending.getQuestAssetId());
-
-            // Left standing rather than written off: an asset missing right now is as likely to be
-            // a mod that failed to load as one that is gone for good, and a debt is not ours to
-            // cancel on a guess. Sweeping them up is its own decision, taken elsewhere.
-            if (asset == null) continue;
-
-            if (asset.isAutoClaim()) grant(pending, playerComponents);
+            grantAuto(pending, playerComponents);
         }
     }
 
@@ -149,21 +139,37 @@ public class QuestRewardService {
         return true;
     }
 
+    private void grantAuto(@Nonnull PendingRewards pending, @Nonnull EntityComponents playerComponents) {
+        QuestReward[] rewards = pending.getRewards();
+        var remaining = new ArrayList<>(Arrays.asList(rewards));
+
+        for (QuestReward reward : rewards) {
+            if (!reward.isAutoClaim()) continue;
+
+            if (!reward.grant(playerComponents)) continue;
+
+            remaining.remove(reward);
+            pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));
+        }
+
+        if (pending.isEmpty()) getPending(playerComponents).remove(pending.getQuestId());
+    }
+
     /**
      * Hands over what is owed, one reward at a time, writing down what is left after each. A
      * reward that cannot be granted right now — a full inventory — stays owed and is retried.
      */
     private void grant(@Nonnull PendingRewards pending, @Nonnull EntityComponents playerComponents) {
-        QuestReward[] owed = pending.getRewards();
-        List<QuestReward> remaining = new ArrayList<>(Arrays.asList(owed));
+        QuestReward[] rewards = pending.getRewards();
+        var remaining = new ArrayList<>(Arrays.asList(rewards));
 
-        for (QuestReward reward : owed) {
+        for (QuestReward reward : rewards) {
             if (!reward.grant(playerComponents)) continue;
 
             remaining.remove(reward);
-            pending.setRewards(remaining.toArray(new QuestReward[0]));
+            pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));
         }
 
-        if (pending.isSettled()) getPending(playerComponents).settle(pending.getQuestId());
+        if (pending.isEmpty()) getPending(playerComponents).remove(pending.getQuestId());
     }
 }

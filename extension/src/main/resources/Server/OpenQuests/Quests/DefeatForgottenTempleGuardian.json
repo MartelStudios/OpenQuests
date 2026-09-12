@@ -13,10 +13,10 @@
       "Type": "GrantQuest",
       "QuestAssetIds": [
         "EnterForgottenTemple"
-      ]
+      ],
+      "AutoClaim": true
     }
   ],
-  "AutoClaim": true,
   "Tags": {
     "HUD_TRACK": []
   }
