@@ -16,7 +16,7 @@ import java.util.UUID;
 public class PendingRewards {
 
     public static final BuilderCodec<PendingRewards> CODEC = BuilderCodec.builder(PendingRewards.class, PendingRewards::new)
-                                                                         .append(new KeyedCodec<>("QuestId", Codec.UUID_BINARY), (owed, questId) -> owed.questId = questId, owed -> owed.questId)
+                                                                         .append(new KeyedCodec<>("QuestId", Codec.UUID_STRING), (owed, questId) -> owed.questId = questId, owed -> owed.questId)
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Rewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (owed, rewards) -> owed.rewards = rewards, owed -> owed.rewards)
                                                                          .add()

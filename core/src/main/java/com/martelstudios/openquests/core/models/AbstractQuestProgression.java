@@ -49,7 +49,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Serializes the fields shared by every quest progression; concrete codecs chain from this.
      */
     public static final BuilderCodec<AbstractQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(AbstractQuestProgression.class)
-                                                                                        .append(new KeyedCodec<>("Id", Codec.UUID_BINARY), (quest, uuid) -> quest.id = uuid, quest -> quest.id)
+                                                                                        .append(new KeyedCodec<>("Id", Codec.UUID_STRING), (quest, uuid) -> quest.id = uuid, quest -> quest.id)
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("AssetId", Codec.STRING), (quest, assetId) -> quest.assetId = assetId, quest -> quest.assetId)
                                                                                         .add()
