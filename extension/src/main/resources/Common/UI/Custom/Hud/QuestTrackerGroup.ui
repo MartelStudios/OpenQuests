@@ -9,6 +9,7 @@ Group #QuestGroup {
   Group #Header {
     Group #IconDefault { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: $Rows.@QuestIconDefault; }
     Group #IconComplete { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: $Rows.@QuestIconComplete; Visible: false; }
+    Group #IconFailed { Anchor: (Width: 14, Height: 14, Top: 4, Left: 0); Background: $Rows.@QuestIconFailed; Visible: false; }
 
     Label #Title { Text: ""; Anchor: (Left: 20, Width: 230); Style: $Rows.@QuestTitleStyle; }
     Label #Progress { Text: ""; Style: $Rows.@QuestProgressStyle; }

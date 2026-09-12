@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
-import com.martelstudios.openquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
@@ -22,7 +21,7 @@ import java.util.List;
  */
 public class ItemReward extends QuestReward {
 
-    public static final BuilderCodec<ItemReward> CODEC = BuilderCodec.builder(ItemReward.class, ItemReward::new)
+    public static final BuilderCodec<ItemReward> CODEC = BuilderCodec.builder(ItemReward.class, ItemReward::new, QuestReward.BASE_CODEC)
                                                                      .append(new KeyedCodec<>("ItemId", Codec.STRING), (reward, itemId) -> reward.itemId = itemId, reward -> reward.itemId)
                                                                      .addValidator(Item.VALIDATOR_CACHE.getValidator())
                                                                      .add()
@@ -36,7 +35,7 @@ public class ItemReward extends QuestReward {
     private ItemReward() {}
 
     @Override
-    public boolean grant(@Nonnull QuestHistoryRecord questHistoryRecord, @Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull EntityComponents playerComponents) {
         List<ItemContainer> containers = new ArrayList<>(InventoryComponent.HOTBAR_FIRST.length);
 
         for (var inventoryType : InventoryComponent.HOTBAR_FIRST) {

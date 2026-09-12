@@ -123,14 +123,41 @@ public class QuestProgressionService {
         return removed;
     }
 
+    /**
+     * Takes a quest that ended out of the live store and keeps it, unless its asset asked for it
+     * to leave no trace — which is the one case where a completion still deletes.
+     *
+     * <p>Kept rather than projected down to a record: what the quest was made of, how far it got
+     * and which of its steps went which way are all still there to be read, and none of it can be
+     * rebuilt once thrown away.
+     *
+     * @return {@code false} for a quest the live store was not holding.
+     */
+    public boolean archiveQuest(@Nonnull AbstractQuestProgression<?> quest) {
+        if (!quest.isPersistHistory()) return unregisterQuest(quest) != null;
+
+        if (!dataStore.archive(quest)) return false;
+
+        quest.onArchived();
+        return true;
+    }
+
     private void handleQuestCompleted(QuestCompletedEvent event) {
         if (!event.getQuest().isStopOnComplete()) return;
 
-        unregisterQuest(event.getQuest());
+        archiveQuest(event.getQuest());
     }
 
     public AbstractQuestProgression<?> getQuest(UUID questId) {
         return dataStore.get(questId);
+    }
+
+    /**
+     * @return the quest under that id only while it is still running, so a caller meaning to move
+     * one never lands on a quest that is already over.
+     */
+    public AbstractQuestProgression<?> getLiveQuest(UUID questId) {
+        return dataStore.getLive(questId);
     }
 
     /**
@@ -166,15 +193,18 @@ public class QuestProgressionService {
     }
 
     /**
-     * Progresses only the given quests, skipping those of another type. The collection may be a
-     * live index: completing a quest unregisters it, and the sets involved tolerate that.
+     * Progresses only the given quests, skipping those of another type and those already over.
+     * The collection may be a live index: completing a quest takes it out of that index, and the
+     * sets involved tolerate that.
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <Q extends AbstractQuestProgression<?>> void progress(@Nonnull QuestVisitor<Q> visitor, @Nonnull Collection<UUID> questIds) {
         Class<Q> questType = visitor.getQuestType();
 
         for (UUID id : questIds) {
-            AbstractQuestProgression<?> quest = dataStore.get(id);
+            // The live half only: an id index holds what a player finished too, and nothing that
+            // is over is meant to move again
+            AbstractQuestProgression<?> quest = dataStore.getLive(id);
             if (!questType.isInstance(quest)) continue;
 
             // Raw on purpose: isInstance already proved the pairing, and the self-type cannot say it

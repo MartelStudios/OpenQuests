@@ -18,6 +18,17 @@ public class QuestProgressionStore {
     @Nonnull
     private final Map<UUID, AbstractQuestProgression<?>> quests = new ConcurrentHashMap<>();
 
+    /**
+     * Quests that ended and are kept for the reading. Held apart from the live ones rather than
+     * told apart by their state: everything that walks the store — a ticking system, a visitor —
+     * wants what can still move, and a quest that is over would be walked forever otherwise.
+     *
+     * <p>Reachable by id all the same, which is what lets a finished chain still be opened, its
+     * steps still be named, and a prerequisite still be answered.
+     */
+    @Nonnull
+    private final Map<UUID, AbstractQuestProgression<?>> archived = new ConcurrentHashMap<>();
+
     @Nonnull
     private final Map<Class<?>, Set<UUID>> idsByType = new ConcurrentHashMap<>();
 
@@ -35,11 +46,34 @@ public class QuestProgressionStore {
         this.dataStore = dataStore;
     }
 
+    /**
+     * A quest read back from disk having already ended goes straight to the archive, so the split
+     * survives a restart without being written down anywhere.
+     */
     public void add(@Nonnull AbstractQuestProgression<?> quest) {
-        if (quests.containsKey(quest.getId())) return;
+        if (quests.containsKey(quest.getId()) || archived.containsKey(quest.getId())) return;
+
+        if (quest.isCompleted() && quest.isStopOnComplete()) {
+            archived.put(quest.getId(), quest);
+            return;
+        }
 
         quests.put(quest.getId(), quest);
         idsByType.computeIfAbsent(quest.getClass(), k -> ConcurrentHashMap.newKeySet()).add(quest.getId());
+    }
+
+    /**
+     * Moves a quest that ended out of the way of everything that walks the live ones, keeping it
+     * answerable by id. Its file stays where it is: what changed is which map holds it, and the
+     * quest itself already says it is over.
+     *
+     * @return {@code false} for a quest the live half was not holding.
+     */
+    public boolean archive(@Nonnull AbstractQuestProgression<?> quest) {
+        if (remove(quest.getId()) == null) return false;
+
+        archived.put(quest.getId(), quest);
+        return true;
     }
 
     public AbstractQuestProgression<?> remove(@Nonnull UUID id) {
@@ -50,8 +84,6 @@ public class QuestProgressionStore {
         Set<UUID> ids = idsByType.get(quest.getClass());
         if (ids != null) ids.remove(id);
 
-        fileBacked.remove(id);
-
         return quest;
     }
 
@@ -60,7 +92,10 @@ public class QuestProgressionStore {
      */
     public AbstractQuestProgression<?> removeAndDeleteFromDisk(@Nonnull UUID id) {
         AbstractQuestProgression<?> quest = remove(id);
+        if (quest == null) quest = archived.remove(id);
         if (quest == null) return null;
+
+        fileBacked.remove(id);
 
         try {
             dataStore.remove(id.toString());
@@ -78,9 +113,29 @@ public class QuestProgressionStore {
     @Nullable
     public AbstractQuestProgression<?> get(@Nonnull UUID id) {
         AbstractQuestProgression<?> quest = quests.get(id);
+        if (quest == null) quest = archived.get(id);
+
         return quest != null ? quest : load(id);
     }
 
+    /**
+     * @return the quest under that id only if it is still running, so a caller meaning to progress
+     * something never lands on one that is over. Falls back to disk the way {@link #get} does: a
+     * quest nobody has read yet is not a quest that ended.
+     */
+    @Nullable
+    public AbstractQuestProgression<?> getLive(@Nonnull UUID id) {
+        AbstractQuestProgression<?> quest = quests.get(id);
+        if (quest != null || archived.containsKey(id)) return quest;
+
+        load(id);
+        return quests.get(id);
+    }
+
+    /**
+     * @return every quest still running. What ended is left out: a caller walking the store is
+     * looking for something to do, and the archive is only ever read by name.
+     */
     @Nonnull
     public Collection<AbstractQuestProgression<?>> getAll() {
         return quests.values();
@@ -115,7 +170,7 @@ public class QuestProgressionStore {
      * quest directory from growing with one file per player and per quest.
      */
     public boolean isFileBacked(@Nonnull AbstractQuestProgression<?> quest) {
-        return quest.getPlayers().size() > 1 || fileBacked.contains(quest.getId());
+        return quest.getHolderCount() > 1 || fileBacked.contains(quest.getId());
     }
 
     /**
@@ -123,6 +178,12 @@ public class QuestProgressionStore {
      */
     public void saveAllToDisk() {
         for (AbstractQuestProgression<?> quest : quests.values()) {
+            saveToDisk(quest);
+        }
+
+        // The archive too: a quest is marked dirty by the very change that ended it, and skipping
+        // it here would leave the outcome it was archived for unwritten
+        for (AbstractQuestProgression<?> quest : archived.values()) {
             saveToDisk(quest);
         }
     }
@@ -147,6 +208,7 @@ public class QuestProgressionStore {
 
     public AbstractQuestProgression<?> load(UUID id) {
         AbstractQuestProgression<?> quest = quests.get(id);
+        if (quest == null) quest = archived.get(id);
         if (quest != null) return quest;
 
         QuestProgressionRecord record;
@@ -161,7 +223,9 @@ public class QuestProgressionStore {
 
         add(record.quest);
         fileBacked.add(id);
-        return quests.get(id);
+
+        // Whichever half add() put it in: one that ended came back to the archive
+        return record.quest;
     }
 
 }

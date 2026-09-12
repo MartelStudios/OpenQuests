@@ -7,7 +7,6 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.martelstudios.openquests.core.models.QuestAsset;
-import com.martelstudios.openquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.utils.EntityComponents;
@@ -22,7 +21,7 @@ import java.util.UUID;
 public class GrantQuestReward extends QuestReward {
 
     public static final BuilderCodec<GrantQuestReward> CODEC =
-        BuilderCodec.builder(GrantQuestReward.class, GrantQuestReward::new)
+        BuilderCodec.builder(GrantQuestReward.class, GrantQuestReward::new, QuestReward.BASE_CODEC)
                     .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(new ContainedAssetCodec<>(QuestAsset.class, QuestAsset.CODEC), String[]::new)), (reward, ids) -> reward.questAssetIds = ids, reward -> reward.questAssetIds)
                     .addValidator(Validators.nonEmptyArray())
                     .addValidator(Validators.uniqueInArray())
@@ -38,7 +37,7 @@ public class GrantQuestReward extends QuestReward {
      * out the quests that did resolve a second time.
      */
     @Override
-    public boolean grant(@Nonnull QuestHistoryRecord questHistoryRecord, @Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull EntityComponents playerComponents) {
         var uuidComponent = playerComponents.getComponent(UUIDComponent.getComponentType());
         if (uuidComponent == null) return false;
 

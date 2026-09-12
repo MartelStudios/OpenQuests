@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension.quests.composite;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.extension.hud.QuestHudContext;
 import com.martelstudios.openquests.extension.hud.QuestHudRenderer;
@@ -41,7 +42,7 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
     public void render(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest) {
         var composite = (CompositeQuestProgression) quest;
 
-        String rowSelector = QuestHudRows.appendRow(context, GROUP_DOCUMENT, quest.getTitle(), quest.isCompleted());
+        String rowSelector = QuestHudRows.appendRow(context, GROUP_DOCUMENT, quest.getTitle(), quest.getState());
         QuestHudRows.appendDescription(context, rowSelector, quest);
 
         context.into(rowSelector + "#SubList", () -> renderChildren(context, composite));
@@ -66,7 +67,7 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
             AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(questIds[i]);
 
             if (child == null) {
-                renderArchivedChild(context, i < assetIds.length ? assetIds[i] : null);
+                renderArchivedChild(context, composite, questIds[i], i < assetIds.length ? assetIds[i] : null);
                 continue;
             }
 
@@ -76,14 +77,17 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
 
     /**
      * A completed child leaves the store, so nothing is left to draw it. Leaving a hole where it
-     * was would read as if it had never been asked for.
+     * was would read as if it had never been asked for. The group remembers which way it went;
+     * read as a success when even it cannot say, which is what a child gone from the store means.
      */
-    private static void renderArchivedChild(@Nonnull QuestHudContext context, String assetId) {
+    private static void renderArchivedChild(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite, @Nonnull UUID questId, String assetId) {
         if (assetId == null) return;
 
         QuestAsset asset = QuestAsset.getAsset(assetId);
         if (asset == null) return;
 
-        QuestHudRows.appendRow(context, AbstractQuestProgression.titleOf(asset), true);
+        QuestState outcome = composite.outcomeOf(questId);
+
+        QuestHudRows.appendRow(context, AbstractQuestProgression.titleOf(asset), outcome == null ? QuestState.SUCCESSFUL : outcome);
     }
 }

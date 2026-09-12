@@ -16,7 +16,7 @@ public class QuestsRecord {
     public static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     public static final BuilderCodec<QuestsRecord> CODEC = BuilderCodec.builder(QuestsRecord.class, QuestsRecord::new)
-                                                                       .append(new KeyedCodec<>("Quests", new SetCodec<>(Codec.UUID_BINARY, HashSet<UUID>::new, false)), (questSet, uuids) -> questSet.questIds.addAll(uuids), (questSet) -> questSet.questIds)
+                                                                       .append(new KeyedCodec<>("Quests", new SetCodec<>(Codec.UUID_STRING, HashSet<UUID>::new, false)), (questSet, uuids) -> questSet.questIds.addAll(uuids), (questSet) -> questSet.questIds)
                                                                        .add()
                                                                        .build();
 

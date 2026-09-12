@@ -14,47 +14,44 @@ public class CompositeQuestVisitor implements QuestVisitor<CompositeQuestProgres
     @Nonnull
     private final AbstractQuestProgression<?> updatedChild;
 
-    public CompositeQuestVisitor(@Nonnull AbstractQuestProgression<?> updatedChild) {
+    /**
+     * The outcome the child announced, rather than whatever it carries by the time this runs.
+     */
+    @Nonnull
+    private final QuestState outcome;
+
+    public CompositeQuestVisitor(@Nonnull AbstractQuestProgression<?> updatedChild, @Nonnull QuestState outcome) {
         this.updatedChild = updatedChild;
+        this.outcome = outcome;
     }
 
     @Override
     public void progress(CompositeQuestProgression quest) {
         if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
-        var childId = updatedChild.getId();
+        if (quest.recordOutcome(updatedChild.getId(), outcome)) quest.markDirty();
 
-        if (updatedChild.isSuccessful() && quest.successfulQuestIds.add(childId)) {
-            quest.failedQuestIds.remove(childId);
-            quest.abandonedQuestIds.remove(childId);
-            quest.markDirty();
-        } else if (updatedChild.isFailed() && quest.failedQuestIds.add(childId)) {
-            quest.successfulQuestIds.remove(childId);
-            quest.abandonedQuestIds.remove(childId);
-            quest.markDirty();
-        } else if (updatedChild.isAbandoned() && quest.abandonedQuestIds.add(childId)) {
-            quest.failedQuestIds.remove(childId);
-            quest.successfulQuestIds.remove(childId);
-            quest.markDirty();
-        }
+        int children = quest.getQuestIds().length;
+        int successful = quest.countOutcomes(QuestState.SUCCESSFUL);
+        int failed = quest.countOutcomes(QuestState.FAILED);
+        int abandoned = quest.countOutcomes(QuestState.ABANDONED);
 
         switch (quest.getAsset().getOperator()) {
             case AND -> {
-                if (!quest.abandonedQuestIds.isEmpty()) {
+                if (abandoned > 0) {
                     quest.setState(QuestState.ABANDONED).markDirty();
-                } else if (!quest.failedQuestIds.isEmpty()) {
+                } else if (failed > 0) {
                     quest.setState(QuestState.FAILED).markDirty();
-                } else if (quest.successfulQuestIds.size() >= quest.questIds.length) {
+                } else if (successful >= children) {
                     quest.setState(QuestState.SUCCESSFUL).markDirty();
                 }
             }
             case OR -> {
-                if (!quest.successfulQuestIds.isEmpty()) {
+                if (successful > 0) {
                     quest.setState(QuestState.SUCCESSFUL).markDirty();
-                } else if (quest.failedQuestIds.size() + quest.abandonedQuestIds.size() >= quest.questIds.length) {
+                } else if (failed + abandoned >= children) {
                     // A composite quest to be ABANDONED has to have all its subquest abandoned.
-                    quest.setState(quest.failedQuestIds.isEmpty() ? QuestState.ABANDONED : QuestState.FAILED)
-                         .markDirty();
+                    quest.setState(failed == 0 ? QuestState.ABANDONED : QuestState.FAILED).markDirty();
                 }
             }
         }

@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.command.system.CommandManager;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.console.ConsoleSender;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.openquests.core.history.models.QuestHistoryRecord;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
@@ -18,7 +17,7 @@ import javax.annotation.Nonnull;
  * Runs a server or player command on completion.
  */
 public class CommandReward extends QuestReward {
-    public static final BuilderCodec<CommandReward> CODEC = BuilderCodec.builder(CommandReward.class, CommandReward::new)
+    public static final BuilderCodec<CommandReward> CODEC = BuilderCodec.builder(CommandReward.class, CommandReward::new, QuestReward.BASE_CODEC)
                                                                         .append(new KeyedCodec<>("Command", Codec.STRING, true), (reward, command) -> reward.command = command, reward -> reward.command)
                                                                         .addValidator(Validators.nonNull())
                                                                         .add()
@@ -33,7 +32,7 @@ public class CommandReward extends QuestReward {
     private CommandReward() {}
 
     @Override
-    public boolean grant(@Nonnull QuestHistoryRecord questHistoryRecord, @Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull EntityComponents playerComponents) {
         PlayerRef playerRef = playerComponents.getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return false;
 
