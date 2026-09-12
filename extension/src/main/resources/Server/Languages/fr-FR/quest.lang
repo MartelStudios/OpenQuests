@@ -1,11 +1,17 @@
 intro.title=Introduction
-intro.description=Terminez les quêtes pour maîtriser les bases du jeu.
+intro.description=Faites vos premiers pas, récupérez de quoi monter un premier campement.
 
 skip-intro.title=Passer l'introduction
-skip-intro.description=Passez le tutoriel avec /quest abandon Intro
+skip-intro.description=Réclamez ceci pour laisser le tutoriel derrière vous.
 
-basics.title=Maîtriser les bases
-basics.description=Récoltez des ressources et fabriquez une épée.
+craft-tools.title=Fabriquer une hachette et une pioche
+craft-tools.description=Deux outils, et le monde s'ouvre.
+
+craft-workbench.title=Fabriquer un établi
+craft-workbench.description=Cassez ce qu'il faut, rapportez-le, et montez l'établi.
+
+choose-weapon.title=Choisissez votre arme
+choose-weapon.description=Une des quatre. Les autres attendront.
 
 gather-stick.title=Ramasser des bâtons
 gather-stick.description=Ramassez des bâtons au sol et dans les buissons.
@@ -16,8 +22,41 @@ gather-fibre.description=Arrachez de la fibre dans les hautes herbes autour de v
 gather-rubble.title=Récolter des gravats
 gather-rubble.description=Brisez des rochers pour récupérer des gravats de pierre.
 
-craft-sword.title=Fabriquer une épée
-craft-sword.description=Transformez vos ressources en une épée rudimentaire.
+craft-hatchet.title=Fabriquer une hachette rudimentaire
+craft-hatchet.description=Des bâtons et de la pierre suffisent pour mordre le bois.
+
+craft-pickaxe.title=Fabriquer une pioche rudimentaire
+craft-pickaxe.description=La même chose, taillée pour la roche.
+
+break-wood.title=Casser du bois
+break-wood.description=Utilisez votre hachette pour abattre un tronc.
+
+break-stone.title=Casser de la pierre
+break-stone.description=Utilisez votre pioche pour casser de la pierre.
+
+gather-wood.title=Récupérer du bois
+gather-wood.description=Quatre morceaux, emportés plutôt que laissés au sol.
+
+gather-stone.title=Récupérer de la pierre
+gather-stone.description=Trois morceaux suffiront pour l'établi.
+
+craft-bench.title=Fabriquer l'établi
+craft-bench.description=Assemblez le bois et la pierre.
+
+place-bench.title=Poser l'établi
+place-bench.description=Un établi dans le sac ne sert à personne.
+
+craft-sword.title=Fabriquer une épée rudimentaire
+craft-sword.description=La réponse la plus directe.
+
+craft-daggers.title=Fabriquer des dagues rudimentaires
+craft-daggers.description=Deux lames pour qui préfère la vitesse.
+
+craft-mace.title=Fabriquer une masse rudimentaire
+craft-mace.description=Rien de subtil là-dedans.
+
+craft-battleaxe.title=Fabriquer une hache de guerre rudimentaire
+craft-battleaxe.description=Lente, et elle vaut l'attente.
 
 defeat-guardian.title=Vaincre le Gardien
 defeat-guardian.description=Terrassez le golem de cristal qui veille sur le temple.

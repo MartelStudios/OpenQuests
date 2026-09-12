@@ -8,7 +8,7 @@
       "Type": "Item",
       "ItemId": "Ingredient_Life_Essence",
       "Quantity": 100,
-      "AutoClaim": true
+      "AutoClaim": false
     }
   ],
   "NpcGroupId": {

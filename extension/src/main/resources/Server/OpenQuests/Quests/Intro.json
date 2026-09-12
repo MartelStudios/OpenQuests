@@ -1,17 +1,63 @@
 {
   "Type": "Composite",
   "StartOnConnection": true,
+  "PersistChildrenHistory": true,
   "TitleKey": "quest.intro.title",
   "DescriptionKey": "quest.intro.description",
-  "PersistProgression": true,
-  "PersistHistory": true,
-  "Operator": "Or",
-  "PersistChildrenHistory": true,
   "QuestAssetIds": [
-    "Basics",
-    "SkipIntro"
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-rubble.title",
+      "DescriptionKey": "quest.gather-rubble.description",
+      "TargetQuantity": 4,
+      "ItemToGather": {
+        "ItemId": "Rubble_Stone"
+      }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-fibre.title",
+      "DescriptionKey": "quest.gather-fibre.description",
+      "TargetQuantity": 4,
+      "ItemToGather": {
+        "ItemId": "Ingredient_Fibre"
+      }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-stick.title",
+      "DescriptionKey": "quest.gather-stick.description",
+      "TargetQuantity": 4,
+      "ItemToGather": {
+        "ItemId": "Ingredient_Stick"
+      }
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Command",
+      "AutoClaim": true,
+      "AsPlayer": true,
+      "Command": "/quest abandon SkipIntro"
+    },
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "CraftTools"
+      ]
+    }
+  ],
+  "AbandonedRewards": [
+    {
+      "Type": "Command",
+      "AutoClaim": true,
+      "AsPlayer": true,
+      "Command": "/quest complete SkipIntro"
+    }
   ],
   "Tags": {
-    "HUD_TRACK": []
+    "HUD_TRACK": [],
+    "HUD_DESC": []
   }
 }
