@@ -48,7 +48,6 @@
     }
   ],
   "Tags": {
-    "HUD_TRACK": [],
-    "HUD_DESC": []
+    "OQ_HIDE": []
   }
 }

@@ -14,18 +14,16 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.HIDE_TAG;
+import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.TRACK_TAG;
+import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.UNTRACK_TAG;
+
 /**
  * Top-right panel listing the quests a player is tracking. Decides which five get in and hands
  * each one to its {@link QuestHudRenderer}, which draws it however its type sees fit.
  */
 public class QuestTrackerHud extends CustomUIHud {
     public static final String KEY = "openquests:quest_tracker";
-
-    /** What puts a quest on the panel at all. */
-    public static final String TRACK_TAG = "HUD_TRACK";
-
-    /** Outranks {@link #TRACK_TAG}, since a tag can only ever be added to a running quest. */
-    public static final String UNTRACK_TAG = "HUD_UNTRACK";
 
     private static final int MAX_QUESTS = 5;
     private static final long UPDATE_INTERVAL_MS = 1000;
@@ -36,7 +34,9 @@ public class QuestTrackerHud extends CustomUIHud {
         super(playerRef, KEY);
     }
 
-    /** Gets this player's existing tracker HUD, or creates and registers a new one. */
+    /**
+     * Gets this player's existing tracker HUD, or creates and registers a new one.
+     */
     @Nonnull
     public static QuestTrackerHud get(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
         var hudManager = player.getHudManager();
@@ -95,10 +95,12 @@ public class QuestTrackerHud extends CustomUIHud {
     }
 
     /**
-     * @return whether the quest asked to be on the panel. Both tags are read through the quest, so
+     * @return whether the quest asked to be on the panel. Every tag is read through the quest, so
      * the asset answers for everything made from it unless the quest itself was tagged.
      */
     public static boolean isTracked(@Nonnull AbstractQuestProgression<?> quest) {
+        if (quest.hasTag(HIDE_TAG)) return false;
+
         return !quest.hasTag(UNTRACK_TAG) && quest.hasTag(TRACK_TAG);
     }
 

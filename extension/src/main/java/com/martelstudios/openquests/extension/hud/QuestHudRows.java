@@ -6,15 +6,14 @@ import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
 
+import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.DESCRIPTION_TAG;
+
 /**
  * The look of a plain line. A renderer is free to ignore all of this and append its own document,
  * but a quest that only has a title to show gets it from here.
  */
 public final class QuestHudRows {
     public static final String ROW_DOCUMENT = "Hud/QuestTrackerRow.ui";
-
-    /** A quest carrying this tag, or made from an asset carrying it, shows its description under the title. */
-    public static final String DESCRIPTION_TAG = "HUD_DESC";
 
     // The values of @ColorGoldHighlight, @ColorButtonText and @ColorDisabled, which the documents
     // import from Common.ui. Repeated here because the completed switch happens at runtime, and a
