@@ -36,6 +36,7 @@ import com.martelstudios.openquests.extension.journal.navigation.routes.JournalR
 import com.martelstudios.openquests.extension.journal.navigation.routes.LabelledRoute;
 import com.martelstudios.openquests.extension.journal.navigation.routes.QuestRoute;
 import com.martelstudios.openquests.extension.journal.navigation.JournalRoutes;
+import com.martelstudios.openquests.extension.hud.QuestTrackerHud;
 import com.martelstudios.openquests.extension.tags.OpenQuestsTags;
 
 import javax.annotation.Nonnull;
@@ -466,6 +467,17 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
+     * Tracked first, then whatever was picked up last. Both halves answer the same question — what
+     * is the player on right now — so tracking a quest is also how they pull it to the top of the
+     * list. A quest with no start recorded sorts last rather than first: an unknown date is no
+     * claim to being recent.
+     */
+    private static Comparator<AbstractQuestProgression<?>> byTrackedThenRecent(@Nonnull UUID viewer) {
+        return Comparator.comparing((AbstractQuestProgression<?> quest) -> QuestTrackerHud.isTracked(quest, viewer), Comparator.reverseOrder())
+                         .thenComparing(AbstractQuestProgression::getStartedAt, Comparator.nullsLast(Comparator.reverseOrder()));
+    }
+
+    /**
      * The running quests first, then what the history kept. Every quest gets a row, the steps of a
      * chain included: a step carries a description, rewards and a rule of its own that a line
      * inside its parent cannot hold. What links them is the objective lines, which lead here.
@@ -478,9 +490,12 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         UUID viewer = playerRef.getUuid();
         List<Entry> entries = new ArrayList<>();
 
+        List<AbstractQuestProgression<?>> held = new ArrayList<>(topLevel(questStore.getQuestIds()));
+        held.sort(byTrackedThenRecent(viewer));
+
         // One pass over everything the player holds: a quest that ended is set aside rather than
         // deleted, so the finished half of the journal is read the same way as the running half
-        for (AbstractQuestProgression<?> quest : topLevel(questStore.getQuestIds())) {
+        for (AbstractQuestProgression<?> quest : held) {
             // Dropped after topLevel worked the steps out, so hiding a chain hides it whole rather
             // than surfacing the steps it was drawing
             if (quest.hasTag(OpenQuestsTags.HIDE_TAG)) continue;
@@ -542,6 +557,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                .set(rowSelector + "#Description.Visible", open && described);
 
         QuestPageRows.setIcon(context, rowSelector + "#Icon", entry.mark());
+
+        // A frame round the whole row, so a tracked quest is picked out while folded and in a list
+        if (entry.quest() != null && QuestTrackerHud.isTracked(entry.quest(), playerRef.getUuid())) QuestPageRows.setTracked(context, rowSelector);
 
         // Drawn whether the row is open or not: a counter beside the title is most of what a folded
         // row is worth. What it appends lands inside #Details, which is what the fold hides.
@@ -631,7 +649,19 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         if (entry.quest() == null || entry.mark() != QuestMark.IN_PROGRESS) return entry.claimable();
 
-        if (!entry.quest().canBeAbandoned()) return entry.claimable();
+        // Offered on every running quest, abandonable or not: what the tracker shows is the
+        // player's to decide even where staying on the quest is not
+        boolean tracked = QuestTrackerHud.isTracked(entry.quest());
+
+        context.getBuilder()
+               .set(rowSelector + "#Track.Visible", true)
+               .set(rowSelector + "#Track.Text", Message.translation(tracked ? "openquests.page.untrack" : "openquests.page.track"));
+
+        context.getEventBuilder()
+               .addEventBinding(CustomUIEventBindingType.Activating, rowSelector + "#Track", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_TRACK)
+                                                                                                     .append(QuestPageEventData.KEY_TARGET, entry.id()));
+
+        if (!entry.quest().canBeAbandoned()) return true;
 
         context.getBuilder()
                .set(rowSelector + "#Abandon.Visible", true)
@@ -653,6 +683,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             case QuestPageEventData.ACTION_TOGGLE -> toggle(data.getTarget());
             case QuestPageEventData.ACTION_CLAIM -> claim(ref, data.getTarget());
             case QuestPageEventData.ACTION_ABANDON -> abandon(ref, data.getTarget());
+            case QuestPageEventData.ACTION_TRACK -> track(ref, data.getTarget());
 
             // These three move the player, and the redraw comes back through RouteChangedEvent.
             // Redrawing here as well would draw the page they are leaving.
@@ -766,6 +797,31 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         QuestProgressionService.get()
                                .progress(new PlayerSetStateVisitor(playerRef.getUuid(), id.toString(), QuestState.ABANDONED), questStore.getQuestIds());
+    }
+
+    /**
+     * Puts a quest on the tracker or takes it off. Both tags are written, since the asset may have
+     * asked for either and a quest can only ever say otherwise by carrying the opposite tag:
+     * dropping one without adding the other would hand the answer straight back to the asset.
+     */
+    private void track(@Nonnull Ref<EntityStore> ref, String target) {
+        UUID id = parse(target);
+        if (id == null) return;
+
+        var questStore = EntityComponents.of(ref).getComponent(QuestStoreComponent.getComponentType());
+        if (questStore == null || !questStore.getQuestIds().contains(id)) return;
+
+        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(id);
+        if (quest == null) return;
+
+        if (QuestTrackerHud.isTracked(quest)) {
+            quest.removeTag(OpenQuestsTags.TRACK_TAG);
+            quest.addTag(OpenQuestsTags.UNTRACK_TAG);
+            return;
+        }
+
+        quest.removeTag(OpenQuestsTags.UNTRACK_TAG);
+        quest.addTag(OpenQuestsTags.TRACK_TAG);
     }
 
     /**
@@ -943,6 +999,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         static final String ACTION_OPEN = "open";
         static final String ACTION_CLAIM = "claim";
         static final String ACTION_ABANDON = "abandon";
+        static final String ACTION_TRACK = "track";
         static final String ACTION_FILTER = "filter";
         static final String ACTION_CRUMB = "crumb";
         static final String ACTION_CLOSE = "close";

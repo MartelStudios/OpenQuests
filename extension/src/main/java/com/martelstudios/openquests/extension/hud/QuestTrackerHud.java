@@ -82,9 +82,8 @@ public class QuestTrackerHud extends CustomUIHud {
 
         for (AbstractQuestProgression<?> quest : quests) {
             if (shown >= MAX_QUESTS) break;
-            if (quest.getStateFor(viewer) != QuestState.IN_PROGRESS) continue;
             if (owned.contains(quest.getId())) continue;
-            if (!isTracked(quest)) continue;
+            if (!isTracked(quest, viewer)) continue;
 
             QuestHudRows.render(context, quest);
             shown++;
@@ -102,6 +101,15 @@ public class QuestTrackerHud extends CustomUIHud {
         if (quest.hasTag(HIDE_TAG)) return false;
 
         return !quest.hasTag(UNTRACK_TAG) && quest.hasTag(TRACK_TAG);
+    }
+
+    /**
+     * @return whether the quest is on this player's panel right now. The tags outlive the work, so
+     * asking them alone would call a quest tracked long after it ended; the panel lists what is
+     * being worked on, and so does anything else drawing a quest as tracked.
+     */
+    public static boolean isTracked(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID viewer) {
+        return quest.getStateFor(viewer) == QuestState.IN_PROGRESS && isTracked(quest);
     }
 
     /**

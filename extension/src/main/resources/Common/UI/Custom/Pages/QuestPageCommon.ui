@@ -27,6 +27,11 @@ $C = "../Common.ui";
 // a state. Referenced from QuestPageRows, so the shade is tuned here and nowhere else.
 @StripeBackground = PatchStyle(Color: #7a9cc6(0.06));
 
+// The frame the client puts round a selected input box, borrowed to say a quest is on the HUD.
+// Gold on the same dark blue the row already sits on, so tracking reads as a state of the row
+// rather than as a row of another kind. Set from QuestPageRows.
+@TrackedRowBackground = PatchStyle(TexturePath: "../Common/InputBoxSelected.png", Border: 16);
+
 // The tracker's own marks, so a quest reads the same on the HUD and in the journal. Paths resolve
 // against this file. Set from QuestPageRows, and left unset for a line that states nothing.
 @QuestIconDefault = PatchStyle(TexturePath: "../Hud/ObjectiveTaskIconDefault.png");

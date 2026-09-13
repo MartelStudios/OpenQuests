@@ -69,6 +69,14 @@ Group #QuestPageRow {
         Visible: false;
       }
 
+      Group { Anchor: (Width: 8); }
+
+      $C.@SmallSecondaryTextButton #Track {
+        Text: "";
+        Anchor: (Width: 110, Height: $C.@SmallButtonHeight);
+        Visible: false;
+      }
+
       Group { FlexWeight: 1; }
     }
   }

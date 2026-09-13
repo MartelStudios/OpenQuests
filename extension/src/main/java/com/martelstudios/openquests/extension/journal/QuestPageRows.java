@@ -26,6 +26,7 @@ public final class QuestPageRows {
 
     /** Kept as references so the shade and the marks stay in the markup, next to the palette. */
     private static final Value<String> STRIPE_BACKGROUND = Value.ref(COMMON_DOCUMENT, "StripeBackground");
+    private static final Value<String> TRACKED_BACKGROUND = Value.ref(COMMON_DOCUMENT, "TrackedRowBackground");
     private static final Value<String> ICON_IN_PROGRESS = Value.ref(COMMON_DOCUMENT, "QuestIconDefault");
     private static final Value<String> ICON_COMPLETED = Value.ref(COMMON_DOCUMENT, "QuestIconComplete");
     private static final Value<String> ICON_FAILED = Value.ref(COMMON_DOCUMENT, "QuestIconFailed");
@@ -164,6 +165,15 @@ public final class QuestPageRows {
      * Shades every other line. A label and its figure sit at opposite ends of a wide row, and the
      * banding is what keeps them on the same line for the reader.
      */
+    /**
+     * Frames a quest row to say it is on the tracker. The row keeps its own background until then,
+     * so the frame is the whole of what tracking looks like.
+     */
+    public static void setTracked(@Nonnull QuestPageContext context, @Nonnull String rowSelector) {
+        // The selector trails a space so a child appends to it. The row itself takes none.
+        context.getBuilder().set(rowSelector.stripTrailing() + ".Background", TRACKED_BACKGROUND);
+    }
+
     private static void stripe(@Nonnull QuestPageContext context, @Nonnull String lineSelector) {
         if (!context.nextStripe()) return;
 
