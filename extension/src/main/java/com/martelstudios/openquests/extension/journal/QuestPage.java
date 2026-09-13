@@ -478,6 +478,14 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
+     * What ended last, first. A finished quest is read for what became of it rather than for what
+     * the player is on, so the date that orders it is the one it ended on and not the one it
+     * started on. A quest whose end went unrecorded sorts last, the same as an unrecorded start.
+     */
+    private static final Comparator<AbstractQuestProgression<?>> BY_RECENTLY_COMPLETED =
+        Comparator.comparing(AbstractQuestProgression::getCompletedAt, Comparator.nullsLast(Comparator.reverseOrder()));
+
+    /**
      * The running quests first, then what the history kept. Every quest gets a row, the steps of a
      * chain included: a step carries a description, rewards and a rule of its own that a line
      * inside its parent cannot hold. What links them is the objective lines, which lead here.
@@ -491,7 +499,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         List<Entry> entries = new ArrayList<>();
 
         List<AbstractQuestProgression<?>> held = new ArrayList<>(topLevel(questStore.getQuestIds()));
-        held.sort(byTrackedThenRecent(viewer));
+        held.sort(filter == Filter.DONE ? BY_RECENTLY_COMPLETED : byTrackedThenRecent(viewer));
 
         // One pass over everything the player holds: a quest that ended is set aside rather than
         // deleted, so the finished half of the journal is read the same way as the running half
