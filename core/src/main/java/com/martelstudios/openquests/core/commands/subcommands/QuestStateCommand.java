@@ -43,8 +43,7 @@ public class QuestStateCommand extends AbstractPlayerCommand {
     }
 
     /**
-     * Runs under a group of its own, for an outcome that is not administration: abandoning is
-     * something a player does to their own quests.
+     * Runs under a group of its own, for an outcome a player must not be able to hand themselves.
      */
     public QuestStateCommand(@Nonnull String name, @Nonnull String description, @Nonnull QuestState state, @Nonnull String permissionGroup) {
         this(name, description, state);
