@@ -1,0 +1,48 @@
+// The quest journal. Rows are not declared here: the page ships an empty #QuestList that
+// QuestPage fills by appending QuestPageRow.ui, so it grows with what the player holds.
+$C = "../Common.ui";
+$P = "QuestPageCommon.ui";
+
+$C.@PageOverlay {}
+
+$C.@DecoratedContainer {
+  @CloseButton = true;
+  Anchor: (Width: 900, Height: 700);
+
+  #Content {
+    LayoutMode: Top;
+
+    Group #HeaderRow {
+      LayoutMode: Left;
+      Anchor: (Height: 34);
+
+      Label #PageTitle { Text: ""; FlexWeight: 1; Style: (...$C.@TitleStyle, FontSize: 20); }
+      Label #Counts { Text: ""; Anchor: (Width: 220); Style: $P.@RowStatusStyle; }
+    }
+
+    $C.@ContentSeparator { Anchor: (Top: 4, Bottom: 8); }
+
+    // The trail back to the journal, filled by the page: it is as long as the player went deep
+    Group #Breadcrumb {
+      LayoutMode: Left;
+      Anchor: (Height: 20);
+    }
+
+    // Filled by the page rather than declared here, so the tab standing open follows the state
+    Group #Tabs {
+      LayoutMode: Left;
+      Anchor: (Height: 30);
+    }
+
+    $C.@ContentSeparator { Anchor: (Top: 8, Bottom: 8); }
+
+    Label #Empty { Text: ""; Anchor: (Height: 30); Visible: false; Style: (...$C.@DefaultLabelStyle, FontSize: 13, HorizontalAlignment: Center, VerticalAlignment: Center); }
+
+    Group #QuestList {
+      FlexWeight: 1;
+      LayoutMode: TopScrolling;
+      ScrollbarStyle: $C.@DefaultScrollbarStyle;
+      Padding: (Right: 8);
+    }
+  }
+}

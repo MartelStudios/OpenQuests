@@ -1,0 +1,18 @@
+// A reward line showing the item in its slot before naming it, the way the inventory shows one.
+// ItemSlot draws the frame, the quality background and the icon; the quantity stays in #Value
+// with every other figure of the journal rather than sitting in the corner of the square.
+$P = "QuestPageCommon.ui";
+
+Group #ItemLine {
+  LayoutMode: Left;
+  Anchor: (Height: 28, Top: 2);
+
+  ItemSlot #Icon {
+    Anchor: (Width: 24, Height: 24, Top: 2, Right: 6);
+    ShowQualityBackground: true;
+    ShowQuantity: false;
+  }
+
+  Label #Label { Text: ""; FlexWeight: 1; Style: $P.@LineLabelStyle; }
+  Label #Value { Text: ""; Anchor: (Width: $P.@ValueWidth); Style: $P.@ProgressStyle; }
+}

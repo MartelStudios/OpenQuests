@@ -1,0 +1,18 @@
+// An objective that names another quest. The title is a button, so the journal can scroll to the
+// row holding that quest; #Value carries what is asked of it. QuestPageLineRow.ui is the same
+// line for a target that leads nowhere.
+$P = "QuestPageCommon.ui";
+
+Group #QuestLine {
+  LayoutMode: Left;
+  Anchor: (Height: 28, Top: 2);
+
+  Group #IconSlot {
+    Anchor: (Width: 24, Height: 24, Top: 2, Right: 6);
+
+    Group #Icon { Anchor: (Width: 12, Height: 12, Top: 6, Left: 6); }
+  }
+
+  TextButton #Link { Text: ""; FlexWeight: 1; Style: $P.@LinkStyle; }
+  Label #Value { Text: ""; Anchor: (Width: $P.@ValueWidth); Style: $P.@ProgressStyle; }
+}

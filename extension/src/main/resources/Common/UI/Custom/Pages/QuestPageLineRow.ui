@@ -1,0 +1,19 @@
+// One line inside a quest's details: an objective, or a reward. The label carries the text and
+// #Value the counter on the right, both filled by whoever renders the quest or the reward.
+$P = "QuestPageCommon.ui";
+
+Group #LineRow {
+  LayoutMode: Left;
+  Anchor: (Height: 28, Top: 2);
+
+  // A column the width of an item slot, so every kind of line starts its label at the same place
+  // whatever it puts here. #Icon is left without a background until the line knows what it is.
+  Group #IconSlot {
+    Anchor: (Width: 24, Height: 24, Top: 2, Right: 6);
+
+    Group #Icon { Anchor: (Width: 12, Height: 12, Top: 6, Left: 6); }
+  }
+
+  Label #Label { Text: ""; FlexWeight: 1; Style: $P.@LineLabelStyle; }
+  Label #Value { Text: ""; Anchor: (Width: $P.@ValueWidth); Style: $P.@ProgressStyle; }
+}

@@ -15,7 +15,8 @@
         "Hytale:Objectives": "*",
         "Hytale:NPC": "*",
         "Hytale:TagSet": "*",
-        "MartelStudios:OpenQuestsCore": "*"
+        "MartelStudios:OpenQuestsCore": "*",
+        "MartelStudios:OpenNavigation": "*"
     },
     "OptionalDependencies": {
         

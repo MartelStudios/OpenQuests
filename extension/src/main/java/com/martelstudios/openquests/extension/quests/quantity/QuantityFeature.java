@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension.quests.quantity;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.extension.hud.QuestHudService;
+import com.martelstudios.openquests.extension.journal.QuestPageService;
 
 import javax.annotation.Nonnull;
 
@@ -15,5 +16,6 @@ public final class QuantityFeature {
 
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestHudService.register(new QuantityQuestHudRenderer());
+        QuestPageService.register(new QuantityQuestPageRenderer());
     }
 }

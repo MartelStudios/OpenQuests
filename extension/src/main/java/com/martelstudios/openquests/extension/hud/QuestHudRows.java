@@ -66,7 +66,7 @@ public final class QuestHudRows {
 
     @Nonnull
     public static String appendRow(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest) {
-        String rowSelector = appendRow(context, ROW_DOCUMENT, quest.getTitle(), quest.getState());
+        String rowSelector = appendRow(context, ROW_DOCUMENT, quest.getTitle(), quest.getStateFor(context.getViewer()));
         appendDescription(context, rowSelector, quest);
 
         return rowSelector;

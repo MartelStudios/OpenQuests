@@ -1,0 +1,58 @@
+// Shared by the quest page documents. An appended document is parsed on its own, so each one
+// imports what it needs from here rather than the page declaring it once for everybody.
+$C = "../Common.ui";
+
+@ColorTitle = $C.@ColorDefault;
+@ColorMuted = $C.@ColorDefaultLabel;
+@ColorDone = $C.@ColorDisabled;
+@ColorAccent = $C.@ColorGoldHighlight;
+
+// A figure column wide enough for a counter or a short state word, the same on every line so the
+// two kinds of detail line agree on where the right-hand column starts.
+@ValueWidth = 110;
+
+@RowTitleStyle = (FontSize: 14, RenderBold: true, TextColor: @ColorTitle, VerticalAlignment: Center);
+@RowStatusStyle = (FontSize: 12, RenderBold: true, TextColor: @ColorAccent, VerticalAlignment: Center, HorizontalAlignment: End);
+@RowTextStyle = (FontSize: 12, TextColor: @ColorMuted, Wrap: true);
+
+// Held to one line, since a detail line is a fixed height. A long title that wrapped would spill
+// out of its row rather than push it taller.
+@LineLabelStyle = (FontSize: 12, TextColor: @ColorMuted, VerticalAlignment: Center, Wrap: true, WrapMaxLines: 1);
+@SectionStyle = (FontSize: 11, RenderBold: true, RenderUppercase: true, LetterSpacing: 1, TextColor: @ColorMuted);
+@ProgressStyle = (FontSize: 12, RenderBold: true, TextColor: @ColorMuted, HorizontalAlignment: End, VerticalAlignment: Center);
+@SeparatorLabelStyle = (FontSize: 11, RenderBold: true, LetterSpacing: 1, TextColor: @ColorMuted, HorizontalAlignment: Center, VerticalAlignment: Center);
+
+// Laid over every other line so the eye keeps the row while crossing from a label on the left to
+// its figure on the right. @ColorBlueAccent at 6%, faint enough to read as banding rather than as
+// a state. Referenced from QuestPageRows, so the shade is tuned here and nowhere else.
+@StripeBackground = PatchStyle(Color: #7a9cc6(0.06));
+
+// The tracker's own marks, so a quest reads the same on the HUD and in the journal. Paths resolve
+// against this file. Set from QuestPageRows, and left unset for a line that states nothing.
+@QuestIconDefault = PatchStyle(TexturePath: "../Hud/ObjectiveTaskIconDefault.png");
+@QuestIconComplete = PatchStyle(TexturePath: "../Hud/ObjectiveTaskIconComplete.png");
+@QuestIconFailed = PatchStyle(TexturePath: "../Hud/ObjectiveTaskIconFailed.png");
+@QuestIconAbandoned = PatchStyle(TexturePath: "../Hud/ObjectiveTaskIconAbandoned.png");
+@QuestIconLocked = PatchStyle(TexturePath: "../Hud/ObjectiveTaskIconLocked.png");
+@QuestIconLost = PatchStyle(TexturePath: "../Hud/ObjectiveTaskIconLost.png");
+
+// The client's own dropdown caret, borrowed to say that finishing a quest opens onto another
+@QuestIconNext = PatchStyle(TexturePath: "../Common/DropdownPressedCaret.png");
+
+@ToggleStyle = TextButtonStyle(
+  Default: (Background: #1e2a38, LabelStyle: (FontSize: 14, RenderBold: true, TextColor: @ColorMuted, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #2a3a4e, LabelStyle: (FontSize: 14, RenderBold: true, TextColor: @ColorTitle, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #142030, LabelStyle: (FontSize: 14, RenderBold: true, TextColor: @ColorAccent, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Sounds: $C.@ButtonSounds
+);
+
+// A title that navigates rather than a button that acts: no frame at rest, the accent blue the
+// rest of the client uses for links, and a colour shift to say it answers the mouse.
+@LinkLabelStyle = (FontSize: 12, TextColor: $C.@ColorBlueAccent, HorizontalAlignment: Start, VerticalAlignment: Center, Wrap: true, WrapMaxLines: 1);
+
+@LinkStyle = TextButtonStyle(
+  Default: (Background: (Color: #000000(0)), LabelStyle: @LinkLabelStyle),
+  Hovered: (Background: (Color: #000000(0)), LabelStyle: (...@LinkLabelStyle, TextColor: $C.@ColorBlueAccentHovered)),
+  Pressed: (Background: (Color: #000000(0)), LabelStyle: (...@LinkLabelStyle, TextColor: $C.@ColorBlueAccentPressed)),
+  Sounds: $C.@ButtonSounds
+);
