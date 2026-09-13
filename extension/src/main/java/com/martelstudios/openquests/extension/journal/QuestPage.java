@@ -36,6 +36,7 @@ import com.martelstudios.openquests.extension.journal.navigation.routes.JournalR
 import com.martelstudios.openquests.extension.journal.navigation.routes.LabelledRoute;
 import com.martelstudios.openquests.extension.journal.navigation.routes.QuestRoute;
 import com.martelstudios.openquests.extension.journal.navigation.JournalRoutes;
+import com.martelstudios.openquests.extension.tags.OpenQuestsTags;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -480,6 +481,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         // One pass over everything the player holds: a quest that ended is set aside rather than
         // deleted, so the finished half of the journal is read the same way as the running half
         for (AbstractQuestProgression<?> quest : topLevel(questStore.getQuestIds())) {
+            // Dropped after topLevel worked the steps out, so hiding a chain hides it whole rather
+            // than surfacing the steps it was drawing
+            if (quest.hasTag(OpenQuestsTags.HIDE_TAG)) continue;
             if (!filter.accepts(quest.getStateFor(viewer))) continue;
 
             entries.add(Entry.held(quest, viewer, isOwed(playerComponents, quest.getId())));

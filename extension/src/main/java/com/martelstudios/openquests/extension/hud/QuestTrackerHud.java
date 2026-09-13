@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.HIDE_TAG;
 import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.TRACK_TAG;
 import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.UNTRACK_TAG;
 
@@ -94,10 +95,12 @@ public class QuestTrackerHud extends CustomUIHud {
     }
 
     /**
-     * @return whether the quest asked to be on the panel. Both tags are read through the quest, so
+     * @return whether the quest asked to be on the panel. Every tag is read through the quest, so
      * the asset answers for everything made from it unless the quest itself was tagged.
      */
     public static boolean isTracked(@Nonnull AbstractQuestProgression<?> quest) {
+        if (quest.hasTag(HIDE_TAG)) return false;
+
         return !quest.hasTag(UNTRACK_TAG) && quest.hasTag(TRACK_TAG);
     }
 

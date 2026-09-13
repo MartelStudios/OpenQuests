@@ -12,7 +12,7 @@ definition never touches saved progression.
 One quest, as the tracker draws it. *Introduction* combines its two children with `OR`, so either
 branch ends it — hence the rule between them. *Master the basics* combines its own four with `AND`,
 and nests one level further. *Gather fibre* is done: complete icon, greyed, counter dropped. The two
-grey lines are descriptions, shown because their assets carry the `HUD_DESC` tag.
+grey lines are descriptions, shown because their assets carry the `OQ_HUD_DESC` tag.
 
 ## Modules
 
@@ -122,17 +122,21 @@ that could not be granted on the spot has nowhere to wait.
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
 
-The tracker only lists quests that asked for it. An asset tagged `HUD_TRACK` puts every quest made
-from it on the panel; `HUD_DESC` shows its description under its title, greyed and smaller:
+The tracker only lists quests that asked for it. An asset tagged `OQ_HUD_TRACK` puts every quest made
+from it on the panel; `OQ_HUD_DESC` shows its description under its title, greyed and smaller:
 
 ```json
-{ "Type": "Composite", "TitleKey": "…", "Tags": { "HUD_TRACK": [], "HUD_DESC": [] } }
+{ "Type": "Composite", "TitleKey": "…", "Tags": { "OQ_HUD_TRACK": [], "OQ_HUD_DESC": [] } }
 ```
 
 A running quest carries tags of its own, through `addTag` and `removeTag`, and is asked before its
 asset — the same override as `PersistHistory`, so one quest can answer differently from everything
-sharing its template. A tag can only be added there, never taken off, which is what `HUD_UNTRACK`
-is for: it outranks `HUD_TRACK` and takes the quest off the panel although its asset asked for it.
+sharing its template. A tag can only be added there, never taken off, which is what `OQ_HUD_UNTRACK`
+is for: it outranks `OQ_HUD_TRACK` and takes the quest off the panel although its asset asked for it.
+
+`OQ_HIDE` outranks the lot: a quest carrying it is on neither the panel nor the journal, whatever
+else it asked for. What it owes the player is untouched — a debt is listed in its own right, so a
+quest the player is not meant to read about still pays out.
 
 A quest drawn under another one — the steps of a chain — is drawn by its parent and never asks on
 its own behalf, so tagging a step changes nothing.
