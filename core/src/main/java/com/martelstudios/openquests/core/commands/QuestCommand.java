@@ -10,10 +10,10 @@ public class QuestCommand extends AbstractCommandCollection {
         super("quest", "Displays quests info");
         this.addAliases("q");
 
-        setPermissionGroups(HytalePermissionsProvider.GROUP_WORLD_EDITOR);
+        setPermissionGroups(HytalePermissionsProvider.GROUP_ADVENTURER);
         this.addSubCommand(new CreateQuestCommand());
-        this.addSubCommand(new QuestStateCommand("complete", "Ends your running quests of a given asset as success", QuestState.SUCCESSFUL));
-        this.addSubCommand(new QuestStateCommand("fail", "Ends your running quests of a given asset as failed", QuestState.FAILED));
-        this.addSubCommand(new QuestStateCommand("abandon", "Ends your running quests of a given asset as abandoned", QuestState.ABANDONED, HytalePermissionsProvider.GROUP_ADVENTURER));
+        this.addSubCommand(new QuestStateCommand("complete", "Ends your running quests of a given asset as success", QuestState.SUCCESSFUL, HytalePermissionsProvider.GROUP_WORLD_EDITOR));
+        this.addSubCommand(new QuestStateCommand("fail", "Ends your running quests of a given asset as failed", QuestState.FAILED, HytalePermissionsProvider.GROUP_WORLD_EDITOR));
+        this.addSubCommand(new QuestStateCommand("abandon", "Ends your running quests of a given asset as abandoned", QuestState.ABANDONED));
     }
 }
