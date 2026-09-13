@@ -2,7 +2,7 @@ intro.title=Introduction
 intro.description=Take your first steps, and gather what a first camp is built from.
 
 skip-intro.title=Skip Intro
-skip-intro.description=Claim this to put the tutorial behind you.
+skip-intro.description=Use the /journal or /quest abandon Intro to skip the tutorial.
 
 craft-tools.title=Craft a hatchet and pickaxe
 craft-tools.description=Two tools, and the world opens up.
