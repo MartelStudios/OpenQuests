@@ -55,9 +55,13 @@ Group #QuestPageRow {
       LayoutMode: Left;
       Anchor: (Height: 26);
 
-      $C.@SmallTertiaryTextButton #Claim {
+      // Only ever drawn over something owed, so it wears the gold outright rather than being
+      // switched into it
+      TextButton #Claim {
         Text: "";
         Anchor: (Width: 110, Height: $C.@SmallButtonHeight);
+        Padding: (Horizontal: 16);
+        Style: $P.@OwedButtonStyle;
         Visible: false;
       }
 
@@ -81,3 +85,4 @@ Group #QuestPageRow {
     }
   }
 }
+

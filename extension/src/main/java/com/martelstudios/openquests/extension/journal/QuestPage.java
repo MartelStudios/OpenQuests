@@ -52,6 +52,7 @@ import java.util.*;
 public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventData> {
     private static final String PAGE_DOCUMENT = "Pages/QuestPage.ui";
     private static final String TAB_DOCUMENT = "Pages/QuestPageTab.ui";
+    private static final String TAB_OWED_DOCUMENT = "Pages/QuestPageTabOwed.ui";
     private static final String CRUMB_DOCUMENT = "Pages/QuestPageCrumb.ui";
     private static final String CRUMB_MORE_DOCUMENT = "Pages/QuestPageCrumbMore.ui";
 
@@ -155,7 +156,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#CloseButton", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_CLOSE), false);
 
         renderBreadcrumb(commandBuilder, eventBuilder);
-        renderTabs(commandBuilder, eventBuilder, filter);
+        renderTabs(commandBuilder, eventBuilder, filter, isOwedAnything(playerComponents));
         commandBuilder.clear(QuestPageContext.ROOT_CONTAINER);
 
         var context = new QuestPageContext(commandBuilder, eventBuilder, lookup(playerComponents), playerRef.getUuid());
@@ -299,6 +300,15 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      */
     private static boolean isOwed(@Nonnull EntityComponents playerComponents, @Nonnull UUID questId) {
         return QuestRewardService.get().isOwed(questId, playerComponents);
+    }
+
+    /**
+     * @return whether anything at all is waiting to be collected, which is what puts the rewards
+     * tab in gold. Read off the debts rather than off the quests: one that kept no trace of itself
+     * still owes, and that is the case the tab exists for.
+     */
+    private static boolean isOwedAnything(@Nonnull EntityComponents playerComponents) {
+        return !QuestRewardService.get().getPending(playerComponents).getAll().isEmpty();
     }
 
     /**
@@ -449,15 +459,20 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * Rebuilt with the list, since the tab standing open is part of what the page is showing. The
      * open one is disabled: that is what marks it, and it stops a click that would redraw the same
      * thing.
+     *
+     * <p>The rewards tab goes gold while something is waiting on it, so a debt is visible from
+     * whichever tab the player is standing on.
      */
-    private void renderTabs(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull Filter open) {
+    private void renderTabs(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull Filter open, boolean owed) {
         commandBuilder.clear(TABS_CONTAINER);
 
         int index = 0;
         for (Filter tab : Filter.values()) {
             String tabSelector = TABS_CONTAINER + "[" + index++ + "]";
 
-            commandBuilder.append(TABS_CONTAINER, TAB_DOCUMENT)
+            boolean gold = tab == Filter.PENDING && owed;
+
+            commandBuilder.append(TABS_CONTAINER, gold ? TAB_OWED_DOCUMENT : TAB_DOCUMENT)
                           .set(tabSelector + ".Text", tab.label())
                           .set(tabSelector + ".Disabled", open == tab);
 
