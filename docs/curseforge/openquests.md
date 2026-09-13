@@ -52,6 +52,10 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 
 **Step into a chain.** An objective naming another quest is a link. Follow it and a trail across the top says where you are and takes you back, so a chain can be read step by step without losing the way out.
 
+![The quest journal opened on Choose your weapon, reached through a trail reading Quest journal, Craft a workbench, Choose your weapon. The quest is marked Locked, and its four crafting objectives are separated by OR rules](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-breadcrumb.png?raw=true)
+
+_A step the player has not reached yet, read from the chain that grants it. The trail across the top is the way back._
+
 ***
 
 ## 🎯 Quest types
