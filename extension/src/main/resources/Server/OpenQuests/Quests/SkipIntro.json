@@ -1,8 +1,18 @@
 {
   "Type": "Script",
+  "StartOnConnection": true,
   "TitleKey": "quest.skip-intro.title",
   "DescriptionKey": "quest.skip-intro.description",
+  "SuccessfulRewards": [
+    {
+      "Type": "Command",
+      "AutoClaim": true,
+      "AsPlayer": true,
+      "Command": "/quest abandon Intro"
+    }
+  ],
   "Tags": {
+    "HUD_TRACK": [],
     "HUD_DESC": []
   }
 }

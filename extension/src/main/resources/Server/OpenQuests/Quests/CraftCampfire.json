@@ -1,0 +1,22 @@
+{
+  "Type": "Craft",
+  "TitleKey": "quest.craft-campfire.title",
+  "DescriptionKey": "quest.craft-campfire.description",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Bench_Campfire"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "CookMeat"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "Tags": {
+    "HUD_TRACK": [],
+    "HUD_DESC": []
+  }
+}

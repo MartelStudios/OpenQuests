@@ -1,0 +1,74 @@
+{
+  "Type": "Composite",
+  "TitleKey": "quest.craft-workbench.title",
+  "DescriptionKey": "quest.craft-workbench.description",
+  "QuestAssetIds": [
+    {
+      "Type": "BreakBlock",
+      "TitleKey": "quest.break-wood.title",
+      "DescriptionKey": "quest.break-wood.description",
+      "TargetQuantity": 1,
+      "BlockToBreak": {
+        "BlockTag": "Trunk"
+      }
+    },
+    {
+      "Type": "BreakBlock",
+      "TitleKey": "quest.break-stone.title",
+      "DescriptionKey": "quest.break-stone.description",
+      "TargetQuantity": 1,
+      "BlockToBreak": {
+        "BlockTag": "Rock"
+      }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-wood.title",
+      "DescriptionKey": "quest.gather-wood.description",
+      "TargetQuantity": 4,
+      "ItemToGather": {
+        "BlockTag": "Trunk"
+      }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-stone.title",
+      "DescriptionKey": "quest.gather-stone.description",
+      "TargetQuantity": 3,
+      "ItemToGather": {
+        "BlockTag": "Rock"
+      }
+    },
+    {
+      "Type": "Craft",
+      "TitleKey": "quest.craft-bench.title",
+      "DescriptionKey": "quest.craft-bench.description",
+      "TargetQuantity": 1,
+      "ItemToCraft": {
+        "ItemId": "Bench_WorkBench"
+      }
+    },
+    {
+      "Type": "PlaceBlock",
+      "TitleKey": "quest.place-bench.title",
+      "DescriptionKey": "quest.place-bench.description",
+      "TargetQuantity": 1,
+      "BlockToPlace": {
+        "ItemId": "Bench_WorkBench"
+      }
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "ChooseYourWeapon"
+      ]
+    }
+  ],
+  "Tags": {
+    "HUD_TRACK": [],
+    "HUD_DESC": []
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "Type": "Consume",
+  "TitleKey": "quest.eat-meat.title",
+  "DescriptionKey": "quest.eat-meat.description",
+  "TargetQuantity": 1,
+  "ItemToConsume": {
+    "ItemId": "Food_Wildmeat_Cooked"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Weapon_Crossbow_Iron",
+      "AutoClaim": false,
+      "Quantity": 1
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Weapon_Arrow_Crude",
+      "Quantity": 32,
+      "AutoClaim": false
+    }
+  ],
+  "Tags": {
+    "HUD_TRACK": [],
+    "HUD_DESC": []
+  }
+}

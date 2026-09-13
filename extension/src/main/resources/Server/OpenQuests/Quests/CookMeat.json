@@ -1,0 +1,22 @@
+{
+  "Type": "Gather",
+  "TitleKey": "quest.cook-meat.title",
+  "DescriptionKey": "quest.cook-meat.description",
+  "TargetQuantity": 1,
+  "ItemToGather": {
+    "ItemId": "Food_Wildmeat_Cooked"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "EatMeat"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "Tags": {
+    "HUD_TRACK": [],
+    "HUD_DESC": []
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "Type": "Composite",
+  "StartOnConnection": true,
+  "Operator": "Or",
+  "TitleKey": "quest.gather-meat.title",
+  "DescriptionKey": "quest.gather-meat.description",
+  "QuestAssetIds": [
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-wildmeat.title",
+      "TargetQuantity": 1,
+      "ItemToGather": {
+        "ItemId": "Food_Wildmeat_Raw"
+      }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-beef.title",
+      "TargetQuantity": 1,
+      "ItemToGather": {
+        "ItemId": "Food_Beef_Raw"
+      }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-chicken.title",
+      "TargetQuantity": 1,
+      "ItemToGather": {
+        "ItemId": "Food_Chicken_Raw"
+      }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.gather-pork.title",
+      "TargetQuantity": 1,
+      "ItemToGather": {
+        "ItemId": "Food_Pork_Raw"
+      }
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "CraftCampfire"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "Tags": {
+    "HUD_TRACK": [],
+    "HUD_DESC": []
+  }
+}

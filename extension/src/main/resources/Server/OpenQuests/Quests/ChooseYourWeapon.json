@@ -1,0 +1,57 @@
+{
+  "Type": "Composite",
+  "Operator": "Or",
+  "TitleKey": "quest.choose-weapon.title",
+  "DescriptionKey": "quest.choose-weapon.description",
+  "QuestAssetIds": [
+    {
+      "Type": "Craft",
+      "TitleKey": "quest.craft-sword.title",
+      "DescriptionKey": "quest.craft-sword.description",
+      "TargetQuantity": 1,
+      "ItemToCraft": {
+        "ItemId": "Weapon_Sword_Crude"
+      }
+    },
+    {
+      "Type": "Craft",
+      "TitleKey": "quest.craft-daggers.title",
+      "DescriptionKey": "quest.craft-daggers.description",
+      "TargetQuantity": 1,
+      "ItemToCraft": {
+        "ItemId": "Weapon_Daggers_Crude"
+      }
+    },
+    {
+      "Type": "Craft",
+      "TitleKey": "quest.craft-mace.title",
+      "DescriptionKey": "quest.craft-mace.description",
+      "TargetQuantity": 1,
+      "ItemToCraft": {
+        "ItemId": "Weapon_Mace_Crude"
+      }
+    },
+    {
+      "Type": "Craft",
+      "TitleKey": "quest.craft-battleaxe.title",
+      "DescriptionKey": "quest.craft-battleaxe.description",
+      "TargetQuantity": 1,
+      "ItemToCraft": {
+        "ItemId": "Weapon_Battleaxe_Crude"
+      }
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "DefeatForgottenTempleGuardian"
+      ]
+    }
+  ],
+  "Tags": {
+    "HUD_TRACK": [],
+    "HUD_DESC": []
+  }
+}

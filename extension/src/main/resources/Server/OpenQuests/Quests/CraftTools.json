@@ -1,0 +1,37 @@
+{
+  "Type": "Composite",
+  "TitleKey": "quest.craft-tools.title",
+  "DescriptionKey": "quest.craft-tools.description",
+  "QuestAssetIds": [
+    {
+      "Type": "Craft",
+      "TitleKey": "quest.craft-hatchet.title",
+      "DescriptionKey": "quest.craft-hatchet.description",
+      "TargetQuantity": 1,
+      "ItemToCraft": {
+        "ItemId": "Tool_Hatchet_Crude"
+      }
+    },
+    {
+      "Type": "Craft",
+      "TitleKey": "quest.craft-pickaxe.title",
+      "DescriptionKey": "quest.craft-pickaxe.description",
+      "TargetQuantity": 1,
+      "ItemToCraft": {
+        "ItemId": "Tool_Pickaxe_Crude"
+      }
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "CraftWorkbench"
+      ]
+    }
+  ],
+  "Tags": {
+    "HUD_TRACK": []
+  }
+}
