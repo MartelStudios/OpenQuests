@@ -2,6 +2,8 @@
 
 **OpenQuests Core** is the system half of [OpenQuests](https://www.curseforge.com/hytale/mods/openquests). It owns everything a quest needs to exist and nothing about what a quest _is_.
 
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
+
 A quest here is two objects. An **asset** describes it — title, parameters, rewards — and is authored as JSON in the Asset Editor. A **progression** carries the running state and is persisted on its own. The two are linked by id, so editing a definition never disturbs saved progress.
 
 Around that, the core provides:
