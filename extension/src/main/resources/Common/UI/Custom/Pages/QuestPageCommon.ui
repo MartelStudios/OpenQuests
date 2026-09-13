@@ -61,3 +61,20 @@ $C = "../Common.ui";
   Pressed: (Background: (Color: #000000(0)), LabelStyle: (...@LinkLabelStyle, TextColor: $C.@ColorBlueAccentPressed)),
   Sounds: $C.@ButtonSounds
 );
+
+// What the client frames an active tertiary control with: an opaque gold border over a brown fill
+// at 30% opacity, so it darkens the page rather than lightening it and the label keeps the same
+// grey every other small button wears. There is no hovered variant of the texture, so the three
+// live states are the one patch.
+@OwedButtonBackground = PatchStyle(TexturePath: "../Common/Buttons/Tertiary_Active.png", Border: $C.@ButtonBorder);
+
+@OwedButtonStyle = TextButtonStyle(
+  Default: (Background: @OwedButtonBackground, LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
+  Hovered: (Background: @OwedButtonBackground, LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
+  Pressed: (Background: @OwedButtonBackground, LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
+
+  // The open tab is drawn disabled, which is what marks it. A tab the player is standing on has no
+  // news left to give, so it drops the gold with everything else.
+  Disabled: (Background: PatchStyle(TexturePath: "../Common/Buttons/Disabled.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallButtonDisabledLabelStyle),
+  Sounds: $C.@ButtonSounds
+);
