@@ -103,6 +103,19 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     }
 
     /**
+     * @return the values written on a tag, empty when the asset declares it without any, and
+     * {@code null} when it does not declare it at all. "Declared, deliberately empty" is
+     * something a bare tag cannot say, and it is what silences what a value would have named.
+     */
+    @Nullable
+    public String[] getTagValues(@Nonnull String tag) {
+        if (data == null) return null;
+
+        Map<String, String[]> tags = data.getRawTags();
+        return tags == null ? null : tags.get(tag);
+    }
+
+    /**
      * @return {@code true} to hand this quest to every player on connection, once. A player who
      * already received it is not given it again, whatever became of it.
      */

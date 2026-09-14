@@ -42,3 +42,8 @@ page.requirement.not.completed = Unfinished
 page.requirement.not.successfully = Not completed
 page.requirement.not.failed = Not failed
 page.requirement.not.abandoned = Not abandoned
+
+feedback.successful = Quest complete
+feedback.failed = Quest failed
+feedback.abandoned = Quest abandoned
+

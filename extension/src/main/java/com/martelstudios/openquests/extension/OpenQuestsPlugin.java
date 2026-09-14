@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.martelstudios.openquests.extension.feedback.FeedbackFeature;
 import com.martelstudios.openquests.extension.hud.HudFeature;
 import com.martelstudios.openquests.extension.journal.JournalFeature;
 import com.martelstudios.openquests.extension.quests.composite.CompositeFeature;
@@ -47,6 +48,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         CompositeFeature.register(this);
         HudFeature.register(this);
         JournalFeature.register(this);
+        FeedbackFeature.register(this);
         KillFeature.register(this);
         CraftFeature.register(this);
         UseBlockFeature.register(this);

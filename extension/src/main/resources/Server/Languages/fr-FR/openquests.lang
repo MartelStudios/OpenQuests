@@ -42,3 +42,8 @@ page.requirement.not.completed = Non terminée
 page.requirement.not.successfully = Non réussie
 page.requirement.not.failed = Non échouée
 page.requirement.not.abandoned = Non abandonnée
+
+feedback.successful = Quête terminée
+feedback.failed = Quête échouée
+feedback.abandoned = Quête abandonnée
+

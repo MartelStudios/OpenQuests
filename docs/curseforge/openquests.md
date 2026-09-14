@@ -30,6 +30,8 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 
 📊 **Tracker HUD included.** Titles, counters, nesting and OR rules, exactly as the screenshot shows.
 
+🔔 **An ending you can hear.** A quest that finishes takes over the middle of the screen, the way discovering a zone does, and plays a sound you choose. New in 2.0.
+
 🈯 **English and French included.** Every line of text is translatable.
 
 🛡️ **Checked at boot.** A missing reference or a loop between quests stops the server with a clear reason, instead of breaking in front of a player hours later.
@@ -100,11 +102,24 @@ Tags are how an asset says something no field covers. They carry down from a par
 | <code>OQ_HUD_DESC</code> |Shows its description under its title, greyed and smaller  |
 | <code>OQ_HUD_UNTRACK</code> |Outranks the above and takes the quest off the tracker     |
 | <code>OQ_HIDE</code> |Keeps the quest out of the tracker and the journal alike   |
+| <code>OQ_SFX_SUCCESSFUL</code> |Names the sound played when the quest succeeds             |
+| <code>OQ_SFX_FAILED</code> |The same, for a quest that failed                          |
+| <code>OQ_SFX_ABANDONED</code> |The same, for a quest the player gave up                   |
 
 `OQ_HIDE` is for a quest the player is not meant to read about: a flag your chain sets on itself, a step you would rather keep off the page. What it owes is untouched, so a hidden quest still pays out.
 
 ```
 { "Type": "Composite", "TitleKey": "…", "Tags": { "OQ_HUD_TRACK": [], "OQ_HUD_DESC": [] } }
+```
+
+## 🔔 Ending a quest
+
+A quest that ends says so: its title takes over the middle of the screen, over a line naming the outcome, and a sound plays. A quest a script abandons rather than the player passes in silence, as does one carrying `OQ_HIDE`.
+
+The three `OQ_SFX_` tags name the sound for each outcome, either a vanilla sound event or one shipped by an asset pack of your own. A tag naming nothing plays nothing, which is how a single quest is made to end quietly.
+
+```
+{ "Tags": { "OQ_SFX_SUCCESSFUL": ["SFX_Memories_Unlock_Local"], "OQ_SFX_ABANDONED": [] } }
 ```
 
 ## 🌐 Who a quest belongs to

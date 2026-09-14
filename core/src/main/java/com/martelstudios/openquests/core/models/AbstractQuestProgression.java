@@ -45,6 +45,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     private static final BiConsumer<AbstractQuestProgression, String[]> TAGS_SETTER = (quest, tags) -> ((AbstractQuestProgression<?>) quest).tags.addAll(List.of(tags));
     private static final Function<AbstractQuestProgression, String[]> TAGS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).tags.toArray(new String[0]);
 
+    private static final String[] NO_TAG_VALUES = new String[0];
+
     /**
      * Serializes the fields shared by every quest progression; concrete codecs chain from this.
      */
@@ -365,6 +367,20 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
         QuestAsset asset = getAsset();
         return asset != null && asset.hasTag(tag);
+    }
+
+    /**
+     * @return the values its asset writes on a tag, or {@code null} when neither it nor its asset
+     * declares it. A tag written on the instance carries no value, so it reads as declared and
+     * empty — an instance can silence what an asset named, never rename it.
+     */
+    @Nullable
+    public String[] getTagValues(@Nonnull String tag) {
+        QuestAsset asset = getAsset();
+        String[] values = asset == null ? null : asset.getTagValues(tag);
+        if (values != null) return values;
+
+        return tags.contains(tag) ? NO_TAG_VALUES : null;
     }
 
     /**
