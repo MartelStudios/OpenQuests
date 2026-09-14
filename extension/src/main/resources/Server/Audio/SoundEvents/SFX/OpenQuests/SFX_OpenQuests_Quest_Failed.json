@@ -1,0 +1,14 @@
+{
+  "Layers": [
+    {
+      "Files": [
+        "Sounds/OpenQuests/Quest_Failed.ogg"
+      ],
+      "Volume": 0
+    }
+  ],
+  "Volume": 6.0,
+  "MaxInstance": 1,
+  "PreventSoundInterruption": true,
+  "AudioCategory": "AudioCat_UI"
+}

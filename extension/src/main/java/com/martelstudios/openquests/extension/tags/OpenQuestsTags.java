@@ -22,4 +22,20 @@ public class OpenQuestsTags {
      * the player is not meant to read about still has to pay out.
      */
     public static final String HIDE_TAG = "OQ_HIDE";
+
+    /**
+     * Names the sound event played when the quest succeeds, overriding the default. Declared
+     * without a value, it plays none — which is how one quest is made to end in silence.
+     */
+    public static final String SUCCESSFUL_SOUND_TAG = "OQ_SFX_SUCCESSFUL";
+
+    /**
+     * The same, for a quest that failed.
+     */
+    public static final String FAILED_SOUND_TAG = "OQ_SFX_FAILED";
+
+    /**
+     * The same, for a quest the player gave up.
+     */
+    public static final String ABANDONED_SOUND_TAG = "OQ_SFX_ABANDONED";
 }
