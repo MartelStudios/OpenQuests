@@ -9,12 +9,11 @@ import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.HIDE_TAG;
+import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.PARENT_QUEST_TAG;
 import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.TRACK_TAG;
 import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.UNTRACK_TAG;
 
@@ -62,8 +61,8 @@ public class QuestTrackerHud extends CustomUIHud {
     }
 
     /**
-     * Rebuilds the whole panel, throttled to {@link #UPDATE_INTERVAL_MS}. Takes every quest of the
-     * player, since a quest only earns its place once no other quest has claimed it.
+     * Rebuilds the whole panel, throttled to {@link #UPDATE_INTERVAL_MS}. One pass: every quest
+     * says for itself whether it belongs here, so nothing has to be worked out from the rest.
      */
     public void pushUpdate(@Nonnull Collection<AbstractQuestProgression<?>> quests) {
         long now = System.currentTimeMillis();
@@ -72,7 +71,6 @@ public class QuestTrackerHud extends CustomUIHud {
         if (!lastPushedMs.compareAndSet(last, now)) return;
 
         UUID viewer = getPlayerRef().getUuid();
-        Set<UUID> owned = getAllOwnedQuestIds(quests);
 
         var builder = new UICommandBuilder();
         builder.clear("#QuestList");
@@ -82,7 +80,10 @@ public class QuestTrackerHud extends CustomUIHud {
 
         for (AbstractQuestProgression<?> quest : quests) {
             if (shown >= MAX_QUESTS) break;
-            if (owned.contains(quest.getId())) continue;
+
+            // A step is drawn inside its group, and a step outliving its group cannot happen:
+            // a chain settles every child under it as it ends
+            if (quest.hasTag(PARENT_QUEST_TAG)) continue;
             if (!isTracked(quest, viewer)) continue;
 
             QuestHudRows.render(context, quest);
@@ -110,21 +111,6 @@ public class QuestTrackerHud extends CustomUIHud {
      */
     public static boolean isTracked(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID viewer) {
         return quest.getStateFor(viewer) == QuestState.IN_PROGRESS && isTracked(quest);
-    }
-
-    /**
-     * One pass to find the quests another quest already draws. They never reach the panel on
-     * their own, whatever state they are in.
-     */
-    @Nonnull
-    private static Set<UUID> getAllOwnedQuestIds(@Nonnull Collection<AbstractQuestProgression<?>> quests) {
-        Set<UUID> owned = new HashSet<>();
-
-        for (AbstractQuestProgression<?> quest : quests) {
-            QuestHudRenderer renderer = QuestHudService.resolve(quest);
-            if (renderer != null) owned.addAll(renderer.getOwnedQuestIds(quest));
-        }
-        return owned;
     }
 
 }
