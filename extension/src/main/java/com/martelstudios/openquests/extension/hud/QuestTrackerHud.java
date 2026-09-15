@@ -13,7 +13,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.HIDE_TAG;
-import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.PARENT_QUEST_TAG;
 import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.TRACK_TAG;
 import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.UNTRACK_TAG;
 
@@ -80,10 +79,6 @@ public class QuestTrackerHud extends CustomUIHud {
 
         for (AbstractQuestProgression<?> quest : quests) {
             if (shown >= MAX_QUESTS) break;
-
-            // A step is drawn inside its group, and a step outliving its group cannot happen:
-            // a chain settles every child under it as it ends
-            if (quest.hasTag(PARENT_QUEST_TAG)) continue;
             if (!isTracked(quest, viewer)) continue;
 
             QuestHudRows.render(context, quest);

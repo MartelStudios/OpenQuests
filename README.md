@@ -140,8 +140,10 @@ outranks `OQ_HUD_TRACK` and takes the quest off the panel although its asset ask
 else it asked for. What it owes the player is untouched — a debt is listed in its own right, so a
 quest the player is not meant to read about still pays out.
 
-A quest drawn under another one — the steps of a chain — is drawn by its parent and never asks on
-its own behalf, so tagging a step changes nothing.
+A quest drawn under another one — the steps of a chain — is drawn by its parent, and an inline step
+inherits nothing from the chain it is written inside: its tags are its own. So a step is on the
+panel on the same terms as anything else, and asking for one is how a player narrows a long chain
+down to what they are doing now. Keeping the chain up beside it is theirs to decide too.
 
 Every counted type extends `QuantityQuestAsset`, which carries `TargetQuantity`. The parameter and
 the target can both be overridden on the progression itself, serialized only when set and falling
