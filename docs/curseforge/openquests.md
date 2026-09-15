@@ -94,7 +94,7 @@ Each reward decides for itself whether it lands on its own or waits to be collec
 
 ## 🏷️ Tags
 
-Tags are how an asset says something no field covers. They carry down from a parent asset, and a running quest can carry its own.
+Tags are how an asset says something no field covers. They carry down from a parent asset, and a running quest can carry its own — with values, exactly like an asset's, the instance answering alone once it declares one.
 
 | Tag        |Effect                                                     |
 | ---------- |---------------------------------------------------------- |
@@ -105,6 +105,7 @@ Tags are how an asset says something no field covers. They carry down from a par
 | <code>OQ_SFX_SUCCESSFUL</code> |Names the sound played when the quest succeeds             |
 | <code>OQ_SFX_FAILED</code> |The same, for a quest that failed                          |
 | <code>OQ_SFX_ABANDONED</code> |The same, for a quest the player gave up                   |
+| <code>OQ_GRANTED_BY</code> |Written by <code>GrantQuest</code> on the quest it creates, naming the run that opened it |
 
 `OQ_HIDE` is for a quest the player is not meant to read about: a flag your chain sets on itself, a step you would rather keep off the page. What it owes is untouched, so a hidden quest still pays out.
 

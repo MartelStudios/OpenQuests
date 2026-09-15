@@ -12,6 +12,7 @@ import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 
 /**
  * Runs a server or player command on completion.
@@ -32,7 +33,7 @@ public class CommandReward extends QuestReward {
     private CommandReward() {}
 
     @Override
-    public boolean grant(@Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
         PlayerRef playerRef = playerComponents.getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return false;
 

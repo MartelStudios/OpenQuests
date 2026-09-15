@@ -146,7 +146,7 @@ public class QuestRewardService {
         for (QuestReward reward : rewards) {
             if (!reward.isAutoClaim()) continue;
 
-            if (!reward.grant(playerComponents)) continue;
+            if (!reward.grant(pending.getQuestId(), playerComponents)) continue;
 
             remaining.remove(reward);
             pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));
@@ -164,7 +164,7 @@ public class QuestRewardService {
         var remaining = new ArrayList<>(Arrays.asList(rewards));
 
         for (QuestReward reward : rewards) {
-            if (!reward.grant(playerComponents)) continue;
+            if (!reward.grant(pending.getQuestId(), playerComponents)) continue;
 
             remaining.remove(reward);
             pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));

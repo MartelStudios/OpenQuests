@@ -6,10 +6,12 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.extension.tags.OpenQuestsTags;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -35,9 +37,14 @@ public class GrantQuestReward extends QuestReward {
     /**
      * An unknown asset is skipped rather than failing the whole grant: retrying would only hand
      * out the quests that did resolve a second time.
+     *
+     * <p>Each quest is built, told where it came from, and only then registered — so everything
+     * that hears of it, {@code onRegistered} included, already knows which completion opened it.
+     * Nothing else could: a chain handed out twice leaves two quests sharing one asset, and the
+     * pairing is gone the moment it is not written down.
      */
     @Override
-    public boolean grant(@Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
         var uuidComponent = playerComponents.getComponent(UUIDComponent.getComponentType());
         if (uuidComponent == null) return false;
 
@@ -47,7 +54,11 @@ public class GrantQuestReward extends QuestReward {
             QuestAsset questAsset = QuestAsset.getAsset(questAssetId);
             if (questAsset == null) continue;
 
-            QuestProgressionService.get().registerQuest(questAsset).addPlayer(playerId);
+            AbstractQuestProgression<?> quest = questAsset.create();
+            quest.addTag(OpenQuestsTags.GRANTED_BY_TAG, sourceQuestId.toString());
+
+            QuestProgressionService.get().registerQuest(quest);
+            quest.addPlayer(playerId);
         }
 
         return true;

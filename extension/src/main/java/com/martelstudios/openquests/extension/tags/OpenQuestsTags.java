@@ -24,6 +24,13 @@ public class OpenQuestsTags {
     public static final String HIDE_TAG = "OQ_HIDE";
 
     /**
+     * Carries the id of the quest whose completion handed this one over. Written by the
+     * {@code GrantQuest} reward on the quest it creates, so a chain can be walked back to the
+     * exact run that opened it rather than to whichever quest shares its asset.
+     */
+    public static final String GRANTED_BY_TAG = "OQ_GRANTED_BY";
+
+    /**
      * Names the sound event played when the quest succeeds, overriding the default. Declared
      * without a value, it plays none — which is how one quest is made to end in silence.
      */

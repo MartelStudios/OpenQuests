@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
+import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
@@ -19,7 +20,10 @@ import com.martelstudios.openquests.core.visitors.QuestVisitor;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,11 +45,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     private static final BiConsumer<AbstractQuestProgression, UUID[]> ABANDONED_PLAYERS_SETTER = (quest, uuids) -> ((AbstractQuestProgression<?>) quest).abandonedPlayers.addAll(List.of(uuids));
     private static final Function<AbstractQuestProgression, UUID[]> ABANDONED_PLAYERS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).abandonedPlayers.toArray(new UUID[0]);
 
-    private static final KeyedCodec<String[]> TAGS_CODEC = new KeyedCodec<>("Tags", new ArrayCodec<>(Codec.STRING, String[]::new));
-    private static final BiConsumer<AbstractQuestProgression, String[]> TAGS_SETTER = (quest, tags) -> ((AbstractQuestProgression<?>) quest).tags.addAll(List.of(tags));
-    private static final Function<AbstractQuestProgression, String[]> TAGS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).tags.toArray(new String[0]);
+    private static final KeyedCodec<Map<String, String[]>> TAGS_CODEC = new KeyedCodec<>("Tags", new MapCodec<>(new ArrayCodec<>(Codec.STRING, String[]::new), HashMap<String, String[]>::new));
+    private static final BiConsumer<AbstractQuestProgression, Map<String, String[]>> TAGS_SETTER = (quest, tags) -> ((AbstractQuestProgression<?>) quest).tags.putAll(tags);
+    private static final Function<AbstractQuestProgression, Map<String, String[]>> TAGS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).tags;
 
-    private static final String[] NO_TAG_VALUES = new String[0];
+    public static final String[] NO_TAG_VALUES = new String[0];
 
     /**
      * Serializes the fields shared by every quest progression; concrete codecs chain from this.
@@ -87,10 +91,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     protected Set<UUID> abandonedPlayers = ConcurrentHashMap.newKeySet();
 
     /**
-     * Tags written on this instance, on top of those its asset declares. What became of this one
-     * quest belongs here, since an asset is shared by everyone holding it.
+     * Tags written on this instance, on top of those its asset declares, each with the values its
+     * asset counterpart would carry. What became of this one quest belongs here, since an asset is
+     * shared by everyone holding it.
      */
-    protected Set<String> tags = ConcurrentHashMap.newKeySet();
+    protected Map<String, String[]> tags = new ConcurrentHashMap<>();
 
     /**
      * The {@link QuestAsset#getId()}
@@ -363,33 +368,48 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * instance says nothing of it.
      */
     public boolean hasTag(@Nonnull String tag) {
-        if (tags.contains(tag)) return true;
+        if (tags.containsKey(tag)) return true;
 
         QuestAsset asset = getAsset();
         return asset != null && asset.hasTag(tag);
     }
 
     /**
-     * @return the values its asset writes on a tag, or {@code null} when neither it nor its asset
-     * declares it. A tag written on the instance carries no value, so it reads as declared and
-     * empty — an instance can silence what an asset named, never rename it.
+     * The instance is asked first and answers alone once it declares the tag, the same override as
+     * {@code PersistHistory}: a quest written over by hand is not arguing with its template, it is
+     * replacing what the template said.
+     *
+     * @return the values written on a tag, empty when it is declared without any, and {@code null}
+     * when neither the quest nor its asset declares it at all.
      */
     @Nullable
     public String[] getTagValues(@Nonnull String tag) {
-        QuestAsset asset = getAsset();
-        String[] values = asset == null ? null : asset.getTagValues(tag);
-        if (values != null) return values;
+        String[] own = tags.get(tag);
+        if (own != null) return own;
 
-        return tags.contains(tag) ? NO_TAG_VALUES : null;
+        QuestAsset asset = getAsset();
+        return asset == null ? null : asset.getTagValues(tag);
     }
 
     /**
-     * @return {@code false} if the quest already carried the tag.
+     * Declares a tag carrying nothing.
+     *
+     * @return {@code false} if the quest already carried it.
      */
     public boolean addTag(@Nonnull String tag) {
-        if (!tags.add(tag)) return false;
-        markDirty();
+        return addTag(tag, NO_TAG_VALUES);
+    }
 
+    /**
+     * Writes a tag and what it carries, replacing whatever the quest held under it.
+     *
+     * @return {@code false} if the quest already carried exactly that.
+     */
+    public boolean addTag(@Nonnull String tag, @Nonnull String... values) {
+        String[] previous = tags.put(tag, values);
+        if (previous != null && Arrays.equals(previous, values)) return false;
+
+        markDirty();
         return true;
     }
 
@@ -397,16 +417,16 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the quest did not carry the tag.
      */
     public boolean removeTag(@Nonnull String tag) {
-        if (!tags.remove(tag)) return false;
+        if (tags.remove(tag) == null) return false;
         markDirty();
 
         return true;
     }
 
     /**
-     * @return the live, mutable set of tags written on this quest alone, without those of its asset.
+     * @return the live, mutable tags written on this quest alone, without those of its asset.
      */
-    public Set<String> getTags() {
+    public Map<String, String[]> getTags() {
         return tags;
     }
 
