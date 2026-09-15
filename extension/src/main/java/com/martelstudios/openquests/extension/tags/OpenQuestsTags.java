@@ -31,6 +31,14 @@ public class OpenQuestsTags {
     public static final String GRANTED_BY_TAG = "OQ_GRANTED_BY";
 
     /**
+     * Carries the id of the composite this quest is a step of. Written on a child as the group
+     * creates it, so a step says so itself rather than being recognised by whoever happens to list
+     * it — the panel and the journal both need to know, and neither should have to ask every other
+     * quest the player holds.
+     */
+    public static final String PARENT_QUEST_TAG = "OQ_PARENT_QUEST";
+
+    /**
      * Names the sound event played when the quest succeeds, overriding the default. Declared
      * without a value, it plays none — which is how one quest is made to end in silence.
      */

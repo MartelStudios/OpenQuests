@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
+import com.martelstudios.openquests.extension.tags.OpenQuestsTags;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -97,6 +98,11 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
     /**
      * Creates and registers one child quest per referenced asset. Unknown ids are left to fail
      * loudly here, as {@link CompositeQuestAssetValidator} already rejects them at boot.
+     *
+     * <p>Each child is built and told whose step it is before it is registered, so everything that
+     * hears of it already knows it belongs to a group. The group keeps {@link #questIds} for the
+     * one direction it walks; the tag is the other direction, which nothing else could work out
+     * without asking every quest the player holds what it is made of.
      */
     @Override
     public void onRegistered() {
@@ -106,8 +112,12 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
 
         for (int i = 0; i < assetIds.length; i++) {
             QuestAsset childAsset = QuestAsset.getAsset(assetIds[i]);
-            AbstractQuestProgression<?> child = QuestProgressionService.get().registerQuest(childAsset);
+
+            AbstractQuestProgression<?> child = childAsset.create();
+            child.addTag(OpenQuestsTags.PARENT_QUEST_TAG, getId().toString());
             if (!getAsset().isPersistChildrenHistory()) child.setPersistHistory(false);
+
+            QuestProgressionService.get().registerQuest(child);
 
             questIds[i] = child.getId();
         }
