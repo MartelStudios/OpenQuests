@@ -48,6 +48,8 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 
 **Tracking, from the journal.** A button puts a quest on the HUD or takes it off. A tracked quest wears a gold frame and rises to the top of *Active*, so the player decides what their journal opens on.
 
+**One step at a time.** Open a chain, pick the step you are on, and track that. It gets a line on the HUD like any other quest, so a long chain can be narrowed down to what you are doing now — with the chain still up beside it, or not, as you prefer.
+
 **Sorted the way you would look for them.** *Active* lists tracked quests first, then whatever was picked up most recently. *Finished* lists whatever ended last, first.
 
 **A debt is visible from anywhere.** The *Rewards* tab turns gold the moment something is owed, and so does the button that collects it.
