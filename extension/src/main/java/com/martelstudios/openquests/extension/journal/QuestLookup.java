@@ -24,4 +24,14 @@ public interface QuestLookup {
      */
     @Nullable
     QuestMark markOf(@Nonnull String target);
+
+    /**
+     * @param sourceQuestId the completion whose rewards are being drawn
+     * @param assetId       the asset that completion pays out
+     * @return the id of the quest that completion actually handed the player from that asset, or
+     * {@code null} when it handed them none. Several runs of one chain leave several quests
+     * sharing an asset, and only the run that created a quest can say it is theirs.
+     */
+    @Nullable
+    String grantedFrom(@Nonnull String sourceQuestId, @Nonnull String assetId);
 }

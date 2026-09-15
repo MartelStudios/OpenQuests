@@ -33,7 +33,9 @@ public final class GrantQuestRewardRenderer implements QuestRewardRenderer {
             Message label = Message.translation("openquests.page.reward.grant")
                                    .param("quest", AbstractQuestProgression.titleOf(asset));
 
-            context.linkingTo(questAssetId, () -> {
+            // The quest this very completion handed over where there is one, so a chain walked
+            // twice leads back to the run being read rather than to the latest of its twins
+            context.granting(questAssetId, () -> {
                 String lineSelector = QuestPageRows.appendLine(context, label);
 
                 QuestPageRows.setNextIcon(context, lineSelector);

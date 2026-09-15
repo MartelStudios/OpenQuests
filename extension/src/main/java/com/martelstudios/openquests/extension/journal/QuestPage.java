@@ -207,7 +207,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      */
     @Nullable
     private Entry resolve(@Nonnull EntityComponents playerComponents, @Nonnull String target, @Nullable QuestMark inherited) {
-        AbstractQuestProgression<?> quest = held(playerComponents, target);
+        AbstractQuestProgression<?> quest = inherited == QuestMark.LOCKED ? null : held(playerComponents, target);
         if (quest != null) return Entry.held(quest, playerRef.getUuid(), isOwed(playerComponents, quest.getId()));
 
         // Only an asset id gets this far: a quest id the player never held names nothing at all
@@ -235,6 +235,13 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                 // Not LOCKED: the journal knowing nothing is not the same as the quest being out
                 // of reach, and the line above this one may well know better
                 return quest == null ? null : QuestMark.of(quest.getStateFor(playerRef.getUuid()));
+            }
+
+            @Override
+            public String grantedFrom(@Nonnull String sourceQuestId, @Nonnull String assetId) {
+                AbstractQuestProgression<?> quest = QuestPage.grantedFrom(playerComponents, sourceQuestId, assetId);
+
+                return quest == null ? null : quest.getId().toString();
             }
         };
     }
@@ -292,6 +299,29 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             if (best == null || isLater(quest, best)) best = quest;
         }
         return best;
+    }
+
+    /**
+     * The quest one completion handed the player from an asset, found by the mark the grant left
+     * on it rather than by the asset alone. A player who ran a chain twice holds two quests under
+     * the same asset, and {@link #held} would answer with the later one whichever run is asking.
+     *
+     * @return {@code null} when that completion handed them nothing — a quest that never reached
+     * the outcome paying for it, or one whose grant is still owed.
+     */
+    @Nullable
+    private static AbstractQuestProgression<?> grantedFrom(@Nonnull EntityComponents playerComponents, @Nonnull String sourceQuestId, @Nonnull String assetId) {
+        var questStore = playerComponents.getComponent(QuestStoreComponent.getComponentType());
+        if (questStore == null) return null;
+
+        for (UUID questId : questStore.getQuestIds()) {
+            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            if (quest == null || !assetId.equals(quest.getAssetId())) continue;
+
+            String[] granter = quest.getTagValues(OpenQuestsTags.GRANTED_BY_TAG);
+            if (granter != null && granter.length > 0 && sourceQuestId.equals(granter[0])) return quest;
+        }
+        return null;
     }
 
     /**
@@ -640,11 +670,14 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         QuestReward[] rewards = entry.rewards();
         if (rewards == null || rewards.length == 0) return 0;
 
-        int lines = context.into(rowSelector + "#Rewards", () -> {
-            for (QuestReward reward : rewards) {
-                QuestPageRows.renderReward(context, reward);
-            }
-        });
+        AbstractQuestProgression<?> paying = entry.quest();
+
+        int lines = context.into(rowSelector + "#Rewards", () ->
+            context.paying(paying == null ? null : paying.getId().toString(), () -> {
+                for (QuestReward reward : rewards) {
+                    QuestPageRows.renderReward(context, reward);
+                }
+            }));
         if (lines == 0) return 0;
 
         context.getBuilder()
