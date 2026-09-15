@@ -150,7 +150,12 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
     }
 
     /**
-     * Abandon remaining children in progress.
+     * Abandon remaining children in progress, and write down that it did.
+     *
+     * <p>The group records these itself rather than hearing them: its listeners are gone by the
+     * line above, and {@link CompositeQuestVisitor} would refuse the news anyway, since a group
+     * that has already settled stops counting. So nothing else is left to remember what became of
+     * a step called off here — a step that is, by default, unregistered on the spot.
      */
     private void settleChildren() {
         releaseChildListeners();
@@ -160,6 +165,8 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
             if (child == null || child.isCompleted()) continue;
 
             QuestProgressionService.get().progress(new SetStateVisitor(QuestState.ABANDONED), List.of(questId));
+
+            if (recordOutcome(questId, QuestState.ABANDONED)) markDirty();
         }
     }
 
