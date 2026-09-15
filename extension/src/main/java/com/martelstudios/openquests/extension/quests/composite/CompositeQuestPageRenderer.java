@@ -36,12 +36,6 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
         return CompositeQuestProgression.class;
     }
 
-    @Nonnull
-    @Override
-    public UUID[] getSteps(@Nonnull AbstractQuestProgression<?> quest) {
-        return ((CompositeQuestProgression) quest).getQuestIds();
-    }
-
     /**
      * A row names the group and says how far through it the player is; the children are listed on
      * the group own card, so a row repeating them would say the same thing twice.

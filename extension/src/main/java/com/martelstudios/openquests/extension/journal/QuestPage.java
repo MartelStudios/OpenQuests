@@ -543,14 +543,12 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         UUID viewer = playerRef.getUuid();
         List<Entry> entries = new ArrayList<>();
 
-        List<AbstractQuestProgression<?>> held = new ArrayList<>(topLevel(questStore.getQuestIds()));
+        List<AbstractQuestProgression<?>> held = topLevel(questStore.getQuestIds());
         held.sort(filter == Filter.DONE ? BY_RECENTLY_COMPLETED : byTrackedThenRecent(viewer));
 
         // One pass over everything the player holds: a quest that ended is set aside rather than
         // deleted, so the finished half of the journal is read the same way as the running half
         for (AbstractQuestProgression<?> quest : held) {
-            // Dropped after topLevel worked the steps out, so hiding a chain hides it whole rather
-            // than surfacing the steps it was drawing
             if (quest.hasTag(OpenQuestsTags.HIDE_TAG)) continue;
             if (!filter.accepts(quest.getStateFor(viewer))) continue;
 
@@ -565,34 +563,29 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      */
     @Nonnull
     private static List<AbstractQuestProgression<?>> topLevel(@Nonnull Set<UUID> questIds) {
-        Map<UUID, AbstractQuestProgression<?>> held = new LinkedHashMap<>();
+        List<AbstractQuestProgression<?>> topLevel = new ArrayList<>();
 
         for (UUID questId : questIds) {
             AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
-            if (quest == null) continue;
+            if (quest == null || drawnByItsGroup(quest)) continue;
 
-            held.put(questId, quest);
+            topLevel.add(quest);
         }
-
-        Set<UUID> steps = new HashSet<>();
-        for (AbstractQuestProgression<?> quest : held.values()) {
-            for (UUID stepId : stepsOf(quest)) {
-                if (held.containsKey(stepId)) steps.add(stepId);
-            }
-        }
-
-        return held.values().stream().filter(quest -> !steps.contains(quest.getId())).toList();
+        return topLevel;
     }
 
     /**
-     * What a quest is made of, as its own type tells it. The page knows no quest type, so this goes
-     * through the renderer the type registered.
+     * @return whether the group this quest is a step of is still there to draw it. A step that
+     * outlived its group — one kept by {@code PersistChildrenHistory} under a chain that kept
+     * nothing of itself — is listed on its own rather than hidden behind something gone, since
+     * there is no longer anywhere to open it from.
      */
-    @Nonnull
-    private static UUID[] stepsOf(@Nonnull AbstractQuestProgression<?> quest) {
-        QuestPageRenderer renderer = QuestPageService.resolve(quest);
+    private static boolean drawnByItsGroup(@Nonnull AbstractQuestProgression<?> quest) {
+        String[] parent = quest.getTagValues(OpenQuestsTags.PARENT_QUEST_TAG);
+        if (parent == null || parent.length == 0) return false;
 
-        return renderer == null ? QuestPageRenderer.NO_STEPS : renderer.getSteps(quest);
+        UUID parentId = parse(parent[0]);
+        return parentId != null && QuestProgressionService.get().getQuest(parentId) != null;
     }
 
     private void renderEntry(@Nonnull QuestPageContext context, @Nonnull Entry entry, @Nonnull QuestShape shape) {

@@ -5,7 +5,6 @@ import com.martelstudios.openquests.core.models.QuestAsset;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.UUID;
 
 /**
  * How one quest type shows itself in the journal. The page owns the frame of each shape — the
@@ -17,9 +16,6 @@ import java.util.UUID;
  * a type whose lines cannot be written down in advance — a chain has as many as it has steps.
  */
 public interface QuestPageRenderer {
-
-    /** A quest made of nothing else, which is most of them. */
-    UUID[] NO_STEPS = new UUID[0];
 
     /**
      * @return the quest class this renders. Subclasses fall back to it, so registering on a base
@@ -60,16 +56,4 @@ public interface QuestPageRenderer {
     default void render(@Nonnull QuestPageContext context, @Nonnull QuestShape shape, @Nonnull String selector,
                         @Nullable AbstractQuestProgression<?> quest, @Nullable QuestAsset asset) {}
 
-    /**
-     * The quests this one hands out and is made of, so the journal can put a chain above its steps.
-     * Ids rather than progressions: the page only orders the rows it is already showing, and a step
-     * that finished has left the store.
-     *
-     * <p>Nothing by default, which is right for every type that asks for one thing. Override it on
-     * a type built from other quests, or its steps land wherever the store happened to keep them.
-     */
-    @Nonnull
-    default UUID[] getSteps(@Nonnull AbstractQuestProgression<?> quest) {
-        return NO_STEPS;
-    }
 }

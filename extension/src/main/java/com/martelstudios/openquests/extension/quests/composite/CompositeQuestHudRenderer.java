@@ -9,9 +9,6 @@ import com.martelstudios.openquests.extension.hud.QuestHudRenderer;
 import com.martelstudios.openquests.extension.hud.QuestHudRows;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -30,12 +27,6 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
     @Override
     public Class<?> getQuestType() {
         return CompositeQuestProgression.class;
-    }
-
-    @Nonnull
-    @Override
-    public Set<UUID> getOwnedQuestIds(@Nonnull AbstractQuestProgression<?> quest) {
-        return new HashSet<>(Arrays.asList(((CompositeQuestProgression) quest).getQuestIds()));
     }
 
     @Override

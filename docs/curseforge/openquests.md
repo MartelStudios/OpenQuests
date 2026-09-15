@@ -106,6 +106,7 @@ Tags are how an asset says something no field covers. They carry down from a par
 | <code>OQ_SFX_FAILED</code> |The same, for a quest that failed                          |
 | <code>OQ_SFX_ABANDONED</code> |The same, for a quest the player gave up                   |
 | <code>OQ_GRANTED_BY</code> |Written by <code>GrantQuest</code> on the quest it creates, naming the run that opened it |
+| <code>OQ_PARENT_QUEST</code> |Written by a composite on each step it creates, naming the group it belongs to |
 
 `OQ_HIDE` is for a quest the player is not meant to read about: a flag your chain sets on itself, a step you would rather keep off the page. What it owes is untouched, so a hidden quest still pays out.
 
