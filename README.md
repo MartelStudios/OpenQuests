@@ -131,8 +131,10 @@ from it on the panel; `OQ_HUD_DESC` shows its description under its title, greye
 
 A running quest carries tags of its own, through `addTag` and `removeTag`, and is asked before its
 asset — the same override as `PersistHistory`, so one quest can answer differently from everything
-sharing its template. A tag can only be added there, never taken off, which is what `OQ_HUD_UNTRACK`
-is for: it outranks `OQ_HUD_TRACK` and takes the quest off the panel although its asset asked for it.
+sharing its template. Its tags carry values just as an asset's do, and the instance answers alone
+once it declares one, so a quest can be written over at runtime rather than only added to. A tag
+can only be added to an asset's set, never taken off it, which is what `OQ_HUD_UNTRACK` is for: it
+outranks `OQ_HUD_TRACK` and takes the quest off the panel although its asset asked for it.
 
 `OQ_HIDE` outranks the lot: a quest carrying it is on neither the panel nor the journal, whatever
 else it asked for. What it owes the player is untouched — a debt is listed in its own right, so a

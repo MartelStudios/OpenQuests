@@ -45,6 +45,13 @@ public final class QuestPageContext {
     private String linkTarget;
 
     /**
+     * The completion whose rewards are being drawn, or {@code null} outside of a reward list. What
+     * a reward hands over is only a fact for the run that paid it; everywhere else it is a promise.
+     */
+    @Nullable
+    private String payingQuestId;
+
+    /**
      * What the lines being drawn are worth. Null when nothing can be said about them at all: a
      * reward preview, or a step of an OR group that succeeded, where neither the asset nor the
      * group can say which branch was taken.
@@ -185,6 +192,42 @@ public final class QuestPageContext {
             linkTarget = previousTarget;
             mark = previousMark;
         }
+    }
+
+    /**
+     * Says which completion the rewards being drawn belong to, so a reward that hands a quest over
+     * can point at the one it handed over rather than at its asset. Pass {@code null} for a quest
+     * the player does not hold: nothing was paid, so nothing was created.
+     */
+    public void paying(@Nullable String questId, @Nonnull Runnable body) {
+        String previousPaying = payingQuestId;
+
+        payingQuestId = questId;
+        try {
+            body.run();
+        } finally {
+            payingQuestId = previousPaying;
+        }
+    }
+
+    /**
+     * Makes whatever the body draws lead to what one reward hands over: the quest this very
+     * completion created where there is one, and the asset itself where there is none.
+     *
+     * <p>Handed over nothing is said as {@link QuestMark#LOCKED} rather than left unsaid, and that
+     * is the whole point of the call. A quest that failed paid none of what success would have
+     * paid, yet the row still lists it — so without a word the line would go looking for the asset
+     * by name and answer with somebody else's run of it, which reads as a quest the player was
+     * given and walked away from.
+     */
+    public void granting(@Nonnull String assetId, @Nonnull Runnable body) {
+        String granted = payingQuestId == null ? null : lookup.grantedFrom(payingQuestId, assetId);
+
+        if (granted != null) {
+            listing(granted, body);
+            return;
+        }
+        listing(assetId, QuestMark.LOCKED, body);
     }
 
     /**

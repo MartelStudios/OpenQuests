@@ -12,6 +12,7 @@ import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class ItemReward extends QuestReward {
     private ItemReward() {}
 
     @Override
-    public boolean grant(@Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
         List<ItemContainer> containers = new ArrayList<>(InventoryComponent.HOTBAR_FIRST.length);
 
         for (var inventoryType : InventoryComponent.HOTBAR_FIRST) {
