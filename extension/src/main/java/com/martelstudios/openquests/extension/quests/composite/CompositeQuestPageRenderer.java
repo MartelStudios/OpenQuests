@@ -176,21 +176,22 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
     }
 
     /**
-     * How far through the group the player is. Counted from what the group can still say became of
-     * each child: a step it has lost track of is not one it may count as cleared, however likely
-     * that is — a tally is read as a fact.
+     * How far through the group the player got. Only a step carried out counts: one that failed and
+     * one the chain called off are both over, but neither is progress, and a chain that ended badly
+     * reading as full would say the opposite of what happened.
+     *
+     * <p>A step the group has lost track of counts for nothing either, however likely it is to have
+     * succeeded — a tally is read as a fact.
      */
     @Nonnull
     private static String tallyOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite) {
         UUID[] questIds = composite.getQuestIds();
-        int completed = 0;
+        int successful = 0;
 
         for (UUID childId : questIds) {
-            QuestMark mark = markOf(context, composite, childId);
-
-            if (mark != QuestMark.IN_PROGRESS && mark != QuestMark.LOST) completed++;
+            if (markOf(context, composite, childId) == QuestMark.SUCCESSFUL) successful++;
         }
-        return completed + "/" + questIds.length;
+        return successful + "/" + questIds.length;
     }
 
     /**
