@@ -1,7 +1,10 @@
 package com.martelstudios.openquests.core.stores;
 
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.datastore.DataStore;
+import com.martelstudios.openquests.core.events.QuestLoadedEvent;
+import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 
@@ -55,11 +58,37 @@ public class QuestProgressionStore {
 
         if (quest.isCompleted() && quest.isStopOnComplete()) {
             archived.put(quest.getId(), quest);
-            return;
+        } else {
+            quests.put(quest.getId(), quest);
+            idsByType.computeIfAbsent(quest.getClass(), k -> ConcurrentHashMap.newKeySet()).add(quest.getId());
         }
 
-        quests.put(quest.getId(), quest);
-        idsByType.computeIfAbsent(quest.getClass(), k -> ConcurrentHashMap.newKeySet()).add(quest.getId());
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestLoadedEvent.class, quest.getId())
+                    .dispatch(new QuestLoadedEvent(quest));
+    }
+
+    /**
+     * Drops a quest from memory, leaving its file where it is: the next lookup by id reads it back.
+     * What it changed is written out first, since nothing else will now hold it.
+     *
+     * @return {@code null} for a quest the store was not holding.
+     */
+    public AbstractQuestProgression<?> unload(@Nonnull UUID id) {
+        AbstractQuestProgression<?> quest = quests.containsKey(id) ? quests.get(id) : archived.get(id);
+        if (quest == null) return null;
+
+        saveToDisk(quest);
+
+        if (remove(id) == null) archived.remove(id);
+
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestUnloadedEvent.class, id)
+                    .dispatch(new QuestUnloadedEvent(quest));
+
+        return quest;
     }
 
     /**
