@@ -57,6 +57,13 @@ public class QuestProgressionService {
     }
 
     /**
+     * Drops a quest from memory without doing away with it: a lookup by its id reads it back.
+     */
+    public AbstractQuestProgression<?> unloadQuest(@Nonnull UUID questId) {
+        return dataStore.unload(questId);
+    }
+
+    /**
      * Creates and registers a new quest in the store.
      *
      * @param questAsset the quest asset to create the quest from

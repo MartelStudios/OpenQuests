@@ -13,6 +13,7 @@ import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
+import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
@@ -198,6 +199,15 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                         .getEventBus()
                         .dispatchFor(QuestCompletedEvent.class, getId())
                         .dispatch(new QuestCompletedEvent(this));
+        }
+
+        // Last, so a listener reacting to the transition reads a quest that has already been paid
+        // and filed rather than one still being settled.
+        if (getState() != previousState) {
+            HytaleServer.get()
+                        .getEventBus()
+                        .dispatchFor(QuestStateChangedEvent.class, getId())
+                        .dispatch(new QuestStateChangedEvent(this, previousState));
         }
     }
 
