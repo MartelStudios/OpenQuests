@@ -39,15 +39,22 @@ public final class QuestStateIndex {
     }
 
     /**
-     * Moves a quest that changed what it watches, for every player holding it.
+     * Moves a quest that changed what it watches, for everyone holding it.
+     *
+     * @param previousAssetId what it watched until now, without which the old entry could only be
+     * found by walking the whole index.
      */
-    public static void rewatch(@Nonnull QuestStateQuestProgression quest) {
-        for (Map<UUID, Set<UUID>> byPlayer : watchers.values()) {
-            byPlayer.values().forEach(questIds -> questIds.remove(quest.getId()));
-        }
+    public static void rewatch(@Nonnull QuestStateQuestProgression quest, @Nullable String previousAssetId) {
+        String assetId = watchedAssetOf(quest);
 
         for (UUID playerId : quest.getPlayers()) {
-            add(watchers, watchedAssetOf(quest), playerId, quest.getId());
+            remove(watchers, previousAssetId, playerId, quest.getId());
+            add(watchers, assetId, playerId, quest.getId());
+        }
+
+        for (UUID playerId : quest.getAbandonedPlayers()) {
+            remove(watchers, previousAssetId, playerId, quest.getId());
+            add(watchers, assetId, playerId, quest.getId());
         }
     }
 
@@ -78,22 +85,37 @@ public final class QuestStateIndex {
         return stateQuest.getQuestAssetId();
     }
 
+    /**
+     * Both halves run under the outer key, so neither can walk in on the other's nesting: an add
+     * landing in a map that a removal is pruning would be lost.
+     */
     private static void add(@Nonnull Map<String, Map<UUID, Set<UUID>>> index, @Nullable String assetId, @Nonnull UUID playerId, @Nonnull UUID questId) {
         if (assetId == null) return;
 
-        index.computeIfAbsent(assetId, id -> new ConcurrentHashMap<>())
-             .computeIfAbsent(playerId, id -> ConcurrentHashMap.newKeySet())
-             .add(questId);
+        index.compute(assetId, (id, byPlayer) -> {
+            Map<UUID, Set<UUID>> players = byPlayer != null ? byPlayer : new ConcurrentHashMap<>();
+            players.computeIfAbsent(playerId, id2 -> ConcurrentHashMap.newKeySet()).add(questId);
+
+            return players;
+        });
     }
 
+    /**
+     * Drops whatever is left empty. An index that only ever grew would outlive every quest it was
+     * built from, one entry per asset and per player who once held one.
+     */
     private static void remove(@Nonnull Map<String, Map<UUID, Set<UUID>>> index, @Nullable String assetId, @Nonnull UUID playerId, @Nonnull UUID questId) {
         if (assetId == null) return;
 
-        Map<UUID, Set<UUID>> byPlayer = index.get(assetId);
-        if (byPlayer == null) return;
+        index.computeIfPresent(assetId, (id, byPlayer) -> {
+            byPlayer.computeIfPresent(playerId, (id2, questIds) -> {
+                questIds.remove(questId);
 
-        Set<UUID> questIds = byPlayer.get(playerId);
-        if (questIds != null) questIds.remove(questId);
+                return questIds.isEmpty() ? null : questIds;
+            });
+
+            return byPlayer.isEmpty() ? null : byPlayer;
+        });
     }
 
     @Nonnull
