@@ -2,8 +2,6 @@ package com.martelstudios.openquests.extension.quests.queststate;
 
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.stores.QuestStoreComponent;
-import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -19,31 +17,25 @@ public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgr
 
     @Override
     public void progress(QuestStateQuestProgression quest) {
-        if (!quest.getPlayers().contains(playerId)) return;
         if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
-        boolean satisfied = quest.isNot() != matches(quest);
+        QuestState answer = quest.isNot() != matches(quest) ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS;
 
-        quest.setState(satisfied ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS).markDirty();
+        // Marking it anyway would announce a change nobody made, and rewrite the quest on every save
+        if (quest.getState() == answer) return;
+
+        quest.setState(answer).markDirty();
     }
 
     /**
-     * One pass over what the player holds, running and finished alike: a quest that ended is set
-     * aside rather than deleted, so it answers here the same way it did while it was running.
+     * Any of them, running or finished alike: a quest that ended is set aside rather than deleted,
+     * so it answers here the same way it did while it was running.
      */
     private boolean matches(@Nonnull QuestStateQuestProgression quest) {
-        var components = EntityComponents.of(playerId);
-        String watchedAssetId = quest.getQuestAssetId();
-
-        var questStore = components.getComponent(QuestStoreComponent.getComponentType());
-        if (questStore == null) return false;
-
-        for (UUID questId : questStore.getQuestIds()) {
+        for (UUID questId : QuestStateIndex.candidatesOf(quest.getQuestAssetId(), playerId)) {
             var watched = QuestProgressionService.get().getQuest(questId);
 
-            if (watched != null && watchedAssetId.equals(watched.getAssetId()) && matchesState(quest, watched.getState())) {
-                return true;
-            }
+            if (watched != null && matchesState(quest, watched.getState())) return true;
         }
         return false;
     }

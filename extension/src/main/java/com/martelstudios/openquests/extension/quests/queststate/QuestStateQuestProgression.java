@@ -48,8 +48,13 @@ public class QuestStateQuestProgression extends AbstractQuestProgression<QuestSt
         return questAssetId != null ? questAssetId : getAsset().getQuestAssetId();
     }
 
+    /**
+     * Re-indexed as it is set: the quest would otherwise stay filed under what it used to watch.
+     */
     public QuestStateQuestProgression setQuestAssetId(@Nullable String questAssetId) {
         this.questAssetId = questAssetId;
+        QuestStateIndex.rewatch(this);
+
         return this;
     }
 
