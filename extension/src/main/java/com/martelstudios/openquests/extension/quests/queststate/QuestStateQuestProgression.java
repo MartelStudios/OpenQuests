@@ -55,7 +55,7 @@ public class QuestStateQuestProgression extends AbstractQuestProgression<QuestSt
         String previous = getAsset() == null ? null : getQuestAssetId();
         this.questAssetId = questAssetId;
 
-        QuestStateIndex.rewatch(this, previous);
+        QuestStateIndex.get().rewatch(this, previous);
         return this;
     }
 

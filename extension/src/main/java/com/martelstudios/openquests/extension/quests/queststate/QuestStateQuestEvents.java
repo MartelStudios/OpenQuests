@@ -29,7 +29,7 @@ public final class QuestStateQuestEvents {
     }
 
     public static void handleQuestUnloaded(@Nonnull QuestUnloadedEvent event) {
-        forEachHolder(event.getQuest(), QuestStateIndex::forget);
+        forEachHolder(event.getQuest(), (quest, playerId) -> QuestStateIndex.get().forget(quest, playerId));
     }
 
     public static void handleQuestAddedToPlayerStore(@Nonnull QuestAddedToPlayerStoreEvent event) {
@@ -37,14 +37,14 @@ public final class QuestStateQuestEvents {
     }
 
     public static void handleQuestRemovedFromPlayerStore(@Nonnull QuestRemovedFromPlayerStoreEvent event) {
-        QuestStateIndex.forget(event.getQuest(), event.getPlayerId());
+        QuestStateIndex.get().forget(event.getQuest(), event.getPlayerId());
     }
 
     public static void handleQuestStateChanged(@Nonnull QuestStateChangedEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
 
         for (UUID playerId : quest.getPlayers()) {
-            reevaluate(playerId, QuestStateIndex.watchersOf(quest.getAssetId(), playerId));
+            reevaluate(playerId, QuestStateIndex.get().watchersOf(quest.getAssetId(), playerId));
         }
     }
 
@@ -54,9 +54,9 @@ public final class QuestStateQuestEvents {
      * there, and each candidate arriving after puts the answer right.
      */
     private static void track(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        QuestStateIndex.track(quest, playerId);
+        QuestStateIndex.get().track(quest, playerId);
 
-        Set<UUID> watcherIds = new HashSet<>(QuestStateIndex.watchersOf(quest.getAssetId(), playerId));
+        Set<UUID> watcherIds = new HashSet<>(QuestStateIndex.get().watchersOf(quest.getAssetId(), playerId));
         if (quest instanceof QuestStateQuestProgression) watcherIds.add(quest.getId());
 
         reevaluate(playerId, watcherIds);

@@ -13,27 +13,29 @@ import java.util.concurrent.ConcurrentHashMap;
  * Which quests read an asset's outcome, and which quests a player holds from it. A cache of the
  * quest store rather than an authority: everything here is put back by the store's own events.
  */
-public final class QuestStateIndex {
+public class QuestStateIndex {
 
     /**
      * Watched asset id, then player, then the quest-state quests reading it.
      */
-    private static final Map<String, Map<UUID, Set<UUID>>> watchers = new ConcurrentHashMap<>();
+    private final Map<String, Map<UUID, Set<UUID>>> watchers = new ConcurrentHashMap<>();
 
     /**
      * Asset id, then player, then the quests they hold from it. Several runs of one asset can be
      * held at once and any of them may satisfy, so an answer is read off the whole set.
      */
-    private static final Map<String, Map<UUID, Set<UUID>>> candidates = new ConcurrentHashMap<>();
+    private final Map<String, Map<UUID, Set<UUID>>> candidates = new ConcurrentHashMap<>();
 
-    private QuestStateIndex() {}
+    public static QuestStateIndex get() {
+        return QuestStateFeature.getIndex();
+    }
 
-    public static void track(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+    public void track(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         add(candidates, quest.getAssetId(), playerId, quest.getId());
         add(watchers, watchedAssetOf(quest), playerId, quest.getId());
     }
 
-    public static void forget(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+    public void forget(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         remove(candidates, quest.getAssetId(), playerId, quest.getId());
         remove(watchers, watchedAssetOf(quest), playerId, quest.getId());
     }
@@ -44,7 +46,7 @@ public final class QuestStateIndex {
      * @param previousAssetId what it watched until now, without which the old entry could only be
      * found by walking the whole index.
      */
-    public static void rewatch(@Nonnull QuestStateQuestProgression quest, @Nullable String previousAssetId) {
+    public void rewatch(@Nonnull QuestStateQuestProgression quest, @Nullable String previousAssetId) {
         String assetId = watchedAssetOf(quest);
 
         for (UUID playerId : quest.getPlayers()) {
@@ -62,7 +64,7 @@ public final class QuestStateIndex {
      * @return the quest-state quests this player holds that read the asset's outcome.
      */
     @Nonnull
-    public static Set<UUID> watchersOf(@Nullable String assetId, @Nonnull UUID playerId) {
+    public Set<UUID> watchersOf(@Nullable String assetId, @Nonnull UUID playerId) {
         return get(watchers, assetId, playerId);
     }
 
@@ -70,7 +72,7 @@ public final class QuestStateIndex {
      * @return what could answer for the asset: the quests this player holds that were built from it.
      */
     @Nonnull
-    public static Set<UUID> candidatesOf(@Nullable String assetId, @Nonnull UUID playerId) {
+    public Set<UUID> candidatesOf(@Nullable String assetId, @Nonnull UUID playerId) {
         return get(candidates, assetId, playerId);
     }
 

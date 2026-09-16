@@ -17,9 +17,21 @@ import javax.annotation.Nonnull;
 public final class QuestStateFeature {
     public static final String TYPE_ID = "QuestState";
 
+    private static QuestStateIndex index;
+
     private QuestStateFeature() {}
 
+    /**
+     * @return the index this feature owns, which holds no meaning outside a registered feature.
+     */
+    @Nonnull
+    public static QuestStateIndex getIndex() {
+        return index;
+    }
+
     public static void register(@Nonnull JavaPlugin plugin) {
+        index = new QuestStateIndex();
+
         QuestProgressionService.get()
                                .registerQuestType(TYPE_ID, QuestStateQuestAsset.class, QuestStateQuestAsset.CODEC, QuestStateQuestProgression.class, QuestStateQuestProgression.CODEC);
 

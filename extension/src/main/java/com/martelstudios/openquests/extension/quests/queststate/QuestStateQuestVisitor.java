@@ -32,7 +32,7 @@ public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgr
      * so it answers here the same way it did while it was running.
      */
     private boolean matches(@Nonnull QuestStateQuestProgression quest) {
-        for (UUID questId : QuestStateIndex.candidatesOf(quest.getQuestAssetId(), playerId)) {
+        for (UUID questId : QuestStateIndex.get().candidatesOf(quest.getQuestAssetId(), playerId)) {
             var watched = QuestProgressionService.get().getQuest(questId);
 
             if (watched != null && matchesState(quest, watched.getState())) return true;
