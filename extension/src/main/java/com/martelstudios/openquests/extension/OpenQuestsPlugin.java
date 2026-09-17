@@ -12,6 +12,7 @@ import com.martelstudios.openquests.extension.quests.enterworld.EnterWorldFeatur
 import com.martelstudios.openquests.extension.quests.gather.GatherFeature;
 import com.martelstudios.openquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
 import com.martelstudios.openquests.extension.quests.kill.KillFeature;
+import com.martelstudios.openquests.extension.quests.movement.MovementFeature;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityFeature;
 import com.martelstudios.openquests.extension.quests.queststate.QuestStateFeature;
 import com.martelstudios.openquests.extension.quests.reachlocation.ReachLocationFeature;
@@ -57,6 +58,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         ConsumeItemFeature.register(this);
         UseEntityFeature.register(this);
         QuestStateFeature.register(this);
+        MovementFeature.register(this);
         QuantityFeature.register(this);
         ScriptFeature.register(this);
 

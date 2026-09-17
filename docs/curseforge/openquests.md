@@ -78,6 +78,10 @@ _A step the player has not reached yet, read from the chain that grants it. The 
 | <code>KillPlayer</code> |Killing players, optionally a designated one                          |
 | <code>ReachLocation</code> |Entering a radius around a position                                   |
 | <code>EnterWorld</code> |Entering a world whose name matches a pattern                         |
+| <code>Walk</code> |Covering a distance at the slow pace, the one held with a key         |
+| <code>Run</code> |Covering a distance at the default pace                               |
+| <code>Sprint</code> |Covering a distance at the fast pace                                  |
+| <code>Jump</code> |Jumping a number of times                                             |
 | <code>Composite</code> |Its children, combined with <code>AND</code> or <code>OR</code>       |
 | <code>QuestState</code> |Another quest reaching a state, which is how you write a prerequisite |
 | <code>Script</code> |Nothing on its own. Completed by a command or by your own plugin      |

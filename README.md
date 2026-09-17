@@ -119,6 +119,10 @@ that could not be granted on the spot has nowhere to wait.
 | `KillPlayer` | Killing players, optionally a designated one. |
 | `ReachLocation` | Entering a radius around a position. |
 | `EnterWorld` | Entering a world whose name matches a regular expression. |
+| `Walk` | Covering a distance at the slow pace, the one the player holds a key for. |
+| `Run` | Covering a distance at the default pace. |
+| `Sprint` | Covering a distance at the fast pace. |
+| `Jump` | Jumping a number of times. |
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
 

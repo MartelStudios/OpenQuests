@@ -8,6 +8,10 @@ quest.default.craft = Fabriquez {quantity, number} {item}
 quest.default.consume = Consommez {quantity, number} {item}
 quest.default.reach-location = Rendez-vous en {x, number}, {y, number}, {z, number}
 quest.default.enter-world = Entrez dans un monde correspondant à {world}
+quest.default.walk = Marchez {quantity, number} mètres
+quest.default.run = Courez {quantity, number} mètres
+quest.default.sprint = Sprintez sur {quantity, number} mètres
+quest.default.jump = Sautez {quantity, plural, one {une fois} other {{quantity, number} fois}}
 
 page.title = Journal de quêtes
 page.empty = Rien pour l'instant.
