@@ -67,6 +67,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("Track", Codec.BOOLEAN), (quest, value) -> quest.track = value, quest -> quest.track)
                                                                                         .add()
+                                                                                        .append(new KeyedCodec<>("AnnounceOutcome", Codec.BOOLEAN), (quest, value) -> quest.announceOutcome = value, quest -> quest.announceOutcome)
+                                                                                        .add()
                                                                                         .append(new KeyedCodec<>("StartedAt", Codec.LONG), (quest, millis) -> quest.startedAt = Instant.ofEpochMilli(millis), quest -> quest.startedAt == null ? null : Long.valueOf(quest.startedAt.toEpochMilli()))
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("CompletedAt", Codec.LONG), (quest, millis) -> quest.completedAt = Instant.ofEpochMilli(millis), quest -> quest.completedAt == null ? null : Long.valueOf(quest.completedAt.toEpochMilli()))
@@ -123,6 +125,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     protected Boolean track;
 
     /**
+     * Overrides the asset on whether this one run announces how it ended. Set on a step by the
+     * chain that handed it out, the way {@code PersistHistory} is.
+     */
+    @Nullable
+    protected Boolean announceOutcome;
+
+    /**
      * When the player was handed this quest, written once as it enters the store. Null for a quest
      * registered before this was kept, which is a date nobody can invent after the fact.
      */
@@ -174,6 +183,22 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     public Q setPersistHistory(@Nullable Boolean persistHistory) {
         this.persistHistory = persistHistory;
+        return self();
+    }
+
+    /**
+     * @return whether this quest says how it ended. Nothing to do with where the quest is listed:
+     * one is the moment it ends, the other the lists it belongs on.
+     */
+    public boolean isAnnounceOutcome() {
+        if (announceOutcome != null) return announceOutcome;
+
+        QuestAsset asset = getAsset();
+        return asset == null || asset.isAnnounceOutcome();
+    }
+
+    public Q setAnnounceOutcome(@Nullable Boolean announceOutcome) {
+        this.announceOutcome = announceOutcome;
         return self();
     }
 

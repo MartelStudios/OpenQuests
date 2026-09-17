@@ -109,7 +109,7 @@ Tags are how an asset says something no field covers. They carry down from a par
 | <code>OQ_GRANTED_BY</code> |Written by <code>GrantQuest</code> on the quest it creates, naming the run that opened it |
 | <code>OQ_PARENT_QUEST</code> |Written by a composite on each step it creates, naming the group it belongs to |
 
-`OQ_HIDE` is for a quest the player is not meant to read about: a flag your chain sets on itself, a step you would rather keep off the page. What it owes is untouched, so a hidden quest still pays out.
+`OQ_HIDE` is for a quest the player is not meant to read about: a flag your chain sets on itself, a step you would rather keep off the page. What it owes is untouched, so a hidden quest still pays out — and still announces how it ended, which is a separate question.
 
 ```
 { "Type": "Composite", "TitleKey": "…", "AutoTrack": true, "Tags": { "OQ_HUD_DESC": [] } }
@@ -123,7 +123,9 @@ Tags are how an asset says something no field covers. They carry down from a par
 
 ## 🔔 Ending a quest
 
-A quest that ends says so: its title takes over the middle of the screen, over a line naming the outcome, and a sound plays. A quest a script abandons rather than the player passes in silence, as does one carrying `OQ_HIDE`.
+A quest that ends says so: its title takes over the middle of the screen, over a line naming the outcome, and a sound plays. A quest a script abandons rather than the player passes in silence, as does one setting `"AnnounceOutcome": false`.
+
+Announcing and being listed are separate questions: a quest kept off the tracker and out of the journal still ends out loud unless it asked not to. `AnnounceOutcome` is overridable on the progression, so a chain can silence the steps it hands out without touching their asset.
 
 `SuccessfulSound`, `FailedSound` and `AbandonedSound` name the sound for each outcome, either a vanilla sound event or one shipped by an asset pack of your own. The empty string plays nothing, which is how a single quest is made to end quietly.
 

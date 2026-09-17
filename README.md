@@ -147,7 +147,7 @@ once it declares one, so a quest can be written over at runtime rather than only
 
 `OQ_HIDE` outranks the lot: a quest carrying it is on neither the panel nor the journal, whatever
 else it asked for. What it owes the player is untouched — a debt is listed in its own right, so a
-quest the player is not meant to read about still pays out.
+quest the player is not meant to read about still pays out, and still announces how it ended.
 
 A quest drawn under another one — the steps of a chain — is drawn by its parent, and an inline step
 inherits nothing from the chain it is written inside: its tags are its own. So a step is on the
@@ -163,7 +163,11 @@ something of its own.
 
 A quest that ends says so: its title takes over the middle of the screen, over a line naming the
 outcome, and a sound plays. A quest a script abandons rather than the player passes in silence, as
-does one carrying `OQ_HIDE`.
+does one setting `"AnnounceOutcome": false`.
+
+Announcing and being listed are separate questions: a quest kept off the panel and out of the
+journal still ends out loud unless it asked not to. `AnnounceOutcome` is overridable on the
+progression, so a chain can silence the steps it hands out without touching their asset.
 
 Each outcome names its own sound, a vanilla sound event or one your asset pack ships. The empty
 string plays nothing.
