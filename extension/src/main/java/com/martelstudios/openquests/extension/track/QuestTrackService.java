@@ -1,10 +1,13 @@
 package com.martelstudios.openquests.extension.track;
 
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.extension.track.events.QuestTrackedEvent;
+import com.martelstudios.openquests.extension.track.events.QuestUntrackedEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,24 +35,24 @@ public final class QuestTrackService {
      * @return {@code false} if the quest was already followed.
      */
     public static boolean track(@Nonnull AbstractQuestProgression<?> quest) {
-        return quest.setTracked(Boolean.TRUE);
+        return apply(quest, Boolean.TRUE);
     }
 
     /**
      * @return {@code false} if the quest was already dropped.
      */
     public static boolean untrack(@Nonnull AbstractQuestProgression<?> quest) {
-        return quest.setTracked(Boolean.FALSE);
+        return apply(quest, Boolean.FALSE);
     }
 
     /**
      * Hands the answer back to the asset, so a quest the player never had an opinion on reads the
      * way a freshly handed out one does.
      *
-     * @return {@code false} if the quest had no opinion of its own to drop.
+     * @return {@code false} if the asset was going to say the same thing anyway.
      */
     public static boolean reset(@Nonnull AbstractQuestProgression<?> quest) {
-        return quest.setTracked(null);
+        return apply(quest, null);
     }
 
     /**
@@ -60,9 +63,42 @@ public final class QuestTrackService {
      */
     public static boolean toggle(@Nonnull AbstractQuestProgression<?> quest) {
         boolean tracked = !quest.isTracked();
-        quest.setTracked(tracked);
+        apply(quest, tracked);
 
         return tracked;
+    }
+
+    /**
+     * Goes by what the quest ends up saying rather than by what was written on it: dropping an
+     * override that agreed with the asset moves the quest without moving the answer, and neither
+     * a panel nor anyone listening is concerned by that.
+     *
+     * @return whether the answer changed.
+     */
+    private static boolean apply(@Nonnull AbstractQuestProgression<?> quest, @Nullable Boolean track) {
+        boolean was = quest.isTracked();
+        quest.setTracked(track);
+
+        boolean now = quest.isTracked();
+        if (was == now) return false;
+
+        announce(quest, now);
+        return true;
+    }
+
+    /**
+     * Fired for the quest, leaving whoever listens to work out which of its holders they care
+     * about — following is a property of the quest, and every holder of it sees the same answer.
+     */
+    private static void announce(@Nonnull AbstractQuestProgression<?> quest, boolean tracked) {
+        var eventBus = HytaleServer.get().getEventBus();
+
+        if (tracked) {
+            eventBus.dispatchFor(QuestTrackedEvent.class, quest.getId()).dispatch(new QuestTrackedEvent(quest));
+            return;
+        }
+
+        eventBus.dispatchFor(QuestUntrackedEvent.class, quest.getId()).dispatch(new QuestUntrackedEvent(quest));
     }
 
     /**
@@ -134,14 +170,18 @@ public final class QuestTrackService {
     }
 
     /**
-     * Skips what is no longer in memory: a quest read back in only to be marked and dropped again
-     * would be marked on an instance nobody else holds.
+     * Goes through {@link #track} and {@link #untrack} rather than writing the flag, so a round
+     * borrowing the tracker is announced like anything else that changes it.
+     *
+     * <p>Skips what is no longer in memory: a quest read back in only to be marked and dropped
+     * again would be marked on an instance nobody else holds.
      */
     private static void setTracked(@Nonnull List<UUID> questIds, boolean tracked) {
         for (UUID questId : questIds) {
             AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            if (quest == null) continue;
 
-            if (quest != null) quest.setTracked(tracked);
+            if (tracked) track(quest); else untrack(quest);
         }
     }
 }
