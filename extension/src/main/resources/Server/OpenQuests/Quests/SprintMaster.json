@@ -1,0 +1,10 @@
+{
+  "Type": "Sprint",
+  "TitleKey": "quest.sprint-master.title",
+  "DescriptionKey": "quest.sprint-master.description",
+  "TargetQuantity": 5000,
+  "AutoTrack": true,
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
+}

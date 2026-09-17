@@ -83,3 +83,24 @@ cook-meat.description=Lay the meat in the fire, feed it fuel, and take back what
 
 eat-meat.title=Eat your meat
 eat-meat.description=The fire did its part. Now eat.
+
+run-novice.title=Find your stride
+run-novice.description=Cover a hundred metres on your own two feet.
+run-adept.title=Long hauler
+run-adept.description=A thousand metres. The world is wider than the camp.
+run-master.title=Tireless
+run-master.description=Ten thousand metres, and still going.
+
+sprint-novice.title=Turn of speed
+sprint-novice.description=Fifty metres at a sprint, while the breath lasts.
+sprint-adept.title=Fleet footed
+sprint-adept.description=Five hundred metres at a sprint, gathered a burst at a time.
+sprint-master.title=Wind runner
+sprint-master.description=Five thousand metres at a sprint. Nothing catches you now.
+
+jump-novice.title=Off the ground
+jump-novice.description=Twenty-five jumps, for no reason at all.
+jump-adept.title=Sure footed
+jump-adept.description=Two hundred and fifty jumps. Ledges stopped mattering a while back.
+jump-master.title=Skyward
+jump-master.description=Two thousand five hundred jumps. Gravity is a suggestion.

@@ -1,0 +1,10 @@
+{
+  "Type": "Run",
+  "TitleKey": "quest.run-master.title",
+  "DescriptionKey": "quest.run-master.description",
+  "TargetQuantity": 10000,
+  "AutoTrack": true,
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
+}

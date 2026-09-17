@@ -1,0 +1,19 @@
+{
+  "Type": "Run",
+  "TitleKey": "quest.run-adept.title",
+  "DescriptionKey": "quest.run-adept.description",
+  "TargetQuantity": 1000,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "RunMaster"
+      ]
+    }
+  ],
+  "AutoTrack": true,
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
+}

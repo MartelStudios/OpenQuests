@@ -1,0 +1,19 @@
+{
+  "Type": "Jump",
+  "StartOnConnection": true,
+  "TitleKey": "quest.jump-novice.title",
+  "DescriptionKey": "quest.jump-novice.description",
+  "TargetQuantity": 25,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "JumpAdept"
+      ]
+    }
+  ],
+  "Tags": {
+    "OQ_HIDE": []
+  }
+}

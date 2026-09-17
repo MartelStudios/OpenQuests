@@ -1,0 +1,19 @@
+{
+  "Type": "Jump",
+  "TitleKey": "quest.jump-adept.title",
+  "DescriptionKey": "quest.jump-adept.description",
+  "TargetQuantity": 250,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "JumpMaster"
+      ]
+    }
+  ],
+  "AutoTrack": true,
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
+}

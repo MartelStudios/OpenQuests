@@ -83,3 +83,24 @@ cook-meat.description=Posez la viande dans le feu, donnez-lui du combustible, et
 
 eat-meat.title=Mangez votre viande
 eat-meat.description=Le feu a fait sa part. À vous de manger.
+
+run-novice.title=Trouver sa foulée
+run-novice.description=Parcourez cent mètres sur vos deux jambes.
+run-adept.title=Longue distance
+run-adept.description=Mille mètres. Le monde est plus vaste que le campement.
+run-master.title=Infatigable
+run-master.description=Dix mille mètres, et toujours en route.
+
+sprint-novice.title=Coup de vitesse
+sprint-novice.description=Cinquante mètres en sprint, le temps d'un souffle.
+sprint-adept.title=Pied léger
+sprint-adept.description=Cinq cents mètres en sprint, amassés par à-coups.
+sprint-master.title=Coureur de vent
+sprint-master.description=Cinq mille mètres en sprint. Plus rien ne vous rattrape.
+
+jump-novice.title=Quitter le sol
+jump-novice.description=Vingt-cinq sauts, sans aucune raison.
+jump-adept.title=Pied sûr
+jump-adept.description=Deux cent cinquante sauts. Les rebords ont cessé de compter.
+jump-master.title=Vers le ciel
+jump-master.description=Deux mille cinq cents sauts. La gravité n'est qu'une suggestion.

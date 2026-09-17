@@ -1,0 +1,19 @@
+{
+  "Type": "Sprint",
+  "StartOnConnection": true,
+  "TitleKey": "quest.sprint-novice.title",
+  "DescriptionKey": "quest.sprint-novice.description",
+  "TargetQuantity": 50,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "SprintAdept"
+      ]
+    }
+  ],
+  "Tags": {
+    "OQ_HIDE": []
+  }
+}

@@ -32,7 +32,11 @@ Two chains, handed out on connection, in English and French.
 
 ---
 
-Ten of the fifteen quest types are in there — `Composite`, `Gather`, `Craft`, `Consume`, `BreakBlock`, `PlaceBlock`, `KillNpc`, `UseEntity`, `EnterWorld` and `Script` — along with all three reward types, descriptions in the tracker, a hidden quest, and two whole progressions carried by rewards alone.
+Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, each starting from a hidden quest nobody is told about. Cover the first distance and the next rung appears on its own, and so does the one after — a hundred metres, then a thousand, then ten thousand.
+
+---
+
+Thirteen of the eighteen quest types are in there — `Composite`, `Gather`, `Craft`, `Consume`, `BreakBlock`, `PlaceBlock`, `KillNpc`, `UseEntity`, `EnterWorld`, `Script`, `Run`, `Sprint` and `Jump` — along with all three reward types, descriptions in the tracker, hidden quests, and progressions carried by rewards alone.
 
 ---
 
