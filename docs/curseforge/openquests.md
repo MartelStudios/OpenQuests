@@ -105,15 +105,29 @@ Tags are how an asset says something no field covers. They carry down from a par
 | Tag        |Effect                                                     |
 | ---------- |---------------------------------------------------------- |
 | <code>OQ_HUD_DESC</code> |Shows its description under its title, greyed and smaller  |
-| <code>OQ_HIDE</code> |Keeps the quest out of the tracker and the journal alike   |
 | <code>OQ_GRANTED_BY</code> |Written by <code>GrantQuest</code> on the quest it creates, naming the run that opened it |
 | <code>OQ_PARENT_QUEST</code> |Written by a composite on each step it creates, naming the group it belongs to |
 
-`OQ_HIDE` is for a quest the player is not meant to read about: a flag your chain sets on itself, a step you would rather keep off the page. What it owes is untouched, so a hidden quest still pays out — and still announces how it ended, which is a separate question.
+The last two are written by the system, not by you.
 
 ```
 { "Type": "Composite", "TitleKey": "…", "AutoTrack": true, "Tags": { "OQ_HUD_DESC": [] } }
 ```
+
+## 👁️ When a quest is shown
+
+`Visibility` says when a quest is worth putting in front of the player at all.
+
+| Value      |Listed                                                     |
+| ---------- |---------------------------------------------------------- |
+| <code>Always</code> |From the moment it is handed out. The default              |
+| <code>WhenProgressed</code> |Once the player has got somewhere with it                  |
+| <code>WhenCompleted</code> |Only once it is over — an achievement, earned before it is named |
+| <code>Never</code> |Not at all, whatever becomes of it                         |
+
+`WhenCompleted` is how a quest is made a secret: the player works towards something they were never told about, and it appears once it is theirs. `Never` is for a quest that carries a chain without asking the player for anything.
+
+What the quest owes is untouched by any of this — a quest nobody ever sees still pays out, and still announces how it ended.
 
 ## 📌 The tracker
 

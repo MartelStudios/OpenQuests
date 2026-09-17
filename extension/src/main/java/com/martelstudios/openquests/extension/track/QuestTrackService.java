@@ -5,7 +5,6 @@ import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
-import com.martelstudios.openquests.extension.tags.OpenQuestsTags;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -71,7 +70,7 @@ public final class QuestTrackService {
      * never is, whatever it or its asset asked for.
      */
     public static boolean isTracked(@Nonnull AbstractQuestProgression<?> quest) {
-        if (quest.hasTag(OpenQuestsTags.HIDE_TAG)) return false;
+        if (!quest.isVisible()) return false;
 
         return quest.isTracked();
     }

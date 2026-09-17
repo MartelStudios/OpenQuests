@@ -47,7 +47,5 @@
       "AutoClaim": true
     }
   ],
-  "Tags": {
-    "OQ_HIDE": []
-  }
+  "Visibility": "Never"
 }

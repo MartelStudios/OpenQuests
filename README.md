@@ -145,9 +145,26 @@ asset — the same override as `PersistHistory`, so one quest can answer differe
 sharing its template. Its tags carry values just as an asset's do, and the instance answers alone
 once it declares one, so a quest can be written over at runtime rather than only added to.
 
-`OQ_HIDE` outranks the lot: a quest carrying it is on neither the panel nor the journal, whatever
-else it asked for. What it owes the player is untouched — a debt is listed in its own right, so a
-quest the player is not meant to read about still pays out, and still announces how it ended.
+`Visibility` outranks the lot, and says when a quest is worth putting in front of the player at all:
+
+| Value | Listed |
+| --- | --- |
+| `Always` | From the moment it is handed out. The default. |
+| `WhenProgressed` | Once the player has got somewhere with it. |
+| `WhenCompleted` | Only once it is over — an achievement, earned before it is named. |
+| `Never` | Not at all, whatever becomes of it. |
+
+Written in camel case in the asset, as every enum is — `QuestVisibility.WHEN_COMPLETED` in Java is
+`"WhenCompleted"` in JSON, the same way `Operator.OR` is `"Or"`. `EnumCodec` does the mapping, and
+a spelling it does not know fails the asset at boot rather than being quietly ignored.
+
+`WhenProgressed` reads `hasProgressed()` on the progression. A type that cannot be partway through
+answers `isCompleted()`, which is what the base does; every counted type answers on its counter
+instead, from `QuantityQuestProgression`. So your own type inherits a sensible answer and overrides
+it only if it has something better to say.
+
+What the quest owes the player is untouched by any of this — a debt is listed in its own right, so
+a quest nobody ever sees still pays out, and still announces how it ended.
 
 A quest drawn under another one — the steps of a chain — is drawn by its parent, and an inline step
 inherits nothing from the chain it is written inside: its tags are its own. So a step is on the

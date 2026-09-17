@@ -4,6 +4,7 @@
   "TitleKey": "quest.run-novice.title",
   "DescriptionKey": "quest.run-novice.description",
   "TargetQuantity": 100,
+  "Visibility": "WhenCompleted",
   "SuccessfulRewards": [
     {
       "Type": "GrantQuest",
@@ -12,8 +13,5 @@
         "RunAdept"
       ]
     }
-  ],
-  "Tags": {
-    "OQ_HIDE": []
-  }
+  ]
 }
