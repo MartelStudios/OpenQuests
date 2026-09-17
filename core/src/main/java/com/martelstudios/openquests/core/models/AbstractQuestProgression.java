@@ -120,7 +120,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     protected Boolean persistHistory;
 
     /**
-     * Whether the player is following this quest, {@code null} while they have not said either way
+     * Whether the player is tracking this quest, {@code null} while they have not said either way
      * and the asset still answers for it.
      */
     @Nullable
@@ -250,7 +250,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * @return what the quest says about being followed, its asset answering while it says nothing
+     * @return what the quest says about being tracked, its asset answering while it says nothing
      * itself. What follows from it is left to whoever draws the quest somewhere.
      */
     public boolean isTracked() {
