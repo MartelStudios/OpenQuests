@@ -123,6 +123,7 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
         }
 
         setQuestIds(questIds).markDirty();
+        listenToChildren();
     }
 
     /**
@@ -240,8 +241,19 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
     }
 
     public CompositeQuestProgression setQuestIds(UUID[] questIds) {
-        releaseChildListeners();
         this.questIds = questIds;
+        return this;
+    }
+
+    /**
+     * Starts hearing the children out. Driven from the store rather than from the codec, which is
+     * read by anything looking at a player's data: a decode that never reaches the store used to
+     * leave a second group answering for the same id, and every child ended twice over.
+     *
+     * <p>Releases first, so a group told twice is listening once.
+     */
+    public void listenToChildren() {
+        releaseChildListeners();
 
         for (UUID questId : questIds) {
             var registration = HytaleServer.get()
@@ -249,7 +261,14 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
                                            .register(QuestCompletedEvent.class, questId, this::handleQuestCompleted);
             if (registration != null) childListeners.add(registration);
         }
-        return this;
+    }
+
+    /**
+     * Stops hearing them, for a group leaving memory with its players. It is put back together by
+     * the same event that reads it in.
+     */
+    public void stopListeningToChildren() {
+        releaseChildListeners();
     }
 
     private void releaseChildListeners() {
