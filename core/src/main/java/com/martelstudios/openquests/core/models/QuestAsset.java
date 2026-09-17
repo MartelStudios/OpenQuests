@@ -45,6 +45,8 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .add()
                                                                           .append(new KeyedCodec<>("CanBeAbandoned", Codec.BOOLEAN), (asset, value) -> asset.canBeAbandoned = value, asset -> Boolean.valueOf(asset.canBeAbandoned))
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("AutoTrack", Codec.BOOLEAN), (asset, value) -> asset.autoTrack = value, asset -> Boolean.valueOf(asset.autoTrack))
+                                                                          .add()
                                                                           .append(new KeyedCodec<>("SuccessfulRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (asset, rewards) -> asset.successfulRewards = rewards, asset -> asset.successfulRewards)
                                                                           .add()
                                                                           .append(new KeyedCodec<>("FailedRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (asset, rewards) -> asset.failedRewards = rewards, asset -> asset.failedRewards)
@@ -71,6 +73,7 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     protected boolean persistProgression = true;
     protected boolean persistHistory = true;
     protected boolean canBeAbandoned = true;
+    protected boolean autoTrack;
     protected QuestReward[] successfulRewards = NO_REWARDS;
     protected QuestReward[] failedRewards = NO_REWARDS;
     protected QuestReward[] abandonedRewards = NO_REWARDS;
@@ -171,6 +174,14 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
      */
     public boolean canBeAbandoned() {
         return canBeAbandoned;
+    }
+
+    /**
+     * @return {@code true} to follow every quest made from this asset from the moment it is handed
+     * out. What the player does with it afterwards is written on the quest, not here.
+     */
+    public boolean isAutoTrack() {
+        return autoTrack;
     }
 
     /**

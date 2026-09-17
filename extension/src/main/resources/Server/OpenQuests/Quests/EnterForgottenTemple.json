@@ -12,7 +12,5 @@
       "AutoClaim": true
     }
   ],
-  "Tags": {
-    "OQ_HUD_TRACK": []
-  }
+  "AutoTrack": true
 }

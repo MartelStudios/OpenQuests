@@ -36,8 +36,8 @@ import com.martelstudios.openquests.extension.journal.navigation.routes.JournalR
 import com.martelstudios.openquests.extension.journal.navigation.routes.LabelledRoute;
 import com.martelstudios.openquests.extension.journal.navigation.routes.QuestRoute;
 import com.martelstudios.openquests.extension.journal.navigation.JournalRoutes;
-import com.martelstudios.openquests.extension.hud.QuestTrackerHud;
 import com.martelstudios.openquests.extension.tags.OpenQuestsTags;
+import com.martelstudios.openquests.extension.track.QuestTrackService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -518,7 +518,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * claim to being recent.
      */
     private static Comparator<AbstractQuestProgression<?>> byTrackedThenRecent(@Nonnull UUID viewer) {
-        return Comparator.comparing((AbstractQuestProgression<?> quest) -> QuestTrackerHud.isTracked(quest, viewer), Comparator.reverseOrder())
+        return Comparator.comparing((AbstractQuestProgression<?> quest) -> QuestTrackService.isTracked(quest, viewer), Comparator.reverseOrder())
                          .thenComparing(AbstractQuestProgression::getStartedAt, Comparator.nullsLast(Comparator.reverseOrder()));
     }
 
@@ -605,7 +605,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         QuestPageRows.setIcon(context, rowSelector + "#Icon", entry.mark());
 
         // A frame round the whole row, so a tracked quest is picked out while folded and in a list
-        if (entry.quest() != null && QuestTrackerHud.isTracked(entry.quest(), playerRef.getUuid())) QuestPageRows.setTracked(context, rowSelector);
+        if (entry.quest() != null && QuestTrackService.isTracked(entry.quest(), playerRef.getUuid())) QuestPageRows.setTracked(context, rowSelector);
 
         // Drawn whether the row is open or not: a counter beside the title is most of what a folded
         // row is worth. What it appends lands inside #Details, which is what the fold hides.
@@ -700,7 +700,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         // Offered on every running quest, abandonable or not: what the tracker shows is the
         // player's to decide even where staying on the quest is not
-        boolean tracked = QuestTrackerHud.isTracked(entry.quest());
+        boolean tracked = QuestTrackService.isTracked(entry.quest());
 
         context.getBuilder()
                .set(rowSelector + "#Track.Visible", true)
@@ -863,14 +863,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(id);
         if (quest == null) return;
 
-        if (QuestTrackerHud.isTracked(quest)) {
-            quest.removeTag(OpenQuestsTags.TRACK_TAG);
-            quest.addTag(OpenQuestsTags.UNTRACK_TAG);
-            return;
-        }
-
-        quest.removeTag(OpenQuestsTags.UNTRACK_TAG);
-        quest.addTag(OpenQuestsTags.TRACK_TAG);
+        QuestTrackService.toggle(quest);
     }
 
     /**

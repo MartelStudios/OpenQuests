@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,6 +64,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.state = state, quest -> quest.state)
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (quest, value) -> quest.persistHistory = value, quest -> quest.persistHistory)
+                                                                                        .add()
+                                                                                        .append(new KeyedCodec<>("Track", Codec.BOOLEAN), (quest, value) -> quest.track = value, quest -> quest.track)
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("StartedAt", Codec.LONG), (quest, millis) -> quest.startedAt = Instant.ofEpochMilli(millis), quest -> quest.startedAt == null ? null : Long.valueOf(quest.startedAt.toEpochMilli()))
                                                                                         .add()
@@ -111,6 +114,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nullable
     protected Boolean persistHistory;
+
+    /**
+     * Whether the player is following this quest, {@code null} while they have not said either way
+     * and the asset still answers for it.
+     */
+    @Nullable
+    protected Boolean track;
 
     /**
      * When the player was handed this quest, written once as it enters the store. Null for a quest
@@ -165,6 +175,31 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public Q setPersistHistory(@Nullable Boolean persistHistory) {
         this.persistHistory = persistHistory;
         return self();
+    }
+
+    /**
+     * @return what the quest says about being followed, its asset answering while it says nothing
+     * itself. What follows from it is left to whoever draws the quest somewhere.
+     */
+    public boolean isTracked() {
+        if (track != null) return track;
+
+        QuestAsset asset = getAsset();
+        return asset != null && asset.isAutoTrack();
+    }
+
+    /**
+     * @param track {@code null} to hand the answer back to the asset, which is not the same as
+     * saying no: the quest stops having an opinion of its own.
+     * @return {@code false} if the quest already said exactly that.
+     */
+    public boolean setTracked(@Nullable Boolean track) {
+        if (Objects.equals(this.track, track)) return false;
+
+        this.track = track;
+        markDirty();
+
+        return true;
     }
 
     /**
