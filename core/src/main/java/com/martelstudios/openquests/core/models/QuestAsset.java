@@ -10,6 +10,7 @@ import com.hypixel.hytale.assetstore.map.JsonAssetWithMap;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.ValidatorCache;
 import com.martelstudios.openquests.core.rewards.QuestReward;
@@ -53,6 +54,8 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .add()
                                                                           .append(new KeyedCodec<>("AbandonedRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (asset, rewards) -> asset.abandonedRewards = rewards, asset -> asset.abandonedRewards)
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("Visibility", new EnumCodec<>(QuestVisibility.class)), (asset, visibility) -> asset.visibility = visibility, asset -> asset.visibility)
+                                                                          .add()
                                                                           .append(new KeyedCodec<>("AnnounceOutcome", Codec.BOOLEAN), (asset, value) -> asset.announceOutcome = value, asset -> Boolean.valueOf(asset.announceOutcome))
                                                                           .add()
                                                                           .append(new KeyedCodec<>("SuccessfulSound", Codec.STRING), (asset, sound) -> asset.successfulSound = sound, asset -> asset.successfulSound)
@@ -80,6 +83,7 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     protected QuestReward[] failedRewards = NO_REWARDS;
     protected QuestReward[] abandonedRewards = NO_REWARDS;
 
+    protected QuestVisibility visibility = QuestVisibility.ALWAYS;
     protected boolean announceOutcome = true;
 
     /**
@@ -206,6 +210,15 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
      */
     public boolean hasRewards(@Nonnull QuestState state) {
         return getRewards(state).length > 0;
+    }
+
+    /**
+     * @return when this quest is worth putting in front of the player. Never {@code null}: an
+     * asset saying nothing is listed like any other.
+     */
+    @Nonnull
+    public QuestVisibility getVisibility() {
+        return visibility;
     }
 
     /**

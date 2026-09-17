@@ -24,7 +24,7 @@ Two chains, handed out on connection, in English and French.
 
 ### 🍖 The hunt
 
-🥩 **Gather meat** is handed to every player on connection and carries `OQ_HIDE`, so nobody ever sees it. It waits. The first time a player picks up raw meat of any kind, it completes and the chain appears out of nowhere.
+🥩 **Gather meat** is handed to every player on connection with `"Visibility": "Never"`, so nobody ever sees it. It waits. The first time a player picks up raw meat of any kind, it completes and the chain appears out of nowhere.
 
 🔥 **Craft a campfire**, then **Cook your meat** — which watches the cooked meat reach your inventory, because a processing bench is worked by the block and not by the player.
 
@@ -32,11 +32,11 @@ Two chains, handed out on connection, in English and French.
 
 ---
 
-Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, each starting from a hidden quest nobody is told about. Cover the first distance and the next rung appears on its own, and so does the one after — a hundred metres, then a thousand, then ten thousand.
+Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, each starting from a secret nobody is told about. Cover the first distance and it reveals itself, earned, while the next rung appears on the tracker — a hundred metres, then a thousand, then ten thousand.
 
 ---
 
-Thirteen of the eighteen quest types are in there — `Composite`, `Gather`, `Craft`, `Consume`, `BreakBlock`, `PlaceBlock`, `KillNpc`, `UseEntity`, `EnterWorld`, `Script`, `Run`, `Sprint` and `Jump` — along with all three reward types, descriptions in the tracker, hidden quests, and progressions carried by rewards alone.
+Thirteen of the eighteen quest types are in there — `Composite`, `Gather`, `Craft`, `Consume`, `BreakBlock`, `PlaceBlock`, `KillNpc`, `UseEntity`, `EnterWorld`, `Script`, `Run`, `Sprint` and `Jump` — along with all three reward types, descriptions in the tracker, the three visibility modes, and progressions carried by rewards alone.
 
 ---
 

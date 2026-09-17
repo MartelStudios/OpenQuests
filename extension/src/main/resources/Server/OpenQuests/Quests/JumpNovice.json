@@ -4,6 +4,7 @@
   "TitleKey": "quest.jump-novice.title",
   "DescriptionKey": "quest.jump-novice.description",
   "TargetQuantity": 25,
+  "Visibility": "WhenCompleted",
   "SuccessfulRewards": [
     {
       "Type": "GrantQuest",
@@ -12,8 +13,5 @@
         "JumpAdept"
       ]
     }
-  ],
-  "Tags": {
-    "OQ_HIDE": []
-  }
+  ]
 }
