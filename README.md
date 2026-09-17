@@ -232,6 +232,21 @@ one listed under another. `QuestHudRows` holds the plain look and the fallback f
 registered nothing. Registering on a base type covers every type built on it, which is how one
 renderer draws the counter of every counted quest.
 
+A type progressed from a ticking system rather than from an event declares a listener component, so
+the tick only reaches the players it concerns:
+
+```java
+var listenerType = plugin.getEntityStoreRegistry().registerComponent(MyQuestListener.class, MyQuestListener::new);
+QuestListenerService.register(MyQuestProgression.class, listenerType);
+```
+
+`MyQuestListener` extends `QuestListenerComponent` and adds nothing: one class per kind is what
+buys the filtering, since a query asks whether a component is there and never what is inside it.
+The component names the player's quests of that kind, goes on as they take one and off with the
+last, and is never written to disk. Your system then queries for it and walks `getQuestIds()`
+instead of the player's whole store. Registering on a base type covers every type built on it, the
+same way a renderer does.
+
 Anything a type needs beyond the core contract stays in its own package — `Composite` validates its
 asset graph at boot from `CompositeFeature`, the tracker HUD renders counted quests from its own
 package. The core never learns about them.
