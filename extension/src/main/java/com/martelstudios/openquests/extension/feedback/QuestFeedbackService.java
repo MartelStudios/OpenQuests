@@ -18,7 +18,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.HIDE_TAG;
 
 /**
  * What a player hears and sees when a quest of theirs ends. A success takes over the middle of the
@@ -151,10 +150,11 @@ public class QuestFeedbackService {
     }
 
     /**
-     * @return {@code false} for a quest the player is not meant to read about, which is the only
-     * thing that keeps an ending quiet. Everything else announces itself, steps of a chain included.
+     * @return what the quest says about announcing itself, and nothing else. A quest kept off the
+     * panel and out of the journal still ends out loud unless it asked not to: being worth hiding
+     * and being worth a fanfare are not the same question.
      */
     private static boolean isAnnounced(@Nonnull AbstractQuestProgression<?> quest) {
-        return !quest.hasTag(HIDE_TAG);
+        return quest.isAnnounceOutcome();
     }
 }

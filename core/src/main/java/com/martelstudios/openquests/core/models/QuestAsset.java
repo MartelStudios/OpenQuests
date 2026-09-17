@@ -53,6 +53,8 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .add()
                                                                           .append(new KeyedCodec<>("AbandonedRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (asset, rewards) -> asset.abandonedRewards = rewards, asset -> asset.abandonedRewards)
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("AnnounceOutcome", Codec.BOOLEAN), (asset, value) -> asset.announceOutcome = value, asset -> Boolean.valueOf(asset.announceOutcome))
+                                                                          .add()
                                                                           .append(new KeyedCodec<>("SuccessfulSound", Codec.STRING), (asset, sound) -> asset.successfulSound = sound, asset -> asset.successfulSound)
                                                                           .add()
                                                                           .append(new KeyedCodec<>("FailedSound", Codec.STRING), (asset, sound) -> asset.failedSound = sound, asset -> asset.failedSound)
@@ -77,6 +79,8 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     protected QuestReward[] successfulRewards = NO_REWARDS;
     protected QuestReward[] failedRewards = NO_REWARDS;
     protected QuestReward[] abandonedRewards = NO_REWARDS;
+
+    protected boolean announceOutcome = true;
 
     /**
      * Sound events overriding what an outcome sounds like, {@code null} for the one the server
@@ -202,6 +206,15 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
      */
     public boolean hasRewards(@Nonnull QuestState state) {
         return getRewards(state).length > 0;
+    }
+
+    /**
+     * @return {@code false} to let this quest end without saying so. Separate from whether the
+     * quest is shown anywhere: one is about the moment it ends, the other about the lists it
+     * belongs on, and a quest kept off both still deserves its fanfare.
+     */
+    public boolean isAnnounceOutcome() {
+        return announceOutcome;
     }
 
     /**
