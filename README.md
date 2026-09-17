@@ -137,7 +137,7 @@ What the player then does with it is written on the quest rather than on the ass
 `QuestTrackService`: `track`, `untrack`, `toggle`, and `reset` to hand the answer back to the asset.
 `getTracked(playerId)` reads the list back as quest ids, and `replaceTracked` swaps it for another
 and returns what it took — which is how a game mode borrows the tracker for a round and gives it
-back. The core declares both fields and reads neither: what being followed amounts to is the
+back. The core declares both fields and reads neither: what being tracked amounts to is the
 extension's business, the same way it owns what a `TitleKey` ends up drawn on.
 
 A running quest carries tags of its own, through `addTag` and `removeTag`, and is asked before its

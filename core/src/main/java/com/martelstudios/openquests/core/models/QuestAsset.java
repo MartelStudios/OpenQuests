@@ -185,7 +185,7 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     }
 
     /**
-     * @return {@code true} to follow every quest made from this asset from the moment it is handed
+     * @return {@code true} to track every quest made from this asset from the moment it is handed
      * out. What the player does with it afterwards is written on the quest, not here.
      */
     public boolean isAutoTrack() {

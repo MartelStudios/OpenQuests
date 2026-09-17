@@ -33,14 +33,14 @@ public abstract class QuestListenerComponent implements Component<EntityStore> {
     }
 
     /**
-     * @return {@code false} if the quest was already followed.
+     * @return {@code false} if the quest was already listed.
      */
     public boolean follow(@Nonnull UUID questId) {
         return questIds.add(questId);
     }
 
     /**
-     * @return {@code false} if the quest was not followed.
+     * @return {@code false} if the quest was not listed.
      */
     public boolean forget(@Nonnull UUID questId) {
         return questIds.remove(questId);

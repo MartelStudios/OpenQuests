@@ -74,11 +74,11 @@ public final class QuestListenerService {
     }
 
     /**
-     * A quest that ended stops being ticked, so it stops being followed — without which the list
+     * A quest that ended stops being ticked, so it stops being listed — without which the list
      * would only ever grow, one entry per quest of that kind the player ever finished.
      *
      * <p>Archiving happens before the change is announced, which is what makes "no longer live"
-     * the whole test: a quest kept running by {@code StopOnComplete: false} stays followed.
+     * the whole test: a quest kept running by {@code StopOnComplete: false} stays listed.
      */
     public static void handleQuestStateChanged(@Nonnull QuestStateChangedEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();

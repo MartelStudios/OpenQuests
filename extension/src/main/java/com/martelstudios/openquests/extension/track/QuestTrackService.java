@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Which quests a player is following. The asset says what a quest starts out as through
+ * Which quests a player is tracking. The asset says what a quest starts out as through
  * {@code AutoTrack}, the quest itself carries what the player made of it, and everything drawing a
- * quest as followed asks here rather than reading either.
+ * quest as tracked asks here rather than reading either.
  *
- * <p>The core declares both fields and leaves them alone: what being followed amounts to is a
+ * <p>The core declares both fields and leaves them alone: what being tracked amounts to is a
  * matter for whoever draws a panel. Static so a feature can ask whenever it likes, without
  * depending on anything being set up first.
  *
@@ -32,7 +32,7 @@ public final class QuestTrackService {
     private QuestTrackService() {}
 
     /**
-     * @return {@code false} if the quest was already followed.
+     * @return {@code false} if the quest was already tracked.
      */
     public static boolean track(@Nonnull AbstractQuestProgression<?> quest) {
         return apply(quest, Boolean.TRUE);
@@ -56,7 +56,7 @@ public final class QuestTrackService {
     }
 
     /**
-     * Follows the quest if it is dropped and drops it if it is followed, which is what a button
+     * Tracks the quest if it is dropped and drops it if it is tracked, which is what a button
      * offering one control for both does.
      *
      * @return what the quest now says.
@@ -88,7 +88,7 @@ public final class QuestTrackService {
 
     /**
      * Fired for the quest, leaving whoever listens to work out which of its holders they care
-     * about — following is a property of the quest, and every holder of it sees the same answer.
+     * about — tracking is a property of the quest, and every holder of it sees the same answer.
      */
     private static void announce(@Nonnull AbstractQuestProgression<?> quest, boolean tracked) {
         var eventBus = HytaleServer.get().getEventBus();
@@ -102,7 +102,7 @@ public final class QuestTrackService {
     }
 
     /**
-     * @return whether the quest is followed at all. A quest the player is not meant to read about
+     * @return whether the quest is tracked at all. A quest the player is not meant to read about
      * never is, whatever it or its asset asked for.
      */
     public static boolean isTracked(@Nonnull AbstractQuestProgression<?> quest) {
@@ -112,8 +112,8 @@ public final class QuestTrackService {
     }
 
     /**
-     * @return whether the quest is followed by this player right now. What a quest is followed for
-     * outlives the work, so asking without a player would call one followed long after it ended.
+     * @return whether the quest is tracked by this player right now. What a quest is tracked for
+     * outlives the work, so asking without a player would call one tracked long after it ended.
      */
     public static boolean isTracked(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         return quest.getStateFor(playerId) == QuestState.IN_PROGRESS && isTracked(quest);
@@ -123,7 +123,7 @@ public final class QuestTrackService {
      * Reads the player's stored data when they are offline, which blocks. Prefer the overload
      * taking their components wherever they are already at hand.
      *
-     * @return the ids of the quests this player is following, in no particular order.
+     * @return the ids of the quests this player is tracking, in no particular order.
      */
     @Nonnull
     public static List<UUID> getTracked(@Nonnull UUID playerId) {
@@ -135,7 +135,7 @@ public final class QuestTrackService {
      * otherwise be holding objects that a player logging out takes out of memory, and hand back
      * quests nothing reads any more.
      *
-     * @return the ids of the quests this player is following, in no particular order.
+     * @return the ids of the quests this player is tracking, in no particular order.
      */
     @Nonnull
     public static List<UUID> getTracked(@Nonnull UUID playerId, @Nonnull EntityComponents playerComponents) {
@@ -153,11 +153,11 @@ public final class QuestTrackService {
     }
 
     /**
-     * Drops every quest this player follows and follows the given ones instead, which is how a game
+     * Drops every quest this player tracks and tracks the given ones instead, which is how a game
      * mode borrows the tracker for the length of a round.
      *
-     * @param questIds what to follow once the rest is dropped, empty to leave the tracker bare.
-     * @return what was being followed until now, to be handed back to this same method afterwards.
+     * @param questIds what to track once the rest is dropped, empty to leave the tracker bare.
+     * @return what was being tracked until now, to be handed back to this same method afterwards.
      */
     @Nonnull
     public static List<UUID> replaceTracked(@Nonnull UUID playerId, @Nullable List<UUID> questIds) {
