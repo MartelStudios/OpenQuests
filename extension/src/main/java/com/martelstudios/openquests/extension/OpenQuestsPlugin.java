@@ -5,6 +5,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.openquests.extension.feedback.FeedbackFeature;
 import com.martelstudios.openquests.extension.hud.HudFeature;
 import com.martelstudios.openquests.extension.journal.JournalFeature;
+import com.martelstudios.openquests.extension.listener.ListenerFeature;
 import com.martelstudios.openquests.extension.quests.composite.CompositeFeature;
 import com.martelstudios.openquests.extension.quests.consumeitem.ConsumeItemFeature;
 import com.martelstudios.openquests.extension.quests.craft.CraftFeature;
@@ -40,6 +41,9 @@ public class OpenQuestsPlugin extends JavaPlugin {
     @Override
     protected void setup() {
         super.setup();
+
+        // Shared machinery, before the types that declare themselves to it
+        ListenerFeature.register(this);
 
         // Quests
         GatherFeature.register(this);
