@@ -161,7 +161,7 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
         releaseChildListeners();
 
         for (UUID questId : questIds) {
-            AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> child = QuestProgressionService.get().loadQuest(questId);
             if (child == null || child.isCompleted()) continue;
 
             QuestProgressionService.get().progress(new SetStateVisitor(QuestState.ABANDONED), List.of(questId));

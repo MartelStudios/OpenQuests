@@ -136,28 +136,23 @@ public class QuestProgressionStore {
     }
 
     /**
-     * Falls back to disk on a miss, so callers never have to care whether a quest was loaded
-     * yet. A genuinely deleted quest costs one {@code Files.exists} check and returns {@code null}.
+     * @return the quest under that id, running or ended alike, or {@code null} for one that is not
+     * in memory. Looking at a quest never reads it back in: {@link #load} is the only way in, so
+     * that a store nobody is filling can only shrink.
      */
     @Nullable
     public AbstractQuestProgression<?> get(@Nonnull UUID id) {
         AbstractQuestProgression<?> quest = quests.get(id);
-        if (quest == null) quest = archived.get(id);
 
-        return quest != null ? quest : load(id);
+        return quest != null ? quest : archived.get(id);
     }
 
     /**
      * @return the quest under that id only if it is still running, so a caller meaning to progress
-     * something never lands on one that is over. Falls back to disk the way {@link #get} does: a
-     * quest nobody has read yet is not a quest that ended.
+     * something never lands on one that is over.
      */
     @Nullable
     public AbstractQuestProgression<?> getLive(@Nonnull UUID id) {
-        AbstractQuestProgression<?> quest = quests.get(id);
-        if (quest != null || archived.containsKey(id)) return quest;
-
-        load(id);
         return quests.get(id);
     }
 
@@ -235,7 +230,14 @@ public class QuestProgressionStore {
         }
     }
 
-    public AbstractQuestProgression<?> load(UUID id) {
+    /**
+     * Reads a quest back in, or hands over the one already there. The way into the store, and the
+     * one place a lookup is allowed to cost a disk read and to announce what it found.
+     *
+     * @return {@code null} for an id nothing on disk answers to.
+     */
+    @Nullable
+    public AbstractQuestProgression<?> load(@Nonnull UUID id) {
         AbstractQuestProgression<?> quest = quests.get(id);
         if (quest == null) quest = archived.get(id);
         if (quest != null) return quest;

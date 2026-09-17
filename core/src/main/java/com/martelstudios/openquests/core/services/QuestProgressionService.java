@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -52,7 +53,13 @@ public class QuestProgressionService {
         AbstractQuestProgression.CODEC.register(id, questClass, questCodec);
     }
 
-    public AbstractQuestProgression<?> loadQuest(UUID questId) {
+    /**
+     * Brings a quest back into memory, reading it from disk if that is what it takes. For a caller
+     * meaning to act on the quest; one only looking at it wants {@link #getQuest}, which leaves a
+     * quest nobody holds any more where it is.
+     */
+    @Nullable
+    public AbstractQuestProgression<?> loadQuest(@Nonnull UUID questId) {
         return dataStore.load(questId);
     }
 
@@ -104,7 +111,9 @@ public class QuestProgressionService {
      * @param questId the id of the quest to unregister
      */
     public AbstractQuestProgression<?> unregisterQuest(@Nonnull UUID questId) {
-        AbstractQuestProgression<?> quest = dataStore.get(questId);
+        // Read back first: doing away with a quest has to reach its file and everyone indexing it,
+        // and a quest nobody currently holds is exactly the kind that gets deleted
+        AbstractQuestProgression<?> quest = dataStore.load(questId);
         if (quest == null) return null;
 
         return unregisterQuest(quest);
@@ -155,7 +164,13 @@ public class QuestProgressionService {
         archiveQuest(event.getQuest());
     }
 
-    public AbstractQuestProgression<?> getQuest(UUID questId) {
+    /**
+     * @return the quest under that id, running or ended alike, or {@code null} for one that is no
+     * longer in memory. An id read off a player's own index answers here for as long as they are
+     * online, which is as long as anything drawing it for them runs.
+     */
+    @Nullable
+    public AbstractQuestProgression<?> getQuest(@Nonnull UUID questId) {
         return dataStore.get(questId);
     }
 

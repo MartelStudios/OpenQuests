@@ -46,7 +46,7 @@ public class WorldQuestService {
     }
 
     public void addQuest(@Nonnull World world, @Nonnull UUID questId) {
-        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+        AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
         if (quest == null) return;
 
         if (!getWorldQuestStoreFromWorld(world).questsRecord.register(questId)) return;
@@ -79,7 +79,7 @@ public class WorldQuestService {
         questsRecord.loadAll();
 
         for (UUID questId : new ArrayList<>(questsRecord.getAllIds())) {
-            var quest = QuestProgressionService.get().getQuest(questId);
+            var quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null) {
                 questsRecord.unregister(questId);
                 continue;
@@ -100,7 +100,7 @@ public class WorldQuestService {
         QuestsRecord questsRecord = getWorldQuestStoreFromWorld(removedPlayerFromWorldEvent.getWorld()).questsRecord;
 
         for (UUID questId : new ArrayList<>(questsRecord.getAllIds())) {
-            var quest = QuestProgressionService.get().getQuest(questId);
+            var quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null) {
                 questsRecord.unregister(questId);
                 continue;

@@ -49,7 +49,7 @@ public class UniverseQuestService {
     }
 
     public void addQuest(@Nonnull UUID questId) {
-        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+        AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
         if (quest == null) return;
 
         if (!getQuests().register(questId)) return;
@@ -103,7 +103,7 @@ public class UniverseQuestService {
 
         QuestsRecord quests = getQuests();
         for (UUID questId : new ArrayList<>(quests.getAllIds())) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null) {
                 quests.unregister(questId);
                 continue;
