@@ -67,6 +67,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("Track", Codec.BOOLEAN), (quest, value) -> quest.track = value, quest -> quest.track)
                                                                                         .add()
+                                                                                        .append(new KeyedCodec<>("Visibility", new EnumCodec<>(QuestVisibility.class)), (quest, value) -> quest.visibility = value, quest -> quest.visibility)
+                                                                                        .add()
                                                                                         .append(new KeyedCodec<>("AnnounceOutcome", Codec.BOOLEAN), (quest, value) -> quest.announceOutcome = value, quest -> quest.announceOutcome)
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("StartedAt", Codec.LONG), (quest, millis) -> quest.startedAt = Instant.ofEpochMilli(millis), quest -> quest.startedAt == null ? null : Long.valueOf(quest.startedAt.toEpochMilli()))
@@ -123,6 +125,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nullable
     protected Boolean track;
+
+    /**
+     * Overrides the asset on when this one run is worth listing, { null} while the asset
+     * answers for it.
+     */
+    @Nullable
+    protected QuestVisibility visibility;
 
     /**
      * Overrides the asset on whether this one run announces how it ended. Set on a step by the
@@ -184,6 +193,44 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public Q setPersistHistory(@Nullable Boolean persistHistory) {
         this.persistHistory = persistHistory;
         return self();
+    }
+
+    /**
+     * @return when this quest is worth putting in front of the player, its asset answering while
+     * the quest says nothing itself.
+     */
+    @Nonnull
+    public QuestVisibility getVisibility() {
+        if (visibility != null) return visibility;
+
+        QuestAsset asset = getAsset();
+        return asset == null ? QuestVisibility.ALWAYS : asset.getVisibility();
+    }
+
+    public Q setVisibility(@Nullable QuestVisibility visibility) {
+        this.visibility = visibility;
+        return self();
+    }
+
+    /**
+     * @return whether the player has got anywhere with this quest. A type that cannot be partway
+     * through has only the two answers, so it says so here; a counted one overrides.
+     */
+    public boolean hasProgressed() {
+        return isCompleted();
+    }
+
+    /**
+     * @return whether the quest is worth listing right now, which is what every panel and page
+     * drawing quests asks before drawing one. What it owes the player is untouched by the answer.
+     */
+    public boolean isVisible() {
+        return switch (getVisibility()) {
+            case ALWAYS -> true;
+            case WHEN_PROGRESSED -> hasProgressed();
+            case WHEN_COMPLETED -> isCompleted();
+            case NEVER -> false;
+        };
     }
 
     /**

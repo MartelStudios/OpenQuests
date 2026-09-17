@@ -4,6 +4,7 @@
   "TitleKey": "quest.sprint-novice.title",
   "DescriptionKey": "quest.sprint-novice.description",
   "TargetQuantity": 50,
+  "Visibility": "WhenCompleted",
   "SuccessfulRewards": [
     {
       "Type": "GrantQuest",
@@ -12,8 +13,5 @@
         "SprintAdept"
       ]
     }
-  ],
-  "Tags": {
-    "OQ_HIDE": []
-  }
+  ]
 }

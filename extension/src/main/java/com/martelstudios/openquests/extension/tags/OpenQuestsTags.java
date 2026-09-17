@@ -7,13 +7,6 @@ public class OpenQuestsTags {
     public static final String DESCRIPTION_TAG = "OQ_HUD_DESC";
 
     /**
-     * Keeps a quest out of the panel and out of the journal alike, whatever else it asked for.
-     * What the quest owes the player is left alone: a debt is listed in its own right, and a quest
-     * the player is not meant to read about still has to pay out.
-     */
-    public static final String HIDE_TAG = "OQ_HIDE";
-
-    /**
      * Carries the id of the quest whose completion handed this one over. Written by the
      * {@code GrantQuest} reward on the quest it creates, so a chain can be walked back to the
      * exact run that opened it rather than to whichever quest shares its asset.

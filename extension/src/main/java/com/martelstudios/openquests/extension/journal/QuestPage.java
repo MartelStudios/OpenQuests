@@ -549,7 +549,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         // One pass over everything the player holds: a quest that ended is set aside rather than
         // deleted, so the finished half of the journal is read the same way as the running half
         for (AbstractQuestProgression<?> quest : held) {
-            if (quest.hasTag(OpenQuestsTags.HIDE_TAG)) continue;
+            if (!quest.isVisible()) continue;
             if (!filter.accepts(quest.getStateFor(viewer))) continue;
 
             entries.add(Entry.held(quest, viewer, isOwed(playerComponents, quest.getId())));

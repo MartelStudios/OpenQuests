@@ -87,4 +87,13 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     public boolean checkCompletion() {
         return currentQuantity >= getTargetQuantity();
     }
+
+    /**
+     * A counted quest can say where it stands, so it answers on the counter rather than falling
+     * back to the two answers a binary quest has.
+     */
+    @Override
+    public boolean hasProgressed() {
+        return currentQuantity > 0 || super.hasProgressed();
+    }
 }
