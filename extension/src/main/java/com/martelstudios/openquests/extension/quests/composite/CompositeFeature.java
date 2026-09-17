@@ -2,6 +2,8 @@ package com.martelstudios.openquests.extension.quests.composite;
 
 import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.events.QuestLoadedEvent;
+import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.extension.hud.QuestHudService;
 import com.martelstudios.openquests.extension.journal.QuestPageService;
@@ -23,6 +25,9 @@ public final class CompositeFeature {
 
         QuestHudService.register(new CompositeQuestHudRenderer());
         QuestPageService.register(new CompositeQuestPageRenderer());
+
+        plugin.getEventRegistry().registerGlobal(QuestLoadedEvent.class, CompositeQuestEvents::handleQuestLoaded);
+        plugin.getEventRegistry().registerGlobal(QuestUnloadedEvent.class, CompositeQuestEvents::handleQuestUnloaded);
 
         // Referencing other assets is what makes this type able to loop, so it validates its own graph
         plugin.getEventRegistry()
