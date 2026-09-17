@@ -18,9 +18,11 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Pushes each player's quests to their {@link QuestTrackerHud} every tick (the HUD itself
- * throttles how often it actually sends an update to the client). Hands over all of them: which
- * ones earn a line is the panel's to decide.
+ * Redraws a player's {@link QuestTrackerHud} on the tick after something of theirs changed. What
+ * changed is not worked out here: {@link QuestHudRefresh} is told by the events that know, and a
+ * player nothing happened to costs one lookup and nothing else.
+ *
+ * <p>Hands the panel every quest the player holds: which ones earn a line is the panel's to decide.
  */
 public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
     @Nonnull
@@ -32,13 +34,20 @@ public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
     @Override
     public void tick(float dt, int index, @Nonnull ArchetypeChunk<EntityStore> archetypeChunk, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         var playerRef = archetypeChunk.getComponent(index, PlayerRef.getComponentType());
+        if (playerRef == null || !QuestHudRefresh.consume(playerRef.getUuid())) return;
+
         var player = archetypeChunk.getComponent(index, Player.getComponentType());
         var questStoreComponent = archetypeChunk.getComponent(index, QuestStoreComponent.getComponentType());
-        if (playerRef == null || player == null || questStoreComponent == null) return;
+        if (player == null || questStoreComponent == null) return;
 
-        // Gathering is pointless while the HUD would throttle the push away
         QuestTrackerHud hud = QuestTrackerHud.get(player, playerRef);
-        if (!hud.shouldUpdate()) return;
+
+        // Gathering is pointless while the HUD would throttle the push away, and the mark is put
+        // back so that what happened is drawn once the floor has passed rather than dropped
+        if (!hud.shouldUpdate()) {
+            QuestHudRefresh.mark(playerRef.getUuid());
+            return;
+        }
 
         List<AbstractQuestProgression<?>> quests = new ArrayList<>();
         for (UUID questId : questStoreComponent.getQuestIds()) {

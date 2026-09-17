@@ -20,7 +20,12 @@ public class QuestTrackerHud extends CustomUIHud {
     public static final String KEY = "openquests:quest_tracker";
 
     private static final int MAX_QUESTS = 5;
-    private static final long UPDATE_INTERVAL_MS = 1000;
+
+    /**
+     * A floor between two pushes, not a heartbeat: the panel is redrawn when something changed,
+     * and this only keeps a burst from becoming a packet per tick.
+     */
+    private static final long UPDATE_INTERVAL_MS = 100;
 
     private final AtomicLong lastPushedMs = new AtomicLong();
 
