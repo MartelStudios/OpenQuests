@@ -11,31 +11,32 @@ import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 
 import javax.annotation.Nonnull;
 
 /**
- * Samples how each connected player is moving, once per tick, and hands it to their movement
- * quests. Distance is integrated from the velocity rather than measured between two positions:
- * a speed is already there to be read, where a previous position would have to be kept per player
- * and given back when they leave.
+ * Samples how a player is moving, once per tick, and hands it to the movement quests they are
+ * running. Only players with one are in the query at all, and only those quests are walked.
+ *
+ * <p>Distance is integrated from the velocity rather than measured between two positions: a speed
+ * is already there to be read, where a previous position would have to be kept per player and
+ * given back when they leave.
  */
 public class MovementTickingSystem extends EntityTickingSystem<EntityStore> {
 
     @Nonnull
     @Override
     public Query<EntityStore> getQuery() {
-        return Query.and(PlayerRef.getComponentType(), MovementStatesComponent.getComponentType(), QuestStoreComponent.getComponentType());
+        return Query.and(PlayerRef.getComponentType(), MovementStatesComponent.getComponentType(), MovementQuestListener.getComponentType());
     }
 
     @Override
     public void tick(float dt, int index, @Nonnull ArchetypeChunk<EntityStore> archetypeChunk, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         var playerRef = archetypeChunk.getComponent(index, PlayerRef.getComponentType());
         var movementStates = archetypeChunk.getComponent(index, MovementStatesComponent.getComponentType());
-        var questStoreComponent = archetypeChunk.getComponent(index, QuestStoreComponent.getComponentType());
+        var listener = archetypeChunk.getComponent(index, MovementQuestListener.getComponentType());
 
-        if (playerRef == null || movementStates == null || questStoreComponent == null) return;
+        if (playerRef == null || movementStates == null || listener == null) return;
 
         MovementStates states = movementStates.getMovementStates();
         if (states == null) return;
@@ -46,7 +47,7 @@ public class MovementTickingSystem extends EntityTickingSystem<EntityStore> {
         double metres = velocity == null ? 0 : horizontalSpeed(velocity) * dt;
 
         QuestProgressionService.get()
-                               .progress(new MovementQuestVisitor(playerRef.getUuid(), states, metres), questStoreComponent.getQuestIds());
+                               .progress(new MovementQuestVisitor(playerRef.getUuid(), states, metres), listener.getQuestIds());
     }
 
     /**

@@ -28,6 +28,14 @@ public interface EntityComponents {
     <T extends Component<EntityStore>> T ensureAndGetComponent(@Nonnull ComponentType<EntityStore, T> componentType);
 
     /**
+     * Drops a component the player may not be carrying, so that letting go of one is not itself a
+     * reason to go and look first.
+     *
+     * @return {@code false} if there was nothing to remove.
+     */
+    <T extends Component<EntityStore>> boolean removeComponent(@Nonnull ComponentType<EntityStore, T> componentType);
+
+    /**
      * @return the entity, or {@code null} when the player is held out of world. Only for the rare
      * code that genuinely needs a store, such as running on its world thread.
      */
@@ -160,6 +168,11 @@ public interface EntityComponents {
             return holder.ensureAndGetComponent(componentType);
         }
 
+        @Override
+        public <T extends Component<EntityStore>> boolean removeComponent(@Nonnull ComponentType<EntityStore, T> componentType) {
+            return holder.tryRemoveComponent(componentType);
+        }
+
         @Nullable
         @Override
         public Ref<EntityStore> getReference() {
@@ -179,6 +192,11 @@ public interface EntityComponents {
         @Override
         public <T extends Component<EntityStore>> T ensureAndGetComponent(@Nonnull ComponentType<EntityStore, T> componentType) {
             return reference.getStore().ensureAndGetComponent(reference, componentType);
+        }
+
+        @Override
+        public <T extends Component<EntityStore>> boolean removeComponent(@Nonnull ComponentType<EntityStore, T> componentType) {
+            return reference.getStore().removeComponentIfExists(reference, componentType);
         }
 
         @Nonnull

@@ -1,7 +1,10 @@
 package com.martelstudios.openquests.extension.quests.movement;
 
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.extension.listener.QuestListenerService;
 
 import javax.annotation.Nonnull;
 
@@ -20,7 +23,17 @@ public final class MovementFeature {
     public static final String SPRINT_TYPE_ID = "Sprint";
     public static final String JUMP_TYPE_ID = "Jump";
 
+    private static ComponentType<EntityStore, MovementQuestListener> listenerType;
+
     private MovementFeature() {}
+
+    /**
+     * @return the component naming a player's movement quests, which holds no meaning outside a
+     * registered feature.
+     */
+    public static ComponentType<EntityStore, MovementQuestListener> getListenerType() {
+        return listenerType;
+    }
 
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestProgressionService service = QuestProgressionService.get();
@@ -29,6 +42,11 @@ public final class MovementFeature {
         service.registerQuestType(RUN_TYPE_ID, RunQuestAsset.class, RunQuestAsset.CODEC, RunQuestProgression.class, RunQuestProgression.CODEC);
         service.registerQuestType(SPRINT_TYPE_ID, SprintQuestAsset.class, SprintQuestAsset.CODEC, SprintQuestProgression.class, SprintQuestProgression.CODEC);
         service.registerQuestType(JUMP_TYPE_ID, JumpQuestAsset.class, JumpQuestAsset.CODEC, JumpQuestProgression.class, JumpQuestProgression.CODEC);
+
+        // Registered without a codec, so it stays out of the player's file, and on the base type,
+        // so the four of them share one component the way they share one system
+        listenerType = plugin.getEntityStoreRegistry().registerComponent(MovementQuestListener.class, MovementQuestListener::new);
+        QuestListenerService.register(MovementQuestProgression.class, listenerType);
 
         plugin.getEntityStoreRegistry().registerSystem(new MovementTickingSystem());
     }
