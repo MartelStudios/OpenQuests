@@ -58,7 +58,7 @@ public class QuestsRecord {
 
         List<AbstractQuestProgression<?>> quests = new ArrayList<>(questIds.size());
         for (UUID questId : questIds) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
             if (quest != null) quests.add(quest);
         }
         return quests;

@@ -141,6 +141,9 @@ public class QuestStoreComponent implements Component<EntityStore> {
     /**
      * The ids left to resolve from elsewhere. Quests written whole below are left out, and so are
      * the ones no store will write: their id would only resolve to nothing next session.
+     *
+     * <p>A quest that has left memory is kept on its id alone rather than looked at: it went out
+     * under a file of its own, which is what an id resolves to.
      */
     @Nonnull
     private QuestsRecord getSharedQuests() {
