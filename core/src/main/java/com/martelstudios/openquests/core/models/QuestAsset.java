@@ -51,6 +51,12 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
                                                                           .add()
                                                                           .append(new KeyedCodec<>("AbandonedRewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (asset, rewards) -> asset.abandonedRewards = rewards, asset -> asset.abandonedRewards)
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("SuccessfulSound", Codec.STRING), (asset, sound) -> asset.successfulSound = sound, asset -> asset.successfulSound)
+                                                                          .add()
+                                                                          .append(new KeyedCodec<>("FailedSound", Codec.STRING), (asset, sound) -> asset.failedSound = sound, asset -> asset.failedSound)
+                                                                          .add()
+                                                                          .append(new KeyedCodec<>("AbandonedSound", Codec.STRING), (asset, sound) -> asset.abandonedSound = sound, asset -> asset.abandonedSound)
+                                                                          .add()
                                                                           .build();
 
 
@@ -68,6 +74,17 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     protected QuestReward[] successfulRewards = NO_REWARDS;
     protected QuestReward[] failedRewards = NO_REWARDS;
     protected QuestReward[] abandonedRewards = NO_REWARDS;
+
+    /**
+     * Sound events overriding what an outcome sounds like, {@code null} for the one the server
+     * plays by default and empty for none at all.
+     */
+    @Nullable
+    protected String successfulSound;
+    @Nullable
+    protected String failedSound;
+    @Nullable
+    protected String abandonedSound;
 
     protected QuestAsset() {}
 
@@ -174,6 +191,20 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
      */
     public boolean hasRewards(@Nonnull QuestState state) {
         return getRewards(state).length > 0;
+    }
+
+    /**
+     * @return the sound event this outcome is to play, {@code null} to leave the choice to the
+     * server, and empty to ask for silence — which no absent field could say.
+     */
+    @Nullable
+    public String getSound(@Nonnull QuestState state) {
+        return switch (state) {
+            case SUCCESSFUL -> successfulSound;
+            case FAILED -> failedSound;
+            case ABANDONED -> abandonedSound;
+            default -> null;
+        };
     }
 
     /**

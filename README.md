@@ -156,11 +156,11 @@ A quest that ends says so: its title takes over the middle of the screen, over a
 outcome, and a sound plays. A quest a script abandons rather than the player passes in silence, as
 does one carrying `OQ_HIDE`.
 
-Each outcome names its own sound, a vanilla sound event or one your asset pack ships. A tag naming
-nothing plays nothing.
+Each outcome names its own sound, a vanilla sound event or one your asset pack ships. The empty
+string plays nothing.
 
 ```json
-{ "Tags": { "OQ_SFX_SUCCESSFUL": ["SFX_Memories_Unlock_Local"], "OQ_SFX_ABANDONED": [] } }
+{ "SuccessfulSound": "SFX_Memories_Unlock_Local", "AbandonedSound": "" }
 ```
 
 ### Commands

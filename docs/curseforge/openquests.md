@@ -104,9 +104,6 @@ Tags are how an asset says something no field covers. They carry down from a par
 | <code>OQ_HUD_DESC</code> |Shows its description under its title, greyed and smaller  |
 | <code>OQ_HUD_UNTRACK</code> |Outranks the above and takes the quest off the tracker     |
 | <code>OQ_HIDE</code> |Keeps the quest out of the tracker and the journal alike   |
-| <code>OQ_SFX_SUCCESSFUL</code> |Names the sound played when the quest succeeds             |
-| <code>OQ_SFX_FAILED</code> |The same, for a quest that failed                          |
-| <code>OQ_SFX_ABANDONED</code> |The same, for a quest the player gave up                   |
 | <code>OQ_GRANTED_BY</code> |Written by <code>GrantQuest</code> on the quest it creates, naming the run that opened it |
 | <code>OQ_PARENT_QUEST</code> |Written by a composite on each step it creates, naming the group it belongs to |
 
@@ -120,10 +117,10 @@ Tags are how an asset says something no field covers. They carry down from a par
 
 A quest that ends says so: its title takes over the middle of the screen, over a line naming the outcome, and a sound plays. A quest a script abandons rather than the player passes in silence, as does one carrying `OQ_HIDE`.
 
-The three `OQ_SFX_` tags name the sound for each outcome, either a vanilla sound event or one shipped by an asset pack of your own. A tag naming nothing plays nothing, which is how a single quest is made to end quietly.
+`SuccessfulSound`, `FailedSound` and `AbandonedSound` name the sound for each outcome, either a vanilla sound event or one shipped by an asset pack of your own. The empty string plays nothing, which is how a single quest is made to end quietly.
 
 ```
-{ "Tags": { "OQ_SFX_SUCCESSFUL": ["SFX_Memories_Unlock_Local"], "OQ_SFX_ABANDONED": [] } }
+{ "SuccessfulSound": "SFX_Memories_Unlock_Local", "AbandonedSound": "" }
 ```
 
 ## 🌐 Who a quest belongs to
