@@ -37,20 +37,4 @@ public class OpenQuestsTags {
      * quest the player holds.
      */
     public static final String PARENT_QUEST_TAG = "OQ_PARENT_QUEST";
-
-    /**
-     * Names the sound event played when the quest succeeds, overriding the default. Declared
-     * without a value, it plays none — which is how one quest is made to end in silence.
-     */
-    public static final String SUCCESSFUL_SOUND_TAG = "OQ_SFX_SUCCESSFUL";
-
-    /**
-     * The same, for a quest that failed.
-     */
-    public static final String FAILED_SOUND_TAG = "OQ_SFX_FAILED";
-
-    /**
-     * The same, for a quest the player gave up.
-     */
-    public static final String ABANDONED_SOUND_TAG = "OQ_SFX_ABANDONED";
 }

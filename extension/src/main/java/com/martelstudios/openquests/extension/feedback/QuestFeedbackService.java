@@ -11,13 +11,14 @@ import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.*;
+import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.HIDE_TAG;
 
 /**
  * What a player hears and sees when a quest of theirs ends. A success takes over the middle of the
@@ -126,22 +127,21 @@ public class QuestFeedbackService {
     }
 
     /**
-     * @return the sound event the quest asked for, the default for that outcome, or {@code null}
-     * for a quest that declared the tag and named nothing — which is how one is silenced.
+     * @return the sound event the asset named, the default for that outcome, or {@code null} for
+     * an asset that named the empty string — which is how one outcome is made to end in silence.
      */
     @Nullable
     private String resolveSound(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state) {
-        String tag = switch (state) {
-            case SUCCESSFUL -> SUCCESSFUL_SOUND_TAG;
-            case FAILED -> FAILED_SOUND_TAG;
-            case ABANDONED -> ABANDONED_SOUND_TAG;
-            default -> null;
-        };
-        if (tag == null) return null;
+        QuestAsset asset = quest.getAsset();
+        String sound = asset == null ? null : asset.getSound(state);
 
-        String[] values = quest.getTagValues(tag);
-        if (values != null) return values.length == 0 ? null : values[0];
+        if (sound == null) sound = defaultSound(state);
 
+        return sound == null || sound.isEmpty() ? null : sound;
+    }
+
+    @Nullable
+    private static String defaultSound(@Nonnull QuestState state) {
         return switch (state) {
             case SUCCESSFUL -> DEFAULT_SUCCESSFUL_SOUND;
             case FAILED -> DEFAULT_FAILED_SOUND;
