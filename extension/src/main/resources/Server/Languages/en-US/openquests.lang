@@ -8,6 +8,10 @@ quest.default.craft = Craft {quantity, plural, one {a {item}} other {{quantity, 
 quest.default.consume = Consume {quantity, plural, one {a {item}} other {{quantity, number} {item}}}
 quest.default.reach-location = Reach {x, number}, {y, number}, {z, number}
 quest.default.enter-world = Enter a world matching {world}
+quest.default.walk = Walk {quantity, number} metres
+quest.default.run = Run {quantity, number} metres
+quest.default.sprint = Sprint {quantity, number} metres
+quest.default.jump = Jump {quantity, plural, one {once} other {{quantity, number} times}}
 
 page.title = Quest journal
 page.empty = Nothing here yet.
