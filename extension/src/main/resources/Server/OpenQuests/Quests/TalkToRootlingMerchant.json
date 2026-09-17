@@ -16,7 +16,5 @@
       "Temple_Kweebec_Merchant"
     ]
   },
-  "Tags": {
-    "OQ_HUD_TRACK": []
-  }
+  "AutoTrack": true
 }

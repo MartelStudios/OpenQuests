@@ -100,9 +100,7 @@ Tags are how an asset says something no field covers. They carry down from a par
 
 | Tag        |Effect                                                     |
 | ---------- |---------------------------------------------------------- |
-| <code>OQ_HUD_TRACK</code> |Puts every quest made from the asset on the tracker        |
 | <code>OQ_HUD_DESC</code> |Shows its description under its title, greyed and smaller  |
-| <code>OQ_HUD_UNTRACK</code> |Outranks the above and takes the quest off the tracker     |
 | <code>OQ_HIDE</code> |Keeps the quest out of the tracker and the journal alike   |
 | <code>OQ_GRANTED_BY</code> |Written by <code>GrantQuest</code> on the quest it creates, naming the run that opened it |
 | <code>OQ_PARENT_QUEST</code> |Written by a composite on each step it creates, naming the group it belongs to |
@@ -110,8 +108,14 @@ Tags are how an asset says something no field covers. They carry down from a par
 `OQ_HIDE` is for a quest the player is not meant to read about: a flag your chain sets on itself, a step you would rather keep off the page. What it owes is untouched, so a hidden quest still pays out.
 
 ```
-{ "Type": "Composite", "TitleKey": "…", "Tags": { "OQ_HUD_TRACK": [], "OQ_HUD_DESC": [] } }
+{ "Type": "Composite", "TitleKey": "…", "AutoTrack": true, "Tags": { "OQ_HUD_DESC": [] } }
 ```
+
+## 📌 The tracker
+
+`AutoTrack` on the asset puts every quest made from it on the panel. What the player does with it afterwards is written on the quest itself, so one run can be dropped without touching the rest.
+
+`QuestTrackService` is the way in: `track`, `untrack` and `toggle` on one quest, `reset` to hand the answer back to the asset, `getTracked(playerId)` for the whole list as quest ids, and `replaceTracked` to swap it for another and get back what it took — which is how a game mode borrows the tracker for a round and puts it back afterwards.
 
 ## 🔔 Ending a quest
 
@@ -195,7 +199,7 @@ Progression is written where it costs least. A quest with one player lives in th
 
 **`AutoClaim` moved from the quest to the reward.** It used to sit beside `TitleKey`; it now sits on each reward, so one quest can hand an item over on the spot and leave the next quest to be collected.
 
-**HUD tags are prefixed.** `HUD_TRACK` and `HUD_DESC` are now `OQ_HUD_TRACK` and `OQ_HUD_DESC`. An asset still carrying the old spelling is not refused, it is simply never read, so the quest quietly stops appearing on the tracker.
+**HUD tags are prefixed.** `HUD_DESC` is now `OQ_HUD_DESC`, and `HUD_TRACK` has become the `AutoTrack` field on the asset. An asset still carrying an old spelling is not refused, it is simply never read, so the quest quietly stops appearing on the tracker.
 
 **Command permissions moved.** `/quest` is granted to adventurers so that the subcommands they may use can be found at all, and `create`, `complete` and `fail` name `hytale:WorldEditor` themselves.
 

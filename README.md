@@ -122,19 +122,24 @@ that could not be granted on the spot has nowhere to wait.
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
 
-The tracker only lists quests that asked for it. An asset tagged `OQ_HUD_TRACK` puts every quest made
-from it on the panel; `OQ_HUD_DESC` shows its description under its title, greyed and smaller:
+The tracker only lists quests that asked for it. `AutoTrack` puts every quest made from the asset on
+the panel; `OQ_HUD_DESC` shows its description under its title, greyed and smaller:
 
 ```json
-{ "Type": "Composite", "TitleKey": "…", "Tags": { "OQ_HUD_TRACK": [], "OQ_HUD_DESC": [] } }
+{ "Type": "Composite", "TitleKey": "…", "AutoTrack": true, "Tags": { "OQ_HUD_DESC": [] } }
 ```
+
+What the player then does with it is written on the quest rather than on the asset, through
+`QuestTrackService`: `track`, `untrack`, `toggle`, and `reset` to hand the answer back to the asset.
+`getTracked(playerId)` reads the list back as quest ids, and `replaceTracked` swaps it for another
+and returns what it took — which is how a game mode borrows the tracker for a round and gives it
+back. The core declares both fields and reads neither: what being followed amounts to is the
+extension's business, the same way it owns what a `TitleKey` ends up drawn on.
 
 A running quest carries tags of its own, through `addTag` and `removeTag`, and is asked before its
 asset — the same override as `PersistHistory`, so one quest can answer differently from everything
 sharing its template. Its tags carry values just as an asset's do, and the instance answers alone
-once it declares one, so a quest can be written over at runtime rather than only added to. A tag
-can only be added to an asset's set, never taken off it, which is what `OQ_HUD_UNTRACK` is for: it
-outranks `OQ_HUD_TRACK` and takes the quest off the panel although its asset asked for it.
+once it declares one, so a quest can be written over at runtime rather than only added to.
 
 `OQ_HIDE` outranks the lot: a quest carrying it is on neither the panel nor the journal, whatever
 else it asked for. What it owes the player is untouched — a debt is listed in its own right, so a
