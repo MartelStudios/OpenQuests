@@ -7,7 +7,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.protocol.MovementStates;
 import com.hypixel.hytale.server.core.entity.movement.MovementStatesComponent;
-import com.hypixel.hytale.server.core.modules.physics.component.Velocity;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -18,46 +18,37 @@ import javax.annotation.Nonnull;
  * Samples how a player is moving, once per tick, and hands it to the movement quests they are
  * running. Only players with one are in the query at all, and only those quests are walked.
  *
- * <p>Distance is integrated from the velocity rather than measured between two positions: a speed
- * is already there to be read, where a previous position would have to be kept per player and
- * given back when they leave.
+ * <p>Distance is the ground actually covered between two ticks. Owing nothing to the units a
+ * velocity is expressed in, nor to which of the two a server holds for a player is the one driving
+ * them, it is the only measure that answers in blocks without being told the scale.
  */
 public class MovementTickingSystem extends EntityTickingSystem<EntityStore> {
 
     @Nonnull
     @Override
     public Query<EntityStore> getQuery() {
-        return Query.and(PlayerRef.getComponentType(), MovementStatesComponent.getComponentType(), MovementQuestListener.getComponentType());
+        return Query.and(PlayerRef.getComponentType(), TransformComponent.getComponentType(), MovementStatesComponent.getComponentType(), MovementQuestListener.getComponentType());
     }
 
     @Override
     public void tick(float dt, int index, @Nonnull ArchetypeChunk<EntityStore> archetypeChunk, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         var playerRef = archetypeChunk.getComponent(index, PlayerRef.getComponentType());
+        var transform = archetypeChunk.getComponent(index, TransformComponent.getComponentType());
         var movementStates = archetypeChunk.getComponent(index, MovementStatesComponent.getComponentType());
         var listener = archetypeChunk.getComponent(index, MovementQuestListener.getComponentType());
 
-        if (playerRef == null || movementStates == null || listener == null) return;
+        if (playerRef == null || transform == null || movementStates == null || listener == null) return;
 
         MovementStates states = movementStates.getMovementStates();
         if (states == null) return;
 
-        // Read rather than queried: a player who somehow carries no velocity still has their jumps
-        // counted, where asking for it up front would drop them from the pass altogether
-        var velocity = archetypeChunk.getComponent(index, Velocity.getComponentType());
-        double metres = velocity == null ? 0 : horizontalSpeed(velocity) * dt;
+        var position = transform.getPosition();
+
+        // Sampled whatever the gait, so that the tick a player changes pace on is measured from
+        // where they were rather than from wherever they last happened to be counted
+        double metres = listener.sampleTravel(position.x(), position.z());
 
         QuestProgressionService.get()
                                .progress(new MovementQuestVisitor(playerRef.getUuid(), states, metres), listener.getQuestIds());
-    }
-
-    /**
-     * Flat distance only: a quest asking for a hundred metres means across the ground, and counting
-     * the climb would have a ladder pay the same as a road.
-     */
-    private static double horizontalSpeed(@Nonnull Velocity velocity) {
-        double x = velocity.getX();
-        double z = velocity.getZ();
-
-        return Math.sqrt(x * x + z * z);
     }
 }
