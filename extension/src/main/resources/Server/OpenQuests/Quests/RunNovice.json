@@ -1,0 +1,19 @@
+{
+  "Type": "Run",
+  "StartOnConnection": true,
+  "TitleKey": "quest.run-novice.title",
+  "DescriptionKey": "quest.run-novice.description",
+  "TargetQuantity": 100,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "RunAdept"
+      ]
+    }
+  ],
+  "Tags": {
+    "OQ_HIDE": []
+  }
+}

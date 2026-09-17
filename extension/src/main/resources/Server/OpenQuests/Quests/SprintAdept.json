@@ -1,0 +1,19 @@
+{
+  "Type": "Sprint",
+  "TitleKey": "quest.sprint-adept.title",
+  "DescriptionKey": "quest.sprint-adept.description",
+  "TargetQuantity": 500,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "SprintMaster"
+      ]
+    }
+  ],
+  "AutoTrack": true,
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
+}
