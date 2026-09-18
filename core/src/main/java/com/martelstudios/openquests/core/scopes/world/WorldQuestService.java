@@ -12,6 +12,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 
@@ -28,11 +29,21 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WorldQuestService {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
+    /**
+     * What a world's index is written under. One namespace for the lot, so a scope added later
+     * picks a prefix of its own.
+     */
+    public static final String WORLD_INDEX_PREFIX = "world:";
+
+    private final QuestStorage storage;
+
     private final ConcurrentHashMap<UUID, EventRegistration<UUID, QuestUnregisteredEvent>> questUnregisteredListeners = new ConcurrentHashMap<>();
 
     private final ConcurrentHashMap<UUID, Set<UUID>> questsToWorlds = new ConcurrentHashMap<>();
 
-    public WorldQuestService(JavaPlugin plugin) {
+    public WorldQuestService(@Nonnull JavaPlugin plugin, @Nonnull QuestStorage storage) {
+        this.storage = storage;
+
         plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
         plugin.getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, this::handleRemovedPlayerFromWorldEvent);
     }
@@ -45,11 +56,18 @@ public class WorldQuestService {
         return world.getEntityStore().getStore().getResource(WorldQuestStoreResource.getResourceType());
     }
 
+    @Nonnull
+    public static String indexKey(@Nonnull World world) {
+        return WORLD_INDEX_PREFIX + world.getWorldConfig().getUuid();
+    }
+
     public void addQuest(@Nonnull World world, @Nonnull UUID questId) {
         AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
         if (quest == null) return;
 
-        if (!getWorldQuestStoreFromWorld(world).questsRecord.register(questId)) return;
+        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
+        if (!store.questsRecord.register(questId)) return;
+        store.markDirty();
 
         LOGGER.atInfo().log("Added quest %s to world %s", questId, world.getName());
 
@@ -63,25 +81,47 @@ public class WorldQuestService {
     public void removeQuest(@Nonnull World world, @Nonnull UUID questId) {
         LOGGER.atInfo().log("Removing quest %s from world %s", questId, world.getName());
 
-        getWorldQuestStoreFromWorld(world).questsRecord.unregister(questId);
+        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
+        if (store.questsRecord.unregister(questId)) store.markDirty();
+
         untrackQuestForWorld(world, questId);
     }
 
     /**
-     * Assigns this world's quests to the entering player.
+     * Writes out the index of every world that changed, for the save pass and for shutdown.
+     */
+    public void saveAll(boolean force) {
+        for (World world : Universe.get().getWorlds().values()) {
+            WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
+            if (store == null) continue;
+
+            if (!store.consumeChanges() && !force) continue;
+
+            storage.saveIndex(indexKey(world), store.questsRecord.getAllIds());
+        }
+    }
+
+    /**
+     * Assigns this world's quests to the entering player, reading the index back on the first
+     * one in.
      */
     private void handleAddPlayerToWorldEvent(@Nonnull AddPlayerToWorldEvent addPlayerToWorldEvent) {
         var playerRef = addPlayerToWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;
 
         var world = addPlayerToWorldEvent.getWorld();
-        QuestsRecord questsRecord = getWorldQuestStoreFromWorld(world).questsRecord;
-        questsRecord.loadAll();
+        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
+        QuestsRecord questsRecord = store.questsRecord;
+
+        if (store.consumeNeedsLoad()) {
+            questsRecord.replaceAll(storage.loadIndex(indexKey(world)));
+        }
 
         for (UUID questId : new ArrayList<>(questsRecord.getAllIds())) {
             var quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null) {
                 questsRecord.unregister(questId);
+                store.markDirty();
                 continue;
             }
 
@@ -97,12 +137,14 @@ public class WorldQuestService {
         var playerRef = removedPlayerFromWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;
 
-        QuestsRecord questsRecord = getWorldQuestStoreFromWorld(removedPlayerFromWorldEvent.getWorld()).questsRecord;
+        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(removedPlayerFromWorldEvent.getWorld());
+        QuestsRecord questsRecord = store.questsRecord;
 
         for (UUID questId : new ArrayList<>(questsRecord.getAllIds())) {
             var quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null) {
                 questsRecord.unregister(questId);
+                store.markDirty();
                 continue;
             }
 

@@ -1,7 +1,5 @@
 package com.martelstudios.openquests.core.rewards.stores;
 
-import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -9,11 +7,11 @@ import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 
 import javax.annotation.Nullable;
 
+/**
+ * What one player is still owed, while they are online. Written down with the rest of their record
+ * rather than in their entity file, so a debt follows them to whichever server they land on next.
+ */
 public class PendingRewardStoreComponent implements Component<EntityStore> {
-    public static final BuilderCodec<PendingRewardStoreComponent> CODEC = BuilderCodec.builder(PendingRewardStoreComponent.class, PendingRewardStoreComponent::new)
-                                                                                      .append(new KeyedCodec<>("PendingRewardStore", PendingRewardStore.CODEC), (component, store) -> component.pending = store, component -> component.pending)
-                                                                                      .add()
-                                                                                      .build();
 
     public PendingRewardStore pending = new PendingRewardStore();
 

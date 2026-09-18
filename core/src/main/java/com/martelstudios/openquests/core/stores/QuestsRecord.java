@@ -1,96 +1,67 @@
 package com.martelstudios.openquests.core.stores;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.codec.codecs.set.SetCodec;
-import com.hypixel.hytale.logger.HytaleLogger;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
-
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The quests of one holder, by id — a player, a world, the universe. None of them holds the
+ * quests themselves: a quest is one object whoever it belongs to.
+ *
+ * <p>In memory only. The {@link com.martelstudios.openquests.core.persistence.QuestStorage}
+ * answers the same question from the other side: the players of a quest.
+ */
 public class QuestsRecord {
-    public static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
-
-    public static final BuilderCodec<QuestsRecord> CODEC = BuilderCodec.builder(QuestsRecord.class, QuestsRecord::new)
-                                                                       .append(new KeyedCodec<>("Quests", new SetCodec<>(Codec.UUID_STRING, HashSet<UUID>::new, false)), (questSet, uuids) -> questSet.questIds.addAll(uuids), (questSet) -> questSet.questIds)
-                                                                       .add()
-                                                                       .build();
 
     private final Set<UUID> questIds = ConcurrentHashMap.newKeySet();
-
-    private boolean loaded;
 
     public QuestsRecord() {
 
     }
 
-    public QuestsRecord(QuestsRecord other) {
+    public QuestsRecord(@Nonnull QuestsRecord other) {
         this.questIds.addAll(other.questIds);
-        this.loaded = other.loaded;
+    }
+
+    public QuestsRecord(@Nonnull Set<UUID> questIds) {
+        this.questIds.addAll(questIds);
     }
 
     /**
      * @return {@code true} if the quest was not already registered.
      */
-    public boolean register(UUID questId) {
+    public boolean register(@Nonnull UUID questId) {
         return this.questIds.add(questId);
     }
 
-    public boolean unregister(UUID questId) {
+    public boolean unregister(@Nonnull UUID questId) {
         return this.questIds.remove(questId);
     }
 
-    public boolean contains(UUID questId) {
+    public boolean contains(@Nonnull UUID questId) {
         return this.questIds.contains(questId);
     }
 
     /**
-     * Resolves every registered id, loading them first if needed.
-     *
-     * @return the quests of this scope, without the ids that no longer resolve.
+     * Drops everything and takes these instead, which is what reading a scope back amounts to.
      */
-    public List<AbstractQuestProgression<?>> getAllQuests() {
-        loadAll();
-
-        List<AbstractQuestProgression<?>> quests = new ArrayList<>(questIds.size());
-        for (UUID questId : questIds) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
-            if (quest != null) quests.add(quest);
-        }
-        return quests;
+    public void replaceAll(@Nonnull Set<UUID> questIds) {
+        this.questIds.retainAll(questIds);
+        this.questIds.addAll(questIds);
     }
 
     /**
      * @return the live set of registered quest ids.
      */
+    @Nonnull
     public Set<UUID> getAllIds() {
         return this.questIds;
     }
 
-    /**
-     * @return {@code true} the first time this is called for this resource instance, {@code false}
-     * afterward. Used to lazily load this world's quests into the {@link QuestProgressionStore} exactly once.
-     */
-    public boolean consumeNeedsLoad() {
-        if (loaded) return false;
-        loaded = true;
-        return true;
-    }
-
-    public void loadAll() {
-        if (!consumeNeedsLoad()) return;
-
-        for (UUID questId : new ArrayList<>(questIds)) {
-            var quest = QuestProgressionService.get().loadQuest(questId);
-            if (quest == null) {
-                questIds.remove(questId);
-                LOGGER.atWarning().log("Obsolete quest id %s, removed from store.", questId);
-            }
-        }
+    public boolean isEmpty() {
+        return this.questIds.isEmpty();
     }
 
     @Nullable

@@ -3,7 +3,7 @@ package com.martelstudios.openquests.core.rewards.services;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
@@ -14,6 +14,7 @@ import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStore;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
+import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
@@ -72,13 +73,7 @@ public class QuestRewardService {
         if (rewards.length == 0) return;
 
         for (UUID playerId : quest.getPlayers()) {
-            EntityComponents.update(playerId, components -> {
-                var pending = new PendingRewards(quest, rewards);
-
-                getPending(components).add(pending);
-
-                grantAuto(pending, components);
-            });
+            owe(playerId, new PendingRewards(quest, rewards));
         }
     }
 
@@ -94,9 +89,20 @@ public class QuestRewardService {
         QuestReward[] rewards = asset.getRewards(QuestState.ABANDONED);
         if (rewards.length == 0) return;
 
-        EntityComponents.update(questPlayerAbandonedEvent.getPlayerId(), components -> {
-            var pending = new PendingRewards(quest, rewards);
+        owe(questPlayerAbandonedEvent.getPlayerId(), new PendingRewards(quest, rewards));
+    }
 
+    /**
+     * Writes a debt down and settles what the quest claims. A player who is not there keeps it
+     * standing in their record, nothing holding their components to write it into.
+     */
+    private void owe(@Nonnull UUID playerId, @Nonnull PendingRewards pending) {
+        if (Universe.get().getPlayer(playerId) == null) {
+            QuestPlayerStateService.get().addPendingRewards(playerId, pending);
+            return;
+        }
+
+        EntityComponents.update(playerId, components -> {
             getPending(components).add(pending);
 
             grantAuto(pending, components);
@@ -105,12 +111,12 @@ public class QuestRewardService {
 
     /**
      * On world entry rather than on connection, so the player is there to be shown the reward.
+     *
+     * <p>Through the holder the event carries, which is where the player still is: they enter the
+     * store only once the join finishes, so asking for their entity here finds nothing.
      */
     private void handleAddPlayerToWorldEvent(@Nonnull AddPlayerToWorldEvent addPlayerToWorldEvent) {
-        var playerRef = addPlayerToWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
-        if (playerRef == null || playerRef.getReference() == null) return;
-
-        claimAuto(EntityComponents.of(playerRef.getReference()));
+        claimAuto(EntityComponents.of(addPlayerToWorldEvent.getHolder()));
     }
 
     /**
@@ -150,6 +156,7 @@ public class QuestRewardService {
 
             remaining.remove(reward);
             pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));
+            getPending(playerComponents).markDirty();
         }
 
         if (pending.isEmpty()) getPending(playerComponents).remove(pending.getQuestId());
@@ -168,6 +175,7 @@ public class QuestRewardService {
 
             remaining.remove(reward);
             pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));
+            getPending(playerComponents).markDirty();
         }
 
         if (pending.isEmpty()) getPending(playerComponents).remove(pending.getQuestId());

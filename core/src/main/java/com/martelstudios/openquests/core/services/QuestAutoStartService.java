@@ -32,6 +32,7 @@ public class QuestAutoStartService {
             if (!asset.isStartOnConnection()) continue;
             if (!questStore.getStartedOnConnection().add(asset.getId())) continue;
 
+            questStore.markDirty();
             QuestProgressionService.get().registerQuest(asset).addPlayer(playerId);
         }
     }
