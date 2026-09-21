@@ -83,6 +83,16 @@ backend answered.
 | Disk | `Disk` | JSON files under the universe directory. The default, and what a single server wants. |
 | JDBC | `Jdbc` | A relational database: tens of thousands of quests, and several servers sharing them. |
 
+#### Which one
+
+Disk is for a solo world or a server among friends. Memory is not what decides: a progression
+costs about 700 bytes in memory, so ten thousand of them fit in 7 MiB. What gives first is the
+file system — one file per quest, one read per quest a connecting player holds, and three file
+operations per quest a save pass writes.
+
+Move to JDBC past a few dozen regular players or a few thousand stored quests, and straight away
+if two servers share the same players: files cannot do that at all.
+
 A backend answers for three kinds of record, and nothing else:
 
 - **progressions**, one per quest, by id, by player, or the lot;
