@@ -10,7 +10,9 @@ No code required. Everything below works out of the box.
 
 _Combine quests as deep as you want and wire them together with AND and OR to get real branching progression. Beat the guardian with a sword, or find another way around._
 
-> 📦 **The chain above is a separate download.** OpenQuests installs with an empty quest list, on purpose: your server, your quests. Grab **[OpenQuests Examples](https://www.curseforge.com/hytale/mods/openquests-examples)** to start with the line you see here, read it as a worked example, and delete it the day your own chain replaces it.
+> 📦 **Everything in that screenshot is a free download.** Install **[OpenQuests Examples](https://www.curseforge.com/hytale/mods/openquests-examples)** next to OpenQuests and two quest lines are handed to your players the moment the server starts, in English and French. It is the quickest way to see what the system does, and the worked example to copy your own from.
+>
+> OpenQuests itself installs with an empty quest list, on purpose: your server, your quests. Delete the examples the day your own chain replaces them.
 
 ***
 
@@ -33,6 +35,8 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 🔔 **An ending you can hear.** A quest that finishes takes over the middle of the screen, the way discovering a zone does, and plays a sound you choose. New in 2.0.
 
 🈯 **English and French included.** Every line of text is translatable.
+
+🗄️ **Files or a database.** A small server keeps its quests as JSON and configures nothing. A large one, or several servers sharing the same players, points at PostgreSQL, MySQL, MariaDB or SQLite instead. New in 3.0.
 
 🛡️ **Checked at boot.** A missing reference or a loop between quests stops the server with a clear reason, instead of breaking in front of a player hours later.
 
@@ -175,13 +179,13 @@ The first needs nothing written. It is a `KillNpc` quest at universe scope.
 
 ### Installing
 
-Three parts, two of them required:
+Three parts. The first two are required, the third is where to start:
 
 | &nbsp;                 |&nbsp;                                                                    |
 | ---------------------- |------------------------------------------------------------------------- |
 | ⚔️ <strong>OpenQuests</strong> |this project: the quest types, the rewards, the journal and the tracker HUD |
 | ⚙️ <strong>OpenQuests Core</strong> |the system underneath, pulled in with it and usable on its own            |
-| 📦 <strong>OpenQuests Examples</strong> |optional: the quest line from the screenshot, yours to read and to delete |
+| 📦 <strong>OpenQuests Examples</strong> |two ready-made quest lines, the ones in the screenshots: play them, read them, delete them |
 
 Drop them in `mods/`. Nothing else to configure.
 
@@ -283,7 +287,7 @@ Titles and descriptions are optional. A quest with no title names itself from it
 
 ## 💻 For developers
 
-OpenQuests ships as two plugins. **OpenQuestsCore** is the system itself, and deliberately ships no quest type of its own. **OpenQuests** is everything layered on top: the fifteen quest types, the three reward types, the journal and the tracker HUD. It doubles as the reference for writing your own, one package per feature.
+OpenQuests ships as two plugins. **OpenQuestsCore** is the system itself, and deliberately ships no quest type of its own. **OpenQuests** is everything layered on top: the nineteen quest types, the three reward types, the journal and the tracker HUD. It doubles as the reference for writing your own, one package per feature.
 
 Depending on the core alone is enough to build a quest system of your own. Declare what you build on in the `manifest.json` your own mod ships: `"MartelStudios:OpenQuestsCore": "*"` for the system alone, `"MartelStudios:OpenQuests": "*"` if you also want the shipped types.
 
