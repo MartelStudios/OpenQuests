@@ -285,7 +285,7 @@ Titles and descriptions are optional. A quest with no title names itself from it
 
 OpenQuests ships as two plugins. **OpenQuestsCore** is the system itself, and deliberately ships no quest type of its own. **OpenQuests** is everything layered on top: the fifteen quest types, the three reward types, the journal and the tracker HUD. It doubles as the reference for writing your own, one package per feature.
 
-Depending on the core alone is enough to build a quest system of your own. Declare what you build on in your own `manifest.json`: `"MartelStudios:OpenQuestsCore": "*"` for the system alone, `"MartelStudios:OpenQuests": "*"` if you also want the shipped types.
+Depending on the core alone is enough to build a quest system of your own. Declare what you build on in the `manifest.json` your own mod ships: `"MartelStudios:OpenQuestsCore": "*"` for the system alone, `"MartelStudios:OpenQuests": "*"` if you also want the shipped types.
 
 A new quest type is one package and one entry point:
 

@@ -16,6 +16,8 @@ Around that, the core provides:
 
 It ships no quest type and no interface. On its own it does nothing visible — which is the point: it is what you build on.
 
-**Install this alongside OpenQuests**, which depends on it and pulls it in. It is also usable on its own if you would rather write every quest type yourself — declare `"MartelStudios:OpenQuestsCore": "*"` in your manifest and nothing else comes with it.
+**Running a server?** Drop it in `mods/` alongside OpenQuests, which depends on it. Nothing to edit.
+
+**Writing a mod?** The core is usable on its own if you would rather write every quest type yourself — declare `"MartelStudios:OpenQuestsCore": "*"` in the `manifest.json` your own mod ships, and nothing else comes with it.
 
 Source and documentation: [https://github.com/MartelStudios/OpenQuests](https://github.com/MartelStudios/OpenQuests) — MIT licensed.
