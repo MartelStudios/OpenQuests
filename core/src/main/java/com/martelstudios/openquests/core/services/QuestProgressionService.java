@@ -106,13 +106,14 @@ public class QuestProgressionService {
     }
 
     /**
-     * Unregisters a quest from the store and deletes its persisted file. Clean up all references left in any player/world/universe index.
+     * Unregisters a quest and does away with what was written of it. Cleans up every reference
+     * left in any player, world or universe index.
      *
      * @param questId the id of the quest to unregister
      */
     public AbstractQuestProgression<?> unregisterQuest(@Nonnull UUID questId) {
-        // Read back first: doing away with a quest has to reach its file and everyone indexing it,
-        // and a quest nobody currently holds is exactly the kind that gets deleted
+        // Read back first: doing away with a quest has to reach the storage and everyone indexing
+        // it, and a quest nobody currently holds is exactly the kind that gets deleted
         AbstractQuestProgression<?> quest = dataStore.load(questId);
         if (quest == null) return null;
 
@@ -120,12 +121,13 @@ public class QuestProgressionService {
     }
 
     /**
-     * Unregisters a quest from the store and deletes its persisted file. Clean up all references left in any player/world/universe index.
+     * Unregisters a quest and does away with what was written of it. Cleans up every reference
+     * left in any player, world or universe index.
      *
      * @param quest the quest to unregister
      */
     public AbstractQuestProgression<?> unregisterQuest(@Nonnull AbstractQuestProgression<?> quest) {
-        AbstractQuestProgression<?> removed = dataStore.removeAndDeleteFromDisk(quest.getId());
+        AbstractQuestProgression<?> removed = dataStore.removeAndDelete(quest.getId());
 
         if (removed == null) return null;
 
@@ -199,11 +201,12 @@ public class QuestProgressionService {
     }
 
     /**
-     * Pulls every persisted quest into memory. Not needed in normal operation, where quests are
-     * loaded on demand through the scope that references them.
+     * Pulls every stored quest into memory. Not needed in normal operation, where quests are
+     * loaded on demand through the scope that references them, and ruinous against a database
+     * several servers write to.
      */
     public void loadAllQuests() {
-        dataStore.loadAllFromDisk();
+        dataStore.loadAll();
     }
 
     /**

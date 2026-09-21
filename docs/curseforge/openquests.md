@@ -207,7 +207,37 @@ Each of the three outcome commands takes a quest id or an asset id, the second r
 
 ### Storage
 
-Progression is written where it costs least. A quest with one player lives in that player's own file, a quest shared by several gets a file of its own. `PersistProgression` and `PersistHistory` turn either off for quests that should not outlive the session.
+Every quest is written on its own, as a JSON file under your universe. `PersistProgression` and `PersistHistory` turn that off for quests that should not outlive the session.
+
+That suits a solo world or a server among friends. Past a few dozen regular players, or as soon as two servers share the same players, point OpenQuests at a database instead — `config.json` in the mod's folder:
+
+```json
+{
+  "Storage": {
+    "Type": "Jdbc",
+    "Url": "jdbc:postgresql://localhost:5432/openquests",
+    "User": "openquests",
+    "Password": "…",
+    "DriverPath": "libs/postgresql-42.7.4.jar"
+  }
+}
+```
+
+PostgreSQL, MySQL, MariaDB and SQLite are spoken natively. Drop the driver jar for your database beside the server and name it under `DriverPath`; none is bundled, so you choose your database and update its driver on your own schedule.
+
+`config.json` lives in `mods/MartelStudios_OpenQuestsCore/`. If a database password has no business sitting there, set the `OPENQUESTS_CONFIG` environment variable to a file anywhere else and it is read instead. A path that cannot be read stops the server rather than quietly falling back to files.
+
+***
+
+## ⚠️ Upgrading to 3.0
+
+3.0 is a breaking release. Read this before updating a live server.
+
+Every quest now gets a record of its own. Quests shared by several players carry over untouched; what used to travel inside a player's own file (their solo quests, the catalogue they had been offered, what they were still owed) is not read anymore, and those players start over. Nothing is deleted: the data is still in the entity files, waiting for a migration.
+
+**Plugins built on OpenQuests Core need recompiling.** Where a quest is stored moved behind one interface, so the storage classes changed shape.
+
+Back up your world and try the update on a copy first.
 
 ***
 

@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 
@@ -25,13 +26,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UniverseQuestService {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    private static final String UNIVERSE_QUEST_INDEX_KEY = "universe";
+    /**
+     * The key this scope's index is written under, shared with every server on the same storage.
+     */
+    public static final String UNIVERSE_INDEX_KEY = "universe";
 
-    private final QuestsStore questsStore;
+    private final QuestStorage storage;
+    private final QuestsRecord quests = new QuestsRecord();
     private final ConcurrentHashMap<UUID, EventRegistration<UUID, QuestUnregisteredEvent>> questUnregisteredListeners = new ConcurrentHashMap<>();
 
-    public UniverseQuestService(JavaPlugin javaPlugin, QuestsStore questsStore) {
-        this.questsStore = questsStore;
+    private boolean dirty;
+
+    public UniverseQuestService(@Nonnull JavaPlugin javaPlugin, @Nonnull QuestStorage storage) {
+        this.storage = storage;
         javaPlugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
     }
 
@@ -40,19 +47,20 @@ public class UniverseQuestService {
     }
 
     /**
-     * @return the live index of universe quests, owned by the store so that mutating it is
-     * exactly what gets persisted.
+     * @return the live index of universe quests. Mutating it is what gets persisted on the next
+     * pass, so a caller adding an id here should say so through {@link #addQuest}.
      */
     @Nonnull
     public QuestsRecord getQuests() {
-        return questsStore.get(UNIVERSE_QUEST_INDEX_KEY);
+        return quests;
     }
 
     public void addQuest(@Nonnull UUID questId) {
         AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
         if (quest == null) return;
 
-        if (!getQuests().register(questId)) return;
+        if (!quests.register(questId)) return;
+        dirty = true;
 
         LOGGER.atInfo().log("Added quest %s to universe", questId);
 
@@ -66,21 +74,21 @@ public class UniverseQuestService {
     public void removeQuest(@Nonnull UUID questId) {
         LOGGER.atInfo().log("Removing quest %s from universe", questId);
 
-        getQuests().unregister(questId);
+        if (quests.unregister(questId)) dirty = true;
         untrackQuest(questId);
     }
 
     /**
-     * Loads the universe-scope quest index and pulls every quest it lists into the datastore.
-     * Re-arms the tracking, without which a quest completed after a restart would leave its id
-     * in the index forever.
+     * Reads the universe index back and pulls every quest it lists into memory. Re-arms the
+     * tracking, without which a quest completed after a restart would never leave the index.
      */
     public void loadQuests() {
-        QuestsRecord quests = questsStore.load(UNIVERSE_QUEST_INDEX_KEY);
+        quests.replaceAll(storage.loadIndex(UNIVERSE_INDEX_KEY));
 
         for (UUID questId : new ArrayList<>(quests.getAllIds())) {
             if (QuestProgressionService.get().loadQuest(questId) == null) {
                 quests.unregister(questId);
+                dirty = true;
                 continue;
             }
 
@@ -88,24 +96,31 @@ public class UniverseQuestService {
         }
     }
 
-    public void saveUniverseQuestIndex() {
-        questsStore.save(UNIVERSE_QUEST_INDEX_KEY);
+    /**
+     * @param force writes the index even if nothing changed, for a shutdown that nothing will
+     * follow.
+     */
+    public void saveQuests(boolean force) {
+        if (!dirty && !force) return;
+
+        storage.saveIndex(UNIVERSE_INDEX_KEY, quests.getAllIds());
+        dirty = false;
     }
 
     /**
-     * Assigns every universe quest to a connecting player, through their incoming holder rather
-     * than their id: they are not online yet, and stored data would be overwritten.
+     * Assigns every universe quest to a connecting player through their incoming holder: they are
+     * not online yet, and stored data would be overwritten.
      */
     private void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
         var holder = playerConnectEvent.getHolder();
         var playerRef = holder.getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;
 
-        QuestsRecord quests = getQuests();
         for (UUID questId : new ArrayList<>(quests.getAllIds())) {
             AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null) {
                 quests.unregister(questId);
+                dirty = true;
                 continue;
             }
 

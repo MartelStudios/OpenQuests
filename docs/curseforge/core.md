@@ -9,7 +9,7 @@ A quest here is two objects. An **asset** describes it — title, parameters, re
 Around that, the core provides:
 
 *   **A lifecycle.** Registering, progressing, completing, archiving and unregistering a quest, with events published at each step so other plugins can react without being wired in.
-*   **Storage that adapts.** A quest held by one player is written with that player; a quest shared by several gets a file of its own. Nothing to configure.
+*   **Storage you choose.** JSON files out of the box, a JDBC database when one server stops being enough. Everything above is written against a single interface and never learns which answered.
 *   **Scopes.** A quest belongs to one player, to everyone in a world, or to the whole server.
 *   **A history.** Completions are recorded per player, with rewards that survive a failed delivery and are retried later.
 *   **Extension points.** Quest types, reward types and their serialization are registered from your own plugin. The core never learns they exist.

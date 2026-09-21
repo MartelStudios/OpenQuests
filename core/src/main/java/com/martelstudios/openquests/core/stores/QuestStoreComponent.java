@@ -1,67 +1,50 @@
 package com.martelstudios.openquests.core.stores;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
-import com.hypixel.hytale.codec.codecs.set.SetCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
-import com.martelstudios.openquests.core.models.QuestAsset;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The quests of one player. Every quest they take part in is indexed here; those they are alone in
- * are also held whole, so they need no file of their own.
+ * The quests of one player while they are online: which ones they take part in, and which of the
+ * catalogue they have already been offered.
+ *
+ * <p>Never written to the player's entity file: where a quest is kept is the
+ * {@link com.martelstudios.openquests.core.persistence.QuestStorage}'s business, and this is the
+ * reverse index it fills on connection.
+ *
+ * <p>It stays a component because it is the marker every quest system queries on.
  */
 public class QuestStoreComponent implements Component<EntityStore> {
-    public static final BuilderCodec<QuestStoreComponent> CODEC = BuilderCodec.builder(QuestStoreComponent.class, QuestStoreComponent::new)
-                                                                              .append(new KeyedCodec<>("SharedQuests", QuestsRecord.CODEC), (component, quests) -> component.quests = quests, QuestStoreComponent::getSharedQuests)
-                                                                              .add()
-                                                                              .append(new KeyedCodec<>("OwnQuests", new ArrayCodec<>(AbstractQuestProgression.CODEC, AbstractQuestProgression<?>[]::new)), QuestStoreComponent::setOwnQuests, QuestStoreComponent::getOwnQuestsArray)
-                                                                              .add()
-                                                                              .append(new KeyedCodec<>("StartedOnConnection", new SetCodec<>(Codec.STRING, HashSet<String>::new, false)), (component, ids) -> component.startedOnConnection.addAll(ids), component -> component.startedOnConnection)
-                                                                              .add()
-                                                                              .build();
 
-    /**
-     * Every quest of this player, whichever store holds it. Decoded from the shared half alone,
-     * the own quests putting their ids back as they are read.
-     */
     private QuestsRecord quests = new QuestsRecord();
 
     /**
-     * Progressions this player is responsible for persisting, kept whole rather than as a file of
-     * their own.
-     */
-    private final Map<UUID, AbstractQuestProgression<?>> ownQuests = new ConcurrentHashMap<>();
-
-    /**
-     * Asset ids already handed to this player by {@code StartOnConnection}. Only this set is kept
-     * between sessions, not the quests themselves, so a catalogue offered to everyone costs one
-     * string per quest actually taken.
+     * Asset ids already handed to this player by {@code StartOnConnection}. Only these are kept
+     * between sessions, not the quests made from them, so a catalogue offered to everyone costs
+     * one string per quest actually taken.
      */
     private final Set<String> startedOnConnection = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Set when something here changed and the player's record is owed a write.
+     */
+    private transient boolean dirty;
 
     public QuestStoreComponent() {
 
     }
 
-    public QuestStoreComponent(QuestStoreComponent other) {
+    public QuestStoreComponent(@Nonnull QuestStoreComponent other) {
         this.quests = other.quests.clone();
-        this.ownQuests.putAll(other.ownQuests);
         this.startedOnConnection.addAll(other.startedOnConnection);
+        this.dirty = other.dirty;
     }
 
     @Nullable
@@ -75,7 +58,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
     }
 
     /**
-     * @return the index of every quest of this player, own ones included.
+     * @return the index of every quest of this player.
      */
     @Nonnull
     public QuestsRecord getQuests() {
@@ -90,88 +73,41 @@ public class QuestStoreComponent implements Component<EntityStore> {
         return quests.getAllIds();
     }
 
-    public void loadQuests() {
-        quests.loadAll();
-    }
-
-    /**
-     * Takes over persisting a quest. Doing so is harmless for a shared one: what is written back
-     * is decided at encode time, not here.
-     */
-    public void addOwnQuest(@Nonnull AbstractQuestProgression<?> quest) {
-        ownQuests.put(quest.getId(), quest);
-    }
-
-    public void removeOwnQuest(@Nonnull UUID questId) {
-        ownQuests.remove(questId);
-    }
-
-    /**
-     * @return the progressions this player persists, by id.
-     */
-    @Nonnull
-    public Map<UUID, AbstractQuestProgression<?>> getOwnQuests() {
-        return ownQuests;
-    }
-
     @Nonnull
     public Set<String> getStartedOnConnection() {
         return startedOnConnection;
     }
 
     /**
-     * Writes back only what this player holds alone. A quest that gained a second player is dropped
-     * here and picked up by the quest store's own files, which is the whole migration.
-     */
-    @Nonnull
-    private AbstractQuestProgression<?>[] getOwnQuestsArray() {
-        return ownQuests.values()
-                        .stream()
-                        .filter(p -> shouldBeHeldByOwner(p) && isPersisted(p))
-                        .toArray(AbstractQuestProgression<?>[]::new);
-    }
-
-    private void setOwnQuests(@Nonnull AbstractQuestProgression<?>[] quests) {
-        for (AbstractQuestProgression<?> quest : quests) {
-            ownQuests.put(quest.getId(), quest);
-            this.quests.register(quest.getId());
-        }
-    }
-
-    /**
-     * The ids left to resolve from elsewhere. Quests written whole below are left out, and so are
-     * the ones no store will write: their id would only resolve to nothing next session.
+     * Takes over what was read back for this player, which is how a session starts.
      *
-     * <p>A quest that has left memory is kept on its id alone rather than looked at: it went out
-     * under a file of its own, which is what an id resolves to.
+     * @param questIds the quests that answered, not the ids their record listed, so a dead id is
+     * dropped here rather than carried another session.
      */
-    @Nonnull
-    private QuestsRecord getSharedQuests() {
-        QuestsRecord shared = new QuestsRecord();
+    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Set<String> startedOnConnection) {
+        quests.replaceAll(questIds);
+        this.startedOnConnection.addAll(startedOnConnection);
+        dirty = false;
+    }
 
-        for (UUID questId : quests.getAllIds()) {
-            AbstractQuestProgression<?> quest = ownQuests.get(questId);
-            if (quest == null) quest = QuestProgressionService.get().getQuest(questId);
-
-            if (quest != null && (shouldBeHeldByOwner(quest) || !isPersisted(quest))) continue;
-
-            shared.register(questId);
-        }
-        return shared;
+    public void markDirty() {
+        this.dirty = true;
     }
 
     /**
-     * @return {@code true} if this quest is written with its only player rather than in a file.
+     * @return {@code true} if this player's record changed since the last write, without clearing
+     * the flag.
      */
-    private static boolean shouldBeHeldByOwner(@Nonnull AbstractQuestProgression<?> quest) {
-        return quest.getHolderCount() <= 1;
+    public boolean hasChanges() {
+        return dirty;
     }
 
     /**
-     * @return {@code true} if this quest is meant to survive a restart at all.
+     * @return {@code true} if this player's record changed since the last call, clearing the flag.
      */
-    private static boolean isPersisted(@Nonnull AbstractQuestProgression<?> quest) {
-        QuestAsset asset = quest.getAsset();
-        return asset == null || asset.isPersistProgression();
+    public boolean consumeChanges() {
+        if (!dirty) return false;
+        dirty = false;
+        return true;
     }
 }

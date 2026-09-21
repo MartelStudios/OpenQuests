@@ -1,0 +1,45 @@
+# A PostgreSQL to point the JDBC backend at while developing, and a browser to read it with.
+#
+#   docker compose -f docker/postgres.yml up -d
+#   ./gradlew :core:test -Popenquests.jdbc.url=jdbc:postgresql://localhost:5433/openquests \
+#                        -Popenquests.jdbc.user=openquests \
+#                        -Popenquests.jdbc.password=openquests
+#
+# Adminer lands on http://localhost:8081/?pgsql=postgres&username=openquests&db=openquests
+# with everything but the password filled in — which is openquests.
+#
+# Port 5433 so it does not argue with a PostgreSQL already installed on the machine, and both
+# ports are bound to the loopback: the credentials here are a development convenience, not
+# something to offer the rest of the network.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: openquests-postgres
+    environment:
+      POSTGRES_DB: openquests
+      POSTGRES_USER: openquests
+      POSTGRES_PASSWORD: openquests
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - openquests-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openquests -d openquests"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  adminer:
+    image: adminer:5
+    container_name: openquests-adminer
+    ports:
+      - "127.0.0.1:8081:8080"
+    environment:
+      # The compose service name, which is what the container resolves on its own network
+      ADMINER_DEFAULT_SERVER: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  openquests-postgres:

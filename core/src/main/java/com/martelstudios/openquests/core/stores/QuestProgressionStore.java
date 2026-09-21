@@ -1,33 +1,37 @@
 package com.martelstudios.openquests.core.stores;
 
-import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.hypixel.hytale.server.core.universe.datastore.DataStore;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
 import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
-import com.martelstudios.openquests.core.models.QuestAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.persistence.QuestStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The quests in memory, and nothing about where they are kept: a {@link QuestStorage} answers for
+ * that, and this holds what has been read back, indexes it by type, and keeps what ended apart
+ * from what is still running.
+ */
 public class QuestProgressionStore {
-    @Nonnull
-    private final static HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     @Nonnull
     private final Map<UUID, AbstractQuestProgression<?>> quests = new ConcurrentHashMap<>();
 
     /**
-     * Quests that ended and are kept for the reading. Held apart from the live ones rather than
-     * told apart by their state: everything that walks the store — a ticking system, a visitor —
-     * wants what can still move, and a quest that is over would be walked forever otherwise.
-     *
-     * <p>Reachable by id all the same, which is what lets a finished chain still be opened, its
-     * steps still be named, and a prerequisite still be answered.
+     * Quests that ended, held apart from the live ones rather than told apart by their state:
+     * everything walking the store wants what can still move. Reachable by id all the same, so a
+     * finished chain still opens and a prerequisite still answers.
      */
     @Nonnull
     private final Map<UUID, AbstractQuestProgression<?>> archived = new ConcurrentHashMap<>();
@@ -35,23 +39,21 @@ public class QuestProgressionStore {
     @Nonnull
     private final Map<Class<?>, Set<UUID>> idsByType = new ConcurrentHashMap<>();
 
-    /**
-     * Quests that have a file of their own. A quest earns one by being shared, and keeps it even if
-     * it later drops back to a single player.
-     */
     @Nonnull
-    private final Set<UUID> fileBacked = ConcurrentHashMap.newKeySet();
+    private final QuestStorage storage;
+
+    public QuestProgressionStore(@Nonnull QuestStorage storage) {
+        this.storage = storage;
+    }
 
     @Nonnull
-    public final DataStore<QuestProgressionRecord> dataStore;
-
-    public QuestProgressionStore(@Nonnull DataStore<QuestProgressionRecord> dataStore) {
-        this.dataStore = dataStore;
+    public QuestStorage getStorage() {
+        return storage;
     }
 
     /**
-     * A quest read back from disk having already ended goes straight to the archive, so the split
-     * survives a restart without being written down anywhere.
+     * A quest read back having already ended goes straight to the archive, so the split survives a
+     * restart without being written down anywhere.
      */
     public void add(@Nonnull AbstractQuestProgression<?> quest) {
         if (quests.containsKey(quest.getId()) || archived.containsKey(quest.getId())) return;
@@ -70,8 +72,8 @@ public class QuestProgressionStore {
     }
 
     /**
-     * Drops a quest from memory, leaving its file where it is: the next lookup by id reads it back.
-     * What it changed is written out first, since nothing else will now hold it.
+     * Drops a quest from memory, leaving it where it is stored: the next lookup by id reads it
+     * back. What it changed is written out first, since nothing else will now hold it.
      *
      * @return {@code null} for a quest the store was not holding.
      */
@@ -79,7 +81,7 @@ public class QuestProgressionStore {
         AbstractQuestProgression<?> quest = quests.containsKey(id) ? quests.get(id) : archived.get(id);
         if (quest == null) return null;
 
-        saveToDisk(quest);
+        save(quest);
 
         if (remove(id) == null) archived.remove(id);
 
@@ -93,7 +95,7 @@ public class QuestProgressionStore {
 
     /**
      * Moves a quest that ended out of the way of everything that walks the live ones, keeping it
-     * answerable by id. Its file stays where it is: what changed is which map holds it, and the
+     * answerable by id. What it is stored as does not change: only which map holds it, and the
      * quest itself already says it is over.
      *
      * @return {@code false} for a quest the live half was not holding.
@@ -117,21 +119,14 @@ public class QuestProgressionStore {
     }
 
     /**
-     * Removes a quest from memory and deletes its persisted file, if any.
+     * Removes a quest from memory and does away with what was written of it.
      */
-    public AbstractQuestProgression<?> removeAndDeleteFromDisk(@Nonnull UUID id) {
+    public AbstractQuestProgression<?> removeAndDelete(@Nonnull UUID id) {
         AbstractQuestProgression<?> quest = remove(id);
         if (quest == null) quest = archived.remove(id);
         if (quest == null) return null;
 
-        fileBacked.remove(id);
-
-        try {
-            dataStore.remove(id.toString());
-        } catch (IOException e) {
-            LOGGER.atWarning().withCause(e).log("Failed to delete quest %s from disk", id);
-        }
-
+        storage.deleteProgression(quest);
         return quest;
     }
 
@@ -166,6 +161,21 @@ public class QuestProgressionStore {
     }
 
     /**
+     * @return those of the given quests that are in memory, running or ended alike. Never reads
+     * anything back: a caller resolving an index wants what is there, not what could be.
+     */
+    @Nonnull
+    public List<AbstractQuestProgression<?>> resolveAll(@Nonnull Collection<UUID> questIds) {
+        List<AbstractQuestProgression<?>> resolved = new ArrayList<>(questIds.size());
+
+        for (UUID questId : questIds) {
+            AbstractQuestProgression<?> quest = get(questId);
+            if (quest != null) resolved.add(quest);
+        }
+        return resolved;
+    }
+
+    /**
      * @return the ids of every registered quest of the given concrete type, or an
      * empty set if none. Never {@code null}.
      */
@@ -176,65 +186,92 @@ public class QuestProgressionStore {
     }
 
     /**
-     * Persists a single quest, but only if {@link AbstractQuestProgression#hasChanges()} and {@link QuestAsset#isPersistProgression()}
+     * Writes one quest out, for a caller letting go of it. Everything else goes through
+     * {@link #saveAll} or {@link #save(Collection)}: a backend charges per call, not per quest.
      */
-    public void saveToDisk(@Nonnull AbstractQuestProgression<?> quest) {
-        if (!quest.consumeChanges()) return;
-
-        QuestAsset asset = quest.getAsset();
-        if (asset != null && !asset.isPersistProgression()) return;
-        if (!isFileBacked(quest)) return;
-
-        dataStore.save(quest.getId().toString(), new QuestProgressionRecord(quest));
-        fileBacked.add(quest.getId());
+    public void save(@Nonnull AbstractQuestProgression<?> quest) {
+        save(List.of(quest));
     }
 
     /**
-     * A quest held by a single player is written with that player instead, which is what keeps the
-     * quest directory from growing with one file per player and per quest.
-     */
-    public boolean isFileBacked(@Nonnull AbstractQuestProgression<?> quest) {
-        return quest.getHolderCount() > 1 || fileBacked.contains(quest.getId());
-    }
-
-    /**
-     * Persists every quest that changed since the last pass.
-     */
-    public void saveAllToDisk() {
-        for (AbstractQuestProgression<?> quest : quests.values()) {
-            saveToDisk(quest);
-        }
-
-        // The archive too: a quest is marked dirty by the very change that ended it, and skipping
-        // it here would leave the outcome it was archived for unwritten
-        for (AbstractQuestProgression<?> quest : archived.values()) {
-            saveToDisk(quest);
-        }
-    }
-
-    /**
-     * Loads every persisted quest from disk into memory, rebuilding the type index.
-     */
-    public void loadAllFromDisk() {
-        Map<String, QuestProgressionRecord> records;
-        try {
-            records = dataStore.loadAll();
-        } catch (IOException e) {
-            LOGGER.atWarning().withCause(e).log("Failed to load quests from disk");
-            return;
-        }
-
-        for (QuestProgressionRecord record : records.values()) {
-            if (record == null || record.quest == null) continue;
-            add(record.quest);
-        }
-    }
-
-    /**
-     * Reads a quest back in, or hands over the one already there. The way into the store, and the
-     * one place a lookup is allowed to cost a disk read and to announce what it found.
+     * Writes out those of the given quests that changed and are meant to be kept, as one batch.
      *
-     * @return {@code null} for an id nothing on disk answers to.
+     * <p>A batch that fails is marked dirty again, so a database down for a minute does not take
+     * an hour of play with it.
+     */
+    public void save(@Nonnull Collection<AbstractQuestProgression<?>> candidates) {
+        List<AbstractQuestProgression<?>> dirty = new ArrayList<>();
+
+        for (AbstractQuestProgression<?> quest : candidates) {
+            if (!isPersisted(quest)) continue;
+            if (!quest.consumeChanges()) continue;
+
+            dirty.add(quest);
+        }
+
+        if (dirty.isEmpty()) return;
+
+        try {
+            storage.saveProgressions(dirty);
+        } catch (RuntimeException e) {
+            for (AbstractQuestProgression<?> quest : dirty) {
+                quest.markDirty();
+            }
+
+            throw e;
+        }
+    }
+
+    /**
+     * Writes out every quest that changed since the last pass.
+     */
+    public void saveAll() {
+        List<AbstractQuestProgression<?>> candidates = new ArrayList<>(quests.size() + archived.size());
+        candidates.addAll(quests.values());
+
+        // The archive too: a quest is marked dirty by the very change that ended it
+        candidates.addAll(archived.values());
+
+        save(candidates);
+    }
+
+    /**
+     * Pulls every stored quest into memory, rebuilding the type index.
+     */
+    public void loadAll() {
+        for (AbstractQuestProgression<?> quest : storage.loadAllProgressions()) {
+            add(quest);
+        }
+    }
+
+    /**
+     * Reads back everything one player takes part in, in one go: a quest at a time would make
+     * connecting cost a round trip per quest.
+     *
+     * @return the quests now in memory for that player, those they were already holding included.
+     */
+    @Nonnull
+    public List<AbstractQuestProgression<?>> loadForPlayer(@Nonnull UUID playerId) {
+        List<AbstractQuestProgression<?>> loaded = storage.loadPlayerProgressions(playerId);
+
+        for (AbstractQuestProgression<?> quest : loaded) {
+            add(quest);
+        }
+
+        // add() keeps whichever instance was already there; the one just read is a copy
+        List<AbstractQuestProgression<?>> held = new ArrayList<>(loaded.size());
+        for (AbstractQuestProgression<?> quest : loaded) {
+            AbstractQuestProgression<?> current = get(quest.getId());
+            if (current != null) held.add(current);
+        }
+        return held;
+    }
+
+    /**
+     * Reads a quest back in, or hands over the one already there. The one lookup allowed to cost
+     * a read and to announce what it found.
+     *
+     * @return {@code null} for an id nothing answers to.
      */
     @Nullable
     public AbstractQuestProgression<?> load(@Nonnull UUID id) {
@@ -242,21 +279,20 @@ public class QuestProgressionStore {
         if (quest == null) quest = archived.get(id);
         if (quest != null) return quest;
 
-        QuestProgressionRecord record;
-        try {
-            record = dataStore.load(id.toString());
-        } catch (IOException e) {
-            LOGGER.atWarning().withCause(e).log("Failed to load quest %s from disk", id);
-            return null;
-        }
+        AbstractQuestProgression<?> read = storage.loadProgression(id);
+        if (read == null) return null;
 
-        if (record == null || record.quest == null) return null;
-
-        add(record.quest);
-        fileBacked.add(id);
+        add(read);
 
         // Whichever half add() put it in: one that ended came back to the archive
-        return record.quest;
+        return get(id);
     }
 
+    /**
+     * @return {@code true} if this quest is meant to survive a restart at all.
+     */
+    public static boolean isPersisted(@Nonnull AbstractQuestProgression<?> quest) {
+        QuestAsset asset = quest.getAsset();
+        return asset == null || asset.isPersistProgression();
+    }
 }

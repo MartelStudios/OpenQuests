@@ -33,7 +33,7 @@ Depending on `OpenQuestsCore` alone is enough to build your own quest types;
 | `QuestVisitor` | Carries the context of an event to the quests it can progress. |
 | `QuestReward` | What a terminal state grants. Polymorphic on `"Type"`. |
 | `QuestProgressionService` | Entry point: register, progress, complete, unregister. |
-| `QuestHistoryStore` | Per-player record of completed quests, with claim state and date. |
+| `QuestStorage` | Where all of it is kept. Pluggable: JSON files or a JDBC database. |
 
 ### Handing quests out
 
@@ -54,7 +54,7 @@ lets a composite fail rather than hang.
 ### Scopes
 
 A quest only ever knows its players: `AbstractQuestProgression` is the single source of truth,
-and `QuestStoreComponent` is the reverse index used to know what to load. Scope is applied from
+and `QuestStoreComponent` is the reverse index a session reads it back through. Scope is applied from
 the outside, from `core/scopes/`, and each scope package is self-contained — the rest of the core
 never depends on it, only the reverse.
 
@@ -74,13 +74,149 @@ instanced events:
 
 ### Storage
 
-Progression is written where it costs least. A quest with a single player is held whole inside
-that player's own file; one shared by several gets a file of its own. A quest that gains a second
-player moves from the first to the second and stays there: moving it back would lose it on the
-way.
+Where a quest is kept is decided by one interface, `QuestStorage`, and named in `config.json`.
+Everything above it — services, scopes, the journal — is written against it and never learns which
+backend answered.
 
-None of this is visible from the outside: `QuestProgressionService` resolves a quest by id
-whichever store holds it.
+| Backend | `"Type"` | For |
+| --- | --- | --- |
+| Disk | `Disk` | JSON files under the universe directory. The default, and what a single server wants. |
+| JDBC | `Jdbc` | A relational database: tens of thousands of quests, and several servers sharing them. |
+
+#### Which one
+
+Disk is for a solo world or a server among friends. Memory is not what decides: a progression
+costs about 700 bytes in memory, so ten thousand of them fit in 7 MiB. What gives first is the
+file system — one file per quest, one read per quest a connecting player holds, and three file
+operations per quest a save pass writes.
+
+Move to JDBC past a few dozen regular players or a few thousand stored quests, and straight away
+if two servers share the same players: files cannot do that at all.
+
+A backend answers for three kinds of record, and nothing else:
+
+- **progressions**, one per quest, by id, by player, or the lot;
+- **indexes**, a named set of quest ids, which is how a scope remembers what it handed out —
+  `universe` for the universe scope, `world:<uuid>` per world;
+- **player records**, what a player carries besides their quests: the catalogue they have already
+  been offered, and what they are still owed.
+
+Who holds a quest is read off the quest itself: `AbstractQuestProgression.getPlayers()` is the
+source of truth, and a backend keeps whatever reverse index it needs to answer "the quests of this
+player" in one lookup.
+
+#### Configuration
+
+`config.json`, in the plugin's data directory, written with its defaults on first boot:
+
+```json
+{
+  "Storage": { "Type": "Disk", "Path": "quests" },
+  "SaveIntervalMinutes": 5
+}
+```
+
+For JDBC:
+
+```json
+{
+  "Storage": {
+    "Type": "Jdbc",
+    "Url": "jdbc:postgresql://localhost:5432/openquests",
+    "User": "openquests",
+    "Password": "…",
+    "DriverPath": "libs/postgresql-42.7.4.jar",
+    "ServerId": "survival-1"
+  },
+  "SaveIntervalMinutes": 5
+}
+```
+
+| Key | Default | |
+| --- | --- | --- |
+| `Url` | — | Required. The dialect is read off it. |
+| `User`, `Password` | none | Left out for a URL carrying its own credentials. |
+| `DriverPath` | none | The driver jar, relative to the server directory. No driver is shipped, so one database is not chosen for you and a driver is updated without waiting for a release. Left out for a driver already on the classpath. |
+| `DriverClass` | none | Left out for a driver jar that declares itself, which every current one does. |
+| `TablePrefix` | `openquests_` | Letters, digits and underscores. |
+| `PoolSize` | `8` | Connections held open. |
+| `ConnectionTimeoutSeconds` | `10` | How long a caller waits for one. |
+| `CreateSchema` | `true` | Turn off where the schema is managed elsewhere. |
+| `ServerId` | `server` | Written into `updated_by`, which is what tells one server's writes from another's. |
+| `Dialect` | from the URL | `Postgresql`, `Mysql`, `Mariadb`, `Sqlite`, `H2`, `Generic`. Only for a database reached through a proxy borrowing another vendor's URL scheme. |
+
+PostgreSQL, MySQL, MariaDB and SQLite are spoken natively; anything else falls back to plain
+SQL-92 and works.
+
+#### Schema
+
+```
+openquests_quest        (id, asset_id, state, data, updated_at, updated_by)
+openquests_quest_player (quest_id, player_id, abandoned)
+openquests_quest_index  (index_key, quest_id)
+openquests_player       (player_id, data, updated_at)
+```
+
+The quest document lives in `data` as the same JSON the disk backend writes, so a quest written by
+one backend is readable by the other. `asset_id` and `state` are lifted out beside it, so counting
+what is running is a query rather than a scan.
+
+#### Several servers on one database
+
+A player is handed over cleanly: their session is written out when they disconnect and read back
+when they connect, quests, catalogue and debts alike. Nothing of theirs is left in the entity file
+of the server they were on.
+
+A quest several servers hold **at once** — a universe-scope community goal — is another matter:
+each keeps its own copy in memory and the last save wins. `updated_at` and `updated_by` say which
+server that was. Treat cross-server universe quests as a known limit rather than a feature.
+
+#### Where the config file lives
+
+`config.json` sits in the plugin data directory, which is `mods/MartelStudios_OpenQuestsCore/` on an
+installed server. Two cases where that is the wrong place, and both are answered by naming another
+file:
+
+- the Gradle workspace deletes and re-links that directory on every `runAllMods`, so nothing written
+  there survives to the next launch;
+- a database password is the last thing to leave sitting in the mods directory.
+
+Set `OPENQUESTS_CONFIG`, or the system property `openquests.config`, to a path. It replaces
+`config.json` whole, and a path that cannot be read stops the server rather than quietly falling
+back to files.
+
+The dev run reads the same path from the `openquests.config` Gradle property, which
+`gradle.properties` already carries commented out — uncomment it and every launch picks it up,
+whatever shell or IDE started it:
+
+```properties
+openquests.config = run/openquests-jdbc.json
+```
+
+`-Popenquests.config=…` on the command line works from bash and from `cmd`, but **not** from
+PowerShell: it splits an argument holding a dot before `gradlew.bat` ever sees it, and Gradle is
+handed `-Popenquests` and `.config=…` as two arguments. Neither quoting nor `--%` avoids it.
+
+#### Coming from an earlier version
+
+Quests used to travel two ways: one held by a single player went inside that player's entity file,
+one shared by several got a file of its own. The first is what left the system with nothing to put
+behind an interface, since nothing above could be told where a quest was without also being told
+how many players it had. Every quest now gets a record of its own.
+
+Shared quests carry over untouched: same directory, same format. What a player's entity file held —
+their solo quests, the catalogue they had been offered, what they were owed — is not read any more,
+and those players start over. None of it is destroyed: the server keeps the data of a component it
+does not recognise, so it is still sitting in the entity files under `Unknown` for a migration to
+read.
+
+#### Writing a backend
+
+Register a provider and name it in the config:
+
+```java
+QuestStorageProvider.CODEC.register("Redis", RedisStorageProvider.class, RedisStorageProvider.CODEC);
+```
 
 ### Lifecycle
 
@@ -95,7 +231,7 @@ Three asset flags change what a quest does when it completes:
 | Flag | Default | Effect when `false` |
 | --- | --- | --- |
 | `StopOnComplete` | `true` | The quest keeps running once complete, staying re-evaluable, so its state can still change. Nothing is recorded and no reward is granted until it stops. |
-| `PersistProgression` | `true` | Progression is never written to disk; a restart forgets it. |
+| `PersistProgression` | `true` | Progression is never written down; a restart forgets it. |
 | `PersistHistory` | `true` | Nothing is recorded on completion. Rewards not granted on the spot are lost, since nothing is left to retry them from. |
 
 `PersistHistory` can also be set on a running quest, which is how a composite applies its
@@ -264,7 +400,7 @@ QuestListenerService.register(MyQuestProgression.class, listenerType);
 `MyQuestListener` extends `QuestListenerComponent` and adds nothing: one class per kind is what
 buys the filtering, since a query asks whether a component is there and never what is inside it.
 The component names the player's quests of that kind, goes on as they take one and off with the
-last, and is never written to disk. Your system then queries for it and walks `getQuestIds()`
+last, and is never written down. Your system then queries for it and walks `getQuestIds()`
 instead of the player's whole store. Registering on a base type covers every type built on it, the
 same way a renderer does.
 
@@ -341,6 +477,24 @@ stops the server with an explicit reason rather than failing later at runtime.
 ```bash
 ./gradlew build
 ```
+
+The persistence backends have tests of their own, run against H2 and SQLite, which need nothing
+started:
+
+```bash
+./gradlew :core:test
+```
+
+Against PostgreSQL, with the compose file this repository ships:
+
+```bash
+docker compose -f docker/postgres.yml up -d
+./gradlew :core:test -Popenquests.jdbc.url=jdbc:postgresql://localhost:5433/openquests -Popenquests.jdbc.user=openquests -Popenquests.jdbc.password=openquests
+```
+
+The same compose file brings up Adminer to read and edit what the server wrote, on
+<http://localhost:8081/?pgsql=postgres&username=openquests&db=openquests> — password `openquests`.
+Both it and the database listen on the loopback only.
 
 ## License
 
