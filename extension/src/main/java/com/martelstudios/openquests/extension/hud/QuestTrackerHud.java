@@ -61,8 +61,9 @@ public class QuestTrackerHud extends CustomUIHud {
     }
 
     /**
-     * Rebuilds the whole panel, throttled to {@link #UPDATE_INTERVAL_MS}. One pass: every quest
-     * says for itself whether it belongs here, so nothing has to be worked out from the rest.
+     * Rebuilds the whole panel, throttled to {@link #UPDATE_INTERVAL_MS}. Document and rows go out
+     * together, so a push stands on its own rather than on what the client still holds. One pass:
+     * every quest says for itself whether it belongs here.
      */
     public void pushUpdate(@Nonnull Collection<AbstractQuestProgression<?>> quests) {
         long now = System.currentTimeMillis();
@@ -73,7 +74,7 @@ public class QuestTrackerHud extends CustomUIHud {
         UUID viewer = getPlayerRef().getUuid();
 
         var builder = new UICommandBuilder();
-        builder.clear("#QuestList");
+        build(builder);
 
         var context = new QuestHudContext(builder, getPlayerRef().getUuid());
         int shown = 0;
@@ -87,7 +88,7 @@ public class QuestTrackerHud extends CustomUIHud {
         }
 
         builder.set("#QuestTrackerPanel.Visible", context.getRowCount() > 0);
-        update(false, builder);
+        update(true, builder);
     }
 
 }
