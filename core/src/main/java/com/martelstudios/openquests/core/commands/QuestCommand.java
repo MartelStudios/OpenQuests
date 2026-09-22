@@ -7,8 +7,8 @@ import com.martelstudios.openquests.core.models.QuestState;
 
 public class QuestCommand extends AbstractCommandCollection {
     public QuestCommand() {
-        super("quest", "Displays quests info");
-        this.addAliases("q");
+        super("oquest", "Displays quests info");
+        this.addAliases("quest", "q");
 
         setPermissionGroups(HytalePermissionsProvider.GROUP_ADVENTURER);
         this.addSubCommand(new CreateQuestCommand());

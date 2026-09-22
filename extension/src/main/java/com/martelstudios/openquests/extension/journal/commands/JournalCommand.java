@@ -23,8 +23,8 @@ import javax.annotation.Nonnull;
 public class JournalCommand extends AbstractPlayerCommand {
 
     public JournalCommand() {
-        super("journal", "Opens your quest journal");
-        this.addAliases("quests");
+        super("ojournal", "Opens your quest journal");
+        this.addAliases("journal", "quests");
         setPermissionGroups(HytalePermissionsProvider.GROUP_ADVENTURER);
     }
 

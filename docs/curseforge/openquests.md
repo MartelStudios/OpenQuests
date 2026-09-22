@@ -18,7 +18,7 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 
 ## ✨ What you get
 
-📖 **A quest journal.** A page of its own, opened with `/journal`, where a player reads what they are on, what they finished, and what they are still owed. New in 2.0.
+📖 **A quest journal.** A page of its own, opened with `/ojournal`, where a player reads what they are on, what they finished, and what they are still owed. New in 2.0.
 
 🧩 **Quests made of quests.** A step is a quest like any other, with its own rewards and its own progression. Nest them as deep as your story needs.
 
@@ -44,7 +44,7 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 
 ## 📖 The quest journal
 
-`/journal` opens a page built for reading a long chain, not just a list of titles.
+`/ojournal` opens a page built for reading a long chain, not just a list of titles.
 
 **Four tabs.** *Active* is what the player is on, *Finished* what became of the rest, *All* both, and *Rewards* what is still waiting to be collected.
 
@@ -195,19 +195,21 @@ Three ways, and nothing else to set up:
 
 *   `"StartOnConnection": true` gives the quest to every player, once
 *   The `GrantQuest` reward hands the next one over when a quest completes
-*   `/quest create player|world|universe <assetId>` from the console or in game
+*   `/oquest create player|world|universe <assetId>` from the console or in game
 
 ### Commands
 
 | Command                                             |Effect                        |Granted to                      |
 | --------------------------------------------------- |------------------------------ |------------------------------- |
-| <code>/journal</code> (<code>/quests</code>)         |Opens the quest journal       |<code>hytale:Adventurer</code>  |
-| <code>/quest abandon &amp;lt;quest&amp;gt;</code>   |Gives your matching quests up |<code>hytale:Adventurer</code>  |
-| <code>/quest complete &amp;lt;quest&amp;gt;</code>  |Ends them as successful       |<code>hytale:WorldEditor</code> |
-| <code>/quest fail &amp;lt;quest&amp;gt;</code>      |Ends them as failed           |<code>hytale:WorldEditor</code> |
-| <code>/quest create player|world|universe &amp;lt;assetId&amp;gt;</code> |Hands a quest out |<code>hytale:WorldEditor</code> |
+| <code>/ojournal</code> (<code>/journal</code>, <code>/quests</code>)         |Opens the quest journal       |<code>hytale:Adventurer</code>  |
+| <code>/oquest abandon &amp;lt;quest&amp;gt;</code>   |Gives your matching quests up |<code>hytale:Adventurer</code>  |
+| <code>/oquest complete &amp;lt;quest&amp;gt;</code>  |Ends them as successful       |<code>hytale:WorldEditor</code> |
+| <code>/oquest fail &amp;lt;quest&amp;gt;</code>      |Ends them as failed           |<code>hytale:WorldEditor</code> |
+| <code>/oquest create player|world|universe &amp;lt;assetId&amp;gt;</code> |Hands a quest out |<code>hytale:WorldEditor</code> |
 
 Each of the three outcome commands takes a quest id or an asset id, the second reaching every quest you hold from it. Reading your journal and giving up your own quest are things a player does; finishing a quest pays it out, so that one stays with the world editors. Change any of it from your own permissions file.
+
+`/oquest` also answers to `/quest` and `/q`. 
 
 ### Storage
 
