@@ -50,11 +50,11 @@ import java.util.*;
  * reward own {@link QuestRewardRenderer}.
  */
 public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventData> {
-    private static final String PAGE_DOCUMENT = "Pages/QuestPage.ui";
-    private static final String TAB_DOCUMENT = "Pages/QuestPageTab.ui";
-    private static final String TAB_OWED_DOCUMENT = "Pages/QuestPageTabOwed.ui";
-    private static final String CRUMB_DOCUMENT = "Pages/QuestPageCrumb.ui";
-    private static final String CRUMB_MORE_DOCUMENT = "Pages/QuestPageCrumbMore.ui";
+    private static final String PAGE_DOCUMENT = "OpenQuests/Pages/QuestPage.ui";
+    private static final String TAB_DOCUMENT = "OpenQuests/Pages/QuestPageTab.ui";
+    private static final String TAB_OWED_DOCUMENT = "OpenQuests/Pages/QuestPageTabOwed.ui";
+    private static final String CRUMB_DOCUMENT = "OpenQuests/Pages/QuestPageCrumb.ui";
+    private static final String CRUMB_MORE_DOCUMENT = "OpenQuests/Pages/QuestPageCrumbMore.ui";
 
     private static final String TABS_CONTAINER = "#Tabs";
     private static final String BREADCRUMB_CONTAINER = "#Breadcrumb";

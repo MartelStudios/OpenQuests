@@ -1,6 +1,6 @@
 // Shared by the quest page documents. An appended document is parsed on its own, so each one
 // imports what it needs from here rather than the page declaring it once for everybody.
-$C = "../Common.ui";
+$C = "../../Common.ui";
 
 @ColorTitle = $C.@ColorDefault;
 @ColorMuted = $C.@ColorDefaultLabel;
@@ -30,7 +30,7 @@ $C = "../Common.ui";
 // The frame the client puts round a selected input box, borrowed to say a quest is on the HUD.
 // Gold on the same dark blue the row already sits on, so tracking reads as a state of the row
 // rather than as a row of another kind. Set from QuestPageRows.
-@TrackedRowBackground = PatchStyle(TexturePath: "../Common/InputBoxSelected.png", Border: 16);
+@TrackedRowBackground = PatchStyle(TexturePath: "../../Common/InputBoxSelected.png", Border: 16);
 
 // The tracker's own marks, so a quest reads the same on the HUD and in the journal. Paths resolve
 // against this file. Set from QuestPageRows, and left unset for a line that states nothing.
@@ -42,7 +42,7 @@ $C = "../Common.ui";
 @QuestIconLost = PatchStyle(TexturePath: "../Hud/ObjectiveTaskIconLost.png");
 
 // The client's own dropdown caret, borrowed to say that finishing a quest opens onto another
-@QuestIconNext = PatchStyle(TexturePath: "../Common/DropdownPressedCaret.png");
+@QuestIconNext = PatchStyle(TexturePath: "../../Common/DropdownPressedCaret.png");
 
 @ToggleStyle = TextButtonStyle(
   Default: (Background: #1e2a38, LabelStyle: (FontSize: 14, RenderBold: true, TextColor: @ColorMuted, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -66,7 +66,7 @@ $C = "../Common.ui";
 // at 30% opacity, so it darkens the page rather than lightening it and the label keeps the same
 // grey every other small button wears. There is no hovered variant of the texture, so the three
 // live states are the one patch.
-@OwedButtonBackground = PatchStyle(TexturePath: "../Common/Buttons/Tertiary_Active.png", Border: $C.@ButtonBorder);
+@OwedButtonBackground = PatchStyle(TexturePath: "../../Common/Buttons/Tertiary_Active.png", Border: $C.@ButtonBorder);
 
 @OwedButtonStyle = TextButtonStyle(
   Default: (Background: @OwedButtonBackground, LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
@@ -75,6 +75,6 @@ $C = "../Common.ui";
 
   // The open tab is drawn disabled, which is what marks it. A tab the player is standing on has no
   // news left to give, so it drops the gold with everything else.
-  Disabled: (Background: PatchStyle(TexturePath: "../Common/Buttons/Disabled.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallButtonDisabledLabelStyle),
+  Disabled: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Disabled.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallButtonDisabledLabelStyle),
   Sounds: $C.@ButtonSounds
 );

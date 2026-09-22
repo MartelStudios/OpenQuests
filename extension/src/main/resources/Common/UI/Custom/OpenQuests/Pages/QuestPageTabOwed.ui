@@ -1,7 +1,7 @@
 // The rewards tab while something is waiting on it. Same tab as QuestPageTab.ui, wearing the gold
 // a claim button wears, so a debt is visible from whichever tab the player is standing on. The page
 // picks between the two documents, which is what keeps the colour here rather than in Java.
-$C = "../Common.ui";
+$C = "../../Common.ui";
 $P = "QuestPageCommon.ui";
 
 TextButton #Tab {

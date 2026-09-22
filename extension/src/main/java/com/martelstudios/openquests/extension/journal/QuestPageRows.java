@@ -14,12 +14,12 @@ import javax.annotation.Nullable;
  * append its own document, but one that only has a label and a figure to show gets it from here.
  */
 public final class QuestPageRows {
-    public static final String ROW_DOCUMENT = "Pages/QuestPageRow.ui";
-    public static final String LINE_DOCUMENT = "Pages/QuestPageLineRow.ui";
-    public static final String QUEST_LINE_DOCUMENT = "Pages/QuestPageQuestLine.ui";
-    public static final String ITEM_LINE_DOCUMENT = "Pages/QuestPageItemLine.ui";
+    public static final String ROW_DOCUMENT = "OpenQuests/Pages/QuestPageRow.ui";
+    public static final String LINE_DOCUMENT = "OpenQuests/Pages/QuestPageLineRow.ui";
+    public static final String QUEST_LINE_DOCUMENT = "OpenQuests/Pages/QuestPageQuestLine.ui";
+    public static final String ITEM_LINE_DOCUMENT = "OpenQuests/Pages/QuestPageItemLine.ui";
 
-    private static final String COMMON_DOCUMENT = "Pages/QuestPageCommon.ui";
+    private static final String COMMON_DOCUMENT = "OpenQuests/Pages/QuestPageCommon.ui";
 
     /** The mark of a detail line, one level in: the column around it keeps the labels aligned. */
     private static final String LINE_ICON = "#IconSlot #Icon";

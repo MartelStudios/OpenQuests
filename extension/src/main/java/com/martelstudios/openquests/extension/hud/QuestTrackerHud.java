@@ -49,7 +49,7 @@ public class QuestTrackerHud extends CustomUIHud {
 
     @Override
     protected void build(@Nonnull UICommandBuilder commandBuilder) {
-        commandBuilder.append("Hud/QuestTrackerHud.ui");
+        commandBuilder.append("OpenQuests/Hud/QuestTrackerHud.ui");
     }
 
     /**
