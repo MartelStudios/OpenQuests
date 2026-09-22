@@ -18,7 +18,7 @@ Two chains, handed out on connection, in English and French.
 
 🔀 **Introduction** joins two branches with `OR`, so either one ends it: gather your first sticks, fibre and rubble, or take the other way out.
 
-⏭️ **Skip Intro** is that other way, for players who would rather get on with it. `/quest abandon Intro` and the tutorial is gone.
+⏭️ **Skip Intro** is that other way, for players who would rather get on with it. `/oquest abandon Intro` and the tutorial is gone.
 
 ⛓️ **Then a chain that hands itself along.** Tools, a workbench, then **Choose your weapon** — four crafts under `OR`, any one of which ends it. From there *Defeat the Guardian*, *Enter the Forgotten Temple* and *Talk to the merchant*, which pays 100 Life Essence.
 
