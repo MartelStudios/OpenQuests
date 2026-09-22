@@ -1,6 +1,6 @@
 // The quest journal. Rows are not declared here: the page ships an empty #QuestList that
 // QuestPage fills by appending QuestPageRow.ui, so it grows with what the player holds.
-$C = "../Common.ui";
+$C = "../../Common.ui";
 $P = "QuestPageCommon.ui";
 
 $C.@PageOverlay {}

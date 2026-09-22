@@ -7,9 +7,9 @@ Group #Separator {
   LayoutMode: Left;
   Anchor: (Top: 8, Height: 8);
 
-  Group { FlexWeight: 1; Background: "../Common/ContainerPanelSeparatorFancyLine.png"; }
+  Group { FlexWeight: 1; Background: "../../Common/ContainerPanelSeparatorFancyLine.png"; }
 
   Label #Label { Text: %openquests.hud.or; Anchor: (Width: 32); Style: $Rows.@SeparatorLabelStyle; }
 
-  Group { FlexWeight: 1; Background: "../Common/ContainerPanelSeparatorFancyLine.png"; }
+  Group { FlexWeight: 1; Background: "../../Common/ContainerPanelSeparatorFancyLine.png"; }
 }

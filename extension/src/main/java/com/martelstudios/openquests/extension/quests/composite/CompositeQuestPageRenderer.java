@@ -28,7 +28,7 @@ import java.util.UUID;
 public final class CompositeQuestPageRenderer implements QuestPageRenderer {
 
     /** Between the children of an OR composite: only one of them has to succeed. */
-    private static final String SEPARATOR_DOCUMENT = "Pages/QuestPageSeparator.ui";
+    private static final String SEPARATOR_DOCUMENT = "OpenQuests/Pages/QuestPageSeparator.ui";
 
     @Nonnull
     @Override

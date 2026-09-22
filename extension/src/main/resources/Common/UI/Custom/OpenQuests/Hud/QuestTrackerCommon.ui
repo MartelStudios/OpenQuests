@@ -1,7 +1,7 @@
 // Shared by the tracker documents. An appended document is parsed on its own, so each one imports
 // what it needs from here rather than the panel declaring it once for everybody.
 
-$Common = "../Common.ui";
+$Common = "../../Common.ui";
 
 @ColorQuestTitle = $Common.@ColorGoldHighlight;
 @ColorQuestProgress = $Common.@ColorButtonText;

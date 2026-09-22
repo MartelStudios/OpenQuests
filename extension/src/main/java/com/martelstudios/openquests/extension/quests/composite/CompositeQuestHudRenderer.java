@@ -18,10 +18,10 @@ import java.util.UUID;
 public final class CompositeQuestHudRenderer implements QuestHudRenderer {
 
     /** Carries the composite line and, under it, the container its children draw into. */
-    private static final String GROUP_DOCUMENT = "Hud/QuestTrackerGroup.ui";
+    private static final String GROUP_DOCUMENT = "OpenQuests/Hud/QuestTrackerGroup.ui";
 
     /** Between the children of an OR composite: only one of them has to succeed. */
-    private static final String SEPARATOR_DOCUMENT = "Hud/QuestTrackerSeparator.ui";
+    private static final String SEPARATOR_DOCUMENT = "OpenQuests/Hud/QuestTrackerSeparator.ui";
 
     @Nonnull
     @Override

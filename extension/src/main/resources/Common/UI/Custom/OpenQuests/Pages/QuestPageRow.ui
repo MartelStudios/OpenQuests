@@ -1,7 +1,7 @@
 // One quest, collapsed to a header until its toggle is pressed. Appended into #QuestList and
 // addressed as "#QuestList[i] #Title".
 $P = "QuestPageCommon.ui";
-$C = "../Common.ui";
+$C = "../../Common.ui";
 
 Group #QuestPageRow {
   LayoutMode: Top;

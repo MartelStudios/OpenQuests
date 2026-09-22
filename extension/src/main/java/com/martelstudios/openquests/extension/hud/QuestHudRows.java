@@ -13,7 +13,7 @@ import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.DESCRIP
  * but a quest that only has a title to show gets it from here.
  */
 public final class QuestHudRows {
-    public static final String ROW_DOCUMENT = "Hud/QuestTrackerRow.ui";
+    public static final String ROW_DOCUMENT = "OpenQuests/Hud/QuestTrackerRow.ui";
 
     // The values of @ColorGoldHighlight, @ColorButtonText and @ColorDisabled, which the documents
     // import from Common.ui. Repeated here because the completed switch happens at runtime, and a
