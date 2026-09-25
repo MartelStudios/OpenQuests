@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
 import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public final class CompositeQuestAssetValidator {
         List<String> errors = new ArrayList<>();
 
         Set<String> validated = new HashSet<>();
-        for (QuestAsset asset : QuestAsset.getAssetMap().getAssetMap().values()) {
+        for (OpenQuestAsset asset : OpenQuestAsset.getAssetMap().getAssetMap().values()) {
             if (!(asset instanceof CompositeQuestAsset generalQuestAsset)) continue;
 
             visit(generalQuestAsset, new LinkedHashSet<>(), validated, errors);
@@ -51,7 +51,7 @@ public final class CompositeQuestAssetValidator {
 
         if (validated.add(assetId)) {
             for (String childId : asset.getAssetIds()) {
-                QuestAsset child = QuestAsset.getAsset(childId);
+                OpenQuestAsset child = OpenQuestAsset.getAsset(childId);
 
                 if (child == null) {
                     errors.add("Quest asset '" + assetId + "' references unknown quest asset '" + childId + "'");

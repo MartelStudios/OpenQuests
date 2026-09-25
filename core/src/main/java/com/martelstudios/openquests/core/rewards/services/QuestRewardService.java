@@ -8,7 +8,7 @@ import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
@@ -66,7 +66,7 @@ public class QuestRewardService {
     private void handleQuestCompletedEvent(QuestCompletedEvent questCompletedEvent) {
         AbstractQuestProgression<?> quest = questCompletedEvent.getQuest();
 
-        QuestAsset asset = quest.getAsset();
+        OpenQuestAsset asset = quest.getAsset();
         if (asset == null) return;
 
         QuestReward[] rewards = asset.getRewards(questCompletedEvent.getState());
@@ -83,7 +83,7 @@ public class QuestRewardService {
     private void handleQuestPlayerAbandonedEvent(QuestPlayerAbandonedEvent questPlayerAbandonedEvent) {
         AbstractQuestProgression<?> quest = questPlayerAbandonedEvent.getQuest();
 
-        QuestAsset asset = quest.getAsset();
+        OpenQuestAsset asset = quest.getAsset();
         if (asset == null) return;
 
         QuestReward[] rewards = asset.getRewards(QuestState.ABANDONED);

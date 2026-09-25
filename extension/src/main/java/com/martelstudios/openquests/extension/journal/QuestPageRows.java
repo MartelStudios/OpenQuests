@@ -3,7 +3,7 @@ package com.martelstudios.openquests.extension.journal;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.ui.Value;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 
 import javax.annotation.Nonnull;
@@ -195,7 +195,7 @@ public final class QuestPageRows {
      */
     @Nonnull
     public static String documentFor(@Nonnull QuestShape shape, @Nullable AbstractQuestProgression<?> quest,
-                                     @Nullable QuestAsset asset, @Nonnull String fallback) {
+                                     @Nullable OpenQuestAsset asset, @Nonnull String fallback) {
         QuestPageRenderer renderer = resolve(quest, asset);
         if (renderer == null) return fallback;
 
@@ -209,7 +209,7 @@ public final class QuestPageRows {
      * list it belongs to, and its title stands in.
      */
     public static void render(@Nonnull QuestPageContext context, @Nonnull QuestShape shape, @Nonnull String selector,
-                              @Nullable AbstractQuestProgression<?> quest, @Nullable QuestAsset asset) {
+                              @Nullable AbstractQuestProgression<?> quest, @Nullable OpenQuestAsset asset) {
         QuestPageRenderer renderer = resolve(quest, asset);
 
         if (renderer == null) {
@@ -224,7 +224,7 @@ public final class QuestPageRows {
      * progression its asset would build when it does not.
      */
     @Nullable
-    private static QuestPageRenderer resolve(@Nullable AbstractQuestProgression<?> quest, @Nullable QuestAsset asset) {
+    private static QuestPageRenderer resolve(@Nullable AbstractQuestProgression<?> quest, @Nullable OpenQuestAsset asset) {
         if (quest != null) return QuestPageService.resolve(quest);
 
         return asset == null ? null : QuestPageService.resolve(asset);
@@ -234,7 +234,7 @@ public final class QuestPageRows {
      * @return what to call a quest that has nothing else to say, from whichever half of it is left.
      */
     @Nonnull
-    private static Message titleOf(@Nullable AbstractQuestProgression<?> quest, @Nullable QuestAsset asset) {
+    private static Message titleOf(@Nullable AbstractQuestProgression<?> quest, @Nullable OpenQuestAsset asset) {
         if (quest != null) return quest.getTitle();
 
         return asset == null ? Message.raw("") : AbstractQuestProgression.titleOf(asset);

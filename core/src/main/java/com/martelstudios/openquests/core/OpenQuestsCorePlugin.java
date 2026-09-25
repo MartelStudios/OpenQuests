@@ -12,7 +12,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.openquests.core.commands.QuestCommand;
 import com.martelstudios.openquests.core.config.OpenQuestsConfig;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.QuestStorageProvider;
@@ -117,10 +117,10 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
         getCommandRegistry().registerCommand(new QuestCommand());
 
-        getAssetRegistry().register(HytaleAssetStore.builder(QuestAsset.class, new DefaultAssetMap<>())
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenQuests/Quests/")
-                                                    .setCodec(QuestAsset.CODEC)
-                                                    .setKeyFunction(QuestAsset::getId)
+                                                    .setCodec(OpenQuestAsset.CODEC)
+                                                    .setKeyFunction(OpenQuestAsset::getId)
                                                     .build());
     }
 

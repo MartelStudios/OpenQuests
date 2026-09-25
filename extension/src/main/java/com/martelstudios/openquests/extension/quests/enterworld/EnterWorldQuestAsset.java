@@ -5,15 +5,15 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 
 /**
  * Enter a world whose name matches a regular expression.
  */
-public class EnterWorldQuestAsset extends QuestAsset {
+public class EnterWorldQuestAsset extends OpenQuestAsset {
 
     public static final BuilderCodec<EnterWorldQuestAsset> CODEC =
-        BuilderCodec.builder(EnterWorldQuestAsset.class, EnterWorldQuestAsset::new, QuestAsset.BASE_CODEC)
+        BuilderCodec.builder(EnterWorldQuestAsset.class, EnterWorldQuestAsset::new, OpenQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING, true), (asset, pattern) -> asset.worldNamePattern = pattern, asset -> asset.worldNamePattern)
                     .addValidator(Validators.nonNull())
                     .add()

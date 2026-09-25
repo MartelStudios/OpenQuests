@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.extension.journal.QuestMark;
@@ -42,7 +42,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      */
     @Override
     public void render(@Nonnull QuestPageContext context, @Nonnull QuestShape shape, @Nonnull String selector,
-                       @Nullable AbstractQuestProgression<?> quest, @Nullable QuestAsset asset) {
+                       @Nullable AbstractQuestProgression<?> quest, @Nullable OpenQuestAsset asset) {
         var composite = quest instanceof CompositeQuestProgression progression ? progression : null;
 
         if (shape == QuestShape.ROW) {
@@ -62,7 +62,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
         if (asset instanceof CompositeQuestAsset compositeAsset) renderPreview(context, compositeAsset);
     }
 
-    private static void renderRow(@Nonnull QuestPageContext context, @Nullable CompositeQuestProgression composite, @Nullable QuestAsset asset) {
+    private static void renderRow(@Nonnull QuestPageContext context, @Nullable CompositeQuestProgression composite, @Nullable OpenQuestAsset asset) {
         if (composite != null) {
             QuestPageRows.appendLine(context, composite.getTitle(), tallyOf(context, composite));
             return;
@@ -149,7 +149,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
     private static void renderChild(@Nonnull QuestPageContext context, @Nullable String assetId) {
         if (assetId == null) return;
 
-        QuestAsset childAsset = QuestAsset.getAsset(assetId);
+        OpenQuestAsset childAsset = OpenQuestAsset.getAsset(assetId);
         if (childAsset == null) return;
 
         context.listing(assetId, () -> QuestPageRows.appendLine(context, AbstractQuestProgression.titleOf(childAsset)));

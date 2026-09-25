@@ -23,15 +23,15 @@ import java.util.Map;
  * Defines the generic quest template configuration. Extend it to create new quest types or to add new serialized data.
  * Do not use it to declare runtime data. Look at {@link AbstractQuestProgression} for runtime data declaration.
  */
-public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, QuestAsset>> {
-    public static final ValidatorCache<String> VALIDATOR_CACHE = new ValidatorCache<>(new AssetKeyValidator<>(QuestAsset::getAssetStore));
+public abstract class OpenQuestAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenQuestAsset>> {
+    public static final ValidatorCache<String> VALIDATOR_CACHE = new ValidatorCache<>(new AssetKeyValidator<>(OpenQuestAsset::getAssetStore));
 
-    public static final AssetCodecMapCodec<String, QuestAsset> CODEC = new AssetCodecMapCodec<>(Codec.STRING, (asset, value) -> asset.id = value, asset -> asset.id, (asset, value) -> asset.data = value, asset -> asset.data);
+    public static final AssetCodecMapCodec<String, OpenQuestAsset> CODEC = new AssetCodecMapCodec<>(Codec.STRING, (asset, value) -> asset.id = value, asset -> asset.id, (asset, value) -> asset.data = value, asset -> asset.data);
 
     /**
      * Serializes the fields shared by every quest asset; concrete codecs chain from this.
      */
-    public static final BuilderCodec<QuestAsset> BASE_CODEC = BuilderCodec.abstractBuilder(QuestAsset.class)
+    public static final BuilderCodec<OpenQuestAsset> BASE_CODEC = BuilderCodec.abstractBuilder(OpenQuestAsset.class)
                                                                           .append(new KeyedCodec<>("TitleKey", Codec.STRING), (asset, key) -> asset.titleKey = key, asset -> asset.titleKey)
                                                                           .add()
                                                                           .append(new KeyedCodec<>("DescriptionKey", Codec.STRING), (asset, key) -> asset.descriptionKey = key, asset -> asset.descriptionKey)
@@ -97,7 +97,7 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
     @Nullable
     protected String abandonedSound;
 
-    protected QuestAsset() {}
+    protected OpenQuestAsset() {}
 
     @Override
     public String getId() {
@@ -249,15 +249,15 @@ public abstract class QuestAsset implements JsonAssetWithMap<String, DefaultAsse
      */
     public abstract AbstractQuestProgression<?> create();
 
-    public static AssetStore<String, QuestAsset, DefaultAssetMap<String, QuestAsset>> getAssetStore() {
-        return AssetRegistry.getAssetStore(QuestAsset.class);
+    public static AssetStore<String, OpenQuestAsset, DefaultAssetMap<String, OpenQuestAsset>> getAssetStore() {
+        return AssetRegistry.getAssetStore(OpenQuestAsset.class);
     }
 
-    public static DefaultAssetMap<String, QuestAsset> getAssetMap() {
+    public static DefaultAssetMap<String, OpenQuestAsset> getAssetMap() {
         return getAssetStore().getAssetMap();
     }
 
-    public static QuestAsset getAsset(String assetId) {
+    public static OpenQuestAsset getAsset(String assetId) {
         return getAssetMap().getAsset(assetId);
     }
 }

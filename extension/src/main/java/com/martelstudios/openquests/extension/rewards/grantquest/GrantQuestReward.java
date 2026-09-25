@@ -7,7 +7,7 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.utils.EntityComponents;
@@ -24,7 +24,7 @@ public class GrantQuestReward extends QuestReward {
 
     public static final BuilderCodec<GrantQuestReward> CODEC =
         BuilderCodec.builder(GrantQuestReward.class, GrantQuestReward::new, QuestReward.BASE_CODEC)
-                    .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(new ContainedAssetCodec<>(QuestAsset.class, QuestAsset.CODEC), String[]::new)), (reward, ids) -> reward.questAssetIds = ids, reward -> reward.questAssetIds)
+                    .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(new ContainedAssetCodec<>(OpenQuestAsset.class, OpenQuestAsset.CODEC), String[]::new)), (reward, ids) -> reward.questAssetIds = ids, reward -> reward.questAssetIds)
                     .addValidator(Validators.nonEmptyArray())
                     .addValidator(Validators.uniqueInArray())
                     .add()
@@ -51,7 +51,7 @@ public class GrantQuestReward extends QuestReward {
         UUID playerId = uuidComponent.getUuid();
 
         for (String questAssetId : questAssetIds) {
-            QuestAsset questAsset = QuestAsset.getAsset(questAssetId);
+            OpenQuestAsset questAsset = OpenQuestAsset.getAsset(questAssetId);
             if (questAsset == null) continue;
 
             AbstractQuestProgression<?> quest = questAsset.create();

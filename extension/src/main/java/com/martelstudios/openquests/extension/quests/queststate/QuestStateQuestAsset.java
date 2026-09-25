@@ -5,20 +5,20 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 
 /**
  * Succeeds while the player holds, or once held, a quest built from {@code QuestAssetId} in a
  * matching state.
  */
-public class QuestStateQuestAsset extends QuestAsset {
+public class QuestStateQuestAsset extends OpenQuestAsset {
 
     public static final BuilderCodec<QuestStateQuestAsset> CODEC =
-        BuilderCodec.builder(QuestStateQuestAsset.class, QuestStateQuestAsset::new, QuestAsset.BASE_CODEC)
+        BuilderCodec.builder(QuestStateQuestAsset.class, QuestStateQuestAsset::new, OpenQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("QuestAssetId", Codec.STRING, true), (asset, assetId) -> asset.questAssetId = assetId, asset -> asset.questAssetId)
                     .addValidator(Validators.nonNull())
-                    .addValidatorLate(() -> QuestAsset.VALIDATOR_CACHE.getValidator().late())
+                    .addValidatorLate(() -> OpenQuestAsset.VALIDATOR_CACHE.getValidator().late())
                     .add()
                     .append(new KeyedCodec<>("QuestStateRequirement", new EnumCodec<>(QuestStateRequirement.class), true), (asset, requirement) -> asset.questStateRequirement = requirement, asset -> asset.questStateRequirement)
                     .add()

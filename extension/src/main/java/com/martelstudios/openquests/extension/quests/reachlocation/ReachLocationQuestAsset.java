@@ -4,14 +4,14 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.math.vector.Vector3dUtil;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import org.joml.Vector3d;
 
-public class ReachLocationQuestAsset extends QuestAsset {
+public class ReachLocationQuestAsset extends OpenQuestAsset {
 
     public static final BuilderCodec<ReachLocationQuestAsset> CODEC =
-        BuilderCodec.builder(ReachLocationQuestAsset.class, ReachLocationQuestAsset::new, QuestAsset.BASE_CODEC)
+        BuilderCodec.builder(ReachLocationQuestAsset.class, ReachLocationQuestAsset::new, OpenQuestAsset.BASE_CODEC)
             .append(new KeyedCodec<>("Position", Vector3dUtil.CODEC), (asset, position) -> asset.position = position, asset -> asset.position)
             .add()
             .append(new KeyedCodec<>("Radius", Codec.DOUBLE), (asset, radius) -> asset.radius = radius, asset -> Double.valueOf(asset.radius))

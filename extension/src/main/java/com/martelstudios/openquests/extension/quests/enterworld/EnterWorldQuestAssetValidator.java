@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.enterworld;
 
 import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 
 import javax.annotation.Nonnull;
 import java.util.regex.Pattern;
@@ -16,7 +16,7 @@ public final class EnterWorldQuestAssetValidator {
     private EnterWorldQuestAssetValidator() {}
 
     public static void handleLoadAsset(@Nonnull LoadAssetEvent event) {
-        for (QuestAsset asset : QuestAsset.getAssetMap().getAssetMap().values()) {
+        for (OpenQuestAsset asset : OpenQuestAsset.getAssetMap().getAssetMap().values()) {
             if (!(asset instanceof EnterWorldQuestAsset enterWorldQuestAsset)) continue;
 
             String pattern = enterWorldQuestAsset.getWorldNamePattern();

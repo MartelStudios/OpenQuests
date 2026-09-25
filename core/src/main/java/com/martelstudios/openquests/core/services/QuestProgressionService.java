@@ -9,7 +9,7 @@ import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestRegisteredEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
@@ -48,8 +48,8 @@ public class QuestProgressionService {
      * Registers a concrete quest type's polymorphic serialization tag, for both its asset and
      * its runtime form, under the same id. Mirrors {@code ObjectivePlugin.registerTask}.
      */
-    public <Q extends AbstractQuestProgression<Q>, QAsset extends QuestAsset> void registerQuestType(String id, Class<QAsset> questAssetClass, BuilderCodec<QAsset> questAssetCodec, Class<Q> questClass, BuilderCodec<Q> questCodec) {
-        QuestAsset.CODEC.register(id, questAssetClass, questAssetCodec);
+    public <Q extends AbstractQuestProgression<Q>, QAsset extends OpenQuestAsset> void registerQuestType(String id, Class<QAsset> questAssetClass, BuilderCodec<QAsset> questAssetCodec, Class<Q> questClass, BuilderCodec<Q> questCodec) {
+        OpenQuestAsset.CODEC.register(id, questAssetClass, questAssetCodec);
         AbstractQuestProgression.CODEC.register(id, questClass, questCodec);
     }
 
@@ -75,7 +75,7 @@ public class QuestProgressionService {
      *
      * @param questAsset the quest asset to create the quest from
      */
-    public AbstractQuestProgression<?> registerQuest(@Nonnull QuestAsset questAsset) {
+    public AbstractQuestProgression<?> registerQuest(@Nonnull OpenQuestAsset questAsset) {
         var quest = questAsset.create();
         quest.markDirty();
         registerQuest(quest);
