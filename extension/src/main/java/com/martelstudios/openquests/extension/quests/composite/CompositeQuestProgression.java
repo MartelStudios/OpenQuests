@@ -11,7 +11,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
@@ -111,7 +111,7 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
         UUID[] questIds = new UUID[assetIds.length];
 
         for (int i = 0; i < assetIds.length; i++) {
-            QuestAsset childAsset = QuestAsset.getAsset(assetIds[i]);
+            OpenQuestAsset childAsset = OpenQuestAsset.getAsset(assetIds[i]);
 
             AbstractQuestProgression<?> child = childAsset.create();
             child.addTag(OpenQuestsTags.PARENT_QUEST_TAG, getId().toString());

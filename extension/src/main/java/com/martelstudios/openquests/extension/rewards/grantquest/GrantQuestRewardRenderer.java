@@ -2,7 +2,7 @@ package com.martelstudios.openquests.extension.rewards.grantquest;
 
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.extension.journal.QuestPageContext;
 import com.martelstudios.openquests.extension.journal.QuestPageRows;
@@ -25,7 +25,7 @@ public final class GrantQuestRewardRenderer implements QuestRewardRenderer {
     @Override
     public void renderPreview(@Nonnull QuestPageContext context, @Nonnull QuestReward reward) {
         for (String questAssetId : ((GrantQuestReward) reward).getQuestAssetIds()) {
-            QuestAsset asset = QuestAsset.getAsset(questAssetId);
+            OpenQuestAsset asset = OpenQuestAsset.getAsset(questAssetId);
             if (asset == null) continue;
 
             // Named as what it hands over, not just by its title: a reward list is read for what

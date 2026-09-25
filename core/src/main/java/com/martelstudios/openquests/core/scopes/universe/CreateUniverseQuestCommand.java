@@ -4,7 +4,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
@@ -24,7 +24,7 @@ public class CreateUniverseQuestCommand extends CommandBase {
     protected void executeSync(@Nonnull CommandContext context) {
         String assetId = context.get(assetIdArg);
 
-        QuestAsset asset = QuestAsset.getAsset(assetId);
+        OpenQuestAsset asset = OpenQuestAsset.getAsset(assetId);
         if (asset == null) {
             context.sendMessage(Message.raw("No quest asset found with id '" + assetId + "'."));
             return;

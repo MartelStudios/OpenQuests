@@ -34,7 +34,7 @@ import java.util.function.Function;
 
 /**
  * Defines the quest progression. Extend it to create new quest types or to add runtime progression data.
- * Avoid using it to declare static serialized data. Look at {@link QuestAsset} for static serialized data declaration.
+ * Avoid using it to declare static serialized data. Look at {@link OpenQuestAsset} for static serialized data declaration.
  */
 public abstract class AbstractQuestProgression<Q extends AbstractQuestProgression<Q>> {
     public static final CodecMapCodec<AbstractQuestProgression<?>> CODEC = new CodecMapCodec<>("Type");
@@ -106,7 +106,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     protected Map<String, String[]> tags = new ConcurrentHashMap<>();
 
     /**
-     * The {@link QuestAsset#getId()}
+     * The {@link OpenQuestAsset#getId()}
      */
     protected String assetId;
 
@@ -165,7 +165,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * running and being re-evaluated, so its state can still change.
      */
     public boolean isStopOnComplete() {
-        QuestAsset asset = getAsset();
+        OpenQuestAsset asset = getAsset();
         return asset == null || asset.isStopOnComplete();
     }
 
@@ -176,7 +176,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public boolean isPersistHistory() {
         if (persistHistory != null) return persistHistory;
 
-        QuestAsset asset = getAsset();
+        OpenQuestAsset asset = getAsset();
         return asset == null || asset.isPersistHistory();
     }
 
@@ -185,7 +185,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * is gone, so a quest nobody can name is not also one nobody can be rid of.
      */
     public boolean canBeAbandoned() {
-        QuestAsset asset = getAsset();
+        OpenQuestAsset asset = getAsset();
 
         return asset == null || asset.canBeAbandoned();
     }
@@ -203,7 +203,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public QuestVisibility getVisibility() {
         if (visibility != null) return visibility;
 
-        QuestAsset asset = getAsset();
+        OpenQuestAsset asset = getAsset();
         return asset == null ? QuestVisibility.ALWAYS : asset.getVisibility();
     }
 
@@ -240,7 +240,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public boolean isAnnounceOutcome() {
         if (announceOutcome != null) return announceOutcome;
 
-        QuestAsset asset = getAsset();
+        OpenQuestAsset asset = getAsset();
         return asset == null || asset.isAnnounceOutcome();
     }
 
@@ -256,7 +256,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public boolean isTracked() {
         if (track != null) return track;
 
-        QuestAsset asset = getAsset();
+        OpenQuestAsset asset = getAsset();
         return asset != null && asset.isAutoTrack();
     }
 
@@ -463,8 +463,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return completedAt;
     }
 
-    public QuestAsset getAsset() {
-        return QuestAsset.getAsset(assetId);
+    public OpenQuestAsset getAsset() {
+        return OpenQuestAsset.getAsset(assetId);
     }
 
     public UUID getId() {
@@ -487,7 +487,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public boolean hasTag(@Nonnull String tag) {
         if (tags.containsKey(tag)) return true;
 
-        QuestAsset asset = getAsset();
+        OpenQuestAsset asset = getAsset();
         return asset != null && asset.hasTag(tag);
     }
 
@@ -504,7 +504,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         String[] own = tags.get(tag);
         if (own != null) return own;
 
-        QuestAsset asset = getAsset();
+        OpenQuestAsset asset = getAsset();
         return asset == null ? null : asset.getTagValues(tag);
     }
 
@@ -568,7 +568,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nonnull
     public Message getTitle() {
-        QuestAsset asset = getAsset();
+        OpenQuestAsset asset = getAsset();
         String titleKey = asset == null ? null : asset.getTitleKey();
 
         return titleKey != null ? Message.translation(titleKey) : getDefaultTitle();
@@ -576,7 +576,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     @Nonnull
     public Message getDescription() {
-        QuestAsset asset = getAsset();
+        OpenQuestAsset asset = getAsset();
         String descriptionKey = asset == null ? null : asset.getDescriptionKey();
 
         return descriptionKey != null ? Message.translation(descriptionKey) : getDefaultDescription();
@@ -632,7 +632,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * The title of a quest asset. If the asset has no title, the quest is instantiated to read the default one.
      */
     @Nonnull
-    public static Message titleOf(@Nonnull QuestAsset asset) {
+    public static Message titleOf(@Nonnull OpenQuestAsset asset) {
         String titleKey = asset.getTitleKey();
 
         return titleKey != null ? Message.translation(titleKey) : asset.create().getDefaultTitle();
@@ -643,7 +643,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * when the asset names none, since a description is optional.
      */
     @Nonnull
-    public static Message descriptionOf(@Nonnull QuestAsset asset) {
+    public static Message descriptionOf(@Nonnull OpenQuestAsset asset) {
         String descriptionKey = asset.getDescriptionKey();
 
         return descriptionKey != null ? Message.translation(descriptionKey) : asset.create().getDefaultDescription();

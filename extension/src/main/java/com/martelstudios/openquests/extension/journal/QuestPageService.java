@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.journal;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 
 import javax.annotation.Nonnull;
@@ -37,7 +37,7 @@ public final class QuestPageService {
      * build. Renderers are keyed by progression type, and an asset knows which one it creates.
      */
     @Nullable
-    public static QuestPageRenderer resolve(@Nonnull QuestAsset asset) {
+    public static QuestPageRenderer resolve(@Nonnull OpenQuestAsset asset) {
         return resolve(QUEST_RENDERERS, asset.create().getClass());
     }
 

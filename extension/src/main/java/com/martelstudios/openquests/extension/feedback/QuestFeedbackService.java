@@ -11,7 +11,7 @@ import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
@@ -131,7 +131,7 @@ public class QuestFeedbackService {
      */
     @Nullable
     private String resolveSound(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state) {
-        QuestAsset asset = quest.getAsset();
+        OpenQuestAsset asset = quest.getAsset();
         String sound = asset == null ? null : asset.getSound(state);
 
         if (sound == null) sound = defaultSound(state);

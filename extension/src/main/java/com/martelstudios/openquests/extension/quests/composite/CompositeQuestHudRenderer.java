@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.extension.hud.QuestHudContext;
@@ -74,7 +74,7 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
     private static void renderArchivedChild(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite, @Nonnull UUID questId, String assetId) {
         if (assetId == null) return;
 
-        QuestAsset asset = QuestAsset.getAsset(assetId);
+        OpenQuestAsset asset = OpenQuestAsset.getAsset(assetId);
         if (asset == null) return;
 
         QuestState outcome = composite.outcomeOf(questId);

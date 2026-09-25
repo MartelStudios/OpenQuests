@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.quantity;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.extension.journal.QuestPageContext;
 import com.martelstudios.openquests.extension.journal.QuestPageRenderer;
 import com.martelstudios.openquests.extension.journal.QuestPageRows;
@@ -25,7 +25,7 @@ public final class QuantityQuestPageRenderer implements QuestPageRenderer {
 
     @Override
     public void render(@Nonnull QuestPageContext context, @Nonnull QuestShape shape, @Nonnull String selector,
-                       @Nullable AbstractQuestProgression<?> quest, @Nullable QuestAsset asset) {
+                       @Nullable AbstractQuestProgression<?> quest, @Nullable OpenQuestAsset asset) {
         // A counter with nothing counting says nothing: a quest never handed out is at none of it,
         // and one that kept no trace of itself is past counting either way
         if (quest == null) {

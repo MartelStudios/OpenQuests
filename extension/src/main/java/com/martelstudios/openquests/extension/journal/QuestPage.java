@@ -23,7 +23,7 @@ import com.martelstudios.opennavigation.routes.Route;
 import com.martelstudios.opennavigation.routes.TabRoute;
 import com.martelstudios.opennavigation.services.NavigationService;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
@@ -211,7 +211,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         if (quest != null) return Entry.held(quest, playerRef.getUuid(), isOwed(playerComponents, quest.getId()));
 
         // Only an asset id gets this far: a quest id the player never held names nothing at all
-        QuestAsset asset = QuestAsset.getAsset(target);
+        OpenQuestAsset asset = OpenQuestAsset.getAsset(target);
         return asset == null ? null : Entry.preview(asset, inherited);
     }
 
@@ -895,7 +895,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * @param mark what the row is worth, which is always something: a quest the journal cannot
      *             place at all is one the player was never given, and saying so is the point of showing it.
      */
-    private record Entry(@Nonnull String id, String assetId, QuestAsset asset, @Nonnull Message title,
+    private record Entry(@Nonnull String id, String assetId, OpenQuestAsset asset, @Nonnull Message title,
                          @Nonnull Message description, @Nonnull Message status, @Nonnull QuestMark mark,
                          AbstractQuestProgression<?> quest, QuestReward[] rewards, boolean claimable) {
 
@@ -906,7 +906,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
          */
         @Nonnull
         static Entry held(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID viewer, boolean owed) {
-            QuestAsset asset = quest.getAsset();
+            OpenQuestAsset asset = quest.getAsset();
 
             // What it came to for this player: one who walked away from a quest the others finished
             // reads it as given up, which is what it was for them
@@ -940,7 +940,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
          *                  says anything — which is what being locked means.
          */
         @Nonnull
-        static Entry preview(@Nonnull QuestAsset asset, @Nullable QuestMark inherited) {
+        static Entry preview(@Nonnull OpenQuestAsset asset, @Nullable QuestMark inherited) {
             QuestMark mark = inherited == null ? QuestMark.LOCKED : inherited;
 
             return of(asset.getId(), asset.getId(), asset, AbstractQuestProgression.titleOf(asset), AbstractQuestProgression.descriptionOf(asset), mark, null, rewardsOf(asset, mark), false);
@@ -956,7 +956,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
          * there is anything, since that is the one thing the row can state as fact.
          */
         @Nonnull
-        private static QuestReward[] rewardsOf(QuestAsset asset, @Nonnull QuestMark mark) {
+        private static QuestReward[] rewardsOf(OpenQuestAsset asset, @Nonnull QuestMark mark) {
             if (asset == null) return null;
 
             QuestState reached = mark.toState();
@@ -969,7 +969,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
          * The status word follows the mark rather than being chosen beside it, so the two agree.
          */
         @Nonnull
-        private static Entry of(@Nonnull String id, String assetId, QuestAsset asset, @Nonnull Message title, @Nonnull Message description, @Nonnull QuestMark mark, AbstractQuestProgression<?> quest, QuestReward[] rewards, boolean claimable) {
+        private static Entry of(@Nonnull String id, String assetId, OpenQuestAsset asset, @Nonnull Message title, @Nonnull Message description, @Nonnull QuestMark mark, AbstractQuestProgression<?> quest, QuestReward[] rewards, boolean claimable) {
             return new Entry(id, assetId, asset, title, description, Message.translation(mark.getStatusKey()), mark, quest, rewards, claimable);
         }
     }

@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.journal;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,6 +54,6 @@ public interface QuestPageRenderer {
      * progression. Null only when that is gone too, which leaves nothing to say at all.
      */
     default void render(@Nonnull QuestPageContext context, @Nonnull QuestShape shape, @Nonnull String selector,
-                        @Nullable AbstractQuestProgression<?> quest, @Nullable QuestAsset asset) {}
+                        @Nullable AbstractQuestProgression<?> quest, @Nullable OpenQuestAsset asset) {}
 
 }

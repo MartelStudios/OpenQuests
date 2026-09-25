@@ -28,7 +28,7 @@ Depending on `OpenQuestsCore` alone is enough to build your own quest types;
 
 | Piece | Role |
 | --- | --- |
-| `QuestAsset` | Immutable definition loaded from `OpenQuests/Quests/*.json`. Polymorphic on `"Type"`. |
+| `OpenQuestAsset` | Immutable definition loaded from `OpenQuests/Quests/*.json`. Polymorphic on `"Type"`. |
 | `AbstractQuestProgression` | Runtime instance holding state, assignees and progression. Polymorphic on `"Type"`. |
 | `QuestVisitor` | Carries the context of an event to the quests it can progress. |
 | `QuestReward` | What a terminal state grants. Polymorphic on `"Type"`. |

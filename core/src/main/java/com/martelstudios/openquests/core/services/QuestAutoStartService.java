@@ -3,7 +3,7 @@ package com.martelstudios.openquests.core.services;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 
 import javax.annotation.Nonnull;
@@ -28,7 +28,7 @@ public class QuestAutoStartService {
         var questStore = playerConnectEvent.getHolder().ensureAndGetComponent(QuestStoreComponent.getComponentType());
         UUID playerId = playerConnectEvent.getPlayerRef().getUuid();
 
-        for (QuestAsset asset : QuestAsset.getAssetMap().getAssetMap().values()) {
+        for (OpenQuestAsset asset : OpenQuestAsset.getAssetMap().getAssetMap().values()) {
             if (!asset.isStartOnConnection()) continue;
             if (!questStore.getStartedOnConnection().add(asset.getId())) continue;
 

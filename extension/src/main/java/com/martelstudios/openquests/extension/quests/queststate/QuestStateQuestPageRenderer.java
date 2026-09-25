@@ -2,7 +2,7 @@ package com.martelstudios.openquests.extension.quests.queststate;
 
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.extension.journal.QuestPageContext;
 import com.martelstudios.openquests.extension.journal.QuestPageRenderer;
 import com.martelstudios.openquests.extension.journal.QuestPageRows;
@@ -30,7 +30,7 @@ public final class QuestStateQuestPageRenderer implements QuestPageRenderer {
      */
     @Override
     public void render(@Nonnull QuestPageContext context, @Nonnull QuestShape shape, @Nonnull String selector,
-                       @Nullable AbstractQuestProgression<?> quest, @Nullable QuestAsset asset) {
+                       @Nullable AbstractQuestProgression<?> quest, @Nullable OpenQuestAsset asset) {
         // The progression may name another quest than its asset does, so it is asked first
         if (quest instanceof QuestStateQuestProgression stateQuest && stateQuest.getAsset() != null) {
             appendWatched(context, stateQuest.getQuestAssetId(), stateQuest.getQuestStateRequirement(), stateQuest.isNot());
@@ -51,7 +51,7 @@ public final class QuestStateQuestPageRenderer implements QuestPageRenderer {
      */
     private static void appendWatched(@Nonnull QuestPageContext context, @Nonnull String watchedId,
                                       @Nonnull QuestStateQuestAsset.QuestStateRequirement requirement, boolean not) {
-        QuestAsset watched = QuestAsset.getAsset(watchedId);
+        OpenQuestAsset watched = OpenQuestAsset.getAsset(watchedId);
 
         Message title = watched == null ? Message.raw(watchedId) : AbstractQuestProgression.titleOf(watched);
         Message label = Message.translation("openquests.page.requirement." + (not ? "not." : "") + requirement.name().toLowerCase());

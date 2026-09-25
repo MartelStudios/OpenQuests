@@ -4,7 +4,7 @@ import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
 import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 
 import javax.annotation.Nonnull;
@@ -292,7 +292,7 @@ public class QuestProgressionStore {
      * @return {@code true} if this quest is meant to survive a restart at all.
      */
     public static boolean isPersisted(@Nonnull AbstractQuestProgression<?> quest) {
-        QuestAsset asset = quest.getAsset();
+        OpenQuestAsset asset = quest.getAsset();
         return asset == null || asset.isPersistProgression();
     }
 }
