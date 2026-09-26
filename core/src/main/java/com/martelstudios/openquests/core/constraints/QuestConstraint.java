@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestCompletions;
+import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -50,6 +51,23 @@ public abstract class QuestConstraint {
      */
     public boolean allowsProgress(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID actorId) {
         return true;
+    }
+
+    /**
+     * @return when a quest still running ends on its own, {@code null} for never. Asked as the
+     * quest is handed out or read back, and again as the moment comes, so it may move meanwhile.
+     */
+    @Nullable
+    public Instant getDeadline(@Nonnull AbstractQuestProgression<?> quest) {
+        return null;
+    }
+
+    /**
+     * @return the outcome a quest reaching the deadline this sets ends on.
+     */
+    @Nonnull
+    public QuestState getExpiredState() {
+        return QuestState.FAILED;
     }
 
     /**

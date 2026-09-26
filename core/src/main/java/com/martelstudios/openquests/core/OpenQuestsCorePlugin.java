@@ -29,6 +29,7 @@ import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestStoreResource;
 import com.martelstudios.openquests.core.services.QuestAutoStartService;
+import com.martelstudios.openquests.core.services.QuestDeadlineService;
 import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
@@ -71,6 +72,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     private QuestProgressionService questProgressionService;
     private QuestPlayerStateService questPlayerStateService;
     private QuestAutoStartService questAutoStartService;
+    private QuestDeadlineService questDeadlineService;
     private QuestRewardService questRewardService;
     private UniverseQuestService universeQuestService;
     private WorldQuestService worldQuestService;
@@ -110,6 +112,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         worldQuestService = new WorldQuestService(this, questStorage);
         playerQuestService = new PlayerQuestService(this);
         questAutoStartService = new QuestAutoStartService(this);
+        questDeadlineService = new QuestDeadlineService(this);
 
         // Both indexes are rebuilt from the storage on connection and on world entry, so neither
         // is written to the entity files the server saves for us
@@ -231,6 +234,10 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     public QuestAutoStartService getQuestAutoStartService() {
         return questAutoStartService;
+    }
+
+    public QuestDeadlineService getQuestDeadlineService() {
+        return questDeadlineService;
     }
 
     public QuestProgressionService getQuestProgressionService() {
