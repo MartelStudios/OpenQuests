@@ -11,6 +11,9 @@ $C = "../../Common.ui";
 // two kinds of detail line agree on where the right-hand column starts.
 @ValueWidth = 110;
 
+// Wider for the rules a quest runs under, whose figure is a sentence: "Again in 19 h 59 min".
+@ConditionValueWidth = 220;
+
 @RowTitleStyle = (FontSize: 14, RenderBold: true, TextColor: @ColorTitle, VerticalAlignment: Center);
 @RowStatusStyle = (FontSize: 12, RenderBold: true, TextColor: @ColorAccent, VerticalAlignment: Center, HorizontalAlignment: End);
 @RowTextStyle = (FontSize: 12, TextColor: @ColorMuted, Wrap: true);

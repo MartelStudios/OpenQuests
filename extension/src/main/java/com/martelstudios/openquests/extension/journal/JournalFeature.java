@@ -21,6 +21,7 @@ public final class JournalFeature {
 
     public static void register(@Nonnull JavaPlugin plugin) {
         plugin.getCommandRegistry().registerCommand(new JournalCommand());
+        plugin.getEntityStoreRegistry().registerSystem(new QuestPageTickingSystem());
         plugin.getEventRegistry()
               .register(RouteChangedEvent.class, JournalRoutes.NAMESPACE, JournalFeature::handleRouteChanged);
     }

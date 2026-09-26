@@ -8,6 +8,9 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -59,6 +62,11 @@ public final class QuestPageContext {
     @Nullable
     private QuestMark mark;
 
+    /**
+     * The figures drawn so far that keep running, for the page to redraw while it stays open.
+     */
+    private final List<LiveValue> countdowns = new ArrayList<>();
+
     QuestPageContext(@Nonnull UICommandBuilder builder, @Nonnull UIEventBuilder eventBuilder, @Nonnull QuestLookup lookup, @Nonnull UUID viewer) {
         this.builder = builder;
         this.eventBuilder = eventBuilder;
@@ -84,6 +92,26 @@ public final class QuestPageContext {
     public UIEventBuilder getEventBuilder() {
         return eventBuilder;
     }
+
+    /**
+     * Keeps the figure at this selector counting down for as long as the page is open. One already
+     * at zero is left as drawn: the page would otherwise redraw every second until the quest ends.
+     */
+    public void countDown(@Nonnull String selector, @Nonnull QuestCountdown countdown) {
+        if (countdown.isOver(Instant.now())) return;
+
+        countdowns.add(new LiveValue(selector, countdown));
+    }
+
+    @Nonnull
+    List<LiveValue> getCountdowns() {
+        return countdowns;
+    }
+
+    /**
+     * A figure the page keeps redrawing, and where it is drawn.
+     */
+    record LiveValue(@Nonnull String selector, @Nonnull QuestCountdown countdown) {}
 
     /**
      * Appends a line to the container currently being filled.

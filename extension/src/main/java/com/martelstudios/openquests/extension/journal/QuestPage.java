@@ -100,6 +100,11 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private static final int CRUMB_MAX_WIDTH = 220;
 
     /**
+     * The finest unit a countdown shows is the second.
+     */
+    private static final long COUNTDOWN_INTERVAL_MS = 1_000;
+
+    /**
      * Rows the player unfolded, by the id their row answers to: a quest id, or the asset id of a
      * quest they were never given. Kept here, since folding is a redraw rather than a client toggle.
      */
@@ -107,6 +112,14 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     @Nonnull
     private Route route;
+
+    /**
+     * The figures on screen that keep running, as the last draw left them.
+     */
+    @Nonnull
+    private List<QuestPageContext.LiveValue> countdowns = List.of();
+
+    private long lastCountdownMs;
 
     public QuestPage(@Nonnull PlayerRef playerRef, @Nonnull Route route) {
         super(playerRef, CustomPageLifetime.CanDismiss, QuestPageEventData.CODEC);
@@ -138,8 +151,37 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
+     * Moves the running figures on by a second, touching nothing else on the page. One that ran
+     * out redraws the whole page instead: what it counted towards has changed what the page says.
+     * Called every tick while the page is open, on the player's world thread.
+     */
+    void tickCountdowns(@Nonnull Ref<EntityStore> ref) {
+        if (countdowns.isEmpty()) return;
+
+        long nowMs = System.currentTimeMillis();
+        if (nowMs - lastCountdownMs < COUNTDOWN_INTERVAL_MS) return;
+        lastCountdownMs = nowMs;
+
+        Instant now = Instant.now();
+        var commandBuilder = new UICommandBuilder();
+
+        if (countdowns.stream().anyMatch(value -> value.countdown().isOver(now))) {
+            var eventBuilder = new UIEventBuilder();
+
+            render(ref, commandBuilder, eventBuilder);
+            sendUpdate(commandBuilder, eventBuilder, false);
+            return;
+        }
+
+        for (QuestPageContext.LiveValue value : countdowns) {
+            commandBuilder.set(value.selector(), value.countdown().format(now));
+        }
+        sendUpdate(commandBuilder, false);
+    }
+
+    /**
      * Rebuilds the list from scratch. Cheaper to reason about than patching rows in place, and the
-     * page only redraws on a click.
+     * page only redraws on a click, or when a countdown on it runs out.
      */
     private void render(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder) {
         var playerComponents = EntityComponents.of(ref);
@@ -164,6 +206,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         for (Entry entry : entries) {
             renderEntry(context, entry, shape);
         }
+
+        countdowns = List.copyOf(context.getCountdowns());
 
         commandBuilder.set("#Empty.Visible", entries.isEmpty())
                       .set("#Empty.TextSpans", Message.translation("openquests.page.empty"))

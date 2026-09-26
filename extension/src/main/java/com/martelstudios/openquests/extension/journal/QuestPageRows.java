@@ -10,6 +10,7 @@ import com.martelstudios.openquests.core.rewards.QuestReward;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Duration;
+import java.time.Instant;
 
 /**
  * The look of a plain line inside a quest's details. A renderer is free to ignore all of this and
@@ -20,6 +21,7 @@ public final class QuestPageRows {
     public static final String LINE_DOCUMENT = "OpenQuests/Pages/QuestPageLineRow.ui";
     public static final String QUEST_LINE_DOCUMENT = "OpenQuests/Pages/QuestPageQuestLine.ui";
     public static final String ITEM_LINE_DOCUMENT = "OpenQuests/Pages/QuestPageItemLine.ui";
+    public static final String CONDITION_LINE_DOCUMENT = "OpenQuests/Pages/QuestPageConditionLine.ui";
 
     private static final String COMMON_DOCUMENT = "OpenQuests/Pages/QuestPageCommon.ui";
 
@@ -275,7 +277,7 @@ public final class QuestPageRows {
 
         QuestConstraintRenderer renderer = QuestPageService.resolve(constraint);
         if (renderer == null) {
-            if (descriptionKey != null) appendLine(context, Message.translation(descriptionKey));
+            if (descriptionKey != null) appendConditionLine(context, Message.translation(descriptionKey), null);
             return;
         }
 
@@ -283,7 +285,31 @@ public final class QuestPageRows {
         if (line == null) return;
 
         Message label = descriptionKey != null ? Message.translation(descriptionKey) : line.label();
-        appendLine(context, label, line.value());
+
+        QuestCountdown countdown = line.countdown();
+        if (countdown == null) {
+            appendConditionLine(context, label, line.value());
+            return;
+        }
+
+        String lineSelector = appendConditionLine(context, label, countdown.format(Instant.now()));
+        context.countDown(lineSelector + "#Value.TextSpans", countdown);
+    }
+
+    /**
+     * A rule is never a link, and its figure takes the wider column it needs.
+     */
+    @Nonnull
+    private static String appendConditionLine(@Nonnull QuestPageContext context, @Nonnull Message label, @Nullable Message value) {
+        String lineSelector = context.appendRow(CONDITION_LINE_DOCUMENT);
+
+        context.getBuilder().set(lineSelector + "#Label.TextSpans", label);
+        if (value != null) context.getBuilder().set(lineSelector + "#Value.TextSpans", value);
+
+        stripe(context, lineSelector);
+        mark(context, lineSelector);
+
+        return lineSelector;
     }
 
     /**

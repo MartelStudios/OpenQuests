@@ -39,9 +39,14 @@ public interface QuestConstraintRenderer {
     }
 
     /**
-     * A label on the left and, when the rule has a figure to give, that figure on the right.
+     * A label on the left and, when the rule has a figure to give, that figure on the right. A
+     * figure counting down is given as a countdown rather than a value, and keeps running.
      */
-    record Line(@Nonnull Message label, @Nullable Message value) {
+    record Line(@Nonnull Message label, @Nullable Message value, @Nullable QuestCountdown countdown) {
+
+        public Line(@Nonnull Message label, @Nullable Message value) {
+            this(label, value, null);
+        }
 
         /**
          * @return a line that is only a label, for a rule with no figure to give.
@@ -49,6 +54,14 @@ public interface QuestConstraintRenderer {
         @Nonnull
         public static Line of(@Nonnull Message label) {
             return new Line(label, null);
+        }
+
+        /**
+         * @return a line whose figure the open journal keeps counting down.
+         */
+        @Nonnull
+        public static Line counting(@Nonnull Message label, @Nonnull QuestCountdown countdown) {
+            return new Line(label, null, countdown);
         }
     }
 }

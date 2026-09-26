@@ -5,12 +5,12 @@ import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.extension.journal.QuestConstraintRenderer;
+import com.martelstudios.openquests.extension.journal.QuestCountdown;
 import com.martelstudios.openquests.extension.journal.QuestPageContext;
 import com.martelstudios.openquests.extension.journal.QuestPageRows;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.time.Duration;
 import java.time.Instant;
 
 /**
@@ -35,6 +35,6 @@ public final class TimeLimitRenderer implements QuestConstraintRenderer {
         if (deadline == null) {
             return new Line(Message.translation("openquests.page.constraint.time-limit"), QuestPageRows.formatDuration(timeLimit.getDuration()));
         }
-        return new Line(Message.translation("openquests.page.constraint.time-left"), QuestPageRows.formatDuration(Duration.between(Instant.now(), deadline)));
+        return Line.counting(Message.translation("openquests.page.constraint.time-left"), new QuestCountdown(deadline, null));
     }
 }
