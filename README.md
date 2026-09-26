@@ -314,6 +314,10 @@ the panel; `OQ_HUD_DESC` shows its description under its title, greyed and small
 { "Type": "Composite", "TitleKey": "…", "AutoTrack": true, "Tags": { "OQ_HUD_DESC": [] } }
 ```
 
+A quest running against a deadline, whichever constraint set it, gets a gold bar and a clock under
+its title. The bar empties from the moment the quest was handed out, and the panel redraws itself
+every second while the clock shows seconds, every minute once it counts in days.
+
 What the player then does with it is written on the quest rather than on the asset, through
 `QuestTrackService`: `track`, `untrack`, `toggle`, and `reset` to hand the answer back to the asset.
 `getTracked(playerId)` reads the list back as quest ids, and `replaceTracked` swaps it for another
@@ -454,8 +458,9 @@ malformed one stops the server with the asset named rather than failing the day 
 
 The journal lists them under **Conditions** on the quest's page, one line each: the time left, the
 world, the players needed against those online, how often the quest can be taken and how much of
-it the player has used. A rule with nothing left to say (the time left on a quest that is over)
-draws nothing. `DescriptionKey`, on any constraint, puts the asset's own words on its line instead,
+it the player has used. The time left, a closing date and the wait before a quest can be taken
+again keep counting down while the page is open. A rule with nothing left to say (the time left on
+a quest that is over) draws nothing. `DescriptionKey`, on any constraint, puts the asset's own words on its line instead,
 which is what a world pattern or a list of conditions wants; an empty one keeps the rule off the
 page:
 
