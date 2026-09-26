@@ -334,16 +334,19 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     /**
      * @return whether what that player did may count towards this quest, every constraint of its
-     * asset agreeing. A quest whose asset is gone is held back by nothing.
+     * asset agreeing, and those of every group it is a step of: a step is played inside its group.
+     * An asset that is gone holds nothing back.
      */
     public boolean allowsProgress(@Nonnull UUID actorId) {
         OpenQuestAsset asset = getAsset();
-        if (asset == null) return true;
-
-        for (QuestConstraint constraint : asset.getConstraints()) {
-            if (!constraint.allowsProgress(this, actorId)) return false;
+        if (asset != null) {
+            for (QuestConstraint constraint : asset.getConstraints()) {
+                if (!constraint.allowsProgress(this, actorId)) return false;
+            }
         }
-        return true;
+
+        AbstractCompositeQuestProgression<?> parent = getParent();
+        return parent == null || parent.allowsProgress(actorId);
     }
 
     /**
