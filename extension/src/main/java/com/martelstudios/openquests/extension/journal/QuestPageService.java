@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.journal;
 
+import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.rewards.QuestReward;
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class QuestPageService {
     private static final Map<Class<?>, QuestPageRenderer> QUEST_RENDERERS = new ConcurrentHashMap<>();
     private static final Map<Class<?>, QuestRewardRenderer> REWARD_RENDERERS = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, QuestConstraintRenderer> CONSTRAINT_RENDERERS = new ConcurrentHashMap<>();
 
     private QuestPageService() {}
 
@@ -25,6 +27,13 @@ public final class QuestPageService {
 
     public static void register(@Nonnull QuestRewardRenderer renderer) {
         REWARD_RENDERERS.put(renderer.getRewardType(), renderer);
+    }
+
+    /**
+     * Declares how a constraint type describes itself on a quest's page.
+     */
+    public static void register(@Nonnull QuestConstraintRenderer renderer) {
+        CONSTRAINT_RENDERERS.put(renderer.getConstraintType(), renderer);
     }
 
     @Nullable
@@ -44,6 +53,15 @@ public final class QuestPageService {
     @Nullable
     public static QuestRewardRenderer resolve(@Nonnull QuestReward reward) {
         return resolve(REWARD_RENDERERS, reward.getClass());
+    }
+
+    /**
+     * @return the renderer of that constraint's type or of the nearest type it is built on,
+     * {@code null} if none registered one.
+     */
+    @Nullable
+    public static QuestConstraintRenderer resolve(@Nonnull QuestConstraint constraint) {
+        return resolve(CONSTRAINT_RENDERERS, constraint.getClass());
     }
 
     /**

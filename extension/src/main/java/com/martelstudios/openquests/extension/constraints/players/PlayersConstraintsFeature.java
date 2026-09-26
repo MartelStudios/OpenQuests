@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension.constraints.players;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
+import com.martelstudios.openquests.extension.journal.QuestPageService;
 
 import javax.annotation.Nonnull;
 
@@ -14,9 +15,11 @@ public final class PlayersConstraintsFeature {
     private PlayersConstraintsFeature() {}
 
     /**
-     * Registers the constraint under its type id.
+     * Registers the constraint under its type id, and how the journal describes it.
      */
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestConstraint.CODEC.register(MIN_PLAYERS_ONLINE_TYPE_ID, MinPlayersOnlineConstraint.class, MinPlayersOnlineConstraint.CODEC);
+
+        QuestPageService.register(new MinPlayersOnlineRenderer());
     }
 }

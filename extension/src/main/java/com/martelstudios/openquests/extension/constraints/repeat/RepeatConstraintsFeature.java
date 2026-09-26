@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension.constraints.repeat;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
+import com.martelstudios.openquests.extension.journal.QuestPageService;
 
 import javax.annotation.Nonnull;
 
@@ -16,10 +17,13 @@ public final class RepeatConstraintsFeature {
     private RepeatConstraintsFeature() {}
 
     /**
-     * Registers both constraints under their type ids.
+     * Registers both constraints under their type ids, and how the journal describes them.
      */
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestConstraint.CODEC.register(COOLDOWN_TYPE_ID, CooldownConstraint.class, CooldownConstraint.CODEC);
         QuestConstraint.CODEC.register(MAX_COMPLETIONS_TYPE_ID, MaxCompletionsConstraint.class, MaxCompletionsConstraint.CODEC);
+
+        QuestPageService.register(new CooldownRenderer());
+        QuestPageService.register(new MaxCompletionsRenderer());
     }
 }

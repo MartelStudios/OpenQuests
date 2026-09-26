@@ -1,5 +1,7 @@
 package com.martelstudios.openquests.core.constraints;
 
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -30,7 +32,24 @@ public abstract class QuestConstraint {
      * Serializes the fields shared by every constraint; concrete codecs chain from this.
      */
     public static final BuilderCodec<QuestConstraint> BASE_CODEC = BuilderCodec.abstractBuilder(QuestConstraint.class)
+                                                                               .append(new KeyedCodec<>("DescriptionKey", Codec.STRING), (constraint, key) -> constraint.descriptionKey = key, constraint -> constraint.descriptionKey)
+                                                                               .add()
                                                                                .build();
+
+    /**
+     * {@code null} while whoever draws the rule describes it from its fields.
+     */
+    @Nullable
+    protected String descriptionKey;
+
+    /**
+     * @return the translation key to describe the rule to the player with, {@code null} to leave
+     * that to whoever draws it, and empty to keep it from the player altogether.
+     */
+    @Nullable
+    public String getDescriptionKey() {
+        return descriptionKey;
+    }
 
     /**
      * Whether a player may be handed a new quest from this asset, given how its quests ended for

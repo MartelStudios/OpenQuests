@@ -2,12 +2,14 @@ package com.martelstudios.openquests.extension.journal;
 
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.ui.Value;
+import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Duration;
 
 /**
  * The look of a plain line inside a quest's details. A renderer is free to ignore all of this and
@@ -34,6 +36,14 @@ public final class QuestPageRows {
     private static final Value<String> ICON_LOCKED = Value.ref(COMMON_DOCUMENT, "QuestIconLocked");
     private static final Value<String> ICON_LOST = Value.ref(COMMON_DOCUMENT, "QuestIconLost");
     private static final Value<String> ICON_NEXT = Value.ref(COMMON_DOCUMENT, "QuestIconNext");
+
+    /** Largest first, the order a duration is read in. */
+    private static final String[] DURATION_UNITS = {
+        "openquests.page.duration.days",
+        "openquests.page.duration.hours",
+        "openquests.page.duration.minutes",
+        "openquests.page.duration.seconds"
+    };
 
     private QuestPageRows() {}
 
@@ -252,5 +262,47 @@ public final class QuestPageRows {
             return;
         }
         renderer.renderPreview(context, reward);
+    }
+
+    /**
+     * Describes a constraint through its renderer, in the asset's own words when it gave some. A
+     * rule no renderer speaks for is only drawn if the asset described it: its type name would
+     * mean nothing to a player.
+     */
+    public static void renderConstraint(@Nonnull QuestPageContext context, @Nonnull QuestConstraint constraint, @Nonnull OpenQuestAsset asset, @Nullable AbstractQuestProgression<?> quest) {
+        String descriptionKey = constraint.getDescriptionKey();
+        if (descriptionKey != null && descriptionKey.isEmpty()) return;
+
+        QuestConstraintRenderer renderer = QuestPageService.resolve(constraint);
+        if (renderer == null) {
+            if (descriptionKey != null) appendLine(context, Message.translation(descriptionKey));
+            return;
+        }
+
+        QuestConstraintRenderer.Line line = renderer.describe(context, constraint, asset, quest);
+        if (line == null) return;
+
+        Message label = descriptionKey != null ? Message.translation(descriptionKey) : line.label();
+        appendLine(context, label, line.value());
+    }
+
+    /**
+     * The two largest units a duration spans, which is as precise as a page drawn once can
+     * honestly be: "2 d 4 h", "4 min 12 s".
+     */
+    @Nonnull
+    public static Message formatDuration(@Nonnull Duration duration) {
+        long seconds = Math.max(0, duration.getSeconds());
+        long[] amounts = {seconds / 86_400, seconds % 86_400 / 3_600, seconds % 3_600 / 60, seconds % 60};
+
+        int first = 0;
+        while (first < DURATION_UNITS.length - 1 && amounts[first] == 0) first++;
+
+        Message largest = Message.translation(DURATION_UNITS[first]).param("count", amounts[first]);
+        if (first == DURATION_UNITS.length - 1 || amounts[first + 1] == 0) return largest;
+
+        return Message.translation("openquests.page.duration.pair")
+                      .param("first", largest)
+                      .param("second", Message.translation(DURATION_UNITS[first + 1]).param("count", amounts[first + 1]));
     }
 }

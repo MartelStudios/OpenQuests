@@ -46,6 +46,17 @@ Group #QuestPageRow {
 
     Group { Anchor: (Height: 6); }
 
+    // Hidden whole, spacing included, so a quest without rules keeps the layout it always had
+    Group #ConditionsSection {
+      LayoutMode: Top;
+      Visible: false;
+
+      Label #ConditionsHeader { Text: ""; Anchor: (Height: 16); Style: $P.@SectionStyle; }
+      Group #Conditions { LayoutMode: Top; }
+
+      Group { Anchor: (Height: 6); }
+    }
+
     Label #RewardsHeader { Text: ""; Anchor: (Height: 16); Style: $P.@SectionStyle; Visible: false; }
     Group #Rewards { LayoutMode: Top; }
 
