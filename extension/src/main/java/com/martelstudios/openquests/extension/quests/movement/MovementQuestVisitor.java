@@ -43,4 +43,10 @@ public class MovementQuestVisitor implements QuestVisitor<MovementQuestProgressi
     public Class<MovementQuestProgression<?>> getQuestType() {
         return (Class<MovementQuestProgression<?>>) (Class<?>) MovementQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
+    }
 }

@@ -57,4 +57,10 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuestProgression> 
     public Class<GatherQuestProgression> getQuestType() {
         return GatherQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
+    }
 }

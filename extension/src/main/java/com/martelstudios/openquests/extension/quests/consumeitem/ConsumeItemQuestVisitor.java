@@ -37,4 +37,10 @@ public class ConsumeItemQuestVisitor implements QuestVisitor<ConsumeItemQuestPro
     public Class<ConsumeItemQuestProgression> getQuestType() {
         return ConsumeItemQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
+    }
 }

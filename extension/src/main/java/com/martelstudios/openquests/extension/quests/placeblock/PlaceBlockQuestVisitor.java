@@ -43,4 +43,10 @@ public class PlaceBlockQuestVisitor implements QuestVisitor<PlaceBlockQuestProgr
     public Class<PlaceBlockQuestProgression> getQuestType() {
         return PlaceBlockQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
+    }
 }

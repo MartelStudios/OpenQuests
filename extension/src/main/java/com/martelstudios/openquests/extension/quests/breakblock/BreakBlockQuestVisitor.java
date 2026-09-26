@@ -40,4 +40,10 @@ public class BreakBlockQuestVisitor implements QuestVisitor<BreakBlockQuestProgr
     public Class<BreakBlockQuestProgression> getQuestType() {
         return BreakBlockQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
+    }
 }
