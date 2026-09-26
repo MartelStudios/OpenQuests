@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -302,7 +303,7 @@ public class JdbcQuestStorage implements QuestStorage {
     @Override
     public void savePlayer(@Nonnull UUID playerId, @Nonnull PlayerQuestRecord record) {
         // The link table owns the ids; a copy here could only disagree with it
-        PlayerQuestRecord stored = new PlayerQuestRecord(Set.of(), record.getStartedOnConnection(), record.getPendingRewards());
+        PlayerQuestRecord stored = new PlayerQuestRecord(Set.of(), record.getStartedOnConnection(), record.getPendingRewards(), record.getCompletions());
 
         pool.inTransaction(connection -> {
             writePlayer(connection, playerId, stored);
@@ -318,6 +319,19 @@ public class JdbcQuestStorage implements QuestStorage {
 
             record.getPendingRewards().remove(owed);
             record.getPendingRewards().add(owed);
+
+            writePlayer(connection, playerId, record);
+            return null;
+        });
+    }
+
+    @Override
+    public void recordCompletion(@Nonnull UUID playerId, @Nonnull String assetId, @Nonnull QuestState outcome, @Nullable Instant startedAt, @Nullable Instant completedAt) {
+        pool.inTransaction(connection -> {
+            PlayerQuestRecord record = readPlayer(connection, playerId);
+            if (record == null) record = new PlayerQuestRecord();
+
+            record.recordCompletion(assetId, outcome, startedAt, completedAt);
 
             writePlayer(connection, playerId, record);
             return null;

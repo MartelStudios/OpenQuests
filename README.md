@@ -116,7 +116,7 @@ A backend answers for three kinds of record, and nothing else:
 - **indexes**, a named set of quest ids, which is how a scope remembers what it handed out —
   `universe` for the universe scope, `world:<uuid>` per world;
 - **player records**, what a player carries besides their quests: the catalogue they have already
-  been offered, and what they are still owed.
+  been offered, what they are still owed, and how each asset ended for them so far.
 
 Who holds a quest is read off the quest itself: `AbstractQuestProgression.getPlayers()` is the
 source of truth, and a backend keeps whatever reverse index it needs to answer "the quests of this
@@ -255,6 +255,13 @@ Three asset flags change what a quest does when it completes:
 `PersistChildrenHistory` flag — off by default, so the steps of a chain do not pile up in the
 log next to the chain itself. Turn it on for children carrying rewards of their own: a reward
 that could not be granted on the spot has nowhere to wait.
+
+Every outcome is also counted in the record of each player holding the quest, per asset: how many
+of its quests ended successful, failed or abandoned for them, when the last one started and when
+it ended. The count lives in the player record rather than in the history, so an asset setting
+`PersistHistory: false` is counted all the same. A player who gave a shared quest up is counted as
+abandoning it when the quest ends rather than when they leave, so one who comes back and sees it
+through counts once. `QuestPlayerStateService.getCompletions(playerId, assetId)` reads it back.
 
 ## Built-in quest types
 
