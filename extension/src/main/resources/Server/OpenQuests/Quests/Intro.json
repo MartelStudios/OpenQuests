@@ -38,7 +38,7 @@
       "Type": "Command",
       "AutoClaim": true,
       "AsPlayer": true,
-      "Command": "/quest abandon SkipIntro"
+      "Command": "/oquest abandon SkipIntro"
     },
     {
       "Type": "GrantQuest",
@@ -53,7 +53,7 @@
       "Type": "Command",
       "AutoClaim": true,
       "AsPlayer": true,
-      "Command": "/quest complete SkipIntro"
+      "Command": "/oquest complete SkipIntro"
     }
   ],
   "AutoTrack": true,

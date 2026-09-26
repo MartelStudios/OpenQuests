@@ -8,7 +8,7 @@
       "Type": "Command",
       "AutoClaim": true,
       "AsPlayer": true,
-      "Command": "/quest abandon Intro"
+      "Command": "/oquest abandon Intro"
     }
   ],
   "AutoTrack": true,

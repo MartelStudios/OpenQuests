@@ -377,8 +377,9 @@ reaches the sender's quests, so the wider group grants nothing over anybody else
 - `Item` — gives items, hotbar first, all or nothing.
 - `GrantQuest` — hands further quests over, linked by id or written inline.
 - `Command` — runs a server or player command. `{player}` is replaced by the username, so
-  `"Command": "give {player} Ingredient_Stick 5"` works. A leading slash is optional. Runs as the
-  console unless `"AsPlayer": true`, which runs it with the permissions of the player instead.
+  `"Command": "give {player} Ingredient_Stick --quantity=5"` works; the optional arguments of a
+  server command are named, never positional. A leading slash is optional. Runs as the console
+  unless `"AsPlayer": true`, which runs it with the permissions of the player instead.
 
 ## Constraints
 
