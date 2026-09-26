@@ -392,6 +392,12 @@ A constraint speaks to the moments of a quest it is about, and has no objection 
 | --- | --- | --- |
 | Handing out | `allowsAssignment(asset, playerId, completions, now)` | A player is handed a new quest from the asset only if every constraint agrees, judging from how its quests ended for them so far. |
 | Progress | `allowsProgress(quest, actorId)` | A player's action counts only if every constraint agrees. Refused, it leaves no trace. |
+| Running out | `getDeadline(quest)`, `getExpiredState()` | A quest still running ends on the earliest deadline its constraints set, on the outcome of the constraint that set it. |
+
+Deadlines cost nothing while they wait: `QuestDeadlineService` keeps them in order and arms one
+timer on the earliest, rather than asking every quest on every tick. Only quests in memory are
+watched, so one whose holders are all offline ends when it is read back — a few seconds after its
+player arrives, on their world thread like any other change.
 
 Only a player's action is put to the constraints. A visitor says whose action it carries through
 `getActorId()`; one the system makes on its own — a quest being settled, failed or abandoned —
