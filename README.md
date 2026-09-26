@@ -406,6 +406,26 @@ says nothing, and is never held back.
 Every constraint is checked once at boot through `validate(asset)`, inline assets included, so a
 malformed one stops the server with the asset named rather than failing the day a player meets it.
 
+### Built-in constraints
+
+```json
+{
+  "Type": "Jump",
+  "TargetQuantity": 20,
+  "Constraints": [
+    { "Type": "TimeLimit", "Seconds": 30 }
+  ]
+}
+```
+
+| Type | Fields | Effect |
+| --- | --- | --- |
+| `TimeLimit` | `Seconds`, `OnExpire` | Ends the quest that long after it started. A shared quest is timed from its own start. |
+| `Deadline` | `At`, `OnExpire` | Ends every quest from the asset at one moment, an ISO-8601 instant such as `"2026-12-31T23:00:00Z"`. Nothing is handed out past it. |
+
+`OnExpire` is the outcome a quest running out ends on: `Failed` by default, `Successful` for a quest
+that is about holding out — survive for five minutes — or `Abandoned`.
+
 ## Extending
 
 Group everything a type needs in one package — asset, progression, visitor, systems — and give it a
