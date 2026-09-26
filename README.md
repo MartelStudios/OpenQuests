@@ -403,6 +403,11 @@ Only a player's action is put to the constraints. A visitor says whose action it
 `getActorId()`; one the system makes on its own — a quest being settled, failed or abandoned —
 says nothing, and is never held back.
 
+A step is played inside its chain, so the constraints of every group above it hold its progress
+back too: an `InWorld` written once on a chain holds for each of its steps. The other moments
+already reach a chain on their own — it is what gets handed out, it is what runs out of time, and
+ending it calls its steps off.
+
 Every constraint is checked once at boot through `validate(asset)`, inline assets included, so a
 malformed one stops the server with the asset named rather than failing the day a player meets it.
 
