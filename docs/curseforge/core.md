@@ -11,8 +11,9 @@ Around that, the core provides:
 *   **A lifecycle.** Registering, progressing, completing, archiving and unregistering a quest, with events published at each step so other plugins can react without being wired in.
 *   **Storage you choose.** JSON files out of the box, a JDBC database when one server stops being enough. Everything above is written against a single interface and never learns which answered.
 *   **Scopes.** A quest belongs to one player, to everyone in a world, or to the whole server.
-*   **A history.** Completions are recorded per player, with rewards that survive a failed delivery and are retried later.
-*   **Extension points.** Quest types, reward types and their serialization are registered from your own plugin. The core never learns they exist.
+*   **A history.** Completions are recorded per player, with rewards that survive a failed delivery and are retried later. How each quest ended is also counted per player, even for quests that keep no history.
+*   **Constraints.** Rules composed onto any quest: whether a player may be handed one, whether their progress counts, when it runs out of time. The core asks them at the right moments and keeps every deadline on a single timer.
+*   **Extension points.** Quest types, reward types, constraints and their serialization are registered from your own plugin. The core never learns they exist.
 
 It ships no quest type and no interface. On its own it does nothing visible — which is the point: it is what you build on.
 
