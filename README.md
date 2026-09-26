@@ -430,6 +430,17 @@ malformed one stops the server with the asset named rather than failing the day 
 | `Cooldown` | `Seconds`, `From` | Hands a quest from the asset out at most once per period: from the end of the last one, whichever way it ended, or from its start with `"From": "Start"`. |
 | `MaxCompletions` | `Count`, `Outcomes` | Stops handing quests from the asset out once that many ended that way for the player. Only `Successful` counts unless `Outcomes` lists more. |
 
+The journal lists them under **Conditions** on the quest's page, one line each: the time left, the
+world, the players needed against those online, how often the quest can be taken and how much of
+it the player has used. A rule with nothing left to say — the time left on a quest that is over —
+draws nothing. `DescriptionKey`, on any constraint, puts the asset's own words on its line instead,
+which is what a world pattern or a list of conditions wants; an empty one keeps the rule off the
+page:
+
+```json
+{ "Type": "InWorld", "WorldNamePattern": "Arena_.*", "DescriptionKey": "quest.arena.only-inside" }
+```
+
 `Cooldown` and `MaxCompletions` read the counts every player record keeps per asset, so they hold
 for an asset that keeps no history, and across restarts. A daily quest is a quest a player can
 take at most once a day, handed out by whatever hands it out — on connection, as a reward, by a
@@ -493,7 +504,12 @@ QuestConstraint.CODEC.register("MyConstraint", MyConstraint.class, MyConstraint.
 ```
 
 A visitor carrying a player's action returns that player from `getActorId()`, which is what puts
-it to the constraints of each quest it reaches.
+it to the constraints of each quest it reaches. A constraint describes itself in the journal the
+way a reward previews itself, one line or none:
+
+```java
+QuestPageService.register(new MyConstraintRenderer());
+```
 
 A quest type also says how it shows itself in the tracker, by registering a `QuestHudRenderer`:
 

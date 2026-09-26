@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension.constraints.condition;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
+import com.martelstudios.openquests.extension.journal.QuestPageService;
 
 import javax.annotation.Nonnull;
 
@@ -14,9 +15,11 @@ public final class ConditionConstraintsFeature {
     private ConditionConstraintsFeature() {}
 
     /**
-     * Registers the constraint under its type id.
+     * Registers the constraint under its type id, and how the journal describes it.
      */
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestConstraint.CODEC.register(ENTITY_CONDITION_TYPE_ID, EntityConditionConstraint.class, EntityConditionConstraint.CODEC);
+
+        QuestPageService.register(new EntityConditionRenderer());
     }
 }
