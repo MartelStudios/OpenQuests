@@ -427,6 +427,25 @@ malformed one stops the server with the asset named rather than failing the day 
 | `EntityCondition` | `Conditions` | Counts progress only while the player's entity meets every condition — the game's own, `Sprinting`, `OutOfCombat`, `HasEffect`…, so one another mod registers works too. |
 | `MinPlayersOnline` | `Count` | Counts progress only while that many players are on the server, the acting one included. |
 | `FailOnDeath` | — | Fails the quest the moment one of its players dies. A shared quest fails for everyone holding it. |
+| `Cooldown` | `Seconds`, `From` | Hands a quest from the asset out at most once per period: from the end of the last one, whichever way it ended, or from its start with `"From": "Start"`. |
+| `MaxCompletions` | `Count`, `Outcomes` | Stops handing quests from the asset out once that many ended that way for the player. Only `Successful` counts unless `Outcomes` lists more. |
+
+`Cooldown` and `MaxCompletions` read the counts every player record keeps per asset, so they hold
+for an asset that keeps no history, and across restarts. A daily quest is a quest a player can
+take at most once a day, handed out by whatever hands it out — on connection, as a reward, by a
+command:
+
+```json
+{
+  "Type": "Gather",
+  "ItemToGather": { "ItemId": "Ingredient_Stick" },
+  "TargetQuantity": 20,
+  "Constraints": [
+    { "Type": "Cooldown", "Seconds": 86400 },
+    { "Type": "MaxCompletions", "Count": 30 }
+  ]
+}
+```
 
 A world, an area or a condition holds the quest back rather than ending it: whatever the player
 does outside is lost, and the quest waits for them to come back. Ending one when something
