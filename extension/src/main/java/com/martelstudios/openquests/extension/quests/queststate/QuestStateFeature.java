@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension.quests.queststate;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
+import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
@@ -42,5 +43,6 @@ public final class QuestStateFeature {
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, QuestStateQuestEvents::handleQuestAddedToPlayerStore);
         plugin.getEventRegistry().registerGlobal(QuestRemovedFromPlayerStoreEvent.class, QuestStateQuestEvents::handleQuestRemovedFromPlayerStore);
         plugin.getEventRegistry().registerGlobal(QuestStateChangedEvent.class, QuestStateQuestEvents::handleQuestStateChanged);
+        plugin.getEventRegistry().registerGlobal(QuestPlayerAbandonedEvent.class, QuestStateQuestEvents::handleQuestPlayerAbandoned);
     }
 }

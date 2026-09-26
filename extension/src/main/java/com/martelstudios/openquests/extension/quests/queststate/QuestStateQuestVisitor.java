@@ -29,13 +29,14 @@ public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgr
 
     /**
      * Any of them, running or finished alike: a quest that ended is set aside rather than deleted,
-     * so it answers here the same way it did while it was running.
+     * so it answers here the same way it did while it was running. Read as this player sees it,
+     * since one who left a shared quest has abandoned it while it runs on for the others.
      */
     private boolean matches(@Nonnull QuestStateQuestProgression quest) {
         for (UUID questId : QuestStateIndex.get().candidatesOf(quest.getQuestAssetId(), playerId)) {
             var watched = QuestProgressionService.get().getQuest(questId);
 
-            if (watched != null && matchesState(quest, watched.getState())) return true;
+            if (watched != null && matchesState(quest, watched.getStateFor(playerId))) return true;
         }
         return false;
     }

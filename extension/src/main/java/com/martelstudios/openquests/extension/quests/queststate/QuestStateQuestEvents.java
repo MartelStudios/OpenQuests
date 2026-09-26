@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.extension.quests.queststate;
 
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
+import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -46,6 +47,16 @@ public final class QuestStateQuestEvents {
         for (UUID playerId : quest.getPlayers()) {
             reevaluate(playerId, QuestStateIndex.get().watchersOf(quest.getAssetId(), playerId));
         }
+    }
+
+    /**
+     * Leaving a quest changes what it is worth to that player alone, and a shared quest carries on
+     * for the others without any change of state to report it.
+     */
+    public static void handleQuestPlayerAbandoned(@Nonnull QuestPlayerAbandonedEvent event) {
+        AbstractQuestProgression<?> quest = event.getQuest();
+
+        reevaluate(event.getPlayerId(), QuestStateIndex.get().watchersOf(quest.getAssetId(), event.getPlayerId()));
     }
 
     /**
