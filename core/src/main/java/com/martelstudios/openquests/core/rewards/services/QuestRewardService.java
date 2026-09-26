@@ -164,7 +164,7 @@ public class QuestRewardService {
 
     /**
      * Hands over what is owed, one reward at a time, writing down what is left after each. A
-     * reward that cannot be granted right now — a full inventory — stays owed and is retried.
+     * reward that cannot be granted right now (a full inventory) stays owed and is retried.
      */
     private void grant(@Nonnull PendingRewards pending, @Nonnull EntityComponents playerComponents) {
         QuestReward[] rewards = pending.getRewards();

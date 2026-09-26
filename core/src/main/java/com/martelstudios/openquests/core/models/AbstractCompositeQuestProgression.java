@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * A quest made of other quests, and the only kind allowed any. Holds the tree — which quests are
- * its steps, each of them knowing whose step it is — and hands its players down to them. What the
+ * A quest made of other quests, and the only kind allowed any. Holds the tree (which quests are
+ * its steps, each of them knowing whose step it is) and hands its players down to them. What the
  * group makes of how its steps end is left to the type built on it.
  *
  * <p>Steps are not embedded: each is an ordinary quest with its own record, resolved, stored and

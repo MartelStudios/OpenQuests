@@ -36,7 +36,7 @@ import javax.annotation.Nonnull;
 
 /**
  * The quest and reward types shipped on top of OpenQuestsCore. Each feature registers itself, so
- * this class only lists them — which is also the shape another plugin should copy to add its own.
+ * this class only lists them, which is also the shape another plugin should copy to add its own.
  */
 public class OpenQuestsPlugin extends JavaPlugin {
 

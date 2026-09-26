@@ -4,7 +4,7 @@
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
 
-A quest here is two objects. An **asset** describes it — title, parameters, rewards — and is authored as JSON in the Asset Editor. A **progression** carries the running state and is persisted on its own. The two are linked by id, so editing a definition never disturbs saved progress.
+A quest here is two objects. An **asset** describes it (title, parameters, rewards) and is authored as JSON in the Asset Editor. A **progression** carries the running state and is persisted on its own. The two are linked by id, so editing a definition never disturbs saved progress.
 
 Around that, the core provides:
 
@@ -15,10 +15,10 @@ Around that, the core provides:
 *   **Constraints.** Rules composed onto any quest: whether a player may be handed one, whether their progress counts, when it runs out of time. The core asks them at the right moments and keeps every deadline on a single timer.
 *   **Extension points.** Quest types, reward types, constraints and their serialization are registered from your own plugin. The core never learns they exist.
 
-It ships no quest type and no interface. On its own it does nothing visible — which is the point: it is what you build on.
+It ships no quest type and no interface. On its own it does nothing visible, which is the point: it is what you build on.
 
 **Running a server?** Drop it in `mods/` alongside OpenQuests, which depends on it. Nothing to edit.
 
-**Writing a mod?** The core is usable on its own if you would rather write every quest type yourself — declare `"MartelStudios:OpenQuestsCore": "*"` in the `manifest.json` your own mod ships, and nothing else comes with it.
+**Writing a mod?** The core is usable on its own if you would rather write every quest type yourself: declare `"MartelStudios:OpenQuestsCore": "*"` in the `manifest.json` your own mod ships, and nothing else comes with it.
 
-Source and documentation: [https://github.com/MartelStudios/OpenQuests](https://github.com/MartelStudios/OpenQuests) — MIT licensed.
+Source and documentation: [https://github.com/MartelStudios/OpenQuests](https://github.com/MartelStudios/OpenQuests), MIT licensed.

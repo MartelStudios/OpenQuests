@@ -77,7 +77,7 @@ public interface QuestStorage extends AutoCloseable {
     }
 
     /**
-     * Every quest the backend holds — a migration, an audit. A shared database holds what every
+     * Every quest the backend holds, for a migration or an audit. A shared database holds what every
      * server on it ever wrote.
      */
     @Nonnull

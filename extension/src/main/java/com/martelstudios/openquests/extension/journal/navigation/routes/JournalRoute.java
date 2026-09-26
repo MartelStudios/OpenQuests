@@ -19,8 +19,8 @@ public class JournalRoute extends TabRoute implements LabelledRoute {
     }
 
     /**
-     * @return what the open tab is called. The group is not a place a player stands — it always
-     * stands for whichever of its tabs is open — so it borrows that tab's name.
+     * @return what the open tab is called. The group is not a place a player stands (it always
+     * stands for whichever of its tabs is open), so it borrows that tab's name.
      */
     @Nonnull
     @Override

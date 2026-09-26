@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * Fired when the store starts holding a quest — created, read back from a player's file, or pulled
+ * Fired when the store starts holding a quest: created, read back from a player's file, or pulled
  * in by a lookup. {@link QuestRegisteredEvent} is a quest coming into existence; this one is it
  * being in memory, which is what anything indexing quests is waiting for.
  */

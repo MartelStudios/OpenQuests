@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 
 /**
  * How one quest type draws itself in the tracker. The panel picks which quests get in and stops at
- * five; everything past that — lines, colours, progress — belongs here.
+ * five; everything past that (lines, colours, progress) belongs here.
  */
 public interface QuestHudRenderer {
 

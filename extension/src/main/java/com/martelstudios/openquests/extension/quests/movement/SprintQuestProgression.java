@@ -19,7 +19,7 @@ public class SprintQuestProgression extends MovementQuestProgression<SprintQuest
     }
 
     /**
-     * The fastest pace, held down for as long as it lasts — so a quest counting it is a quest about
+     * The fastest pace, held down for as long as it lasts, so a quest counting it is a quest about
      * keeping it up rather than about the ground covered.
      */
     @Override

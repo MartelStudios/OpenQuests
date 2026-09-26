@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 
 /**
  * Checks a player's position against the reach-location quests they are running, once per tick.
- * Simpler than Hytale's marker + spatial-index approach — fine at this mod's scale, since the query
+ * Simpler than Hytale's marker + spatial-index approach, and fine at this mod's scale, since the query
  * leaves out every player who has no such quest and each check is a distance comparison.
  */
 public class ReachLocationTickingSystem extends EntityTickingSystem<EntityStore> {

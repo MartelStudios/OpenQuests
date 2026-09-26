@@ -314,7 +314,7 @@ class JdbcQuestStorageTest {
 
     /**
      * SQLite spells its upsert the way PostgreSQL does, so this is the {@code ON CONFLICT}
-     * statement under test — on a file, since several connections to one in-memory SQLite are
+     * statement under test, run on a file since several connections to one in-memory SQLite are
      * several databases.
      */
     @Test

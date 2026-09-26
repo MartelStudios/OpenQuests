@@ -12,7 +12,7 @@ import java.util.UUID;
 
 /**
  * What a renderer needs to draw into the journal: the builders, and the only things it cannot work
- * out on its own — which line it is writing, and where that line leads. Neither is its concern to
+ * out on its own: which line it is writing, and where that line leads. Neither is its concern to
  * decide: the page opens the container, and whoever lists a quest says where it points.
  */
 public final class QuestPageContext {
@@ -169,8 +169,8 @@ public final class QuestPageContext {
      * The same for a quest named rather than held: its lines lead to it and carry what the journal
      * knows about it.
      *
-     * <p>When the journal knows nothing — never handed out, or ended and kept no record of its own
-     * — the lines keep the mark they already had, which is the one the quest above them carries. A
+     * <p>When the journal knows nothing (never handed out, or ended and kept no record of its own),
+     * the lines keep the mark they already had, which is the one the quest above them carries. A
      * chain given up is a chain whose every step was given up, and saying so is nearer the truth
      * than showing a step the player did reach as one they never opened.
      */
@@ -216,7 +216,7 @@ public final class QuestPageContext {
      *
      * <p>Handed over nothing is said as {@link QuestMark#LOCKED} rather than left unsaid, and that
      * is the whole point of the call. A quest that failed paid none of what success would have
-     * paid, yet the row still lists it — so without a word the line would go looking for the asset
+     * paid, yet the row still lists it, so without a word the line would go looking for the asset
      * by name and answer with somebody else's run of it, which reads as a quest the player was
      * given and walked away from.
      */
@@ -268,7 +268,7 @@ public final class QuestPageContext {
      * locked: the answer is a page the player asked for, not a decision.
      *
      * <p>Whatever mark the line carries goes along with the click. A quest that ended and left
-     * nothing behind — a step of a chain, which by default keeps no history of its own — is known
+     * nothing behind (a step of a chain, which by default keeps no history of its own) is known
      * to nothing but the line that just drew it, so the page it opens is told rather than left to
      * read it as one never started.
      */

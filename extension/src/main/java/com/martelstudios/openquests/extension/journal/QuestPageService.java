@@ -66,7 +66,7 @@ public final class QuestPageService {
 
     /**
      * Walks up the class hierarchy, so one renderer registered on a base type serves every type
-     * built on it — every counted quest shares the one that draws a counter.
+     * built on it: every counted quest shares the one that draws a counter.
      */
     @Nullable
     private static <R> R resolve(@Nonnull Map<Class<?>, R> renderers, @Nonnull Class<?> type) {

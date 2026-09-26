@@ -19,7 +19,7 @@ public class WalkQuestProgression extends MovementQuestProgression<WalkQuestProg
     }
 
     /**
-     * The slow pace a player has to hold a key down for, not the one they travel at by default —
+     * The slow pace a player has to hold a key down for, not the one they travel at by default,
      * so this is a quest about taking one's time rather than about covering ground.
      */
     @Override

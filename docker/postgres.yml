@@ -6,7 +6,7 @@
 #                        -Popenquests.jdbc.password=openquests
 #
 # Adminer lands on http://localhost:8081/?pgsql=postgres&username=openquests&db=openquests
-# with everything but the password filled in — which is openquests.
+# with everything but the password filled in. The password is openquests.
 #
 # Port 5433 so it does not argue with a PostgreSQL already installed on the machine, and both
 # ports are bound to the loopback: the credentials here are a development convenience, not

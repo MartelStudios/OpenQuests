@@ -21,7 +21,7 @@ import java.util.UUID;
 
 /**
  * What a player hears and sees when a quest of theirs ends. A success takes over the middle of the
- * screen the way a zone discovery does — same packet, same timings — and every outcome gets a cue
+ * screen the way a zone discovery does (same packet, same timings), and every outcome gets a cue
  * of its own.
  *
  * <p>A presentation choice rather than part of the quest system: the outcome is already decided
@@ -98,7 +98,7 @@ public class QuestFeedbackService {
     }
 
     /**
-     * The quest's own title, over the line saying what became of it — the arrangement a zone
+     * The quest's own title, over the line saying what became of it: the arrangement a zone
      * discovery uses for its region and zone.
      */
     private void showTitle(@Nonnull PlayerRef playerRef, @Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state) {
@@ -127,7 +127,7 @@ public class QuestFeedbackService {
 
     /**
      * @return the sound event the asset named, the default for that outcome, or {@code null} for
-     * an asset that named the empty string — which is how one outcome is made to end in silence.
+     * an asset that named the empty string, which is how one outcome is made to end in silence.
      */
     @Nullable
     private String resolveSound(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state) {

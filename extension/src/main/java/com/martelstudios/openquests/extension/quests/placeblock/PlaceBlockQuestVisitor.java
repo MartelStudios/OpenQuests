@@ -13,7 +13,7 @@ import java.util.UUID;
  *
  * <p>Matched on the item in hand rather than on a block type: placing is the one side of this pair
  * the server announces before the block exists, so the item about to become it is all there is to
- * go on. For a block that is placed from its own item — which is most of them — the two names are
+ * go on. For a block that is placed from its own item (which is most of them), the two names are
  * the same, and a tag resolves the same way either way.
  */
 public class PlaceBlockQuestVisitor implements QuestVisitor<PlaceBlockQuestProgression> {

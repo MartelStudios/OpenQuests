@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * Fired when a quest is registered into a specific player's store, regardless of scope (direct
  * player, world, or universe). Unlike {@link QuestRegisteredEvent} (fired once per quest instance),
- * this fires once per (quest, player) pair — the right hook for per-player catch-up logic.
+ * this fires once per (quest, player) pair: the right hook for per-player catch-up logic.
  */
 public class QuestAddedToPlayerStoreEvent implements IEvent<UUID> {
     @Nonnull

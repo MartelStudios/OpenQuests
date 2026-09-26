@@ -7,7 +7,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The quests of one holder, by id — a player, a world, the universe. None of them holds the
+ * The quests of one holder, by id: a player, a world, the universe. None of them holds the
  * quests themselves: a quest is one object whoever it belongs to.
  *
  * <p>In memory only. The {@link com.martelstudios.openquests.core.persistence.QuestStorage}

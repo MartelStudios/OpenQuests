@@ -159,7 +159,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     /**
      * When it reached the outcome it now carries. Rewritten whenever that outcome changes, and
-     * struck out if the quest goes back to running — a quest kept alive by {@code StopOnComplete:
+     * struck out if the quest goes back to running, as a quest kept alive by {@code StopOnComplete:
      * false} can, and a date left standing would say it ended when it did not.
      */
     @Nullable
@@ -353,7 +353,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Called just after the quest progression entered the quest store.
      * Called by {@link QuestProgressionService#registerQuest(AbstractQuestProgression)}.
      *
-     * <p>Runs once, when the quest is first handed out, and not when one is read back from disk —
+     * <p>Runs once, when the quest is first handed out, and not when one is read back from disk,
      * which is what makes it the moment the quest started.
      */
     public void onRegistered() {

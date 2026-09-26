@@ -22,8 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Composite quest whose objective is that other quests complete successfully, combined with
- * {@code AND} or {@code OR}. The tree itself — which quests are its steps, and each step knowing
- * it — is the core's; this type adds how the group ends, derived from its children by a visitor.
+ * {@code AND} or {@code OR}. The tree itself (which quests are its steps, and each step knowing
+ * it) is the core's; this type adds how the group ends, derived from its children by a visitor.
  */
 public class CompositeQuestProgression extends AbstractCompositeQuestProgression<CompositeQuestProgression> {
 
@@ -80,7 +80,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * is called off rather than dropped: this is where the losing branches of an OR are settled,
      * and where a chain the player gave up gives up every step under it.
      *
-     * <p>Called off means heard to end, which is the whole reason to do it here — each child writes
+     * <p>Called off means heard to end, which is the whole reason to do it here: each child writes
      * its record, pays what that outcome pays, and releases whoever was waiting on it. A child that
      * is itself a chain does the same to its own, so an abandoned tree settles all the way down.
      *
@@ -107,7 +107,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * <p>The group records these itself rather than hearing them: its listeners are gone by the
      * line above, and {@link CompositeQuestVisitor} would refuse the news anyway, since a group
      * that has already settled stops counting. So nothing else is left to remember what became of
-     * a step called off here — a step that is, by default, unregistered on the spot.
+     * a step called off here, a step that is, by default, unregistered on the spot.
      */
     private void settleChildren() {
         releaseChildListeners();
@@ -138,8 +138,8 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     }
 
     /**
-     * Writes down how a child ended. A child that is running again — which one kept alive by
-     * {@code StopOnComplete:false} can be — has its outcome struck out rather than left standing:
+     * Writes down how a child ended. A child that is running again (which one kept alive by
+     * {@code StopOnComplete:false} can be) has its outcome struck out rather than left standing:
      * the group would otherwise keep counting an end the child has moved past.
      *
      * @return {@code true} when this changed anything, so the group is only marked dirty on news.

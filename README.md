@@ -10,7 +10,7 @@ definition never touches saved progression.
 <img src="docs/images/quest-tracker.png" alt="The quest tracker showing a composite quest: Introduction, holding Master the basics with its four gathering and crafting steps, an OR rule, and Skip Intro" width="420">
 
 One quest, as the tracker draws it. *Introduction* combines its two children with `OR`, so either
-branch ends it — hence the rule between them. *Master the basics* combines its own four with `AND`,
+branch ends it, hence the rule between them. *Master the basics* combines its own four with `AND`,
 and nests one level further. *Gather fibre* is done: complete icon, greyed, counter dropped. The two
 grey lines are descriptions, shown because their assets carry the `OQ_HUD_DESC` tag.
 
@@ -41,11 +41,11 @@ Depending on `OpenQuestsCore` alone is enough to build your own quest types;
 There is no separate assignment concept: a quest is handed out in one of three ways, and the
 prerequisites of a quest are other quests.
 
-- **On connection** — `"StartOnConnection": true` gives the quest to every player, once. Only the
+- **On connection**: `"StartOnConnection": true` gives the quest to every player, once. Only the
   ids already handed out are kept between sessions, so a quest nobody took costs one string.
-- **As a reward** — the `GrantQuest` reward hands further quests over when a quest completes. This
+- **As a reward**: the `GrantQuest` reward hands further quests over when a quest completes. This
   is how a chain is written: finishing A grants B.
-- **Explicitly** — `QuestProgressionService.assignQuest(asset, playerId)`, from a command or from
+- **Explicitly**: `QuestProgressionService.assignQuest(asset, playerId)`, from a command or from
   your own plugin.
 
 Each of these asks the [constraints](#constraints) of the asset first, and so do the scopes as
@@ -56,7 +56,7 @@ one. The steps of a chain are handed out by the chain, so only the chain is aske
 that decides on its own.
 
 A quest gating on another one is a `QuestState` quest, usually as the child of a composite. Since a
-quest holds a state rather than a boolean, "not yet" and "failed" stay distinct — which is what
+quest holds a state rather than a boolean, "not yet" and "failed" stay distinct, which is what
 lets a composite fail rather than hang.
 
 ### Quests made of quests
@@ -79,7 +79,7 @@ as the `OQ_GRANTED_BY` tag, not a part of a whole.
 
 A quest only ever knows its players: `AbstractQuestProgression` is the single source of truth,
 and `QuestStoreComponent` is the reverse index a session reads it back through. Scope is applied from
-the outside, from `core/scopes/`, and each scope package is self-contained — the rest of the core
+the outside, from `core/scopes/`, and each scope package is self-contained: the rest of the core
 never depends on it, only the reverse.
 
 #### Player scope
@@ -99,7 +99,7 @@ instanced events:
 ### Storage
 
 Where a quest is kept is decided by one interface, `QuestStorage`, and named in `config.json`.
-Everything above it — services, scopes, the journal — is written against it and never learns which
+Everything above it (services, scopes, the journal) is written against it and never learns which
 backend answered.
 
 | Backend | `"Type"` | For |
@@ -111,7 +111,7 @@ backend answered.
 
 Disk is for a solo world or a server among friends. Memory is not what decides: a progression
 costs about 700 bytes in memory, so ten thousand of them fit in 7 MiB. What gives first is the
-file system — one file per quest, one read per quest a connecting player holds, and three file
+file system: one file per quest, one read per quest a connecting player holds, and three file
 operations per quest a save pass writes.
 
 Move to JDBC past a few dozen regular players or a few thousand stored quests, and straight away
@@ -120,7 +120,7 @@ if two servers share the same players: files cannot do that at all.
 A backend answers for three kinds of record, and nothing else:
 
 - **progressions**, one per quest, by id, by player, or the lot;
-- **indexes**, a named set of quest ids, which is how a scope remembers what it handed out —
+- **indexes**, a named set of quest ids, which is how a scope remembers what it handed out:
   `universe` for the universe scope, `world:<uuid>` per world;
 - **player records**, what a player carries besides their quests: the catalogue they have already
   been offered, what they are still owed, and how each asset ended for them so far.
@@ -158,7 +158,7 @@ For JDBC:
 
 | Key | Default | |
 | --- | --- | --- |
-| `Url` | — | Required. The dialect is read off it. |
+| `Url` | none | Required. The dialect is read off it. |
 | `User`, `Password` | none | Left out for a URL carrying its own credentials. |
 | `DriverPath` | none | The driver jar, relative to the server directory. No driver is shipped, so one database is not chosen for you and a driver is updated without waiting for a release. Left out for a driver already on the classpath. |
 | `DriverClass` | none | Left out for a driver jar that declares itself, which every current one does. |
@@ -191,7 +191,7 @@ A player is handed over cleanly: their session is written out when they disconne
 when they connect, quests, catalogue and debts alike. Nothing of theirs is left in the entity file
 of the server they were on.
 
-A quest several servers hold **at once** — a universe-scope community goal — is another matter:
+A quest several servers hold **at once** (a universe-scope community goal) is another matter:
 each keeps its own copy in memory and the last save wins. `updated_at` and `updated_by` say which
 server that was. Treat cross-server universe quests as a known limit rather than a feature.
 
@@ -210,7 +210,7 @@ Set `OPENQUESTS_CONFIG`, or the system property `openquests.config`, to a path. 
 back to files.
 
 The dev run reads the same path from the `openquests.config` Gradle property, which
-`gradle.properties` already carries commented out — uncomment it and every launch picks it up,
+`gradle.properties` already carries commented out. Uncomment it and every launch picks it up,
 whatever shell or IDE started it:
 
 ```properties
@@ -228,8 +228,8 @@ one shared by several got a file of its own. The first is what left the system w
 behind an interface, since nothing above could be told where a quest was without also being told
 how many players it had. Every quest now gets a record of its own.
 
-Shared quests carry over untouched: same directory, same format. What a player's entity file held —
-their solo quests, the catalogue they had been offered, what they were owed — is not read any more,
+Shared quests carry over untouched: same directory, same format. What a player's entity file held
+(their solo quests, the catalogue they had been offered, what they were owed) is not read any more,
 and those players start over. None of it is destroyed: the server keeps the data of a component it
 does not recognise, so it is still sitting in the entity files under `Unknown` for a migration to
 read.
@@ -246,8 +246,8 @@ QuestStorageProvider.CODEC.register("Redis", RedisStorageProvider.class, RedisSt
 
 A quest is created from its asset, progresses through visitors, and on reaching a terminal state
 (`SUCCESSFUL`, `FAILED`, `ABANDONED`) is archived into each assignee's history and unregistered.
-Rewards are granted immediately when `AutoClaim` is set; one that could not be granted — a full
-inventory, an offline player — stays pending on the history record and is retried on the next
+Rewards are granted immediately when `AutoClaim` is set; one that could not be granted (a full
+inventory, an offline player) stays pending on the history record and is retried on the next
 world entry.
 
 Three asset flags change what a quest does when it completes:
@@ -259,7 +259,7 @@ Three asset flags change what a quest does when it completes:
 | `PersistHistory` | `true` | Nothing is recorded on completion. Rewards not granted on the spot are lost, since nothing is left to retry them from. |
 
 `PersistHistory` can also be set on a running quest, which is how a composite applies its
-`PersistChildrenHistory` flag — off by default, so the steps of a chain do not pile up in the
+`PersistChildrenHistory` flag, off by default, so the steps of a chain do not pile up in the
 log next to the chain itself. Turn it on for children carrying rewards of their own: a reward
 that could not be granted on the spot has nowhere to wait.
 
@@ -304,12 +304,12 @@ the panel; `OQ_HUD_DESC` shows its description under its title, greyed and small
 What the player then does with it is written on the quest rather than on the asset, through
 `QuestTrackService`: `track`, `untrack`, `toggle`, and `reset` to hand the answer back to the asset.
 `getTracked(playerId)` reads the list back as quest ids, and `replaceTracked` swaps it for another
-and returns what it took — which is how a game mode borrows the tracker for a round and gives it
+and returns what it took, which is how a game mode borrows the tracker for a round and gives it
 back. The core declares both fields and reads neither: what being tracked amounts to is the
 extension's business, the same way it owns what a `TitleKey` ends up drawn on.
 
 A running quest carries tags of its own, through `addTag` and `removeTag`, and is asked before its
-asset — the same override as `PersistHistory`, so one quest can answer differently from everything
+asset: the same override as `PersistHistory`, so one quest can answer differently from everything
 sharing its template. Its tags carry values just as an asset's do, and the instance answers alone
 once it declares one, so a quest can be written over at runtime rather than only added to.
 
@@ -319,10 +319,10 @@ once it declares one, so a quest can be written over at runtime rather than only
 | --- | --- |
 | `Always` | From the moment it is handed out. The default. |
 | `WhenProgressed` | Once the player has got somewhere with it. |
-| `WhenCompleted` | Only once it is over — an achievement, earned before it is named. |
+| `WhenCompleted` | Only once it is over: an achievement, earned before it is named. |
 | `Never` | Not at all, whatever becomes of it. |
 
-Written in camel case in the asset, as every enum is — `QuestVisibility.WHEN_COMPLETED` in Java is
+Written in camel case in the asset, as every enum is: `QuestVisibility.WHEN_COMPLETED` in Java is
 `"WhenCompleted"` in JSON, the same way `Operator.OR` is `"Or"`. `EnumCodec` does the mapping, and
 a spelling it does not know fails the asset at boot rather than being quietly ignored.
 
@@ -331,17 +331,17 @@ answers `isCompleted()`, which is what the base does; every counted type answers
 instead, from `QuantityQuestProgression`. So your own type inherits a sensible answer and overrides
 it only if it has something better to say.
 
-What the quest owes the player is untouched by any of this — a debt is listed in its own right, so
+What the quest owes the player is untouched by any of this: a debt is listed in its own right, so
 a quest nobody ever sees still pays out, and still announces how it ended.
 
-A quest drawn under another one — the steps of a chain — is drawn by its parent, and an inline step
+A quest drawn under another one (the steps of a chain) is drawn by its parent, and an inline step
 inherits nothing from the chain it is written inside: its tags are its own. So a step is on the
 panel on the same terms as anything else, and asking for one is how a player narrows a long chain
 down to what they are doing now. Keeping the chain up beside it is theirs to decide too.
 
 Every counted type extends `QuantityQuestAsset`, which carries `TargetQuantity`. The parameter and
 the target can both be overridden on the progression itself, serialized only when set and falling
-back to the asset otherwise — so a quest handed out from a shared template can still target
+back to the asset otherwise, so a quest handed out from a shared template can still target
 something of its own.
 
 ### Ending a quest
@@ -365,7 +365,7 @@ string plays nothing.
 
 `/oquest create player|world|universe <assetId> …` hands a quest out. `/oquest complete`,
 `/oquest fail` and `/oquest abandon` write that state onto the sender's quests, taking either one quest
-id or an asset id — the second reaches every quest they hold from it. They go through the ordinary
+id or an asset id: the second reaches every quest they hold from it. They go through the ordinary
 progression path, so `StopOnComplete` still decides whether the quest stops there.
 
 Permissions are generated from the plugin and the command path, so `/oquest complete` answers to
@@ -375,9 +375,9 @@ reaches the sender's quests, so the wider group grants nothing over anybody else
 
 ## Built-in rewards
 
-- `Item` — gives items, hotbar first, all or nothing.
-- `GrantQuest` — hands further quests over, linked by id or written inline.
-- `Command` — runs a server or player command. `{player}` is replaced by the username, so
+- `Item`: gives items, hotbar first, all or nothing.
+- `GrantQuest`: hands further quests over, linked by id or written inline.
+- `Command`: runs a server or player command. `{player}` is replaced by the username, so
   `"Command": "give {player} Ingredient_Stick --quantity=5"` works; the optional arguments of a
   server command are named, never positional. A leading slash is optional. Runs as the console
   unless `"AsPlayer": true`, which runs it with the permissions of the player instead.
@@ -398,16 +398,16 @@ A constraint speaks to the moments of a quest it is about, and has no objection 
 
 Deadlines cost nothing while they wait: `QuestDeadlineService` keeps them in order and arms one
 timer on the earliest, rather than asking every quest on every tick. Only quests in memory are
-watched, so one whose holders are all offline ends when it is read back — a few seconds after its
+watched, so one whose holders are all offline ends when it is read back, a few seconds after its
 player arrives, on their world thread like any other change.
 
 Only a player's action is put to the constraints. A visitor says whose action it carries through
-`getActorId()`; one the system makes on its own — a quest being settled, failed or abandoned —
+`getActorId()`; one the system makes on its own (a quest being settled, failed or abandoned)
 says nothing, and is never held back.
 
 A step is played inside its chain, so the constraints of every group above it hold its progress
 back too: an `InWorld` written once on a chain holds for each of its steps. The other moments
-already reach a chain on their own — it is what gets handed out, it is what runs out of time, and
+already reach a chain on their own: it is what gets handed out, it is what runs out of time, and
 ending it calls its steps off.
 
 Every constraint is checked once at boot through `validate(asset)`, inline assets included, so a
@@ -431,15 +431,15 @@ malformed one stops the server with the asset named rather than failing the day 
 | `Deadline` | `At`, `OnExpire` | Ends every quest from the asset at one moment, an ISO-8601 instant such as `"2026-12-31T23:00:00Z"`. Nothing is handed out past it. |
 | `InWorld` | `WorldNamePattern`, `OnLeave` | Counts progress only in a world whose whole name matches, the way `EnterWorld` reads its own. `"OnLeave": "Fail"` fails the quest when its player goes from a matching world to one that is not; logging out is not leaving. |
 | `NearPosition` | `Position`, `Radius`, `WorldNamePattern` | Counts progress only within the radius, its edge included. The pattern, optional, says which world the position is in. |
-| `EntityCondition` | `Conditions` | Counts progress only while the player's entity meets every condition — the game's own, `Sprinting`, `OutOfCombat`, `HasEffect`…, so one another mod registers works too. |
+| `EntityCondition` | `Conditions` | Counts progress only while the player's entity meets every condition: the game's own, `Sprinting`, `OutOfCombat`, `HasEffect`…, so one another mod registers works too. |
 | `MinPlayersOnline` | `Count` | Counts progress only while that many players are on the server, the acting one included. |
-| `FailOnDeath` | — | Fails the quest the moment one of its players dies. A shared quest fails for everyone holding it. |
+| `FailOnDeath` | none | Fails the quest the moment one of its players dies. A shared quest fails for everyone holding it. |
 | `Cooldown` | `Seconds`, `From` | Hands a quest from the asset out at most once per period: from the end of the last one, whichever way it ended, or from its start with `"From": "Start"`. |
 | `MaxCompletions` | `Count`, `Outcomes` | Stops handing quests from the asset out once that many ended that way for the player. Only `Successful` counts unless `Outcomes` lists more. |
 
 The journal lists them under **Conditions** on the quest's page, one line each: the time left, the
 world, the players needed against those online, how often the quest can be taken and how much of
-it the player has used. A rule with nothing left to say — the time left on a quest that is over —
+it the player has used. A rule with nothing left to say (the time left on a quest that is over)
 draws nothing. `DescriptionKey`, on any constraint, puts the asset's own words on its line instead,
 which is what a world pattern or a list of conditions wants; an empty one keeps the rule off the
 page:
@@ -450,8 +450,8 @@ page:
 
 `Cooldown` and `MaxCompletions` read the counts every player record keeps per asset, so they hold
 for an asset that keeps no history, and across restarts. A daily quest is a quest a player can
-take at most once a day, handed out by whatever hands it out — on connection, as a reward, by a
-command:
+take at most once a day, handed out by whatever hands it out (on connection, as a reward, by a
+command):
 
 ```json
 {
@@ -467,7 +467,7 @@ command:
 
 A world, an area or a condition holds the quest back rather than ending it: whatever the player
 does outside is lost, and the quest waits for them to come back. Ending one when something
-happens to its player — a death, leaving the world — is the system's doing rather than theirs, so
+happens to its player (a death, leaving the world) is the system's doing rather than theirs, so
 no constraint holds that back.
 
 ```json
@@ -475,11 +475,11 @@ no constraint holds that back.
 ```
 
 `OnExpire` is the outcome a quest running out ends on: `Failed` by default, `Successful` for a quest
-that is about holding out — survive for five minutes — or `Abandoned`.
+that is about holding out (survive for five minutes), or `Abandoned`.
 
 ## Extending
 
-Group everything a type needs in one package — asset, progression, visitor, systems — and give it a
+Group everything a type needs in one package (asset, progression, visitor, systems) and give it a
 single entry point, the way each package of `OpenQuests` does:
 
 ```java
@@ -546,7 +546,7 @@ last, and is never written down. Your system then queries for it and walks `getQ
 instead of the player's whole store. Registering on a base type covers every type built on it, the
 same way a renderer does.
 
-Anything a type needs beyond the core contract stays in its own package — `Composite` validates its
+Anything a type needs beyond the core contract stays in its own package: `Composite` validates its
 asset graph at boot from `CompositeFeature`, the tracker HUD renders counted quests from its own
 package. The core never learns about them.
 
@@ -610,12 +610,12 @@ is registered as an asset of its own under a generated id. The same goes for `Gr
 Enum values are written in CamelCase: `Successfully`, `InProgress`, `And`, `Or`.
 
 Text lives in `Server/Languages/<locale>/*.lang`, whose file name is the first segment of every key
-it holds — `hud.or` in `openquests.lang` answers to `openquests.hud.or`. The server loads them and
+it holds: `hud.or` in `openquests.lang` answers to `openquests.hud.or`. The server loads them and
 pushes them to clients, so they resolve from markup as `%openquests.hud.or` and from code as
 `Message.translation(...)` alike. `en-US` and `fr-FR` ship.
 
 `TitleKey` and `DescriptionKey` are optional. Without them a quest falls back to
-`getDefaultTitle()`, which a type overrides to describe itself from its own parameters — a `Gather`
+`getDefaultTitle()`, which a type overrides to describe itself from its own parameters: a `Gather`
 quest reads "Gather 2 Sticks" on its own, the item naming itself through Hytale's own
 `Item.getTranslationMessage()`. The templates live in the same files and use ICU, so a locale
 pluralises where it needs to.
@@ -644,9 +644,9 @@ docker compose -f docker/postgres.yml up -d
 ```
 
 The same compose file brings up Adminer to read and edit what the server wrote, on
-<http://localhost:8081/?pgsql=postgres&username=openquests&db=openquests> — password `openquests`.
+<http://localhost:8081/?pgsql=postgres&username=openquests&db=openquests>, password `openquests`.
 Both it and the database listen on the loopback only.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).

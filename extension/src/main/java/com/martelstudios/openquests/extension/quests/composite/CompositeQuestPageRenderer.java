@@ -123,7 +123,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
 
     /**
      * What became of one child: read off the child itself where it is still there to ask, off the
-     * group where it is not — a child told to keep no trace leaves nothing but what the group
+     * group where it is not: a child told to keep no trace leaves nothing but what the group
      * wrote down about it.
      *
      * @return {@link QuestMark#LOST} when neither can say. Not a guess at the likeliest outcome:
@@ -161,7 +161,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
 
         // A group that succeeded through an OR did so on one branch, and the asset never says
         // which: its children are left to the journal rather than each shown as the winner. Every
-        // other outcome is shared by all of them, an OR included — a chain given up was given up
+        // other outcome is shared by all of them, an OR included: a chain given up was given up
         // whichever way the player was going to take.
         boolean undecided = separated && context.getMark() == QuestMark.SUCCESSFUL;
 
@@ -181,7 +181,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * reading as full would say the opposite of what happened.
      *
      * <p>A step the group has lost track of counts for nothing either, however likely it is to have
-     * succeeded — a tally is read as a fact.
+     * succeeded: a tally is read as a fact.
      */
     @Nonnull
     private static String tallyOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite) {

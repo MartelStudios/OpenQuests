@@ -29,7 +29,7 @@ public enum QuestMark {
      * quest was told to keep no trace of itself, or because whatever held it is no longer there.
      *
      * <p>Its own mark rather than a guess at the likeliest outcome. A step missing from a chain
-     * used to be read as one that succeeded, which is the one thing a journal must not do — say in
+     * used to be read as one that succeeded, which is the one thing a journal must not do: say in
      * green something it does not know.
      */
     LOST(null);
@@ -53,7 +53,7 @@ public enum QuestMark {
 
     /**
      * @param name what {@link #name()} wrote, from a click the page sent itself.
-     * @return the mark it names, or {@code null} for anything this version never wrote — a stale
+     * @return the mark it names, or {@code null} for anything this version never wrote, which is a stale
      * client rather than a fault.
      */
     @Nullable

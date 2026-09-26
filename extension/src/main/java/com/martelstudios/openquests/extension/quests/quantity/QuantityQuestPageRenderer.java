@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 /**
  * A tally, and nothing else. What is being counted is already the title of the quest, so this only
- * ever adds the figure — beside the title on a card, at the end of the line on a row. Registered on
+ * ever adds the figure: beside the title on a card, at the end of the line on a row. Registered on
  * the base type, so every quest that counts something shares it.
  */
 public final class QuantityQuestPageRenderer implements QuestPageRenderer {
