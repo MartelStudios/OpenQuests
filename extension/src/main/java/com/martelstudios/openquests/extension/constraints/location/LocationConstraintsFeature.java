@@ -1,5 +1,7 @@
 package com.martelstudios.openquests.extension.constraints.location;
 
+import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
+import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 
@@ -15,10 +17,14 @@ public final class LocationConstraintsFeature {
     private LocationConstraintsFeature() {}
 
     /**
-     * Registers both constraints under their type ids.
+     * Registers both constraints under their type ids, and what fails a quest its player walks out of.
      */
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestConstraint.CODEC.register(IN_WORLD_TYPE_ID, InWorldConstraint.class, InWorldConstraint.CODEC);
         QuestConstraint.CODEC.register(NEAR_POSITION_TYPE_ID, NearPositionConstraint.class, NearPositionConstraint.CODEC);
+
+        InWorldLeaveTracker leaveTracker = new InWorldLeaveTracker();
+        plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, leaveTracker::handleAddPlayerToWorld);
+        plugin.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, leaveTracker::handlePlayerDisconnect);
     }
 }

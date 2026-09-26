@@ -422,13 +422,16 @@ malformed one stops the server with the asset named rather than failing the day 
 | --- | --- | --- |
 | `TimeLimit` | `Seconds`, `OnExpire` | Ends the quest that long after it started. A shared quest is timed from its own start. |
 | `Deadline` | `At`, `OnExpire` | Ends every quest from the asset at one moment, an ISO-8601 instant such as `"2026-12-31T23:00:00Z"`. Nothing is handed out past it. |
-| `InWorld` | `WorldNamePattern` | Counts progress only in a world whose whole name matches, the way `EnterWorld` reads its own. |
+| `InWorld` | `WorldNamePattern`, `OnLeave` | Counts progress only in a world whose whole name matches, the way `EnterWorld` reads its own. `"OnLeave": "Fail"` fails the quest when its player goes from a matching world to one that is not; logging out is not leaving. |
 | `NearPosition` | `Position`, `Radius`, `WorldNamePattern` | Counts progress only within the radius, its edge included. The pattern, optional, says which world the position is in. |
 | `EntityCondition` | `Conditions` | Counts progress only while the player's entity meets every condition — the game's own, `Sprinting`, `OutOfCombat`, `HasEffect`…, so one another mod registers works too. |
 | `MinPlayersOnline` | `Count` | Counts progress only while that many players are on the server, the acting one included. |
+| `FailOnDeath` | — | Fails the quest the moment one of its players dies. A shared quest fails for everyone holding it. |
 
 A world, an area or a condition holds the quest back rather than ending it: whatever the player
-does outside is lost, and the quest waits for them to come back.
+does outside is lost, and the quest waits for them to come back. Ending one when something
+happens to its player — a death, leaving the world — is the system's doing rather than theirs, so
+no constraint holds that back.
 
 ```json
 { "Type": "EntityCondition", "Conditions": [ { "Id": "Sprinting" }, { "Id": "OutOfCombat", "Inverse": true } ] }

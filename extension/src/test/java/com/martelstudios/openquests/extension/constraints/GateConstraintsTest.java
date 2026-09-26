@@ -42,6 +42,12 @@ class GateConstraintsTest {
     }
 
     @Test
+    void walkingOutOfTheWorldOnlyHoldsTheQuestBackUnlessTheAssetSaysOtherwise() {
+        assertFalse(decode(InWorldConstraint.CODEC, "{\"WorldNamePattern\": \"Arena_.*\"}").failsOnLeave());
+        assertTrue(decode(InWorldConstraint.CODEC, "{\"WorldNamePattern\": \"Arena_.*\", \"OnLeave\": \"Fail\"}").failsOnLeave());
+    }
+
+    @Test
     void aMalformedWorldPatternIsRefusedAtBootWithItsReason() {
         InWorldConstraint constraint = decode(InWorldConstraint.CODEC, "{\"WorldNamePattern\": \"Arena_(\"}");
 
