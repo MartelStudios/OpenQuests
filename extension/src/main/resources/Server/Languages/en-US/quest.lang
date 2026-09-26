@@ -107,16 +107,16 @@ jump-master.title=Skyward
 jump-master.description=Two thousand five hundred jumps. Gravity is a suggestion.
 
 temple-trial.title=The Temple's trial
-temple-trial.description=Three steps against the clock, inside the Forgotten Temple. Leaving the temple or dying fails the trial.
+temple-trial.description=Three minutes, inside the Forgotten Temple. Leaving the temple or dying fails the trial.
 temple-trial.in-temple=Stay inside the Forgotten Temple: leaving fails the trial
 temple-warmup.title=Sprint-jump at the rune altar
 temple-warmup.description=Jump ten times while sprinting, close to the rune altar under the temple's central gate.
 temple-warmup.sprinting=While sprinting
 temple-warmup.near-altar=Within 12 blocks of the rune altar
-temple-race.title=Run back to the entrance hall
-temple-race.description=Return to the hall where you entered the temple.
-temple-hold.title=Stay in the temple for a minute
-temple-hold.description=Wait one minute, without leaving the temple or dying.
+temple-race.title=Run to the rune altar
+temple-race.description=Reach the rune altar under the temple's central gate.
+temple-hold.title=Survive a minute
+temple-hold.description=Stay alive inside the temple for one minute.
 
 daily-chores.title=Garden chores
 daily-chores.description=Pick berries, gather poppies and put the harvest away in a chest.

@@ -7,6 +7,18 @@
   "SuccessfulSound": "SFX_Discovery_Z1_Medium",
   "QuestAssetIds": [
     {
+      "Type": "ReachLocation",
+      "TitleKey": "quest.temple-race.title",
+      "DescriptionKey": "quest.temple-race.description",
+      "AnnounceOutcome": false,
+      "Position": {
+        "X": 4976,
+        "Y": 158,
+        "Z": 4983
+      },
+      "Radius": 6
+    },
+    {
       "Type": "Jump",
       "TitleKey": "quest.temple-warmup.title",
       "DescriptionKey": "quest.temple-warmup.description",
@@ -33,18 +45,6 @@
           "Radius": 12
         }
       ]
-    },
-    {
-      "Type": "ReachLocation",
-      "TitleKey": "quest.temple-race.title",
-      "DescriptionKey": "quest.temple-race.description",
-      "AnnounceOutcome": false,
-      "Position": {
-        "X": 5081,
-        "Y": 169,
-        "Z": 4983
-      },
-      "Radius": 4
     },
     {
       "Type": "NoOp",

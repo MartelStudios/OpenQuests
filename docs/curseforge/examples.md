@@ -28,7 +28,7 @@ Two chains and a daily chore handed out on connection, a trial inside the Forgot
 
 🗣️ **Talk to the temple merchant** only counts inside the Forgotten Temple. Completing it hands you the trial below.
 
-⏱️ **The Temple's trial** gives you three minutes for three steps: jump ten times while sprinting near the rune altar, run back to the entrance hall, then stay one more minute. Leaving the temple or dying fails it. These rules are set on the trial, and every step under it follows them.
+⏱️ **The Temple's trial** gives you three minutes to run to the rune altar, jump ten times there while sprinting, and survive at least a minute. The steps run side by side, and leaving the temple or dying fails the whole trial. These rules are set on the trial, and every step under it follows them.
 
 🏅 **Flawless** is a secret until you pass the trial without ever having failed it.
 

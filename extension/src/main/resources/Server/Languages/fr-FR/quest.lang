@@ -107,16 +107,16 @@ jump-master.title=Vers le ciel
 jump-master.description=Deux mille cinq cents sauts. La gravité n'est qu'une suggestion.
 
 temple-trial.title=L'épreuve du Temple
-temple-trial.description=Trois étapes contre la montre, dans le Temple oublié. Sortir du temple ou mourir fait échouer l'épreuve.
+temple-trial.description=Trois minutes, dans le Temple oublié. Sortir du temple ou mourir fait échouer l'épreuve.
 temple-trial.in-temple=Rester dans le Temple oublié : en sortir fait échouer l'épreuve
 temple-warmup.title=Sauter en sprint près de l'autel
 temple-warmup.description=Sautez dix fois en sprintant, près de l'autel des runes sous la porte centrale du temple.
 temple-warmup.sprinting=En sprintant
 temple-warmup.near-altar=À moins de 12 blocs de l'autel des runes
-temple-race.title=Retourner au hall d'entrée
-temple-race.description=Revenez dans le hall par lequel vous êtes entré dans le temple.
-temple-hold.title=Rester une minute dans le temple
-temple-hold.description=Attendez une minute sans sortir du temple ni mourir.
+temple-race.title=Courir jusqu'à l'autel des runes
+temple-race.description=Rejoignez l'autel des runes sous la porte centrale du temple.
+temple-hold.title=Survivre une minute
+temple-hold.description=Restez en vie dans le temple pendant une minute.
 
 daily-chores.title=Les corvées du jardin
 daily-chores.description=Cueillez des baies, ramassez des coquelicots et rangez la récolte dans un coffre.
