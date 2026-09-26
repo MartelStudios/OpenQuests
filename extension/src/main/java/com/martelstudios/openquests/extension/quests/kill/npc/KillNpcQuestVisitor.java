@@ -35,4 +35,10 @@ public class KillNpcQuestVisitor implements QuestVisitor<KillNpcQuestProgression
     public Class<KillNpcQuestProgression> getQuestType() {
         return KillNpcQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return killerId;
+    }
 }

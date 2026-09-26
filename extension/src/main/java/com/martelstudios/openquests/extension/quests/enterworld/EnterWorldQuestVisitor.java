@@ -32,4 +32,10 @@ public class EnterWorldQuestVisitor implements QuestVisitor<EnterWorldQuestProgr
     public Class<EnterWorldQuestProgression> getQuestType() {
         return EnterWorldQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
+    }
 }

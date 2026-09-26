@@ -4,6 +4,7 @@ import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 import org.joml.Vector3d;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
@@ -35,5 +36,11 @@ public class ReachLocationQuestVisitor implements QuestVisitor<ReachLocationQues
     @Override
     public Class<ReachLocationQuestProgression> getQuestType() {
         return ReachLocationQuestProgression.class;
+    }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
     }
 }

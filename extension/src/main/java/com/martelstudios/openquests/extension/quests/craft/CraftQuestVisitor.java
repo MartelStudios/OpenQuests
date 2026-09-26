@@ -56,4 +56,10 @@ public class CraftQuestVisitor implements QuestVisitor<CraftQuestProgression> {
     public Class<CraftQuestProgression> getQuestType() {
         return CraftQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
+    }
 }

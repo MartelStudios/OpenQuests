@@ -37,4 +37,10 @@ public class UseBlockQuestVisitor implements QuestVisitor<UseBlockQuestProgressi
     public Class<UseBlockQuestProgression> getQuestType() {
         return UseBlockQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
+    }
 }

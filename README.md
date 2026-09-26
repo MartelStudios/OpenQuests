@@ -373,6 +373,25 @@ reaches the sender's quests, so the wider group grants nothing over anybody else
   `"Command": "give {player} Ingredient_Stick 5"` works. A leading slash is optional. Runs as the
   console unless `"AsPlayer": true`, which runs it with the permissions of the player instead.
 
+## Constraints
+
+An asset can lay rules on the quests made from it, on top of what its type asks for, under
+`Constraints`. They compose rather than inherit, so any type of quest can be timed, bound to a
+world, or both, without a type of its own for each combination.
+
+A constraint speaks to the moments of a quest it is about, and has no objection at the others:
+
+| Moment | Hook | Effect |
+| --- | --- | --- |
+| Progress | `allowsProgress(quest, actorId)` | A player's action counts only if every constraint agrees. Refused, it leaves no trace. |
+
+Only a player's action is put to the constraints. A visitor says whose action it carries through
+`getActorId()`; one the system makes on its own — a quest being settled, failed or abandoned —
+says nothing, and is never held back.
+
+Every constraint is checked once at boot through `validate(asset)`, inline assets included, so a
+malformed one stops the server with the asset named rather than failing the day a player meets it.
+
 ## Extending
 
 Group everything a type needs in one package — asset, progression, visitor, systems — and give it a
@@ -399,6 +418,15 @@ A reward type is registered the same way:
 ```java
 QuestReward.CODEC.register("MyReward", MyQuestReward.class, MyQuestReward.CODEC);
 ```
+
+And so is a constraint, overriding only the hooks it has something to say about:
+
+```java
+QuestConstraint.CODEC.register("MyConstraint", MyConstraint.class, MyConstraint.CODEC);
+```
+
+A visitor carrying a player's action returns that player from `getActorId()`, which is what puts
+it to the constraints of each quest it reaches.
 
 A quest type also says how it shows itself in the tracker, by registering a `QuestHudRenderer`:
 

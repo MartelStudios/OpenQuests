@@ -45,4 +45,10 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
     public Class<InteractivelyPickupQuestProgression> getQuestType() {
         return InteractivelyPickupQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
+    }
 }

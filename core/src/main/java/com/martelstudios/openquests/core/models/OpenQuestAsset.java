@@ -13,6 +13,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.ValidatorCache;
+import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 
 import javax.annotation.Nonnull;
@@ -64,10 +65,14 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
                                                                           .add()
                                                                           .append(new KeyedCodec<>("AbandonedSound", Codec.STRING), (asset, sound) -> asset.abandonedSound = sound, asset -> asset.abandonedSound)
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("Constraints", new ArrayCodec<>(QuestConstraint.CODEC, QuestConstraint[]::new)), (asset, constraints) -> asset.constraints = constraints, asset -> asset.constraints)
+                                                                          .add()
                                                                           .build();
 
 
     private static final QuestReward[] NO_REWARDS = new QuestReward[0];
+
+    private static final QuestConstraint[] NO_CONSTRAINTS = new QuestConstraint[0];
 
     protected String id;
     protected AssetExtraInfo.Data data;
@@ -96,6 +101,8 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
     protected String failedSound;
     @Nullable
     protected String abandonedSound;
+
+    protected QuestConstraint[] constraints = NO_CONSTRAINTS;
 
     protected OpenQuestAsset() {}
 
@@ -242,6 +249,15 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
             case ABANDONED -> abandonedSound;
             default -> null;
         };
+    }
+
+    /**
+     * @return the rules laid on every quest made from this asset, on top of what its type asks
+     * for. Empty for none, never {@code null}.
+     */
+    @Nonnull
+    public QuestConstraint[] getConstraints() {
+        return constraints;
     }
 
     /**
