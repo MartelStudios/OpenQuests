@@ -3,12 +3,26 @@
   "TitleKey": "quest.talk-merchant.title",
   "DescriptionKey": "quest.talk-merchant.description",
   "TargetQuantity": 1,
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.talk-merchant.in-temple",
+      "WorldNamePattern": "instance-Forgotten_Temple-.*"
+    }
+  ],
   "SuccessfulRewards": [
     {
       "Type": "Item",
       "ItemId": "Ingredient_Life_Essence",
       "Quantity": 100,
       "AutoClaim": false
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "TempleTrial"
+      ],
+      "AutoClaim": true
     }
   ],
   "NpcGroupId": {

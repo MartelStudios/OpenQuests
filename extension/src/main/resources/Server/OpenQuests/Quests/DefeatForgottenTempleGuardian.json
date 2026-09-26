@@ -8,11 +8,25 @@
   "TitleKey": "quest.defeat-guardian.title",
   "DescriptionKey": "quest.defeat-guardian.description",
   "TargetQuantity": 1,
+  "Constraints": [
+    {
+      "Type": "FailOnDeath"
+    }
+  ],
   "SuccessfulRewards": [
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
         "EnterForgottenTemple"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "FailedRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "DefeatForgottenTempleGuardian"
       ],
       "AutoClaim": true
     }

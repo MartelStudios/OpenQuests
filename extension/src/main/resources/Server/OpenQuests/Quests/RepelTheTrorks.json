@@ -1,0 +1,30 @@
+{
+  "Type": "KillNpc",
+  "TitleKey": "quest.repel-trorks.title",
+  "DescriptionKey": "quest.repel-trorks.description",
+  "TargetQuantity": 20,
+  "AutoTrack": true,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Trork",
+      "Trork_*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "TimeLimit",
+      "Seconds": 900
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Food_Bread",
+      "Quantity": 5,
+      "AutoClaim": true
+    }
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
+}

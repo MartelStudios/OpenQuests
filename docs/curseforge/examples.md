@@ -12,7 +12,7 @@ OpenQuests installs with an empty quest list, on purpose: your server, your ques
 
 ## ✨ What is inside
 
-Two chains, handed out on connection, in English and French.
+Two chains and a daily chore handed out on connection, a trial inside the Forgotten Temple, two server events and a few secrets, in English and French.
 
 ### ⛏️ The introduction
 
@@ -21,6 +21,28 @@ Two chains, handed out on connection, in English and French.
 ⏭️ **Skip Intro** is that other way, for players who would rather get on with it. `/oquest abandon Intro` and the tutorial is gone.
 
 ⛓️ **Then a chain that hands itself along.** Tools, a workbench, then **Choose your weapon** — four crafts under `OR`, any one of which ends it. From there *Defeat the Guardian*, *Enter the Forgotten Temple* and *Talk to the merchant*, which pays 100 Life Essence.
+
+💀 **Defeat the Guardian** fails the moment you die, and hands itself straight back: try again.
+
+### 🏛️ The Temple's trial
+
+🗣️ **Talk to the merchant** only counts inside the Forgotten Temple, and once done the merchant asks for proof.
+
+⏱️ **The Temple's trial** gives you three minutes: ten jumps at a sprint around the rune altar, a race back to the entrance, and a minute's hold. Leave the temple or die and it is over — the rules sit on the trial and hold for every step under it.
+
+🏅 **Flawless** is a secret until you pass the trial without ever having failed it.
+
+### 🧺 Moss's chores
+
+🫐 **Moss's chores** asks for berries picked by hand, flowers for the altar and the harvest put away in a chest. At most once every twenty hours, seven times in all, and the journal counts both. The reward waits in the journal until you claim it.
+
+### 🌲 Server events
+
+Two quests an admin launches, for everyone at once:
+
+🪓 **The Great Felling** — `/oquest create universe GreatFelling`. Five hundred trunks felled by the whole server, counting only while three players are online, before a closing date.
+
+🛡️ **Repel the Trorks** — `/oquest create world RepelTheTrorks <world>`. Twenty Trorks in fifteen minutes, shared by everyone in that world.
 
 ### 🍖 The hunt
 
@@ -32,11 +54,11 @@ Two chains, handed out on connection, in English and French.
 
 ---
 
-Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, each starting from a secret nobody is told about. Cover the first distance and it reveals itself, earned, while the next rung appears on the tracker — a hundred metres, then a thousand, then ten thousand.
+Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, each starting from a secret nobody is told about. Cover the first distance and it reveals itself, earned, while the next rung appears on the tracker — a hundred metres, then a thousand, then ten thousand. **Silent step** does the same at a walk, and **First blood** waits for your first duel.
 
 ---
 
-Thirteen of the eighteen quest types are in there — `Composite`, `Gather`, `Craft`, `Consume`, `BreakBlock`, `PlaceBlock`, `KillNpc`, `UseEntity`, `EnterWorld`, `Script`, `Run`, `Sprint` and `Jump` — along with all three reward types, descriptions in the tracker, the three visibility modes, and progressions carried by rewards alone.
+All nineteen quest types are in there, along with every constraint — time limits, a closing date, a world, an area, conditions on the player, a minimum of players online, death, cooldowns and caps — the three scopes, all three reward types including rewards for failing, descriptions in the tracker, the three visibility modes, and progressions carried by rewards alone.
 
 ---
 

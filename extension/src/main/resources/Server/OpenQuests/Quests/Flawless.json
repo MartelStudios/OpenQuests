@@ -1,0 +1,23 @@
+{
+  "Type": "Composite",
+  "StartOnConnection": true,
+  "TitleKey": "quest.flawless.title",
+  "DescriptionKey": "quest.flawless.description",
+  "Visibility": "WhenCompleted",
+  "QuestAssetIds": [
+    {
+      "Type": "QuestState",
+      "TitleKey": "quest.flawless-passed.title",
+      "QuestAssetId": "TempleTrial",
+      "QuestStateRequirement": "Successfully"
+    },
+    {
+      "Type": "QuestState",
+      "TitleKey": "quest.flawless-never-failed.title",
+      "QuestAssetId": "TempleTrial",
+      "QuestStateRequirement": "Failed",
+      "Not": true,
+      "StopOnComplete": false
+    }
+  ]
+}

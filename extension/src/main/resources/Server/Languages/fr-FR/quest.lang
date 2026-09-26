@@ -66,6 +66,7 @@ enter-forgotten-temple.description=Trouvez le chemin vers l'intérieur du temple
 
 talk-merchant.title=Parler au marchand
 talk-merchant.description=Rencontrez le marchand Kweebec qui attend dans le temple.
+talk-merchant.in-temple=Dans le Temple oublié
 
 gather-meat.title=Récupérez de la viande
 gather-meat.description=Quoi que vous abattiez, rapportez-en un morceau.
@@ -104,3 +105,41 @@ jump-adept.title=Pied sûr
 jump-adept.description=Deux cent cinquante sauts. Les rebords ont cessé de compter.
 jump-master.title=Vers le ciel
 jump-master.description=Deux mille cinq cents sauts. La gravité n'est qu'une suggestion.
+
+temple-trial.title=L'épreuve du Temple
+temple-trial.description=Le marchand veut une preuve. Échauffez-vous près de l'autel des runes, retournez à l'entrée en courant et tenez bon, avant que le temple ne se lasse de vous.
+temple-trial.in-temple=Dans le Temple oublié, et en sortir fait échouer l'épreuve
+temple-warmup.title=Échauffement
+temple-warmup.description=Dix sauts en sprint, près de l'autel des runes.
+temple-warmup.sprinting=En sprintant
+temple-warmup.near-altar=Autour de l'autel des runes
+temple-race.title=Course vers l'entrée
+temple-race.description=Retraversez la cour jusqu'au couloir par lequel vous êtes entré.
+temple-hold.title=Tenir bon
+temple-hold.description=Restez une minute dans le temple. Ses gardiens vous observent.
+
+daily-chores.title=Les corvées de Mousse
+daily-chores.description=La vieille Kweebec n'a plus la force de s'occuper du jardin. Un coup de main par jour est le bienvenu.
+chores-berries.title=Cueillir les baies
+chores-berries.description=Huit baies rouges, cueillies à la main sur les buissons.
+chores-flowers.title=Des fleurs pour l'autel
+chores-flowers.description=Cinq fleurs rouges. L'autel est resté nu trop longtemps.
+chores-chest.title=Ranger la récolte
+chores-chest.description=Ouvrez un coffre rudimentaire et rangez-y ce que vous avez récolté.
+
+great-felling.title=La Grande Coupe
+great-felling.description=Tout le serveur défriche la forêt ensemble. Chaque tronc compte, mais seulement quand vous êtes assez nombreux.
+
+repel-trorks.title=Repousser les Trorks
+repel-trorks.description=Les Trorks encerclent ce monde. Tous ceux qui s'y trouvent ont quinze minutes pour les repousser.
+
+first-blood.title=Premier sang
+first-blood.description=Un autre joueur est tombé de votre main.
+
+flawless.title=Sans faute
+flawless.description=Vous avez réussi l'épreuve du Temple sans jamais l'échouer.
+flawless-passed.title=Réussir l'épreuve du Temple
+flawless-never-failed.title=Ne jamais l'échouer
+
+silent-step.title=Pas de loup
+silent-step.description=Cinq cents mètres au pas, sans un bruit.

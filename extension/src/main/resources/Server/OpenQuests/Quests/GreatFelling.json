@@ -1,0 +1,31 @@
+{
+  "Type": "BreakBlock",
+  "TitleKey": "quest.great-felling.title",
+  "DescriptionKey": "quest.great-felling.description",
+  "TargetQuantity": 500,
+  "AutoTrack": true,
+  "BlockToBreak": {
+    "BlockTag": "Trunk"
+  },
+  "Constraints": [
+    {
+      "Type": "MinPlayersOnline",
+      "Count": 3
+    },
+    {
+      "Type": "Deadline",
+      "At": "2030-01-01T00:00:00Z"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 25,
+      "AutoClaim": true
+    }
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
+}

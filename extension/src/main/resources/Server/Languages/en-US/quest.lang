@@ -66,6 +66,7 @@ enter-forgotten-temple.description=Find your way inside the temple the guardian 
 
 talk-merchant.title=Talk to the merchant
 talk-merchant.description=Meet the Kweebec merchant waiting in the temple.
+talk-merchant.in-temple=Inside the Forgotten Temple
 
 gather-meat.title=Gather meat
 gather-meat.description=Whatever you bring down, carry a cut of it home.
@@ -104,3 +105,41 @@ jump-adept.title=Sure footed
 jump-adept.description=Two hundred and fifty jumps. Ledges stopped mattering a while back.
 jump-master.title=Skyward
 jump-master.description=Two thousand five hundred jumps. Gravity is a suggestion.
+
+temple-trial.title=The Temple's trial
+temple-trial.description=The merchant wants proof. Warm up by the rune altar, race back to the entrance, and hold on — all before the temple tires of you.
+temple-trial.in-temple=Inside the Forgotten Temple, and leaving fails it
+temple-warmup.title=Warm up
+temple-warmup.description=Ten jumps at a sprint, by the rune altar.
+temple-warmup.sprinting=While sprinting
+temple-warmup.near-altar=Around the rune altar
+temple-race.title=Race to the entrance
+temple-race.description=Back through the courtyard to the hall you came in by.
+temple-hold.title=Hold on
+temple-hold.description=Stay a minute in the temple. Its guardians are watching.
+
+daily-chores.title=Moss's chores
+daily-chores.description=The old Kweebec has little strength left for the garden. A hand, once a day, is welcome.
+chores-berries.title=Pick the berries
+chores-berries.description=Eight red berries, picked by hand from the bushes.
+chores-flowers.title=Flowers for the altar
+chores-flowers.description=Five red flowers. The altar has been bare for too long.
+chores-chest.title=Put the harvest away
+chores-chest.description=Open a crude chest and store what you gathered.
+
+great-felling.title=The Great Felling
+great-felling.description=The whole server clears the woods together. Every trunk counts, but only while enough of you are around.
+
+repel-trorks.title=Repel the Trorks
+repel-trorks.description=Trorks are closing in on this world. Everyone here has fifteen minutes to push them back.
+
+first-blood.title=First blood
+first-blood.description=Another player fell by your hand.
+
+flawless.title=Flawless
+flawless.description=You passed the Temple's trial without ever failing it.
+flawless-passed.title=Pass the Temple's trial
+flawless-never-failed.title=Never fail it
+
+silent-step.title=Silent step
+silent-step.description=Five hundred metres at a walk, without a sound.
