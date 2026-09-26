@@ -292,6 +292,7 @@ through counts once. `QuestPlayerStateService.getCompletions(playerId, assetId)`
 | `Jump` | Jumping a number of times. |
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
+| `NoOp` | Nothing on its own: a command, a reward, a constraint or a plugin ends it. Still read under its former name, `Script`. |
 
 The tracker only lists quests that asked for it. `AutoTrack` puts every quest made from the asset on
 the panel; `OQ_HUD_DESC` shows its description under its title, greyed and smaller:

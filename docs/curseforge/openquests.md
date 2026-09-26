@@ -90,7 +90,7 @@ _A step the player has not reached yet, read from the chain that grants it. The 
 | <code>Jump</code> |Jumping a number of times                                             |
 | <code>Composite</code> |Its children, combined with <code>AND</code> or <code>OR</code>       |
 | <code>QuestState</code> |Another quest reaching a state, which is how you write a prerequisite |
-| <code>Script</code> |Nothing on its own. Completed by a command or by your own plugin      |
+| <code>NoOp</code> |Nothing on its own: a command, a reward, a constraint or your own plugin ends it. Formerly <code>Script</code>, which still loads |
 
 Every counted type takes a target quantity, and a running quest can override it. One asset, handed out with different targets.
 

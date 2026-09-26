@@ -47,7 +47,7 @@
       "Radius": 4
     },
     {
-      "Type": "Script",
+      "Type": "NoOp",
       "TitleKey": "quest.temple-hold.title",
       "DescriptionKey": "quest.temple-hold.description",
       "AnnounceOutcome": false,
