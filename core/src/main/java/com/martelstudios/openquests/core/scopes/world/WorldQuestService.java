@@ -74,7 +74,7 @@ public class WorldQuestService {
         trackQuestForWorld(world, questId);
 
         for (PlayerRef playerRef : world.getPlayerRefs()) {
-            quest.addPlayer(playerRef.getUuid());
+            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
         }
     }
 
@@ -126,7 +126,7 @@ public class WorldQuestService {
             }
 
             trackQuestForWorld(world, questId);
-            quest.addPlayer(playerRef.getUuid());
+            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
         }
     }
 

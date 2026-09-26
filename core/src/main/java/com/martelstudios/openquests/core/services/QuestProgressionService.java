@@ -5,17 +5,20 @@ import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestRegisteredEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -71,7 +74,8 @@ public class QuestProgressionService {
     }
 
     /**
-     * Creates and registers a new quest in the store.
+     * Creates and registers a new quest in the store. Asks no constraint: a caller meaning to hand
+     * it to a player goes through {@link #assignQuest(OpenQuestAsset, UUID)}.
      *
      * @param questAsset the quest asset to create the quest from
      */
@@ -80,6 +84,69 @@ public class QuestProgressionService {
         quest.markDirty();
         registerQuest(quest);
         return quest;
+    }
+
+    /**
+     * @return whether the constraints of the asset let that player be handed a new quest from it
+     * now. Free for an asset laying none; otherwise reads how its quests ended for the player, from
+     * the storage if they are offline.
+     */
+    public boolean isEligible(@Nonnull OpenQuestAsset asset, @Nonnull UUID playerId) {
+        QuestConstraint[] constraints = asset.getConstraints();
+        if (constraints.length == 0) return true;
+
+        QuestCompletions completions = QuestPlayerStateService.get().getCompletions(playerId, asset.getId());
+        Instant now = Instant.now();
+
+        for (QuestConstraint constraint : constraints) {
+            if (!constraint.allowsAssignment(asset, playerId, completions, now)) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Creates a quest from the asset and hands it to the player, unless its constraints refuse
+     * them. Nothing is registered for a player refused, so no quest is left that nobody holds.
+     *
+     * @return the quest handed out, or {@code null} if the player was refused.
+     */
+    @Nullable
+    public AbstractQuestProgression<?> assignQuest(@Nonnull OpenQuestAsset asset, @Nonnull UUID playerId) {
+        if (!isEligible(asset, playerId)) return null;
+
+        AbstractQuestProgression<?> quest = registerQuest(asset);
+        quest.addPlayer(playerId);
+        return quest;
+    }
+
+    /**
+     * Registers a quest built elsewhere and hands it to the player, unless the constraints of its
+     * asset refuse them. For a caller writing onto the quest before anyone hears of it.
+     *
+     * @return {@code false} if the player was refused, the quest then left unregistered.
+     */
+    public boolean assignQuest(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        OpenQuestAsset asset = quest.getAsset();
+        if (asset != null && !isEligible(asset, playerId)) return false;
+
+        registerQuest(quest);
+        quest.addPlayer(playerId);
+        return true;
+    }
+
+    /**
+     * Adds a player to a quest already running — one a scope shares — unless the constraints of
+     * its asset refuse them.
+     *
+     * @return {@code false} if the player was refused or already held the quest.
+     */
+    public boolean joinQuest(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        if (quest.getPlayers().contains(playerId)) return false;
+
+        OpenQuestAsset asset = quest.getAsset();
+        if (asset != null && !isEligible(asset, playerId)) return false;
+
+        return quest.addPlayer(playerId);
     }
 
     /**

@@ -35,8 +35,12 @@ public class CreatePlayerQuestCommand extends CommandBase {
             return;
         }
 
-        var quest = QuestProgressionService.get().registerQuest(asset);
-        quest.addPlayer(profile.getUuid());
+        var quest = QuestProgressionService.get().assignQuest(asset, profile.getUuid());
+        if (quest == null) {
+            context.sendMessage(Message.raw("The constraints of '" + assetId + "' refuse " + profile.getUsername() + " for now."));
+            return;
+        }
+
         context.sendMessage(Message.raw("Created quest " + quest.getId() + " from asset '" + assetId + "'."));
     }
 }
