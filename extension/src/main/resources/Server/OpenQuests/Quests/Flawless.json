@@ -9,7 +9,8 @@
       "Type": "QuestState",
       "TitleKey": "quest.flawless-passed.title",
       "QuestAssetId": "TempleTrial",
-      "QuestStateRequirement": "Successfully"
+      "QuestStateRequirement": "Successfully",
+      "AnnounceOutcome": false
     },
     {
       "Type": "QuestState",
@@ -17,7 +18,8 @@
       "QuestAssetId": "TempleTrial",
       "QuestStateRequirement": "Failed",
       "Not": true,
-      "StopOnComplete": false
+      "StopOnComplete": false,
+      "AnnounceOutcome": false
     }
   ]
 }

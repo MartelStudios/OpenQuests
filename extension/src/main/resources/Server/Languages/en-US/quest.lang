@@ -64,8 +64,8 @@ defeat-guardian.description=Bring down the crystal golem watching over the templ
 enter-forgotten-temple.title=Enter the Forgotten Temple
 enter-forgotten-temple.description=Find your way inside the temple the guardian was protecting.
 
-talk-merchant.title=Talk to the merchant
-talk-merchant.description=Meet the Kweebec merchant waiting in the temple.
+talk-merchant.title=Talk to the temple merchant
+talk-merchant.description=Speak with the Kweebec merchant who trades inside the Forgotten Temple.
 talk-merchant.in-temple=Inside the Forgotten Temple
 
 gather-meat.title=Gather meat
@@ -107,31 +107,31 @@ jump-master.title=Skyward
 jump-master.description=Two thousand five hundred jumps. Gravity is a suggestion.
 
 temple-trial.title=The Temple's trial
-temple-trial.description=The merchant wants proof. Warm up by the rune altar, race back to the entrance, and hold on — all before the temple tires of you.
-temple-trial.in-temple=Inside the Forgotten Temple, and leaving fails it
-temple-warmup.title=Warm up
-temple-warmup.description=Ten jumps at a sprint, by the rune altar.
+temple-trial.description=Three steps against the clock, inside the Forgotten Temple. Leaving the temple or dying fails the trial.
+temple-trial.in-temple=Stay inside the Forgotten Temple: leaving fails the trial
+temple-warmup.title=Sprint-jump at the rune altar
+temple-warmup.description=Jump ten times while sprinting, close to the rune altar under the temple's central gate.
 temple-warmup.sprinting=While sprinting
-temple-warmup.near-altar=Around the rune altar
-temple-race.title=Race to the entrance
-temple-race.description=Back through the courtyard to the hall you came in by.
-temple-hold.title=Hold on
-temple-hold.description=Stay a minute in the temple. Its guardians are watching.
+temple-warmup.near-altar=Within 12 blocks of the rune altar
+temple-race.title=Run back to the entrance hall
+temple-race.description=Return to the hall where you entered the temple.
+temple-hold.title=Stay in the temple for a minute
+temple-hold.description=Wait one minute, without leaving the temple or dying.
 
-daily-chores.title=Moss's chores
-daily-chores.description=The old Kweebec has little strength left for the garden. A hand, once a day, is welcome.
-chores-berries.title=Pick the berries
-chores-berries.description=Eight red berries, picked by hand from the bushes.
-chores-flowers.title=Flowers for the altar
-chores-flowers.description=Five red flowers. The altar has been bare for too long.
-chores-chest.title=Put the harvest away
-chores-chest.description=Open a crude chest and store what you gathered.
+daily-chores.title=Garden chores
+daily-chores.description=Pick berries, gather poppies and put the harvest away in a chest.
+chores-berries.title=Pick wild berries
+chores-berries.description=Pick wild berries from the bushes by hand.
+chores-flowers.title=Gather poppies
+chores-flowers.description=Poppies grow in the plains. Keep five of them in your inventory.
+chores-chest.title=Open a wooden chest
+chores-chest.description=Open a wooden chest to put the harvest away.
 
 great-felling.title=The Great Felling
-great-felling.description=The whole server clears the woods together. Every trunk counts, but only while enough of you are around.
+great-felling.description=Fell 500 tree trunks together, across the whole server. Trunks only count while at least three players are online.
 
 repel-trorks.title=Repel the Trorks
-repel-trorks.description=Trorks are closing in on this world. Everyone here has fifteen minutes to push them back.
+repel-trorks.description=Kill Trorks in this world, all together, before the fifteen minutes run out.
 
 first-blood.title=First blood
 first-blood.description=Another player fell by your hand.
@@ -142,4 +142,4 @@ flawless-passed.title=Pass the Temple's trial
 flawless-never-failed.title=Never fail it
 
 silent-step.title=Silent step
-silent-step.description=Five hundred metres at a walk, without a sound.
+silent-step.description=Walk five hundred metres at the slow pace, the one you hold a key for.

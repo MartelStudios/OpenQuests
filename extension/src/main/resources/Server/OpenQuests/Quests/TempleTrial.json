@@ -83,5 +83,8 @@
       "Quantity": 50,
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }
