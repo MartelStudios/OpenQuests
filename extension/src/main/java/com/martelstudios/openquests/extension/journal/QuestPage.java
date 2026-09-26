@@ -581,11 +581,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * there is no longer anywhere to open it from.
      */
     private static boolean drawnByItsGroup(@Nonnull AbstractQuestProgression<?> quest) {
-        String[] parent = quest.getTagValues(OpenQuestsTags.PARENT_QUEST_TAG);
-        if (parent == null || parent.length == 0) return false;
-
-        UUID parentId = parse(parent[0]);
-        return parentId != null && QuestProgressionService.get().getQuest(parentId) != null;
+        return quest.getParent() != null;
     }
 
     private void renderEntry(@Nonnull QuestPageContext context, @Nonnull Entry entry, @Nonnull QuestShape shape) {

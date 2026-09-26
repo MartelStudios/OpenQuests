@@ -1,21 +1,19 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
-import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
-import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
+import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
-import com.martelstudios.openquests.extension.tags.OpenQuestsTags;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,24 +21,18 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Composite quest whose objective is that other quests complete successfully. Children are
- * not embedded: they are ordinary quests referenced by {@link #questIds}, so each
- * child gets the exact same resolution, storage and progression treatment as any
- * top-level quest. This quest's own progression is delegated to a visitor, which
- * typically derives its state from its children.
+ * Composite quest whose objective is that other quests complete successfully, combined with
+ * {@code AND} or {@code OR}. The tree itself — which quests are its steps, and each step knowing
+ * it — is the core's; this type adds how the group ends, derived from its children by a visitor.
  */
-public class CompositeQuestProgression extends AbstractQuestProgression<CompositeQuestProgression> {
+public class CompositeQuestProgression extends AbstractCompositeQuestProgression<CompositeQuestProgression> {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    public static final BuilderCodec<CompositeQuestProgression> CODEC = BuilderCodec.builder(CompositeQuestProgression.class, CompositeQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
-                                                                                    .append(new KeyedCodec<>("QuestIds", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new)), CompositeQuestProgression::setQuestIds, quest -> quest.questIds)
-                                                                                    .add()
+    public static final BuilderCodec<CompositeQuestProgression> CODEC = BuilderCodec.builder(CompositeQuestProgression.class, CompositeQuestProgression::new, AbstractCompositeQuestProgression.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("ChildOutcomes", new MapCodec<>(new EnumCodec<>(QuestState.class), HashMap<String, QuestState>::new)), CompositeQuestProgression::decodeOutcomes, CompositeQuestProgression::encodeOutcomes)
                                                                                     .add()
                                                                                     .build();
-
-    protected UUID[] questIds = new UUID[0];
 
     /**
      * What became of each child, recorded as it changes state. Kept here rather than read back
@@ -59,70 +51,27 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
         update(new CompositeQuestVisitor(questCompletedEvent.getQuest(), questCompletedEvent.getState()));
     }
 
-    @Override
-    public boolean addPlayer(@Nonnull UUID playerId) {
-        if (!super.addPlayer(playerId)) return false;
-
-        Arrays.stream(questIds)
-              .map(QuestProgressionService.get()::getQuest)
-              .filter(Objects::nonNull)
-              .forEach(child -> child.addPlayer(playerId));
-
-        return true;
-    }
-
-    @Override
-    public boolean removePlayer(@Nonnull UUID playerId) {
-        if (!super.removePlayer(playerId)) return false;
-
-        Arrays.stream(questIds)
-              .map(QuestProgressionService.get()::getQuest)
-              .filter(Objects::nonNull)
-              .forEach(child -> child.removePlayer(playerId));
-
-        return true;
-    }
-
-    @Override
-    public boolean abandonPlayer(@Nonnull UUID playerId) {
-        if (!super.abandonPlayer(playerId)) return false;
-
-        Arrays.stream(questIds)
-              .map(QuestProgressionService.get()::getQuest)
-              .filter(Objects::nonNull)
-              .forEach(child -> child.abandonPlayer(playerId));
-
-        return true;
-    }
-
     /**
      * Creates and registers one child quest per referenced asset. Unknown ids are left to fail
      * loudly here, as {@link CompositeQuestAssetValidator} already rejects them at boot.
      *
-     * <p>Each child is built and told whose step it is before it is registered, so everything that
-     * hears of it already knows it belongs to a group. The group keeps {@link #questIds} for the
-     * one direction it walks; the tag is the other direction, which nothing else could work out
-     * without asking every quest the player holds what it is made of.
+     * <p>Each child is adopted before it is registered, so everything that hears of it already
+     * knows whose step it is.
      */
     @Override
     public void onRegistered() {
         super.onRegistered();
-        var assetIds = getAsset().getAssetIds();
-        UUID[] questIds = new UUID[assetIds.length];
 
-        for (int i = 0; i < assetIds.length; i++) {
-            OpenQuestAsset childAsset = OpenQuestAsset.getAsset(assetIds[i]);
+        for (String assetId : getAsset().getAssetIds()) {
+            OpenQuestAsset childAsset = OpenQuestAsset.getAsset(assetId);
 
             AbstractQuestProgression<?> child = childAsset.create();
-            child.addTag(OpenQuestsTags.PARENT_QUEST_TAG, getId().toString());
             if (!getAsset().isPersistChildrenHistory()) child.setPersistHistory(false);
+            adopt(child);
 
             QuestProgressionService.get().registerQuest(child);
-
-            questIds[i] = child.getId();
         }
 
-        setQuestIds(questIds).markDirty();
         listenToChildren();
     }
 
@@ -161,7 +110,7 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
     private void settleChildren() {
         releaseChildListeners();
 
-        for (UUID questId : questIds) {
+        for (UUID questId : getChildIds()) {
             AbstractQuestProgression<?> child = QuestProgressionService.get().loadQuest(questId);
             if (child == null || child.isCompleted()) continue;
 
@@ -169,10 +118,6 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
 
             if (recordOutcome(questId, QuestState.ABANDONED)) markDirty();
         }
-    }
-
-    public UUID[] getQuestIds() {
-        return questIds;
     }
 
     /**
@@ -240,11 +185,6 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
         return (CompositeQuestAsset) super.getAsset();
     }
 
-    public CompositeQuestProgression setQuestIds(UUID[] questIds) {
-        this.questIds = questIds;
-        return this;
-    }
-
     /**
      * Starts hearing the children out. Driven from the store rather than from the codec, which is
      * read by anything looking at a player's data: a decode that never reaches the store used to
@@ -255,7 +195,7 @@ public class CompositeQuestProgression extends AbstractQuestProgression<Composit
     public void listenToChildren() {
         releaseChildListeners();
 
-        for (UUID questId : questIds) {
+        for (UUID questId : getChildIds()) {
             var registration = HytaleServer.get()
                                            .getEventBus()
                                            .register(QuestCompletedEvent.class, questId, this::handleQuestCompleted);

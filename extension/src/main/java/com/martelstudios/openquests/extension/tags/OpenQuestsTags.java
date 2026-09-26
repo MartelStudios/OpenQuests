@@ -14,10 +14,8 @@ public class OpenQuestsTags {
     public static final String GRANTED_BY_TAG = "OQ_GRANTED_BY";
 
     /**
-     * Carries the id of the composite this quest is a step of. Written on a child as the group
-     * creates it, so a step says so itself rather than being recognised by whoever happens to list
-     * it — the panel and the journal both need to know, and neither should have to ask every other
-     * quest the player holds.
+     * Carried the id of the composite a quest is a step of, before the core kept it on the quest
+     * itself. Only read now, to hand steps written back then to their group.
      */
     public static final String PARENT_QUEST_TAG = "OQ_PARENT_QUEST";
 }

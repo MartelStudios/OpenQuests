@@ -105,7 +105,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      */
     @Nonnull
     private static List<Step> stepsOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite, @Nonnull CompositeQuestAsset asset) {
-        UUID[] questIds = composite.getQuestIds();
+        UUID[] questIds = composite.getChildIds();
         String[] assetIds = asset.getAssetIds();
 
         List<Step> steps = new ArrayList<>(questIds.length);
@@ -185,7 +185,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      */
     @Nonnull
     private static String tallyOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite) {
-        UUID[] questIds = composite.getQuestIds();
+        UUID[] questIds = composite.getChildIds();
         int successful = 0;
 
         for (UUID childId : questIds) {

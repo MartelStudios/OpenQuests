@@ -14,8 +14,13 @@ public final class CompositeQuestEvents {
 
     private CompositeQuestEvents() {}
 
+    /**
+     * Also joins a group and a step written before the core kept parents, whichever comes second.
+     */
     public static void handleQuestLoaded(@Nonnull QuestLoadedEvent event) {
         if (event.getQuest() instanceof CompositeQuestProgression composite) composite.listenToChildren();
+
+        LegacyParentTags.migrate(event.getQuest());
     }
 
     public static void handleQuestUnloaded(@Nonnull QuestUnloadedEvent event) {

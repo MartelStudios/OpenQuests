@@ -47,7 +47,7 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
         CompositeQuestAsset asset = composite.getAsset();
         if (asset == null) return;
 
-        UUID[] questIds = composite.getQuestIds();
+        UUID[] questIds = composite.getChildIds();
         String[] assetIds = asset.getAssetIds();
 
         boolean separated = asset.getOperator() == CompositeQuestAsset.Operator.OR;

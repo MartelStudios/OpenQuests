@@ -30,6 +30,7 @@ Depending on `OpenQuestsCore` alone is enough to build your own quest types;
 | --- | --- |
 | `OpenQuestAsset` | Immutable definition loaded from `OpenQuests/Quests/*.json`. Polymorphic on `"Type"`. |
 | `AbstractQuestProgression` | Runtime instance holding state, assignees and progression. Polymorphic on `"Type"`. |
+| `AbstractCompositeQuestProgression` | A quest made of other quests, and the only kind with children. |
 | `QuestVisitor` | Carries the context of an event to the quests it can progress. |
 | `QuestReward` | What a terminal state grants. Polymorphic on `"Type"`. |
 | `QuestProgressionService` | Entry point: register, progress, complete, unregister. |
@@ -50,6 +51,22 @@ prerequisites of a quest are other quests.
 A quest gating on another one is a `QuestState` quest, usually as the child of a composite. Since a
 quest holds a state rather than a boolean, "not yet" and "failed" stay distinct — which is what
 lets a composite fail rather than hang.
+
+### Quests made of quests
+
+The core keeps one tree. Every progression may name a parent, `getParentId()`, and only a
+composite may have children: `AbstractCompositeQuestProgression` lists its steps, hands its players
+down to them, and is the one place a step's parent is written, through `adopt(child)` before the
+step is registered. A step is an ordinary quest all the same, with its own record, its own asset
+and its own progression.
+
+What a group makes of how its steps end is left to the type built on it: `Composite`, in
+`OpenQuests`, is the one combining them with `AND` or `OR`. A step saved before the core kept
+parents carried its group as the `OQ_PARENT_QUEST` tag; it is handed back to its group as the two
+are read, and loses the tag.
+
+A quest a reward hands over is not a step of the one that paid for it: that is a lineage, written
+as the `OQ_GRANTED_BY` tag, not a part of a whole.
 
 ### Scopes
 
@@ -407,6 +424,15 @@ same way a renderer does.
 Anything a type needs beyond the core contract stays in its own package — `Composite` validates its
 asset graph at boot from `CompositeFeature`, the tracker HUD renders counted quests from its own
 package. The core never learns about them.
+
+A type made of other quests extends `AbstractCompositeQuestProgression` rather than the plain base,
+and adopts each step before registering it:
+
+```java
+AbstractQuestProgression<?> step = stepAsset.create();
+adopt(step);
+QuestProgressionService.get().registerQuest(step);
+```
 
 ## Example assets
 
