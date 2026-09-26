@@ -23,6 +23,9 @@ import java.util.UUID;
  * player nothing happened to costs one lookup and nothing else.
  *
  * <p>Hands the panel every quest the player holds: which ones earn a line is the panel's to decide.
+ *
+ * <p>A timer running down changes nothing any event reports, so a panel drawing one is also redrawn
+ * when it said it would go stale.
  */
 public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
     @Nonnull
@@ -34,11 +37,11 @@ public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
     @Override
     public void tick(float dt, int index, @Nonnull ArchetypeChunk<EntityStore> archetypeChunk, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         var playerRef = archetypeChunk.getComponent(index, PlayerRef.getComponentType());
-        if (playerRef == null || !QuestHudRefresh.consume(playerRef.getUuid())) return;
-
         var player = archetypeChunk.getComponent(index, Player.getComponentType());
         var questStoreComponent = archetypeChunk.getComponent(index, QuestStoreComponent.getComponentType());
-        if (player == null || questStoreComponent == null) return;
+        if (playerRef == null || player == null || questStoreComponent == null) return;
+
+        if (!QuestHudRefresh.consume(playerRef.getUuid()) && !QuestTrackerHud.isDue(player)) return;
 
         QuestTrackerHud hud = QuestTrackerHud.get(player, playerRef);
 

@@ -13,7 +13,9 @@ $Common = "../../Common.ui";
 
 @QuestProgressStyle = (FontSize: 15, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestProgress, HorizontalAlignment: End, VerticalAlignment: Center);
 
-@SeparatorLabelStyle = (FontSize: 12, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestProgress, HorizontalAlignment: Center, VerticalAlignment: Center);
+@QuestTimerStyle = (FontSize: 12, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestProgress, HorizontalAlignment: End, VerticalAlignment: Center);
+
+@SeparatorLabelStyle =(FontSize: 12, RenderBold: true, LetterSpacing: 1, TextColor: @ColorQuestProgress, HorizontalAlignment: Center, VerticalAlignment: Center);
 
 // Paths resolve against this file, which sits next to the textures
 @QuestIconDefault = PatchStyle(TexturePath: "ObjectiveTaskIconDefault.png");
@@ -21,3 +23,6 @@ $Common = "../../Common.ui";
 @QuestIconComplete = PatchStyle(TexturePath: "ObjectiveTaskIconComplete.png");
 
 @QuestIconFailed = PatchStyle(TexturePath: "ObjectiveTaskIconFailed.png");
+
+// The groove a time bar empties along. The border keeps its one pixel of gold at any width.
+@TimerTrack = PatchStyle(TexturePath: "TimerBarTrack.png", Border: 2);

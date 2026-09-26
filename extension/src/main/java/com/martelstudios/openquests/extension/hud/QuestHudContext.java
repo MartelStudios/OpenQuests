@@ -19,6 +19,12 @@ public final class QuestHudContext {
     private int rowCount;
 
     /**
+     * How soon what is being drawn goes stale on its own, as a timer runs down. Zero while nothing
+     * drawn so far is timed.
+     */
+    private long refreshMillis;
+
+    /**
      * Who is looking. A quest several players share can have ended for this one and still be
      * running for the others, so what it is worth is only ever asked on their behalf.
      */
@@ -71,5 +77,20 @@ public final class QuestHudContext {
 
     public int getRowCount() {
         return rowCount;
+    }
+
+    /**
+     * Asks for the panel to be drawn again within this delay, even if nothing else changes: a timer
+     * running down is a change no event announces.
+     */
+    public void refreshWithin(long millis) {
+        refreshMillis = refreshMillis == 0 ? millis : Math.min(refreshMillis, millis);
+    }
+
+    /**
+     * @return the shortest delay any line asked for, or zero when nothing drawn is timed.
+     */
+    public long getRefreshMillis() {
+        return refreshMillis;
     }
 }

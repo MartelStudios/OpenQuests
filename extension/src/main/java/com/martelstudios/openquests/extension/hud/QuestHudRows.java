@@ -5,6 +5,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
+import java.time.Instant;
 
 import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.DESCRIPTION_TAG;
 
@@ -67,8 +68,30 @@ public final class QuestHudRows {
     public static String appendRow(@Nonnull QuestHudContext context, @Nonnull AbstractQuestProgression<?> quest) {
         String rowSelector = appendRow(context, ROW_DOCUMENT, quest.getTitle(), quest.getStateFor(context.getViewer()));
         appendDescription(context, rowSelector, quest);
+        appendTimer(context, rowSelector, quest);
 
         return rowSelector;
+    }
+
+    /**
+     * Adds a bar and a clock under a quest running against a deadline, and asks for the panel to be
+     * drawn again before they read wrong. Left to the caller like the description, and drawn only
+     * while the viewer is still running the quest.
+     */
+    public static void appendTimer(@Nonnull QuestHudContext context, @Nonnull String rowSelector, @Nonnull AbstractQuestProgression<?> quest) {
+        if (quest.getStateFor(context.getViewer()) != QuestState.IN_PROGRESS) return;
+
+        QuestTimer timer = QuestTimer.of(quest);
+        if (timer == null) return;
+
+        Instant now = Instant.now();
+
+        context.getBuilder()
+               .set(rowSelector + "#Timer.Visible", true)
+               .set(rowSelector + "#TimerBar.Value", timer.fractionLeft(now))
+               .set(rowSelector + "#TimerText.TextSpans", timer.format(now));
+
+        context.refreshWithin(timer.refreshMillis(now));
     }
 
     /**
