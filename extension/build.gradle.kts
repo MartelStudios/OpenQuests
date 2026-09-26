@@ -35,6 +35,27 @@ dependencies {
     compileOnly(project(":core"))
 
     vineImplementation("curse.maven:opennavigation-1692713:8865131")
+
+    // What a constraint decides from its own fields is exercised off a running server, the way the
+    // core tests its backends. The server jar and the core are compileOnly, so the tests ask for both.
+    testImplementation(platform("org.junit:junit-bom:5.11.4"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    testImplementation(project(":core"))
+    testImplementation(files(configurations.named("vineServerJar")))
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+
+    // HytaleLogger installs its own LogManager and refuses to load if something got there first
+    systemProperty("java.util.logging.manager", "com.hypixel.hytale.logger.backend.HytaleLogManager")
+
+    testLogging {
+        events("passed", "failed", "skipped")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
 }
 
 tasks.named<Jar>("jar") {
