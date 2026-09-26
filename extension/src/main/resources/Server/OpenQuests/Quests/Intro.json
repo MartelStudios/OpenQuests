@@ -48,14 +48,6 @@
       ]
     }
   ],
-  "AbandonedRewards": [
-    {
-      "Type": "Command",
-      "AutoClaim": true,
-      "AsPlayer": true,
-      "Command": "/oquest complete SkipIntro"
-    }
-  ],
   "AutoTrack": true,
   "Tags": {
     "OQ_HUD_DESC": []
