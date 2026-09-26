@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
 import com.martelstudios.openquests.core.persistence.jdbc.SqlDialect;
@@ -15,8 +16,10 @@ import org.junit.jupiter.api.io.TempDir;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.stream.Collectors;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -189,7 +192,7 @@ class JdbcQuestStorageTest {
 
         PendingRewards owed = new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")});
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), Set.of("StartHatchet", "PickBerries"), Set.of(owed)));
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), Set.of("StartHatchet", "PickBerries"), Set.of(owed), Map.of()));
 
         PlayerQuestRecord read = storage.loadPlayer(playerId);
 
@@ -210,7 +213,7 @@ class JdbcQuestStorageTest {
         TestQuestProgression quest = quest("Owed", playerId);
         storage.saveProgressions(List.of(quest));
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), Set.of("StartHatchet"), Set.of()));
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), Set.of("StartHatchet"), Set.of(), Map.of()));
 
         storage.addPendingRewards(playerId, new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")}));
 
@@ -225,6 +228,56 @@ class JdbcQuestStorageTest {
         assertEquals(1, read.getPendingRewards().size());
         assertEquals(0, read.getPendingRewards().iterator().next().getRewards().length);
         assertEquals(Set.of("StartHatchet"), read.getStartedOnConnection());
+    }
+
+    @Test
+    void writesAndReadsBackHowEachAssetEnded() {
+        UUID playerId = UUID.randomUUID();
+        Instant startedAt = Instant.ofEpochMilli(1_000);
+        Instant completedAt = Instant.ofEpochMilli(5_000);
+
+        PlayerQuestRecord record = new PlayerQuestRecord();
+        record.recordCompletion("DailyWood", QuestState.SUCCESSFUL, startedAt, completedAt);
+        storage.savePlayer(playerId, record);
+
+        QuestCompletions read = storage.loadPlayer(playerId).getCompletions().get("DailyWood");
+
+        assertNotNull(read);
+        assertEquals(1, read.count(QuestState.SUCCESSFUL));
+        assertEquals(0, read.count(QuestState.FAILED));
+        assertEquals(startedAt, read.getLastStartedAt());
+        assertEquals(completedAt, read.getLastCompletedAt());
+    }
+
+    @Test
+    void recordingACompletionLeavesTheRestOfTheRecordAlone() {
+        UUID playerId = UUID.randomUUID();
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), Set.of("StartHatchet"), Set.of(), Map.of()));
+
+        storage.recordCompletion(playerId, "DailyWood", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000), Instant.ofEpochMilli(2_000));
+        storage.recordCompletion(playerId, "DailyWood", QuestState.ABANDONED, Instant.ofEpochMilli(3_000), Instant.ofEpochMilli(4_000));
+
+        PlayerQuestRecord read = storage.loadPlayer(playerId);
+        QuestCompletions completions = read.getCompletions().get("DailyWood");
+
+        assertEquals(Set.of("StartHatchet"), read.getStartedOnConnection());
+        assertNotNull(completions);
+        assertEquals(1, completions.count(QuestState.SUCCESSFUL));
+        assertEquals(1, completions.count(QuestState.ABANDONED));
+        assertEquals(2, completions.total());
+        assertEquals(Instant.ofEpochMilli(4_000), completions.getLastCompletedAt());
+    }
+
+    @Test
+    void recordingACompletionForAPlayerNobodyHasHeardOfStartsTheirRecord() {
+        UUID playerId = UUID.randomUUID();
+
+        storage.recordCompletion(playerId, "DailyWood", QuestState.FAILED, null, Instant.ofEpochMilli(2_000));
+
+        PlayerQuestRecord read = storage.loadPlayer(playerId);
+        assertFalse(read.isEmpty());
+        assertEquals(1, read.getCompletions().get("DailyWood").count(QuestState.FAILED));
+        assertNull(read.getCompletions().get("DailyWood").getLastStartedAt());
     }
 
     @Test
@@ -329,8 +382,8 @@ class JdbcQuestStorageTest {
         target.saveIndex("universe", Set.of(quest.getId()));
         assertEquals(Set.of(quest.getId()), target.loadIndex("universe"));
 
-        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), Set.of("Chain"), Set.of()));
-        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), Set.of("Chain", "Other"), Set.of()));
+        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), Set.of("Chain"), Set.of(), Map.of()));
+        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), Set.of("Chain", "Other"), Set.of(), Map.of()));
         assertEquals(Set.of("Chain", "Other"), target.loadPlayer(alice).getStartedOnConnection());
 
         quest.getPlayers().remove(bob);
