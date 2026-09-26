@@ -3,6 +3,7 @@ package com.martelstudios.openquests.extension;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.openquests.extension.constraints.condition.ConditionConstraintsFeature;
+import com.martelstudios.openquests.extension.constraints.death.DeathConstraintsFeature;
 import com.martelstudios.openquests.extension.constraints.location.LocationConstraintsFeature;
 import com.martelstudios.openquests.extension.constraints.players.PlayersConstraintsFeature;
 import com.martelstudios.openquests.extension.constraints.time.TimeConstraintsFeature;
@@ -80,5 +81,6 @@ public class OpenQuestsPlugin extends JavaPlugin {
         LocationConstraintsFeature.register(this);
         ConditionConstraintsFeature.register(this);
         PlayersConstraintsFeature.register(this);
+        DeathConstraintsFeature.register(this);
     }
 }
