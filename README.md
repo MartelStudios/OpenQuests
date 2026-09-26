@@ -45,8 +45,15 @@ prerequisites of a quest are other quests.
   ids already handed out are kept between sessions, so a quest nobody took costs one string.
 - **As a reward** — the `GrantQuest` reward hands further quests over when a quest completes. This
   is how a chain is written: finishing A grants B.
-- **Explicitly** — `QuestProgressionService.registerQuest(asset).addPlayer(playerId)`, from a
-  command or from your own plugin.
+- **Explicitly** — `QuestProgressionService.assignQuest(asset, playerId)`, from a command or from
+  your own plugin.
+
+Each of these asks the [constraints](#constraints) of the asset first, and so do the scopes as
+they add a player to a quest they share: `assignQuest` and `joinQuest` return nothing for a player
+refused, and register nothing either. A quest refused on connection is offered again on the next
+one. The steps of a chain are handed out by the chain, so only the chain is asked.
+`registerQuest(asset).addPlayer(playerId)` still hands a quest out asking nobody, for a game mode
+that decides on its own.
 
 A quest gating on another one is a `QuestState` quest, usually as the child of a composite. Since a
 quest holds a state rather than a boolean, "not yet" and "failed" stay distinct — which is what
@@ -383,6 +390,7 @@ A constraint speaks to the moments of a quest it is about, and has no objection 
 
 | Moment | Hook | Effect |
 | --- | --- | --- |
+| Handing out | `allowsAssignment(asset, playerId, completions, now)` | A player is handed a new quest from the asset only if every constraint agrees, judging from how its quests ended for them so far. |
 | Progress | `allowsProgress(quest, actorId)` | A player's action counts only if every constraint agrees. Refused, it leaves no trace. |
 
 Only a player's action is put to the constraints. A visitor says whose action it carries through

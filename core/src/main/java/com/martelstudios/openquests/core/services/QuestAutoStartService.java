@@ -30,10 +30,13 @@ public class QuestAutoStartService {
 
         for (OpenQuestAsset asset : OpenQuestAsset.getAssetMap().getAssetMap().values()) {
             if (!asset.isStartOnConnection()) continue;
-            if (!questStore.getStartedOnConnection().add(asset.getId())) continue;
+            if (questStore.getStartedOnConnection().contains(asset.getId())) continue;
 
+            // Only written down once handed out, so a quest its constraints refused is offered again
+            if (QuestProgressionService.get().assignQuest(asset, playerId) == null) continue;
+
+            questStore.getStartedOnConnection().add(asset.getId());
             questStore.markDirty();
-            QuestProgressionService.get().registerQuest(asset).addPlayer(playerId);
         }
     }
 }

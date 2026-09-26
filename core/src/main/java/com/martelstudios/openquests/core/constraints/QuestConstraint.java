@@ -4,9 +4,11 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestCompletions;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -28,6 +30,16 @@ public abstract class QuestConstraint {
      */
     public static final BuilderCodec<QuestConstraint> BASE_CODEC = BuilderCodec.abstractBuilder(QuestConstraint.class)
                                                                                .build();
+
+    /**
+     * Whether a player may be handed a new quest from this asset, given how its quests ended for
+     * them so far. Asked wherever a quest is handed out, never as a chain hands out its steps.
+     *
+     * @param now the moment of asking, handed in so every constraint judges the same instant.
+     */
+    public boolean allowsAssignment(@Nonnull OpenQuestAsset asset, @Nonnull UUID playerId, @Nonnull QuestCompletions completions, @Nonnull Instant now) {
+        return true;
+    }
 
     /**
      * Whether what a player just did may count towards the quest. Asked on the thread the action

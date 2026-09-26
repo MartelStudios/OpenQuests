@@ -67,7 +67,7 @@ public class UniverseQuestService {
         trackQuest(questId);
 
         for (PlayerRef playerRef : Universe.get().getPlayers()) {
-            quest.addPlayer(playerRef.getUuid());
+            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
         }
     }
 
@@ -124,7 +124,7 @@ public class UniverseQuestService {
                 continue;
             }
 
-            quest.addPlayer(playerRef.getUuid());
+            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
         }
     }
 

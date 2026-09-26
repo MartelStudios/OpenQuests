@@ -57,8 +57,9 @@ public class GrantQuestReward extends QuestReward {
             AbstractQuestProgression<?> quest = questAsset.create();
             quest.addTag(OpenQuestsTags.GRANTED_BY_TAG, sourceQuestId.toString());
 
-            QuestProgressionService.get().registerQuest(quest);
-            quest.addPlayer(playerId);
+            // A quest its constraints refuse is dropped rather than retried: the grant is what
+            // was owed, and it happened
+            QuestProgressionService.get().assignQuest(quest, playerId);
         }
 
         return true;
