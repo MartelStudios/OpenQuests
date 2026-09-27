@@ -10,6 +10,10 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.extension.quests.block.BlockAction;
+import com.martelstudios.openquests.extension.quests.block.BlockActionVisitor;
+import com.martelstudios.openquests.extension.quests.block.PlacedBlocks;
+import org.joml.Vector3i;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,8 +38,11 @@ public class BreakBlockEventSystem extends EntityEventSystem<EntityStore, BreakB
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
         if (playerRef == null || questStoreComponent == null) return;
 
+        Vector3i target = event.getTargetBlock();
+        String position = PlacedBlocks.position(store.getExternalData().getWorld().getName(), target.x(), target.y(), target.z());
+
         QuestProgressionService.get()
-                               .progress(new BreakBlockQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
+                               .progress(new BlockActionVisitor(playerRef.getUuid(), BlockAction.BREAK, event.getBlockType().getId(), position), questStoreComponent.getQuestIds());
     }
 
     @Override

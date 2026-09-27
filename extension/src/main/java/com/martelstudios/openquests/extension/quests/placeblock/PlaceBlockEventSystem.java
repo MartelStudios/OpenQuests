@@ -6,10 +6,15 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.server.core.event.events.ecs.PlaceBlockEvent;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.extension.quests.block.BlockAction;
+import com.martelstudios.openquests.extension.quests.block.BlockActionVisitor;
+import com.martelstudios.openquests.extension.quests.block.PlacedBlocks;
+import org.joml.Vector3i;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,8 +39,14 @@ public class PlaceBlockEventSystem extends EntityEventSystem<EntityStore, PlaceB
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
         if (playerRef == null || questStoreComponent == null) return;
 
+        ItemStack itemInHand = event.getItemInHand();
+        if (itemInHand == null) return;
+
+        Vector3i target = event.getTargetBlock();
+        String position = PlacedBlocks.position(store.getExternalData().getWorld().getName(), target.x(), target.y(), target.z());
+
         QuestProgressionService.get()
-                               .progress(new PlaceBlockQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
+                               .progress(new BlockActionVisitor(playerRef.getUuid(), BlockAction.PLACE, itemInHand.getItemId(), position), questStoreComponent.getQuestIds());
     }
 
     @Override

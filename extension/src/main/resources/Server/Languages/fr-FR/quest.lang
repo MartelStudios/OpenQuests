@@ -130,7 +130,7 @@ chores-chest.title=Ouvrir un coffre en bois
 chores-chest.description=Ouvrez un coffre en bois pour y ranger la récolte.
 
 great-felling.title=La Grande Coupe
-great-felling.description=Abattez 500 troncs ensemble, sur tout le serveur. Les troncs ne comptent que si au moins trois joueurs sont connectés.
+great-felling.description=Abattez 500 troncs ensemble, sur tout le serveur. Les troncs ne comptent que si au moins trois joueurs sont connectés. Un tronc posé par un joueur puis abattu à nouveau ne compte pas.
 
 repel-trorks.title=Repousser les Trorks
 repel-trorks.description=Tuez des Trorks dans ce monde, tous ensemble, avant la fin des quinze minutes.

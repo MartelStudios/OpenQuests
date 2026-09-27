@@ -130,7 +130,7 @@ chores-chest.title=Open a wooden chest
 chores-chest.description=Open a wooden chest to put the harvest away.
 
 great-felling.title=The Great Felling
-great-felling.description=Fell 500 tree trunks together, across the whole server. Trunks only count while at least three players are online.
+great-felling.description=Fell 500 tree trunks together, across the whole server. Trunks only count while at least three players are online. Trunks placed by a player then felled again do not count.
 
 repel-trorks.title=Repel the Trorks
 repel-trorks.description=Kill Trorks in this world, all together, before the fifteen minutes run out.
