@@ -1,0 +1,39 @@
+{
+  "Type": "DropItem",
+  "TitleKey": "quest.temple-offering.title",
+  "DescriptionKey": "quest.temple-offering.description",
+  "TargetQuantity": 10,
+  "AutoTrack": true,
+  "AntiAbuse": true,
+  "ItemToDrop": {
+    "ItemId": "Ingredient_Life_Essence"
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.temple-offering.in-temple",
+      "WorldNamePattern": "instance-Forgotten_Temple-.*"
+    },
+    {
+      "Type": "NearPosition",
+      "DescriptionKey": "quest.temple-offering.near-altar",
+      "Position": {
+        "X": 4976,
+        "Y": 158,
+        "Z": 4983
+      },
+      "Radius": 6
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Potion_Health_Greater",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "Type": "PickupItem",
+  "StartOnConnection": true,
+  "TitleKey": "quest.woodpile.title",
+  "DescriptionKey": "quest.woodpile.description",
+  "TargetQuantity": 20,
+  "AntiAbuse": true,
+  "ItemToPickup": {
+    "ResourceTypeId": "Wood_Trunk"
+  },
+  "Visibility": "WhenProgressed"
+}

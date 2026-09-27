@@ -109,6 +109,10 @@ temple-warmup.title=Sauter en sprint près de l'autel
 temple-warmup.description=Sautez dix fois en sprintant, près de l'autel des runes sous la porte centrale du temple.
 temple-warmup.sprinting=En sprintant
 temple-warmup.near-altar=À moins de 12 blocs de l'autel des runes
+temple-offering.title=Offrez de l'essence à l'autel des runes
+temple-offering.description=Jetez dix Essences de vie au pied de l'autel des runes. Reprendre une offrande pour la jeter à nouveau ne compte pas deux fois.
+temple-offering.in-temple=Dans le Temple oublié
+temple-offering.near-altar=À moins de 6 blocs de l'autel des runes
 temple-race.title=Courir jusqu'à l'autel des runes
 temple-race.description=Rejoignez l'autel des runes sous la porte centrale du temple.
 temple-run.title=Courez une minute dans le temple
@@ -141,3 +145,5 @@ flawless-never-failed.title=Ne jamais l'échouer
 
 silent-step.title=Pas de loup
 silent-step.description=Parcourez cinq cents mètres au pas, l'allure lente qu'on maintient avec une touche.
+woodpile.title=Tas de bois
+woodpile.description=Ramassez vingt troncs d'arbre au sol. Ceux que vous avez jetés vous-même ne comptent pas.
