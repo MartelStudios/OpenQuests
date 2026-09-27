@@ -176,7 +176,7 @@ A quest that ends says so: its title takes over the middle of the screen, over a
 
 Announcing and being listed are separate questions: a quest kept off the tracker and out of the journal still ends out loud unless it asked not to. `AnnounceOutcome` is overridable on the progression, so a chain can silence the steps it hands out without touching their asset.
 
-`SuccessfulSound`, `FailedSound` and `AbandonedSound` name the sound for each outcome, either a vanilla sound event or one shipped by an asset pack of your own. The empty string plays nothing, which is how a single quest is made to end quietly.
+`SuccessfulSound`, `FailedSound` and `AbandonedSound` name the sound for each outcome, either a vanilla sound event or one shipped by an asset pack of your own. The empty string plays nothing, which is how a single quest is made to end quietly. The default sounds play one at a time, so quests ending together are heard once; a sound event of your own does the same with `"MaxInstance": 1` and `"PreventSoundInterruption": true`.
 
 ```
 { "SuccessfulSound": "SFX_Memories_Unlock_Local", "AbandonedSound": "" }

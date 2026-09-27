@@ -21,8 +21,8 @@ import java.util.UUID;
 
 /**
  * What a player hears and sees when a quest of theirs ends. A success takes over the middle of the
- * screen the way a zone discovery does (same packet, same timings), and every outcome gets a cue
- * of its own.
+ * screen the way a zone discovery does (same packet, held a little shorter), and every outcome gets
+ * a cue of its own.
  *
  * <p>A presentation choice rather than part of the quest system: the outcome is already decided
  * and paid by the time this runs, and a server wanting its own feedback leaves the feature out.
@@ -30,26 +30,24 @@ import java.util.UUID;
 public class QuestFeedbackService {
 
     /**
-     * The zone discovery fanfare, which ducks the music under itself and is what the fullscreen
-     * title was written for.
+     * The zone discovery fanfare, which ducks the music under itself. Every sound below plays one
+     * instance at a time, so quests ending together are heard once rather than stacked.
      */
-    private static final String DEFAULT_SUCCESSFUL_SOUND = "SFX_Discovery_Z1_Medium";
+    private static final String DEFAULT_SUCCESSFUL_SOUND = "SFX_OpenQuests_Quest_Successful";
 
-    /**
-     * Shipped by this mod's own asset pack, rather than borrowed from vanilla.
-     */
     private static final String DEFAULT_FAILED_SOUND = "SFX_OpenQuests_Quest_Failed";
 
     /**
      * A sheet of paper set down.
      */
-    private static final String DEFAULT_ABANDONED_SOUND = "SFX_Drop_Items_Paper";
+    private static final String DEFAULT_ABANDONED_SOUND = "SFX_OpenQuests_Quest_Abandoned";
 
     /**
-     * Vanilla zone discovery timings, so a quest ending reads as the same kind of moment.
+     * Held for less than a zone discovery's 4 seconds and 1.5 second fades: quests end far more
+     * often than zones are found.
      */
-    private static final float TITLE_DURATION = EventTitleUtil.DEFAULT_DURATION;
-    private static final float TITLE_FADE_DURATION = EventTitleUtil.DEFAULT_FADE_DURATION;
+    private static final float TITLE_DURATION = 3.0f;
+    private static final float TITLE_FADE_DURATION = 1.0f;
 
     /**
      * Majors get the larger treatment client-side, which is what a finished quest is worth.
