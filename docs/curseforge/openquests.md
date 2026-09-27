@@ -92,7 +92,7 @@ _A step the player has not reached yet, read from the chain that grants it. The 
 | <code>QuestState</code> |Another quest reaching a state, which is how you write a prerequisite |
 | <code>NoOp</code> |Nothing on its own: a command, a reward, a constraint or your own plugin ends it. Formerly <code>Script</code>, which still loads |
 
-Every counted type takes a target quantity, and a running quest can override it. One asset, handed out with different targets.
+Every counted type takes a target quantity, and a running quest can override it. One asset, handed out with different targets. <code>Walk</code>, <code>Run</code> and <code>Sprint</code> count metres, or seconds spent at their pace with <code>"Measure": "Seconds"</code>.
 
 ## 🎁 Rewards
 

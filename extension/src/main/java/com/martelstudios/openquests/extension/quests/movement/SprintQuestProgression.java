@@ -2,12 +2,11 @@ package com.martelstudios.openquests.extension.quests.movement;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.protocol.MovementStates;
-import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 
-public class SprintQuestProgression extends MovementQuestProgression<SprintQuestProgression> {
+public class SprintQuestProgression extends TravelQuestProgression<SprintQuestProgression> {
 
     public static final BuilderCodec<SprintQuestProgression> CODEC =
         BuilderCodec.builder(SprintQuestProgression.class, SprintQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
@@ -23,13 +22,13 @@ public class SprintQuestProgression extends MovementQuestProgression<SprintQuest
      * keeping it up rather than about the ground covered.
      */
     @Override
-    protected double advance(@Nonnull MovementStates states, double metres) {
-        return states.sprinting && states.onGround ? metres : 0;
+    protected boolean isAtPace(@Nonnull MovementStates states) {
+        return states.sprinting && states.onGround;
     }
 
     @Nonnull
     @Override
-    public Message getDefaultTitle() {
-        return Message.translation("openquests.quest.default.sprint").param("quantity", getTargetQuantity());
+    protected String getPaceKey() {
+        return "sprint";
     }
 }

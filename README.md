@@ -294,6 +294,9 @@ through counts once. `QuestPlayerStateService.getCompletions(playerId, assetId)`
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
 | `NoOp` | Nothing on its own: a command, a reward, a constraint or a plugin ends it. Still read under its former name, `Script`. |
 
+`Walk`, `Run` and `Sprint` count metres. With `"Measure": "Seconds"` they count the seconds spent moving at
+their pace instead, added up across every stretch: `TargetQuantity` is then a duration.
+
 The tracker only lists quests that asked for it. `AutoTrack` puts every quest made from the asset on
 the panel; `OQ_HUD_DESC` shows its description under its title, greyed and smaller:
 

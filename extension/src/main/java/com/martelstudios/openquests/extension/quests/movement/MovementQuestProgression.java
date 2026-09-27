@@ -20,11 +20,12 @@ public abstract class MovementQuestProgression<Q extends MovementQuestProgressio
     private transient double pending;
 
     /**
-     * @param metres how far the player travelled horizontally during this sample, zero while still.
-     * @return what this sample is worth in counted units, fractional for a distance and never
-     * negative. Called once per tick per player holding the quest, so it stays a comparison.
+     * @param metres  how far the player travelled horizontally during this sample, zero while still.
+     * @param seconds how long the sample lasted.
+     * @return what this sample is worth in counted units, fractional for a distance or a duration
+     * and never negative. Called once per tick per player holding the quest, so it stays a comparison.
      */
-    protected abstract double advance(@Nonnull MovementStates states, double metres);
+    protected abstract double advance(@Nonnull MovementStates states, double metres, double seconds);
 
     /**
      * Adds a sample to the counter, keeping what is left of a unit for the next one: a counter
@@ -32,8 +33,8 @@ public abstract class MovementQuestProgression<Q extends MovementQuestProgressio
      *
      * @return {@code true} if the counter moved, which is the only thing worth writing down.
      */
-    public boolean accumulate(@Nonnull MovementStates states, double metres) {
-        double advance = advance(states, metres);
+    public boolean accumulate(@Nonnull MovementStates states, double metres, double seconds) {
+        double advance = advance(states, metres, seconds);
         if (advance <= 0) return false;
 
         pending += advance;

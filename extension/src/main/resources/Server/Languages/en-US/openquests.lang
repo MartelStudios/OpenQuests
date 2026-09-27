@@ -11,6 +11,9 @@ quest.default.enter-world = Enter a world matching {world}
 quest.default.walk = Walk {quantity, number} metres
 quest.default.run = Run {quantity, number} metres
 quest.default.sprint = Sprint {quantity, number} metres
+quest.default.walk-for = Walk for {quantity, plural, one {a second} other {{quantity, number} seconds}}
+quest.default.run-for = Run for {quantity, plural, one {a second} other {{quantity, number} seconds}}
+quest.default.sprint-for = Sprint for {quantity, plural, one {a second} other {{quantity, number} seconds}}
 quest.default.jump = Jump {quantity, plural, one {once} other {{quantity, number} times}}
 
 page.title = Quest journal
