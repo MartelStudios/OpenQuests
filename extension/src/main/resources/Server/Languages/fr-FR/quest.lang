@@ -115,8 +115,8 @@ temple-warmup.sprinting=En sprintant
 temple-warmup.near-altar=À moins de 12 blocs de l'autel des runes
 temple-race.title=Courir jusqu'à l'autel des runes
 temple-race.description=Rejoignez l'autel des runes sous la porte centrale du temple.
-temple-hold.title=Survivre une minute
-temple-hold.description=Restez en vie dans le temple pendant une minute.
+temple-hold.title=Restez une minute à explorer le temple
+temple-hold.description=Passez au moins une minute dans le temple à le parcourir.
 
 daily-chores.title=Les corvées du jardin
 daily-chores.description=Cueillez des baies, ramassez des coquelicots et rangez la récolte dans un coffre.

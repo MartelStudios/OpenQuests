@@ -115,8 +115,8 @@ temple-warmup.sprinting=While sprinting
 temple-warmup.near-altar=Within 12 blocks of the rune altar
 temple-race.title=Run to the rune altar
 temple-race.description=Reach the rune altar under the temple's central gate.
-temple-hold.title=Survive a minute
-temple-hold.description=Stay alive inside the temple for one minute.
+temple-hold.title=Explore the temple for a minute
+temple-hold.description=Spend at least one minute inside the temple, looking around.
 
 daily-chores.title=Garden chores
 daily-chores.description=Pick berries, gather poppies and put the harvest away in a chest.
