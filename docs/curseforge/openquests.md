@@ -70,7 +70,7 @@ _A step the player has not reached yet, read from the chain that grants it. The 
 
 ## 🎯 Quest types
 
-Items and blocks are named by <code>ItemId</code>, by <code>BlockTag</code> or by <code>ResourceTypeId</code>, a family such as any flower or any raw meat. <code>PickupItem</code> and <code>DropItem</code> take <code>"AntiAbuse": true</code>, so one item thrown and picked up over and over counts once, even across a reconnection.
+Items and blocks are named by <code>ItemId</code>, by <code>BlockTag</code> or by <code>ResourceTypeId</code>, a family such as any flower or any raw meat. <code>PickupItem</code> and <code>DropItem</code> take <code>"AntiAbuse": true</code>, so one item thrown and picked up over and over counts once, even across a reconnection. <code>BreakBlock</code> and <code>PlaceBlock</code> take it too, against one block placed and broken over and over.
 
 | Type                |Completes on                                                          |
 | ------------------- |--------------------------------------------------------------------- |

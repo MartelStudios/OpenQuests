@@ -42,7 +42,7 @@ Two chains and a daily chore handed out on connection, a trial inside the Forgot
 
 Two quests an admin launches, for everyone at once:
 
-🪓 **The Great Felling**, launched with `/oquest create universe GreatFelling`: five hundred trunks felled by the whole server, counting only while three players are online, before a closing date.
+🪓 **The Great Felling**, launched with `/oquest create universe GreatFelling`: five hundred trunks felled by the whole server, counting only while three players are online, before a closing date. `AntiAbuse` is on, so a trunk placed and felled again counts once.
 
 🛡️ **Repel the Trorks**, launched with `/oquest create world RepelTheTrorks <world>`: twenty Trorks in fifteen minutes, shared by everyone in that world.
 

@@ -71,7 +71,6 @@ talk-merchant.in-temple=Inside the Forgotten Temple
 gather-meat.title=Gather meat
 gather-meat.description=Whatever you bring down, carry a cut of it home.
 
-
 craft-campfire.title=Craft a campfire
 craft-campfire.description=Four sticks and some rubble. Raw meat makes no dinner.
 
@@ -103,37 +102,37 @@ jump-master.title=Skyward
 jump-master.description=Two thousand five hundred jumps. Gravity is a suggestion.
 
 temple-trial.title=The Temple's trial
-temple-trial.description=Three minutes, inside the Forgotten Temple. Leaving the temple or dying fails the trial.
+temple-trial.description=Three minutes to prove yourself inside the Forgotten Temple.
 temple-trial.in-temple=Stay inside the Forgotten Temple: leaving fails the trial
 temple-warmup.title=Sprint-jump at the rune altar
 temple-warmup.description=Jump ten times while sprinting, close to the rune altar under the temple's central gate.
 temple-warmup.sprinting=While sprinting
 temple-warmup.near-altar=Within 12 blocks of the rune altar
 temple-offering.title=Offer essence at the rune altar
-temple-offering.description=Throw ten Essence of Life at the foot of the rune altar. Picking an offering back up to throw it again does not count twice.
+temple-offering.description=Throw ten Essence of Life at the foot of the rune altar.
 temple-offering.in-temple=Inside the Forgotten Temple
 temple-offering.near-altar=Within 6 blocks of the rune altar
 temple-race.title=Run to the rune altar
 temple-race.description=Reach the rune altar under the temple's central gate.
 temple-run.title=Run through the temple for a minute
-temple-run.description=Run for a minute in all, at your usual pace. Stopping does not reset the count.
+temple-run.description=Run for a minute, exploring the temple grounds.
 temple-hold.title=Explore the temple for a minute
 temple-hold.description=Spend at least one minute inside the temple, looking around.
 
 daily-chores.title=Garden chores
 daily-chores.description=Pick berries, gather flowers and put the harvest away in a chest.
 chores-berries.title=Pick wild berries
-chores-berries.description=Pick wild berries from the bushes by hand.
+chores-berries.description=Pick wild berries from the bushes.
 chores-flowers.title=Gather flowers
-chores-flowers.description=Any flower counts, whatever its colour. Keep five of them in your inventory.
+chores-flowers.description=Pick five flowers to brighten up the house.
 chores-chest.title=Open a wooden chest
 chores-chest.description=Open a wooden chest to put the harvest away.
 
 great-felling.title=The Great Felling
-great-felling.description=Fell 500 tree trunks together, across the whole server. Trunks only count while at least three players are online.
+great-felling.description=Fell 500 tree trunks, all of you together.
 
 repel-trorks.title=Repel the Trorks
-repel-trorks.description=Kill Trorks in this world, all together, before the fifteen minutes run out.
+repel-trorks.description=Kill Trorks, all of you together, before it is too late.
 
 first-blood.title=First blood
 first-blood.description=Another player fell by your hand.
@@ -144,6 +143,6 @@ flawless-passed.title=Pass the Temple's trial
 flawless-never-failed.title=Never fail it
 
 silent-step.title=Silent step
-silent-step.description=Walk five hundred metres at the slow pace, the one you hold a key for.
+silent-step.description=Walk five hundred metres without making a sound.
 woodpile.title=Woodpile
-woodpile.description=Pick up twenty tree trunks off the ground. Trunks you threw yourself do not count.
+woodpile.description=Pick up twenty tree trunks lying on the ground.

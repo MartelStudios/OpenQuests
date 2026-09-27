@@ -3,6 +3,7 @@
   "TitleKey": "quest.great-felling.title",
   "DescriptionKey": "quest.great-felling.description",
   "TargetQuantity": 500,
+  "AntiAbuse": true,
   "AutoTrack": true,
   "BlockToBreak": {
     "BlockTag": "Trunk"
