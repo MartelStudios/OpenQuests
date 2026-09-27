@@ -17,11 +17,13 @@ public class MovementQuestVisitor implements QuestVisitor<MovementQuestProgressi
     private final UUID playerId;
     private final MovementStates states;
     private final double metres;
+    private final double seconds;
 
-    public MovementQuestVisitor(@Nonnull UUID playerId, @Nonnull MovementStates states, double metres) {
+    public MovementQuestVisitor(@Nonnull UUID playerId, @Nonnull MovementStates states, double metres, double seconds) {
         this.playerId = playerId;
         this.states = states;
         this.metres = metres;
+        this.seconds = seconds;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class MovementQuestVisitor implements QuestVisitor<MovementQuestProgressi
 
         // Every sample is offered, even an empty one: a jump is counted from the tick it starts on,
         // which a quest can only tell apart by having been shown the tick before
-        if (!quest.accumulate(states, metres)) return;
+        if (!quest.accumulate(states, metres, seconds)) return;
 
         if (quest.checkCompletion()) quest.setState(QuestState.SUCCESSFUL);
 

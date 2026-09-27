@@ -30,7 +30,7 @@ public class JumpQuestProgression extends MovementQuestProgression<JumpQuestProg
      * sample and remembers it, unlike the other movement quests, which only measure.
      */
     @Override
-    protected double advance(@Nonnull MovementStates states, double metres) {
+    protected double advance(@Nonnull MovementStates states, double metres, double seconds) {
         boolean jumping = states.jumping;
         boolean tookOff = jumping && !wasJumping;
 

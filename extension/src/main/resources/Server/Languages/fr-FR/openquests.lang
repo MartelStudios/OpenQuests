@@ -11,6 +11,9 @@ quest.default.enter-world = Entrez dans un monde correspondant à {world}
 quest.default.walk = Marchez {quantity, number} mètres
 quest.default.run = Courez {quantity, number} mètres
 quest.default.sprint = Sprintez sur {quantity, number} mètres
+quest.default.walk-for = Marchez pendant {quantity, plural, one {une seconde} other {{quantity, number} secondes}}
+quest.default.run-for = Courez pendant {quantity, plural, one {une seconde} other {{quantity, number} secondes}}
+quest.default.sprint-for = Sprintez pendant {quantity, plural, one {une seconde} other {{quantity, number} secondes}}
 quest.default.jump = Sautez {quantity, plural, one {une fois} other {{quantity, number} fois}}
 
 page.title = Journal de quêtes

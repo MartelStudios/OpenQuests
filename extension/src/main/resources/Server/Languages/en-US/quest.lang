@@ -115,6 +115,8 @@ temple-warmup.sprinting=While sprinting
 temple-warmup.near-altar=Within 12 blocks of the rune altar
 temple-race.title=Run to the rune altar
 temple-race.description=Reach the rune altar under the temple's central gate.
+temple-run.title=Run through the temple for a minute
+temple-run.description=Run for a minute in all, at your usual pace. Stopping does not reset the count.
 temple-hold.title=Explore the temple for a minute
 temple-hold.description=Spend at least one minute inside the temple, looking around.
 

@@ -49,6 +49,6 @@ public class MovementTickingSystem extends EntityTickingSystem<EntityStore> {
         double metres = listener.sampleTravel(position.x(), position.z());
 
         QuestProgressionService.get()
-                               .progress(new MovementQuestVisitor(playerRef.getUuid(), states, metres), listener.getQuestIds());
+                               .progress(new MovementQuestVisitor(playerRef.getUuid(), states, metres, dt), listener.getQuestIds());
     }
 }

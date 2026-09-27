@@ -47,6 +47,14 @@
       ]
     },
     {
+      "Type": "Run",
+      "TitleKey": "quest.temple-run.title",
+      "DescriptionKey": "quest.temple-run.description",
+      "Measure": "Seconds",
+      "TargetQuantity": 60,
+      "AnnounceOutcome": false
+    },
+    {
       "Type": "NoOp",
       "TitleKey": "quest.temple-hold.title",
       "DescriptionKey": "quest.temple-hold.description",

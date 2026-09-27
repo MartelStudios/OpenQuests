@@ -2,12 +2,11 @@ package com.martelstudios.openquests.extension.quests.movement;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.protocol.MovementStates;
-import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 
-public class WalkQuestProgression extends MovementQuestProgression<WalkQuestProgression> {
+public class WalkQuestProgression extends TravelQuestProgression<WalkQuestProgression> {
 
     public static final BuilderCodec<WalkQuestProgression> CODEC =
         BuilderCodec.builder(WalkQuestProgression.class, WalkQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
@@ -23,13 +22,13 @@ public class WalkQuestProgression extends MovementQuestProgression<WalkQuestProg
      * so this is a quest about taking one's time rather than about covering ground.
      */
     @Override
-    protected double advance(@Nonnull MovementStates states, double metres) {
-        return states.walking && states.onGround ? metres : 0;
+    protected boolean isAtPace(@Nonnull MovementStates states) {
+        return states.walking && states.onGround;
     }
 
     @Nonnull
     @Override
-    public Message getDefaultTitle() {
-        return Message.translation("openquests.quest.default.walk").param("quantity", getTargetQuantity());
+    protected String getPaceKey() {
+        return "walk";
     }
 }
