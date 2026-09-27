@@ -368,7 +368,9 @@ journal still ends out loud unless it asked not to. `AnnounceOutcome` is overrid
 progression, so a chain can silence the steps it hands out without touching their asset.
 
 Each outcome names its own sound, a vanilla sound event or one your asset pack ships. The empty
-string plays nothing.
+string plays nothing. The default sounds play one at a time, so quests ending together are heard
+once; a sound event of your own does the same with `"MaxInstance": 1` and
+`"PreventSoundInterruption": true`.
 
 ```json
 { "SuccessfulSound": "SFX_Memories_Unlock_Local", "AbandonedSound": "" }

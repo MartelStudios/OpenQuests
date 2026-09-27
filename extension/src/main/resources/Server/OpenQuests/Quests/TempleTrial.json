@@ -4,7 +4,6 @@
   "DescriptionKey": "quest.temple-trial.description",
   "CanBeAbandoned": false,
   "AutoTrack": true,
-  "SuccessfulSound": "SFX_Discovery_Z1_Medium",
   "QuestAssetIds": [
     {
       "Type": "ReachLocation",

@@ -1,0 +1,24 @@
+{
+  "Layers": [
+    {
+      "Files": [
+        "Sounds/UI/Discovery/Discovery_Z1_Medium_Stereo.ogg"
+      ],
+      "Volume": 0
+    }
+  ],
+  "Volume": -2.0,
+  "MaxInstance": 1,
+  "PreventSoundInterruption": true,
+  "AudioCategory": "AudioCat_Discovery",
+  "DuckingRules": [
+    {
+      "TargetCategory": "AudioCat_Music",
+      "DuckingVolumeDb": -12,
+      "AttackMs": 500,
+      "ReleaseMs": 2500,
+      "Curve": "SCurve",
+      "ReleaseCurve": "SCurve"
+    }
+  ]
+}
