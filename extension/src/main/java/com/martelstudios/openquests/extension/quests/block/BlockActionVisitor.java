@@ -15,17 +15,17 @@ public class BlockActionVisitor implements QuestVisitor<BlockActionQuestProgress
     private final UUID playerId;
     private final BlockAction action;
     private final String blockId;
-    private final String position;
+    private final boolean placedByPlayer;
 
     /**
-     * @param blockId  the block's id, or the id of the item placing it, which is the same.
-     * @param position where it stands, as {@link PlacedBlocks#position} writes it.
+     * @param blockId        the block's id, or the id of the item placing it, which is the same.
+     * @param placedByPlayer for a break, whether a player had placed the block.
      */
-    public BlockActionVisitor(@Nonnull UUID playerId, @Nonnull BlockAction action, @Nonnull String blockId, @Nonnull String position) {
+    public BlockActionVisitor(@Nonnull UUID playerId, @Nonnull BlockAction action, @Nonnull String blockId, boolean placedByPlayer) {
         this.playerId = playerId;
         this.action = action;
         this.blockId = blockId;
-        this.position = position;
+        this.placedByPlayer = placedByPlayer;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class BlockActionVisitor implements QuestVisitor<BlockActionQuestProgress
         if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
         if (!quest.getBlockFilter().matches(blockId)) return;
-        if (!quest.act(playerId, action, position)) return;
+        if (!quest.act(playerId, action, placedByPlayer)) return;
 
         quest.setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();

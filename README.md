@@ -286,8 +286,8 @@ already defines, such as `Flowers` or `Meats`. A block is matched through the it
 | `InteractivelyPickup` | Picking up a quantity through the harvest interaction. |
 | `Craft` | Crafting a quantity of an item, whatever the recipe. |
 | `UseBlock` | Interacting with a block a number of times. |
-| `BreakBlock` | Breaking a number of blocks, named by id or by block tag. With `"AntiAbuse": true`, blocks the quest's players placed while holding it do not count. |
-| `PlaceBlock` | Placing a number of blocks, matched on the item they are placed from. With `"AntiAbuse": true`, placing again a block broken back out of one of those placements does not count. |
+| `BreakBlock` | Breaking a number of blocks, named by id or by block tag. With `"AntiAbuse": true`, a block any player placed does not count, even one placed before the quest: the world marks every placed block, one bit per block, saved with its chunk. |
+| `PlaceBlock` | Placing a number of blocks, matched on the item they are placed from. With `"AntiAbuse": true`, placing again a block broken out of a player's placement does not count. |
 | `Consume` | Eating or drinking a quantity of an item. |
 | `DropItem` | Throwing a quantity of an item out of the inventory, counted as it leaves. What a full inventory spills does not count. With `"AntiAbuse": true`, what the player picked back up after throwing it does not count again, which the quest keeps track of in its own save. |
 | `PickupItem` | Picking a quantity of an item up off the ground or by hand, counted as it arrives. With `"AntiAbuse": true`, what the player threw themselves while holding the quest does not count. |

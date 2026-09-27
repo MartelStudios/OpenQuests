@@ -3,32 +3,28 @@ package com.martelstudios.openquests.extension.quests.block;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
 /**
  * Runtime state shared by the quests counting blocks placed or broken. Every such quest sees both
- * actions, whichever it counts: a break quest guarding against abuse has to know what was placed.
+ * actions, whichever it counts: a place quest guarding against abuse has to know what was broken.
  *
  * @param <Q> the concrete quest type extending this class
  */
 public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProgression<Q>> extends QuantityQuestProgression<Q> {
 
     public static final BuilderCodec<BlockActionQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(BlockActionQuestProgression.class, QuantityQuestProgression.BASE_CODEC)
-                                                                                           .append(new KeyedCodec<>("Placed", new ArrayCodec<>(Codec.STRING, String[]::new)), (quest, positions) -> quest.placed.positions.addAll(Arrays.asList(positions)), quest -> quest.placed.positions.isEmpty() ? null : quest.placed.positions.toArray(String[]::new))
-                                                                                           .add()
-                                                                                           .append(new KeyedCodec<>("Recovered", new MapCodec<>(Codec.INTEGER, HashMap::new)), (quest, counts) -> quest.placed.recovered.putAll(counts), quest -> quest.placed.recovered.isEmpty() ? null : new HashMap<>(quest.placed.recovered))
+                                                                                           .append(new KeyedCodec<>("Recovered", new MapCodec<>(Codec.INTEGER, HashMap::new)), (quest, counts) -> quest.recoveries.recovered.putAll(counts), quest -> quest.recoveries.recovered.isEmpty() ? null : new HashMap<>(quest.recoveries.recovered))
                                                                                            .add()
                                                                                            .build();
 
-    protected final PlacedBlocks placed = new PlacedBlocks();
+    protected final BlockRecoveries recoveries = new BlockRecoveries();
 
     /**
      * @return the blocks this quest counts.
@@ -37,7 +33,7 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
     public abstract QuestItemFilter getBlockFilter();
 
     /**
-     * @return whether this quest counts that action at all, the other one only feeding its memory.
+     * @return whether this quest counts that action at all, the other one only feeding its counters.
      */
     protected abstract boolean counts(@Nonnull BlockAction action);
 
@@ -55,23 +51,37 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
     }
 
     /**
-     * Records an action on a block this quest counts, remembering placements only when guarding
-     * against abuse, and forgetting them once the quest is done counting.
+     * Records an action on a block this quest counts. Guarding against abuse, a block a player placed
+     * does not count once broken, and placing it again does not count either.
      *
-     * @return whether anything changed, the count or the memory, which is what is worth saving.
+     * @param placedByPlayer for a break, whether a player had placed the block, as the world remembers.
+     * @return whether anything changed, the count or the counters, which is what is worth saving.
      */
-    public boolean act(@Nonnull UUID playerId, @Nonnull BlockAction action, @Nonnull String position) {
+    public boolean act(@Nonnull UUID playerId, @Nonnull BlockAction action, boolean placedByPlayer) {
         boolean guarded = isAntiAbuse();
-
+        boolean changed = false;
         boolean fresh = true;
-        if (guarded && action == BlockAction.PLACE) fresh = placed.recordPlacement(playerId, position);
-        if (guarded && action == BlockAction.BREAK) fresh = !placed.recordBreak(playerId, position);
 
-        boolean counted = fresh && counts(action);
-        if (counted) setCurrentQuantity(getCurrentQuantity() + 1);
+        if (guarded && action == BlockAction.BREAK && placedByPlayer) {
+            fresh = false;
+            if (counts(BlockAction.PLACE)) {
+                recoveries.record(playerId);
+                changed = true;
+            }
+        }
 
-        if (guarded && checkCompletion() && isStopOnComplete()) placed.clear();
+        if (guarded && action == BlockAction.PLACE && recoveries.consume(playerId)) {
+            fresh = false;
+            changed = true;
+        }
 
-        return counted || guarded;
+        if (fresh && counts(action)) {
+            setCurrentQuantity(getCurrentQuantity() + 1);
+            changed = true;
+        }
+
+        if (guarded && checkCompletion() && isStopOnComplete()) recoveries.clear();
+
+        return changed;
     }
 }
