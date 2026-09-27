@@ -1,9 +1,9 @@
 package com.martelstudios.openquests.extension.quests.gather;
 
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
@@ -16,12 +16,12 @@ import javax.annotation.Nullable;
 public class GatherQuestProgression extends QuantityQuestProgression<GatherQuestProgression> {
 
     public static final BuilderCodec<GatherQuestProgression> CODEC = BuilderCodec.builder(GatherQuestProgression.class, GatherQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
-                                                                                 .append(new KeyedCodec<>("ItemToGather", BlockTagOrItemIdField.CODEC), (quest, item) -> quest.itemToGather = item, quest -> quest.itemToGather)
+                                                                                 .append(new KeyedCodec<>("ItemToGather", QuestItemFilter.CODEC), (quest, item) -> quest.itemToGather = item, quest -> quest.itemToGather)
                                                                                  .add()
                                                                                  .build();
 
     @Nullable
-    protected BlockTagOrItemIdField itemToGather;
+    protected QuestItemFilter itemToGather;
 
     @Override
     public GatherQuestAsset getAsset() {
@@ -32,11 +32,11 @@ public class GatherQuestProgression extends QuantityQuestProgression<GatherQuest
      * @return this instance's item if one was set on it, the asset's otherwise.
      */
     @Nonnull
-    public BlockTagOrItemIdField getItemToGather() {
+    public QuestItemFilter getItemToGather() {
         return itemToGather != null ? itemToGather : getAsset().getItemToGather();
     }
 
-    public GatherQuestProgression setItemToGather(@Nullable BlockTagOrItemIdField itemToGather) {
+    public GatherQuestProgression setItemToGather(@Nullable QuestItemFilter itemToGather) {
         this.itemToGather = itemToGather;
         return this;
     }
@@ -47,6 +47,6 @@ public class GatherQuestProgression extends QuantityQuestProgression<GatherQuest
         var asset = getAsset();
         if (asset == null || asset.getItemToGather() == null) return super.getDefaultTitle();
 
-        return countedTitle("openquests.quest.default.gather", asset.getItemToGather().getItemId());
+        return countedTitle("openquests.quest.default.gather", asset.getItemToGather());
     }
 }

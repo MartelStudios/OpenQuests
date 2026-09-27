@@ -71,10 +71,6 @@ talk-merchant.in-temple=Inside the Forgotten Temple
 gather-meat.title=Gather meat
 gather-meat.description=Whatever you bring down, carry a cut of it home.
 
-gather-wildmeat.title=Gather raw wild meat
-gather-beef.title=Gather raw beef
-gather-chicken.title=Gather raw chicken
-gather-pork.title=Gather raw pork
 
 craft-campfire.title=Craft a campfire
 craft-campfire.description=Four sticks and some rubble. Raw meat makes no dinner.
@@ -121,11 +117,11 @@ temple-hold.title=Explore the temple for a minute
 temple-hold.description=Spend at least one minute inside the temple, looking around.
 
 daily-chores.title=Garden chores
-daily-chores.description=Pick berries, gather poppies and put the harvest away in a chest.
+daily-chores.description=Pick berries, gather flowers and put the harvest away in a chest.
 chores-berries.title=Pick wild berries
 chores-berries.description=Pick wild berries from the bushes by hand.
-chores-flowers.title=Gather poppies
-chores-flowers.description=Poppies grow in the plains. Keep five of them in your inventory.
+chores-flowers.title=Gather flowers
+chores-flowers.description=Any flower counts, whatever its colour. Keep five of them in your inventory.
 chores-chest.title=Open a wooden chest
 chores-chest.description=Open a wooden chest to put the harvest away.
 

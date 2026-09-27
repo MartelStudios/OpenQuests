@@ -1,9 +1,9 @@
 package com.martelstudios.openquests.extension.quests.consumeitem;
 
-import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
 /**
@@ -13,11 +13,11 @@ public class ConsumeItemQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<ConsumeItemQuestAsset> CODEC =
         BuilderCodec.builder(ConsumeItemQuestAsset.class, ConsumeItemQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
-                    .append(new KeyedCodec<>("ItemToConsume", BlockTagOrItemIdField.CODEC), (asset, item) -> asset.itemToConsume = item, asset -> asset.itemToConsume)
+                    .append(new KeyedCodec<>("ItemToConsume", QuestItemFilter.CODEC), (asset, item) -> asset.itemToConsume = item, asset -> asset.itemToConsume)
                     .add()
                     .build();
 
-    protected BlockTagOrItemIdField itemToConsume;
+    protected QuestItemFilter itemToConsume;
 
     private ConsumeItemQuestAsset() {}
 
@@ -26,7 +26,7 @@ public class ConsumeItemQuestAsset extends QuantityQuestAsset {
         return new ConsumeItemQuestProgression().setAssetId(getId());
     }
 
-    public BlockTagOrItemIdField getItemToConsume() {
+    public QuestItemFilter getItemToConsume() {
         return itemToConsume;
     }
 }

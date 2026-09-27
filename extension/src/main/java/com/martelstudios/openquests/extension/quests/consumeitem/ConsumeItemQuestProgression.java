@@ -1,9 +1,9 @@
 package com.martelstudios.openquests.extension.quests.consumeitem;
 
-import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
+import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 public class ConsumeItemQuestProgression extends QuantityQuestProgression<ConsumeItemQuestProgression> {
 
     public static final BuilderCodec<ConsumeItemQuestProgression> CODEC = BuilderCodec.builder(ConsumeItemQuestProgression.class, ConsumeItemQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
-                                                                                      .append(new KeyedCodec<>("ItemToConsume", BlockTagOrItemIdField.CODEC), (quest, item) -> quest.itemToConsume = item, quest -> quest.itemToConsume)
+                                                                                      .append(new KeyedCodec<>("ItemToConsume", QuestItemFilter.CODEC), (quest, item) -> quest.itemToConsume = item, quest -> quest.itemToConsume)
                                                                                       .add()
                                                                                       .build();
 
@@ -20,7 +20,7 @@ public class ConsumeItemQuestProgression extends QuantityQuestProgression<Consum
      * Overrides the asset's item for this instance alone.
      */
     @Nullable
-    protected BlockTagOrItemIdField itemToConsume;
+    protected QuestItemFilter itemToConsume;
 
     @Override
     public ConsumeItemQuestAsset getAsset() {
@@ -31,11 +31,11 @@ public class ConsumeItemQuestProgression extends QuantityQuestProgression<Consum
      * @return this instance's item if one was set on it, the asset's otherwise.
      */
     @Nonnull
-    public BlockTagOrItemIdField getItemToConsume() {
+    public QuestItemFilter getItemToConsume() {
         return itemToConsume != null ? itemToConsume : getAsset().getItemToConsume();
     }
 
-    public ConsumeItemQuestProgression setItemToConsume(@Nullable BlockTagOrItemIdField itemToConsume) {
+    public ConsumeItemQuestProgression setItemToConsume(@Nullable QuestItemFilter itemToConsume) {
         this.itemToConsume = itemToConsume;
         return this;
     }
@@ -46,6 +46,6 @@ public class ConsumeItemQuestProgression extends QuantityQuestProgression<Consum
         var asset = getAsset();
         if (asset == null || asset.getItemToConsume() == null) return super.getDefaultTitle();
 
-        return countedTitle("openquests.quest.default.consume", asset.getItemToConsume().getItemId());
+        return countedTitle("openquests.quest.default.consume", asset.getItemToConsume());
     }
 }

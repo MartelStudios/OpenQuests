@@ -12,7 +12,6 @@
     "ServerVersion": "^0.6.2",
     "Dependencies": {
         "Hytale:AssetModule": "*",
-        "Hytale:Objectives": "*",
         "Hytale:NPC": "*",
         "Hytale:TagSet": "*",
         "MartelStudios:OpenQuestsCore": "*",

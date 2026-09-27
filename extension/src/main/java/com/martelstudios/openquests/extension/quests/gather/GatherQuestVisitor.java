@@ -43,7 +43,7 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuestProgression> 
         if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
         int count = combinedItemContainer.countItemStacks(itemStack -> quest.getItemToGather()
-                                                                            .isBlockTypeIncluded(itemStack.getItemId()));
+                                                                            .matches(itemStack.getItemId()));
 
         quest.setCurrentQuantity(count)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)

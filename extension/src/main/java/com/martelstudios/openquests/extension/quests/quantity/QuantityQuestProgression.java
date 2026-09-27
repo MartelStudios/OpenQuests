@@ -4,8 +4,8 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 
 import javax.annotation.Nonnull;
 
@@ -65,16 +65,12 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     /**
      * A default title built from the target and what is being counted.
      *
-     * @param itemId the item counted, or {@code null} when the quest names a block tag instead
+     * @param counted what the quest counts, named when it is an item or a resource type
      */
     @Nonnull
-    protected Message countedTitle(@Nonnull String messageKey, @Nullable String itemId) {
-        Item asset = itemId == null ? null : Item.getAssetMap().getAsset(itemId);
-
-        // Item resolves its own name: it may carry a translation key of its own, and arguments
-        Message item = asset == null
-            ? Message.translation("openquests.quest.default.something")
-            : asset.getTranslationMessage();
+    protected Message countedTitle(@Nonnull String messageKey, @Nullable QuestItemFilter counted) {
+        Message name = counted == null ? null : counted.getName();
+        Message item = name != null ? name : Message.translation("openquests.quest.default.something");
 
         return Message.translation(messageKey)
                       .param("quantity", getTargetQuantity())

@@ -70,6 +70,8 @@ _A step the player has not reached yet, read from the chain that grants it. The 
 
 ## 🎯 Quest types
 
+Items and blocks are named by <code>ItemId</code>, by <code>BlockTag</code> or by <code>ResourceTypeId</code>, a family such as any flower or any raw meat.
+
 | Type                |Completes on                                                          |
 | ------------------- |--------------------------------------------------------------------- |
 | <code>Gather</code> |Holding a quantity of an item                                         |

@@ -1,8 +1,8 @@
 package com.martelstudios.openquests.extension.quests.breakblock;
 
-import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 public class BreakBlockQuestProgression extends QuantityQuestProgression<BreakBlockQuestProgression> {
 
     public static final BuilderCodec<BreakBlockQuestProgression> CODEC = BuilderCodec.builder(BreakBlockQuestProgression.class, BreakBlockQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
-                                                                                   .append(new KeyedCodec<>("BlockToBreak", BlockTagOrItemIdField.CODEC), (quest, block) -> quest.blockToBreak = block, quest -> quest.blockToBreak)
+                                                                                   .append(new KeyedCodec<>("BlockToBreak", QuestItemFilter.CODEC), (quest, block) -> quest.blockToBreak = block, quest -> quest.blockToBreak)
                                                                                    .add()
                                                                                    .build();
 
@@ -19,7 +19,7 @@ public class BreakBlockQuestProgression extends QuantityQuestProgression<BreakBl
      * Overrides the asset's block for this instance alone.
      */
     @Nullable
-    protected BlockTagOrItemIdField blockToBreak;
+    protected QuestItemFilter blockToBreak;
 
     @Override
     public BreakBlockQuestAsset getAsset() {
@@ -30,11 +30,11 @@ public class BreakBlockQuestProgression extends QuantityQuestProgression<BreakBl
      * @return this instance's block if one was set on it, the asset's otherwise.
      */
     @Nonnull
-    public BlockTagOrItemIdField getBlockToBreak() {
+    public QuestItemFilter getBlockToBreak() {
         return blockToBreak != null ? blockToBreak : getAsset().getBlockToBreak();
     }
 
-    public BreakBlockQuestProgression setBlockToBreak(@Nullable BlockTagOrItemIdField blockToBreak) {
+    public BreakBlockQuestProgression setBlockToBreak(@Nullable QuestItemFilter blockToBreak) {
         this.blockToBreak = blockToBreak;
         return this;
     }
