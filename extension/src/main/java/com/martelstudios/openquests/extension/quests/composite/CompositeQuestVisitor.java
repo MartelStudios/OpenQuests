@@ -31,7 +31,7 @@ public class CompositeQuestVisitor implements QuestVisitor<CompositeQuestProgres
 
         if (quest.recordOutcome(updatedChild.getId(), outcome)) quest.markDirty();
 
-        int children = quest.getQuestIds().length;
+        int children = quest.getChildIds().length;
         int successful = quest.countOutcomes(QuestState.SUCCESSFUL);
         int failed = quest.countOutcomes(QuestState.FAILED);
         int abandoned = quest.countOutcomes(QuestState.ABANDONED);

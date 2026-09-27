@@ -61,6 +61,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("AssetId", Codec.STRING), (quest, assetId) -> quest.assetId = assetId, quest -> quest.assetId)
                                                                                         .add()
+                                                                                        .append(new KeyedCodec<>("ParentId", Codec.UUID_STRING), (quest, parentId) -> quest.parentId = parentId, quest -> quest.parentId)
+                                                                                        .add()
                                                                                         .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.state = state, quest -> quest.state)
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (quest, value) -> quest.persistHistory = value, quest -> quest.persistHistory)
@@ -109,6 +111,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * The {@link OpenQuestAsset#getId()}
      */
     protected String assetId;
+
+    /**
+     * The composite this quest is a step of, {@code null} for a quest standing on its own. Only a
+     * composite writes it, as it adopts the step, which is what keeps children to composites.
+     */
+    @Nullable
+    private UUID parentId;
 
     protected QuestState state = QuestState.IN_PROGRESS;
 
@@ -478,6 +487,33 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public Q setAssetId(String assetId) {
         this.assetId = assetId;
         return self();
+    }
+
+    /**
+     * @return the id of the composite this quest is a step of, {@code null} for one standing on
+     * its own. Answers even once the composite has left memory.
+     */
+    @Nullable
+    public UUID getParentId() {
+        return parentId;
+    }
+
+    /**
+     * @return the composite this quest is a step of, {@code null} for one standing on its own or
+     * whose composite is not in memory. Never reads anything back.
+     */
+    @Nullable
+    public AbstractCompositeQuestProgression<?> getParent() {
+        if (parentId == null) return null;
+
+        return QuestProgressionService.get().getQuest(parentId) instanceof AbstractCompositeQuestProgression<?> parent ? parent : null;
+    }
+
+    /**
+     * Written by {@link AbstractCompositeQuestProgression} alone, as it adopts or claims a step.
+     */
+    void setParentId(@Nullable UUID parentId) {
+        this.parentId = parentId;
     }
 
     /**
