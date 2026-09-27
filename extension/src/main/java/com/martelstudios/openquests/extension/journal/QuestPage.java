@@ -22,6 +22,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opennavigation.routes.Route;
 import com.martelstudios.opennavigation.routes.TabRoute;
 import com.martelstudios.opennavigation.services.NavigationService;
+import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -615,7 +616,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         if (described) context.getBuilder().set(rowSelector + "#Description.TextSpans", entry.description());
 
-        int lines = objectives + renderRewards(context, rowSelector, entry);
+        int lines = objectives + renderConditions(context, rowSelector, entry) + renderRewards(context, rowSelector, entry);
         boolean acted = renderActions(context, rowSelector, entry);
 
         // An unfolded row with nothing under it would open onto a gap. A finished quest that kept
@@ -646,6 +647,29 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         context.getBuilder()
                .set(rowSelector + "#ObjectivesHeader.Visible", true)
                .set(rowSelector + "#ObjectivesHeader.TextSpans", Message.translation("openquests.page.objectives"));
+
+        return lines;
+    }
+
+    /**
+     * The rules the asset lays on the quest, one line each: its time, its world, how often it can
+     * be taken. A rule with nothing left to say — the time left on a quest that is over — draws
+     * nothing, and no heading is left behind when none has anything to say.
+     */
+    private int renderConditions(@Nonnull QuestPageContext context, @Nonnull String rowSelector, @Nonnull Entry entry) {
+        OpenQuestAsset asset = entry.asset();
+        if (asset == null || asset.getConstraints().length == 0) return 0;
+
+        int lines = context.into(rowSelector + "#Conditions", () -> {
+            for (QuestConstraint constraint : asset.getConstraints()) {
+                QuestPageRows.renderConstraint(context, constraint, asset, entry.quest());
+            }
+        });
+        if (lines == 0) return 0;
+
+        context.getBuilder()
+               .set(rowSelector + "#ConditionsSection.Visible", true)
+               .set(rowSelector + "#ConditionsHeader.TextSpans", Message.translation("openquests.page.conditions"));
 
         return lines;
     }

@@ -9,7 +9,10 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestCompletions;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
@@ -55,6 +58,7 @@ public class QuestPlayerStateService {
         plugin.getEventRegistry().registerGlobal(EventPriority.FIRST, PlayerConnectEvent.class, this::handlePlayerConnectEvent);
         // EventPriority.LAST, so whatever another listener does on the way out is written too
         plugin.getEventRegistry().registerGlobal(EventPriority.LAST, PlayerDisconnectEvent.class, this::handlePlayerDisconnectEvent);
+        plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
     }
 
     public static QuestPlayerStateService get() {
@@ -82,7 +86,7 @@ public class QuestPlayerStateService {
         }
 
         QuestStoreComponent questStore = holder.ensureAndGetComponent(QuestStoreComponent.getComponentType());
-        questStore.restore(resolved, record.getStartedOnConnection());
+        questStore.restore(resolved, record.getStartedOnConnection(), record.getCompletions());
 
         PendingRewardStoreComponent rewards = holder.ensureAndGetComponent(PendingRewardStoreComponent.getComponentType());
         rewards.pending.restore(record.getPendingRewards());
@@ -142,7 +146,7 @@ public class QuestPlayerStateService {
         boolean changed = questStore.hasChanges() || rewards.hasChanges();
         if (!changed && !force) return;
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(questIds, questStore.getStartedOnConnection(), rewards.snapshot()));
+        storage.savePlayer(playerId, new PlayerQuestRecord(questIds, questStore.getStartedOnConnection(), rewards.snapshot(), questStore.getCompletions()));
 
         questStore.consumeChanges();
         rewards.consumeChanges();
@@ -154,6 +158,52 @@ public class QuestPlayerStateService {
      */
     public void addPendingRewards(@Nonnull UUID playerId, @Nonnull PendingRewards owed) {
         storage.addPendingRewards(playerId, owed);
+    }
+
+    /**
+     * @return how quests from that asset ended for the player so far. An offline player is read
+     * from the storage, which blocks: meant for the rare question asked about someone away.
+     */
+    @Nonnull
+    public QuestCompletions getCompletions(@Nonnull UUID playerId, @Nonnull String assetId) {
+        Session session = sessions.get(playerId);
+        if (session != null) return session.questStore().getCompletions(assetId);
+
+        return storage.loadPlayer(playerId).getCompletions().getOrDefault(assetId, QuestCompletions.NONE);
+    }
+
+    /**
+     * Counts the outcome for everyone holding the quest as it ends, those who gave it up as having
+     * abandoned it. Counted here rather than as they leave, so a player who comes back and sees
+     * it through counts once, the way it ended for them.
+     */
+    private void handleQuestCompletedEvent(@Nonnull QuestCompletedEvent questCompletedEvent) {
+        AbstractQuestProgression<?> quest = questCompletedEvent.getQuest();
+
+        String assetId = quest.getAssetId();
+        if (assetId == null) return;
+
+        for (UUID playerId : quest.getPlayers()) {
+            recordCompletion(playerId, assetId, questCompletedEvent.getState(), quest);
+        }
+
+        for (UUID playerId : quest.getAbandonedPlayers()) {
+            recordCompletion(playerId, assetId, QuestState.ABANDONED, quest);
+        }
+    }
+
+    /**
+     * Into the session of an online player, written with the rest of their record; straight into
+     * the storage for one nobody is holding.
+     */
+    private void recordCompletion(@Nonnull UUID playerId, @Nonnull String assetId, @Nonnull QuestState outcome, @Nonnull AbstractQuestProgression<?> quest) {
+        Session session = sessions.get(playerId);
+        if (session != null) {
+            session.questStore().recordCompletion(assetId, outcome, quest.getStartedAt(), quest.getCompletedAt());
+            return;
+        }
+
+        storage.recordCompletion(playerId, assetId, outcome, quest.getStartedAt(), quest.getCompletedAt());
     }
 
     /**

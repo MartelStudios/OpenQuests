@@ -35,4 +35,10 @@ public class UseEntityQuestVisitor implements QuestVisitor<UseEntityQuestProgres
     public Class<UseEntityQuestProgression> getQuestType() {
         return UseEntityQuestProgression.class;
     }
+
+    @Nonnull
+    @Override
+    public UUID getActorId() {
+        return playerId;
+    }
 }

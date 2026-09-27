@@ -2,6 +2,12 @@ package com.martelstudios.openquests.extension;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.martelstudios.openquests.extension.constraints.condition.ConditionConstraintsFeature;
+import com.martelstudios.openquests.extension.constraints.death.DeathConstraintsFeature;
+import com.martelstudios.openquests.extension.constraints.location.LocationConstraintsFeature;
+import com.martelstudios.openquests.extension.constraints.players.PlayersConstraintsFeature;
+import com.martelstudios.openquests.extension.constraints.repeat.RepeatConstraintsFeature;
+import com.martelstudios.openquests.extension.constraints.time.TimeConstraintsFeature;
 import com.martelstudios.openquests.extension.feedback.FeedbackFeature;
 import com.martelstudios.openquests.extension.hud.HudFeature;
 import com.martelstudios.openquests.extension.journal.JournalFeature;
@@ -70,5 +76,13 @@ public class OpenQuestsPlugin extends JavaPlugin {
         ItemRewardFeature.register(this);
         GrantQuestRewardFeature.register(this);
         CommandRewardFeature.register(this);
+
+        // Constraints
+        TimeConstraintsFeature.register(this);
+        LocationConstraintsFeature.register(this);
+        ConditionConstraintsFeature.register(this);
+        PlayersConstraintsFeature.register(this);
+        DeathConstraintsFeature.register(this);
+        RepeatConstraintsFeature.register(this);
     }
 }

@@ -9,6 +9,7 @@ import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
+import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
@@ -286,10 +287,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     /**
      * Updates the quest progression by applying the visitor to it.
      * After the visitor's pass, the quest settles before anyone hears about it.
+     * A player's action is first put to the constraints of the asset, and leaves no trace if one objects.
      *
      * @param visitor the visitor to apply
      */
     public void update(QuestVisitor<Q> visitor) {
+        UUID actorId = visitor.getActorId();
+        if (actorId != null && !allowsProgress(actorId)) return;
+
         QuestState previousState = getState();
 
         visitor.progress(self());
@@ -325,6 +330,23 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                         .dispatchFor(QuestStateChangedEvent.class, getId())
                         .dispatch(new QuestStateChangedEvent(this, previousState));
         }
+    }
+
+    /**
+     * @return whether what that player did may count towards this quest, every constraint of its
+     * asset agreeing, and those of every group it is a step of: a step is played inside its group.
+     * An asset that is gone holds nothing back.
+     */
+    public boolean allowsProgress(@Nonnull UUID actorId) {
+        OpenQuestAsset asset = getAsset();
+        if (asset != null) {
+            for (QuestConstraint constraint : asset.getConstraints()) {
+                if (!constraint.allowsProgress(this, actorId)) return false;
+            }
+        }
+
+        AbstractCompositeQuestProgression<?> parent = getParent();
+        return parent == null || parent.allowsProgress(actorId);
     }
 
     /**

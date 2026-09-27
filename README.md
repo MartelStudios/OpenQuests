@@ -45,8 +45,15 @@ prerequisites of a quest are other quests.
   ids already handed out are kept between sessions, so a quest nobody took costs one string.
 - **As a reward** — the `GrantQuest` reward hands further quests over when a quest completes. This
   is how a chain is written: finishing A grants B.
-- **Explicitly** — `QuestProgressionService.registerQuest(asset).addPlayer(playerId)`, from a
-  command or from your own plugin.
+- **Explicitly** — `QuestProgressionService.assignQuest(asset, playerId)`, from a command or from
+  your own plugin.
+
+Each of these asks the [constraints](#constraints) of the asset first, and so do the scopes as
+they add a player to a quest they share: `assignQuest` and `joinQuest` return nothing for a player
+refused, and register nothing either. A quest refused on connection is offered again on the next
+one. The steps of a chain are handed out by the chain, so only the chain is asked.
+`registerQuest(asset).addPlayer(playerId)` still hands a quest out asking nobody, for a game mode
+that decides on its own.
 
 A quest gating on another one is a `QuestState` quest, usually as the child of a composite. Since a
 quest holds a state rather than a boolean, "not yet" and "failed" stay distinct — which is what
@@ -116,7 +123,7 @@ A backend answers for three kinds of record, and nothing else:
 - **indexes**, a named set of quest ids, which is how a scope remembers what it handed out —
   `universe` for the universe scope, `world:<uuid>` per world;
 - **player records**, what a player carries besides their quests: the catalogue they have already
-  been offered, and what they are still owed.
+  been offered, what they are still owed, and how each asset ended for them so far.
 
 Who holds a quest is read off the quest itself: `AbstractQuestProgression.getPlayers()` is the
 source of truth, and a backend keeps whatever reverse index it needs to answer "the quests of this
@@ -256,6 +263,13 @@ Three asset flags change what a quest does when it completes:
 log next to the chain itself. Turn it on for children carrying rewards of their own: a reward
 that could not be granted on the spot has nowhere to wait.
 
+Every outcome is also counted in the record of each player holding the quest, per asset: how many
+of its quests ended successful, failed or abandoned for them, when the last one started and when
+it ended. The count lives in the player record rather than in the history, so an asset setting
+`PersistHistory: false` is counted all the same. A player who gave a shared quest up is counted as
+abandoning it when the quest ends rather than when they leave, so one who comes back and sees it
+through counts once. `QuestPlayerStateService.getCompletions(playerId, assetId)` reads it back.
+
 ## Built-in quest types
 
 | Type | Completes on |
@@ -366,6 +380,101 @@ reaches the sender's quests, so the wider group grants nothing over anybody else
   `"Command": "give {player} Ingredient_Stick 5"` works. A leading slash is optional. Runs as the
   console unless `"AsPlayer": true`, which runs it with the permissions of the player instead.
 
+## Constraints
+
+An asset can lay rules on the quests made from it, on top of what its type asks for, under
+`Constraints`. They compose rather than inherit, so any type of quest can be timed, bound to a
+world, or both, without a type of its own for each combination.
+
+A constraint speaks to the moments of a quest it is about, and has no objection at the others:
+
+| Moment | Hook | Effect |
+| --- | --- | --- |
+| Handing out | `allowsAssignment(asset, playerId, completions, now)` | A player is handed a new quest from the asset only if every constraint agrees, judging from how its quests ended for them so far. |
+| Progress | `allowsProgress(quest, actorId)` | A player's action counts only if every constraint agrees. Refused, it leaves no trace. |
+| Running out | `getDeadline(quest)`, `getExpiredState()` | A quest still running ends on the earliest deadline its constraints set, on the outcome of the constraint that set it. |
+
+Deadlines cost nothing while they wait: `QuestDeadlineService` keeps them in order and arms one
+timer on the earliest, rather than asking every quest on every tick. Only quests in memory are
+watched, so one whose holders are all offline ends when it is read back — a few seconds after its
+player arrives, on their world thread like any other change.
+
+Only a player's action is put to the constraints. A visitor says whose action it carries through
+`getActorId()`; one the system makes on its own — a quest being settled, failed or abandoned —
+says nothing, and is never held back.
+
+A step is played inside its chain, so the constraints of every group above it hold its progress
+back too: an `InWorld` written once on a chain holds for each of its steps. The other moments
+already reach a chain on their own — it is what gets handed out, it is what runs out of time, and
+ending it calls its steps off.
+
+Every constraint is checked once at boot through `validate(asset)`, inline assets included, so a
+malformed one stops the server with the asset named rather than failing the day a player meets it.
+
+### Built-in constraints
+
+```json
+{
+  "Type": "Jump",
+  "TargetQuantity": 20,
+  "Constraints": [
+    { "Type": "TimeLimit", "Seconds": 30 }
+  ]
+}
+```
+
+| Type | Fields | Effect |
+| --- | --- | --- |
+| `TimeLimit` | `Seconds`, `OnExpire` | Ends the quest that long after it started. A shared quest is timed from its own start. |
+| `Deadline` | `At`, `OnExpire` | Ends every quest from the asset at one moment, an ISO-8601 instant such as `"2026-12-31T23:00:00Z"`. Nothing is handed out past it. |
+| `InWorld` | `WorldNamePattern`, `OnLeave` | Counts progress only in a world whose whole name matches, the way `EnterWorld` reads its own. `"OnLeave": "Fail"` fails the quest when its player goes from a matching world to one that is not; logging out is not leaving. |
+| `NearPosition` | `Position`, `Radius`, `WorldNamePattern` | Counts progress only within the radius, its edge included. The pattern, optional, says which world the position is in. |
+| `EntityCondition` | `Conditions` | Counts progress only while the player's entity meets every condition — the game's own, `Sprinting`, `OutOfCombat`, `HasEffect`…, so one another mod registers works too. |
+| `MinPlayersOnline` | `Count` | Counts progress only while that many players are on the server, the acting one included. |
+| `FailOnDeath` | — | Fails the quest the moment one of its players dies. A shared quest fails for everyone holding it. |
+| `Cooldown` | `Seconds`, `From` | Hands a quest from the asset out at most once per period: from the end of the last one, whichever way it ended, or from its start with `"From": "Start"`. |
+| `MaxCompletions` | `Count`, `Outcomes` | Stops handing quests from the asset out once that many ended that way for the player. Only `Successful` counts unless `Outcomes` lists more. |
+
+The journal lists them under **Conditions** on the quest's page, one line each: the time left, the
+world, the players needed against those online, how often the quest can be taken and how much of
+it the player has used. A rule with nothing left to say — the time left on a quest that is over —
+draws nothing. `DescriptionKey`, on any constraint, puts the asset's own words on its line instead,
+which is what a world pattern or a list of conditions wants; an empty one keeps the rule off the
+page:
+
+```json
+{ "Type": "InWorld", "WorldNamePattern": "Arena_.*", "DescriptionKey": "quest.arena.only-inside" }
+```
+
+`Cooldown` and `MaxCompletions` read the counts every player record keeps per asset, so they hold
+for an asset that keeps no history, and across restarts. A daily quest is a quest a player can
+take at most once a day, handed out by whatever hands it out — on connection, as a reward, by a
+command:
+
+```json
+{
+  "Type": "Gather",
+  "ItemToGather": { "ItemId": "Ingredient_Stick" },
+  "TargetQuantity": 20,
+  "Constraints": [
+    { "Type": "Cooldown", "Seconds": 86400 },
+    { "Type": "MaxCompletions", "Count": 30 }
+  ]
+}
+```
+
+A world, an area or a condition holds the quest back rather than ending it: whatever the player
+does outside is lost, and the quest waits for them to come back. Ending one when something
+happens to its player — a death, leaving the world — is the system's doing rather than theirs, so
+no constraint holds that back.
+
+```json
+{ "Type": "EntityCondition", "Conditions": [ { "Id": "Sprinting" }, { "Id": "OutOfCombat", "Inverse": true } ] }
+```
+
+`OnExpire` is the outcome a quest running out ends on: `Failed` by default, `Successful` for a quest
+that is about holding out — survive for five minutes — or `Abandoned`.
+
 ## Extending
 
 Group everything a type needs in one package — asset, progression, visitor, systems — and give it a
@@ -391,6 +500,20 @@ A reward type is registered the same way:
 
 ```java
 QuestReward.CODEC.register("MyReward", MyQuestReward.class, MyQuestReward.CODEC);
+```
+
+And so is a constraint, overriding only the hooks it has something to say about:
+
+```java
+QuestConstraint.CODEC.register("MyConstraint", MyConstraint.class, MyConstraint.CODEC);
+```
+
+A visitor carrying a player's action returns that player from `getActorId()`, which is what puts
+it to the constraints of each quest it reaches. A constraint describes itself in the journal the
+way a reward previews itself, one line or none:
+
+```java
+QuestPageService.register(new MyConstraintRenderer());
 ```
 
 A quest type also says how it shows itself in the tracker, by registering a `QuestHudRenderer`:

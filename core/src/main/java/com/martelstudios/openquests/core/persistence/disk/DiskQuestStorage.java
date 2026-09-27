@@ -4,6 +4,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.datastore.DiskDataStore;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestProgressionRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -250,6 +252,11 @@ public class DiskQuestStorage implements QuestStorage {
             record.getPendingRewards().remove(owed);
             record.getPendingRewards().add(owed);
         });
+    }
+
+    @Override
+    public void recordCompletion(@Nonnull UUID playerId, @Nonnull String assetId, @Nonnull QuestState outcome, @Nullable Instant startedAt, @Nullable Instant completedAt) {
+        updatePlayer(playerId, record -> record.recordCompletion(assetId, outcome, startedAt, completedAt));
     }
 
     @Nonnull

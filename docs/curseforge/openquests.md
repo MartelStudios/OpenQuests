@@ -30,6 +30,8 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 
 🎁 **Rewards on success, failure and abandon.** Give items, run a command, hand out the next quest.
 
+⏳ **Rules on any quest.** A time limit, a world, a cooldown, a cap on how many times it can be done: add them to any quest type, and combine them as you like.
+
 📊 **Tracker HUD included.** Titles, counters, nesting and OR rules, exactly as the screenshot shows.
 
 🔔 **An ending you can hear.** A quest that finishes takes over the middle of the screen, the way discovering a zone does, and plays a sound you choose. New in 2.0.
@@ -101,6 +103,31 @@ Every counted type takes a target quantity, and a running quest can override it.
 | <code>Command</code> |Runs a server command, as the console or as the player     |
 
 Each reward decides for itself whether it lands on its own or waits to be collected, with `"AutoClaim": true` written on the reward. A reward that could not be granted, because the inventory was full or the player logged off, waits on the completion record and is handed over the next time they enter a world. Nothing is silently dropped.
+
+## ⏳ Constraints
+
+Rules written under `"Constraints"`, on any quest type. They combine freely: a gathering quest can be timed, bound to a world and taken once a day, all at once.
+
+| Type       |Effect                                                     |
+| ---------- |---------------------------------------------------------- |
+| <code>TimeLimit</code> |Ends the quest a number of seconds after it started, failed by default or successful for a quest about holding out |
+| <code>Deadline</code> |Ends every quest from the asset at one moment, the close of an event |
+| <code>InWorld</code> |Progress only counts in a world whose name matches a pattern. Leaving can fail the quest instead |
+| <code>NearPosition</code> |Progress only counts within a radius of a position |
+| <code>EntityCondition</code> |Progress only counts while the player meets the game's own conditions: sprinting, out of combat, under an effect |
+| <code>MinPlayersOnline</code> |Progress only counts while enough players are online |
+| <code>FailOnDeath</code> |Dying fails the quest |
+| <code>Cooldown</code> |A player can take the quest at most once per period, a day for a daily quest |
+| <code>MaxCompletions</code> |A player can finish the quest a set number of times, and no more |
+
+```
+"Constraints": [
+  { "Type": "TimeLimit", "Seconds": 300 },
+  { "Type": "Cooldown", "Seconds": 86400 }
+]
+```
+
+The journal lists them on the quest's page, with the time left, the players needed and how many tries are used. A regular expression reads badly to a player, so any constraint takes a `DescriptionKey` to be described in your own words. Timed quests cost nothing while they wait: one timer serves the whole server.
 
 ## 🏷️ Tags
 
@@ -303,9 +330,9 @@ QuestProgressionService.get().registerQuestType(
 );
 ```
 
-Progression is delivered by **visitors**: an event builds one, the service carries it to the quests that can accept it, and each type decides what to do with it. Rewards are a **strategy** behind one `grant` call, so a new reward type is a codec and a method. The tracker HUD and the journal both ask each type how it draws itself, so a type you add shows up with its own progress without either of them ever learning it exists.
+Progression is delivered by **visitors**: an event builds one, the service carries it to the quests that can accept it, and each type decides what to do with it. Rewards are a **strategy** behind one `grant` call, so a new reward type is a codec and a method. Constraints are one too, composed onto any type: a new one overrides only the moments it cares about, handing a quest out, counting progress or running out of time. The tracker HUD and the journal both ask each type how it draws itself, so a type you add shows up with its own progress without either of them ever learning it exists.
 
-Registering a reward, a HUD renderer or a journal renderer is a single line each. Everything a type needs beyond that stays in its own package.
+Registering a reward, a constraint, a HUD renderer or a journal renderer is a single line each. Everything a type needs beyond that stays in its own package.
 
 ***
 

@@ -4,16 +4,20 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.models.QuestCompletions;
+import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The quests of one player while they are online: which ones they take part in, and which of the
- * catalogue they have already been offered.
+ * The quests of one player while they are online: which ones they take part in, which of the
+ * catalogue they have already been offered, and how each asset ended for them so far.
  *
  * <p>Never written to the player's entity file: where a quest is kept is the
  * {@link com.martelstudios.openquests.core.persistence.QuestStorage}'s business, and this is the
@@ -33,6 +37,12 @@ public class QuestStoreComponent implements Component<EntityStore> {
     private final Set<String> startedOnConnection = ConcurrentHashMap.newKeySet();
 
     /**
+     * How each asset ended for this player so far, by asset id. Counted as quests end, whether
+     * or not the quests themselves are kept.
+     */
+    private final Map<String, QuestCompletions> completions = new ConcurrentHashMap<>();
+
+    /**
      * Set when something here changed and the player's record is owed a write.
      */
     private transient boolean dirty;
@@ -44,6 +54,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
     public QuestStoreComponent(@Nonnull QuestStoreComponent other) {
         this.quests = other.quests.clone();
         this.startedOnConnection.addAll(other.startedOnConnection);
+        this.completions.putAll(other.completions);
         this.dirty = other.dirty;
     }
 
@@ -79,14 +90,40 @@ public class QuestStoreComponent implements Component<EntityStore> {
     }
 
     /**
+     * @return the live map of how each asset ended for this player, by asset id.
+     */
+    @Nonnull
+    public Map<String, QuestCompletions> getCompletions() {
+        return completions;
+    }
+
+    /**
+     * @return how quests from that asset ended for this player, {@link QuestCompletions#NONE} if
+     * none has yet.
+     */
+    @Nonnull
+    public QuestCompletions getCompletions(@Nonnull String assetId) {
+        return completions.getOrDefault(assetId, QuestCompletions.NONE);
+    }
+
+    /**
+     * Counts one more quest from that asset ended that way.
+     */
+    public void recordCompletion(@Nonnull String assetId, @Nonnull QuestState outcome, @Nullable Instant startedAt, @Nullable Instant completedAt) {
+        completions.compute(assetId, (id, current) -> (current == null ? QuestCompletions.NONE : current).record(outcome, startedAt, completedAt));
+        markDirty();
+    }
+
+    /**
      * Takes over what was read back for this player, which is how a session starts.
      *
      * @param questIds the quests that answered, not the ids their record listed, so a dead id is
      * dropped here rather than carried another session.
      */
-    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Set<String> startedOnConnection) {
+    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Set<String> startedOnConnection, @Nonnull Map<String, QuestCompletions> completions) {
         quests.replaceAll(questIds);
         this.startedOnConnection.addAll(startedOnConnection);
+        this.completions.putAll(completions);
         dirty = false;
     }
 

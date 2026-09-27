@@ -1,10 +1,12 @@
 package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -110,7 +112,8 @@ public interface QuestStorage extends AutoCloseable {
 
     /**
      * What a player carries besides the quests themselves: which of their quests to look for, the
-     * catalogue they have already been offered, and what they are still owed.
+     * catalogue they have already been offered, what they are still owed, and how each asset
+     * ended for them so far.
      *
      * @return their record, empty for a player who has never held a quest. Never {@code null}.
      */
@@ -129,4 +132,10 @@ public interface QuestStorage extends AutoCloseable {
      * <p>Replaces the entry under the same quest id: a debt partly paid is still one debt.
      */
     void addPendingRewards(@Nonnull UUID playerId, @Nonnull PendingRewards owed);
+
+    /**
+     * Counts one outcome into a player's record atomically, for the player nobody is holding, the
+     * same way as a debt.
+     */
+    void recordCompletion(@Nonnull UUID playerId, @Nonnull String assetId, @Nonnull QuestState outcome, @Nullable Instant startedAt, @Nullable Instant completedAt);
 }
