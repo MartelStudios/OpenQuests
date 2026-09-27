@@ -292,6 +292,7 @@ through counts once. `QuestPlayerStateService.getCompletions(playerId, assetId)`
 | `Jump` | Jumping a number of times. |
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
+| `NoOp` | Nothing on its own: a command, a reward, a constraint or a plugin ends it. Still read under its former name, `Script`. |
 
 The tracker only lists quests that asked for it. `AutoTrack` puts every quest made from the asset on
 the panel; `OQ_HUD_DESC` shows its description under its title, greyed and smaller:
@@ -377,8 +378,9 @@ reaches the sender's quests, so the wider group grants nothing over anybody else
 - `Item` — gives items, hotbar first, all or nothing.
 - `GrantQuest` — hands further quests over, linked by id or written inline.
 - `Command` — runs a server or player command. `{player}` is replaced by the username, so
-  `"Command": "give {player} Ingredient_Stick 5"` works. A leading slash is optional. Runs as the
-  console unless `"AsPlayer": true`, which runs it with the permissions of the player instead.
+  `"Command": "give {player} Ingredient_Stick --quantity=5"` works; the optional arguments of a
+  server command are named, never positional. A leading slash is optional. Runs as the console
+  unless `"AsPlayer": true`, which runs it with the permissions of the player instead.
 
 ## Constraints
 

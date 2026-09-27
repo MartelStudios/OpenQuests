@@ -23,7 +23,7 @@ import com.martelstudios.openquests.extension.quests.movement.MovementFeature;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityFeature;
 import com.martelstudios.openquests.extension.quests.queststate.QuestStateFeature;
 import com.martelstudios.openquests.extension.quests.reachlocation.ReachLocationFeature;
-import com.martelstudios.openquests.extension.quests.script.ScriptFeature;
+import com.martelstudios.openquests.extension.quests.noop.NoOpFeature;
 import com.martelstudios.openquests.extension.quests.breakblock.BreakBlockFeature;
 import com.martelstudios.openquests.extension.quests.placeblock.PlaceBlockFeature;
 import com.martelstudios.openquests.extension.quests.useblock.UseBlockFeature;
@@ -70,7 +70,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         QuestStateFeature.register(this);
         MovementFeature.register(this);
         QuantityFeature.register(this);
-        ScriptFeature.register(this);
+        NoOpFeature.register(this);
 
         // Rewards
         ItemRewardFeature.register(this);

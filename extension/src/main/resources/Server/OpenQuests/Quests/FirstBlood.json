@@ -1,0 +1,8 @@
+{
+  "Type": "KillPlayer",
+  "StartOnConnection": true,
+  "TitleKey": "quest.first-blood.title",
+  "DescriptionKey": "quest.first-blood.description",
+  "TargetQuantity": 1,
+  "Visibility": "WhenCompleted"
+}

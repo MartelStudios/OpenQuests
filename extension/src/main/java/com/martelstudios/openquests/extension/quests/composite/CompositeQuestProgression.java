@@ -100,7 +100,9 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     }
 
     /**
-     * Abandon remaining children in progress, and write down that it did.
+     * Abandon remaining children in progress, and write down that it did. A child that already
+     * ended but kept running, by {@code StopOnComplete: false}, is stopped on the outcome it has:
+     * left live, it would go on changing under a group that no longer hears it.
      *
      * <p>The group records these itself rather than hearing them: its listeners are gone by the
      * line above, and {@link CompositeQuestVisitor} would refuse the news anyway, since a group
@@ -112,7 +114,12 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
 
         for (UUID questId : getChildIds()) {
             AbstractQuestProgression<?> child = QuestProgressionService.get().loadQuest(questId);
-            if (child == null || child.isCompleted()) continue;
+            if (child == null) continue;
+
+            if (child.isCompleted()) {
+                if (QuestProgressionService.get().getLiveQuest(questId) != null) QuestProgressionService.get().archiveQuest(child);
+                continue;
+            }
 
             QuestProgressionService.get().progress(new SetStateVisitor(QuestState.ABANDONED), List.of(questId));
 

@@ -1,0 +1,54 @@
+{
+  "Type": "Composite",
+  "StartOnConnection": true,
+  "TitleKey": "quest.daily-chores.title",
+  "DescriptionKey": "quest.daily-chores.description",
+  "AbandonedSound": "",
+  "QuestAssetIds": [
+    {
+      "Type": "InteractivelyPickup",
+      "TitleKey": "quest.chores-berries.title",
+      "DescriptionKey": "quest.chores-berries.description",
+      "TargetQuantity": 8,
+      "ItemToPickup": {
+        "ItemId": "Plant_Fruit_Berries_Red"
+      }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "quest.chores-flowers.title",
+      "DescriptionKey": "quest.chores-flowers.description",
+      "TargetQuantity": 5,
+      "ItemToGather": {
+        "ItemId": "Plant_Flower_Common_Red2"
+      }
+    },
+    {
+      "Type": "UseBlock",
+      "TitleKey": "quest.chores-chest.title",
+      "DescriptionKey": "quest.chores-chest.description",
+      "TargetQuantity": 1,
+      "BlockToUse": {
+        "ItemId": "Furniture_Crude_Chest_Small"
+      }
+    }
+  ],
+  "Constraints": [
+    {
+      "Type": "Cooldown",
+      "Seconds": 72000
+    },
+    {
+      "Type": "MaxCompletions",
+      "Count": 7
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Food_Bread",
+      "Quantity": 3,
+      "AutoClaim": false
+    }
+  ]
+}

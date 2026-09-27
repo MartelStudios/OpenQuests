@@ -3,7 +3,6 @@
   "TitleKey": "quest.jump-master.title",
   "DescriptionKey": "quest.jump-master.description",
   "TargetQuantity": 2500,
-  "AutoTrack": true,
   "Tags": {
     "OQ_HUD_DESC": []
   }

@@ -1,21 +1,19 @@
-package com.martelstudios.openquests.extension.quests.script;
+package com.martelstudios.openquests.extension.quests.noop;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 
 /**
- * Succeeds when completed by other scripts.
+ * A {@link NoOpQuestAsset} under the name it first shipped with. A class of its own, since the
+ * asset editor describes each type through its codec and one codec cannot carry two type names.
+ *
+ * @deprecated write {@code "Type": "NoOp"} instead.
  */
-public class ScriptQuestAsset extends OpenQuestAsset {
+@Deprecated
+public class ScriptQuestAsset extends NoOpQuestAsset {
 
     public static final BuilderCodec<ScriptQuestAsset> CODEC = BuilderCodec.builder(ScriptQuestAsset.class, ScriptQuestAsset::new, OpenQuestAsset.BASE_CODEC)
                                                                            .build();
 
     private ScriptQuestAsset() {}
-
-    @Override
-    public AbstractQuestProgression<?> create() {
-        return new ScriptQuestProgression().setAssetId(getId());
-    }
 }

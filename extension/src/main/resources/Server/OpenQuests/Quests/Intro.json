@@ -38,7 +38,7 @@
       "Type": "Command",
       "AutoClaim": true,
       "AsPlayer": true,
-      "Command": "/quest abandon SkipIntro"
+      "Command": "/oquest abandon SkipIntro"
     },
     {
       "Type": "GrantQuest",
@@ -46,14 +46,6 @@
       "QuestAssetIds": [
         "CraftTools"
       ]
-    }
-  ],
-  "AbandonedRewards": [
-    {
-      "Type": "Command",
-      "AutoClaim": true,
-      "AsPlayer": true,
-      "Command": "/quest complete SkipIntro"
     }
   ],
   "AutoTrack": true,
