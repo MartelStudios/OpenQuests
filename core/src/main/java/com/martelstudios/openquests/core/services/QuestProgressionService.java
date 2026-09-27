@@ -26,7 +26,7 @@ import java.util.UUID;
 /**
  * Owns the lifecycle of quest instances: registration, progression, completion and rewards.
  * Every instance lives in the single {@link QuestProgressionStore}, and {@link AbstractQuestProgression#getPlayers()}
- * is the source of truth for who holds it — {@link QuestStoreComponent} being the reverse index
+ * is the source of truth for who holds it, {@link QuestStoreComponent} being the reverse index
  * used to know what to load.
  * <p>
  * Quests are agnostic of scope: {@code UniverseQuestService} and {@code WorldQuestService} assign
@@ -135,7 +135,7 @@ public class QuestProgressionService {
     }
 
     /**
-     * Adds a player to a quest already running — one a scope shares — unless the constraints of
+     * Adds a player to a quest already running (one a scope shares) unless the constraints of
      * its asset refuse them.
      *
      * @return {@code false} if the player was refused or already held the quest.
@@ -150,7 +150,7 @@ public class QuestProgressionService {
     }
 
     /**
-     * Puts a quest that was decoded elsewhere — a player's own store — back into the registry,
+     * Puts a quest that was decoded elsewhere (a player's own store) back into the registry,
      * without the registration events: it is not new, it is coming back.
      */
     public void registerLoadedQuest(@Nonnull AbstractQuestProgression<?> quest) {
@@ -210,7 +210,7 @@ public class QuestProgressionService {
 
     /**
      * Takes a quest that ended out of the live store and keeps it, unless its asset asked for it
-     * to leave no trace — which is the one case where a completion still deletes.
+     * to leave no trace, which is the one case where a completion still deletes.
      *
      * <p>Kept rather than projected down to a record: what the quest was made of, how far it got
      * and which of its steps went which way are all still there to be read, and none of it can be

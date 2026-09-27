@@ -26,7 +26,7 @@ public final class QuestStateQuestPageRenderer implements QuestPageRenderer {
     /**
      * The same line in every shape, and the same with or without a progression. Unlike a counted
      * quest, what this one waits on is not in its title, so a row naming only the title would say
-     * nothing at all — and a quest still locked is exactly the one a player opened to understand.
+     * nothing at all, and a quest still locked is exactly the one a player opened to understand.
      */
     @Override
     public void render(@Nonnull QuestPageContext context, @Nonnull QuestShape shape, @Nonnull String selector,

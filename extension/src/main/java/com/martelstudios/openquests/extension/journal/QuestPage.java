@@ -100,7 +100,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private static final int CRUMB_MAX_WIDTH = 220;
 
     /**
-     * Rows the player unfolded, by the id their row answers to — a quest id, or the asset id of a
+     * Rows the player unfolded, by the id their row answers to: a quest id, or the asset id of a
      * quest they were never given. Kept here, since folding is a redraw rather than a client toggle.
      */
     private final Set<String> unfolded = new HashSet<>();
@@ -173,7 +173,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     /**
      * @return the journal this history hangs from, or {@code null} for a route that reached the page
-     * without one — nothing builds such a route today, and a missing journal reads as a fresh one.
+     * without one. Nothing builds such a route today, and a missing journal reads as a fresh one.
      */
     @Nullable
     private JournalRoute journal() {
@@ -203,7 +203,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * and what it pays.
      *
      * @param inherited what the line that led here said became of the quest, used only once nothing
-     *                  else can say — a step that ended and kept no record of its own is known to no one else, and
+     *                  else can say: a step that ended and kept no record of its own is known to no one else, and
      *                  a chain given up gave up every step under it.
      */
     @Nullable
@@ -249,7 +249,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     /**
      * What the open tab lists. Every tab but one reads the quests the player holds; that one reads
-     * what they are still owed, which is not the same list — a quest told to keep no trace of
+     * what they are still owed, which is not the same list: a quest told to keep no trace of
      * itself is gone from the journal with its debt still standing.
      */
     @Nonnull
@@ -307,7 +307,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * on it rather than by the asset alone. A player who ran a chain twice holds two quests under
      * the same asset, and {@link #held} would answer with the later one whichever run is asking.
      *
-     * @return {@code null} when that completion handed them nothing — a quest that never reached
+     * @return {@code null} when that completion handed them nothing, as for a quest that never reached
      * the outcome paying for it, or one whose grant is still owed.
      */
     @Nullable
@@ -428,7 +428,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     /**
      * How wide a crumb has to be to hold its name. Nothing in this interface sizes itself to its
-     * text — a box takes the width it is given or a share of the row — so a trail of boxes wide
+     * text (a box takes the width it is given or a share of the row), so a trail of boxes wide
      * enough for the longest name puts a gap after every step. The page measures instead.
      *
      * <p>An estimate, and it can only be one: the text is drawn by the client in a font the server
@@ -513,8 +513,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
-     * Tracked first, then whatever was picked up last. Both halves answer the same question — what
-     * is the player on right now — so tracking a quest is also how they pull it to the top of the
+     * Tracked first, then whatever was picked up last. Both halves answer the same question (what
+     * is the player on right now), so tracking a quest is also how they pull it to the top of the
      * list. A quest with no start recorded sorts last rather than first: an unknown date is no
      * claim to being recent.
      */
@@ -577,8 +577,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     /**
      * @return whether the group this quest is a step of is still there to draw it. A step that
-     * outlived its group — one kept by {@code PersistChildrenHistory} under a chain that kept
-     * nothing of itself — is listed on its own rather than hidden behind something gone, since
+     * outlived its group (one kept by {@code PersistChildrenHistory} under a chain that kept
+     * nothing of itself) is listed on its own rather than hidden behind something gone, since
      * there is no longer anywhere to open it from.
      */
     private static boolean drawnByItsGroup(@Nonnull AbstractQuestProgression<?> quest) {
@@ -625,7 +625,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
-     * Only types made of parts draw here — a quest asking for one thing named it in its title. So
+     * Only types made of parts draw here: a quest asking for one thing named it in its title. So
      * the heading follows what was actually written rather than the other way round.
      *
      * <p>A quest read from its asset alone hands its own outcome down to whatever it is made of: a
@@ -653,7 +653,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     /**
      * The rules the asset lays on the quest, one line each: its time, its world, how often it can
-     * be taken. A rule with nothing left to say — the time left on a quest that is over — draws
+     * be taken. A rule with nothing left to say (the time left on a quest that is over) draws
      * nothing, and no heading is left behind when none has anything to say.
      */
     private int renderConditions(@Nonnull QuestPageContext context, @Nonnull String rowSelector, @Nonnull Entry entry) {
@@ -676,8 +676,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     /**
      * A running quest previews what success would pay; an archived one shows what is still owed,
-     * which is what the claim button hands over. A reward that draws nothing — a command, whose
-     * workings are none of the player's business — leaves no heading behind either.
+     * which is what the claim button hands over. A reward that draws nothing (a command, whose
+     * workings are none of the player's business) leaves no heading behind either.
      */
     private int renderRewards(@Nonnull QuestPageContext context, @Nonnull String rowSelector, @Nonnull Entry entry) {
         QuestReward[] rewards = entry.rewards();
@@ -952,12 +952,12 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         /**
          * A quest read from its asset alone, for one the journal cannot place: never handed out, or
-         * ended and kept no record — a step of a chain, which by default keeps none.
+         * ended and kept no record, like a step of a chain, which by default keeps none.
          *
          * <p>Nothing here can be claimed or given up.
          *
          * @param inherited what the quest above it says became of it, or {@code null} when nothing
-         *                  says anything — which is what being locked means.
+         *                  says anything, which is what being locked means.
          */
         @Nonnull
         static Entry preview(@Nonnull OpenQuestAsset asset, @Nullable QuestMark inherited) {
@@ -970,7 +970,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
          * What the row shows under REWARDS: what reaching this outcome pays, and what succeeding
          * pays when that outcome pays nothing.
          *
-         * <p>A quest is opened to learn what it is worth, and most quests pay on success alone — so
+         * <p>A quest is opened to learn what it is worth, and most quests pay on success alone, so
          * a chain the player gave up, or one they have yet to be given, would answer with an empty
          * list where it could say what is on the table. What the outcome did pay still wins where
          * there is anything, since that is the one thing the row can state as fact.
@@ -1036,7 +1036,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         /**
          * @return the tab of that route, falling back to the first one for a name this page no
-         * longer offers — a history written by an older version rather than something to refuse.
+         * longer offers: a history written by an older version rather than something to refuse.
          */
         @Nonnull
         static Filter ofTab(@Nonnull String tabName) {
@@ -1094,7 +1094,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         }
 
         /**
-         * @return the mark the click carried, or {@code null} when it carried none — and for a
+         * @return the mark the click carried, or {@code null} when it carried none, and for a
          * name no version of this page ever wrote, which is a stale client rather than a fault.
          */
         @Nullable

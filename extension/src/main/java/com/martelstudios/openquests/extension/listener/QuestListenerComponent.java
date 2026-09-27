@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * concerned with those quests queries for this component instead of walking every player and every
  * quest they hold: an entity carrying none is not in the query at all.
  *
- * <p>Never persisted, and built back on connection — which is also what makes it impossible to
+ * <p>Never persisted, and built back on connection, which is also what makes it impossible to
  * leak, since it goes wherever the player's entity goes.
  *
  * <p>Concrete subtypes add nothing. One class per kind is what buys the filtering: a query asks

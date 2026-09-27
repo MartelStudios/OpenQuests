@@ -88,7 +88,7 @@ public final class QuestTrackService {
 
     /**
      * Fired for the quest, leaving whoever listens to work out which of its holders they care
-     * about — tracking is a property of the quest, and every holder of it sees the same answer.
+     * about: tracking is a property of the quest, and every holder of it sees the same answer.
      */
     private static void announce(@Nonnull AbstractQuestProgression<?> quest, boolean tracked) {
         var eventBus = HytaleServer.get().getEventBus();

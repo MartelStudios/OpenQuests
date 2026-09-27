@@ -2,7 +2,7 @@ package com.martelstudios.openquests.extension.journal;
 
 /**
  * How much of a quest is being shown. The journal draws the same quest three ways and a type is
- * asked which one it is looking at rather than which method it landed in — what changes between
+ * asked which one it is looking at rather than which method it landed in. What changes between
  * them is how much room there is to say something, not what there is to say.
  */
 public enum QuestShape {

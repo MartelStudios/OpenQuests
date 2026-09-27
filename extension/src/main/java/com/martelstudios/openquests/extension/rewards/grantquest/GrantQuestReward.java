@@ -38,7 +38,7 @@ public class GrantQuestReward extends QuestReward {
      * An unknown asset is skipped rather than failing the whole grant: retrying would only hand
      * out the quests that did resolve a second time.
      *
-     * <p>Each quest is built, told where it came from, and only then registered — so everything
+     * <p>Each quest is built, told where it came from, and only then registered, so everything
      * that hears of it, {@code onRegistered} included, already knows which completion opened it.
      * Nothing else could: a chain handed out twice leaves two quests sharing one asset, and the
      * pairing is gone the moment it is not written down.

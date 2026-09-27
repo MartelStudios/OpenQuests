@@ -54,7 +54,7 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 
 **Tracking, from the journal.** A button puts a quest on the HUD or takes it off. A tracked quest wears a gold frame and rises to the top of *Active*, so the player decides what their journal opens on.
 
-**One step at a time.** Open a chain, pick the step you are on, and track that. It gets a line on the HUD like any other quest, so a long chain can be narrowed down to what you are doing now — with the chain still up beside it, or not, as you prefer.
+**One step at a time.** Open a chain, pick the step you are on, and track that. It gets a line on the HUD like any other quest, so a long chain can be narrowed down to what you are doing now, with the chain still up beside it, or not, as you prefer.
 
 **Sorted the way you would look for them.** *Active* lists tracked quests first, then whatever was picked up most recently. *Finished* lists whatever ended last, first.
 
@@ -131,7 +131,7 @@ The journal lists them on the quest's page, with the time left, the players need
 
 ## 🏷️ Tags
 
-Tags are how an asset says something no field covers. They carry down from a parent asset, and a running quest can carry its own — with values, exactly like an asset's, the instance answering alone once it declares one.
+Tags are how an asset says something no field covers. They carry down from a parent asset, and a running quest can carry its own, with values exactly like an asset's, the instance answering alone once it declares one.
 
 | Tag        |Effect                                                     |
 | ---------- |---------------------------------------------------------- |
@@ -153,18 +153,18 @@ The last two are written by the system, not by you.
 | ---------- |---------------------------------------------------------- |
 | <code>Always</code> |From the moment it is handed out. The default              |
 | <code>WhenProgressed</code> |Once the player has got somewhere with it                  |
-| <code>WhenCompleted</code> |Only once it is over — an achievement, earned before it is named |
+| <code>WhenCompleted</code> |Only once it is over: an achievement, earned before it is named |
 | <code>Never</code> |Not at all, whatever becomes of it                         |
 
 `WhenCompleted` is how a quest is made a secret: the player works towards something they were never told about, and it appears once it is theirs. `Never` is for a quest that carries a chain without asking the player for anything.
 
-What the quest owes is untouched by any of this — a quest nobody ever sees still pays out, and still announces how it ended.
+What the quest owes is untouched by any of this: a quest nobody ever sees still pays out, and still announces how it ended.
 
 ## 📌 The tracker
 
 `AutoTrack` on the asset puts every quest made from it on the panel. What the player does with it afterwards is written on the quest itself, so one run can be dropped without touching the rest.
 
-`QuestTrackService` is the way in: `track`, `untrack` and `toggle` on one quest, `reset` to hand the answer back to the asset, `getTracked(playerId)` for the whole list as quest ids, and `replaceTracked` to swap it for another and get back what it took — which is how a game mode borrows the tracker for a round and puts it back afterwards.
+`QuestTrackService` is the way in: `track`, `untrack` and `toggle` on one quest, `reset` to hand the answer back to the asset, `getTracked(playerId)` for the whole list as quest ids, and `replaceTracked` to swap it for another and get back what it took, which is how a game mode borrows the tracker for a round and puts it back afterwards.
 
 ## 🔔 Ending a quest
 
@@ -242,7 +242,7 @@ Each of the three outcome commands takes a quest id or an asset id, the second r
 
 Every quest is written on its own, as a JSON file under your universe. `PersistProgression` and `PersistHistory` turn that off for quests that should not outlive the session.
 
-That suits a solo world or a server among friends. Past a few dozen regular players, or as soon as two servers share the same players, point OpenQuests at a database instead — `config.json` in the mod's folder:
+That suits a solo world or a server among friends. Past a few dozen regular players, or as soon as two servers share the same players, point OpenQuests at a database instead, with `config.json` in the mod's folder:
 
 ```json
 {

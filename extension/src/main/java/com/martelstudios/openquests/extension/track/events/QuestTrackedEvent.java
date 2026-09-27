@@ -8,7 +8,7 @@ import java.util.UUID;
 
 /**
  * Fired when a quest starts being tracked, for everyone holding it. Tracking changes nothing
- * about the quest itself, so nothing else announces it — anything drawing a player's quests has
+ * about the quest itself, so nothing else announces it: anything drawing a player's quests has
  * this and only this to go on.
  */
 public class QuestTrackedEvent implements IEvent<UUID> {

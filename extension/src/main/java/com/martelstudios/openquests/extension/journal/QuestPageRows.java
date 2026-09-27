@@ -215,7 +215,7 @@ public final class QuestPageRows {
 
     /**
      * Lets a quest say what it is, in whichever shape is being drawn. A type that registered no
-     * renderer says nothing — except in a row, where saying nothing would drop the quest out of the
+     * renderer says nothing, except in a row, where saying nothing would drop the quest out of the
      * list it belongs to, and its title stands in.
      */
     public static void render(@Nonnull QuestPageContext context, @Nonnull QuestShape shape, @Nonnull String selector,
@@ -251,7 +251,7 @@ public final class QuestPageRows {
     }
 
     /**
-     * Previews a reward through its renderer, or names its type when none is registered — a player
+     * Previews a reward through its renderer, or names its type when none is registered: a player
      * seeing "Command" learns more than a player seeing nothing.
      */
     public static void renderReward(@Nonnull QuestPageContext context, @Nonnull QuestReward reward) {

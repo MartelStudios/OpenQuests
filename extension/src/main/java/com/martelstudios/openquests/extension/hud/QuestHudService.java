@@ -22,7 +22,7 @@ public final class QuestHudService {
 
     /**
      * Walks up the class hierarchy, so one renderer registered on a base type serves every type
-     * built on it — every counted quest shares the one that draws a counter.
+     * built on it: every counted quest shares the one that draws a counter.
      *
      * @return the renderer for this quest, or {@code null} if no type in its hierarchy declared one.
      */

@@ -7,13 +7,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * How one quest type shows itself in the journal. The page owns the frame of each shape — the
- * title, the fold, the rewards, the buttons — and hands the inside over here, so a new quest type
+ * How one quest type shows itself in the journal. The page owns the frame of each shape (the
+ * title, the fold, the rewards, the buttons) and hands the inside over here, so a new quest type
  * explains itself without the page knowing it exists.
  *
  * <p>Both halves are optional, and they answer different needs. {@link #documentFor} changes what
  * a shape <em>looks</em> like and asks for no code; {@link #render} fills it, and is only needed by
- * a type whose lines cannot be written down in advance — a chain has as many as it has steps.
+ * a type whose lines cannot be written down in advance: a chain has as many as it has steps.
  */
 public interface QuestPageRenderer {
 
@@ -26,8 +26,8 @@ public interface QuestPageRenderer {
 
     /**
      * @return the document the journal appends for that shape, or {@code null} to take its own. A
-     * replacement carries the names the journal writes into — {@code #Title}, {@code #Status},
-     * {@code #Progress}, {@code #Details}, {@code #Objectives} — and whatever else it likes; a name
+     * replacement carries the names the journal writes into ({@code #Title}, {@code #Status},
+     * {@code #Progress}, {@code #Details}, {@code #Objectives}) and whatever else it likes; a name
      * it leaves out is simply never written.
      *
      * <p>Only asked for {@link QuestShape#CARD} and {@link QuestShape#PAGE}, the shapes whose
@@ -45,7 +45,7 @@ public interface QuestPageRenderer {
      * its title, and repeating it under a heading says it twice.
      *
      * <p>A row is expected to append exactly one line, since it stands for the quest in a list.
-     * A card and a page write onto the row through {@code selector} — a counter beside the title —
+     * A card and a page write onto the row through {@code selector} (a counter beside the title)
      * and append their objectives, which land under the heading wherever they are appended from.
      *
      * @param quest the progression, or {@code null} for a quest the journal cannot place: one the

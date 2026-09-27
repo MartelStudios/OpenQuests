@@ -7,7 +7,7 @@ import java.util.UUID;
 
 /**
  * What a renderer needs to draw into the panel: the builder, and the only thing it cannot work out
- * on its own, which line it is writing. Where that line sits is not its concern — a quest listing
+ * on its own, which line it is writing. Where that line sits is not its concern: a quest listing
  * others opens a container, and everything drawn inside lands there.
  */
 public final class QuestHudContext {

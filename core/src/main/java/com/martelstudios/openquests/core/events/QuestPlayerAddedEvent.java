@@ -8,7 +8,7 @@ import java.util.UUID;
 
 /**
  * Fired by {@link AbstractQuestProgression#addPlayer} once the quest holds the player. Nothing has been
- * written to the player yet — {@link QuestAddedToPlayerStoreEvent} announces that — so this is
+ * written to the player yet ({@link QuestAddedToPlayerStoreEvent} announces that), so this is
  * what any scope listens to in order to record the assignment on its side.
  */
 public class QuestPlayerAddedEvent implements IEvent<UUID> {

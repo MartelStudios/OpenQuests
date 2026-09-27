@@ -18,7 +18,7 @@ public enum QuestVisibility {
     WHEN_PROGRESSED,
 
     /**
-     * Listed only once it is over — the shape of an achievement, earned before it is named.
+     * Listed only once it is over: the shape of an achievement, earned before it is named.
      */
     WHEN_COMPLETED,
 

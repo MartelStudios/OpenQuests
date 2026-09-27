@@ -185,7 +185,7 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
     /**
      * @return {@code false} to refuse a player giving this quest up. Written on a step of a
      * chain, which abandoned on its own would leave the group asking for something that can
-     * no longer be finished — the chain is what the player gives up, not one of its parts.
+     * no longer be finished: the chain is what the player gives up, not one of its parts.
      */
     public boolean canBeAbandoned() {
         return canBeAbandoned;
@@ -239,7 +239,7 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
 
     /**
      * @return the sound event this outcome is to play, {@code null} to leave the choice to the
-     * server, and empty to ask for silence — which no absent field could say.
+     * server, and empty to ask for silence, which no absent field could say.
      */
     @Nullable
     public String getSound(@Nonnull QuestState state) {

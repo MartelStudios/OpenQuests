@@ -40,7 +40,7 @@ public final class JdbcDriverLoader implements Closeable {
      * {@code null} to take it off the classpath.
      * @param driverClass the driver's class name, or {@code null} to let the jar name itself
      * through its service declaration.
-     * @throws QuestStorageException if no driver can be found, or none accepts the URL — which is
+     * @throws QuestStorageException if no driver can be found, or none accepts the URL, which is
      * the same mistake seen from either end.
      */
     @Nonnull

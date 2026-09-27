@@ -37,15 +37,15 @@ public final class QuestListenerService {
 
     /**
      * @param questType matched on {@code isInstance}, so registering a base type covers every type
-     * built on it — which is what lets one ticking system serve a family of quests.
+     * built on it, which is what lets one ticking system serve a family of quests.
      */
     public static void register(@Nonnull Class<?> questType, @Nonnull ComponentType<EntityStore, ? extends QuestListenerComponent> componentType) {
         KINDS.add(new Kind(questType, componentType));
     }
 
     /**
-     * Builds every listener from scratch. Nothing can be written to a connecting player by id —
-     * they are not online yet — so this pass goes through their incoming holder, and it runs last
+     * Builds every listener from scratch. Nothing can be written to a connecting player by id
+     * (they are not online yet), so this pass goes through their incoming holder, and it runs last
      * so that whatever connecting hands out has been handed out.
      */
     public static void handlePlayerConnect(@Nonnull PlayerConnectEvent event) {
@@ -74,7 +74,7 @@ public final class QuestListenerService {
     }
 
     /**
-     * A quest that ended stops being ticked, so it stops being listed — without which the list
+     * A quest that ended stops being ticked, so it stops being listed, without which the list
      * would only ever grow, one entry per quest of that kind the player ever finished.
      *
      * <p>Archiving happens before the change is announced, which is what makes "no longer live"

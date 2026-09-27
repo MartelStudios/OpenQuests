@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * The quest system itself: definitions as assets, per-instance runtime progression, scopes and
- * rewards. Ships no quest type of its own — those are registered on top, by
+ * rewards. Ships no quest type of its own: those are registered on top, by
  * {@code OpenQuestsPlugin} or by any other plugin.
  */
 public class OpenQuestsCorePlugin extends JavaPlugin {

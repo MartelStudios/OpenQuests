@@ -73,7 +73,7 @@ public class JdbcQuestStorageProvider implements QuestStorageProvider {
     private int connectionTimeoutSeconds = 10;
 
     /**
-     * Turn off on a database whose schema is managed elsewhere — a migration tool, a DBA.
+     * Turn off on a database whose schema is managed elsewhere, by a migration tool or a DBA.
      */
     private boolean createSchema = true;
 

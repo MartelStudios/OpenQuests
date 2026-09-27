@@ -5,8 +5,8 @@ import javax.annotation.Nullable;
 
 /**
  * What the journal knows about a quest a renderer only has the name of. A renderer listing another
- * quest holds an id and nothing else — the quest it names may be running, finished, or not yet
- * handed out — and deciding which is the page's business rather than its own.
+ * quest holds an id and nothing else. The quest it names may be running, finished, or not yet
+ * handed out, and deciding which is the page's business rather than its own.
  */
 public interface QuestLookup {
 
@@ -18,8 +18,8 @@ public interface QuestLookup {
     boolean canOpen(@Nonnull String target);
 
     /**
-     * @return what the journal can say became of it on its own — a progression it still holds, or
-     * a completion it kept a record of — and {@code null} when it knows nothing, which leaves
+     * @return what the journal can say became of it on its own (a progression it still holds, or
+     * a completion it kept a record of) and {@code null} when it knows nothing, which leaves
      * whoever is drawing the line free to say what the quest above it was worth.
      */
     @Nullable
