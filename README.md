@@ -289,6 +289,8 @@ already defines, such as `Flowers` or `Meats`. A block is matched through the it
 | `BreakBlock` | Breaking a number of blocks, named by id or by block tag. |
 | `PlaceBlock` | Placing a number of blocks, matched on the item they are placed from. |
 | `Consume` | Eating or drinking a quantity of an item. |
+| `DropItem` | Throwing a quantity of an item out of the inventory, counted as it leaves. What a full inventory spills does not count. With `"AntiAbuse": true`, what the player picked back up after throwing it does not count again, which the quest keeps track of in its own save. |
+| `PickupItem` | Picking a quantity of an item up off the ground or by hand, counted as it arrives. With `"AntiAbuse": true`, what the player threw themselves while holding the quest does not count. |
 | `UseEntity` | Interacting with NPCs of a group a number of times. |
 | `KillNpc` | Killing NPCs of a group, either an existing one or one written inline. |
 | `KillPlayer` | Killing players, optionally a designated one. |

@@ -109,6 +109,10 @@ temple-warmup.title=Sprint-jump at the rune altar
 temple-warmup.description=Jump ten times while sprinting, close to the rune altar under the temple's central gate.
 temple-warmup.sprinting=While sprinting
 temple-warmup.near-altar=Within 12 blocks of the rune altar
+temple-offering.title=Offer essence at the rune altar
+temple-offering.description=Throw ten Essence of Life at the foot of the rune altar. Picking an offering back up to throw it again does not count twice.
+temple-offering.in-temple=Inside the Forgotten Temple
+temple-offering.near-altar=Within 6 blocks of the rune altar
 temple-race.title=Run to the rune altar
 temple-race.description=Reach the rune altar under the temple's central gate.
 temple-run.title=Run through the temple for a minute
@@ -141,3 +145,5 @@ flawless-never-failed.title=Never fail it
 
 silent-step.title=Silent step
 silent-step.description=Walk five hundred metres at the slow pace, the one you hold a key for.
+woodpile.title=Woodpile
+woodpile.description=Pick up twenty tree trunks off the ground. Trunks you threw yourself do not count.

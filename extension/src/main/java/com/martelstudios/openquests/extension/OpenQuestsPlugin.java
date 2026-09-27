@@ -15,6 +15,7 @@ import com.martelstudios.openquests.extension.listener.ListenerFeature;
 import com.martelstudios.openquests.extension.quests.composite.CompositeFeature;
 import com.martelstudios.openquests.extension.quests.consumeitem.ConsumeItemFeature;
 import com.martelstudios.openquests.extension.quests.craft.CraftFeature;
+import com.martelstudios.openquests.extension.quests.dropitem.DropItemFeature;
 import com.martelstudios.openquests.extension.quests.enterworld.EnterWorldFeature;
 import com.martelstudios.openquests.extension.quests.gather.GatherFeature;
 import com.martelstudios.openquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
@@ -24,6 +25,7 @@ import com.martelstudios.openquests.extension.quests.quantity.QuantityFeature;
 import com.martelstudios.openquests.extension.quests.queststate.QuestStateFeature;
 import com.martelstudios.openquests.extension.quests.reachlocation.ReachLocationFeature;
 import com.martelstudios.openquests.extension.quests.noop.NoOpFeature;
+import com.martelstudios.openquests.extension.quests.pickupitem.PickupItemFeature;
 import com.martelstudios.openquests.extension.quests.breakblock.BreakBlockFeature;
 import com.martelstudios.openquests.extension.quests.placeblock.PlaceBlockFeature;
 import com.martelstudios.openquests.extension.quests.useblock.UseBlockFeature;
@@ -54,6 +56,8 @@ public class OpenQuestsPlugin extends JavaPlugin {
         // Quests
         GatherFeature.register(this);
         InteractivelyPickupFeature.register(this);
+        DropItemFeature.register(this);
+        PickupItemFeature.register(this);
         ReachLocationFeature.register(this);
         EnterWorldFeature.register(this);
         CompositeFeature.register(this);

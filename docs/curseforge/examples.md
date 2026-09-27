@@ -32,6 +32,8 @@ Two chains and a daily chore handed out on connection, a trial inside the Forgot
 
 🏅 **Flawless** is a secret until you pass the trial without ever having failed it.
 
+🕯️ **An offering** follows the trial: throw ten Essence of Life at the foot of the rune altar, counted by `DropItem` as they leave your hand. `AntiAbuse` is on, so picking an offering back up to throw it again does not count twice.
+
 ### 🧺 Garden chores
 
 🫐 **Garden chores** asks for wild berries picked by hand, five flowers of any kind and a wooden chest opened. The reward waits in the journal until you claim it. It can be done at most once every twenty hours and seven times in all, and the journal counts down both. Nothing hands it out again by itself yet: `/oquest create player DailyChores <player>` does, and the two limits decide whether it is accepted.
@@ -54,7 +56,7 @@ Two quests an admin launches, for everyone at once:
 
 ---
 
-Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, each starting from a secret nobody is told about. Cover the first distance and it reveals itself, earned, while the next rung waits in the journal: a hundred metres, then a thousand, then ten thousand. **Silent step** does the same at a walk, and **First blood** waits for your first duel.
+Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, each starting from a secret nobody is told about. Cover the first distance and it reveals itself, earned, while the next rung waits in the journal: a hundred metres, then a thousand, then ten thousand. **Silent step** does the same at a walk, **Woodpile** counts the trunks you pick up off the ground with `PickupItem` and leaves out the ones you threw, and **First blood** waits for your first duel.
 
 ---
 

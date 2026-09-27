@@ -70,7 +70,7 @@ _A step the player has not reached yet, read from the chain that grants it. The 
 
 ## 🎯 Quest types
 
-Items and blocks are named by <code>ItemId</code>, by <code>BlockTag</code> or by <code>ResourceTypeId</code>, a family such as any flower or any raw meat.
+Items and blocks are named by <code>ItemId</code>, by <code>BlockTag</code> or by <code>ResourceTypeId</code>, a family such as any flower or any raw meat. <code>PickupItem</code> and <code>DropItem</code> take <code>"AntiAbuse": true</code>, so one item thrown and picked up over and over counts once, even across a reconnection.
 
 | Type                |Completes on                                                          |
 | ------------------- |--------------------------------------------------------------------- |
@@ -78,6 +78,8 @@ Items and blocks are named by <code>ItemId</code>, by <code>BlockTag</code> or b
 | <code>InteractivelyPickup</code> |Picking a quantity up by hand                                         |
 | <code>Craft</code>  |Crafting a quantity of an item, whatever the recipe                   |
 | <code>Consume</code> |Eating or drinking a quantity of an item                              |
+| <code>DropItem</code> |Throwing a quantity of an item out of the inventory                   |
+| <code>PickupItem</code> |Picking a quantity of an item up, off the ground or by hand          |
 | <code>BreakBlock</code> |Breaking a number of blocks, named by id or by block tag              |
 | <code>PlaceBlock</code> |Placing a number of blocks, matched on the item they come from        |
 | <code>UseBlock</code> |Interacting with a block a number of times                            |
