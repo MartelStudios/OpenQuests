@@ -71,7 +71,6 @@ talk-merchant.in-temple=Dans le Temple oublié
 gather-meat.title=Récupérez de la viande
 gather-meat.description=Quoi que vous abattiez, rapportez-en un morceau.
 
-
 craft-campfire.title=Fabriquez un feu de camp
 craft-campfire.description=Quatre bâtons et des gravats. La viande crue ne fait pas un repas.
 
@@ -103,37 +102,37 @@ jump-master.title=Vers le ciel
 jump-master.description=Deux mille cinq cents sauts. La gravité n'est qu'une suggestion.
 
 temple-trial.title=L'épreuve du Temple
-temple-trial.description=Trois minutes, dans le Temple oublié. Sortir du temple ou mourir fait échouer l'épreuve.
+temple-trial.description=Trois minutes pour faire vos preuves dans le Temple oublié.
 temple-trial.in-temple=Rester dans le Temple oublié : en sortir fait échouer l'épreuve
 temple-warmup.title=Sauter en sprint près de l'autel
 temple-warmup.description=Sautez dix fois en sprintant, près de l'autel des runes sous la porte centrale du temple.
 temple-warmup.sprinting=En sprintant
 temple-warmup.near-altar=À moins de 12 blocs de l'autel des runes
 temple-offering.title=Offrez de l'essence à l'autel des runes
-temple-offering.description=Jetez dix Essences de vie au pied de l'autel des runes. Reprendre une offrande pour la jeter à nouveau ne compte pas deux fois.
+temple-offering.description=Jetez dix Essences de vie au pied de l'autel des runes.
 temple-offering.in-temple=Dans le Temple oublié
 temple-offering.near-altar=À moins de 6 blocs de l'autel des runes
 temple-race.title=Courir jusqu'à l'autel des runes
 temple-race.description=Rejoignez l'autel des runes sous la porte centrale du temple.
 temple-run.title=Courez une minute dans le temple
-temple-run.description=Courez une minute au total, à votre allure habituelle. S'arrêter ne remet pas le compteur à zéro.
+temple-run.description=Courez une minute en explorant les alentours du temple.
 temple-hold.title=Restez une minute à explorer le temple
 temple-hold.description=Passez au moins une minute dans le temple à le parcourir.
 
 daily-chores.title=Les corvées du jardin
 daily-chores.description=Cueillez des baies, ramassez des fleurs et rangez la récolte dans un coffre.
 chores-berries.title=Cueillir des baies sauvages
-chores-berries.description=Cueillez à la main des baies sauvages sur les buissons.
+chores-berries.description=Cueillez des baies sauvages sur les buissons.
 chores-flowers.title=Ramasser des fleurs
-chores-flowers.description=N'importe quelle fleur compte, quelle que soit sa couleur. Gardez-en cinq dans votre inventaire.
+chores-flowers.description=Cueillez cinq fleurs pour égayer la maison.
 chores-chest.title=Ouvrir un coffre en bois
 chores-chest.description=Ouvrez un coffre en bois pour y ranger la récolte.
 
 great-felling.title=La Grande Coupe
-great-felling.description=Abattez 500 troncs ensemble, sur tout le serveur. Les troncs ne comptent que si au moins trois joueurs sont connectés. Un tronc posé par un joueur puis abattu à nouveau ne compte pas.
+great-felling.description=Abattez 500 troncs d'arbre, tous ensemble.
 
 repel-trorks.title=Repousser les Trorks
-repel-trorks.description=Tuez des Trorks dans ce monde, tous ensemble, avant la fin des quinze minutes.
+repel-trorks.description=Tuez des Trorks, tous ensemble, avant qu'il ne soit trop tard.
 
 first-blood.title=Premier sang
 first-blood.description=Un autre joueur est tombé de votre main.
@@ -144,6 +143,6 @@ flawless-passed.title=Réussir l'épreuve du Temple
 flawless-never-failed.title=Ne jamais l'échouer
 
 silent-step.title=Pas de loup
-silent-step.description=Parcourez cinq cents mètres au pas, l'allure lente qu'on maintient avec une touche.
+silent-step.description=Parcourez cinq cents mètres au pas, sans un bruit.
 woodpile.title=Tas de bois
-woodpile.description=Ramassez vingt troncs d'arbre au sol. Ceux que vous avez jetés vous-même ne comptent pas.
+woodpile.description=Ramassez vingt troncs d'arbre qui traînent au sol.
