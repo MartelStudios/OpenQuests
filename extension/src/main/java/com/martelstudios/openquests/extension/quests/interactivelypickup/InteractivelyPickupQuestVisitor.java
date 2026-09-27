@@ -30,7 +30,7 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
         if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
 
-        if (!quest.getItemToPickup().isBlockTypeIncluded(event.getItemStack().getItemId())) {
+        if (!quest.getItemToPickup().matches(event.getItemStack().getItemId())) {
             return;
         }
 

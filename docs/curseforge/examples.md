@@ -34,7 +34,7 @@ Two chains and a daily chore handed out on connection, a trial inside the Forgot
 
 ### 🧺 Garden chores
 
-🫐 **Garden chores** asks for wild berries picked by hand, five poppies and a wooden chest opened. The reward waits in the journal until you claim it. It can be done at most once every twenty hours and seven times in all, and the journal counts down both. Nothing hands it out again by itself yet: `/oquest create player DailyChores <player>` does, and the two limits decide whether it is accepted.
+🫐 **Garden chores** asks for wild berries picked by hand, five flowers of any kind and a wooden chest opened. The reward waits in the journal until you claim it. It can be done at most once every twenty hours and seven times in all, and the journal counts down both. Nothing hands it out again by itself yet: `/oquest create player DailyChores <player>` does, and the two limits decide whether it is accepted.
 
 ### 🌲 Server events
 
@@ -46,7 +46,7 @@ Two quests an admin launches, for everyone at once:
 
 ### 🍖 The hunt
 
-🥩 **Gather meat** is handed to every player on connection with `"Visibility": "Never"`, so nobody ever sees it. It waits. The first time a player picks up raw meat of any kind, it completes and the chain appears out of nowhere.
+🥩 **Gather meat** is handed to every player on connection with `"Visibility": "Never"`, so nobody ever sees it. It waits. The first time a player picks up raw meat of any kind, it completes, through the `Meats` resource type rather than a list of every meat, and the chain appears out of nowhere.
 
 🔥 **Craft a campfire**, then **Cook your meat**, which watches the cooked meat reach your inventory because a processing bench is worked by the block and not by the player.
 

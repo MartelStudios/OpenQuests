@@ -32,7 +32,7 @@ public class PlaceBlockQuestVisitor implements QuestVisitor<PlaceBlockQuestProgr
         if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
         ItemStack itemInHand = event.getItemInHand();
-        if (itemInHand == null || !quest.getBlockToPlace().isBlockTypeIncluded(itemInHand.getItemId())) return;
+        if (itemInHand == null || !quest.getBlockToPlace().matches(itemInHand.getItemId())) return;
 
         quest.setCurrentQuantity(quest.getCurrentQuantity() + 1)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)

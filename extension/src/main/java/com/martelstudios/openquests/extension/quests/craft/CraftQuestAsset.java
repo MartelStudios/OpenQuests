@@ -1,9 +1,9 @@
 package com.martelstudios.openquests.extension.quests.craft;
 
-import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
 /**
@@ -13,11 +13,11 @@ public class CraftQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<CraftQuestAsset> CODEC =
         BuilderCodec.builder(CraftQuestAsset.class, CraftQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
-                    .append(new KeyedCodec<>("ItemToCraft", BlockTagOrItemIdField.CODEC), (asset, item) -> asset.itemToCraft = item, asset -> asset.itemToCraft)
+                    .append(new KeyedCodec<>("ItemToCraft", QuestItemFilter.CODEC), (asset, item) -> asset.itemToCraft = item, asset -> asset.itemToCraft)
                     .add()
                     .build();
 
-    protected BlockTagOrItemIdField itemToCraft;
+    protected QuestItemFilter itemToCraft;
 
     private CraftQuestAsset() {}
 
@@ -26,7 +26,7 @@ public class CraftQuestAsset extends QuantityQuestAsset {
         return new CraftQuestProgression().setAssetId(getId());
     }
 
-    public BlockTagOrItemIdField getItemToCraft() {
+    public QuestItemFilter getItemToCraft() {
         return itemToCraft;
     }
 }

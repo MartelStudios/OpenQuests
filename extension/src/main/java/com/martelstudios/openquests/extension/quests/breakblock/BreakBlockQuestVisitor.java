@@ -29,7 +29,7 @@ public class BreakBlockQuestVisitor implements QuestVisitor<BreakBlockQuestProgr
         if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
         BlockType blockType = event.getBlockType();
-        if (!quest.getBlockToBreak().isBlockTypeIncluded(blockType.getId())) return;
+        if (!quest.getBlockToBreak().matches(blockType.getId())) return;
 
         quest.setCurrentQuantity(quest.getCurrentQuantity() + 1)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)

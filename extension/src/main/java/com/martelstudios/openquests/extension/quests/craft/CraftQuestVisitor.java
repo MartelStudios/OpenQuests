@@ -44,7 +44,7 @@ public class CraftQuestVisitor implements QuestVisitor<CraftQuestProgression> {
         int matched = 0;
         for (MaterialQuantity output : outputs) {
             if (output.getItemId() == null) continue;
-            if (!quest.getItemToCraft().isBlockTypeIncluded(output.getItemId())) continue;
+            if (!quest.getItemToCraft().matches(output.getItemId())) continue;
 
             matched += output.getQuantity();
         }

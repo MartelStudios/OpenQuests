@@ -1,9 +1,9 @@
 package com.martelstudios.openquests.extension.quests.useblock;
 
-import com.hypixel.hytale.builtin.adventure.objectives.config.task.BlockTagOrItemIdField;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
 /**
@@ -13,11 +13,11 @@ public class UseBlockQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<UseBlockQuestAsset> CODEC =
         BuilderCodec.builder(UseBlockQuestAsset.class, UseBlockQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
-                    .append(new KeyedCodec<>("BlockToUse", BlockTagOrItemIdField.CODEC), (asset, block) -> asset.blockToUse = block, asset -> asset.blockToUse)
+                    .append(new KeyedCodec<>("BlockToUse", QuestItemFilter.CODEC), (asset, block) -> asset.blockToUse = block, asset -> asset.blockToUse)
                     .add()
                     .build();
 
-    protected BlockTagOrItemIdField blockToUse;
+    protected QuestItemFilter blockToUse;
 
     private UseBlockQuestAsset() {}
 
@@ -26,7 +26,7 @@ public class UseBlockQuestAsset extends QuantityQuestAsset {
         return new UseBlockQuestProgression().setAssetId(getId());
     }
 
-    public BlockTagOrItemIdField getBlockToUse() {
+    public QuestItemFilter getBlockToUse() {
         return blockToUse;
     }
 }

@@ -71,10 +71,6 @@ talk-merchant.in-temple=Dans le Temple oublié
 gather-meat.title=Récupérez de la viande
 gather-meat.description=Quoi que vous abattiez, rapportez-en un morceau.
 
-gather-wildmeat.title=Récupérer de la viande sauvage crue
-gather-beef.title=Récupérer du bœuf cru
-gather-chicken.title=Récupérer du poulet cru
-gather-pork.title=Récupérer du porc cru
 
 craft-campfire.title=Fabriquez un feu de camp
 craft-campfire.description=Quatre bâtons et des gravats. La viande crue ne fait pas un repas.
@@ -121,11 +117,11 @@ temple-hold.title=Restez une minute à explorer le temple
 temple-hold.description=Passez au moins une minute dans le temple à le parcourir.
 
 daily-chores.title=Les corvées du jardin
-daily-chores.description=Cueillez des baies, ramassez des coquelicots et rangez la récolte dans un coffre.
+daily-chores.description=Cueillez des baies, ramassez des fleurs et rangez la récolte dans un coffre.
 chores-berries.title=Cueillir des baies sauvages
 chores-berries.description=Cueillez à la main des baies sauvages sur les buissons.
-chores-flowers.title=Ramasser des coquelicots
-chores-flowers.description=Les coquelicots poussent dans les plaines. Gardez-en cinq dans votre inventaire.
+chores-flowers.title=Ramasser des fleurs
+chores-flowers.description=N'importe quelle fleur compte, quelle que soit sa couleur. Gardez-en cinq dans votre inventaire.
 chores-chest.title=Ouvrir un coffre en bois
 chores-chest.description=Ouvrez un coffre en bois pour y ranger la récolte.
 

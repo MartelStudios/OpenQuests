@@ -26,7 +26,7 @@ public class ConsumeItemQuestVisitor implements QuestVisitor<ConsumeItemQuestPro
         if (!quest.getPlayers().contains(playerId)) return;
         if (quest.isCompleted() && quest.isStopOnComplete()) return;
 
-        if (!quest.getItemToConsume().isBlockTypeIncluded(itemId)) return;
+        if (!quest.getItemToConsume().matches(itemId)) return;
 
         quest.setCurrentQuantity(quest.getCurrentQuantity() + quantity)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)

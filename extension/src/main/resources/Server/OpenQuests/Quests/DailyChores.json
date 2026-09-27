@@ -20,7 +20,7 @@
       "DescriptionKey": "quest.chores-flowers.description",
       "TargetQuantity": 5,
       "ItemToGather": {
-        "ItemId": "Plant_Flower_Common_Red2"
+        "ResourceTypeId": "Flowers"
       }
     },
     {

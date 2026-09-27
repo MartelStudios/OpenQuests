@@ -272,6 +272,14 @@ through counts once. `QuestPlayerStateService.getCompletions(playerId, assetId)`
 
 ## Built-in quest types
 
+The types counting items or blocks name them the same way, with one of three keys: `ItemId` for a
+single item, `BlockTag` for every item under a tag, or `ResourceTypeId` for a family the game
+already defines, such as `Flowers` or `Meats`. A block is matched through the item it comes from.
+
+```json
+"ItemToGather": { "ResourceTypeId": "Meats" }
+```
+
 | Type | Completes on |
 | --- | --- |
 | `Gather` | Holding a quantity of an item, recounted on every inventory change. |
