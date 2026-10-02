@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.core.stores;
 
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
 import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
@@ -25,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class QuestProgressionStore {
 
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
     @Nonnull
     private final Map<UUID, AbstractQuestProgression<?>> quests = new ConcurrentHashMap<>();
 
@@ -38,6 +41,14 @@ public class QuestProgressionStore {
 
     @Nonnull
     private final Map<Class<?>, Set<UUID>> idsByType = new ConcurrentHashMap<>();
+
+    /**
+     * Quests read back whose asset is gone or changed type, never let in: everything holding a
+     * quest reads its asset, and would throw on these. Remembered so they are read and reported
+     * once, and left as stored, so they come back with their asset.
+     */
+    @Nonnull
+    private final Set<UUID> setAside = ConcurrentHashMap.newKeySet();
 
     @Nonnull
     private final QuestStorage storage;
@@ -53,10 +64,16 @@ public class QuestProgressionStore {
 
     /**
      * A quest read back having already ended goes straight to the archive, so the split survives a
-     * restart without being written down anywhere.
+     * restart without being written down anywhere. One whose asset no longer fits is set aside.
      */
     public void add(@Nonnull AbstractQuestProgression<?> quest) {
         if (quests.containsKey(quest.getId()) || archived.containsKey(quest.getId())) return;
+
+        String mismatch = quest.findAssetMismatch();
+        if (mismatch != null) {
+            if (setAside.add(quest.getId())) LOGGER.atWarning().log("Quest %s set aside, its asset no longer fits: %s", quest.getId(), mismatch);
+            return;
+        }
 
         if (quest.isCompleted() && quest.isStopOnComplete()) {
             archived.put(quest.getId(), quest);
@@ -279,6 +296,8 @@ public class QuestProgressionStore {
         if (quest == null) quest = archived.get(id);
         if (quest != null) return quest;
 
+        if (setAside.contains(id)) return null;
+
         AbstractQuestProgression<?> read = storage.loadProgression(id);
         if (read == null) return null;
 
@@ -286,6 +305,14 @@ public class QuestProgressionStore {
 
         // Whichever half add() put it in: one that ended came back to the archive
         return get(id);
+    }
+
+    /**
+     * @return whether that quest was read back and set aside, its asset gone or changed type. An
+     * index naming it should keep it, so that it comes back with its asset.
+     */
+    public boolean isSetAside(@Nonnull UUID id) {
+        return setAside.contains(id);
     }
 
     /**

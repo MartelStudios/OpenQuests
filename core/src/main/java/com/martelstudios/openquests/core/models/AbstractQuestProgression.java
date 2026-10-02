@@ -55,6 +55,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public static final String[] NO_TAG_VALUES = new String[0];
 
     /**
+     * The asset class each quest type casts its asset to, recorded as the types are registered, so
+     * a quest read back can be checked against whatever stands under its asset id today.
+     */
+    private static final Map<Class<?>, Class<? extends OpenQuestAsset>> ASSET_CLASSES = new ConcurrentHashMap<>();
+
+    /**
      * Serializes the fields shared by every quest progression; concrete codecs chain from this.
      */
     public static final BuilderCodec<AbstractQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(AbstractQuestProgression.class)
@@ -496,6 +502,38 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     public OpenQuestAsset getAsset() {
         return OpenQuestAsset.getAsset(assetId);
+    }
+
+    /**
+     * Records the asset class a quest type casts its asset to, which {@link #findAssetMismatch()}
+     * checks a quest read back against.
+     */
+    public static void registerAssetClass(@Nonnull Class<?> questClass, @Nonnull Class<? extends OpenQuestAsset> assetClass) {
+        ASSET_CLASSES.put(questClass, assetClass);
+    }
+
+    /**
+     * @return why this quest cannot run on the asset now under its id, gone or of another type than
+     * the one it casts to, or {@code null} if it can. A quest built without an asset id never had
+     * one to lose.
+     */
+    @Nullable
+    public String findAssetMismatch() {
+        // Straight from the asset store: the overrides of getAsset() cast, which is the very failure
+        return assetId == null ? null : findAssetMismatch(getClass(), assetId, OpenQuestAsset.getAsset(assetId));
+    }
+
+    /**
+     * The check itself, apart from the asset store the instance method reads.
+     */
+    @Nullable
+    static String findAssetMismatch(@Nonnull Class<?> questClass, @Nonnull String assetId, @Nullable OpenQuestAsset asset) {
+        if (asset == null) return "no quest asset is named " + assetId;
+
+        Class<? extends OpenQuestAsset> expected = ASSET_CLASSES.get(questClass);
+        if (expected == null || expected.isInstance(asset)) return null;
+
+        return assetId + " is a " + asset.getClass().getSimpleName() + " now, where " + questClass.getSimpleName() + " reads a " + expected.getSimpleName();
     }
 
     public UUID getId() {

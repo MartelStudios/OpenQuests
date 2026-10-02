@@ -270,6 +270,11 @@ it ended. The count lives in the player record rather than in the history, so an
 abandoning it when the quest ends rather than when they leave, so one who comes back and sees it
 through counts once. `QuestPlayerStateService.getCompletions(playerId, assetId)` reads it back.
 
+A quest read back whose asset is gone, or is now of another type than the one the quest was saved
+as, is set aside rather than loaded: it stays as stored, out of the journal, the tracker and every
+visitor, and the log says so once. The player, world and universe indexes keep naming it, so it
+comes back as soon as its asset does.
+
 ## Built-in quest types
 
 The types counting items or blocks name them the same way, with one of three keys: `ItemId` for a
