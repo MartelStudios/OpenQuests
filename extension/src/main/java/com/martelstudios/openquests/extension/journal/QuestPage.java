@@ -11,9 +11,6 @@ import com.hypixel.hytale.protocol.packets.interface_.Page;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
-import com.hypixel.hytale.server.core.modules.i18n.I18nModule;
-import com.hypixel.hytale.server.core.ui.Anchor;
-import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -71,33 +68,6 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * An asset naming no reward for an outcome, rather than a null the callers would each guard.
      */
     private static final QuestReward[] NO_REWARDS = new QuestReward[0];
-
-    /**
-     * What one character of a crumb costs, at the size the trail is drawn. Tuned by eye against the
-     * client's own font, which is the only way to have it: the server never sees the glyphs.
-     */
-    private static final double CRUMB_CHARACTER_WIDTH = 6.4;
-
-    /**
-     * Room for the mark before a name, matching the width the crumb document gives it.
-     */
-    private static final int CRUMB_SEPARATOR_WIDTH = 14;
-
-    /**
-     * The trail's own height, sent with every width so an anchor never arrives half written.
-     */
-    private static final int CRUMB_HEIGHT = 20;
-
-    /**
-     * Slack after a name, so a word measured a little short is still drawn whole.
-     */
-    private static final int CRUMB_PADDING = 10;
-
-    /**
-     * As wide as one step of the trail is allowed to get. A title long enough to fill the row would
-     * push every step after it off the page, and a name cut short still says which quest it is.
-     */
-    private static final int CRUMB_MAX_WIDTH = 220;
 
     /**
      * The finest unit a countdown shows is the second.
@@ -460,50 +430,6 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         } else {
             commandBuilder.set(crumbSelector + "#Here.TextSpans", label);
         }
-
-        // The height goes along with the width: an anchor sent from here may well replace the one
-        // the document declared rather than lean on it, and a crumb with no height has none
-        var anchor = new Anchor();
-        anchor.setWidth(Value.of(widthOf(label)));
-        anchor.setHeight(Value.of(CRUMB_HEIGHT));
-
-        commandBuilder.setObject(BREADCRUMB_CONTAINER + "[" + index + "].Anchor", anchor);
-    }
-
-    /**
-     * How wide a crumb has to be to hold its name. Nothing in this interface sizes itself to its
-     * text (a box takes the width it is given or a share of the row), so a trail of boxes wide
-     * enough for the longest name puts a gap after every step. The page measures instead.
-     *
-     * <p>An estimate, and it can only be one: the text is drawn by the client in a font the server
-     * never sees. It leans wide, since a crumb a little roomy reads as spacing while a crumb a
-     * little tight cuts a name in half.
-     *
-     * <p>Room for the mark is counted on every crumb, the first one included, where it is hidden
-     * rather than absent. Whether a hidden label still holds its place is the client's business,
-     * and the two answers differ by one mark's width against a name cut short.
-     */
-    private int widthOf(@Nonnull Message label) {
-        int width = (int) Math.ceil(textOf(label).length() * CRUMB_CHARACTER_WIDTH) + CRUMB_PADDING;
-
-        return Math.min(CRUMB_MAX_WIDTH, width) + CRUMB_SEPARATOR_WIDTH;
-    }
-
-    /**
-     * The words a crumb will actually show, resolved here rather than left to the client, which is
-     * the only one that ever needed them. A key with no translation is drawn as itself, so its
-     * length is the right thing to measure too.
-     */
-    @Nonnull
-    private String textOf(@Nonnull Message label) {
-        String raw = label.getRawText();
-        if (raw != null) return raw;
-
-        String messageId = label.getMessageId();
-        if (messageId == null) return "";
-
-        String translated = I18nModule.get().getMessage(playerRef.getLanguage(), messageId);
-        return translated == null ? messageId : translated;
     }
 
     private static void bindCrumb(@Nonnull UIEventBuilder eventBuilder, int index, @Nonnull Route target) {

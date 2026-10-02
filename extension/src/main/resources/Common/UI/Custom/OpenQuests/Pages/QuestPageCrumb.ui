@@ -2,17 +2,15 @@
 // first crumb rather than drawn by the page, so a crumb stays one appended document either way.
 $P = "QuestPageCommon.ui";
 
-// A width rather than a share of the row: nothing here sizes to its text, and a crumb given a
-// share stretches to fill it, which spreads a four-step trail across the whole page. The page
-// measures each name and sends the width along with the crumb, so what stands here is only what a
-// crumb falls back to.
+// No width anywhere, not even a maximum: an element given a MaxWidth grows to it, while one given
+// none is only as wide as its text, so the steps sit side by side with only the separator between.
 Group #Crumb {
   LayoutMode: Left;
-  Anchor: (Width: 150, Height: 20);
+  Anchor: (Height: 20);
 
-  Label #Separator { Text: ">"; Anchor: (Width: 14); Style: (...$P.@RowStatusStyle, HorizontalAlignment: Center); }
+  Label #Separator { Text: ">"; Padding: (Horizontal: 6); Style: (...$P.@RowStatusStyle, HorizontalAlignment: Center); }
 
   // A crumb the player can go back to; #Here is the same name for the page they are already on
-  TextButton #Link { Text: ""; FlexWeight: 1; Style: $P.@LinkStyle; Visible: false; }
-  Label #Here { Text: ""; FlexWeight: 1; Style: (...$P.@RowStatusStyle, HorizontalAlignment: Start); Visible: false; }
+  TextButton #Link { Text: ""; Style: $P.@LinkStyle; Visible: false; }
+  Label #Here { Text: ""; Style: (...$P.@RowStatusStyle, HorizontalAlignment: Start); Visible: false; }
 }
