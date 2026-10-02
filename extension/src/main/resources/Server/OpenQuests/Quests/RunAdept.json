@@ -1,5 +1,6 @@
 {
   "Type": "Run",
+  "Categories": ["Achievement"],
   "TitleKey": "quest.run-adept.title",
   "DescriptionKey": "quest.run-adept.description",
   "TargetQuantity": 1000,

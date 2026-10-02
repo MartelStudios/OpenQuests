@@ -1,5 +1,6 @@
 {
   "Type": "PickupItem",
+  "Categories": ["Survival"],
   "StartOnConnection": true,
   "TitleKey": "quest.woodpile.title",
   "DescriptionKey": "quest.woodpile.description",

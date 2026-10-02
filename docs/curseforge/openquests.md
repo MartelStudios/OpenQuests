@@ -149,6 +149,18 @@ The last two are written by the system, not by you.
 { "Type": "Composite", "TitleKey": "…", "AutoTrack": true, "Tags": { "OQ_HUD_DESC": [] } }
 ```
 
+## 🗂️ Categories
+
+A category is a small asset of its own, in `Server/OpenQuests/Categories/`: a translated name and the colours it is drawn in. A quest lists its categories by id, and the journal shows them after its title, each on its own colour, wrapping onto another line when there are more than fit.
+
+```
+{ "NameKey": "quest.category.temple", "BackgroundColor": "#5b3f8c", "TextColor": "#f1eafb" }
+```
+
+```
+{ "Type": "Composite", "Categories": ["Temple", "Timed"], "TitleKey": "…" }
+```
+
 ## 👁️ When a quest is shown
 
 `Visibility` says when a quest is worth putting in front of the player at all.

@@ -146,3 +146,11 @@ silent-step.title=Pas de loup
 silent-step.description=Parcourez cinq cents mètres au pas, sans un bruit.
 woodpile.title=Tas de bois
 woodpile.description=Ramassez vingt troncs d'arbre qui traînent au sol.
+
+category.tutorial=Tutoriel
+category.survival=Survie
+category.temple=Temple oublié
+category.chores=Corvées
+category.event=Événement
+category.achievement=Haut fait
+category.timed=Chronométré

@@ -1,5 +1,6 @@
 {
   "Type": "Jump",
+  "Categories": ["Achievement"],
   "TitleKey": "quest.jump-adept.title",
   "DescriptionKey": "quest.jump-adept.description",
   "TargetQuantity": 250,

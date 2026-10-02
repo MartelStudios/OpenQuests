@@ -1,5 +1,6 @@
 {
   "Type": "Sprint",
+  "Categories": ["Achievement"],
   "TitleKey": "quest.sprint-master.title",
   "DescriptionKey": "quest.sprint-master.description",
   "TargetQuantity": 5000,

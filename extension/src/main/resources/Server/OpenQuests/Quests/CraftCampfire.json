@@ -1,5 +1,6 @@
 {
   "Type": "Craft",
+  "Categories": ["Survival"],
   "TitleKey": "quest.craft-campfire.title",
   "DescriptionKey": "quest.craft-campfire.description",
   "TargetQuantity": 1,

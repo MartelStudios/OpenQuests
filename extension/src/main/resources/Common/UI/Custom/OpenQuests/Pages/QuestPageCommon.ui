@@ -15,6 +15,9 @@ $C = "../../Common.ui";
 @ConditionValueWidth = 220;
 
 @RowTitleStyle = (FontSize: 14, RenderBold: true, TextColor: @ColorTitle, VerticalAlignment: Center);
+
+// A category's name; the page writes the colour each category asks for over this one
+@CategoryStyle = (FontSize: 11, RenderBold: true, TextColor: #d9e1ee, VerticalAlignment: Center);
 @RowStatusStyle = (FontSize: 12, RenderBold: true, TextColor: @ColorAccent, VerticalAlignment: Center, HorizontalAlignment: End);
 @RowTextStyle = (FontSize: 12, TextColor: @ColorMuted, Wrap: true);
 

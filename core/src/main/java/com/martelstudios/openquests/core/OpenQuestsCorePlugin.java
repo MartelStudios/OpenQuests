@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.commands.QuestCommand;
 import com.martelstudios.openquests.core.config.OpenQuestsConfig;
 import com.martelstudios.openquests.core.constraints.QuestConstraintValidator;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestCategory;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.QuestStorageProvider;
@@ -122,10 +123,18 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
         getCommandRegistry().registerCommand(new QuestCommand());
 
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestCategory.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenQuests/Categories/")
+                                                    .setCodec(OpenQuestCategory.CODEC)
+                                                    .setKeyFunction(OpenQuestCategory::getId)
+                                                    .build());
+
+        // After the categories, which the quests name and are checked against
         getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenQuests/Quests/")
                                                     .setCodec(OpenQuestAsset.CODEC)
                                                     .setKeyFunction(OpenQuestAsset::getId)
+                                                    .loadsAfter(OpenQuestCategory.class)
                                                     .build());
 
         getEventRegistry().registerGlobal(LoadAssetEvent.PRIORITY_LOAD_LATE, LoadAssetEvent.class, QuestConstraintValidator::handleLoadAsset);

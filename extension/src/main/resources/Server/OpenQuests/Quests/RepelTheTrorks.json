@@ -1,5 +1,6 @@
 {
   "Type": "KillNpc",
+  "Categories": ["Event", "Timed"],
   "TitleKey": "quest.repel-trorks.title",
   "DescriptionKey": "quest.repel-trorks.description",
   "TargetQuantity": 20,

@@ -11,6 +11,8 @@ import com.hypixel.hytale.protocol.packets.interface_.Page;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
+import com.hypixel.hytale.server.core.ui.PatchStyle;
+import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -22,6 +24,7 @@ import com.martelstudios.opennavigation.services.NavigationService;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.OpenQuestCategory;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
@@ -53,6 +56,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private static final String TAB_OWED_DOCUMENT = "OpenQuests/Pages/QuestPageTabOwed.ui";
     private static final String CRUMB_DOCUMENT = "OpenQuests/Pages/QuestPageCrumb.ui";
     private static final String CRUMB_MORE_DOCUMENT = "OpenQuests/Pages/QuestPageCrumbMore.ui";
+    private static final String CATEGORY_DOCUMENT = "OpenQuests/Pages/QuestPageCategory.ui";
 
     private static final String TABS_CONTAINER = "#Tabs";
     private static final String BREADCRUMB_CONTAINER = "#Breadcrumb";
@@ -570,6 +574,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                .set(rowSelector + "#Description.Visible", open && described);
 
         QuestPageRows.setIcon(context, rowSelector + "#Icon", entry.mark());
+        renderCategories(context, rowSelector, entry.asset());
 
         // A frame round the whole row, so a tracked quest is picked out while folded and in a list
         if (entry.quest() != null && QuestTrackService.isTracked(entry.quest(), playerRef.getUuid())) QuestPageRows.setTracked(context, rowSelector);
@@ -592,6 +597,31 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         // An unfolded row with nothing under it would open onto a gap. A finished quest that kept
         // no record beyond its name is the case that reaches here.
         context.getBuilder().set(rowSelector + "#Details.Visible", lines > 0 || acted);
+    }
+
+    /**
+     * The categories the quest is filed under, after its title and drawn folded or not: telling
+     * quests apart is what a list is read for. A category no pack declares any more is skipped.
+     */
+    private static void renderCategories(@Nonnull QuestPageContext context, @Nonnull String rowSelector, @Nullable OpenQuestAsset asset) {
+        if (asset == null) return;
+
+        // Appended after the title, which the document declares as the line's first child
+        String container = rowSelector + "#TitleLine";
+        int index = 1;
+
+        for (String categoryId : asset.getCategories()) {
+            OpenQuestCategory category = OpenQuestCategory.getCategory(categoryId);
+            if (category == null) continue;
+
+            String chip = container + "[" + index++ + "]";
+
+            context.getBuilder()
+                   .append(container, CATEGORY_DOCUMENT)
+                   .set(chip + " #Name.TextSpans", Message.translation(category.getNameKey()))
+                   .set(chip + " #Name.Style.TextColor", category.getTextColor())
+                   .setObject(chip + ".Background", new PatchStyle().setColor(Value.of(category.getBackgroundColor())));
+        }
     }
 
     /**

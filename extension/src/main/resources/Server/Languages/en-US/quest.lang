@@ -146,3 +146,11 @@ silent-step.title=Silent step
 silent-step.description=Walk five hundred metres without making a sound.
 woodpile.title=Woodpile
 woodpile.description=Pick up twenty tree trunks lying on the ground.
+
+category.tutorial=Tutorial
+category.survival=Survival
+category.temple=Forgotten Temple
+category.chores=Chores
+category.event=Server event
+category.achievement=Achievement
+category.timed=Timed

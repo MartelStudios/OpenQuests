@@ -1,5 +1,6 @@
 {
   "Type": "Composite",
+  "Categories": ["Tutorial"],
   "Operator": "Or",
   "TitleKey": "quest.choose-weapon.title",
   "DescriptionKey": "quest.choose-weapon.description",

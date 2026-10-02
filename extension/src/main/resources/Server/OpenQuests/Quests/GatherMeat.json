@@ -1,5 +1,6 @@
 {
   "Type": "Gather",
+  "Categories": ["Survival"],
   "StartOnConnection": true,
   "TitleKey": "quest.gather-meat.title",
   "DescriptionKey": "quest.gather-meat.description",

@@ -9,13 +9,14 @@ Group #QuestPageRow {
   Padding: (Full: 12);
   Anchor: (Bottom: 4);
 
+  // No height of its own: categories that do not fit beside the title wrap under it and the header
+  // grows with them, while everything either side keeps to the first line
   Group #Header {
     LayoutMode: Left;
-    Anchor: (Height: 24);
 
     TextButton #Toggle {
       Text: "+";
-      Anchor: (Width: 28, Height: 24);
+      Anchor: (Width: 28, Height: 24, Top: 0);
       Style: $P.@ToggleStyle;
     }
 
@@ -24,13 +25,19 @@ Group #QuestPageRow {
     // Same mark the objectives carry, so the eye reads a quest and its steps the same way
     Group #Icon { Anchor: (Width: 12, Height: 12, Top: 6, Right: 8); }
 
-    Label #Title { Text: ""; FlexWeight: 1; Style: $P.@RowTitleStyle; }
+    // The title, then the categories the page appends after it, wrapping like words on a line
+    Group #TitleLine {
+      LayoutMode: LeftWrap;
+      FlexWeight: 1;
+
+      Label #Title { Text: ""; Anchor: (Height: 24, Right: 8); Style: $P.@RowTitleStyle; }
+    }
 
     // Filled by the quest own renderer, and only by it: a type with nothing to count leaves it
     // empty rather than the row pretending to a figure
-    Label #Progress { Text: ""; Anchor: (Width: 90, Right: 16); Style: $P.@ProgressStyle; }
+    Label #Progress { Text: ""; Anchor: (Width: 90, Height: 24, Top: 0, Left: 8, Right: 16); Style: $P.@ProgressStyle; }
 
-    Label #Status { Text: ""; Anchor: (Width: 140); Style: $P.@RowStatusStyle; }
+    Label #Status { Text: ""; Anchor: (Width: 140, Height: 24, Top: 0); Style: $P.@RowStatusStyle; }
   }
 
   Label #Description { Text: ""; Anchor: (Top: 4); Style: $P.@RowTextStyle; Visible: false; }

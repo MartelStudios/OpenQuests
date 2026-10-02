@@ -1,5 +1,6 @@
 {
   "Type": "Gather",
+  "Categories": ["Survival"],
   "TitleKey": "quest.cook-meat.title",
   "DescriptionKey": "quest.cook-meat.description",
   "TargetQuantity": 1,

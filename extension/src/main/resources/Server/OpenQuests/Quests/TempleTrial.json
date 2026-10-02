@@ -1,5 +1,6 @@
 {
   "Type": "Composite",
+  "Categories": ["Temple", "Timed"],
   "TitleKey": "quest.temple-trial.title",
   "DescriptionKey": "quest.temple-trial.description",
   "CanBeAbandoned": false,

@@ -1,5 +1,6 @@
 {
   "Type": "DropItem",
+  "Categories": ["Temple"],
   "TitleKey": "quest.temple-offering.title",
   "DescriptionKey": "quest.temple-offering.description",
   "TargetQuantity": 10,
