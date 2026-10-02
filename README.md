@@ -302,7 +302,7 @@ already defines, such as `Flowers` or `Meats`. A block is matched through the it
 | `Jump` | Jumping a number of times. |
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
-| `NoOp` | Nothing on its own: a command, a reward, a constraint or a plugin ends it. Still read under its former name, `Script`. |
+| `NoOp` | Nothing on its own: a command, a reward, a constraint or a plugin ends it. |
 
 `Walk`, `Run` and `Sprint` count metres. With `"Measure": "Seconds"` they count the seconds spent moving at
 their pace instead, added up across every stretch: `TargetQuantity` is then a duration.
