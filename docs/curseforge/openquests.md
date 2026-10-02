@@ -94,7 +94,7 @@ Items and blocks are named by <code>ItemId</code>, by <code>BlockTag</code> or b
 | <code>Jump</code> |Jumping a number of times                                             |
 | <code>Composite</code> |Its children, combined with <code>AND</code> or <code>OR</code>       |
 | <code>QuestState</code> |Another quest reaching a state, which is how you write a prerequisite |
-| <code>NoOp</code> |Nothing on its own: a command, a reward, a constraint or your own plugin ends it. Formerly <code>Script</code>, which still loads |
+| <code>NoOp</code> |Nothing on its own: a command, a reward, a constraint or your own plugin ends it. |
 
 Every counted type takes a target quantity, and a running quest can override it. One asset, handed out with different targets. <code>Walk</code>, <code>Run</code> and <code>Sprint</code> count metres, or seconds spent at their pace with <code>"Measure": "Seconds"</code>.
 
