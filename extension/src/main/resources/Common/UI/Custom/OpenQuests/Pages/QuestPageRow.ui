@@ -35,64 +35,52 @@ Group #QuestPageRow {
 
   Label #Description { Text: ""; Anchor: (Top: 4); Style: $P.@RowTextStyle; Visible: false; }
 
+  // Every gap is the top margin of what follows it rather than a spacer after what precedes it, so
+  // a hidden section takes its gap along and nothing is left trailing under the last one shown
   Group #Details {
     LayoutMode: Top;
     Visible: false;
 
-    Group { Anchor: (Height: 6); }
-
-    Label #ObjectivesHeader { Text: ""; Anchor: (Height: 16); Style: $P.@SectionStyle; Visible: false; }
+    Label #ObjectivesHeader { Text: ""; Anchor: (Height: 16, Top: 6); Style: $P.@SectionStyle; Visible: false; }
     Group #Objectives { LayoutMode: Top; }
 
-    Group { Anchor: (Height: 6); }
-
-    // Hidden whole, spacing included, so a quest without rules keeps the layout it always had
     Group #ConditionsSection {
       LayoutMode: Top;
+      Anchor: (Top: 6);
       Visible: false;
 
       Label #ConditionsHeader { Text: ""; Anchor: (Height: 16); Style: $P.@SectionStyle; }
       Group #Conditions { LayoutMode: Top; }
-
-      Group { Anchor: (Height: 6); }
     }
 
-    Label #RewardsHeader { Text: ""; Anchor: (Height: 16); Style: $P.@SectionStyle; Visible: false; }
+    Label #RewardsHeader { Text: ""; Anchor: (Height: 16, Top: 6); Style: $P.@SectionStyle; Visible: false; }
     Group #Rewards { LayoutMode: Top; }
 
-    Group { Anchor: (Height: 8); }
-
+    // No height of its own: it is as tall as the buttons shown, and nothing at all without one
     Group #Actions {
       LayoutMode: Left;
-      Anchor: (Height: 26);
 
       // Only ever drawn over something owed, so it wears the gold outright rather than being
       // switched into it
       TextButton #Claim {
         Text: "";
-        Anchor: (Width: 110, Height: $C.@SmallButtonHeight);
+        Anchor: (Width: 110, Height: $C.@SmallButtonHeight, Top: 8, Right: 8);
         Padding: (Horizontal: 16);
         Style: $P.@OwedButtonStyle;
         Visible: false;
       }
 
-      Group { Anchor: (Width: 8); }
-
       $C.@SmallSecondaryTextButton #Abandon {
+        @Anchor = (Width: 110, Top: 8, Right: 8);
         Text: "";
-        Anchor: (Width: 110, Height: $C.@SmallButtonHeight);
         Visible: false;
       }
-
-      Group { Anchor: (Width: 8); }
 
       $C.@SmallSecondaryTextButton #Track {
+        @Anchor = (Width: 110, Top: 8, Right: 8);
         Text: "";
-        Anchor: (Width: 110, Height: $C.@SmallButtonHeight);
         Visible: false;
       }
-
-      Group { FlexWeight: 1; }
     }
   }
 }
