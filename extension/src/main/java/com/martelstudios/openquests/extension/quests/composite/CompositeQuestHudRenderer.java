@@ -35,6 +35,7 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
 
         String rowSelector = QuestHudRows.appendRow(context, GROUP_DOCUMENT, quest.getTitle(), quest.getState());
         QuestHudRows.appendDescription(context, rowSelector, quest);
+        QuestHudRows.appendTimer(context, rowSelector, quest);
 
         context.into(rowSelector + "#SubList", () -> renderChildren(context, composite));
     }

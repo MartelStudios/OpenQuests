@@ -29,6 +29,11 @@ public class QuestTrackerHud extends CustomUIHud {
 
     private final AtomicLong lastPushedMs = new AtomicLong();
 
+    /**
+     * When a timer drawn by the last push stops reading true, or zero while none is drawn.
+     */
+    private volatile long refreshAtMs;
+
     public QuestTrackerHud(@Nonnull PlayerRef playerRef) {
         super(playerRef, KEY);
     }
@@ -45,6 +50,19 @@ public class QuestTrackerHud extends CustomUIHud {
         var hud = new QuestTrackerHud(playerRef);
         hudManager.addCustomHud(playerRef, hud);
         return hud;
+    }
+
+    /**
+     * @return {@code true} if this player's panel shows a timer that is due to be drawn again. A
+     * player who never got a panel has nothing to redraw.
+     */
+    public static boolean isDue(@Nonnull Player player) {
+        return player.getHudManager().getCustomHud(KEY) instanceof QuestTrackerHud hud && hud.isDue();
+    }
+
+    private boolean isDue() {
+        long refreshAt = refreshAtMs;
+        return refreshAt != 0 && System.currentTimeMillis() >= refreshAt;
     }
 
     @Override
@@ -89,6 +107,9 @@ public class QuestTrackerHud extends CustomUIHud {
 
         builder.set("#QuestTrackerPanel.Visible", context.getRowCount() > 0);
         update(true, builder);
+
+        long refreshMillis = context.getRefreshMillis();
+        refreshAtMs = refreshMillis == 0 ? 0 : now + refreshMillis;
     }
 
 }

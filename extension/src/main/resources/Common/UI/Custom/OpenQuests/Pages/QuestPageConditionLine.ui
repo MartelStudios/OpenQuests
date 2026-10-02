@@ -1,0 +1,17 @@
+// One rule a quest runs under. Laid out like any other detail line, with a wider figure on the
+// right: a rule's figure is a short sentence rather than a counter.
+$P = "QuestPageCommon.ui";
+
+Group #LineRow {
+  LayoutMode: Left;
+  Anchor: (Height: 28, Top: 2);
+
+  Group #IconSlot {
+    Anchor: (Width: 24, Height: 24, Top: 2, Right: 6);
+
+    Group #Icon { Anchor: (Width: 12, Height: 12, Top: 6, Left: 6); }
+  }
+
+  Label #Label { Text: ""; FlexWeight: 1; Style: $P.@LineLabelStyle; }
+  Label #Value { Text: ""; Anchor: (Width: $P.@ConditionValueWidth); Style: $P.@ProgressStyle; }
+}

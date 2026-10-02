@@ -17,4 +17,23 @@ Group #QuestRow {
 
   // Shown only for an asset tagged HUD_DESC
   Label #Description { Text: ""; Anchor: (Left: 20, Width: 230, Top: 2); Style: $Rows.@QuestDescriptionStyle; Visible: false; }
+
+  // Shown only for a quest running against the clock
+  Group #Timer {
+    LayoutMode: Left;
+    Anchor: (Top: 4, Height: 14);
+    Padding: (Left: 20);
+    Visible: false;
+
+    Group #TimerTrack {
+      FlexWeight: 1;
+      Anchor: (Top: 3, Height: 8);
+      Background: $Rows.@TimerTrack;
+      Padding: 1;
+
+      ProgressBar #TimerBar { BarTexturePath: "TimerBarFill.png"; Value: 1; }
+    }
+
+    Label #TimerText { Text: ""; Anchor: (Left: 8, Width: 52); Style: $Rows.@QuestTimerStyle; }
+  }
 }

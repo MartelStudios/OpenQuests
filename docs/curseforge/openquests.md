@@ -131,7 +131,7 @@ Rules written under `"Constraints"`, on any quest type. They combine freely: a g
 ]
 ```
 
-The journal lists them on the quest's page, with the time left, the players needed and how many tries are used. A regular expression reads badly to a player, so any constraint takes a `DescriptionKey` to be described in your own words. Timed quests cost nothing while they wait: one timer serves the whole server.
+The journal lists them on the quest's page, with the time left, the players needed and how many tries are used, and the times keep counting down while it is open. On the tracker, a timed quest gets a gold bar and a clock under its title. A regular expression reads badly to a player, so any constraint takes a `DescriptionKey` to be described in your own words. Timed quests cost nothing while they wait: one timer serves the whole server.
 
 ## 🏷️ Tags
 

@@ -6,12 +6,12 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.extension.journal.QuestConstraintRenderer;
+import com.martelstudios.openquests.extension.journal.QuestCountdown;
 import com.martelstudios.openquests.extension.journal.QuestPageContext;
 import com.martelstudios.openquests.extension.journal.QuestPageRows;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.time.Duration;
 import java.time.Instant;
 
 /**
@@ -36,6 +36,6 @@ public final class CooldownRenderer implements QuestConstraintRenderer {
         Instant availableAt = cooldown.getAvailableAt(QuestPlayerStateService.get().getCompletions(context.getViewer(), asset.getId()));
         if (availableAt == null || !now.isBefore(availableAt)) return Line.of(label);
 
-        return new Line(label, Message.translation("openquests.page.constraint.cooldown.wait").param("duration", QuestPageRows.formatDuration(Duration.between(now, availableAt))));
+        return Line.counting(label, new QuestCountdown(availableAt, "openquests.page.constraint.cooldown.wait"));
     }
 }
