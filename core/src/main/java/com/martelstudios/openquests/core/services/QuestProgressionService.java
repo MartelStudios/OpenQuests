@@ -54,6 +54,7 @@ public class QuestProgressionService {
     public <Q extends AbstractQuestProgression<Q>, QAsset extends OpenQuestAsset> void registerQuestType(String id, Class<QAsset> questAssetClass, BuilderCodec<QAsset> questAssetCodec, Class<Q> questClass, BuilderCodec<Q> questCodec) {
         OpenQuestAsset.CODEC.register(id, questAssetClass, questAssetCodec);
         AbstractQuestProgression.CODEC.register(id, questClass, questCodec);
+        AbstractQuestProgression.registerAssetClass(questClass, questAssetClass);
     }
 
     /**
@@ -64,6 +65,14 @@ public class QuestProgressionService {
     @Nullable
     public AbstractQuestProgression<?> loadQuest(@Nonnull UUID questId) {
         return dataStore.load(questId);
+    }
+
+    /**
+     * @return whether that quest was read back and set aside, its asset gone or changed type. An
+     * index naming it should keep it, so that it comes back with its asset.
+     */
+    public boolean isSetAside(@Nonnull UUID questId) {
+        return dataStore.isSetAside(questId);
     }
 
     /**

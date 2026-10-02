@@ -85,6 +85,11 @@ public class QuestPlayerStateService {
             LOGGER.atInfo().log("Player %s: %d of the %d quests on record answered", playerId, resolved.size(), record.getQuestIds().size());
         }
 
+        // Kept on record, so that a quest set aside comes back with its asset rather than for good
+        for (UUID questId : record.getQuestIds()) {
+            if (progressionStore.isSetAside(questId)) resolved.add(questId);
+        }
+
         QuestStoreComponent questStore = holder.ensureAndGetComponent(QuestStoreComponent.getComponentType());
         questStore.restore(resolved, record.getStartedOnConnection(), record.getCompletions());
 

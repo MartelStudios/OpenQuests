@@ -120,6 +120,9 @@ public class WorldQuestService {
         for (UUID questId : new ArrayList<>(questsRecord.getAllIds())) {
             var quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null) {
+                // Left on the index, so that a quest set aside comes back with its asset
+                if (QuestProgressionService.get().isSetAside(questId)) continue;
+
                 questsRecord.unregister(questId);
                 store.markDirty();
                 continue;
@@ -143,6 +146,9 @@ public class WorldQuestService {
         for (UUID questId : new ArrayList<>(questsRecord.getAllIds())) {
             var quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null) {
+                // Left on the index, so that a quest set aside comes back with its asset
+                if (QuestProgressionService.get().isSetAside(questId)) continue;
+
                 questsRecord.unregister(questId);
                 store.markDirty();
                 continue;

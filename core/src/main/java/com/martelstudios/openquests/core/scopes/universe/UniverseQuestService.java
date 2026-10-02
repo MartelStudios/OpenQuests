@@ -87,6 +87,9 @@ public class UniverseQuestService {
 
         for (UUID questId : new ArrayList<>(quests.getAllIds())) {
             if (QuestProgressionService.get().loadQuest(questId) == null) {
+                // Left on the index, so that a quest set aside comes back with its asset
+                if (QuestProgressionService.get().isSetAside(questId)) continue;
+
                 quests.unregister(questId);
                 dirty = true;
                 continue;
@@ -119,6 +122,8 @@ public class UniverseQuestService {
         for (UUID questId : new ArrayList<>(quests.getAllIds())) {
             AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null) {
+                if (QuestProgressionService.get().isSetAside(questId)) continue;
+
                 quests.unregister(questId);
                 dirty = true;
                 continue;
