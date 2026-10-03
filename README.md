@@ -78,6 +78,7 @@ several ways.
 | --- | --- | --- |
 | `Trigger` | `PlayerConnect` | as a player connects |
 | | `PlayerEnterWorld` | as a player enters a world whose whole name matches its `WorldNamePattern`, any world without one; connecting into a world counts |
+| | `Schedule` | on the date and time `At` (ISO, with its offset) and, given `Every` (an ISO duration), on every period from it |
 | `Scope` | `Player` (default) | a quest of their own for the player the occasion concerns, theirs to keep |
 | | `World` | one quest per world, shared by everyone inside: the world entered, or each open world its own `WorldNamePattern` names |
 | | `Universe` | one quest for the whole server |
@@ -88,6 +89,21 @@ several ways.
 What counts as the same occasion depends on the scope: for a player the world they entered is part
 of it, since they move, while for a world or the server it is not. `Once` hands a quest out for
 good on connection, and once per player and world entered, or once per world.
+
+Under a `Schedule` the period is part of the occasion too, so `Once` hands each period out once. A
+period is handed to the holders reached while it lasts: those online as it begins, a player as they
+connect, a world as it is found open. Nobody is handed a period they were away for, and a player
+back after weeks finds the current one only. The schedule is looked at every thirty seconds, and a
+period that began while the server was down is handed out as it comes back.
+
+```json
+{
+  "Trigger": { "Type": "Schedule", "At": "2026-10-10T18:00:00Z", "Every": "P7D" },
+  "Scope": { "Type": "Universe" },
+  "Repeat": { "Type": "Replace" },
+  "QuestAssetIds": ["WeeklyHunt"]
+}
+```
 
 Every `Repeat` takes a `Max`, the most times a holder is handed the quest by this assignment. The
 quest's own constraints still decide whether a player takes it, and one refused is offered again

@@ -24,6 +24,7 @@ import com.martelstudios.openquests.core.assignments.scope.WorldAssignmentScope;
 import com.martelstudios.openquests.core.assignments.trigger.AssignmentTrigger;
 import com.martelstudios.openquests.core.assignments.trigger.PlayerConnectTrigger;
 import com.martelstudios.openquests.core.assignments.trigger.PlayerEnterWorldTrigger;
+import com.martelstudios.openquests.core.assignments.trigger.ScheduleTrigger;
 import com.martelstudios.openquests.core.commands.QuestCommand;
 import com.martelstudios.openquests.core.config.OpenQuestsConfig;
 import com.martelstudios.openquests.core.constraints.QuestConstraintValidator;
@@ -142,6 +143,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
         AssignmentTrigger.CODEC.register(PlayerConnectTrigger.TYPE, PlayerConnectTrigger.class, PlayerConnectTrigger.CODEC);
         AssignmentTrigger.CODEC.register(PlayerEnterWorldTrigger.TYPE, PlayerEnterWorldTrigger.class, PlayerEnterWorldTrigger.CODEC);
+        AssignmentTrigger.CODEC.register(ScheduleTrigger.TYPE, ScheduleTrigger.class, ScheduleTrigger.CODEC);
         AssignmentScope.CODEC.register(PlayerAssignmentScope.TYPE, PlayerAssignmentScope.class, PlayerAssignmentScope.CODEC);
         AssignmentScope.CODEC.register(WorldAssignmentScope.TYPE, WorldAssignmentScope.class, WorldAssignmentScope.CODEC);
         AssignmentScope.CODEC.register(UniverseAssignmentScope.TYPE, UniverseAssignmentScope.class, UniverseAssignmentScope.CODEC);
@@ -186,6 +188,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     @Override
     protected void start() {
         universeQuestService.loadQuests();
+        questAssignmentService.start();
 
         long interval = settings.getSaveIntervalMinutes();
 

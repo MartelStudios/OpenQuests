@@ -1,5 +1,7 @@
 package com.martelstudios.openquests.core.assignments;
 
+import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Hands out what the {@link OpenQuestAssignment} assets ask for. Each part of an assignment does
@@ -36,6 +39,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * what was handed before; this only carries the decision out.
  */
 public class QuestAssignmentService {
+
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
+    /**
+     * How often the triggers keeping time are asked where they stand, which bounds how late a
+     * period is handed out after it begins.
+     */
+    private static final long TICK_SECONDS = 30;
 
     @Nonnull
     private final QuestStorage storage;
@@ -56,6 +67,14 @@ public class QuestAssignmentService {
 
     public static QuestAssignmentService get() {
         return OpenQuestsCorePlugin.get().getQuestAssignmentService();
+    }
+
+    /**
+     * Starts asking the triggers that keep time where they stand, soon and then every so often: a
+     * period that began while the server was down is handed out as it comes back.
+     */
+    public void start() {
+        HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(this::tick, 5, TICK_SECONDS, TimeUnit.SECONDS);
     }
 
     /**
@@ -132,6 +151,20 @@ public class QuestAssignmentService {
             UniverseQuestService.get().addQuest(quest.getId());
             if (joining != null) QuestProgressionService.get().joinQuest(quest, joining);
         });
+    }
+
+    private void tick() {
+        try {
+            Instant now = Instant.now();
+
+            for (OpenQuestAssignment assignment : List.copyOf(OpenQuestAssignment.getAssetMap().getAssetMap().values())) {
+                Occasion occasion = assignment.getTrigger().onTick(now);
+                if (occasion != null) evaluate(assignment, occasion);
+            }
+        } catch (RuntimeException e) {
+            // Thrown out of a scheduled task, it would cancel every tick after it
+            LOGGER.atWarning().withCause(e).log("Handing out scheduled quests failed");
+        }
     }
 
     /**

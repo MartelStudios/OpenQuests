@@ -8,6 +8,7 @@ import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -43,6 +44,18 @@ public abstract class AssignmentTrigger {
      */
     @Nullable
     public Occasion onEnterWorld(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull World world) {
+        return null;
+    }
+
+    /**
+     * Asked every so often, whoever is there: the way a trigger keeping time hands out a period
+     * as it begins, and keeps handing it to holders reached while it lasts.
+     *
+     * @return the occasion it is at that moment for nobody in particular, {@code null} when it
+     * keeps no time.
+     */
+    @Nullable
+    public Occasion onTick(@Nonnull Instant now) {
         return null;
     }
 
