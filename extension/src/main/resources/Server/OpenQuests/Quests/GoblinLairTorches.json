@@ -1,0 +1,18 @@
+{
+  "Type": "PlaceBlock",
+  "Categories": ["Dungeon", "SideQuest"],
+  "TitleKey": "quest.goblin-lair-torches.title",
+  "DescriptionKey": "quest.goblin-lair-torches.description",
+  "TargetQuantity": 10,
+  "BlockToPlace": {
+    "ItemId": "Furniture_Crude_Torch"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 15,
+      "AutoClaim": true
+    }
+  ]
+}

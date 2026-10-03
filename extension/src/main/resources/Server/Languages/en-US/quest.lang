@@ -131,9 +131,6 @@ chores-chest.description=Open a wooden chest to put the harvest away.
 great-felling.title=The Great Felling
 great-felling.description=Fell 500 tree trunks, all of you together.
 
-repel-trorks.title=Repel the Trorks
-repel-trorks.description=Kill Trorks, all of you together, before it is too late.
-
 first-blood.title=First blood
 first-blood.description=Another player fell by your hand.
 
@@ -144,8 +141,27 @@ flawless-never-failed.title=Never fail it
 
 silent-step.title=Silent step
 silent-step.description=Walk five hundred metres without making a sound.
-woodpile.title=Woodpile
-woodpile.description=Pick up twenty tree trunks lying on the ground.
+lumberjack.title=Lumberjack
+lumberjack.description=Fell trees and bring back twenty trunks.
+
+goblin-lair-rats.title=Clear out the rats
+goblin-lair-rats.description=The first galleries are crawling with rats. Clean them out before going deeper.
+goblin-lair-tunnels.title=Through the goblin tunnels
+goblin-lair-tunnels.description=Goblins have dug their warren deep into the rock. Cut your way through their ranks.
+goblin-lair-lookout.title=Reach the overlook
+goblin-lair-lookout.description=Find the ledge that looks down on the ogre's den.
+goblin-lair-ogre.title=Slay the Goblin Ogre
+goblin-lair-ogre.description=It has seen you too. Bring the brute down.
+goblin-lair-duke.title=The Goblin Duke
+goblin-lair-duke.description=Past the ogre lies the duke's hall. Break his guard and end his reign.
+goblin-lair-guard.title=Break the duke's guard
+goblin-lair-guard.description=Cut down the goblins rushing to their lord's side.
+goblin-lair-duke-fall.title=Defeat the Goblin Duke
+goblin-lair-duke-fall.description=Topple him from his throne, for good.
+goblin-lair-spiders.title=Squash the spiders
+goblin-lair-spiders.description=Spiders lurk all through the lair. Thin out their numbers.
+goblin-lair-torches.title=Light the way
+goblin-lair-torches.description=Mark your path through the dark galleries with torches.
 
 category.tutorial=Tutorial
 category.survival=Survival
@@ -154,3 +170,5 @@ category.chores=Chores
 category.event=Server event
 category.achievement=Achievement
 category.timed=Timed
+category.dungeon=Dungeon
+category.side-quest=Side quest

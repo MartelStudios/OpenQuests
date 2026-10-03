@@ -1,8 +1,8 @@
 {
   "Type": "PickupItem",
   "Categories": ["Survival"],
-  "TitleKey": "quest.woodpile.title",
-  "DescriptionKey": "quest.woodpile.description",
+  "TitleKey": "quest.lumberjack.title",
+  "DescriptionKey": "quest.lumberjack.description",
   "TargetQuantity": 20,
   "AntiAbuse": true,
   "ItemToPickup": {

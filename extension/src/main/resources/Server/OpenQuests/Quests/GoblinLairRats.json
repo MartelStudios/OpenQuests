@@ -1,0 +1,20 @@
+{
+  "Type": "KillNpc",
+  "Categories": ["Dungeon"],
+  "TitleKey": "quest.goblin-lair-rats.title",
+  "DescriptionKey": "quest.goblin-lair-rats.description",
+  "TargetQuantity": 10,
+  "AutoTrack": true,
+  "NpcGroupId": "Rat",
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinLairTunnels",
+        "GoblinLairSpiders",
+        "GoblinLairTorches"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

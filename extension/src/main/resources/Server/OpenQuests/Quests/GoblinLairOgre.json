@@ -1,0 +1,22 @@
+{
+  "Type": "KillNpc",
+  "Categories": ["Dungeon"],
+  "TitleKey": "quest.goblin-lair-ogre.title",
+  "DescriptionKey": "quest.goblin-lair-ogre.description",
+  "TargetQuantity": 1,
+  "AutoTrack": true,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Goblin_Ogre"
+    ]
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinLairDuke"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

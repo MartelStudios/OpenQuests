@@ -1,0 +1,16 @@
+{
+  "Type": "KillNpc",
+  "Categories": ["Dungeon", "SideQuest"],
+  "TitleKey": "quest.goblin-lair-spiders.title",
+  "DescriptionKey": "quest.goblin-lair-spiders.description",
+  "TargetQuantity": 10,
+  "NpcGroupId": "Spiders",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Silver",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ]
+}

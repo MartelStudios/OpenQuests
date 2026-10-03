@@ -12,7 +12,7 @@ OpenQuests installs with an empty quest list, on purpose: your server, your ques
 
 ## ✨ What is inside
 
-Two chains and a daily chore handed out on connection, a trial inside the Forgotten Temple, two server events and a few secrets, in English and French.
+Two chains and a daily chore handed out on connection, a trial inside the Forgotten Temple, a goblin dungeon to clear, a server event and a few secrets, in English and French.
 
 ### ⛏️ The introduction
 
@@ -38,13 +38,23 @@ Two chains and a daily chore handed out on connection, a trial inside the Forgot
 
 🫐 **Garden chores** asks for wild berries picked by hand, five flowers of any kind and a wooden chest opened. The reward waits in the journal until you claim it. It can be done at most once every twenty hours and seven times in all, and the journal counts down both. Its own assignment, `Assignments/DailyChores.json`, hands it out again at the next connection once the last one has ended, done or given up, with `"Repeat": { "Type": "AfterEnd" }`. The two limits then decide whether it is accepted.
 
-### 🌲 Server events
+### 🕳️ The goblin lair
 
-Two quests an admin launches, for everyone at once:
+A quest line through the goblin lair, the dungeon Hytale ships as an instance. The game keeps it for operators: `/instances spawn Dungeons/Dungeon_Goblin` opens a fresh copy and takes you inside.
 
-🪓 **The Great Felling**, launched with `/oquest create universe GreatFelling`: five hundred trunks felled by the whole server, counting only while three players are online, before a closing date. `AntiAbuse` is on, so a trunk placed and felled again counts once.
+👥 **A world quest line.** The whole line belongs to the copy of the lair you are in, so everyone inside shares it: every rat anyone kills counts for the group, whoever joins later finds the line where the group left it, and whoever leaves is taken off it. Rewards go to those still inside when a quest ends. What the group finished stays in each journal, and when the copy closes, what it had not finished fails.
 
-🛡️ **Repel the Trorks**, launched with `/oquest create world RepelTheTrorks <world>`: twenty Trorks in fifteen minutes, shared by everyone in that world.
+🐀 **Clear out the rats** starts on its own as the first player comes in. The quest itself says nothing of it: an assignment beside it, `Assignments/GoblinLair.json`, hands it out on `PlayerEnterWorld` with the `World` scope, in every copy of the lair named by `instance-Dungeons-Dungeon_Goblin-.*`. It asks for the caves by the entrance to be cleared, and opens the rest of the lair.
+
+⚔️ **The main line** runs through the goblin tunnels, up to a ledge where the Goblin Ogre is in sight (a `ReachLocation` quest), through the ogre itself, and into the duke's hall. There **The Goblin Duke** asks for his guard broken and the duke brought down, in either order, and pays five gold bars waiting in the journal.
+
+🕷️ **Two side quests** open alongside it: squash the spiders haunting the lair, and light its galleries with the torches from the entrance chest, counted by `PlaceBlock`.
+
+Each quest hands the next one over with `GrantQuest`, and since the one paying belongs to the lair, so does the next: the chain stays shared from the rats to the duke. Every quest of the line carries the *Dungeon* category, the side quests *Side quest* as well, and the journal shows both beside their titles.
+
+### 🌲 A server event
+
+🪓 **The Great Felling**, launched by an admin with `/oquest create universe GreatFelling`: five hundred trunks felled by the whole server, counting only while two players are online, before a closing date. `AntiAbuse` is on, so a trunk placed and felled again counts once.
 
 ### 🍖 The hunt
 
@@ -56,11 +66,11 @@ Two quests an admin launches, for everyone at once:
 
 ---
 
-Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, each starting from a secret nobody is told about. Cover the first distance and it reveals itself, earned, while the next rung waits in the journal: a hundred metres, then a thousand, then ten thousand. **Silent step** does the same at a walk, **Woodpile** counts the trunks you pick up off the ground with `PickupItem` and leaves out the ones you threw, and **First blood** waits for your first duel.
+Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, each starting from a secret nobody is told about. Cover the first distance and it reveals itself, earned, while the next rung waits in the journal: a hundred metres, then a thousand, then ten thousand. **Silent step** does the same at a walk, **Lumberjack** counts the trunks you bring back from your fellings with `PickupItem` and leaves out the ones you threw, and **First blood** waits for your first duel.
 
 ---
 
-All nineteen quest types are in there, along with every constraint (time limits, a closing date, a world, an area, conditions on the player, a minimum of players online, death, cooldowns and caps), the three scopes, all three reward types including rewards for failing, descriptions in the tracker, the three visibility modes, and progressions carried by rewards alone. What starts by itself is handed out by assignments: `Assignments/OnConnection.json` on connection, `Assignments/DailyChores.json` again after each end.
+All nineteen quest types are in there, along with every constraint (time limits, a closing date, a world, an area, conditions on the player, a minimum of players online, death, cooldowns and caps), the three scopes, all three reward types including rewards for failing, descriptions in the tracker, the three visibility modes, categories, and progressions carried by rewards alone. What starts by itself is handed out by assignments: `Assignments/OnConnection.json` on connection, `Assignments/DailyChores.json` again after each end, `Assignments/GoblinLair.json` in every copy of the lair.
 
 ---
 

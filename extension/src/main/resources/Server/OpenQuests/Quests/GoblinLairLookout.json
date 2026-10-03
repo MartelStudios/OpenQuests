@@ -1,0 +1,22 @@
+{
+  "Type": "ReachLocation",
+  "Categories": ["Dungeon"],
+  "TitleKey": "quest.goblin-lair-lookout.title",
+  "DescriptionKey": "quest.goblin-lair-lookout.description",
+  "AutoTrack": true,
+  "Position": {
+    "X": 3997,
+    "Y": 83,
+    "Z": -1710
+  },
+  "Radius": 5,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinLairOgre"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

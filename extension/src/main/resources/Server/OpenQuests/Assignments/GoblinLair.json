@@ -1,0 +1,12 @@
+{
+  "Trigger": {
+    "Type": "PlayerEnterWorld",
+    "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*"
+  },
+  "Scope": {
+    "Type": "World"
+  },
+  "QuestAssetIds": [
+    "GoblinLairRats"
+  ]
+}
