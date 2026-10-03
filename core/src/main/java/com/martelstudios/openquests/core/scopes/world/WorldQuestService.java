@@ -13,7 +13,9 @@ import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
@@ -247,12 +249,16 @@ public class WorldQuestService {
     /**
      * Takes this world's running quests back from the leaving player. What ended while they were
      * here stays theirs, in their journal, the way any finished quest does.
+     *
+     * <p>Their index is updated through the holder they leave with: their entity is on its way out of
+     * this world, and work queued for it here would find nothing left to write on.
      */
     private void handleRemovedPlayerFromWorldEvent(@Nonnull RemovedPlayerFromWorldEvent removedPlayerFromWorldEvent) {
         var playerRef = removedPlayerFromWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;
 
         WorldQuestStoreResource store = getWorldQuestStoreFromWorld(removedPlayerFromWorldEvent.getWorld());
+        QuestStoreComponent playerStore = removedPlayerFromWorldEvent.getHolder().getComponent(QuestStoreComponent.getComponentType());
         QuestsRecord questsRecord = store.questsRecord;
 
         for (UUID questId : new ArrayList<>(questsRecord.getAllIds())) {
@@ -268,7 +274,9 @@ public class WorldQuestService {
 
             if (QuestProgressionService.get().getLiveQuest(questId) == null) continue;
 
-            quest.removePlayer(playerRef.getUuid());
+            if (quest.removePlayer(playerRef.getUuid()) && playerStore != null) {
+                PlayerQuestService.get().removeQuestFromPlayerStore(playerStore, quest, playerRef.getUuid());
+            }
         }
     }
 
