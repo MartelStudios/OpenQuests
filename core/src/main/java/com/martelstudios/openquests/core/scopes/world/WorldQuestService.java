@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.core.scopes.world;
 
+import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.RemovedPlayerFromWorldEvent;
@@ -7,11 +8,14 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
+import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -19,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Holds the quests shared by every player of a world: assigns them on world entry, takes them back
@@ -34,6 +39,12 @@ public class WorldQuestService {
      */
     public static final String WORLD_INDEX_PREFIX = "world:";
 
+    /**
+     * Worlds being closed, which nothing is shared into any more: a quest failed on the way out
+     * and paying with another quest would otherwise leave it behind in a world that is gone.
+     */
+    private static final Set<UUID> CLOSING = ConcurrentHashMap.newKeySet();
+
     private final QuestStorage storage;
 
     public WorldQuestService(@Nonnull JavaPlugin plugin, @Nonnull QuestStorage storage) {
@@ -41,6 +52,9 @@ public class WorldQuestService {
 
         plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
         plugin.getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, this::handleRemovedPlayerFromWorldEvent);
+
+        // Last, so a removal another plugin called off is seen as such
+        plugin.getEventRegistry().registerGlobal(EventPriority.LAST, RemoveWorldEvent.class, this::handleRemoveWorldEvent);
     }
 
     public static WorldQuestService get() {
@@ -104,14 +118,15 @@ public class WorldQuestService {
     }
 
     /**
-     * @return those of the worlds that are open, the only ones a quest can be shared in.
+     * @return those of the worlds that are open, the only ones a quest can be shared in. A world
+     * being closed is left out, so that nothing is shared into it.
      */
     @Nonnull
     public static List<World> openWorlds(@Nonnull Collection<UUID> worldIds) {
         List<World> worlds = new ArrayList<>();
         for (UUID worldId : worldIds) {
             World world = Universe.get().getWorld(worldId);
-            if (world != null) worlds.add(world);
+            if (world != null && !CLOSING.contains(worldId)) worlds.add(world);
         }
         return worlds;
     }
@@ -183,6 +198,72 @@ public class WorldQuestService {
 
             quest.removePlayer(playerRef.getUuid());
         }
+    }
+
+    /**
+     * Fails what a world still runs as it closes for good, an instance done with or a world removed
+     * by hand, then lets go of its index. A crash keeps everything, the world being reloaded, and
+     * so does a server stop, which raises no removal at all.
+     */
+    private void handleRemoveWorldEvent(@Nonnull RemoveWorldEvent removeWorldEvent) {
+        if (removeWorldEvent.isCancelled()) return;
+        if (removeWorldEvent.getRemovalReason() != RemoveWorldEvent.RemovalReason.GENERAL) return;
+
+        World world = removeWorldEvent.getWorld();
+        UUID worldId = world.getWorldConfig().getUuid();
+        QuestsRecord questsRecord = loadedRecord(world);
+
+        CLOSING.add(worldId);
+        try {
+            for (UUID questId : new ArrayList<>(questsRecord.getAllIds())) {
+                AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+                if (quest != null) close(world, quest);
+            }
+
+            questsRecord.replaceAll(Set.of());
+            getWorldQuestStoreFromWorld(world).consumeChanges();
+            storage.deleteIndex(indexKey(world));
+
+            LOGGER.atInfo().log("Closed the quests of world %s", world.getName());
+        } finally {
+            CLOSING.remove(worldId);
+        }
+    }
+
+    /**
+     * A quest another open world shares goes on there. Otherwise one still running fails, and one
+     * no journal holds is done away with, nothing being left to ever read it; the rest stays with
+     * whoever holds it, in memory only while one of them is online.
+     */
+    private void close(@Nonnull World world, @Nonnull AbstractQuestProgression<?> quest) {
+        UUID questId = quest.getId();
+
+        if (quest.getScope() instanceof WorldQuestScope scope && !openWorlds(scope.getWorlds()).isEmpty()) {
+            removeQuest(world, questId);
+            return;
+        }
+
+        if (QuestProgressionService.get().getLiveQuest(questId) != null) {
+            QuestProgressionService.get().progress(new SetStateVisitor(QuestState.FAILED), List.of(questId));
+        }
+
+        if (quest.getPlayers().isEmpty() && quest.getAbandonedPlayers().isEmpty()) {
+            QuestProgressionService.get().unregisterQuest(quest);
+        } else if (!isHeldOnline(quest)) {
+            QuestProgressionService.get().unloadQuest(questId);
+        }
+    }
+
+    private static boolean isHeldOnline(@Nonnull AbstractQuestProgression<?> quest) {
+        for (UUID playerId : quest.getPlayers()) {
+            if (Universe.get().getPlayer(playerId) != null) return true;
+        }
+
+        for (UUID playerId : quest.getAbandonedPlayers()) {
+            if (Universe.get().getPlayer(playerId) != null) return true;
+        }
+
+        return false;
     }
 
     /**

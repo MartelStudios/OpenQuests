@@ -108,6 +108,12 @@ instanced events:
 Only what is still running is removed: a quest that ended while the player was there stays in
 their journal, and one they left before its end does not.
 
+A world that closes for good, an instance done with or a world removed, fails the quests it still
+runs: they could not be finished before the end of their world, however they were created. Its
+index goes with it, and a quest no journal holds is deleted. A crash keeps everything, the world
+being reloaded, and so does a server stop, which removes no world. A quest another open world
+still shares goes on there.
+
 ### Storage
 
 Where a quest is kept is decided by one interface, `QuestStorage`, and named in `config.json`.

@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -223,6 +224,20 @@ public class DiskQuestStorage implements QuestStorage {
     @Override
     public void saveIndex(@Nonnull String indexKey, @Nonnull Set<UUID> questIds) {
         indexes.save(fileName(indexKey), new QuestIndexRecord(questIds));
+    }
+
+    /**
+     * Removes the file rather than emptying it, so closed instances leave nothing behind.
+     */
+    @Override
+    public void deleteIndex(@Nonnull String indexKey) {
+        try {
+            indexes.remove(fileName(indexKey));
+        } catch (NoSuchFileException e) {
+            // Never written: a world nobody played a quest in
+        } catch (IOException e) {
+            LOGGER.atWarning().withCause(e).log("Failed to delete the %s quest index", indexKey);
+        }
     }
 
     @Nonnull

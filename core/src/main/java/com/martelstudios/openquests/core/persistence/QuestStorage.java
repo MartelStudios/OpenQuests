@@ -111,6 +111,14 @@ public interface QuestStorage extends AutoCloseable {
     void saveIndex(@Nonnull String indexKey, @Nonnull Set<UUID> questIds);
 
     /**
+     * Lets go of a key nothing will read again, such as a closed instance's. A backend keeping
+     * nothing per key can leave it at an empty index.
+     */
+    default void deleteIndex(@Nonnull String indexKey) {
+        saveIndex(indexKey, Set.of());
+    }
+
+    /**
      * What a player carries besides the quests themselves: which of their quests to look for, the
      * catalogue they have already been offered, what they are still owed, and how each asset
      * ended for them so far.
