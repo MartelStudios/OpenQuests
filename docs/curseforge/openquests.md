@@ -237,7 +237,7 @@ Drop them in `mods/`. Nothing else to configure.
 Three ways, and nothing else to set up:
 
 *   `"StartOnConnection": true` gives the quest to every player, once
-*   The `GrantQuest` reward hands the next one over when a quest completes
+*   The `GrantQuest` reward hands the next one over when a quest completes, in the same scope: a world quest's next step is the world's too
 *   `/oquest create player|world|universe <assetId>` from the console or in game
 
 ### Commands

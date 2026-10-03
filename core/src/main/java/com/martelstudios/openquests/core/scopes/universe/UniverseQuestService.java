@@ -1,14 +1,11 @@
 package com.martelstudios.openquests.core.scopes.universe;
 
-import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
-import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -17,11 +14,10 @@ import com.martelstudios.openquests.core.stores.QuestsRecord;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Holds the quests shared by every player regardless of world. Quests know nothing about this
- * scope: the service assigns them to whoever is online, and to whoever connects later.
+ * Holds the quests shared by every player regardless of world: assigns them to whoever is online
+ * and to whoever connects later, and writes on each the {@link UniverseQuestScope} sharing it.
  */
 public class UniverseQuestService {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -33,7 +29,6 @@ public class UniverseQuestService {
 
     private final QuestStorage storage;
     private final QuestsRecord quests = new QuestsRecord();
-    private final ConcurrentHashMap<UUID, EventRegistration<UUID, QuestUnregisteredEvent>> questUnregisteredListeners = new ConcurrentHashMap<>();
 
     private boolean dirty;
 
@@ -64,7 +59,7 @@ public class UniverseQuestService {
 
         LOGGER.atInfo().log("Added quest %s to universe", questId);
 
-        trackQuest(questId);
+        if (!(quest.getScope() instanceof UniverseQuestScope)) quest.setScope(new UniverseQuestScope());
 
         for (PlayerRef playerRef : Universe.get().getPlayers()) {
             QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
@@ -75,27 +70,26 @@ public class UniverseQuestService {
         LOGGER.atInfo().log("Removing quest %s from universe", questId);
 
         if (quests.unregister(questId)) dirty = true;
-        untrackQuest(questId);
+
+        // Gone already when it left for good, and nothing then is left to write on
+        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+        if (quest != null && quest.getScope() instanceof UniverseQuestScope) quest.setScope(null);
     }
 
     /**
-     * Reads the universe index back and pulls every quest it lists into memory. Re-arms the
-     * tracking, without which a quest completed after a restart would never leave the index.
+     * Reads the universe index back and pulls every quest it lists into memory.
      */
     public void loadQuests() {
         quests.replaceAll(storage.loadIndex(UNIVERSE_INDEX_KEY));
 
         for (UUID questId : new ArrayList<>(quests.getAllIds())) {
-            if (QuestProgressionService.get().loadQuest(questId) == null) {
-                // Left on the index, so that a quest set aside comes back with its asset
-                if (QuestProgressionService.get().isSetAside(questId)) continue;
+            if (QuestProgressionService.get().loadQuest(questId) != null) continue;
 
-                quests.unregister(questId);
-                dirty = true;
-                continue;
-            }
+            // Left on the index, so that a quest set aside comes back with its asset
+            if (QuestProgressionService.get().isSetAside(questId)) continue;
 
-            trackQuest(questId);
+            quests.unregister(questId);
+            dirty = true;
         }
     }
 
@@ -130,26 +124,6 @@ public class UniverseQuestService {
             }
 
             QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
-        }
-    }
-
-    private void handleQuestUnregisteredEvent(QuestUnregisteredEvent questUnregisteredEvent) {
-        removeQuest(questUnregisteredEvent.getQuest().getId());
-    }
-
-    /**
-     * One listener per quest, however many times it is added.
-     */
-    private void trackQuest(UUID questId) {
-        questUnregisteredListeners.computeIfAbsent(questId, id -> HytaleServer.get()
-                                                                              .getEventBus()
-                                                                              .register(QuestUnregisteredEvent.class, id, this::handleQuestUnregisteredEvent));
-    }
-
-    private void untrackQuest(UUID questId) {
-        var questListener = questUnregisteredListeners.remove(questId);
-        if (questListener != null) {
-            questListener.unregister();
         }
     }
 }

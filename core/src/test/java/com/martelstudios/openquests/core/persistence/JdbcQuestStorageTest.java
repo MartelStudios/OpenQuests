@@ -2,11 +2,13 @@ package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestCompletions;
+import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
 import com.martelstudios.openquests.core.persistence.jdbc.SqlDialect;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
+import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +46,7 @@ class JdbcQuestStorageTest {
     static void registerTypes() {
         AbstractQuestProgression.CODEC.register(TestQuestProgression.TYPE, TestQuestProgression.class, TestQuestProgression.CODEC);
         QuestReward.CODEC.register(TestQuestReward.TYPE, TestQuestReward.class, TestQuestReward.CODEC);
+        QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
     }
 
     @BeforeEach
@@ -75,6 +78,36 @@ class JdbcQuestStorageTest {
         assertTrue(read.hasTag("OQ_TEST"));
         assertEquals(List.of("a", "b"), List.of(read.getTagValues("OQ_TEST")));
         assertNotNull(read.getStartedAt());
+    }
+
+    @Test
+    void aSharedQuestKeepsWhoSharesIt() {
+        UUID lair = UUID.randomUUID();
+        UUID arena = UUID.randomUUID();
+        TestQuestProgression quest = quest("ClearTheRats", UUID.randomUUID());
+        WorldQuestScope scope = new WorldQuestScope(lair);
+        scope.getWorlds().add(arena);
+        quest.setScope(scope);
+
+        storage.saveProgressions(List.of(quest));
+
+        AbstractQuestProgression<?> read = storage.loadProgression(quest.getId());
+
+        assertNotNull(read);
+        assertTrue(read.getScope() instanceof WorldQuestScope);
+        assertEquals(Set.of(lair, arena), ((WorldQuestScope) read.getScope()).getWorlds());
+    }
+
+    @Test
+    void aQuestNobodySharesHasNoScope() {
+        TestQuestProgression quest = quest("CollectStick", UUID.randomUUID());
+
+        storage.saveProgressions(List.of(quest));
+
+        AbstractQuestProgression<?> read = storage.loadProgression(quest.getId());
+
+        assertNotNull(read);
+        assertNull(read.getScope());
     }
 
     @Test

@@ -1,8 +1,6 @@
 package com.martelstudios.openquests.core.scopes.world;
 
-import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.RemovedPlayerFromWorldEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -10,7 +8,6 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
-import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -18,13 +15,15 @@ import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Holds the quests shared by every player of a world. Quests know nothing about this scope: the
- * service assigns them on world entry and takes them back on world exit.
+ * Holds the quests shared by every player of a world: assigns them on world entry, takes them back
+ * on world exit, and writes on each quest the worlds holding it ({@link WorldQuestScope}), which
+ * is how a quest finds its worlds and a world its quests.
  */
 public class WorldQuestService {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -36,10 +35,6 @@ public class WorldQuestService {
     public static final String WORLD_INDEX_PREFIX = "world:";
 
     private final QuestStorage storage;
-
-    private final ConcurrentHashMap<UUID, EventRegistration<UUID, QuestUnregisteredEvent>> questUnregisteredListeners = new ConcurrentHashMap<>();
-
-    private final ConcurrentHashMap<UUID, Set<UUID>> questsToWorlds = new ConcurrentHashMap<>();
 
     public WorldQuestService(@Nonnull JavaPlugin plugin, @Nonnull QuestStorage storage) {
         this.storage = storage;
@@ -61,17 +56,25 @@ public class WorldQuestService {
         return WORLD_INDEX_PREFIX + world.getWorldConfig().getUuid();
     }
 
+    /**
+     * Shares the quest with everyone inside, now and as they come in. A quest several worlds hold
+     * is one progression they all push.
+     */
     public void addQuest(@Nonnull World world, @Nonnull UUID questId) {
         AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
         if (quest == null) return;
 
-        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
-        if (!store.questsRecord.register(questId)) return;
-        store.markDirty();
+        if (!loadedRecord(world).register(questId)) return;
+        getWorldQuestStoreFromWorld(world).markDirty();
 
         LOGGER.atInfo().log("Added quest %s to world %s", questId, world.getName());
 
-        trackQuestForWorld(world, questId);
+        UUID worldId = world.getWorldConfig().getUuid();
+        if (quest.getScope() instanceof WorldQuestScope scope) {
+            if (scope.getWorlds().add(worldId)) quest.markDirty();
+        } else {
+            quest.setScope(new WorldQuestScope(worldId));
+        }
 
         for (PlayerRef playerRef : world.getPlayerRefs()) {
             QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
@@ -84,7 +87,33 @@ public class WorldQuestService {
         WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
         if (store.questsRecord.unregister(questId)) store.markDirty();
 
-        untrackQuestForWorld(world, questId);
+        // Gone already when it left for good, and nothing then is left to write on
+        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+        if (quest != null && quest.getScope() instanceof WorldQuestScope scope && scope.getWorlds().remove(world.getWorldConfig().getUuid())) {
+            quest.markDirty();
+        }
+    }
+
+    /**
+     * @return the ids on that world's index, those that ended included, read back first if no
+     * player has come in yet.
+     */
+    @Nonnull
+    public Set<UUID> getQuestIds(@Nonnull World world) {
+        return loadedRecord(world).getAllIds();
+    }
+
+    /**
+     * @return those of the worlds that are open, the only ones a quest can be shared in.
+     */
+    @Nonnull
+    public static List<World> openWorlds(@Nonnull Collection<UUID> worldIds) {
+        List<World> worlds = new ArrayList<>();
+        for (UUID worldId : worldIds) {
+            World world = Universe.get().getWorld(worldId);
+            if (world != null) worlds.add(world);
+        }
+        return worlds;
     }
 
     /**
@@ -111,11 +140,7 @@ public class WorldQuestService {
 
         var world = addPlayerToWorldEvent.getWorld();
         WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
-        QuestsRecord questsRecord = store.questsRecord;
-
-        if (store.consumeNeedsLoad()) {
-            questsRecord.replaceAll(storage.loadIndex(indexKey(world)));
-        }
+        QuestsRecord questsRecord = loadedRecord(world);
 
         for (UUID questId : new ArrayList<>(questsRecord.getAllIds())) {
             var quest = QuestProgressionService.get().loadQuest(questId);
@@ -128,7 +153,6 @@ public class WorldQuestService {
                 continue;
             }
 
-            trackQuestForWorld(world, questId);
             QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
         }
     }
@@ -161,48 +185,17 @@ public class WorldQuestService {
         }
     }
 
-    private void handleQuestUnregisteredEvent(QuestUnregisteredEvent questUnregisteredEvent) {
-        UUID questId = questUnregisteredEvent.getQuest().getId();
-        Set<UUID> worlds = questsToWorlds.get(questId);
-
-        if (worlds != null) {
-            // Snapshot: removeQuest mutates this very set
-            for (UUID worldId : Set.copyOf(worlds)) {
-                World world = Universe.get().getWorld(worldId);
-                if (world != null) removeQuest(world, questId);
-            }
-        }
-
-        // Drop what is left, e.g. worlds that no longer resolve
-        questsToWorlds.remove(questId);
-        releaseListener(questId);
-    }
-
     /**
-     * One listener per quest, however many worlds hold it.
+     * The index of a world, read back the first time anything asks for it, whoever asks first:
+     * the first player in, or something handing the world a quest before anyone came.
      */
-    private void trackQuestForWorld(World world, UUID questId) {
-        questsToWorlds.computeIfAbsent(questId, key -> ConcurrentHashMap.newKeySet())
-                      .add(world.getWorldConfig().getUuid());
+    @Nonnull
+    private QuestsRecord loadedRecord(@Nonnull World world) {
+        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
 
-        questUnregisteredListeners.computeIfAbsent(questId, id -> HytaleServer.get()
-                                                                              .getEventBus()
-                                                                              .register(QuestUnregisteredEvent.class, id, this::handleQuestUnregisteredEvent));
-    }
-
-    private void untrackQuestForWorld(World world, UUID questId) {
-        var worlds = questsToWorlds.computeIfPresent(questId, (id, knownWorlds) -> {
-            knownWorlds.remove(world.getWorldConfig().getUuid());
-            return knownWorlds.isEmpty() ? null : knownWorlds;
-        });
-
-        if (worlds == null) releaseListener(questId);
-    }
-
-    private void releaseListener(UUID questId) {
-        var questListener = questUnregisteredListeners.remove(questId);
-        if (questListener != null) {
-            questListener.unregister();
+        if (store.consumeNeedsLoad()) {
+            store.questsRecord.replaceAll(storage.loadIndex(indexKey(world)));
         }
+        return store.questsRecord;
     }
 }

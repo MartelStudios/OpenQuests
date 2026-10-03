@@ -44,7 +44,8 @@ prerequisites of a quest are other quests.
 - **On connection**: `"StartOnConnection": true` gives the quest to every player, once. Only the
   ids already handed out are kept between sessions, so a quest nobody took costs one string.
 - **As a reward**: the `GrantQuest` reward hands further quests over when a quest completes. This
-  is how a chain is written: finishing A grants B.
+  is how a chain is written: finishing A grants B. The next quest stays in the scope of the one
+  paying for it, so a chain a world or the universe shares goes on shared.
 - **Explicitly**: `QuestProgressionService.assignQuest(asset, playerId)`, from a command or from
   your own plugin.
 
@@ -79,10 +80,16 @@ as the `OQ_GRANTED_BY` tag, not a part of a whole.
 
 ### Scopes
 
-A quest only ever knows its players: `AbstractQuestProgression` is the single source of truth,
-and `QuestStoreComponent` is the reverse index a session reads it back through. Scope is applied from
+A quest knows its players: `AbstractQuestProgression` is the single source of truth, and
+`QuestStoreComponent` is the reverse index a session reads it back through. Scope is applied from
 the outside, from `core/scopes/`, and each scope package is self-contained: the rest of the core
 never depends on it, only the reverse.
+
+A scope sharing a quest writes itself on it as `getScope()`, data the quest never acts on: a
+`QuestScope` registered under a `"Type"` (`World` with its worlds, `Universe`), `null` for a quest
+its players hold on their own. Each kind says how a quest it holds is shared and let go of, so
+`GrantQuest` keeps a chain in its scope and a quest leaving for good leaves its indexes without
+anything telling the kinds apart. A plugin adds its own by registering it on `QuestScope.CODEC`.
 
 #### Player scope
 Quests assigned to named players, the default path.
@@ -423,7 +430,8 @@ reaches the sender's quests, so the wider group grants nothing over anybody else
 ## Built-in rewards
 
 - `Item`: gives items, hotbar first, all or nothing.
-- `GrantQuest`: hands further quests over, linked by id or written inline.
+- `GrantQuest`: hands further quests over, linked by id or written inline, in the scope of the
+  quest paying: to the player, or once to the world or the universe sharing it.
 - `Command`: runs a server or player command. `{player}` is replaced by the username, so
   `"Command": "give {player} Ingredient_Stick --quantity=5"` works; the optional arguments of a
   server command are named, never positional. A leading slash is optional. Runs as the console

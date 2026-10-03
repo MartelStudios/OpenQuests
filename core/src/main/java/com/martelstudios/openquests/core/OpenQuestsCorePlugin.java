@@ -14,8 +14,10 @@ import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.openquests.core.commands.QuestCommand;
 import com.martelstudios.openquests.core.config.OpenQuestsConfig;
 import com.martelstudios.openquests.core.constraints.QuestConstraintValidator;
+import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.OpenQuestCategory;
+import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.QuestStorageProvider;
@@ -26,7 +28,9 @@ import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorageProvid
 import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
+import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
+import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestStoreResource;
 import com.martelstudios.openquests.core.services.QuestAutoStartService;
@@ -111,6 +115,16 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questRewardService = new QuestRewardService(this);
         universeQuestService = new UniverseQuestService(this, questStorage);
         worldQuestService = new WorldQuestService(this, questStorage);
+
+        QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
+        QuestScope.CODEC.register(UniverseQuestScope.TYPE, UniverseQuestScope.class, UniverseQuestScope.CODEC);
+
+        // A quest leaving for good leaves whatever shared it, which only its scope knows how to undo
+        getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, event -> {
+            QuestScope scope = event.getQuest().getScope();
+            if (scope != null) scope.release(event.getQuest());
+        });
+
         playerQuestService = new PlayerQuestService(this);
         questAutoStartService = new QuestAutoStartService(this);
         questDeadlineService = new QuestDeadlineService(this);

@@ -88,6 +88,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(ABANDONED_PLAYERS_CODEC, ABANDONED_PLAYERS_SETTER, ABANDONED_PLAYERS_GETTER)
                                                                                         .add()
+                                                                                        .append(new KeyedCodec<>("Scope", QuestScope.CODEC), (quest, scope) -> quest.scope = scope, quest -> quest.scope)
+                                                                                        .add()
                                                                                         .append(TAGS_CODEC, TAGS_SETTER, TAGS_GETTER)
                                                                                         .add()
                                                                                         .build();
@@ -106,6 +108,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Ids of the players who have left the quest progression.
      */
     protected Set<UUID> abandonedPlayers = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Who shares this quest beyond its players, written by the scope holding it. Data only: the
+     * quest does nothing with it. {@code null} for a quest its players hold on their own.
+     */
+    @Nullable
+    protected QuestScope scope;
 
     /**
      * Tags written on this instance, on top of those its asset declares, each with the values its
@@ -474,6 +483,23 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     @Nonnull
     public Set<UUID> getAbandonedPlayers() {
         return abandonedPlayers;
+    }
+
+    /**
+     * @return who shares this quest beyond its players, {@code null} for one they hold on their own.
+     */
+    @Nullable
+    public QuestScope getScope() {
+        return scope;
+    }
+
+    /**
+     * Written by the scope holding the quest, never by the quest itself.
+     */
+    public Q setScope(@Nullable QuestScope scope) {
+        this.scope = scope;
+        markDirty();
+        return self();
     }
 
     /**
