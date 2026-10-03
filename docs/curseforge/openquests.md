@@ -206,7 +206,7 @@ The same quest asset behaves differently depending on who owns the progression.
 *   Survive ten waves together
 *   Light every brazier in the temple before the torches burn out
 
-Rewards go to whoever is still there when it completes. Anyone who left early gets nothing, and you have no bookkeeping to do.
+Rewards go to whoever is still there when it completes. Anyone who left early gets nothing, and you have no bookkeeping to do. A quest that ended while you were there stays in your journal once you leave.
 
 **🌍 Universe.** One counter the whole community pushes. This is where a quest stops being a chore and becomes a server event:
 

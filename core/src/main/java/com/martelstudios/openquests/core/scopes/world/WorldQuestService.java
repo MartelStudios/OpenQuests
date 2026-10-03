@@ -134,7 +134,8 @@ public class WorldQuestService {
     }
 
     /**
-     * Takes this world's quests back from the leaving player.
+     * Takes this world's running quests back from the leaving player. What ended while they were
+     * here stays theirs, in their journal, the way any finished quest does.
      */
     private void handleRemovedPlayerFromWorldEvent(@Nonnull RemovedPlayerFromWorldEvent removedPlayerFromWorldEvent) {
         var playerRef = removedPlayerFromWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
@@ -153,6 +154,8 @@ public class WorldQuestService {
                 store.markDirty();
                 continue;
             }
+
+            if (QuestProgressionService.get().getLiveQuest(questId) == null) continue;
 
             quest.removePlayer(playerRef.getUuid());
         }

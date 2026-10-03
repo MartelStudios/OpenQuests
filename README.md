@@ -51,7 +51,9 @@ prerequisites of a quest are other quests.
 Each of these asks the [constraints](#constraints) of the asset first, and so do the scopes as
 they add a player to a quest they share: `assignQuest` and `joinQuest` return nothing for a player
 refused, and register nothing either. A quest refused on connection is offered again on the next
-one. The steps of a chain are handed out by the chain, so only the chain is asked.
+one. A scope never hands back a quest that is over or that the player gave up: `joinQuest` leaves
+both out, so coming back into a world, or reconnecting, is not taking them up again. The steps of
+a chain are handed out by the chain, so only the chain is asked.
 `registerQuest(asset).addPlayer(playerId)` still hands a quest out asking nobody, for a game mode
 that decides on its own.
 
@@ -95,6 +97,9 @@ Quests assigned to every player entering a world, and removed when they leave. U
 instanced events:
 - Slay the Devil Boss
 - Reach the 10th zombie wave
+
+Only what is still running is removed: a quest that ended while the player was there stays in
+their journal, and one they left before its end does not.
 
 ### Storage
 
