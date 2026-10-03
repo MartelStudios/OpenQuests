@@ -223,6 +223,7 @@ public class WorldQuestService {
             questsRecord.replaceAll(Set.of());
             getWorldQuestStoreFromWorld(world).consumeChanges();
             storage.deleteIndex(indexKey(world));
+            storage.deleteAssignments(indexKey(world));
 
             LOGGER.atInfo().log("Closed the quests of world %s", world.getName());
         } finally {

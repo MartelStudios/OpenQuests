@@ -38,11 +38,11 @@ Depending on `OpenQuestsCore` alone is enough to build your own quest types;
 
 ### Handing quests out
 
-There is no separate assignment concept: a quest is handed out in one of three ways, and the
-prerequisites of a quest are other quests.
+A quest asset says what is asked, never who plays it or when it starts: that is written beside it.
+A quest is handed out in one of three ways, and the prerequisites of a quest are other quests.
 
-- **On connection**: `"StartOnConnection": true` gives the quest to every player, once. Only the
-  ids already handed out are kept between sessions, so a quest nobody took costs one string.
+- **By an assignment**: an `OpenQuestAssignment` asset names quests, the moment they are handed
+  out and who to ([assignments](#assignments)).
 - **As a reward**: the `GrantQuest` reward hands further quests over when a quest completes. This
   is how a chain is written: finishing A grants B. The next quest stays in the scope of the one
   paying for it, so a chain a world or the universe shares goes on shared.
@@ -57,6 +57,52 @@ both out, so coming back into a world, or reconnecting, is not taking them up ag
 a chain are handed out by the chain, so only the chain is asked.
 `registerQuest(asset).addPlayer(playerId)` still hands a quest out asking nobody, for a game mode
 that decides on its own.
+
+#### Assignments
+
+An `OpenQuestAssignment`, under `OpenQuests/Assignments/`, hands quests out by itself. It is made
+of three parts, each registered under a `"Type"` so a plugin can add its own: a `Trigger` saying
+when an occasion comes, a `Scope` saying who it is for, and a `Repeat` saying whether it hands the
+quest out again. Several assignments can name the same quest, which is how one quest is played
+several ways.
+
+```json
+{
+  "Trigger": { "Type": "PlayerEnterWorld", "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*" },
+  "Scope": { "Type": "World" },
+  "QuestAssetIds": ["GoblinLairRats"]
+}
+```
+
+| Part | `"Type"` | Meaning |
+| --- | --- | --- |
+| `Trigger` | `PlayerConnect` | as a player connects |
+| | `PlayerEnterWorld` | as a player enters a world whose whole name matches its `WorldNamePattern`, any world without one; connecting into a world counts |
+| `Scope` | `Player` (default) | a quest of their own for the player the occasion concerns, theirs to keep |
+| | `World` | one quest per world, shared by everyone inside: the world entered, or each open world its own `WorldNamePattern` names |
+| | `Universe` | one quest for the whole server |
+| `Repeat` | `Once` (default) | once per occasion |
+| | `AfterEnd` | again on the next occasion once what the last one opened has ended, done, failed or given up |
+| | `Replace` | anew on every occasion, what the last one opened failing if it is still running |
+
+What counts as the same occasion depends on the scope: for a player the world they entered is part
+of it, since they move, while for a world or the server it is not. `Once` hands a quest out for
+good on connection, and once per player and world entered, or once per world.
+
+Every `Repeat` takes a `Max`, the most times a holder is handed the quest by this assignment. The
+quest's own constraints still decide whether a player takes it, and one refused is offered again
+next time: `Max` counts what this assignment handed out, `MaxCompletions` how the quest ended
+wherever it came from.
+
+What was handed out is written down per holder, by assignment and then by quest, as `Count`,
+`LastAt` and `Occasion`. A player's records travel in their own; a world's and the server's live in
+a store of their own, keyed like their index and written conditionally, so servers sharing a
+database never hand the same occasion out twice. The quest carries its `Origin` (assignment, quest
+and occasion), which `GrantQuest` passes down its chain: everything one occasion opened is one
+line, the line `AfterEnd` waits for and `Replace` fails.
+
+An assignment that cannot mean anything is refused as it loads: a malformed pattern, or a `World`
+scope naming no worlds under a trigger that happens in none.
 
 A quest gating on another one is a `QuestState` quest, usually as the child of a composite. Since a
 quest holds a state rather than a boolean, "not yet" and "failed" stay distinct, which is what
@@ -105,12 +151,18 @@ instanced events:
 - Slay the Devil Boss
 - Reach the 10th zombie wave
 
+A world quest is created with `/oquest create world`, or by an [assignment](#assignments) with the
+`World` scope, which is how every copy of an instance opens with its own. A `GrantQuest` paid by
+a world quest hands its follow-ups to the same world, once however many players are paid, which
+keeps a dungeon line shared from its first quest to its last. A follow-up claimed by hand once
+that world has closed goes to the player claiming it, so a shared chain grants with `AutoClaim`.
+
 Only what is still running is removed: a quest that ended while the player was there stays in
 their journal, and one they left before its end does not.
 
 A world that closes for good, an instance done with or a world removed, fails the quests it still
 runs: they could not be finished before the end of their world, however they were created. Its
-index goes with it, and a quest no journal holds is deleted. A crash keeps everything, the world
+index and its assignment records go with it, and a quest no journal holds is deleted. A crash keeps everything, the world
 being reloaded, and so does a server stop, which removes no world. A quest another open world
 still shares goes on there.
 
@@ -639,15 +691,14 @@ A quest, in `OpenQuests/Quests/CollectStick.json`:
 }
 ```
 
-A quest chain, in `OpenQuests/Quests/StartHatchet.json`. It reaches every player on connection and
-hands the next one over when it completes:
+A quest chain, in `OpenQuests/Quests/StartHatchet.json`. It hands the next one over when it
+completes:
 
 ```json
 {
   "Type": "Composite",
   "TitleKey": "quest.start-hatchet.title",
   "DescriptionKey": "quest.start-hatchet.description",
-  "StartOnConnection": true,
   "AutoClaim": true,
   "QuestAssetIds": [
     "CollectStick",
@@ -657,6 +708,12 @@ hands the next one over when it completes:
     { "Type": "GrantQuest", "QuestAssetIds": ["PickBerries"] }
   ]
 }
+```
+
+And what hands it to every player on connection, in `OpenQuests/Assignments/Welcome.json`:
+
+```json
+{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": ["StartHatchet"] }
 ```
 
 A quest targeting NPCs takes an `NPCGroup` the same way, so a single role does not need a group

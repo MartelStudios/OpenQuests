@@ -1,0 +1,17 @@
+{
+  "Trigger": {
+    "Type": "PlayerConnect"
+  },
+  "QuestAssetIds": [
+    "Intro",
+    "SkipIntro",
+    "GatherMeat",
+    "RunNovice",
+    "SprintNovice",
+    "JumpNovice",
+    "SilentStep",
+    "Woodpile",
+    "FirstBlood",
+    "Flawless"
+  ]
+}

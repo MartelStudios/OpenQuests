@@ -36,7 +36,7 @@ Two chains and a daily chore handed out on connection, a trial inside the Forgot
 
 ### 🧺 Garden chores
 
-🫐 **Garden chores** asks for wild berries picked by hand, five flowers of any kind and a wooden chest opened. The reward waits in the journal until you claim it. It can be done at most once every twenty hours and seven times in all, and the journal counts down both. Nothing hands it out again by itself yet: `/oquest create player DailyChores <player>` does, and the two limits decide whether it is accepted.
+🫐 **Garden chores** asks for wild berries picked by hand, five flowers of any kind and a wooden chest opened. The reward waits in the journal until you claim it. It can be done at most once every twenty hours and seven times in all, and the journal counts down both. Its own assignment, `Assignments/DailyChores.json`, hands it out again at the next connection once the last one has ended, done or given up, with `"Repeat": { "Type": "AfterEnd" }`. The two limits then decide whether it is accepted.
 
 ### 🌲 Server events
 
@@ -60,7 +60,7 @@ Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, 
 
 ---
 
-All nineteen quest types are in there, along with every constraint (time limits, a closing date, a world, an area, conditions on the player, a minimum of players online, death, cooldowns and caps), the three scopes, all three reward types including rewards for failing, descriptions in the tracker, the three visibility modes, and progressions carried by rewards alone.
+All nineteen quest types are in there, along with every constraint (time limits, a closing date, a world, an area, conditions on the player, a minimum of players online, death, cooldowns and caps), the three scopes, all three reward types including rewards for failing, descriptions in the tracker, the three visibility modes, and progressions carried by rewards alone. What starts by itself is handed out by assignments: `Assignments/OnConnection.json` on connection, `Assignments/DailyChores.json` again after each end.
 
 ---
 

@@ -4,6 +4,8 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.models.AssignmentRecord;
+import com.martelstudios.openquests.core.models.AssignmentRecords;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
 
@@ -30,11 +32,10 @@ public class QuestStoreComponent implements Component<EntityStore> {
     private QuestsRecord quests = new QuestsRecord();
 
     /**
-     * Asset ids already handed to this player by {@code StartOnConnection}. Only these are kept
-     * between sessions, not the quests made from them, so a catalogue offered to everyone costs
-     * one string per quest actually taken.
+     * What the assignments handed this player, by assignment and then by quest. Only the hand-outs
+     * are kept between sessions, not the quests made from them.
      */
-    private final Set<String> startedOnConnection = ConcurrentHashMap.newKeySet();
+    private final AssignmentRecords assignments = new AssignmentRecords();
 
     /**
      * How each asset ended for this player so far, by asset id. Counted as quests end, whether
@@ -53,7 +54,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
 
     public QuestStoreComponent(@Nonnull QuestStoreComponent other) {
         this.quests = other.quests.clone();
-        this.startedOnConnection.addAll(other.startedOnConnection);
+        this.assignments.replaceAll(other.assignments.snapshot());
         this.completions.putAll(other.completions);
         this.dirty = other.dirty;
     }
@@ -84,9 +85,12 @@ public class QuestStoreComponent implements Component<EntityStore> {
         return quests.getAllIds();
     }
 
+    /**
+     * @return the live records of what the assignments handed this player.
+     */
     @Nonnull
-    public Set<String> getStartedOnConnection() {
-        return startedOnConnection;
+    public AssignmentRecords getAssignments() {
+        return assignments;
     }
 
     /**
@@ -120,9 +124,9 @@ public class QuestStoreComponent implements Component<EntityStore> {
      * @param questIds the quests that answered, not the ids their record listed, so a dead id is
      * dropped here rather than carried another session.
      */
-    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Set<String> startedOnConnection, @Nonnull Map<String, QuestCompletions> completions) {
+    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Map<String, QuestCompletions> completions) {
         quests.replaceAll(questIds);
-        this.startedOnConnection.addAll(startedOnConnection);
+        this.assignments.replaceAll(assignments);
         this.completions.putAll(completions);
         dirty = false;
     }

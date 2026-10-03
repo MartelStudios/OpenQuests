@@ -208,6 +208,18 @@ The same quest asset behaves differently depending on who owns the progression.
 
 Rewards go to whoever is still there when it completes. Anyone who left early gets nothing, and you have no bookkeeping to do. A quest that ended while you were there stays in your journal once you leave. When the world closes for good, such as an instance once everyone has left, whatever it had not finished fails.
 
+An instance opens with its quests by itself, through an assignment:
+
+```json
+{
+  "Trigger": { "Type": "PlayerEnterWorld", "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*" },
+  "Scope": { "Type": "World" },
+  "QuestAssetIds": ["GoblinLairRats"]
+}
+```
+
+Every copy of that dungeon gets its own, shared by the group inside. Each quest it hands over with `GrantQuest` stays in the same world, up to the last one.
+
 **🌍 Universe.** One counter the whole community pushes. This is where a quest stops being a chore and becomes a server event:
 
 *   Kill 1,000,000 skeletons, together
@@ -236,7 +248,7 @@ Drop them in `mods/`. Nothing else to configure.
 
 Three ways, and nothing else to set up:
 
-*   `"StartOnConnection": true` gives the quest to every player, once
+*   An assignment hands quests out on connection or as players enter given worlds, to each player or shared by a world or the whole server, once or again each time the last one ends
 *   The `GrantQuest` reward hands the next one over when a quest completes, in the same scope: a world quest's next step is the world's too
 *   `/oquest create player|world|universe <assetId>` from the console or in game
 
@@ -278,6 +290,10 @@ PostgreSQL, MySQL, MariaDB and SQLite are spoken natively. Drop the driver jar f
 
 ***
 
+## ⚠️ Upgrading to 4.0
+
+**`StartOnConnection` became an asset of its own.** A quest no longer says when it starts: list it in an assignment under `OpenQuests/Assignments/`, `{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": [...] }`. The field is no longer read, so a quest still carrying it is simply never handed out on connection. Players keep what they were already given and are not handed it a second time.
+
 ## ⚠️ Upgrading to 3.0
 
 3.0 is a breaking release. Read this before updating a live server.
@@ -312,7 +328,6 @@ A quest is a JSON asset:
 {
   "Type": "Composite",
   "TitleKey": "quest.basics.title",
-  "StartOnConnection": true,
   "QuestAssetIds": [
     "GatherSticks",
     { "Type": "Craft", "ItemToCraft": { "ItemId": "Weapon_Sword_Crude" }, "TargetQuantity": 1 }
@@ -325,6 +340,12 @@ A quest is a JSON asset:
 ```
 
 Each entry is either the id of an existing asset or a definition written on the spot, so a whole chain can live in one file.
+
+Who gets a quest, and when, is written beside it rather than in it, as an assignment under `OpenQuests/Assignments/`:
+
+```
+{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": ["Basics"] }
+```
 
 Titles and descriptions are optional. A quest with no title names itself from its own parameters, so a `Gather` quest reads _Gather 2 Sticks_ with nothing authored at all.
 

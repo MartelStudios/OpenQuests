@@ -1,0 +1,11 @@
+{
+  "Trigger": {
+    "Type": "PlayerConnect"
+  },
+  "Repeat": {
+    "Type": "AfterEnd"
+  },
+  "QuestAssetIds": [
+    "DailyChores"
+  ]
+}

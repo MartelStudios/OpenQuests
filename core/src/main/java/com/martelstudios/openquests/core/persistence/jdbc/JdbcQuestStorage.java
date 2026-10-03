@@ -2,6 +2,8 @@ package com.martelstudios.openquests.core.persistence.jdbc;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.AssignmentRecord;
+import com.martelstudios.openquests.core.models.AssignmentRecords;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.CodecJson;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
@@ -16,6 +18,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -58,6 +61,7 @@ public class JdbcQuestStorage implements QuestStorage {
     private String questPlayerTable;
     private String questIndexTable;
     private String playerTable;
+    private String assignmentTable;
 
     private String upsertQuestSql;
     private String upsertPlayerSql;
@@ -75,6 +79,7 @@ public class JdbcQuestStorage implements QuestStorage {
         questPlayerTable = prefix + "quest_player";
         questIndexTable = prefix + "quest_index";
         playerTable = prefix + "player";
+        assignmentTable = prefix + "quest_assignment";
 
         upsertQuestSql = buildUpsert(questTable, "id", "id, asset_id, state, data, updated_at, updated_by", "asset_id = ?, state = ?, data = ?, updated_at = ?, updated_by = ?");
         upsertPlayerSql = buildUpsert(playerTable, "player_id", "player_id, data, updated_at", "data = ?, updated_at = ?");
@@ -274,6 +279,82 @@ public class JdbcQuestStorage implements QuestStorage {
         });
     }
 
+    @Nonnull
+    @Override
+    public AssignmentRecords loadAssignments(@Nonnull String holderKey) {
+        return pool.with(connection -> {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT assignment_id, quest_asset_id, handed_count, last_at, occasion FROM " + assignmentTable + " WHERE holder_key = ?")) {
+                statement.setString(1, holderKey);
+
+                AssignmentRecords records = new AssignmentRecords();
+                try (ResultSet results = statement.executeQuery()) {
+                    while (results.next()) {
+                        records.put(results.getString(1), results.getString(2), new AssignmentRecord(results.getInt(3), results.getLong(4), results.getString(5)));
+                    }
+                }
+                return records;
+            }
+        });
+    }
+
+    /**
+     * The count doubles as the row's version: a server that read one count only writes over that
+     * same count, and an insert of a row another server inserted first collides on the key.
+     */
+    @Override
+    public boolean claimAssignment(@Nonnull String holderKey, @Nonnull String assignmentId, @Nonnull String questAssetId, @Nullable AssignmentRecord expected, @Nonnull AssignmentRecord next) {
+        return pool.with(connection -> {
+            if (expected == null) {
+                try (PreparedStatement insert = connection.prepareStatement("INSERT INTO " + assignmentTable + " (holder_key, assignment_id, quest_asset_id, handed_count, last_at, occasion) VALUES (?, ?, ?, ?, ?, ?)")) {
+                    insert.setString(1, holderKey);
+                    insert.setString(2, assignmentId);
+                    insert.setString(3, questAssetId);
+                    insert.setInt(4, next.getCount());
+                    insert.setLong(5, next.getLastAt().toEpochMilli());
+                    insert.setString(6, next.getOccasion());
+                    insert.executeUpdate();
+                    return true;
+                } catch (SQLException e) {
+                    if (isDuplicateKey(e)) return false;
+                    throw e;
+                }
+            }
+
+            try (PreparedStatement update = connection.prepareStatement("UPDATE " + assignmentTable + " SET handed_count = ?, last_at = ?, occasion = ? WHERE holder_key = ? AND assignment_id = ? AND quest_asset_id = ? AND handed_count = ?")) {
+                update.setInt(1, next.getCount());
+                update.setLong(2, next.getLastAt().toEpochMilli());
+                update.setString(3, next.getOccasion());
+                update.setString(4, holderKey);
+                update.setString(5, assignmentId);
+                update.setString(6, questAssetId);
+                update.setInt(7, expected.getCount());
+                return update.executeUpdate() == 1;
+            }
+        });
+    }
+
+    @Override
+    public void deleteAssignments(@Nonnull String holderKey) {
+        pool.with(connection -> {
+            execute(connection, "DELETE FROM " + assignmentTable + " WHERE holder_key = ?", holderKey);
+            return null;
+        });
+    }
+
+    /**
+     * Every database spells a key collision its own way: an integrity class state, the dedicated
+     * exception, or SQLite's constraint code in the message.
+     */
+    private static boolean isDuplicateKey(@Nonnull SQLException e) {
+        if (e instanceof SQLIntegrityConstraintViolationException) return true;
+
+        String state = e.getSQLState();
+        if (state != null && state.startsWith("23")) return true;
+
+        String message = e.getMessage();
+        return message != null && message.contains("SQLITE_CONSTRAINT");
+    }
+
     /**
      * The quest ids come from the link table, not the player row: a quest another server handed
      * them is linked there and nowhere else.
@@ -303,7 +384,7 @@ public class JdbcQuestStorage implements QuestStorage {
     @Override
     public void savePlayer(@Nonnull UUID playerId, @Nonnull PlayerQuestRecord record) {
         // The link table owns the ids; a copy here could only disagree with it
-        PlayerQuestRecord stored = new PlayerQuestRecord(Set.of(), record.getStartedOnConnection(), record.getPendingRewards(), record.getCompletions());
+        PlayerQuestRecord stored = new PlayerQuestRecord(Set.of(), record.getAssignments(), record.getPendingRewards(), record.getCompletions());
 
         pool.inTransaction(connection -> {
             writePlayer(connection, playerId, stored);
@@ -483,6 +564,15 @@ public class JdbcQuestStorage implements QuestStorage {
                     + "player_id VARCHAR(36) NOT NULL PRIMARY KEY, "
                     + "data " + text + " NOT NULL, "
                     + "updated_at BIGINT NOT NULL)");
+
+                statement.execute("CREATE TABLE IF NOT EXISTS " + assignmentTable + " ("
+                    + "holder_key VARCHAR(190) NOT NULL, "
+                    + "assignment_id VARCHAR(190) NOT NULL, "
+                    + "quest_asset_id VARCHAR(190) NOT NULL, "
+                    + "handed_count INTEGER NOT NULL, "
+                    + "last_at BIGINT NOT NULL, "
+                    + "occasion VARCHAR(255) NOT NULL, "
+                    + "PRIMARY KEY (holder_key, assignment_id, quest_asset_id))");
             }
 
             createIndex(connection, "idx_" + questPlayerTable + "_player", questPlayerTable, "player_id");

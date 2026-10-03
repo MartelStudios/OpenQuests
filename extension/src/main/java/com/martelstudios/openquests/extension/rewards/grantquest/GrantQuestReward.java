@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.extension.tags.OpenQuestsTags;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -63,7 +64,7 @@ public class GrantQuestReward extends QuestReward {
             } else {
                 // A quest its constraints refuse is dropped rather than retried: the grant is what
                 // was owed, and it happened
-                QuestProgressionService.get().assignQuest(createFrom(questAsset, sourceQuestId), playerId);
+                QuestProgressionService.get().assignQuest(createFrom(questAsset, sourceQuestId, source), playerId);
             }
         }
 
@@ -81,7 +82,7 @@ public class GrantQuestReward extends QuestReward {
     private static void handOnShared(@Nonnull AbstractQuestProgression<?> source, @Nonnull OpenQuestAsset asset, @Nonnull QuestScope scope) {
         if (isHandedOn(scope.getQuestIds(), source.getId(), asset.getId())) return;
 
-        AbstractQuestProgression<?> quest = createFrom(asset, source.getId());
+        AbstractQuestProgression<?> quest = createFrom(asset, source.getId(), source);
         QuestProgressionService.get().registerQuest(quest);
         scope.share(quest);
     }
@@ -103,11 +104,13 @@ public class GrantQuestReward extends QuestReward {
     /**
      * Told where it came from before it is registered, so everything that hears of it already
      * knows which completion opened it: once two quests share an asset, nothing else could tell.
+     * It carries on the origin of the quest paying, being part of the line that occasion opened.
      */
     @Nonnull
-    private static AbstractQuestProgression<?> createFrom(@Nonnull OpenQuestAsset asset, @Nonnull UUID sourceQuestId) {
+    private static AbstractQuestProgression<?> createFrom(@Nonnull OpenQuestAsset asset, @Nonnull UUID sourceQuestId, @Nullable AbstractQuestProgression<?> source) {
         AbstractQuestProgression<?> quest = asset.create();
         quest.addTag(OpenQuestsTags.GRANTED_BY_TAG, sourceQuestId.toString());
+        if (source != null) quest.setOrigin(source.getOrigin());
         return quest;
     }
 }

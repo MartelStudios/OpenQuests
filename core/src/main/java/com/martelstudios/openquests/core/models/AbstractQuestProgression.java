@@ -90,6 +90,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("Scope", QuestScope.CODEC), (quest, scope) -> quest.scope = scope, quest -> quest.scope)
                                                                                         .add()
+                                                                                        .append(new KeyedCodec<>("Origin", QuestOrigin.CODEC), (quest, origin) -> quest.origin = origin, quest -> quest.origin)
+                                                                                        .add()
                                                                                         .append(TAGS_CODEC, TAGS_SETTER, TAGS_GETTER)
                                                                                         .add()
                                                                                         .build();
@@ -115,6 +117,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nullable
     protected QuestScope scope;
+
+    /**
+     * Which assignment handed this quest out and on which occasion, carried down a chain.
+     * {@code null} for a quest no assignment handed out.
+     */
+    @Nullable
+    protected QuestOrigin origin;
 
     /**
      * Tags written on this instance, on top of those its asset declares, each with the values its
@@ -498,6 +507,25 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     public Q setScope(@Nullable QuestScope scope) {
         this.scope = scope;
+        markDirty();
+        return self();
+    }
+
+    /**
+     * @return which assignment handed this quest out and on which occasion, {@code null} for one
+     * no assignment handed out.
+     */
+    @Nullable
+    public QuestOrigin getOrigin() {
+        return origin;
+    }
+
+    /**
+     * Written before the quest is registered, by the assignment handing it out or by a chain
+     * passing its own on.
+     */
+    public Q setOrigin(@Nullable QuestOrigin origin) {
+        this.origin = origin;
         markDirty();
         return self();
     }
