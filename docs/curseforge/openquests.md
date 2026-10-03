@@ -248,7 +248,7 @@ Drop them in `mods/`. Nothing else to configure.
 
 Three ways, and nothing else to set up:
 
-*   An assignment hands quests out on connection, as players enter given worlds or on a schedule, to each player or shared by a world or the whole server, once or again each time the last one ends
+*   An assignment hands quests out on connection, as players enter given worlds or on a schedule, to each player or shared by a world, a group of worlds or the whole server, once or again each time the last one ends
 *   The `GrantQuest` reward hands the next one over when a quest completes, in the same scope: a world quest's next step is the world's too
 *   `/oquest create player|world|universe <assetId>` from the console or in game
 

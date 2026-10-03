@@ -7,6 +7,7 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.assignments.repeat.AssignmentRepeat;
@@ -18,6 +19,7 @@ import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
+import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
@@ -32,6 +34,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
 
 /**
  * Hands out what the {@link OpenQuestAssignment} assets ask for. Each part of an assignment does
@@ -168,6 +171,35 @@ public class QuestAssignmentService {
     }
 
     /**
+     * Every world the group gathers, open now, takes the quest up on its own thread; the player
+     * whose entry this is joins it there, being among its players only once in.
+     *
+     * @param gathers whether a world belongs to the group
+     * @param entered the world the occasion happens in, if the group gathers it
+     * @param joining the player entering it
+     * @return the group of worlds as a holder, its records and index under the group's key.
+     */
+    @Nonnull
+    public AssignmentHolder groupHolder(@Nonnull String group, @Nonnull Predicate<World> gathers, @Nullable World entered, @Nullable UUID joining) {
+        UUID enteredId = entered == null ? null : entered.getWorldConfig().getUuid();
+
+        return new SharedAssignmentHolder(storage, WorldQuestService.groupKey(group), () -> WorldQuestService.get().getGroupQuestIds(group), quest -> {
+            quest.setScope(new WorldsQuestScope(group));
+            WorldQuestService.get().addToGroup(group, quest.getId());
+
+            for (World world : Universe.get().getWorlds().values()) {
+                if (!gathers.test(world)) continue;
+
+                boolean joiningHere = joining != null && world.getWorldConfig().getUuid().equals(enteredId);
+                WorldQuestService.onThreadOf(world, () -> {
+                    WorldQuestService.get().addQuest(world, quest.getId());
+                    if (joiningHere) QuestProgressionService.get().joinQuest(quest, joining);
+                });
+            }
+        });
+    }
+
+    /**
      * Through the incoming holder: the player is not online yet, and what is written to their
      * stored data would be overwritten.
      */
@@ -189,6 +221,8 @@ public class QuestAssignmentService {
         World world = addPlayerToWorldEvent.getWorld();
 
         for (OpenQuestAssignment assignment : List.copyOf(OpenQuestAssignment.getAssetMap().getAssetMap().values())) {
+            assignment.getScope().onEnterWorld(assignment, playerRef.getUuid(), world);
+
             Occasion occasion = assignment.getTrigger().onEnterWorld(playerRef.getUuid(), player, world);
             if (occasion != null) evaluate(assignment, occasion);
         }

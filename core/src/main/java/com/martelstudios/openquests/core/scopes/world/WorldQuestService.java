@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,12 +41,26 @@ public class WorldQuestService {
     public static final String WORLD_INDEX_PREFIX = "world:";
 
     /**
+     * What a group of worlds' index is written under: the quests one assignment shares between
+     * every world it gathers.
+     */
+    public static final String GROUP_INDEX_PREFIX = "worlds:";
+
+    /**
      * Worlds being closed, which nothing is shared into any more: a quest failed on the way out
      * and paying with another quest would otherwise leave it behind in a world that is gone.
      */
     private static final Set<UUID> CLOSING = ConcurrentHashMap.newKeySet();
 
     private final QuestStorage storage;
+
+    /**
+     * The groups read back so far, by name. Unlike a world's, a group's index lives on no world,
+     * so it is kept here, and written out with the rest.
+     */
+    private final Map<String, QuestsRecord> groups = new ConcurrentHashMap<>();
+
+    private final Set<String> dirtyGroups = ConcurrentHashMap.newKeySet();
 
     public WorldQuestService(@Nonnull JavaPlugin plugin, @Nonnull QuestStorage storage) {
         this.storage = storage;
@@ -132,7 +147,52 @@ public class WorldQuestService {
     }
 
     /**
-     * Writes out the index of every world that changed, for the save pass and for shutdown.
+     * Runs the work on the world's own thread, the only one allowed to touch it: at once if
+     * already there, later otherwise.
+     */
+    public static void onThreadOf(@Nonnull World world, @Nonnull Runnable work) {
+        if (world.isInThread()) {
+            work.run();
+        } else {
+            world.execute(work);
+        }
+    }
+
+    /**
+     * @return the key a group of worlds sharing one quest is written under, named after the
+     * assignment gathering it.
+     */
+    @Nonnull
+    public static String groupKey(@Nonnull String group) {
+        return GROUP_INDEX_PREFIX + group;
+    }
+
+    /**
+     * @return the ids on that group's index, those that ended included, read back the first time.
+     */
+    @Nonnull
+    public Set<UUID> getGroupQuestIds(@Nonnull String group) {
+        return groupRecord(group).getAllIds();
+    }
+
+    /**
+     * Puts a quest in a group: the worlds it gathers take it up as they are entered.
+     */
+    public void addToGroup(@Nonnull String group, @Nonnull UUID questId) {
+        if (groupRecord(group).register(questId)) dirtyGroups.add(group);
+    }
+
+    /**
+     * Takes a quest out of a group, for one leaving for good.
+     */
+    public void removeFromGroup(@Nonnull String group, @Nonnull UUID questId) {
+        QuestsRecord record = groups.get(group);
+        if (record != null && record.unregister(questId)) dirtyGroups.add(group);
+    }
+
+    /**
+     * Writes out the index of every world and group that changed, for the save pass and for
+     * shutdown.
      */
     public void saveAll(boolean force) {
         for (World world : Universe.get().getWorlds().values()) {
@@ -143,6 +203,18 @@ public class WorldQuestService {
 
             storage.saveIndex(indexKey(world), store.questsRecord.getAllIds());
         }
+
+        for (String group : force ? Set.copyOf(groups.keySet()) : Set.copyOf(dirtyGroups)) {
+            dirtyGroups.remove(group);
+
+            QuestsRecord record = groups.get(group);
+            if (record != null) storage.saveIndex(groupKey(group), record.getAllIds());
+        }
+    }
+
+    @Nonnull
+    private QuestsRecord groupRecord(@Nonnull String group) {
+        return groups.computeIfAbsent(group, key -> new QuestsRecord(storage.loadIndex(groupKey(key))));
     }
 
     /**

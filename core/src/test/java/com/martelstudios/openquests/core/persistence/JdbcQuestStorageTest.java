@@ -10,6 +10,7 @@ import com.martelstudios.openquests.core.persistence.jdbc.SqlDialect;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
+import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,7 @@ class JdbcQuestStorageTest {
         AbstractQuestProgression.CODEC.register(TestQuestProgression.TYPE, TestQuestProgression.class, TestQuestProgression.CODEC);
         QuestReward.CODEC.register(TestQuestReward.TYPE, TestQuestReward.class, TestQuestReward.CODEC);
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
+        QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);
     }
 
     @BeforeEach
@@ -132,6 +134,24 @@ class JdbcQuestStorageTest {
         assertNotNull(read);
         assertTrue(read.getScope() instanceof WorldQuestScope);
         assertEquals(Set.of(lair, arena), ((WorldQuestScope) read.getScope()).getWorlds());
+    }
+
+    @Test
+    void aQuestAGroupSharesKeepsItsGroupAndTheWorldsItReached() {
+        UUID arena = UUID.randomUUID();
+        TestQuestProgression quest = quest("ArenaGoal", UUID.randomUUID());
+        WorldsQuestScope scope = new WorldsQuestScope("ArenaTogether");
+        scope.getWorlds().add(arena);
+        quest.setScope(scope);
+
+        storage.saveProgressions(List.of(quest));
+
+        AbstractQuestProgression<?> read = storage.loadProgression(quest.getId());
+
+        assertNotNull(read);
+        assertTrue(read.getScope() instanceof WorldsQuestScope);
+        assertEquals("ArenaTogether", ((WorldsQuestScope) read.getScope()).getGroup());
+        assertEquals(Set.of(arena), ((WorldsQuestScope) read.getScope()).getWorlds());
     }
 
     @Test

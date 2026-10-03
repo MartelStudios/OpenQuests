@@ -55,13 +55,7 @@ public class WorldAssignmentScope extends AssignmentScope {
             if (occasion.isTimed() && service.isSettled(WorldQuestService.indexKey(world), assignment, key)) continue;
 
             UUID joining = worldId.equals(entered) ? occasion.getPlayerId() : null;
-            Runnable offer = () -> service.offerAll(assignment, service.worldHolder(world, joining), key, occasion.isTimed());
-
-            if (world.isInThread()) {
-                offer.run();
-            } else {
-                world.execute(offer);
-            }
+            WorldQuestService.onThreadOf(world, () -> service.offerAll(assignment, service.worldHolder(world, joining), key, occasion.isTimed()));
         }
     }
 

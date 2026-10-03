@@ -81,6 +81,7 @@ several ways.
 | | `Schedule` | on the date and time `At` (ISO, with its offset) and, given `Every` (an ISO duration), on every period from it |
 | `Scope` | `Player` (default) | a quest of their own for the player the occasion concerns, theirs to keep |
 | | `World` | one quest per world, shared by everyone inside: the world entered, or each open world its own `WorldNamePattern` names |
+| | `Worlds` | one quest shared by a whole group of worlds: those its own `WorldNamePattern` names, or those its trigger happens in |
 | | `Universe` | one quest for the whole server |
 | `Repeat` | `Once` (default) | once per occasion |
 | | `AfterEnd` | again on the next occasion once what the last one opened has ended, done, failed or given up |
@@ -117,8 +118,14 @@ database never hand the same occasion out twice. The quest carries its `Origin` 
 and occasion), which `GrantQuest` passes down its chain: everything one occasion opened is one
 line, the line `AfterEnd` waits for and `Replace` fails.
 
-An assignment that cannot mean anything is refused as it loads: a malformed pattern, or a `World`
-scope naming no worlds under a trigger that happens in none.
+A `Worlds` group is named after its assignment and kept as an index of its own, `worlds:<id>`, next
+to the worlds'. Each world of the group takes its running quests up as someone enters it, whatever
+the trigger, so entering a second arena joins the quest the first one started, and a schedule
+reaches arenas opened mid-period. A world of the group closing does not end the quest while
+another is open.
+
+An assignment that cannot mean anything is refused as it loads: a malformed pattern, a malformed
+date, or a `World` or `Worlds` scope naming no worlds under a trigger that happens in none.
 
 A quest gating on another one is a `QuestState` quest, usually as the child of a composite. Since a
 quest holds a state rather than a boolean, "not yet" and "failed" stay distinct, which is what
@@ -148,7 +155,8 @@ the outside, from `core/scopes/`, and each scope package is self-contained: the 
 never depends on it, only the reverse.
 
 A scope sharing a quest writes itself on it as `getScope()`, data the quest never acts on: a
-`QuestScope` registered under a `"Type"` (`World` with its worlds, `Universe`), `null` for a quest
+`QuestScope` registered under a `"Type"` (`World` with its worlds, `Worlds` with its group as well,
+`Universe`), `null` for a quest
 its players hold on their own. Each kind says how a quest it holds is shared and let go of, so
 `GrantQuest` keeps a chain in its scope and a quest leaving for good leaves its indexes without
 anything telling the kinds apart. A plugin adds its own by registering it on `QuestScope.CODEC`.

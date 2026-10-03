@@ -68,6 +68,14 @@ public abstract class AssignmentTrigger {
     }
 
     /**
+     * @return whether its occasions happen in that world, which is how a scope naming no worlds
+     * of its own knows the ones it gathers.
+     */
+    public boolean happensIn(@Nonnull World world) {
+        return false;
+    }
+
+    /**
      * @return what is wrong with this trigger, {@code null} when nothing is, so the assignment is
      * refused as it loads rather than doing nothing in game.
      */

@@ -5,9 +5,11 @@ import com.martelstudios.openquests.core.assignments.scope.AssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.PlayerAssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.UniverseAssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.WorldAssignmentScope;
+import com.martelstudios.openquests.core.assignments.scope.WorldsAssignmentScope;
 import com.martelstudios.openquests.core.assignments.trigger.AssignmentTrigger;
 import com.martelstudios.openquests.core.assignments.trigger.PlayerConnectTrigger;
 import com.martelstudios.openquests.core.assignments.trigger.PlayerEnterWorldTrigger;
+import com.martelstudios.openquests.core.assignments.trigger.ScheduleTrigger;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -55,6 +57,13 @@ class OpenQuestAssignmentTest {
     @Test
     void enteringOneWorldCanStartAQuestInOthers() {
         assertNull(assignment(new PlayerEnterWorldTrigger("Hub"), new WorldAssignmentScope("Arena_.*")).findInconsistency());
+    }
+
+    @Test
+    void aGroupOfWorldsIsNamedByItsPatternOrByTheWorldsItsTriggerHappensIn() {
+        assertNull(assignment(new PlayerEnterWorldTrigger("Arena_.*"), new WorldsAssignmentScope(null)).findInconsistency());
+        assertNull(assignment(new ScheduleTrigger("2026-10-04T00:00:00Z", "P1D"), new WorldsAssignmentScope("Arena_.*")).findInconsistency());
+        assertNotNull(assignment(new ScheduleTrigger("2026-10-04T00:00:00Z", "P1D"), new WorldsAssignmentScope(null)).findInconsistency());
     }
 
     @Test

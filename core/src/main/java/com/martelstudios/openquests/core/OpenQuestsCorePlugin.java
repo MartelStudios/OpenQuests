@@ -21,6 +21,7 @@ import com.martelstudios.openquests.core.assignments.scope.AssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.PlayerAssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.UniverseAssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.WorldAssignmentScope;
+import com.martelstudios.openquests.core.assignments.scope.WorldsAssignmentScope;
 import com.martelstudios.openquests.core.assignments.trigger.AssignmentTrigger;
 import com.martelstudios.openquests.core.assignments.trigger.PlayerConnectTrigger;
 import com.martelstudios.openquests.core.assignments.trigger.PlayerEnterWorldTrigger;
@@ -47,6 +48,7 @@ import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestStoreResource;
+import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.services.QuestDeadlineService;
 import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -130,6 +132,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         worldQuestService = new WorldQuestService(this, questStorage);
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
+        QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);
         QuestScope.CODEC.register(UniverseQuestScope.TYPE, UniverseQuestScope.class, UniverseQuestScope.CODEC);
 
         // A quest leaving for good leaves whatever shared it, which only its scope knows how to undo
@@ -146,6 +149,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         AssignmentTrigger.CODEC.register(ScheduleTrigger.TYPE, ScheduleTrigger.class, ScheduleTrigger.CODEC);
         AssignmentScope.CODEC.register(PlayerAssignmentScope.TYPE, PlayerAssignmentScope.class, PlayerAssignmentScope.CODEC);
         AssignmentScope.CODEC.register(WorldAssignmentScope.TYPE, WorldAssignmentScope.class, WorldAssignmentScope.CODEC);
+        AssignmentScope.CODEC.register(WorldsAssignmentScope.TYPE, WorldsAssignmentScope.class, WorldsAssignmentScope.CODEC);
         AssignmentScope.CODEC.register(UniverseAssignmentScope.TYPE, UniverseAssignmentScope.class, UniverseAssignmentScope.CODEC);
         AssignmentRepeat.CODEC.register(OnceRepeat.TYPE, OnceRepeat.class, OnceRepeat.CODEC);
         AssignmentRepeat.CODEC.register(AfterEndRepeat.TYPE, AfterEndRepeat.class, AfterEndRepeat.CODEC);

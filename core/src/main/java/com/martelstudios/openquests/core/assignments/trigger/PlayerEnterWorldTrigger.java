@@ -48,6 +48,11 @@ public class PlayerEnterWorldTrigger extends AssignmentTrigger {
     }
 
     @Override
+    public boolean happensIn(@Nonnull World world) {
+        return matches(world.getName());
+    }
+
+    @Override
     public boolean hasPlace() {
         return true;
     }
