@@ -8,6 +8,7 @@ import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.utils.WorldNamePattern;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

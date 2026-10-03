@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.utils.WorldNamePattern;
 import org.joml.Vector3d;
 
 import javax.annotation.Nonnull;

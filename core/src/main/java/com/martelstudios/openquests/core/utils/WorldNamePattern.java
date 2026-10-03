@@ -1,4 +1,4 @@
-package com.martelstudios.openquests.extension.constraints.location;
+package com.martelstudios.openquests.core.utils;
 
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
@@ -11,11 +11,11 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * A world name pattern as the constraints of this package read it: the whole name must match, the
- * way {@code EnterWorld} reads its own. Compiled once as it is decoded, so a player moving is only
- * ever a match against a short string.
+ * A world name pattern as every asset naming worlds reads it: the whole name must match, so
+ * {@code Dungeon} does not match {@code MyDungeonWorld} and {@code .*Dungeon.*} does. Compiled once
+ * as it is decoded, so a player moving is only ever a match against a short string.
  */
-final class WorldNamePattern {
+public final class WorldNamePattern {
 
     @Nonnull
     private final String source;
@@ -37,7 +37,7 @@ final class WorldNamePattern {
      * boot with its name on it rather than by a codec that cannot say which one.
      */
     @Nonnull
-    static WorldNamePattern of(@Nonnull String source) {
+    public static WorldNamePattern of(@Nonnull String source) {
         try {
             return new WorldNamePattern(source, Pattern.compile(source), null);
         } catch (PatternSyntaxException e) {
@@ -45,8 +45,11 @@ final class WorldNamePattern {
         }
     }
 
+    /**
+     * @return the pattern as the asset wrote it, for saving it back and for showing it.
+     */
     @Nonnull
-    String getSource() {
+    public String getSource() {
         return source;
     }
 
@@ -54,11 +57,14 @@ final class WorldNamePattern {
      * @return why the pattern does not compile, {@code null} if it does.
      */
     @Nullable
-    String getError() {
+    public String getError() {
         return error;
     }
 
-    boolean matches(@Nonnull String worldName) {
+    /**
+     * @return whether the whole name matches. Never for a pattern that does not compile.
+     */
+    public boolean matches(@Nonnull String worldName) {
         return compiled != null && compiled.matcher(worldName).matches();
     }
 
@@ -67,13 +73,13 @@ final class WorldNamePattern {
      *
      * @return {@code false} for a player offline or between worlds, who is in none of them.
      */
-    boolean matchesWorldOf(@Nonnull UUID playerId) {
+    public boolean matchesWorldOf(@Nonnull UUID playerId) {
         String worldName = worldNameOf(playerId);
         return worldName != null && matches(worldName);
     }
 
     @Nullable
-    static String worldNameOf(@Nonnull UUID playerId) {
+    private static String worldNameOf(@Nonnull UUID playerId) {
         PlayerRef player = Universe.get().getPlayer(playerId);
         if (player == null) return null;
 
