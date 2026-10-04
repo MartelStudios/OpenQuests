@@ -1,0 +1,16 @@
+{
+  "Type": "KillNpc",
+  "Categories": ["Dungeon", "Event"],
+  "TitleKey": "quest.goblin-lair-daily-hunt.title",
+  "DescriptionKey": "quest.goblin-lair-daily-hunt.description",
+  "TargetQuantity": 50,
+  "NpcGroupId": "Goblin_No_Bosses",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
+}

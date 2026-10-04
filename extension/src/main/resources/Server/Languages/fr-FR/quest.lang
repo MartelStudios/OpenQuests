@@ -131,9 +131,6 @@ chores-chest.description=Ouvrez un coffre en bois pour y ranger la récolte.
 great-felling.title=La Grande Coupe
 great-felling.description=Abattez 500 troncs d'arbre, tous ensemble.
 
-repel-trorks.title=Repousser les Trorks
-repel-trorks.description=Tuez des Trorks, tous ensemble, avant qu'il ne soit trop tard.
-
 first-blood.title=Premier sang
 first-blood.description=Un autre joueur est tombé de votre main.
 
@@ -144,8 +141,29 @@ flawless-never-failed.title=Ne jamais l'échouer
 
 silent-step.title=Pas de loup
 silent-step.description=Parcourez cinq cents mètres au pas, sans un bruit.
-woodpile.title=Tas de bois
-woodpile.description=Ramassez vingt troncs d'arbre qui traînent au sol.
+lumberjack.title=Bûcheron
+lumberjack.description=Abattez des arbres et rapportez vingt troncs.
+
+goblin-lair-rats.title=Dératiser les galeries
+goblin-lair-rats.description=Les premières galeries grouillent de rats. Faites place nette avant de descendre plus loin.
+goblin-lair-tunnels.title=Les tunnels des gobelins
+goblin-lair-tunnels.description=Les gobelins ont creusé leur repaire au cœur de la roche. Frayez-vous un chemin à travers leurs rangs.
+goblin-lair-lookout.title=Atteindre le surplomb
+goblin-lair-lookout.description=Trouvez la corniche qui domine l'antre de l'ogre.
+goblin-lair-ogre.title=Abattre l'Ogre gobelin
+goblin-lair-ogre.description=Il vous a vu, lui aussi. Terrassez la brute.
+goblin-lair-duke.title=Le Duc gobelin
+goblin-lair-duke.description=Au-delà de l'ogre s'étend la salle du duc. Brisez sa garde et mettez fin à son règne.
+goblin-lair-guard.title=Briser la garde du duc
+goblin-lair-guard.description=Abattez les gobelins qui accourent auprès de leur seigneur.
+goblin-lair-duke-fall.title=Vaincre le Duc gobelin
+goblin-lair-duke-fall.description=Faites-le tomber de son trône, pour de bon.
+goblin-lair-spiders.title=Écraser les araignées
+goblin-lair-spiders.description=Des araignées rôdent dans tout l'antre. Réduisez leur nombre.
+goblin-lair-torches.title=Éclairer le chemin
+goblin-lair-torches.description=Jalonnez votre route de torches à travers les galeries obscures.
+goblin-lair-daily-hunt.title=La battue du jour
+goblin-lair-daily-hunt.description=Les galeries se remplissent aussi vite qu'on les vide. La battue du jour : cinquante gobelins, où que s'ouvre le repaire.
 
 category.tutorial=Tutoriel
 category.survival=Survie
@@ -154,3 +172,5 @@ category.chores=Corvées
 category.event=Événement
 category.achievement=Haut fait
 category.timed=Chronométré
+category.dungeon=Donjon
+category.side-quest=Quête secondaire

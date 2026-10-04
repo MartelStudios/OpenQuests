@@ -1,0 +1,37 @@
+{
+  "Type": "Composite",
+  "Categories": ["Dungeon"],
+  "TitleKey": "quest.goblin-lair-duke.title",
+  "DescriptionKey": "quest.goblin-lair-duke.description",
+  "AutoTrack": true,
+  "QuestAssetIds": [
+    {
+      "Type": "KillNpc",
+      "TitleKey": "quest.goblin-lair-guard.title",
+      "DescriptionKey": "quest.goblin-lair-guard.description",
+      "TargetQuantity": 4,
+      "AnnounceOutcome": false,
+      "NpcGroupId": "Goblin_No_Bosses"
+    },
+    {
+      "Type": "KillNpc",
+      "TitleKey": "quest.goblin-lair-duke-fall.title",
+      "DescriptionKey": "quest.goblin-lair-duke-fall.description",
+      "TargetQuantity": 1,
+      "AnnounceOutcome": false,
+      "NpcGroupId": {
+        "IncludeRoles": [
+          "Goblin_Duke*"
+        ]
+      }
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 5,
+      "AutoClaim": false
+    }
+  ]
+}

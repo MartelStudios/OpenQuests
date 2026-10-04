@@ -1,0 +1,18 @@
+{
+  "Type": "KillNpc",
+  "Categories": ["Dungeon"],
+  "TitleKey": "quest.goblin-lair-tunnels.title",
+  "DescriptionKey": "quest.goblin-lair-tunnels.description",
+  "TargetQuantity": 12,
+  "AutoTrack": true,
+  "NpcGroupId": "Goblin_No_Bosses",
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinLairLookout"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

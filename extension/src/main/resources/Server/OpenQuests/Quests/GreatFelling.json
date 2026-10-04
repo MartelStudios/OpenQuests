@@ -1,6 +1,8 @@
 {
   "Type": "BreakBlock",
-  "Categories": ["Event"],
+  "Categories": [
+    "Event"
+  ],
   "TitleKey": "quest.great-felling.title",
   "DescriptionKey": "quest.great-felling.description",
   "TargetQuantity": 500,
@@ -12,7 +14,7 @@
   "Constraints": [
     {
       "Type": "MinPlayersOnline",
-      "Count": 3
+      "Count": 2
     },
     {
       "Type": "Deadline",
