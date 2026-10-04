@@ -1,17 +1,13 @@
 package com.martelstudios.openquests.core.assignments.scope;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.assignments.Occasion;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
 import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
-import com.martelstudios.openquests.core.assignments.trigger.AssignmentTrigger;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.utils.WorldNamePattern;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,22 +18,16 @@ import java.util.UUID;
  * the worlds the pattern names, or those its trigger happens in. Each world takes the group's
  * running quests up as it is entered, whatever the trigger.
  */
-public class WorldsAssignmentScope extends AssignmentScope {
+public class WorldsAssignmentScope extends AbstractWorldAssignmentScope {
 
     public static final String TYPE = "Worlds";
 
-    public static final BuilderCodec<WorldsAssignmentScope> CODEC = BuilderCodec.builder(WorldsAssignmentScope.class, WorldsAssignmentScope::new, AssignmentScope.BASE_CODEC)
-                                                                                .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING), (scope, pattern) -> scope.worldNamePattern = pattern == null ? null : WorldNamePattern.of(pattern), scope -> scope.worldNamePattern == null ? null : scope.worldNamePattern.getSource())
-                                                                                .add()
-                                                                                .build();
-
-    @Nullable
-    protected WorldNamePattern worldNamePattern;
+    public static final BuilderCodec<WorldsAssignmentScope> CODEC = BuilderCodec.builder(WorldsAssignmentScope.class, WorldsAssignmentScope::new, AbstractWorldAssignmentScope.BASE_CODEC).build();
 
     public WorldsAssignmentScope() {}
 
     public WorldsAssignmentScope(@Nullable String worldNamePattern) {
-        this.worldNamePattern = worldNamePattern == null ? null : WorldNamePattern.of(worldNamePattern);
+        super(worldNamePattern);
     }
 
     /**
@@ -78,13 +68,5 @@ public class WorldsAssignmentScope extends AssignmentScope {
             WorldQuestService.get().addQuest(world, questId);
             QuestProgressionService.get().joinQuest(quest, playerId);
         }
-    }
-
-    @Nullable
-    @Override
-    public String findInconsistency(@Nonnull AssignmentTrigger trigger) {
-        if (worldNamePattern != null && worldNamePattern.getError() != null) return "WorldNamePattern does not compile: " + worldNamePattern.getError();
-        if (worldNamePattern == null && !trigger.hasPlace()) return "the Worlds scope needs a WorldNamePattern under a trigger happening in no world";
-        return null;
     }
 }

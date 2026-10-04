@@ -31,7 +31,7 @@ public class NearPositionConstraint extends QuestConstraint {
                                                                                  .append(new KeyedCodec<>("Radius", Codec.DOUBLE, true), (constraint, radius) -> constraint.radius = radius, constraint -> Double.valueOf(constraint.radius))
                                                                                  .addValidator(Validators.greaterThan(0.0))
                                                                                  .add()
-                                                                                 .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING), (constraint, pattern) -> constraint.worldNamePattern = WorldNamePattern.of(pattern), constraint -> constraint.worldNamePattern == null ? null : constraint.worldNamePattern.getSource())
+                                                                                 .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC), (constraint, pattern) -> constraint.worldNamePattern = pattern, constraint -> constraint.worldNamePattern)
                                                                                  .add()
                                                                                  .build();
 

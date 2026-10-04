@@ -1,6 +1,5 @@
 package com.martelstudios.openquests.extension.constraints.location;
 
-import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
@@ -22,7 +21,7 @@ import java.util.UUID;
 public class InWorldConstraint extends QuestConstraint {
 
     public static final BuilderCodec<InWorldConstraint> CODEC = BuilderCodec.builder(InWorldConstraint.class, InWorldConstraint::new, QuestConstraint.BASE_CODEC)
-                                                                            .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING, true), (constraint, pattern) -> constraint.worldNamePattern = WorldNamePattern.of(pattern), constraint -> constraint.worldNamePattern == null ? null : constraint.worldNamePattern.getSource())
+                                                                            .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC, true), (constraint, pattern) -> constraint.worldNamePattern = pattern, constraint -> constraint.worldNamePattern)
                                                                             .addValidator(Validators.nonNull())
                                                                             .add()
                                                                             .append(new KeyedCodec<>("OnLeave", new EnumCodec<>(OnLeave.class)), (constraint, onLeave) -> constraint.onLeave = onLeave, constraint -> constraint.onLeave)

@@ -1,6 +1,5 @@
 package com.martelstudios.openquests.core.assignments.trigger;
 
-import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -21,7 +20,7 @@ public class PlayerEnterWorldTrigger extends AssignmentTrigger {
     public static final String TYPE = "PlayerEnterWorld";
 
     public static final BuilderCodec<PlayerEnterWorldTrigger> CODEC = BuilderCodec.builder(PlayerEnterWorldTrigger.class, PlayerEnterWorldTrigger::new, AssignmentTrigger.BASE_CODEC)
-                                                                                  .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING), (trigger, pattern) -> trigger.worldNamePattern = pattern == null ? null : WorldNamePattern.of(pattern), trigger -> trigger.worldNamePattern == null ? null : trigger.worldNamePattern.getSource())
+                                                                                  .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC), (trigger, pattern) -> trigger.worldNamePattern = pattern, trigger -> trigger.worldNamePattern)
                                                                                   .add()
                                                                                   .build();
 
@@ -31,7 +30,7 @@ public class PlayerEnterWorldTrigger extends AssignmentTrigger {
     public PlayerEnterWorldTrigger() {}
 
     public PlayerEnterWorldTrigger(@Nullable String worldNamePattern) {
-        this.worldNamePattern = worldNamePattern == null ? null : WorldNamePattern.of(worldNamePattern);
+        this.worldNamePattern = WorldNamePattern.ofNullable(worldNamePattern);
     }
 
     /**
@@ -60,7 +59,6 @@ public class PlayerEnterWorldTrigger extends AssignmentTrigger {
     @Nullable
     @Override
     public String findInconsistency() {
-        if (worldNamePattern == null || worldNamePattern.getError() == null) return null;
-        return "WorldNamePattern does not compile: " + worldNamePattern.getError();
+        return WorldNamePattern.findError(worldNamePattern);
     }
 }

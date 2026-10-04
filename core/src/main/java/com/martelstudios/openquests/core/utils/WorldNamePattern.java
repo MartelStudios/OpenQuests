@@ -1,5 +1,7 @@
 package com.martelstudios.openquests.core.utils;
 
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.function.FunctionCodec;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -16,6 +18,12 @@ import java.util.regex.PatternSyntaxException;
  * as it is decoded, so a player moving is only ever a match against a short string.
  */
 public final class WorldNamePattern {
+
+    /**
+     * Reads the pattern the way {@link #of} does, so a malformed one decodes too and is refused
+     * where the asset holding it can be named.
+     */
+    public static final Codec<WorldNamePattern> CODEC = new FunctionCodec<>(Codec.STRING, WorldNamePattern::of, WorldNamePattern::getSource);
 
     @Nonnull
     private final String source;
@@ -43,6 +51,23 @@ public final class WorldNamePattern {
         } catch (PatternSyntaxException e) {
             return new WorldNamePattern(source, null, e.getMessage());
         }
+    }
+
+    /**
+     * @return the pattern, {@code null} for no source: the many places a pattern is optional.
+     */
+    @Nullable
+    public static WorldNamePattern ofNullable(@Nullable String source) {
+        return source == null ? null : of(source);
+    }
+
+    /**
+     * @return why that pattern does not compile, worded for an asset refused over it, {@code null}
+     * when it does or when there is none.
+     */
+    @Nullable
+    public static String findError(@Nullable WorldNamePattern pattern) {
+        return pattern == null || pattern.error == null ? null : "WorldNamePattern does not compile: " + pattern.error;
     }
 
     /**
