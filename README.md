@@ -128,6 +128,13 @@ closing, wait in its index for the next one entered, and end on their own terms 
 An assignment that cannot mean anything is refused as it loads: a malformed pattern, a malformed
 date, or a `World` or `Worlds` scope naming no worlds under a trigger that happens in none.
 
+Each part is a type a plugin can add to, registered on `AssignmentTrigger.CODEC`,
+`AssignmentScope.CODEC` or `AssignmentRepeat.CODEC`. A trigger turns what happens into an
+`Occasion`; a scope picks among the `AssignmentTargets` it is given (the player concerned, every
+player online, a world, a group, the server) and never reaches them itself, the thread and the
+periods already settled being taken care of behind; a repeat decides on an `AssignmentHistory`,
+which reads the line off the holder only when asked.
+
 A quest gating on another one is a `QuestState` quest, usually as the child of a composite. Since a
 quest holds a state rather than a boolean, "not yet" and "failed" stay distinct, which is what
 lets a composite fail rather than hang.

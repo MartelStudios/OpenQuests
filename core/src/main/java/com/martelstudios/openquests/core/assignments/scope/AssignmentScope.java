@@ -3,6 +3,7 @@ package com.martelstudios.openquests.core.assignments.scope;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.martelstudios.openquests.core.assignments.AssignmentTargets;
 import com.martelstudios.openquests.core.assignments.Occasion;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
 import com.martelstudios.openquests.core.assignments.trigger.AssignmentTrigger;
@@ -12,9 +13,8 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
- * Who an assignment hands its quests to, given an occasion: the player it concerns, a world, the
- * server. Each kind finds its holders, reaches each on the thread allowed to touch it, and says
- * what tells one hand-out to a holder from the next.
+ * Who an assignment hands its quests to, given an occasion: the player it concerns, a world, a
+ * group of worlds, the server. Each kind picks its holders among the targets it is given.
  */
 public abstract class AssignmentScope {
 
@@ -30,10 +30,10 @@ public abstract class AssignmentScope {
     public static final BuilderCodec<AssignmentScope> BASE_CODEC = BuilderCodec.abstractBuilder(AssignmentScope.class).build();
 
     /**
-     * Offers the assignment's quests to every holder this occasion concerns, through
-     * {@link com.martelstudios.openquests.core.assignments.QuestAssignmentService#offerAll}.
+     * Picks among the targets every holder this occasion concerns, each of which is then offered
+     * the assignment's quests.
      */
-    public abstract void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion);
+    public abstract void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion, @Nonnull AssignmentTargets targets);
 
     /**
      * Called on every world entry, whatever the trigger: a scope sharing quests between worlds

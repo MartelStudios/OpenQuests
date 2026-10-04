@@ -2,9 +2,9 @@ package com.martelstudios.openquests.core.assignments.scope;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.martelstudios.openquests.core.assignments.AssignmentTargets;
 import com.martelstudios.openquests.core.assignments.Occasion;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
-import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
@@ -44,14 +44,9 @@ public class WorldsAssignmentScope extends AbstractWorldAssignmentScope {
      * apart: entering a second world of the group joins the quest the first one started.
      */
     @Override
-    public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion) {
-        QuestAssignmentService service = QuestAssignmentService.get();
-        String key = occasion.timeKey();
-
-        if (occasion.isTimed() && service.isSettled(WorldGroupIndex.keyOf(assignment.getId()), assignment, key)) return;
-
+    public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion, @Nonnull AssignmentTargets targets) {
         boolean entersGroup = occasion.getWorld() != null && gathers(assignment, occasion.getWorld());
-        service.offerAll(assignment, service.groupHolder(assignment.getId(), entersGroup ? occasion.getPlayerId() : null), key, occasion.isTimed());
+        targets.group(assignment.getId(), entersGroup ? occasion.getPlayerId() : null);
     }
 
     /**

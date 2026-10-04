@@ -3,10 +3,9 @@ package com.martelstudios.openquests.core.assignments.scope;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.martelstudios.openquests.core.assignments.AssignmentTargets;
 import com.martelstudios.openquests.core.assignments.Occasion;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
-import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
-import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,21 +30,15 @@ public class WorldAssignmentScope extends AbstractWorldAssignmentScope {
     }
 
     /**
-     * Each world on its own thread, the only one allowed to touch it. The player whose entry this
-     * is joins a quest created for the world they enter, being among its players only once in.
+     * The player whose entry this is joins a quest created for the world they enter.
      */
     @Override
-    public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion) {
-        QuestAssignmentService service = QuestAssignmentService.get();
-        String key = occasion.timeKey();
+    public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion, @Nonnull AssignmentTargets targets) {
         UUID entered = occasion.getWorld() == null ? null : occasion.getWorld().getWorldConfig().getUuid();
 
-        for (World world : targets(occasion)) {
-            UUID worldId = world.getWorldConfig().getUuid();
-            if (occasion.isTimed() && service.isSettled(WorldQuestService.indexKey(world), assignment, key)) continue;
-
-            UUID joining = worldId.equals(entered) ? occasion.getPlayerId() : null;
-            WorldQuestService.onThreadOf(world, () -> service.offerAll(assignment, service.worldHolder(world, joining), key, occasion.isTimed()));
+        for (World world : worldsReached(occasion)) {
+            boolean entering = world.getWorldConfig().getUuid().equals(entered);
+            targets.world(world, entering ? occasion.getPlayerId() : null);
         }
     }
 
@@ -54,7 +47,7 @@ public class WorldAssignmentScope extends AbstractWorldAssignmentScope {
      * every open world it names otherwise: one opening later is reached by the next occasion.
      */
     @Nonnull
-    private List<World> targets(@Nonnull Occasion occasion) {
+    private List<World> worldsReached(@Nonnull Occasion occasion) {
         World place = occasion.getWorld();
 
         if (worldNamePattern == null) return place == null ? List.of() : List.of(place);
