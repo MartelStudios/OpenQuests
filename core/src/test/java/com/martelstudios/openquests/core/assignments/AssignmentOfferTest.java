@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -98,6 +99,29 @@ class AssignmentOfferTest {
         assertTrue(failed.isEmpty());
     }
 
+    @Test
+    void aClaimAnotherServerWonIsDecidedOnceMoreOnWhatItWrote() {
+        OpenQuestAssignment assignment = assignment(new OnceRepeat());
+        FakeHolder holder = new FakeHolder();
+        holder.shared = true;
+        holder.rival = AssignmentRecord.next(null, "once", Instant.now());
+
+        assertTrue(offer.offer(assignment, asset, holder, "once", false));
+
+        assertEquals(1, holder.handOuts);
+        assertTrue(holder.quests.isEmpty());
+    }
+
+    @Test
+    void aPlayerRefusedIsNotAskedTwice() {
+        OpenQuestAssignment assignment = assignment(new OnceRepeat());
+        FakeHolder holder = new FakeHolder();
+        holder.refusing = true;
+
+        assertFalse(offer.offer(assignment, asset, holder, "once", false));
+        assertEquals(1, holder.handOuts);
+    }
+
     private static OpenQuestAssignment assignment(AssignmentRepeat repeat) {
         OpenQuestAssignment assignment = new OpenQuestAssignment();
         assignment.id = "Daily";
@@ -119,13 +143,16 @@ class AssignmentOfferTest {
 
     /**
      * A holder that takes whatever it is handed unless told to refuse, every quest running until
-     * the test says otherwise.
+     * the test says otherwise. A shared one may find a rival server wrote its record first.
      */
     private static final class FakeHolder implements AssignmentHolder {
         private final Map<String, AssignmentRecord> records = new HashMap<>();
         private final List<AbstractQuestProgression<?>> quests = new ArrayList<>();
         private final Set<UUID> running = new HashSet<>();
         private boolean refusing;
+        private boolean shared;
+        private AssignmentRecord rival;
+        private int handOuts;
 
         @Nonnull
         @Override
@@ -152,12 +179,23 @@ class AssignmentOfferTest {
 
         @Override
         public boolean handOut(@Nonnull AbstractQuestProgression<?> quest, @Nonnull String assignmentId, @Nonnull String questAssetId, @Nullable AssignmentRecord expected, @Nonnull AssignmentRecord next) {
+            handOuts++;
             if (refusing) return false;
+            if (rival != null) {
+                records.put(assignmentId + "/" + questAssetId, rival);
+                rival = null;
+                return false;
+            }
 
             records.put(assignmentId + "/" + questAssetId, next);
             quests.add(quest);
             running.add(quest.getId());
             return true;
+        }
+
+        @Override
+        public boolean refresh() {
+            return shared;
         }
     }
 }

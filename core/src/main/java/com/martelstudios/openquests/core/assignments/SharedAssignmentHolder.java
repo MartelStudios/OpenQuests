@@ -2,9 +2,7 @@ package com.martelstudios.openquests.core.assignments;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
-import com.martelstudios.openquests.core.models.AssignmentRecords;
 import com.martelstudios.openquests.core.models.QuestScope;
-import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
@@ -16,13 +14,13 @@ import java.util.UUID;
 
 /**
  * A holder many players share, a world, a group of worlds or the server, whose records live in a
- * store of their own and are written conditionally: servers sharing one never both hand the same
- * occasion out.
+ * store of their own, kept in memory and written conditionally: servers sharing one never both
+ * hand the same occasion out.
  */
 public final class SharedAssignmentHolder implements AssignmentHolder {
 
     @Nonnull
-    private final QuestStorage storage;
+    private final SharedAssignmentRecords records;
 
     @Nonnull
     private final String key;
@@ -32,9 +30,6 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
 
     @Nullable
     private final UUID joining;
-
-    @Nullable
-    private AssignmentRecords records;
 
     /**
      * The quests its index names, read once per offer: each one would otherwise be read back again
@@ -49,8 +44,8 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
      * @param scope the scope a quest handed out here is shared through, which indexes its quests
      * @param joining the player whose arrival this is, not among those the scope reaches yet
      */
-    public SharedAssignmentHolder(@Nonnull QuestStorage storage, @Nonnull String key, @Nonnull QuestScope scope, @Nullable UUID joining) {
-        this.storage = storage;
+    public SharedAssignmentHolder(@Nonnull SharedAssignmentRecords records, @Nonnull String key, @Nonnull QuestScope scope, @Nullable UUID joining) {
+        this.records = records;
         this.key = key;
         this.scope = scope;
         this.joining = joining;
@@ -65,7 +60,7 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
     @Nullable
     @Override
     public AssignmentRecord getRecord(@Nonnull String assignmentId, @Nonnull String questAssetId) {
-        return records().get(assignmentId, questAssetId);
+        return records.get(key).get(assignmentId, questAssetId);
     }
 
     @Nonnull
@@ -98,9 +93,8 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
      */
     @Override
     public boolean handOut(@Nonnull AbstractQuestProgression<?> quest, @Nonnull String assignmentId, @Nonnull String questAssetId, @Nullable AssignmentRecord expected, @Nonnull AssignmentRecord next) {
-        if (!storage.claimAssignment(key, assignmentId, questAssetId, expected, next)) return false;
+        if (!records.claim(key, assignmentId, questAssetId, expected, next)) return false;
 
-        records().put(assignmentId, questAssetId, next);
         quests = null;
         QuestProgressionService.get().registerQuest(quest);
         scope.share(quest);
@@ -109,11 +103,12 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
     }
 
     /**
-     * Read once per holder and occasion, the decision being made on what was read.
+     * A claim is only ever lost to another server writing first, and losing one read the records
+     * again already: the quests may have changed with them.
      */
-    @Nonnull
-    private AssignmentRecords records() {
-        if (records == null) records = storage.loadAssignments(key);
-        return records;
+    @Override
+    public boolean refresh() {
+        quests = null;
+        return true;
     }
 }

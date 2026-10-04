@@ -10,7 +10,6 @@ import com.martelstudios.openquests.core.assignments.trigger.AssignmentTrigger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.UUID;
 
 /**
  * Who an assignment hands its quests to, given an occasion: the player it concerns, a world, a
@@ -36,10 +35,15 @@ public abstract class AssignmentScope {
     public abstract void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion, @Nonnull AssignmentTargets targets);
 
     /**
-     * Called on every world entry, whatever the trigger: a scope sharing quests between worlds
-     * hands the entering player those already running in the world they arrive in.
+     * Asked on every world entry, whatever the trigger: a world of a group takes up the group's
+     * running quests as it is entered, and the player entering joins them.
+     *
+     * @return the group of worlds this scope puts that world in, {@code null} for none.
      */
-    public void onEnterWorld(@Nonnull OpenQuestAssignment assignment, @Nonnull UUID playerId, @Nonnull World world) {}
+    @Nullable
+    public String groupOf(@Nonnull OpenQuestAssignment assignment, @Nonnull World world) {
+        return null;
+    }
 
     /**
      * @return what is wrong with this scope under that trigger, {@code null} when nothing is.
