@@ -121,8 +121,9 @@ line, the line `AfterEnd` waits for and `Replace` fails.
 A `Worlds` group is named after its assignment and kept as an index of its own, `worlds:<id>`, next
 to the worlds'. Each world of the group takes its running quests up as someone enters it, whatever
 the trigger, so entering a second arena joins the quest the first one started, and a schedule
-reaches arenas opened mid-period. A world of the group closing does not end the quest while
-another is open.
+reaches arenas opened mid-period. A group never closes: its quests outlive every one of its worlds
+closing, wait in its index for the next one entered, and end on their own terms (completed, a
+`TimeLimit` or a `Deadline`) or as the assignment replaces them.
 
 An assignment that cannot mean anything is refused as it loads: a malformed pattern, a malformed
 date, or a `World` or `Worlds` scope naming no worlds under a trigger that happens in none.

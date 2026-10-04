@@ -74,4 +74,13 @@ public class WorldsQuestScope extends WorldQuestScope {
         WorldGroupIndex.get().remove(group, quest.getId());
         super.release(quest);
     }
+
+    /**
+     * The group is the holder, and a group never closes: its quests wait for the next of its worlds
+     * to be entered, and end on their own terms or as their assignment replaces them.
+     */
+    @Override
+    public boolean outlives(@Nonnull UUID closingWorldId) {
+        return true;
+    }
 }

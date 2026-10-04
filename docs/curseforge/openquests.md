@@ -220,6 +220,17 @@ An instance opens with its quests by itself, through an assignment:
 
 Every copy of that dungeon gets its own, shared by the group inside. Each quest it hands over with `GrantQuest` stays in the same world, up to the last one.
 
+**🗺️ Worlds.** One quest shared by every copy at once: a daily hunt across all the goblin lairs run that day. Each run adds to the same counter, and the quest waits between runs instead of failing when a copy closes. It ends when it is completed, when its time runs out, or when the next day replaces it:
+
+```json
+{
+  "Trigger": { "Type": "Schedule", "At": "2026-10-05T00:00:00+02:00", "Every": "P1D" },
+  "Scope": { "Type": "Worlds", "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*" },
+  "Repeat": { "Type": "Replace" },
+  "QuestAssetIds": ["GoblinLairDailyHunt"]
+}
+```
+
 **🌍 Universe.** One counter the whole community pushes. This is where a quest stops being a chore and becomes a server event:
 
 *   Kill 1,000,000 skeletons, together
