@@ -38,6 +38,13 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
     private AssignmentRecords records;
 
     /**
+     * The quests its index names, read once per offer: each one would otherwise be read back again
+     * for every quest the assignment lists. Dropped once a hand-out changes them.
+     */
+    @Nullable
+    private List<AbstractQuestProgression<?>> quests;
+
+    /**
      * @param key the holder's key in the store, the same as its index: {@code world:<uuid>},
      * {@code universe}
      * @param questIds the ids its index holds
@@ -65,12 +72,15 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
     @Nonnull
     @Override
     public Collection<AbstractQuestProgression<?>> getQuests() {
-        List<AbstractQuestProgression<?>> quests = new ArrayList<>();
+        if (quests != null) return quests;
+
+        List<AbstractQuestProgression<?>> read = new ArrayList<>();
         for (UUID questId : new ArrayList<>(questIds.get())) {
             AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
-            if (quest != null) quests.add(quest);
+            if (quest != null) read.add(quest);
         }
-        return quests;
+        quests = read;
+        return read;
     }
 
     /**
@@ -91,6 +101,7 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
         if (!storage.claimAssignment(key, assignmentId, questAssetId, expected, next)) return false;
 
         records().put(assignmentId, questAssetId, next);
+        quests = null;
         QuestProgressionService.get().registerQuest(quest);
         share.accept(quest);
         return true;

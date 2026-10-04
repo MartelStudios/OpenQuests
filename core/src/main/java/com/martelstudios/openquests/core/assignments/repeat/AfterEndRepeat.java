@@ -1,10 +1,8 @@
 package com.martelstudios.openquests.core.assignments.repeat;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AssignmentRecord;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Again on the next occasion once what the last one opened has ended, however it ended: done,
@@ -18,8 +16,8 @@ public class AfterEndRepeat extends AssignmentRepeat {
 
     @Nonnull
     @Override
-    protected Decision decideWithin(@Nullable AssignmentRecord record, @Nonnull String occasion, boolean timed, boolean seen, boolean lineRunning) {
-        if (isSamePeriod(record, occasion, timed) || lineRunning) return Decision.SKIP;
+    protected Decision decideWithin(@Nonnull AssignmentHistory history) {
+        if (history.isSamePeriod() || history.isLineRunning()) return Decision.SKIP;
         return Decision.HAND_OUT;
     }
 }

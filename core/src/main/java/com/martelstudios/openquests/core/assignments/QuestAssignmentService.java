@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.assignments.repeat.AssignmentHistory;
 import com.martelstudios.openquests.core.assignments.repeat.AssignmentRepeat;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
@@ -229,8 +230,8 @@ public class QuestAssignmentService {
     }
 
     /**
-     * Reads what this holder already has of the line, lets the repeat decide, and carries it out.
-     * A replaced line fails only once the new quest is out, so a refused hand-out leaves it be.
+     * Lets the repeat decide on what this holder already had, and carries it out. A replaced line
+     * fails only once the new quest is out, so a refused hand-out leaves it be.
      *
      * @return whether the holder now has this occasion handed out, by this call or an earlier one.
      */
@@ -239,29 +240,39 @@ public class QuestAssignmentService {
         String questAssetId = asset.getId();
 
         AssignmentRecord record = holder.getRecord(assignmentId, questAssetId);
-        boolean handedAlready = record != null && occasion.equals(record.getOccasion());
-        boolean seen = handedAlready;
-        List<UUID> line = new ArrayList<>();
+        AssignmentHistory history = new AssignmentHistory(record, occasion, timed, () -> readLine(holder, assignmentId, questAssetId, occasion));
 
-        for (AbstractQuestProgression<?> held : holder.getQuests()) {
-            QuestOrigin origin = held.getOrigin();
-            if (origin == null || !origin.isLineOf(assignmentId, questAssetId)) continue;
+        AssignmentRepeat.Decision decision = assignment.getRepeat().decide(history);
+        if (decision == AssignmentRepeat.Decision.SKIP) return history.isHandedAlready();
 
-            if (occasion.equals(origin.getOccasion())) seen = true;
-            if (holder.isRunning(held)) line.add(held.getId());
-        }
-
-        AssignmentRepeat.Decision decision = assignment.getRepeat().decide(record, occasion, timed, seen, !line.isEmpty());
-        if (decision == AssignmentRepeat.Decision.SKIP) return handedAlready;
+        // Read before the new quest is out, which would otherwise count as part of the line
+        List<UUID> replaced = decision == AssignmentRepeat.Decision.REPLACE ? history.getRunningLine() : List.of();
 
         AbstractQuestProgression<?> quest = asset.create();
         quest.setOrigin(new QuestOrigin(assignmentId, questAssetId, occasion));
 
         if (!holder.handOut(quest, assignmentId, questAssetId, record, AssignmentRecord.next(record, occasion, Instant.now()))) return false;
 
-        if (decision == AssignmentRepeat.Decision.REPLACE) {
-            QuestProgressionService.get().progress(new SetStateVisitor(QuestState.FAILED), line);
-        }
+        if (!replaced.isEmpty()) QuestProgressionService.get().progress(new SetStateVisitor(QuestState.FAILED), replaced);
         return true;
+    }
+
+    /**
+     * Everything one occasion opened carries its origin down the chain, so the line is found on
+     * the holder's quests without following any chain.
+     */
+    @Nonnull
+    private static AssignmentHistory.Line readLine(@Nonnull AssignmentHolder holder, @Nonnull String assignmentId, @Nonnull String questAssetId, @Nonnull String occasion) {
+        boolean openedOnOccasion = false;
+        List<UUID> running = new ArrayList<>();
+
+        for (AbstractQuestProgression<?> held : holder.getQuests()) {
+            QuestOrigin origin = held.getOrigin();
+            if (origin == null || !origin.isLineOf(assignmentId, questAssetId)) continue;
+
+            if (occasion.equals(origin.getOccasion())) openedOnOccasion = true;
+            if (holder.isRunning(held)) running.add(held.getId());
+        }
+        return new AssignmentHistory.Line(openedOnOccasion, running);
     }
 }
