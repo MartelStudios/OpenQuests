@@ -1,5 +1,6 @@
 {
   "Type": "EnterWorld",
+  "Categories": ["Temple"],
   "TitleKey": "quest.enter-forgotten-temple.title",
   "DescriptionKey": "quest.enter-forgotten-temple.description",
   "WorldNamePattern": "instance-Forgotten_Temple.*",

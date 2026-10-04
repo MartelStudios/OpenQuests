@@ -1,5 +1,6 @@
 {
   "Type": "Consume",
+  "Categories": ["Survival"],
   "TitleKey": "quest.eat-meat.title",
   "DescriptionKey": "quest.eat-meat.description",
   "TargetQuantity": 1,

@@ -1,5 +1,6 @@
 {
   "Type": "KillPlayer",
+  "Categories": ["Achievement"],
   "StartOnConnection": true,
   "TitleKey": "quest.first-blood.title",
   "DescriptionKey": "quest.first-blood.description",

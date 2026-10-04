@@ -1,5 +1,6 @@
 {
   "Type": "KillNpc",
+  "Categories": ["Temple"],
   "NpcGroupId": {
     "IncludeRoles": [
       "Golem_Crystal_Earth"

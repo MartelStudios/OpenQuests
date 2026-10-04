@@ -1,5 +1,6 @@
 {
   "Type": "Sprint",
+  "Categories": ["Achievement"],
   "StartOnConnection": true,
   "TitleKey": "quest.sprint-novice.title",
   "DescriptionKey": "quest.sprint-novice.description",

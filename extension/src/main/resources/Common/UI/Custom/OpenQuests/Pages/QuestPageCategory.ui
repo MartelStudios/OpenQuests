@@ -1,0 +1,14 @@
+// One category a quest is filed under, appended after its title: the translated name on the
+// colours the category asset names, both written by the page.
+$P = "QuestPageCommon.ui";
+
+// No width: the chip hugs its name. The margins make it as tall as the title, so a line of chips
+// wrapped under the title is spaced like the first one, and start it flush with the title.
+Group #Category {
+  LayoutMode: Left;
+  Anchor: (Height: 18, Top: 3, Bottom: 3, Right: 6);
+  Padding: (Horizontal: 7);
+  Background: #2c3a52;
+
+  Label #Name { Text: ""; Style: $P.@CategoryStyle; }
+}

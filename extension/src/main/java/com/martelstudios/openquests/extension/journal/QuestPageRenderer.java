@@ -26,9 +26,9 @@ public interface QuestPageRenderer {
 
     /**
      * @return the document the journal appends for that shape, or {@code null} to take its own. A
-     * replacement carries the names the journal writes into ({@code #Title}, {@code #Status},
-     * {@code #Progress}, {@code #Details}, {@code #Objectives}) and whatever else it likes; a name
-     * it leaves out is simply never written.
+     * replacement carries the names the journal writes into ({@code #Title}, {@code #TitleLine},
+     * {@code #Status}, {@code #Progress}, {@code #Details}, {@code #Objectives}) and whatever else
+     * it likes; a name it leaves out is simply never written.
      *
      * <p>Only asked for {@link QuestShape#CARD} and {@link QuestShape#PAGE}, the shapes whose
      * container the journal opens. A row is a line the renderer appends itself, so a type wanting

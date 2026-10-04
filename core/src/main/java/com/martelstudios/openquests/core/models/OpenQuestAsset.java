@@ -67,12 +67,17 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
                                                                           .add()
                                                                           .append(new KeyedCodec<>("Constraints", new ArrayCodec<>(QuestConstraint.CODEC, QuestConstraint[]::new)), (asset, constraints) -> asset.constraints = constraints, asset -> asset.constraints)
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("Categories", new ArrayCodec<>(Codec.STRING, String[]::new)), (asset, categories) -> asset.categories = categories, asset -> asset.categories)
+                                                                          .addValidator(OpenQuestCategory.VALIDATOR_CACHE.getArrayValidator())
+                                                                          .add()
                                                                           .build();
 
 
     private static final QuestReward[] NO_REWARDS = new QuestReward[0];
 
     private static final QuestConstraint[] NO_CONSTRAINTS = new QuestConstraint[0];
+
+    private static final String[] NO_CATEGORIES = new String[0];
 
     protected String id;
     protected AssetExtraInfo.Data data;
@@ -103,6 +108,7 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
     protected String abandonedSound;
 
     protected QuestConstraint[] constraints = NO_CONSTRAINTS;
+    protected String[] categories = NO_CATEGORIES;
 
     protected OpenQuestAsset() {}
 
@@ -258,6 +264,15 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
     @Nonnull
     public QuestConstraint[] getConstraints() {
         return constraints;
+    }
+
+    /**
+     * @return the ids of the {@link OpenQuestCategory categories} this quest is filed under, in the
+     * order the journal shows them. Empty for none, never {@code null}.
+     */
+    @Nonnull
+    public String[] getCategories() {
+        return categories;
     }
 
     /**

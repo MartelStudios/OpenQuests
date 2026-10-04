@@ -1,5 +1,6 @@
 {
   "Type": "Composite",
+  "Categories": ["Achievement", "Temple"],
   "StartOnConnection": true,
   "TitleKey": "quest.flawless.title",
   "DescriptionKey": "quest.flawless.description",

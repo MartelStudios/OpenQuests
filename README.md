@@ -385,6 +385,24 @@ once; a sound event of your own does the same with `"MaxInstance": 1` and
 { "SuccessfulSound": "SFX_Memories_Unlock_Local", "AbandonedSound": "" }
 ```
 
+### Categories
+
+A category is an asset of its own, under `Server/OpenQuests/Categories/`: a translated name and
+the two colours it is drawn in. `BackgroundColor` and `TextColor` take `#RGB`, `#RRGGBB` or
+`rgb(R, G, B)`, and fall back to the journal's own row colours.
+
+```json
+{ "NameKey": "quest.category.temple", "BackgroundColor": "#5b3f8c", "TextColor": "#f1eafb" }
+```
+
+A quest asset names its categories by id under `Categories`, and the journal draws them in that
+order after its title, folded or not, wrapping under it when they do not fit on its line. An id no
+category answers to fails the asset at load.
+
+```json
+{ "Type": "Composite", "Categories": ["Temple", "Timed"], "TitleKey": "…" }
+```
+
 ### Commands
 
 `/oquest create player|world|universe <assetId> …` hands a quest out. `/oquest complete`,

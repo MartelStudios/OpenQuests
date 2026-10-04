@@ -1,5 +1,6 @@
 {
   "Type": "Composite",
+  "Categories": ["Tutorial"],
   "TitleKey": "quest.craft-tools.title",
   "DescriptionKey": "quest.craft-tools.description",
   "QuestAssetIds": [
