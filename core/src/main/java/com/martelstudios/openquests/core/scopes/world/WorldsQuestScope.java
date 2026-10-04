@@ -42,7 +42,7 @@ public class WorldsQuestScope extends WorldQuestScope {
     }
 
     /**
-     * A group outlives its worlds closing: the quests in it wait for the next one to open.
+     * A group is there to share with even while none of its worlds is open.
      */
     @Override
     public boolean isReachable() {
@@ -52,26 +52,35 @@ public class WorldsQuestScope extends WorldQuestScope {
     @Nonnull
     @Override
     public Collection<UUID> getQuestIds() {
-        return List.copyOf(WorldQuestService.get().getGroupQuestIds(group));
+        return List.copyOf(WorldGroupIndex.get().getQuestIds(group));
     }
 
     /**
-     * Into the group, and into each of its worlds the quest paying already reached, on their own
-     * thread; the others take it up as they are entered.
+     * Into the group, and into each of its worlds someone is in, on their own thread; the others
+     * take it up as they are entered.
      */
     @Override
     public void share(@Nonnull AbstractQuestProgression<?> quest) {
         quest.setScope(new WorldsQuestScope(group));
-        WorldQuestService.get().addToGroup(group, quest.getId());
+        WorldGroupIndex.get().add(group, quest.getId());
 
-        for (World world : WorldQuestService.openWorlds(worlds)) {
-            WorldQuestService.onThreadOf(world, () -> WorldQuestService.get().addQuest(world, quest.getId()));
+        for (World world : WorldGroupIndex.get().getJoinedWorlds(group)) {
+            WorldQuestService.get().addQuest(world, quest.getId());
         }
     }
 
     @Override
     public void release(@Nonnull AbstractQuestProgression<?> quest) {
-        WorldQuestService.get().removeFromGroup(group, quest.getId());
+        WorldGroupIndex.get().remove(group, quest.getId());
         super.release(quest);
+    }
+
+    /**
+     * The group is the holder, and a group never closes: its quests wait for the next of its worlds
+     * to be entered, and end on their own terms or as their assignment replaces them.
+     */
+    @Override
+    public boolean outlives(@Nonnull UUID closingWorldId) {
+        return true;
     }
 }

@@ -9,37 +9,26 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
-import com.martelstudios.openquests.core.assignments.repeat.AssignmentRepeat;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.models.QuestOrigin;
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
+import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
-import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
-import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 /**
  * Hands out what the {@link OpenQuestAssignment} assets ask for. Each part of an assignment does
- * its share: the trigger recognises an occasion, the scope reaches its holders, the repeat weighs
- * what was handed before; this only carries the decision out.
+ * its share: the trigger recognises an occasion, the scope picks its holders, the repeat weighs
+ * what was handed before. This brings occasions to them and reaches the holders picked.
  */
 public class QuestAssignmentService {
 
@@ -52,20 +41,19 @@ public class QuestAssignmentService {
     private static final long TICK_SECONDS = 30;
 
     @Nonnull
-    private final QuestStorage storage;
+    private final AssignmentHolders holders;
 
-    /**
-     * The period each holder was last found settled for, by holder key and then by assignment and
-     * quest, so a period reached again and again costs no read once it is handed out.
-     */
-    private final Map<String, Map<String, String>> settled = new ConcurrentHashMap<>();
+    private final AssignmentOffer offer = new AssignmentOffer();
+
+    private final SettledOccasions settled = new SettledOccasions();
 
     public QuestAssignmentService(@Nonnull JavaPlugin plugin, @Nonnull QuestStorage storage) {
-        this.storage = storage;
+        this.holders = new AssignmentHolders(storage);
 
         plugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
         plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
-        plugin.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> settled.remove(PlayerAssignmentHolder.keyOf(event.getPlayerRef().getUuid())));
+        plugin.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> settled.forget(PlayerAssignmentHolder.keyOf(event.getPlayerRef().getUuid())));
+        plugin.getEventRegistry().registerGlobal(RemoveWorldEvent.class, event -> settled.forget(WorldQuestService.indexKey(event.getWorld())));
     }
 
     public static QuestAssignmentService get() {
@@ -81,79 +69,10 @@ public class QuestAssignmentService {
     }
 
     /**
-     * Brings an occasion to the assignment's scope, which reaches the holders it concerns.
+     * Brings an occasion to the assignment's scope, which picks the holders it concerns.
      */
     public void evaluate(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion) {
-        assignment.getScope().reach(assignment, occasion);
-    }
-
-    /**
-     * Offers every quest the assignment lists to one holder, on the thread allowed to touch it.
-     *
-     * @param occasion the key telling this hand-out from the others, as the scope reads it
-     * @param timed whether the occasion is a period, which comes back each time the holder is reached
-     */
-    public void offerAll(@Nonnull OpenQuestAssignment assignment, @Nonnull AssignmentHolder holder, @Nonnull String occasion, boolean timed) {
-        for (String questAssetId : assignment.getQuestAssetIds()) {
-            OpenQuestAsset asset = OpenQuestAsset.getAsset(questAssetId);
-            if (asset == null) continue;
-
-            if (offer(assignment, asset, holder, occasion, timed) && timed) {
-                settled.computeIfAbsent(holder.getKey(), key -> new ConcurrentHashMap<>()).put(assignment.getId() + "/" + questAssetId, occasion);
-            }
-        }
-    }
-
-    /**
-     * Only ever true for what this server saw handed out: another server handing a period out
-     * first is found on the next read instead.
-     *
-     * @return whether every quest the assignment lists was already settled with that holder for
-     * that occasion.
-     */
-    public boolean isSettled(@Nonnull String holderKey, @Nonnull OpenQuestAssignment assignment, @Nonnull String occasion) {
-        Map<String, String> byQuest = settled.get(holderKey);
-        if (byQuest == null) return false;
-
-        for (String questAssetId : assignment.getQuestAssetIds()) {
-            if (!occasion.equals(byQuest.get(assignment.getId() + "/" + questAssetId))) return false;
-        }
-        return true;
-    }
-
-    /**
-     * @param player the player's components, written on the thread the occasion came on
-     * @return the player as a holder, their records travelling with their own.
-     */
-    @Nonnull
-    public AssignmentHolder playerHolder(@Nonnull UUID playerId, @Nonnull EntityComponents player) {
-        return new PlayerAssignmentHolder(playerId, player.ensureAndGetComponent(QuestStoreComponent.getComponentType()));
-    }
-
-    /**
-     * @param joining the player entering that world, who is not among its players until the entry
-     * is done, so a quest created on their way in is handed to them here
-     * @return the world as a holder, its records in the shared store under its index key.
-     */
-    @Nonnull
-    public AssignmentHolder worldHolder(@Nonnull World world, @Nullable UUID joining) {
-        return new SharedAssignmentHolder(storage, WorldQuestService.indexKey(world), () -> WorldQuestService.get().getQuestIds(world), quest -> {
-            WorldQuestService.get().addQuest(world, quest.getId());
-            if (joining != null) QuestProgressionService.get().joinQuest(quest, joining);
-        });
-    }
-
-    /**
-     * @param joining the player still connecting, not online yet for the server to hand a quest
-     * created now to them
-     * @return the server as a holder, its records in the shared store under its index key.
-     */
-    @Nonnull
-    public AssignmentHolder universeHolder(@Nullable UUID joining) {
-        return new SharedAssignmentHolder(storage, UniverseQuestService.UNIVERSE_INDEX_KEY, () -> UniverseQuestService.get().getQuests().getAllIds(), quest -> {
-            UniverseQuestService.get().addQuest(quest.getId());
-            if (joining != null) QuestProgressionService.get().joinQuest(quest, joining);
-        });
+        assignment.getScope().reach(assignment, occasion, new Reach(assignment, occasion));
     }
 
     private void tick() {
@@ -164,39 +83,10 @@ public class QuestAssignmentService {
                 Occasion occasion = assignment.getTrigger().onTick(now);
                 if (occasion != null) evaluate(assignment, occasion);
             }
-        } catch (RuntimeException e) {
-            // Thrown out of a scheduled task, it would cancel every tick after it
+        } catch (Throwable e) {
+            // Anything thrown out of a scheduled task cancels every tick after it, silently
             LOGGER.atWarning().withCause(e).log("Handing out scheduled quests failed");
         }
-    }
-
-    /**
-     * Every world the group gathers, open now, takes the quest up on its own thread; the player
-     * whose entry this is joins it there, being among its players only once in.
-     *
-     * @param gathers whether a world belongs to the group
-     * @param entered the world the occasion happens in, if the group gathers it
-     * @param joining the player entering it
-     * @return the group of worlds as a holder, its records and index under the group's key.
-     */
-    @Nonnull
-    public AssignmentHolder groupHolder(@Nonnull String group, @Nonnull Predicate<World> gathers, @Nullable World entered, @Nullable UUID joining) {
-        UUID enteredId = entered == null ? null : entered.getWorldConfig().getUuid();
-
-        return new SharedAssignmentHolder(storage, WorldQuestService.groupKey(group), () -> WorldQuestService.get().getGroupQuestIds(group), quest -> {
-            quest.setScope(new WorldsQuestScope(group));
-            WorldQuestService.get().addToGroup(group, quest.getId());
-
-            for (World world : Universe.get().getWorlds().values()) {
-                if (!gathers.test(world)) continue;
-
-                boolean joiningHere = joining != null && world.getWorldConfig().getUuid().equals(enteredId);
-                WorldQuestService.onThreadOf(world, () -> {
-                    WorldQuestService.get().addQuest(world, quest.getId());
-                    if (joiningHere) QuestProgressionService.get().joinQuest(quest, joining);
-                });
-            }
-        });
     }
 
     /**
@@ -229,39 +119,80 @@ public class QuestAssignmentService {
     }
 
     /**
-     * Reads what this holder already has of the line, lets the repeat decide, and carries it out.
-     * A replaced line fails only once the new quest is out, so a refused hand-out leaves it be.
-     *
-     * @return whether the holder now has this occasion handed out, by this call or an earlier one.
+     * One occasion of one assignment, reaching the holders its scope picks: each on the thread
+     * allowed to touch it, and none settled already for the period. A holder that moves, a player,
+     * tells hand-outs apart by place and time; the others by time alone.
      */
-    private boolean offer(@Nonnull OpenQuestAssignment assignment, @Nonnull OpenQuestAsset asset, @Nonnull AssignmentHolder holder, @Nonnull String occasion, boolean timed) {
-        String assignmentId = assignment.getId();
-        String questAssetId = asset.getId();
+    private final class Reach implements AssignmentTargets {
 
-        AssignmentRecord record = holder.getRecord(assignmentId, questAssetId);
-        boolean handedAlready = record != null && occasion.equals(record.getOccasion());
-        boolean seen = handedAlready;
-        List<UUID> line = new ArrayList<>();
+        @Nonnull
+        private final OpenQuestAssignment assignment;
 
-        for (AbstractQuestProgression<?> held : holder.getQuests()) {
-            QuestOrigin origin = held.getOrigin();
-            if (origin == null || !origin.isLineOf(assignmentId, questAssetId)) continue;
+        @Nonnull
+        private final Occasion occasion;
 
-            if (occasion.equals(origin.getOccasion())) seen = true;
-            if (holder.isRunning(held)) line.add(held.getId());
+        private Reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion) {
+            this.assignment = assignment;
+            this.occasion = occasion;
         }
 
-        AssignmentRepeat.Decision decision = assignment.getRepeat().decide(record, occasion, timed, seen, !line.isEmpty());
-        if (decision == AssignmentRepeat.Decision.SKIP) return handedAlready;
+        @Override
+        public void player(@Nonnull UUID playerId, @Nonnull EntityComponents player) {
+            String key = occasion.placeKey();
+            if (isSettled(PlayerAssignmentHolder.keyOf(playerId), key)) return;
 
-        AbstractQuestProgression<?> quest = asset.create();
-        quest.setOrigin(new QuestOrigin(assignmentId, questAssetId, occasion));
-
-        if (!holder.handOut(quest, assignmentId, questAssetId, record, AssignmentRecord.next(record, occasion, Instant.now()))) return false;
-
-        if (decision == AssignmentRepeat.Decision.REPLACE) {
-            QuestProgressionService.get().progress(new SetStateVisitor(QuestState.FAILED), line);
+            offerAll(holders.player(playerId, player), key);
         }
-        return true;
+
+        @Override
+        public void onlinePlayers() {
+            String key = occasion.placeKey();
+
+            for (PlayerRef playerRef : Universe.get().getPlayers()) {
+                UUID playerId = playerRef.getUuid();
+                if (isSettled(PlayerAssignmentHolder.keyOf(playerId), key)) continue;
+
+                EntityComponents.update(playerId, player -> offerAll(holders.player(playerId, player), key));
+            }
+        }
+
+        @Override
+        public void world(@Nonnull World world, @Nullable UUID joining) {
+            String key = occasion.timeKey();
+            if (isSettled(WorldQuestService.indexKey(world), key)) return;
+
+            WorldQuestService.onThreadOf(world, () -> offerAll(holders.world(world, joining), key));
+        }
+
+        @Override
+        public void group(@Nonnull String group, @Nullable UUID joining) {
+            String key = occasion.timeKey();
+            if (isSettled(WorldGroupIndex.keyOf(group), key)) return;
+
+            offerAll(holders.group(group, joining), key);
+        }
+
+        @Override
+        public void universe(@Nullable UUID joining) {
+            String key = occasion.timeKey();
+            if (isSettled(UniverseQuestService.UNIVERSE_INDEX_KEY, key)) return;
+
+            offerAll(holders.universe(joining), key);
+        }
+
+        private boolean isSettled(@Nonnull String holderKey, @Nonnull String key) {
+            return occasion.isTimed() && settled.isSettled(holderKey, assignment, key);
+        }
+
+        private void offerAll(@Nonnull AssignmentHolder holder, @Nonnull String key) {
+            for (String questAssetId : assignment.getQuestAssetIds()) {
+                OpenQuestAsset asset = OpenQuestAsset.getAsset(questAssetId);
+                if (asset == null) continue;
+
+                if (offer.offer(assignment, asset, holder, key, occasion.isTimed()) && occasion.isTimed()) {
+                    settled.settle(holder.getKey(), assignment.getId(), questAssetId, key);
+                }
+            }
+        }
     }
 }

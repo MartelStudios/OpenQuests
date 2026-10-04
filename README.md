@@ -121,11 +121,19 @@ line, the line `AfterEnd` waits for and `Replace` fails.
 A `Worlds` group is named after its assignment and kept as an index of its own, `worlds:<id>`, next
 to the worlds'. Each world of the group takes its running quests up as someone enters it, whatever
 the trigger, so entering a second arena joins the quest the first one started, and a schedule
-reaches arenas opened mid-period. A world of the group closing does not end the quest while
-another is open.
+reaches arenas opened mid-period. A group never closes: its quests outlive every one of its worlds
+closing, wait in its index for the next one entered, and end on their own terms (completed, a
+`TimeLimit` or a `Deadline`) or as the assignment replaces them.
 
 An assignment that cannot mean anything is refused as it loads: a malformed pattern, a malformed
 date, or a `World` or `Worlds` scope naming no worlds under a trigger that happens in none.
+
+Each part is a type a plugin can add to, registered on `AssignmentTrigger.CODEC`,
+`AssignmentScope.CODEC` or `AssignmentRepeat.CODEC`. A trigger turns what happens into an
+`Occasion`; a scope picks among the `AssignmentTargets` it is given (the player concerned, every
+player online, a world, a group, the server) and never reaches them itself, the thread and the
+periods already settled being taken care of behind; a repeat decides on an `AssignmentHistory`,
+which reads the line off the holder only when asked.
 
 A quest gating on another one is a `QuestState` quest, usually as the child of a composite. Since a
 quest holds a state rather than a boolean, "not yet" and "failed" stay distinct, which is what
@@ -157,9 +165,10 @@ never depends on it, only the reverse.
 A scope sharing a quest writes itself on it as `getScope()`, data the quest never acts on: a
 `QuestScope` registered under a `"Type"` (`World` with its worlds, `Worlds` with its group as well,
 `Universe`), `null` for a quest
-its players hold on their own. Each kind says how a quest it holds is shared and let go of, so
-`GrantQuest` keeps a chain in its scope and a quest leaving for good leaves its indexes without
-anything telling the kinds apart. A plugin adds its own by registering it on `QuestScope.CODEC`.
+its players hold on their own. Each kind says how a quest it holds is shared, let go of, and
+whether it outlives a world closing, so `GrantQuest` keeps a chain in its scope, a quest leaving for
+good leaves its indexes, and a closing world settles its quests without anything telling the kinds
+apart. A plugin adds its own by registering it on `QuestScope.CODEC`.
 
 #### Player scope
 Quests assigned to named players, the default path.
@@ -178,7 +187,8 @@ instanced events:
 A world quest is created with `/oquest create world`, or by an [assignment](#assignments) with the
 `World` scope, which is how every copy of an instance opens with its own. A `GrantQuest` paid by
 a world quest hands its follow-ups to the same world, once however many players are paid, which
-keeps a dungeon line shared from its first quest to its last. A follow-up claimed by hand once
+keeps a dungeon line shared from its first quest to its last. A step of a `Composite` hands its
+follow-ups on the way its outermost quest is shared. A follow-up claimed by hand once
 that world has closed goes to the player claiming it, so a shared chain grants with `AutoClaim`.
 
 Only what is still running is removed: a quest that ended while the player was there stays in

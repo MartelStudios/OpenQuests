@@ -141,6 +141,7 @@ Tags are how an asset says something no field covers. They carry down from a par
 | ---------- |---------------------------------------------------------- |
 | <code>OQ_HUD_DESC</code> |Shows its description under its title, greyed and smaller  |
 | <code>OQ_GRANTED_BY</code> |Written by <code>GrantQuest</code> on the quest it creates, naming the run that opened it |
+| <code>OQ_HANDED_ON</code> |Written by <code>GrantQuest</code> on a shared quest, naming what it already handed on, so its follow-ups are created once for all its players |
 | <code>OQ_PARENT_QUEST</code> |Written by a composite on each step it creates, naming the group it belongs to |
 
 The last two are written by the system, not by you.
@@ -220,6 +221,17 @@ An instance opens with its quests by itself, through an assignment:
 
 Every copy of that dungeon gets its own, shared by the group inside. Each quest it hands over with `GrantQuest` stays in the same world, up to the last one.
 
+**🗺️ Worlds.** One quest shared by every copy at once: a daily hunt across all the goblin lairs run that day. Each run adds to the same counter, and the quest waits between runs instead of failing when a copy closes. It ends when it is completed, when its time runs out, or when the next day replaces it:
+
+```json
+{
+  "Trigger": { "Type": "Schedule", "At": "2026-10-05T00:00:00+02:00", "Every": "P1D" },
+  "Scope": { "Type": "Worlds", "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*" },
+  "Repeat": { "Type": "Replace" },
+  "QuestAssetIds": ["GoblinLairDailyHunt"]
+}
+```
+
 **🌍 Universe.** One counter the whole community pushes. This is where a quest stops being a chore and becomes a server event:
 
 *   Kill 1,000,000 skeletons, together
@@ -292,7 +304,9 @@ PostgreSQL, MySQL, MariaDB and SQLite are spoken natively. Drop the driver jar f
 
 ## ⚠️ Upgrading to 4.0
 
-**`StartOnConnection` became an asset of its own.** A quest no longer says when it starts: list it in an assignment under `OpenQuests/Assignments/`, `{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": [...] }`. The field is no longer read, so a quest still carrying it is simply never handed out on connection. Players keep what they were already given and are not handed it a second time.
+**`StartOnConnection` became an asset of its own.** A quest no longer says when it starts: list it in an assignment under `OpenQuests/Assignments/`, `{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": [...] }`. The field is no longer read, so a quest still carrying it is simply never handed out on connection. Players keep what they were already given, but nothing recorded it under 3.x, so a quest handed out on connection back then is handed out once more.
+
+**Plugins storing quests their own way need three more methods.** A `QuestStorage` now keeps what each assignment handed out: `loadAssignments`, `claimAssignment` (a conditional write, so two servers never both hand the same occasion out) and `deleteAssignments`. The file and database storages that ship with OpenQuests already have them.
 
 ## ⚠️ Upgrading to 3.0
 

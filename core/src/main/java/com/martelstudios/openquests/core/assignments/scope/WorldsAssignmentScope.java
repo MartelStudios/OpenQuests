@@ -1,20 +1,18 @@
 package com.martelstudios.openquests.core.assignments.scope;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.martelstudios.openquests.core.assignments.AssignmentTargets;
 import com.martelstudios.openquests.core.assignments.Occasion;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
-import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
-import com.martelstudios.openquests.core.assignments.trigger.AssignmentTrigger;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.utils.WorldNamePattern;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -22,22 +20,16 @@ import java.util.UUID;
  * the worlds the pattern names, or those its trigger happens in. Each world takes the group's
  * running quests up as it is entered, whatever the trigger.
  */
-public class WorldsAssignmentScope extends AssignmentScope {
+public class WorldsAssignmentScope extends AbstractWorldAssignmentScope {
 
     public static final String TYPE = "Worlds";
 
-    public static final BuilderCodec<WorldsAssignmentScope> CODEC = BuilderCodec.builder(WorldsAssignmentScope.class, WorldsAssignmentScope::new, AssignmentScope.BASE_CODEC)
-                                                                                .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING), (scope, pattern) -> scope.worldNamePattern = pattern == null ? null : WorldNamePattern.of(pattern), scope -> scope.worldNamePattern == null ? null : scope.worldNamePattern.getSource())
-                                                                                .add()
-                                                                                .build();
-
-    @Nullable
-    protected WorldNamePattern worldNamePattern;
+    public static final BuilderCodec<WorldsAssignmentScope> CODEC = BuilderCodec.builder(WorldsAssignmentScope.class, WorldsAssignmentScope::new, AbstractWorldAssignmentScope.BASE_CODEC).build();
 
     public WorldsAssignmentScope() {}
 
     public WorldsAssignmentScope(@Nullable String worldNamePattern) {
-        this.worldNamePattern = worldNamePattern == null ? null : WorldNamePattern.of(worldNamePattern);
+        super(worldNamePattern);
     }
 
     /**
@@ -52,25 +44,24 @@ public class WorldsAssignmentScope extends AssignmentScope {
      * apart: entering a second world of the group joins the quest the first one started.
      */
     @Override
-    public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion) {
-        QuestAssignmentService service = QuestAssignmentService.get();
-        String key = timeKey(occasion);
-
-        if (occasion.isTimed() && service.isSettled(WorldQuestService.groupKey(assignment.getId()), assignment, key)) return;
-
-        World entered = occasion.getWorld() != null && gathers(assignment, occasion.getWorld()) ? occasion.getWorld() : null;
-        service.offerAll(assignment, service.groupHolder(assignment.getId(), world -> gathers(assignment, world), entered, occasion.getPlayerId()), key, occasion.isTimed());
+    public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion, @Nonnull AssignmentTargets targets) {
+        boolean entersGroup = occasion.getWorld() != null && gathers(assignment, occasion.getWorld());
+        targets.group(assignment.getId(), entersGroup ? occasion.getPlayerId() : null);
     }
 
     /**
-     * Brings the group's running quests to a world of the group as someone enters it, and hands
-     * them to that player, who is among its players only once in.
+     * Counts a world of the group as entered, so that what the group starts next reaches it, and
+     * brings it the group's running quests, handed to that player, who is among its players only
+     * once in.
      */
     @Override
     public void onEnterWorld(@Nonnull OpenQuestAssignment assignment, @Nonnull UUID playerId, @Nonnull World world) {
         if (!gathers(assignment, world)) return;
 
-        for (UUID questId : WorldQuestService.get().getGroupQuestIds(assignment.getId())) {
+        String group = assignment.getId();
+        WorldGroupIndex.get().join(group, world);
+
+        for (UUID questId : List.copyOf(WorldGroupIndex.get().getQuestIds(group))) {
             // Read back first: after a restart, nothing else has brought the group's quests into memory
             AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null || QuestProgressionService.get().getLiveQuest(questId) == null) continue;
@@ -78,13 +69,5 @@ public class WorldsAssignmentScope extends AssignmentScope {
             WorldQuestService.get().addQuest(world, questId);
             QuestProgressionService.get().joinQuest(quest, playerId);
         }
-    }
-
-    @Nullable
-    @Override
-    public String findInconsistency(@Nonnull AssignmentTrigger trigger) {
-        if (worldNamePattern != null && worldNamePattern.getError() != null) return "WorldNamePattern does not compile: " + worldNamePattern.getError();
-        if (worldNamePattern == null && !trigger.hasPlace()) return "the Worlds scope needs a WorldNamePattern under a trigger happening in no world";
-        return null;
     }
 }

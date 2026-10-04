@@ -1,7 +1,6 @@
 package com.martelstudios.openquests.extension.quests.enterworld;
 
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -16,7 +15,7 @@ import javax.annotation.Nullable;
 public class EnterWorldQuestProgression extends AbstractQuestProgression<EnterWorldQuestProgression> {
 
     public static final BuilderCodec<EnterWorldQuestProgression> CODEC = BuilderCodec.builder(EnterWorldQuestProgression.class, EnterWorldQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
-                                                                                     .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING), (quest, pattern) -> quest.setWorldNamePattern(pattern), quest -> quest.worldNamePattern == null ? null : quest.worldNamePattern.getSource())
+                                                                                     .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC), (quest, pattern) -> quest.worldNamePattern = pattern, quest -> quest.worldNamePattern)
                                                                                      .add()
                                                                                      .build();
 
@@ -40,7 +39,7 @@ public class EnterWorldQuestProgression extends AbstractQuestProgression<EnterWo
     }
 
     public EnterWorldQuestProgression setWorldNamePattern(@Nullable String worldNamePattern) {
-        this.worldNamePattern = worldNamePattern == null ? null : WorldNamePattern.of(worldNamePattern);
+        this.worldNamePattern = WorldNamePattern.ofNullable(worldNamePattern);
         return this;
     }
 

@@ -1,6 +1,5 @@
 package com.martelstudios.openquests.extension.quests.enterworld;
 
-import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
@@ -15,7 +14,7 @@ public class EnterWorldQuestAsset extends OpenQuestAsset {
 
     public static final BuilderCodec<EnterWorldQuestAsset> CODEC =
         BuilderCodec.builder(EnterWorldQuestAsset.class, EnterWorldQuestAsset::new, OpenQuestAsset.BASE_CODEC)
-                    .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING, true), (asset, pattern) -> asset.worldNamePattern = pattern == null ? null : WorldNamePattern.of(pattern), asset -> asset.worldNamePattern == null ? null : asset.worldNamePattern.getSource())
+                    .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC, true), (asset, pattern) -> asset.worldNamePattern = pattern, asset -> asset.worldNamePattern)
                     .addValidator(Validators.nonNull())
                     .add()
                     .build();

@@ -59,7 +59,7 @@ public class UniverseQuestService {
 
         LOGGER.atInfo().log("Added quest %s to universe", questId);
 
-        if (!(quest.getScope() instanceof UniverseQuestScope)) quest.setScope(new UniverseQuestScope());
+        if (!(quest.getScope() instanceof UniverseQuestScope)) quest.setScope(UniverseQuestScope.INSTANCE);
 
         for (PlayerRef playerRef : Universe.get().getPlayers()) {
             QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());

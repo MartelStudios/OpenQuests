@@ -1,6 +1,5 @@
 package com.martelstudios.openquests.core.scopes.world;
 
-import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.RemovedPlayerFromWorldEvent;
@@ -8,30 +7,26 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
-import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Holds the quests shared by every player of a world: assigns them on world entry, takes them back
- * on world exit, and writes on each quest the worlds holding it ({@link WorldQuestScope}), which
- * is how a quest finds its worlds and a world its quests.
+ * on world exit, and has each quest's scope note the worlds holding it, which is how a quest finds
+ * its worlds and a world its quests. Whatever touches a world does so on that world's thread.
  */
 public class WorldQuestService {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -42,36 +37,13 @@ public class WorldQuestService {
      */
     public static final String WORLD_INDEX_PREFIX = "world:";
 
-    /**
-     * What a group of worlds' index is written under: the quests one assignment shares between
-     * every world it gathers.
-     */
-    public static final String GROUP_INDEX_PREFIX = "worlds:";
-
-    /**
-     * Worlds being closed, which nothing is shared into any more: a quest failed on the way out
-     * and paying with another quest would otherwise leave it behind in a world that is gone.
-     */
-    private static final Set<UUID> CLOSING = ConcurrentHashMap.newKeySet();
-
     private final QuestStorage storage;
-
-    /**
-     * The groups read back so far, by name. Unlike a world's, a group's index lives on no world,
-     * so it is kept here, and written out with the rest.
-     */
-    private final Map<String, QuestsRecord> groups = new ConcurrentHashMap<>();
-
-    private final Set<String> dirtyGroups = ConcurrentHashMap.newKeySet();
 
     public WorldQuestService(@Nonnull JavaPlugin plugin, @Nonnull QuestStorage storage) {
         this.storage = storage;
 
         plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
         plugin.getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, this::handleRemovedPlayerFromWorldEvent);
-
-        // Last, so a removal another plugin called off is seen as such
-        plugin.getEventRegistry().registerGlobal(EventPriority.LAST, RemoveWorldEvent.class, this::handleRemoveWorldEvent);
     }
 
     public static WorldQuestService get() {
@@ -88,41 +60,18 @@ public class WorldQuestService {
     }
 
     /**
-     * Shares the quest with everyone inside, now and as they come in. A quest several worlds hold
-     * is one progression they all push.
+     * Shares the quest with everyone inside, now and as they come in, on the world's own thread
+     * whoever calls. A quest several worlds hold is one progression they all push.
      */
     public void addQuest(@Nonnull World world, @Nonnull UUID questId) {
-        AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
-        if (quest == null) return;
-
-        if (!loadedRecord(world).register(questId)) return;
-        getWorldQuestStoreFromWorld(world).markDirty();
-
-        LOGGER.atInfo().log("Added quest %s to world %s", questId, world.getName());
-
-        UUID worldId = world.getWorldConfig().getUuid();
-        if (quest.getScope() instanceof WorldQuestScope scope) {
-            if (scope.getWorlds().add(worldId)) quest.markDirty();
-        } else {
-            quest.setScope(new WorldQuestScope(worldId));
-        }
-
-        for (PlayerRef playerRef : world.getPlayerRefs()) {
-            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
-        }
+        onThreadOf(world, () -> addQuestHere(world, questId));
     }
 
+    /**
+     * Takes the quest off the world's index, on the world's own thread whoever calls.
+     */
     public void removeQuest(@Nonnull World world, @Nonnull UUID questId) {
-        LOGGER.atInfo().log("Removing quest %s from world %s", questId, world.getName());
-
-        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
-        if (store.questsRecord.unregister(questId)) store.markDirty();
-
-        // Gone already when it left for good, and nothing then is left to write on
-        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
-        if (quest != null && quest.getScope() instanceof WorldQuestScope scope && scope.getWorlds().remove(world.getWorldConfig().getUuid())) {
-            quest.markDirty();
-        }
+        onThreadOf(world, () -> removeQuestHere(world, questId));
     }
 
     /**
@@ -143,7 +92,10 @@ public class WorldQuestService {
         List<World> worlds = new ArrayList<>();
         for (UUID worldId : worldIds) {
             World world = Universe.get().getWorld(worldId);
-            if (world != null && !CLOSING.contains(worldId)) worlds.add(world);
+            if (world == null) continue;
+
+            WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
+            if (store == null || !store.isClosing()) worlds.add(world);
         }
         return worlds;
     }
@@ -161,40 +113,7 @@ public class WorldQuestService {
     }
 
     /**
-     * @return the key a group of worlds sharing one quest is written under, named after the
-     * assignment gathering it.
-     */
-    @Nonnull
-    public static String groupKey(@Nonnull String group) {
-        return GROUP_INDEX_PREFIX + group;
-    }
-
-    /**
-     * @return the ids on that group's index, those that ended included, read back the first time.
-     */
-    @Nonnull
-    public Set<UUID> getGroupQuestIds(@Nonnull String group) {
-        return groupRecord(group).getAllIds();
-    }
-
-    /**
-     * Puts a quest in a group: the worlds it gathers take it up as they are entered.
-     */
-    public void addToGroup(@Nonnull String group, @Nonnull UUID questId) {
-        if (groupRecord(group).register(questId)) dirtyGroups.add(group);
-    }
-
-    /**
-     * Takes a quest out of a group, for one leaving for good.
-     */
-    public void removeFromGroup(@Nonnull String group, @Nonnull UUID questId) {
-        QuestsRecord record = groups.get(group);
-        if (record != null && record.unregister(questId)) dirtyGroups.add(group);
-    }
-
-    /**
-     * Writes out the index of every world and group that changed, for the save pass and for
-     * shutdown.
+     * Writes out the index of every world that changed, for the save pass and for shutdown.
      */
     public void saveAll(boolean force) {
         for (World world : Universe.get().getWorlds().values()) {
@@ -205,18 +124,52 @@ public class WorldQuestService {
 
             storage.saveIndex(indexKey(world), store.questsRecord.getAllIds());
         }
-
-        for (String group : force ? Set.copyOf(groups.keySet()) : Set.copyOf(dirtyGroups)) {
-            dirtyGroups.remove(group);
-
-            QuestsRecord record = groups.get(group);
-            if (record != null) storage.saveIndex(groupKey(group), record.getAllIds());
-        }
     }
 
-    @Nonnull
-    private QuestsRecord groupRecord(@Nonnull String group) {
-        return groups.computeIfAbsent(group, key -> new QuestsRecord(storage.loadIndex(groupKey(key))));
+    /**
+     * On whatever thread the caller is on: a world closing may have no thread left to run on.
+     */
+    void removeQuestHere(@Nonnull World world, @Nonnull UUID questId) {
+        LOGGER.atInfo().log("Removing quest %s from world %s", questId, world.getName());
+
+        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
+        if (store.questsRecord.unregister(questId)) store.markDirty();
+
+        // Gone already when it left for good, and nothing then is left to write on
+        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+        QuestScope scope = quest == null ? null : quest.getScope();
+        if (scope != null && scope.removeWorld(world.getWorldConfig().getUuid())) quest.markDirty();
+    }
+
+    /**
+     * Lets go of a world's index for good, in memory and in the storage.
+     */
+    void deleteIndex(@Nonnull World world) {
+        loadedRecord(world).replaceAll(Set.of());
+        getWorldQuestStoreFromWorld(world).consumeChanges();
+        storage.deleteIndex(indexKey(world));
+    }
+
+    private void addQuestHere(@Nonnull World world, @Nonnull UUID questId) {
+        AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+        if (quest == null) return;
+
+        if (!loadedRecord(world).register(questId)) return;
+        getWorldQuestStoreFromWorld(world).markDirty();
+
+        LOGGER.atInfo().log("Added quest %s to world %s", questId, world.getName());
+
+        UUID worldId = world.getWorldConfig().getUuid();
+        QuestScope scope = quest.getScope();
+        if (scope == null) {
+            quest.setScope(new WorldQuestScope(List.of(worldId)));
+        } else if (scope.addWorld(worldId)) {
+            quest.markDirty();
+        }
+
+        for (PlayerRef playerRef : world.getPlayerRefs()) {
+            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
+        }
     }
 
     /**
@@ -278,73 +231,6 @@ public class WorldQuestService {
                 PlayerQuestService.get().removeQuestFromPlayerStore(playerStore, quest, playerRef.getUuid());
             }
         }
-    }
-
-    /**
-     * Fails what a world still runs as it closes for good, an instance done with or a world removed
-     * by hand, then lets go of its index. A crash keeps everything, the world being reloaded, and
-     * so does a server stop, which raises no removal at all.
-     */
-    private void handleRemoveWorldEvent(@Nonnull RemoveWorldEvent removeWorldEvent) {
-        if (removeWorldEvent.isCancelled()) return;
-        if (removeWorldEvent.getRemovalReason() != RemoveWorldEvent.RemovalReason.GENERAL) return;
-
-        World world = removeWorldEvent.getWorld();
-        UUID worldId = world.getWorldConfig().getUuid();
-        QuestsRecord questsRecord = loadedRecord(world);
-
-        CLOSING.add(worldId);
-        try {
-            for (UUID questId : new ArrayList<>(questsRecord.getAllIds())) {
-                AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
-                if (quest != null) close(world, quest);
-            }
-
-            questsRecord.replaceAll(Set.of());
-            getWorldQuestStoreFromWorld(world).consumeChanges();
-            storage.deleteIndex(indexKey(world));
-            storage.deleteAssignments(indexKey(world));
-
-            LOGGER.atInfo().log("Closed the quests of world %s", world.getName());
-        } finally {
-            CLOSING.remove(worldId);
-        }
-    }
-
-    /**
-     * A quest another open world shares goes on there. Otherwise one still running fails, and one
-     * no journal holds is done away with, nothing being left to ever read it; the rest stays with
-     * whoever holds it, in memory only while one of them is online.
-     */
-    private void close(@Nonnull World world, @Nonnull AbstractQuestProgression<?> quest) {
-        UUID questId = quest.getId();
-
-        if (quest.getScope() instanceof WorldQuestScope scope && !openWorlds(scope.getWorlds()).isEmpty()) {
-            removeQuest(world, questId);
-            return;
-        }
-
-        if (QuestProgressionService.get().getLiveQuest(questId) != null) {
-            QuestProgressionService.get().progress(new SetStateVisitor(QuestState.FAILED), List.of(questId));
-        }
-
-        if (quest.getPlayers().isEmpty() && quest.getAbandonedPlayers().isEmpty()) {
-            QuestProgressionService.get().unregisterQuest(quest);
-        } else if (!isHeldOnline(quest)) {
-            QuestProgressionService.get().unloadQuest(questId);
-        }
-    }
-
-    private static boolean isHeldOnline(@Nonnull AbstractQuestProgression<?> quest) {
-        for (UUID playerId : quest.getPlayers()) {
-            if (Universe.get().getPlayer(playerId) != null) return true;
-        }
-
-        for (UUID playerId : quest.getAbandonedPlayers()) {
-            if (Universe.get().getPlayer(playerId) != null) return true;
-        }
-
-        return false;
     }
 
     /**

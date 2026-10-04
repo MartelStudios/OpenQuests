@@ -1,10 +1,8 @@
 package com.martelstudios.openquests.core.assignments.repeat;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AssignmentRecord;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Anew on every occasion: what the last one opened, if still running, fails as the new quest is
@@ -18,8 +16,8 @@ public class ReplaceRepeat extends AssignmentRepeat {
 
     @Nonnull
     @Override
-    protected Decision decideWithin(@Nullable AssignmentRecord record, @Nonnull String occasion, boolean timed, boolean seen, boolean lineRunning) {
-        if (isSamePeriod(record, occasion, timed)) return Decision.SKIP;
-        return lineRunning ? Decision.REPLACE : Decision.HAND_OUT;
+    protected Decision decideWithin(@Nonnull AssignmentHistory history) {
+        if (history.isSamePeriod()) return Decision.SKIP;
+        return history.isLineRunning() ? Decision.REPLACE : Decision.HAND_OUT;
     }
 }

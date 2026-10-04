@@ -37,17 +37,13 @@ public abstract class AssignmentRepeat {
     /**
      * The cap is the same for every kind and weighed first: a holder handed the quest that many
      * times is never handed it again.
-     *
-     * @param occasion the key of the occasion now, as the scope tells hand-outs apart
-     * @param timed whether the occasion is a period, which comes back each time a holder is reached
-     * @param seen whether this holder was already handed the quest on this very occasion
-     * @param lineRunning whether what an earlier hand-out opened is still running for this holder
      */
     @Nonnull
-    public final Decision decide(@Nullable AssignmentRecord record, @Nonnull String occasion, boolean timed, boolean seen, boolean lineRunning) {
+    public final Decision decide(@Nonnull AssignmentHistory history) {
+        AssignmentRecord record = history.getRecord();
         if (max > 0 && record != null && record.getCount() >= max) return Decision.SKIP;
 
-        return decideWithin(record, occasion, timed, seen, lineRunning);
+        return decideWithin(history);
     }
 
     /**
@@ -66,15 +62,7 @@ public abstract class AssignmentRepeat {
     }
 
     @Nonnull
-    protected abstract Decision decideWithin(@Nullable AssignmentRecord record, @Nonnull String occasion, boolean timed, boolean seen, boolean lineRunning);
-
-    /**
-     * A period is handed out once however often its holder is reached during it; an event, a
-     * connection or an entry, is a new occasion every time.
-     */
-    protected static boolean isSamePeriod(@Nullable AssignmentRecord record, @Nonnull String occasion, boolean timed) {
-        return timed && record != null && occasion.equals(record.getOccasion());
-    }
+    protected abstract Decision decideWithin(@Nonnull AssignmentHistory history);
 
     /**
      * What an occasion comes to for one holder.

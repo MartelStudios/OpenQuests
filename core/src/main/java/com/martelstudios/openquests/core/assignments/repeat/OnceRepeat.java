@@ -1,10 +1,8 @@
 package com.martelstudios.openquests.core.assignments.repeat;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AssignmentRecord;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Once per occasion and holder, the default: once for good on connection, once per world entered,
@@ -18,7 +16,7 @@ public class OnceRepeat extends AssignmentRepeat {
 
     @Nonnull
     @Override
-    protected Decision decideWithin(@Nullable AssignmentRecord record, @Nonnull String occasion, boolean timed, boolean seen, boolean lineRunning) {
-        return seen ? Decision.SKIP : Decision.HAND_OUT;
+    protected Decision decideWithin(@Nonnull AssignmentHistory history) {
+        return history.isSeen() ? Decision.SKIP : Decision.HAND_OUT;
     }
 }
