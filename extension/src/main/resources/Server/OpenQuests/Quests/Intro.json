@@ -1,7 +1,6 @@
 {
   "Type": "Composite",
   "Categories": ["Tutorial"],
-  "StartOnConnection": true,
   "PersistChildrenHistory": true,
   "TitleKey": "quest.intro.title",
   "DescriptionKey": "quest.intro.description",

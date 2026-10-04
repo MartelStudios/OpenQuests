@@ -1,7 +1,6 @@
 {
   "Type": "Composite",
   "Categories": ["Chores"],
-  "StartOnConnection": true,
   "TitleKey": "quest.daily-chores.title",
   "DescriptionKey": "quest.daily-chores.description",
   "AbandonedSound": "",

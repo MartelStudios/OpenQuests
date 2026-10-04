@@ -1,7 +1,6 @@
 {
   "Type": "QuestState",
   "Categories": ["Tutorial"],
-  "StartOnConnection": true,
   "TitleKey": "quest.skip-intro.title",
   "DescriptionKey": "quest.skip-intro.description",
   "QuestAssetId": "Intro",

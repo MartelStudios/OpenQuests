@@ -5,10 +5,10 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.utils.WorldNamePattern;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.regex.Pattern;
 
 /**
  * Quest completed by entering a world whose name matches the pattern.
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class EnterWorldQuestProgression extends AbstractQuestProgression<EnterWorldQuestProgression> {
 
     public static final BuilderCodec<EnterWorldQuestProgression> CODEC = BuilderCodec.builder(EnterWorldQuestProgression.class, EnterWorldQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
-                                                                                     .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING), (quest, pattern) -> quest.worldNamePattern = pattern, quest -> quest.worldNamePattern)
+                                                                                     .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING), (quest, pattern) -> quest.setWorldNamePattern(pattern), quest -> quest.worldNamePattern == null ? null : quest.worldNamePattern.getSource())
                                                                                      .add()
                                                                                      .build();
 
@@ -24,10 +24,7 @@ public class EnterWorldQuestProgression extends AbstractQuestProgression<EnterWo
      * Overrides the asset's pattern for this instance alone.
      */
     @Nullable
-    protected String worldNamePattern;
-
-    private transient Pattern compiled;
-    private transient String compiledFrom;
+    protected WorldNamePattern worldNamePattern;
 
     @Override
     public EnterWorldQuestAsset getAsset() {
@@ -38,36 +35,26 @@ public class EnterWorldQuestProgression extends AbstractQuestProgression<EnterWo
      * @return this instance's pattern if one was set on it, the asset's otherwise.
      */
     @Nonnull
-    public String getWorldNamePattern() {
+    public WorldNamePattern getWorldNamePattern() {
         return worldNamePattern != null ? worldNamePattern : getAsset().getWorldNamePattern();
     }
 
     public EnterWorldQuestProgression setWorldNamePattern(@Nullable String worldNamePattern) {
-        this.worldNamePattern = worldNamePattern;
+        this.worldNamePattern = worldNamePattern == null ? null : WorldNamePattern.of(worldNamePattern);
         return this;
     }
 
     /**
-     * Matches the name whole, so {@code Dungeon} does not match {@code MyDungeonWorld}. Write
-     * {@code .*Dungeon.*} to match a fragment.
-     *
-     * @return {@code true} when the world name matches this quest's pattern.
+     * @return {@code true} when the whole world name matches this quest's pattern.
      */
     public boolean matchesWorld(@Nonnull String worldName) {
-        String pattern = getWorldNamePattern();
-
-        // Keyed on the string so an override recompiles, and nothing else does
-        if (!pattern.equals(compiledFrom)) {
-            compiled = Pattern.compile(pattern);
-            compiledFrom = pattern;
-        }
-        return compiled.matcher(worldName).matches();
+        return getWorldNamePattern().matches(worldName);
     }
 
     @Nonnull
     @Override
     public Message getDefaultTitle() {
         return Message.translation("openquests.quest.default.enter-world")
-                      .param("world", getWorldNamePattern());
+                      .param("world", getWorldNamePattern().getSource());
     }
 }

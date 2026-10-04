@@ -1,6 +1,8 @@
 package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.AssignmentRecord;
+import com.martelstudios.openquests.core.models.AssignmentRecords;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 
@@ -109,6 +111,37 @@ public interface QuestStorage extends AutoCloseable {
      * leaving it as it was.
      */
     void saveIndex(@Nonnull String indexKey, @Nonnull Set<UUID> questIds);
+
+    /**
+     * Lets go of a key nothing will read again, such as a closed instance's. A backend keeping
+     * nothing per key can leave it at an empty index.
+     */
+    default void deleteIndex(@Nonnull String indexKey) {
+        saveIndex(indexKey, Set.of());
+    }
+
+    /**
+     * Reads back what the assignments handed a holder many players share: a world, a group of
+     * worlds, the server. A player's own are part of their record.
+     *
+     * @return empty for a holder handed nothing yet.
+     */
+    @Nonnull
+    AssignmentRecords loadAssignments(@Nonnull String holderKey);
+
+    /**
+     * Writes one record only if what is stored still matches what the caller read, so servers
+     * sharing a holder never both hand the same occasion out.
+     *
+     * @param expected what the caller read, {@code null} when there was nothing
+     * @return {@code false} if something else wrote in between, nothing then written.
+     */
+    boolean claimAssignment(@Nonnull String holderKey, @Nonnull String assignmentId, @Nonnull String questAssetId, @Nullable AssignmentRecord expected, @Nonnull AssignmentRecord next);
+
+    /**
+     * Lets go of a holder nothing will hand anything to again, such as a closed world.
+     */
+    void deleteAssignments(@Nonnull String holderKey);
 
     /**
      * What a player carries besides the quests themselves: which of their quests to look for, the

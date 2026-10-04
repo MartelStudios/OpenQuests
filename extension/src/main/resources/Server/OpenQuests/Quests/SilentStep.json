@@ -1,7 +1,6 @@
 {
   "Type": "Walk",
   "Categories": ["Achievement"],
-  "StartOnConnection": true,
   "TitleKey": "quest.silent-step.title",
   "DescriptionKey": "quest.silent-step.description",
   "TargetQuantity": 500,

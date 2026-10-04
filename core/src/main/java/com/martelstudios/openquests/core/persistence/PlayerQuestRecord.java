@@ -5,6 +5,8 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.codec.codecs.set.SetCodec;
+import com.martelstudios.openquests.core.models.AssignmentRecord;
+import com.martelstudios.openquests.core.models.AssignmentRecords;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
@@ -27,7 +29,7 @@ public class PlayerQuestRecord {
     public static final BuilderCodec<PlayerQuestRecord> CODEC = BuilderCodec.builder(PlayerQuestRecord.class, PlayerQuestRecord::new)
                                                                             .append(new KeyedCodec<>("Quests", new SetCodec<>(Codec.UUID_STRING, HashSet<UUID>::new, false)), (record, ids) -> record.questIds.addAll(ids), record -> record.questIds)
                                                                             .add()
-                                                                            .append(new KeyedCodec<>("StartedOnConnection", new SetCodec<>(Codec.STRING, HashSet<String>::new, false)), (record, ids) -> record.startedOnConnection.addAll(ids), record -> record.startedOnConnection)
+                                                                            .append(new KeyedCodec<>("Assignments", AssignmentRecords.MAP_CODEC), (record, assignments) -> record.assignments.putAll(assignments), record -> record.assignments)
                                                                             .add()
                                                                             .append(new KeyedCodec<>("PendingRewards", new SetCodec<>(PendingRewards.CODEC, HashSet<PendingRewards>::new, false)), (record, owed) -> record.pendingRewards.addAll(owed), record -> record.pendingRewards)
                                                                             .add()
@@ -37,7 +39,7 @@ public class PlayerQuestRecord {
 
     private final Set<UUID> questIds = new HashSet<>();
 
-    private final Set<String> startedOnConnection = new HashSet<>();
+    private final Map<String, Map<String, AssignmentRecord>> assignments = new HashMap<>();
 
     private final Set<PendingRewards> pendingRewards = new HashSet<>();
 
@@ -45,9 +47,9 @@ public class PlayerQuestRecord {
 
     public PlayerQuestRecord() {}
 
-    public PlayerQuestRecord(@Nonnull Set<UUID> questIds, @Nonnull Set<String> startedOnConnection, @Nonnull Set<PendingRewards> pendingRewards, @Nonnull Map<String, QuestCompletions> completions) {
+    public PlayerQuestRecord(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Set<PendingRewards> pendingRewards, @Nonnull Map<String, QuestCompletions> completions) {
         this.questIds.addAll(questIds);
-        this.startedOnConnection.addAll(startedOnConnection);
+        this.assignments.putAll(assignments);
         this.pendingRewards.addAll(pendingRewards);
         this.completions.putAll(completions);
     }
@@ -61,13 +63,13 @@ public class PlayerQuestRecord {
     }
 
     /**
-     * @return the asset ids already handed to this player by {@code StartOnConnection}. Only these
-     * are kept, not the quests made from them, so a catalogue offered to everyone costs one string
-     * per quest actually taken.
+     * @return what the assignments handed this player, by assignment and then by quest. Only the
+     * hand-outs are kept, not the quests made from them, so a catalogue offered to everyone costs
+     * one line per quest actually taken.
      */
     @Nonnull
-    public Set<String> getStartedOnConnection() {
-        return startedOnConnection;
+    public Map<String, Map<String, AssignmentRecord>> getAssignments() {
+        return assignments;
     }
 
     /**
@@ -99,6 +101,6 @@ public class PlayerQuestRecord {
      * backend may answer without having anything written down.
      */
     public boolean isEmpty() {
-        return questIds.isEmpty() && startedOnConnection.isEmpty() && pendingRewards.isEmpty() && completions.isEmpty();
+        return questIds.isEmpty() && assignments.isEmpty() && pendingRewards.isEmpty() && completions.isEmpty();
     }
 }

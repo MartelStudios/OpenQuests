@@ -11,11 +11,28 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
+import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
+import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
+import com.martelstudios.openquests.core.assignments.repeat.AfterEndRepeat;
+import com.martelstudios.openquests.core.assignments.repeat.AssignmentRepeat;
+import com.martelstudios.openquests.core.assignments.repeat.OnceRepeat;
+import com.martelstudios.openquests.core.assignments.repeat.ReplaceRepeat;
+import com.martelstudios.openquests.core.assignments.scope.AssignmentScope;
+import com.martelstudios.openquests.core.assignments.scope.PlayerAssignmentScope;
+import com.martelstudios.openquests.core.assignments.scope.UniverseAssignmentScope;
+import com.martelstudios.openquests.core.assignments.scope.WorldAssignmentScope;
+import com.martelstudios.openquests.core.assignments.scope.WorldsAssignmentScope;
+import com.martelstudios.openquests.core.assignments.trigger.AssignmentTrigger;
+import com.martelstudios.openquests.core.assignments.trigger.PlayerConnectTrigger;
+import com.martelstudios.openquests.core.assignments.trigger.PlayerEnterWorldTrigger;
+import com.martelstudios.openquests.core.assignments.trigger.ScheduleTrigger;
 import com.martelstudios.openquests.core.commands.QuestCommand;
 import com.martelstudios.openquests.core.config.OpenQuestsConfig;
 import com.martelstudios.openquests.core.constraints.QuestConstraintValidator;
+import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.OpenQuestCategory;
+import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.QuestStorageProvider;
@@ -26,10 +43,12 @@ import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorageProvid
 import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
+import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
+import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestStoreResource;
-import com.martelstudios.openquests.core.services.QuestAutoStartService;
+import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.services.QuestDeadlineService;
 import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -72,7 +91,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     private QuestProgressionService questProgressionService;
     private QuestPlayerStateService questPlayerStateService;
-    private QuestAutoStartService questAutoStartService;
+    private QuestAssignmentService questAssignmentService;
     private QuestDeadlineService questDeadlineService;
     private QuestRewardService questRewardService;
     private UniverseQuestService universeQuestService;
@@ -111,8 +130,30 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questRewardService = new QuestRewardService(this);
         universeQuestService = new UniverseQuestService(this, questStorage);
         worldQuestService = new WorldQuestService(this, questStorage);
+
+        QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
+        QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);
+        QuestScope.CODEC.register(UniverseQuestScope.TYPE, UniverseQuestScope.class, UniverseQuestScope.CODEC);
+
+        // A quest leaving for good leaves whatever shared it, which only its scope knows how to undo
+        getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, event -> {
+            QuestScope scope = event.getQuest().getScope();
+            if (scope != null) scope.release(event.getQuest());
+        });
+
         playerQuestService = new PlayerQuestService(this);
-        questAutoStartService = new QuestAutoStartService(this);
+        questAssignmentService = new QuestAssignmentService(this, questStorage);
+
+        AssignmentTrigger.CODEC.register(PlayerConnectTrigger.TYPE, PlayerConnectTrigger.class, PlayerConnectTrigger.CODEC);
+        AssignmentTrigger.CODEC.register(PlayerEnterWorldTrigger.TYPE, PlayerEnterWorldTrigger.class, PlayerEnterWorldTrigger.CODEC);
+        AssignmentTrigger.CODEC.register(ScheduleTrigger.TYPE, ScheduleTrigger.class, ScheduleTrigger.CODEC);
+        AssignmentScope.CODEC.register(PlayerAssignmentScope.TYPE, PlayerAssignmentScope.class, PlayerAssignmentScope.CODEC);
+        AssignmentScope.CODEC.register(WorldAssignmentScope.TYPE, WorldAssignmentScope.class, WorldAssignmentScope.CODEC);
+        AssignmentScope.CODEC.register(WorldsAssignmentScope.TYPE, WorldsAssignmentScope.class, WorldsAssignmentScope.CODEC);
+        AssignmentScope.CODEC.register(UniverseAssignmentScope.TYPE, UniverseAssignmentScope.class, UniverseAssignmentScope.CODEC);
+        AssignmentRepeat.CODEC.register(OnceRepeat.TYPE, OnceRepeat.class, OnceRepeat.CODEC);
+        AssignmentRepeat.CODEC.register(AfterEndRepeat.TYPE, AfterEndRepeat.class, AfterEndRepeat.CODEC);
+        AssignmentRepeat.CODEC.register(ReplaceRepeat.TYPE, ReplaceRepeat.class, ReplaceRepeat.CODEC);
         questDeadlineService = new QuestDeadlineService(this);
 
         // Both indexes are rebuilt from the storage on connection and on world entry, so neither
@@ -137,12 +178,21 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
                                                     .loadsAfter(OpenQuestCategory.class)
                                                     .build());
 
+        // After the quests, which the assignments name and are checked against
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestAssignment.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenQuests/Assignments/")
+                                                    .setCodec(OpenQuestAssignment.CODEC)
+                                                    .setKeyFunction(OpenQuestAssignment::getId)
+                                                    .loadsAfter(OpenQuestAsset.class)
+                                                    .build());
+
         getEventRegistry().registerGlobal(LoadAssetEvent.PRIORITY_LOAD_LATE, LoadAssetEvent.class, QuestConstraintValidator::handleLoadAsset);
     }
 
     @Override
     protected void start() {
         universeQuestService.loadQuests();
+        questAssignmentService.start();
 
         long interval = settings.getSaveIntervalMinutes();
 
@@ -241,8 +291,8 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         return questPlayerStateService;
     }
 
-    public QuestAutoStartService getQuestAutoStartService() {
-        return questAutoStartService;
+    public QuestAssignmentService getQuestAssignmentService() {
+        return questAssignmentService;
     }
 
     public QuestDeadlineService getQuestDeadlineService() {

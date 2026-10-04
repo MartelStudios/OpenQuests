@@ -6,6 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.utils.WorldNamePattern;
 
 /**
  * Enter a world whose name matches a regular expression.
@@ -14,12 +15,12 @@ public class EnterWorldQuestAsset extends OpenQuestAsset {
 
     public static final BuilderCodec<EnterWorldQuestAsset> CODEC =
         BuilderCodec.builder(EnterWorldQuestAsset.class, EnterWorldQuestAsset::new, OpenQuestAsset.BASE_CODEC)
-                    .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING, true), (asset, pattern) -> asset.worldNamePattern = pattern, asset -> asset.worldNamePattern)
+                    .append(new KeyedCodec<>("WorldNamePattern", Codec.STRING, true), (asset, pattern) -> asset.worldNamePattern = pattern == null ? null : WorldNamePattern.of(pattern), asset -> asset.worldNamePattern == null ? null : asset.worldNamePattern.getSource())
                     .addValidator(Validators.nonNull())
                     .add()
                     .build();
 
-    protected String worldNamePattern;
+    protected WorldNamePattern worldNamePattern;
 
     private EnterWorldQuestAsset() {}
 
@@ -28,7 +29,7 @@ public class EnterWorldQuestAsset extends OpenQuestAsset {
         return new EnterWorldQuestProgression().setAssetId(getId());
     }
 
-    public String getWorldNamePattern() {
+    public WorldNamePattern getWorldNamePattern() {
         return worldNamePattern;
     }
 }

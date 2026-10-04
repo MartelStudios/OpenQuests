@@ -145,12 +145,15 @@ public class QuestProgressionService {
 
     /**
      * Adds a player to a quest already running (one a scope shares) unless the constraints of
-     * its asset refuse them.
+     * its asset refuse them. A quest that is over, or that this player gave up, is not joined:
+     * coming back into its scope is not taking it up again.
      *
-     * @return {@code false} if the player was refused or already held the quest.
+     * @return {@code false} if the player was refused, already held the quest or gave it up, or
+     * the quest is over.
      */
     public boolean joinQuest(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         if (quest.getPlayers().contains(playerId)) return false;
+        if (quest.isAbandonedBy(playerId) || dataStore.getLive(quest.getId()) == null) return false;
 
         OpenQuestAsset asset = quest.getAsset();
         if (asset != null && !isEligible(asset, playerId)) return false;

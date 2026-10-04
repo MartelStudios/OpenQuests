@@ -1,7 +1,6 @@
 {
   "Type": "Run",
   "Categories": ["Achievement"],
-  "StartOnConnection": true,
   "TitleKey": "quest.run-novice.title",
   "DescriptionKey": "quest.run-novice.description",
   "TargetQuantity": 100,

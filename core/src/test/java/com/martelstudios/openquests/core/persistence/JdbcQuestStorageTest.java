@@ -1,12 +1,16 @@
 package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.QuestCompletions;
+import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
 import com.martelstudios.openquests.core.persistence.jdbc.SqlDialect;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
+import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
+import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +22,7 @@ import javax.annotation.Nonnull;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.stream.Collectors;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +49,8 @@ class JdbcQuestStorageTest {
     static void registerTypes() {
         AbstractQuestProgression.CODEC.register(TestQuestProgression.TYPE, TestQuestProgression.class, TestQuestProgression.CODEC);
         QuestReward.CODEC.register(TestQuestReward.TYPE, TestQuestReward.class, TestQuestReward.CODEC);
+        QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
+        QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);
     }
 
     @BeforeEach
@@ -75,6 +82,88 @@ class JdbcQuestStorageTest {
         assertTrue(read.hasTag("OQ_TEST"));
         assertEquals(List.of("a", "b"), List.of(read.getTagValues("OQ_TEST")));
         assertNotNull(read.getStartedAt());
+    }
+
+    @Test
+    void aSharedHolderIsHandedAnOccasionOnce() {
+        AssignmentRecord first = new AssignmentRecord(1, 1790476800000L, "period:2026-10-10T18:00:00Z");
+
+        assertTrue(storage.claimAssignment("universe", "WeeklyHunt", "WeeklyHunt", null, first));
+        assertFalse(storage.claimAssignment("universe", "WeeklyHunt", "WeeklyHunt", null, first));
+
+        assertEquals(first, storage.loadAssignments("universe").get("WeeklyHunt", "WeeklyHunt"));
+    }
+
+    @Test
+    void aRecordReadBeforeAnotherServerWroteIsRefused() {
+        AssignmentRecord first = new AssignmentRecord(1, 1790476800000L, "period:2026-10-10T18:00:00Z");
+        AssignmentRecord second = new AssignmentRecord(2, 1791081600000L, "period:2026-10-17T18:00:00Z");
+        storage.claimAssignment("universe", "WeeklyHunt", "WeeklyHunt", null, first);
+
+        assertTrue(storage.claimAssignment("universe", "WeeklyHunt", "WeeklyHunt", first, second));
+        assertFalse(storage.claimAssignment("universe", "WeeklyHunt", "WeeklyHunt", first, second));
+
+        assertEquals(second, storage.loadAssignments("universe").get("WeeklyHunt", "WeeklyHunt"));
+    }
+
+    @Test
+    void aClosedWorldLetsGoOfItsRecords() {
+        String lair = "world:" + UUID.randomUUID();
+        storage.claimAssignment(lair, "GoblinLair", "GoblinLairRats", null, new AssignmentRecord(1, 1790476800000L, "once"));
+        storage.claimAssignment("universe", "WeeklyHunt", "WeeklyHunt", null, new AssignmentRecord(1, 1790476800000L, "once"));
+
+        storage.deleteAssignments(lair);
+
+        assertTrue(storage.loadAssignments(lair).isEmpty());
+        assertFalse(storage.loadAssignments("universe").isEmpty());
+    }
+
+    @Test
+    void aSharedQuestKeepsWhoSharesIt() {
+        UUID lair = UUID.randomUUID();
+        UUID arena = UUID.randomUUID();
+        TestQuestProgression quest = quest("ClearTheRats", UUID.randomUUID());
+        WorldQuestScope scope = new WorldQuestScope(lair);
+        scope.getWorlds().add(arena);
+        quest.setScope(scope);
+
+        storage.saveProgressions(List.of(quest));
+
+        AbstractQuestProgression<?> read = storage.loadProgression(quest.getId());
+
+        assertNotNull(read);
+        assertTrue(read.getScope() instanceof WorldQuestScope);
+        assertEquals(Set.of(lair, arena), ((WorldQuestScope) read.getScope()).getWorlds());
+    }
+
+    @Test
+    void aQuestAGroupSharesKeepsItsGroupAndTheWorldsItReached() {
+        UUID arena = UUID.randomUUID();
+        TestQuestProgression quest = quest("ArenaGoal", UUID.randomUUID());
+        WorldsQuestScope scope = new WorldsQuestScope("ArenaTogether");
+        scope.getWorlds().add(arena);
+        quest.setScope(scope);
+
+        storage.saveProgressions(List.of(quest));
+
+        AbstractQuestProgression<?> read = storage.loadProgression(quest.getId());
+
+        assertNotNull(read);
+        assertTrue(read.getScope() instanceof WorldsQuestScope);
+        assertEquals("ArenaTogether", ((WorldsQuestScope) read.getScope()).getGroup());
+        assertEquals(Set.of(arena), ((WorldsQuestScope) read.getScope()).getWorlds());
+    }
+
+    @Test
+    void aQuestNobodySharesHasNoScope() {
+        TestQuestProgression quest = quest("CollectStick", UUID.randomUUID());
+
+        storage.saveProgressions(List.of(quest));
+
+        AbstractQuestProgression<?> read = storage.loadProgression(quest.getId());
+
+        assertNotNull(read);
+        assertNull(read.getScope());
     }
 
     @Test
@@ -192,11 +281,11 @@ class JdbcQuestStorageTest {
 
         PendingRewards owed = new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")});
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), Set.of("StartHatchet", "PickBerries"), Set.of(owed), Map.of()));
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet", "PickBerries"), Set.of(owed), Map.of()));
 
         PlayerQuestRecord read = storage.loadPlayer(playerId);
 
-        assertEquals(Set.of("StartHatchet", "PickBerries"), read.getStartedOnConnection());
+        assertEquals(handed("OnConnection", "StartHatchet", "PickBerries"), read.getAssignments());
         assertEquals(1, read.getPendingRewards().size());
 
         PendingRewards readOwed = read.getPendingRewards().iterator().next();
@@ -213,12 +302,12 @@ class JdbcQuestStorageTest {
         TestQuestProgression quest = quest("Owed", playerId);
         storage.saveProgressions(List.of(quest));
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), Set.of("StartHatchet"), Set.of(), Map.of()));
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of()));
 
         storage.addPendingRewards(playerId, new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")}));
 
         PlayerQuestRecord read = storage.loadPlayer(playerId);
-        assertEquals(Set.of("StartHatchet"), read.getStartedOnConnection());
+        assertEquals(handed("OnConnection", "StartHatchet"), read.getAssignments());
         assertEquals(1, read.getPendingRewards().size());
 
         // The same completion, now owing less: it replaces rather than piling up
@@ -227,7 +316,7 @@ class JdbcQuestStorageTest {
         read = storage.loadPlayer(playerId);
         assertEquals(1, read.getPendingRewards().size());
         assertEquals(0, read.getPendingRewards().iterator().next().getRewards().length);
-        assertEquals(Set.of("StartHatchet"), read.getStartedOnConnection());
+        assertEquals(handed("OnConnection", "StartHatchet"), read.getAssignments());
     }
 
     @Test
@@ -252,7 +341,7 @@ class JdbcQuestStorageTest {
     @Test
     void recordingACompletionLeavesTheRestOfTheRecordAlone() {
         UUID playerId = UUID.randomUUID();
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), Set.of("StartHatchet"), Set.of(), Map.of()));
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of()));
 
         storage.recordCompletion(playerId, "DailyWood", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000), Instant.ofEpochMilli(2_000));
         storage.recordCompletion(playerId, "DailyWood", QuestState.ABANDONED, Instant.ofEpochMilli(3_000), Instant.ofEpochMilli(4_000));
@@ -260,7 +349,7 @@ class JdbcQuestStorageTest {
         PlayerQuestRecord read = storage.loadPlayer(playerId);
         QuestCompletions completions = read.getCompletions().get("DailyWood");
 
-        assertEquals(Set.of("StartHatchet"), read.getStartedOnConnection());
+        assertEquals(handed("OnConnection", "StartHatchet"), read.getAssignments());
         assertNotNull(completions);
         assertEquals(1, completions.count(QuestState.SUCCESSFUL));
         assertEquals(1, completions.count(QuestState.ABANDONED));
@@ -382,9 +471,9 @@ class JdbcQuestStorageTest {
         target.saveIndex("universe", Set.of(quest.getId()));
         assertEquals(Set.of(quest.getId()), target.loadIndex("universe"));
 
-        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), Set.of("Chain"), Set.of(), Map.of()));
-        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), Set.of("Chain", "Other"), Set.of(), Map.of()));
-        assertEquals(Set.of("Chain", "Other"), target.loadPlayer(alice).getStartedOnConnection());
+        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain"), Set.of(), Map.of()));
+        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of()));
+        assertEquals(handed("OnConnection", "Chain", "Other"), target.loadPlayer(alice).getAssignments());
 
         quest.getPlayers().remove(bob);
         target.saveProgressions(List.of(quest));
@@ -416,6 +505,14 @@ class JdbcQuestStorageTest {
     }
 
     @Nonnull
+    private static Map<String, Map<String, AssignmentRecord>> handed(@Nonnull String assignmentId, @Nonnull String... questAssetIds) {
+        Map<String, AssignmentRecord> byQuest = new HashMap<>();
+        for (String questAssetId : questAssetIds) {
+            byQuest.put(questAssetId, new AssignmentRecord(1, 1790476800000L, "once"));
+        }
+        return Map.of(assignmentId, byQuest);
+    }
+
     private static TestQuestProgression quest(@Nonnull String assetId, @Nonnull UUID... playerIds) {
         TestQuestProgression quest = new TestQuestProgression();
         quest.setAssetId(assetId);

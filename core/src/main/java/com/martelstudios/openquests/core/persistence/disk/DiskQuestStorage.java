@@ -4,6 +4,8 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.datastore.DiskDataStore;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.AssignmentRecord;
+import com.martelstudios.openquests.core.models.AssignmentRecords;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestProgressionRecord;
@@ -15,6 +17,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -24,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,9 +52,16 @@ public class DiskQuestStorage implements QuestStorage {
      */
     private final Map<UUID, Object> playerLocks = new ConcurrentHashMap<>();
 
+    /**
+     * One lock per shared holder, so reading a record and writing the next is one step for this
+     * server. A server is all a disk store is ever written by.
+     */
+    private final Map<String, Object> assignmentLocks = new ConcurrentHashMap<>();
+
     private DiskDataStore<QuestProgressionRecord> progressions;
     private DiskDataStore<PlayerQuestRecord> players;
     private DiskDataStore<QuestIndexRecord> indexes;
+    private DiskDataStore<AssignmentRecordsFile> assignments;
 
     public DiskQuestStorage(@Nonnull String rootPath) {
         this.rootPath = rootPath;
@@ -61,11 +72,13 @@ public class DiskQuestStorage implements QuestStorage {
         progressions = new DiskDataStore<>(child("progressions"), QuestProgressionRecord.CODEC);
         players = new DiskDataStore<>(child("players"), PlayerQuestRecord.CODEC);
         indexes = new DiskDataStore<>(child("indexes"), QuestIndexRecord.CODEC);
+        assignments = new DiskDataStore<>(child("assignments"), AssignmentRecordsFile.CODEC);
 
         // list() and loadAll() walk a directory stream, which throws on one that is not there yet
         createDirectory(progressions.getPath());
         createDirectory(players.getPath());
         createDirectory(indexes.getPath());
+        createDirectory(assignments.getPath());
 
         LOGGER.atInfo().log("Quest storage: JSON files under %s", rootPath);
     }
@@ -223,6 +236,65 @@ public class DiskQuestStorage implements QuestStorage {
     @Override
     public void saveIndex(@Nonnull String indexKey, @Nonnull Set<UUID> questIds) {
         indexes.save(fileName(indexKey), new QuestIndexRecord(questIds));
+    }
+
+    /**
+     * Removes the file rather than emptying it, so closed instances leave nothing behind.
+     */
+    @Override
+    public void deleteIndex(@Nonnull String indexKey) {
+        try {
+            indexes.remove(fileName(indexKey));
+        } catch (NoSuchFileException e) {
+            // Never written: a world nobody played a quest in
+        } catch (IOException e) {
+            LOGGER.atWarning().withCause(e).log("Failed to delete the %s quest index", indexKey);
+        }
+    }
+
+    @Nonnull
+    @Override
+    public AssignmentRecords loadAssignments(@Nonnull String holderKey) {
+        return new AssignmentRecords(readAssignments(holderKey));
+    }
+
+    @Override
+    public boolean claimAssignment(@Nonnull String holderKey, @Nonnull String assignmentId, @Nonnull String questAssetId, @Nullable AssignmentRecord expected, @Nonnull AssignmentRecord next) {
+        synchronized (assignmentLocks.computeIfAbsent(holderKey, key -> new Object())) {
+            AssignmentRecords records = new AssignmentRecords(readAssignments(holderKey));
+            if (!Objects.equals(records.get(assignmentId, questAssetId), expected)) return false;
+
+            records.put(assignmentId, questAssetId, next);
+            assignments.save(fileName(holderKey), new AssignmentRecordsFile(records.snapshot()));
+            return true;
+        }
+    }
+
+    /**
+     * Removes the file rather than emptying it, so closed worlds leave nothing behind.
+     */
+    @Override
+    public void deleteAssignments(@Nonnull String holderKey) {
+        synchronized (assignmentLocks.computeIfAbsent(holderKey, key -> new Object())) {
+            try {
+                assignments.remove(fileName(holderKey));
+            } catch (NoSuchFileException e) {
+                // Never written: a holder nothing was handed to
+            } catch (IOException e) {
+                LOGGER.atWarning().withCause(e).log("Failed to delete the %s assignment records", holderKey);
+            }
+        }
+    }
+
+    @Nonnull
+    private Map<String, Map<String, AssignmentRecord>> readAssignments(@Nonnull String holderKey) {
+        try {
+            AssignmentRecordsFile file = assignments.load(fileName(holderKey));
+            return file == null ? Map.of() : file.getRecords();
+        } catch (IOException e) {
+            LOGGER.atWarning().withCause(e).log("Failed to read the %s assignment records", holderKey);
+            return Map.of();
+        }
     }
 
     @Nonnull
