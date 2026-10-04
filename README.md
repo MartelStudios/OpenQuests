@@ -229,8 +229,8 @@ the one it uses:
 
 - **progressions** (`ProgressionStore`): one replica per quest and per server that wrote it,
   merged when read, and the outcome claimed for a quest that ended;
-- **indexes** (`IndexStore`), a named set of quest ids, which is how a scope remembers what it
-  shares: `universe`, `world:<uuid>` per world, `worlds:<group>` per group of worlds. Written
+- **indexes** (`IndexStore`), a named set of running quest ids, which is how a scope remembers
+  what it shares: `universe`, `world:<uuid>` per world, `worlds:<group>` per group of worlds. Written
   member by member, never replaced whole;
 - **players** (`PlayerStore`), what a player carries besides their quests: the catalogue they have
   already been offered, what they are still owed, how each asset ended for them so far, and the
@@ -265,7 +265,8 @@ For JDBC:
     "DriverPath": "libs/postgresql-42.7.4.jar",
     "ServerId": "survival-1"
   },
-  "SaveIntervalMinutes": 5
+  "SaveIntervalMinutes": 5,
+  "ReplicationSeconds": 5
 }
 ```
 
@@ -281,6 +282,9 @@ For JDBC:
 | `CreateSchema` | `true` | Turn off where the schema is managed elsewhere. |
 | `ServerId` | `server` | Names this server's replicas. Every server sharing the database needs its own: two under one name write over each other's progress. |
 | `Dialect` | from the URL | `Postgresql`, `Mysql`, `Mariadb`, `Sqlite`, `H2`, `Generic`. Only for a database reached through a proxy borrowing another vendor's URL scheme. |
+
+`ReplicationSeconds`, at the top level, is how often servers sharing the database keep each other in
+step (5 by default), which bounds how late one sees another's progress.
 
 PostgreSQL, MySQL, MariaDB and SQLite are spoken natively; anything else falls back to plain
 SQL-92 and works.
@@ -311,9 +315,26 @@ A player is handed over cleanly: their session is written out when they disconne
 when they connect, quests, catalogue and debts alike. Nothing of theirs is left in the entity file
 of the server they were on.
 
-A quest several servers hold **at once** (a universe-scope community goal) is another matter:
-each keeps its own copy in memory and the last save wins. `updated_at` and `updated_by` say which
-server that was. Treat cross-server universe quests as a known limit rather than a feature.
+A quest several servers hold **at once**, a universe quest or one a group of worlds shares, is
+shared without any of them overwriting another:
+
+- **Each server writes its own replica** of the quest, its share of the progress: its own slot of
+  a counter, the moves of the players it hosts. Reading the quest merges the replicas, so two
+  servers counting at once both count.
+- **Every few seconds** (`ReplicationSeconds`) each server writes its replicas of the shared quests
+  and reads what the others wrote since, on a thread of its own: only the replicas that moved come
+  over, and the players see the progress made elsewhere.
+- **An end is claimed once.** The first server to end a shared quest writes its outcome; it pays
+  every player, and a player another server hosts finds the reward in a message that server takes
+  in. A server learning of the end files the quest and tells its own players, but pays nothing.
+- **Indexes are written member by member** and followed the same way, so a universe quest one
+  server starts reaches the players of every other.
+- **A player record has one writer**, the server hosting the player. What another server owes them,
+  a reward or an ending to count, is left as a message the host takes in, now or at their next
+  connection, and lets go of in the same write as the record that took it in.
+
+A world lives on one server, so a world quest is that server's alone; so is a player's own quest
+while they are on it.
 
 #### Where the config file lives
 

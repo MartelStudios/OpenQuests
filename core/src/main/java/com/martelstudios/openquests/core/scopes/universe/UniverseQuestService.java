@@ -13,6 +13,7 @@ import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -77,13 +78,45 @@ public class UniverseQuestService {
     }
 
     /**
+     * Takes an ended quest off the index of running ones. Its players keep it in their journals,
+     * and the quest keeps its scope, which says it was the server's.
+     */
+    public void unindex(@Nonnull UUID questId) {
+        if (quests.unregister(questId)) dirty = true;
+    }
+
+    /**
+     * Takes in what other servers added to and removed from the index since: a quest one of them
+     * started is read back and joined by everyone online here.
+     */
+    public void refresh(@Nonnull Set<UUID> storedNow) {
+        for (UUID questId : quests.absorb(storedNow).added()) {
+            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+            if (quest == null) continue;
+
+            for (PlayerRef playerRef : Universe.get().getPlayers()) {
+                QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
+            }
+        }
+    }
+
+    /**
      * Reads the universe index back and pulls every quest it lists into memory.
      */
     public void loadQuests() {
         quests.load(storage.loadIndex(UNIVERSE_INDEX_KEY));
 
+        QuestProgressionService.get().loadQuests(quests.getAllIds());
+
         for (UUID questId : new ArrayList<>(quests.getAllIds())) {
-            if (QuestProgressionService.get().loadQuest(questId) != null) continue;
+            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+
+            // The index holds running quests only: one that ended is left to its players' journals
+            if (quest != null && quest.isCompleted()) {
+                quests.unregister(questId);
+                dirty = true;
+            }
+            if (quest != null) continue;
 
             // Left on the index, so that a quest set aside comes back with its asset
             if (QuestProgressionService.get().isSetAside(questId)) continue;

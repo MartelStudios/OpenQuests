@@ -26,7 +26,7 @@ class QuantityMergeTest {
         Replica.setLocalId("b");
         onB.setCurrentQuantity(onB.getCurrentQuantity() + 3);
 
-        assertTrue(onA.merge(onB).progressed());
+        assertTrue(onA.merge(onB));
         assertEquals(7, onA.getCurrentQuantity());
     }
 

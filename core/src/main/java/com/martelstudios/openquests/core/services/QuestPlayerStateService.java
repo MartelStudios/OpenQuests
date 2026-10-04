@@ -17,6 +17,7 @@ import com.martelstudios.openquests.core.persistence.PlayerMessage;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
+import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStore;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
@@ -176,6 +177,31 @@ public class QuestPlayerStateService {
     }
 
     /**
+     * Takes in what other servers left the players this server hosts, each message once: a debt is
+     * owed, and paid at once where it claims itself; an ending is counted. The next write of the
+     * player's record lets go of them.
+     */
+    public void deliverMessages(@Nonnull List<PlayerMessage> messages) {
+        for (PlayerMessage message : messages) {
+            Session session = sessions.get(message.getPlayerId());
+            if (session == null || !session.delivered().add(message.getId())) continue;
+
+            if (message.getOwed() != null) QuestRewardService.get().deliver(message.getPlayerId(), message.getOwed());
+
+            PlayerMessage.Ending ending = message.getEnding();
+            if (ending != null) session.questStore().recordCompletion(ending.getAssetId(), ending.getOutcome(), ending.startedAt(), ending.completedAt());
+        }
+    }
+
+    /**
+     * @return the players this server hosts, whose messages it takes in.
+     */
+    @Nonnull
+    public Set<UUID> getHostedPlayers() {
+        return Set.copyOf(sessions.keySet());
+    }
+
+    /**
      * @return how quests from that asset ended for the player so far. An offline player is read
      * from the storage, which blocks: meant for the rare question asked about someone away.
      */
@@ -190,9 +216,12 @@ public class QuestPlayerStateService {
     /**
      * Counts the outcome for everyone holding the quest as it ends, those who gave it up as having
      * abandoned it. Counted here rather than as they leave, so a player who comes back and sees
-     * it through counts once, the way it ended for them.
+     * it through counts once, the way it ended for them. Counted by the server that
+     * ended it alone, so that every server learning of the end does not count it again.
      */
     private void handleQuestCompletedEvent(@Nonnull QuestCompletedEvent questCompletedEvent) {
+        if (!questCompletedEvent.isClaimedHere()) return;
+
         AbstractQuestProgression<?> quest = questCompletedEvent.getQuest();
 
         String assetId = quest.getAssetId();

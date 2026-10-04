@@ -8,6 +8,8 @@ import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -111,6 +113,45 @@ public class WorldGroupIndex {
     public void forgetWorld(@Nonnull UUID worldId) {
         for (Set<UUID> worldIds : joinedWorlds.values()) {
             worldIds.remove(worldId);
+        }
+    }
+
+    /**
+     * @return the keys of the groups read so far, the ones this server follows.
+     */
+    @Nonnull
+    public Set<String> getLoadedKeys() {
+        Set<String> keys = new HashSet<>();
+        for (String group : groups.keySet()) keys.add(keyOf(group));
+        return keys;
+    }
+
+    /**
+     * Takes in what other servers added to and removed from the groups this server follows: a
+     * quest one of them started reaches the worlds of the group someone is in here.
+     *
+     * @param storedNow the ids under each group's key, as {@link #keyOf} names it
+     */
+    public void refresh(@Nonnull Map<String, Set<UUID>> storedNow) {
+        groups.forEach((group, record) -> {
+            Set<UUID> stored = storedNow.get(keyOf(group));
+            if (stored == null) return;
+
+            for (UUID questId : record.absorb(stored).added()) {
+                for (World world : getJoinedWorlds(group)) {
+                    WorldQuestService.get().addQuest(world, questId);
+                }
+            }
+        });
+    }
+
+    /**
+     * Reads the groups named here back now, rather than on the first entry into one of their
+     * worlds, with the quests they run.
+     */
+    public void preload(@Nonnull Collection<String> groupNames) {
+        for (String group : groupNames) {
+            QuestProgressionService.get().loadQuests(record(group).getAllIds());
         }
     }
 

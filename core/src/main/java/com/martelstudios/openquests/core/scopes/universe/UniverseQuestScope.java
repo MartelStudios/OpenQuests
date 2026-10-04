@@ -45,6 +45,19 @@ public class UniverseQuestScope extends QuestScope {
         UniverseQuestService.get().removeQuest(quest.getId());
     }
 
+    @Override
+    public void retire(@Nonnull AbstractQuestProgression<?> quest) {
+        UniverseQuestService.get().unindex(quest.getId());
+    }
+
+    /**
+     * Every server sharing the storage holds the same universe quests.
+     */
+    @Override
+    public boolean isReplicated() {
+        return true;
+    }
+
     /**
      * The server outlives any of its worlds.
      */

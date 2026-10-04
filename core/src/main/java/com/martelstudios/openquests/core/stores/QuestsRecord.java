@@ -95,6 +95,27 @@ public class QuestsRecord {
     }
 
     /**
+     * Takes in what the storage holds now under this record's key, as other servers wrote it:
+     * their adds and removals. What this server added or removed and has not written yet stays as
+     * it is, to be written next.
+     *
+     * @return the ids other servers added since, and those they removed.
+     */
+    @Nonnull
+    public Absorbed absorb(@Nonnull Set<UUID> storedNow) {
+        Set<UUID> added = new HashSet<>(storedNow);
+        added.removeAll(stored);
+        Set<UUID> removed = new HashSet<>(stored);
+        removed.removeAll(storedNow);
+
+        questIds.addAll(added);
+        questIds.removeAll(removed);
+        stored.addAll(added);
+        stored.removeAll(removed);
+        return new Absorbed(added, removed);
+    }
+
+    /**
      * @return the live set of registered quest ids.
      */
     @Nonnull
@@ -111,4 +132,12 @@ public class QuestsRecord {
     public QuestsRecord clone() {
         return new QuestsRecord(this);
     }
+
+    /**
+     * What other servers changed under a key since this server last looked.
+     *
+     * @param added the ids they added
+     * @param removed the ids they removed
+     */
+    public record Absorbed(@Nonnull Set<UUID> added, @Nonnull Set<UUID> removed) {}
 }

@@ -62,10 +62,13 @@ public class QuestRewardService {
 
     /**
      * Pays what the outcome pays the quest as a whole, then writes down what it owes each player
-     * holding it, handed over at once for a reward that claims itself.
+     * holding it, handed over at once for a reward that claims itself. Only on the server that ended the quest:
+     * it pays every player, those another server hosts through a message.
      */
     private void handleQuestCompletedEvent(QuestCompletedEvent questCompletedEvent) {
         AbstractQuestProgression<?> quest = questCompletedEvent.getQuest();
+        if (!questCompletedEvent.isClaimedHere()) return;
+
 
         OpenQuestAsset asset = quest.getAsset();
         if (asset == null) return;
@@ -112,6 +115,14 @@ public class QuestRewardService {
             return;
         }
 
+        deliver(playerId, pending);
+    }
+
+    /**
+     * Owes a player this server hosts, handing over at once what claims itself: a debt reached here
+     * or one another server left them.
+     */
+    public void deliver(@Nonnull UUID playerId, @Nonnull PendingRewards pending) {
         EntityComponents.update(playerId, components -> {
             getPending(components).add(pending);
 

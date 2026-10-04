@@ -7,10 +7,12 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.events.StartWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.replication.QuestReplicationService;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
@@ -44,6 +46,7 @@ public class WorldQuestService {
 
         plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
         plugin.getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, this::handleRemovedPlayerFromWorldEvent);
+        plugin.getEventRegistry().registerGlobal(StartWorldEvent.class, event -> preload(event.getWorld()));
     }
 
     public static WorldQuestService get() {
@@ -75,8 +78,34 @@ public class WorldQuestService {
     }
 
     /**
-     * @return the ids on that world's index, those that ended included, read back first if no
-     * player has come in yet.
+     * Takes an ended quest off the world's index of running ones, on the world's own thread. The
+     * quest keeps the world in its scope, and its players keep it in their journals.
+     */
+    public void unindex(@Nonnull World world, @Nonnull UUID questId) {
+        onThreadOf(world, () -> {
+            WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
+            if (store.questsRecord.unregister(questId)) store.markDirty();
+        });
+    }
+
+    /**
+     * Reads a world's index and the quests it runs back off the game threads as the world starts,
+     * so the first player in finds them in memory. One entering first reads them on the spot.
+     */
+    public void preload(@Nonnull World world) {
+        QuestReplicationService.get().execute("the quests of world " + world.getName(), () -> {
+            Set<UUID> questIds = storage.loadIndex(indexKey(world));
+            QuestProgressionService.get().loadQuests(questIds);
+
+            onThreadOf(world, () -> {
+                WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
+                if (store.consumeNeedsLoad()) store.questsRecord.load(questIds);
+            });
+        });
+    }
+
+    /**
+     * @return the ids on that world's index of running quests, read back first if nothing did yet.
      */
     @Nonnull
     public Set<UUID> getQuestIds(@Nonnull World world) {

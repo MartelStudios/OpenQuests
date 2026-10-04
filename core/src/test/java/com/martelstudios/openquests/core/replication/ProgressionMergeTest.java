@@ -35,22 +35,29 @@ class ProgressionMergeTest {
         Replica.setLocalId("b");
         onB.move(BOB, Membership.Status.JOINED);
 
-        AbstractQuestProgression.MergeOutcome outcome = onA.merge(onB);
-
-        assertTrue(outcome.progressed());
-        assertFalse(outcome.ended());
+        assertTrue(onA.merge(onB));
         assertEquals(Set.of(ALICE, BOB), onA.getPlayers());
     }
 
     @Test
-    void anOutcomeTakenInEndsTheQuestOnce() {
+    void aCopyThatEndedEndsNothingHere() {
         TestQuestProgression onA = new TestQuestProgression();
         TestQuestProgression onB = copyOf(onA);
         onB.setState(QuestState.SUCCESSFUL);
 
-        assertTrue(onA.merge(onB).ended());
+        onA.merge(onB);
+
+        assertEquals(QuestState.IN_PROGRESS, onA.getState());
+    }
+
+    @Test
+    void aClaimedOutcomeSettlesEveryCopyTheSameWay() {
+        TestQuestProgression onA = new TestQuestProgression();
+        onA.setState(QuestState.FAILED);
+
+        assertTrue(onA.settle(QuestState.SUCCESSFUL, null));
         assertEquals(QuestState.SUCCESSFUL, onA.getState());
-        assertFalse(onA.merge(onB).ended());
+        assertFalse(onA.settle(QuestState.SUCCESSFUL, null));
     }
 
     @Test
@@ -59,7 +66,7 @@ class ProgressionMergeTest {
         TestQuestProgression other = new TestQuestProgression();
         other.move(ALICE, Membership.Status.JOINED);
 
-        assertSame(AbstractQuestProgression.MergeOutcome.NONE, onA.merge(other));
+        assertFalse(onA.merge(other));
         assertTrue(onA.getPlayers().isEmpty());
     }
 

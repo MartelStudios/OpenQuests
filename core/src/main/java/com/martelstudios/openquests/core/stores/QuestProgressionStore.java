@@ -268,6 +268,22 @@ public class QuestProgressionStore {
      * @return the quests now in memory for that player, those they were already holding included.
      */
     @Nonnull
+    /**
+     * Reads back, in one go, those of the quests not in memory yet, so that a world or a group
+     * coming up costs one read rather than one per quest.
+     */
+    public void loadMissing(@Nonnull Collection<UUID> ids) {
+        List<UUID> missing = new ArrayList<>();
+        for (UUID id : ids) {
+            if (get(id) == null && !setAside.contains(id)) missing.add(id);
+        }
+        if (missing.isEmpty()) return;
+
+        for (AbstractQuestProgression<?> quest : storage.loadProgressions(missing)) {
+            add(quest);
+        }
+    }
+
     public List<AbstractQuestProgression<?>> loadForPlayer(@Nonnull UUID playerId) {
         List<AbstractQuestProgression<?>> loaded = storage.loadPlayerProgressions(playerId);
 
