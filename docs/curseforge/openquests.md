@@ -304,7 +304,9 @@ PostgreSQL, MySQL, MariaDB and SQLite are spoken natively. Drop the driver jar f
 
 ## ⚠️ Upgrading to 4.0
 
-**`StartOnConnection` became an asset of its own.** A quest no longer says when it starts: list it in an assignment under `OpenQuests/Assignments/`, `{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": [...] }`. The field is no longer read, so a quest still carrying it is simply never handed out on connection. Players keep what they were already given and are not handed it a second time.
+**`StartOnConnection` became an asset of its own.** A quest no longer says when it starts: list it in an assignment under `OpenQuests/Assignments/`, `{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": [...] }`. The field is no longer read, so a quest still carrying it is simply never handed out on connection. Players keep what they were already given, but nothing recorded it under 3.x, so a quest handed out on connection back then is handed out once more.
+
+**Plugins storing quests their own way need three more methods.** A `QuestStorage` now keeps what each assignment handed out: `loadAssignments`, `claimAssignment` (a conditional write, so two servers never both hand the same occasion out) and `deleteAssignments`. The file and database storages that ship with OpenQuests already have them.
 
 ## ⚠️ Upgrading to 3.0
 
