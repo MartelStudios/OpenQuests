@@ -2,6 +2,7 @@ package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
+import com.martelstudios.openquests.core.replication.Membership;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -202,8 +203,7 @@ class JdbcQuestStorageTest {
     void aPlayerWhoGaveUpStillHoldsTheQuest() {
         UUID playerId = UUID.randomUUID();
         TestQuestProgression quest = quest("Abandoned", playerId);
-        quest.getPlayers().remove(playerId);
-        quest.getAbandonedPlayers().add(playerId);
+        quest.move(playerId, Membership.Status.ABANDONED);
 
         storage.saveProgressions(List.of(quest));
 
@@ -222,7 +222,7 @@ class JdbcQuestStorageTest {
 
         storage.saveProgressions(List.of(quest));
 
-        quest.getPlayers().remove(bob);
+        quest.move(bob, Membership.Status.LEFT);
         storage.saveProgressions(List.of(quest));
 
         assertEquals(Set.of(quest.getId()), ids(storage.loadPlayerProgressions(alice)));
@@ -475,7 +475,7 @@ class JdbcQuestStorageTest {
         target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of()));
         assertEquals(handed("OnConnection", "Chain", "Other"), target.loadPlayer(alice).getAssignments());
 
-        quest.getPlayers().remove(bob);
+        quest.move(bob, Membership.Status.LEFT);
         target.saveProgressions(List.of(quest));
         assertTrue(target.loadPlayerProgressions(bob).isEmpty());
 
@@ -516,7 +516,7 @@ class JdbcQuestStorageTest {
     private static TestQuestProgression quest(@Nonnull String assetId, @Nonnull UUID... playerIds) {
         TestQuestProgression quest = new TestQuestProgression();
         quest.setAssetId(assetId);
-        quest.getPlayers().addAll(Set.of(playerIds));
+        for (UUID playerId : playerIds) quest.move(playerId, Membership.Status.JOINED);
 
         // The one field a record cannot invent later
         quest.onRegistered();

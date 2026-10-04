@@ -16,6 +16,7 @@ import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
+import com.martelstudios.openquests.core.replication.Membership;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
@@ -40,13 +41,12 @@ import java.util.function.Function;
 public abstract class AbstractQuestProgression<Q extends AbstractQuestProgression<Q>> {
     public static final CodecMapCodec<AbstractQuestProgression<?>> CODEC = new CodecMapCodec<>("Type");
 
-    private static final KeyedCodec<UUID[]> PLAYERS_CODEC = new KeyedCodec<>("Players", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
-    private static final BiConsumer<AbstractQuestProgression, UUID[]> PLAYERS_SETTER = (quest, uuids) -> ((AbstractQuestProgression<?>) quest).players.addAll(List.of(uuids));
-    private static final Function<AbstractQuestProgression, UUID[]> PLAYERS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).players.toArray(new UUID[0]);
-
-    private static final KeyedCodec<UUID[]> ABANDONED_PLAYERS_CODEC = new KeyedCodec<>("AbandonedPlayers", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
-    private static final BiConsumer<AbstractQuestProgression, UUID[]> ABANDONED_PLAYERS_SETTER = (quest, uuids) -> ((AbstractQuestProgression<?>) quest).abandonedPlayers.addAll(List.of(uuids));
-    private static final Function<AbstractQuestProgression, UUID[]> ABANDONED_PLAYERS_GETTER = (quest) -> ((AbstractQuestProgression<?>) quest).abandonedPlayers.toArray(new UUID[0]);
+    /**
+     * Players written as plain lists before moves were kept, read back but never written: whatever
+     * a copy with moves says of them wins.
+     */
+    private static final KeyedCodec<UUID[]> PLAIN_PLAYERS_CODEC = new KeyedCodec<>("Players", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
+    private static final KeyedCodec<UUID[]> PLAIN_ABANDONED_CODEC = new KeyedCodec<>("AbandonedPlayers", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
 
     private static final KeyedCodec<Map<String, String[]>> TAGS_CODEC = new KeyedCodec<>("Tags", new MapCodec<>(new ArrayCodec<>(Codec.STRING, String[]::new), HashMap<String, String[]>::new));
     private static final BiConsumer<AbstractQuestProgression, Map<String, String[]>> TAGS_SETTER = (quest, tags) -> ((AbstractQuestProgression<?>) quest).tags.putAll(tags);
@@ -84,9 +84,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("CompletedAt", Codec.LONG), (quest, millis) -> quest.completedAt = Instant.ofEpochMilli(millis), quest -> quest.completedAt == null ? null : Long.valueOf(quest.completedAt.toEpochMilli()))
                                                                                         .add()
-                                                                                        .append(PLAYERS_CODEC, PLAYERS_SETTER, PLAYERS_GETTER)
+                                                                                        .append(new KeyedCodec<>("Membership", Membership.CODEC), (quest, moves) -> quest.membership.putAll(moves), quest -> quest.membership.toMap())
                                                                                         .add()
-                                                                                        .append(ABANDONED_PLAYERS_CODEC, ABANDONED_PLAYERS_SETTER, ABANDONED_PLAYERS_GETTER)
+                                                                                        .append(PLAIN_PLAYERS_CODEC, (quest, ids) -> quest.membership.putPlain(List.of(ids), List.of()), quest -> null)
+                                                                                        .add()
+                                                                                        .append(PLAIN_ABANDONED_CODEC, (quest, ids) -> quest.membership.putPlain(List.of(), List.of(ids)), quest -> null)
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("Scope", QuestScope.CODEC), (quest, scope) -> quest.scope = scope, quest -> quest.scope)
                                                                                         .add()
@@ -104,14 +106,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     protected UUID id = UUID.randomUUID();
 
     /**
-     * Ids of the players still running the quest progression.
+     * Who runs the quest and who gave it up, merged move by move with what other servers saw.
      */
-    protected Set<UUID> players = ConcurrentHashMap.newKeySet();
-
-    /**
-     * Ids of the players who have left the quest progression.
-     */
-    protected Set<UUID> abandonedPlayers = ConcurrentHashMap.newKeySet();
+    protected final Membership membership = new Membership();
 
     /**
      * Who shares this quest beyond its players, written by the scope holding it. Data only: the
@@ -318,6 +315,55 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
+     * Takes in what another copy of this quest knows, read from another server's share: who holds
+     * it, how far it went, how it ended. Never marks this copy dirty, what is merged being stored
+     * already, and never ends it twice: an outcome taken in is one another server already paid.
+     *
+     * @return what merging moved here.
+     */
+    @Nonnull
+    public final MergeOutcome merge(@Nonnull AbstractQuestProgression<?> other) {
+        if (other == this || other.getClass() != getClass() || !other.getId().equals(getId())) return MergeOutcome.NONE;
+
+        @SuppressWarnings("unchecked")
+        Q same = (Q) other;
+
+        boolean progressed = membership.merge(other.membership);
+        progressed |= mergeProgress(same);
+
+        boolean ended = !isCompleted() && other.isCompleted();
+        if (ended) {
+            state = other.state;
+            completedAt = other.completedAt;
+        }
+        return new MergeOutcome(progressed, ended);
+    }
+
+    /**
+     * Takes in the progress another copy of the same quest made. A type whose progress several
+     * servers move overrides this; what it keeps for its own server alone, it leaves be.
+     *
+     * @return whether anything moved.
+     */
+    protected boolean mergeProgress(@Nonnull Q other) {
+        return false;
+    }
+
+    /**
+     * What merging another copy of a quest moved here.
+     *
+     * @param progressed whether what the players see moved: who holds it, how far it went
+     * @param ended whether it ended through that copy, having been running here
+     */
+    public record MergeOutcome(boolean progressed, boolean ended) {
+
+        /**
+         * Nothing moved.
+         */
+        public static final MergeOutcome NONE = new MergeOutcome(false, false);
+    }
+
+    /**
      * Updates the quest progression by applying the visitor to it.
      * After the visitor's pass, the quest settles before anyone hears about it.
      * A player's action is first put to the constraints of the asset, and leaves no trace if one objects.
@@ -333,7 +379,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         visitor.progress(self());
 
         // If no player remains and some has abandoned set the quest as abandoned
-        if (!isCompleted() && players.isEmpty() && !abandonedPlayers.isEmpty()) {
+        if (!isCompleted() && getPlayers().isEmpty() && !getAbandonedPlayers().isEmpty()) {
             setState(QuestState.ABANDONED).markDirty();
         }
 
@@ -414,10 +460,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player already held this quest.
      */
     public boolean addPlayer(@Nonnull UUID playerId) {
-        if (!getPlayers().add(playerId)) return false;
-
         // Handed the quest again after walking away from it: they are running it, not done with it
-        abandonedPlayers.remove(playerId);
+        if (!membership.move(playerId, Membership.Status.JOINED)) return false;
         markDirty();
 
         HytaleServer.get()
@@ -433,7 +477,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player did not hold this quest.
      */
     public boolean removePlayer(@Nonnull UUID playerId) {
-        if (!getPlayers().remove(playerId)) return false;
+        if (!membership.is(playerId, Membership.Status.JOINED)) return false;
+
+        membership.move(playerId, Membership.Status.LEFT);
         markDirty();
 
         HytaleServer.get()
@@ -451,9 +497,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player was not running this quest.
      */
     public boolean abandonPlayer(@Nonnull UUID playerId) {
-        if (!players.remove(playerId)) return false;
+        if (!membership.is(playerId, Membership.Status.JOINED)) return false;
 
-        abandonedPlayers.add(playerId);
+        membership.move(playerId, Membership.Status.ABANDONED);
         markDirty();
 
         HytaleServer.get()
@@ -484,7 +530,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code true} if this player gave the quest up.
      */
     public boolean isAbandonedBy(@Nonnull UUID playerId) {
-        return abandonedPlayers.contains(playerId);
+        return membership.is(playerId, Membership.Status.ABANDONED);
     }
 
     /**
@@ -496,11 +542,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * @return the live, mutable set of ids of the players who gave this quest up.
+     * @return the ids of the players who gave this quest up, read only: moves go through
+     * {@link #abandonPlayer}.
      */
     @Nonnull
     public Set<UUID> getAbandonedPlayers() {
-        return abandonedPlayers;
+        return membership.getAbandoned();
     }
 
     /**
@@ -562,7 +609,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return how many players held the quest progression.
      */
     public int getHolderCount() {
-        return players.size() + abandonedPlayers.size();
+        return getPlayers().size() + getAbandonedPlayers().size();
     }
 
     /**
@@ -726,10 +773,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * @return the live, mutable set of ids of the players this quest is assigned to.
+     * @return the ids of the players this quest is assigned to, read only: moves go through
+     * {@link #addPlayer} and {@link #removePlayer}.
      */
+    @Nonnull
     public Set<UUID> getPlayers() {
-        return players;
+        return membership.getPlayers();
     }
 
     public QuestState getState() {

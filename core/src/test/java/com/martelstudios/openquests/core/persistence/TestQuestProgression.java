@@ -4,6 +4,9 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.replication.Membership;
+
+import java.util.UUID;
 
 /**
  * A quest type standing in for the ones the extension ships, so a backend can be exercised without
@@ -20,6 +23,14 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
                     .build();
 
     private int counter;
+
+    /**
+     * Moves a player the way the quest would, without the events a test has no server to send.
+     */
+    public TestQuestProgression move(UUID playerId, Membership.Status status) {
+        membership.move(playerId, status);
+        return this;
+    }
 
     public int getCounter() {
         return counter;
