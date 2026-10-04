@@ -224,13 +224,19 @@ operations per quest a save pass writes.
 Move to JDBC past a few dozen regular players or a few thousand stored quests, and straight away
 if two servers share the same players: files cannot do that at all.
 
-A backend answers for three kinds of record, and nothing else:
+A backend answers for four kinds of record, each through a port of its own, so a caller depends on
+the one it uses:
 
-- **progressions**, one per quest, by id, by player, or the lot;
-- **indexes**, a named set of quest ids, which is how a scope remembers what it handed out:
-  `universe` for the universe scope, `world:<uuid>` per world;
-- **player records**, what a player carries besides their quests: the catalogue they have already
-  been offered, what they are still owed, and how each asset ended for them so far.
+- **progressions** (`ProgressionStore`): one replica per quest and per server that wrote it,
+  merged when read, and the outcome claimed for a quest that ended;
+- **indexes** (`IndexStore`), a named set of quest ids, which is how a scope remembers what it
+  shares: `universe`, `world:<uuid>` per world, `worlds:<group>` per group of worlds. Written
+  member by member, never replaced whole;
+- **players** (`PlayerStore`), what a player carries besides their quests: the catalogue they have
+  already been offered, what they are still owed, how each asset ended for them so far, and the
+  messages other servers left them;
+- **assignment records** (`AssignmentStore`), what each assignment handed a world, a group or the
+  server, written conditionally.
 
 Who holds a quest is read off the quest itself: `AbstractQuestProgression.getPlayers()` is the
 source of truth, and a backend keeps whatever reverse index it needs to answer "the quests of this
@@ -273,7 +279,7 @@ For JDBC:
 | `PoolSize` | `8` | Connections held open. |
 | `ConnectionTimeoutSeconds` | `10` | How long a caller waits for one. |
 | `CreateSchema` | `true` | Turn off where the schema is managed elsewhere. |
-| `ServerId` | `server` | Written into `updated_by`, which is what tells one server's writes from another's. |
+| `ServerId` | `server` | Names this server's replicas. Every server sharing the database needs its own: two under one name write over each other's progress. |
 | `Dialect` | from the URL | `Postgresql`, `Mysql`, `Mariadb`, `Sqlite`, `H2`, `Generic`. Only for a database reached through a proxy borrowing another vendor's URL scheme. |
 
 PostgreSQL, MySQL, MariaDB and SQLite are spoken natively; anything else falls back to plain
@@ -282,15 +288,22 @@ SQL-92 and works.
 #### Schema
 
 ```
-openquests_quest        (id, asset_id, state, data, updated_at, updated_by)
-openquests_quest_player (quest_id, player_id, abandoned)
-openquests_quest_index  (index_key, quest_id)
-openquests_player       (player_id, data, updated_at)
+openquests_schema_version (version)
+openquests_quest          (id, asset_id, state, completed_at, created_at)
+openquests_quest_replica  (quest_id, server_id, revision, data, updated_at)
+openquests_quest_player   (quest_id, player_id, abandoned)
+openquests_quest_index    (index_key, quest_id)
+openquests_player         (player_id, data, updated_at)
+openquests_player_message (id, player_id, data, created_at)
+openquests_quest_assignment (holder_key, assignment_id, quest_asset_id, handed_count, last_at, occasion)
 ```
 
-The quest document lives in `data` as the same JSON the disk backend writes, so a quest written by
-one backend is readable by the other. `asset_id` and `state` are lifted out beside it, so counting
-what is running is a query rather than a scan.
+A quest document lives in a replica's `data` as the same JSON the disk backend writes, so a quest
+written by one backend is readable by the other. Each server writes its own replica of a quest and
+no other; reading a quest merges them. `quest` holds what every server agrees on: the asset, and
+the outcome the first server to end the quest claimed, so counting what is running is a query rather
+than a scan. Tables an older version wrote, or of another layout, stop the server with a message
+rather than being misread: drop them, or name another `TablePrefix`.
 
 #### Several servers on one database
 
@@ -348,6 +361,13 @@ Register a provider and name it in the config:
 ```java
 QuestStorageProvider.CODEC.register("Redis", RedisStorageProvider.class, RedisStorageProvider.CODEC);
 ```
+
+The provider builds a `QuestStorage`, which is every port at once. Keep the guarantees the ports
+state, since several servers rely on them: a server writes only its own replica of a quest, an index
+only member by member, a player record only while it hosts the player; a claim, of an assignment
+hand-out or of a quest's end, writes only if nothing else wrote first; a message is let go of in
+the same write as the record that took it in. `isShared()` says whether other servers may write the
+backend at once.
 
 ### Lifecycle
 

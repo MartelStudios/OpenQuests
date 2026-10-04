@@ -1,7 +1,10 @@
 package com.martelstudios.openquests.core.stores;
 
+import com.martelstudios.openquests.core.persistence.IndexStore;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,12 +20,19 @@ public class QuestsRecord {
 
     private final Set<UUID> questIds = ConcurrentHashMap.newKeySet();
 
+    /**
+     * What the storage holds under this record's key as far as this server knows, which is what a
+     * write is told apart from: only what was added or removed since is written.
+     */
+    private final Set<UUID> stored = ConcurrentHashMap.newKeySet();
+
     public QuestsRecord() {
 
     }
 
     public QuestsRecord(@Nonnull QuestsRecord other) {
         this.questIds.addAll(other.questIds);
+        this.stored.addAll(other.stored);
     }
 
     public QuestsRecord(@Nonnull Set<UUID> questIds) {
@@ -50,6 +60,38 @@ public class QuestsRecord {
     public void replaceAll(@Nonnull Set<UUID> questIds) {
         this.questIds.retainAll(questIds);
         this.questIds.addAll(questIds);
+    }
+
+    /**
+     * Takes what the storage holds under this record's key, as read back from it.
+     */
+    public void load(@Nonnull Set<UUID> storedIds) {
+        replaceAll(storedIds);
+        stored.retainAll(storedIds);
+        stored.addAll(storedIds);
+    }
+
+    /**
+     * Writes what was added and removed since the last write or read, member by member, so a
+     * server sharing the key loses nothing another one added meanwhile.
+     *
+     * @return whether anything was written.
+     */
+    public boolean flush(@Nonnull IndexStore storage, @Nonnull String indexKey) {
+        Set<UUID> current = Set.copyOf(questIds);
+
+        Set<UUID> added = new HashSet<>(current);
+        added.removeAll(stored);
+        Set<UUID> removed = new HashSet<>(stored);
+        removed.removeAll(current);
+        if (added.isEmpty() && removed.isEmpty()) return false;
+
+        storage.addToIndex(indexKey, added);
+        storage.removeFromIndex(indexKey, removed);
+
+        stored.addAll(added);
+        stored.removeAll(removed);
+        return true;
     }
 
     /**

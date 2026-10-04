@@ -34,6 +34,7 @@ import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.OpenQuestCategory;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.replication.Replica;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.QuestStorageProvider;
 import com.martelstudios.openquests.core.persistence.disk.DiskQuestStorage;
@@ -126,6 +127,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         getLogger().atInfo().log("Quest storage: %s", settings.getStorage());
         questStorage = settings.getStorage().create();
         questStorage.start();
+        Replica.setLocalId(questStorage.getReplicaId());
 
         questProgressionStore = new QuestProgressionStore(questStorage);
 

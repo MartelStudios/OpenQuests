@@ -80,7 +80,7 @@ public class UniverseQuestService {
      * Reads the universe index back and pulls every quest it lists into memory.
      */
     public void loadQuests() {
-        quests.replaceAll(storage.loadIndex(UNIVERSE_INDEX_KEY));
+        quests.load(storage.loadIndex(UNIVERSE_INDEX_KEY));
 
         for (UUID questId : new ArrayList<>(quests.getAllIds())) {
             if (QuestProgressionService.get().loadQuest(questId) != null) continue;
@@ -100,7 +100,7 @@ public class UniverseQuestService {
     public void saveQuests(boolean force) {
         if (!dirty && !force) return;
 
-        storage.saveIndex(UNIVERSE_INDEX_KEY, quests.getAllIds());
+        quests.flush(storage, UNIVERSE_INDEX_KEY);
         dirty = false;
     }
 

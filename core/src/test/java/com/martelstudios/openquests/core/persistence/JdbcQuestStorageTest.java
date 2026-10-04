@@ -3,6 +3,7 @@ package com.martelstudios.openquests.core.persistence;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.replication.Membership;
+import com.martelstudios.openquests.core.replication.Replica;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -235,7 +236,7 @@ class JdbcQuestStorageTest {
         TestQuestProgression quest = quest("Gone", playerId);
 
         storage.saveProgressions(List.of(quest));
-        storage.saveIndex("universe", Set.of(quest.getId()));
+        storage.addToIndex("universe", Set.of(quest.getId()));
 
         storage.deleteProgression(quest);
 
@@ -246,17 +247,18 @@ class JdbcQuestStorageTest {
     }
 
     @Test
-    void anIndexIsReplacedWhole() {
+    void anIndexIsWrittenMemberByMember() {
         UUID first = UUID.randomUUID();
         UUID second = UUID.randomUUID();
 
-        storage.saveIndex("universe", Set.of(first, second));
+        storage.addToIndex("universe", Set.of(first, second));
+        storage.addToIndex("universe", Set.of(first));
         assertEquals(Set.of(first, second), storage.loadIndex("universe"));
 
-        storage.saveIndex("universe", Set.of(second));
+        storage.removeFromIndex("universe", Set.of(first));
         assertEquals(Set.of(second), storage.loadIndex("universe"));
 
-        storage.saveIndex("universe", Set.of());
+        storage.removeFromIndex("universe", Set.of(first, second));
         assertTrue(storage.loadIndex("universe").isEmpty());
     }
 
@@ -266,8 +268,8 @@ class JdbcQuestStorageTest {
         UUID worldQuest = UUID.randomUUID();
         String worldKey = "world:" + UUID.randomUUID();
 
-        storage.saveIndex("universe", Set.of(universeQuest));
-        storage.saveIndex(worldKey, Set.of(worldQuest));
+        storage.addToIndex("universe", Set.of(universeQuest));
+        storage.addToIndex(worldKey, Set.of(worldQuest));
 
         assertEquals(Set.of(universeQuest), storage.loadIndex("universe"));
         assertEquals(Set.of(worldQuest), storage.loadIndex(worldKey));
@@ -281,7 +283,7 @@ class JdbcQuestStorageTest {
 
         PendingRewards owed = new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")});
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet", "PickBerries"), Set.of(owed), Map.of()));
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet", "PickBerries"), Set.of(owed), Map.of()), List.of());
 
         PlayerQuestRecord read = storage.loadPlayer(playerId);
 
@@ -297,26 +299,22 @@ class JdbcQuestStorageTest {
     }
 
     @Test
-    void addingADebtLeavesTheRestOfTheRecordAlone() {
+    void aDebtLeftForAPlayerWaitsUntilTheirRecordTakesItIn() {
         UUID playerId = UUID.randomUUID();
         TestQuestProgression quest = quest("Owed", playerId);
         storage.saveProgressions(List.of(quest));
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of()), List.of());
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of()));
+        storage.postMessage(PlayerMessage.owed(playerId, new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")})));
+        // The same completion, now owing less: taken in, it replaces rather than piling up
+        storage.postMessage(PlayerMessage.owed(playerId, new PendingRewards(quest, new QuestReward[0])));
 
-        storage.addPendingRewards(playerId, new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")}));
+        PlayerQuestRecord read = takeInMessages(storage, playerId);
 
-        PlayerQuestRecord read = storage.loadPlayer(playerId);
         assertEquals(handed("OnConnection", "StartHatchet"), read.getAssignments());
-        assertEquals(1, read.getPendingRewards().size());
-
-        // The same completion, now owing less: it replaces rather than piling up
-        storage.addPendingRewards(playerId, new PendingRewards(quest, new QuestReward[0]));
-
-        read = storage.loadPlayer(playerId);
         assertEquals(1, read.getPendingRewards().size());
         assertEquals(0, read.getPendingRewards().iterator().next().getRewards().length);
-        assertEquals(handed("OnConnection", "StartHatchet"), read.getAssignments());
+        assertTrue(storage.loadMessages(List.of(playerId)).isEmpty());
     }
 
     @Test
@@ -327,7 +325,7 @@ class JdbcQuestStorageTest {
 
         PlayerQuestRecord record = new PlayerQuestRecord();
         record.recordCompletion("DailyWood", QuestState.SUCCESSFUL, startedAt, completedAt);
-        storage.savePlayer(playerId, record);
+        storage.savePlayer(playerId, record, List.of());
 
         QuestCompletions read = storage.loadPlayer(playerId).getCompletions().get("DailyWood");
 
@@ -339,14 +337,14 @@ class JdbcQuestStorageTest {
     }
 
     @Test
-    void recordingACompletionLeavesTheRestOfTheRecordAlone() {
+    void anEndingLeftForAPlayerCountsLikeOneSeenThere() {
         UUID playerId = UUID.randomUUID();
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of()));
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of()), List.of());
 
-        storage.recordCompletion(playerId, "DailyWood", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000), Instant.ofEpochMilli(2_000));
-        storage.recordCompletion(playerId, "DailyWood", QuestState.ABANDONED, Instant.ofEpochMilli(3_000), Instant.ofEpochMilli(4_000));
+        storage.postMessage(PlayerMessage.ended(playerId, "DailyWood", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000), Instant.ofEpochMilli(2_000)));
+        storage.postMessage(PlayerMessage.ended(playerId, "DailyWood", QuestState.ABANDONED, Instant.ofEpochMilli(3_000), Instant.ofEpochMilli(4_000)));
 
-        PlayerQuestRecord read = storage.loadPlayer(playerId);
+        PlayerQuestRecord read = takeInMessages(storage, playerId);
         QuestCompletions completions = read.getCompletions().get("DailyWood");
 
         assertEquals(handed("OnConnection", "StartHatchet"), read.getAssignments());
@@ -358,12 +356,12 @@ class JdbcQuestStorageTest {
     }
 
     @Test
-    void recordingACompletionForAPlayerNobodyHasHeardOfStartsTheirRecord() {
+    void anEndingLeftForAPlayerNobodyHasHeardOfStartsTheirRecord() {
         UUID playerId = UUID.randomUUID();
 
-        storage.recordCompletion(playerId, "DailyWood", QuestState.FAILED, null, Instant.ofEpochMilli(2_000));
+        storage.postMessage(PlayerMessage.ended(playerId, "DailyWood", QuestState.FAILED, null, Instant.ofEpochMilli(2_000)));
 
-        PlayerQuestRecord read = storage.loadPlayer(playerId);
+        PlayerQuestRecord read = takeInMessages(storage, playerId);
         assertFalse(read.isEmpty());
         assertEquals(1, read.getCompletions().get("DailyWood").count(QuestState.FAILED));
         assertNull(read.getCompletions().get("DailyWood").getLastStartedAt());
@@ -390,7 +388,7 @@ class JdbcQuestStorageTest {
         UUID questId = UUID.randomUUID();
 
         QuestStorage first = open(url, null, null);
-        first.saveIndex("universe", Set.of(questId));
+        first.addToIndex("universe", Set.of(questId));
         first.close();
 
         QuestStorage second = open(url, null, null);
@@ -468,11 +466,11 @@ class JdbcQuestStorageTest {
 
         assertEquals(Set.of(quest.getId()), ids(target.loadPlayerProgressions(alice)));
 
-        target.saveIndex("universe", Set.of(quest.getId()));
+        target.addToIndex("universe", Set.of(quest.getId()));
         assertEquals(Set.of(quest.getId()), target.loadIndex("universe"));
 
-        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain"), Set.of(), Map.of()));
-        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of()));
+        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain"), Set.of(), Map.of()), List.of());
+        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of()), List.of());
         assertEquals(handed("OnConnection", "Chain", "Other"), target.loadPlayer(alice).getAssignments());
 
         quest.move(bob, Membership.Status.LEFT);
@@ -483,6 +481,167 @@ class JdbcQuestStorageTest {
         assertNull(target.loadProgression(quest.getId()));
         assertTrue(target.loadIndex("universe").isEmpty());
         assertFalse(target.loadPlayer(alice).getQuestIds().contains(quest.getId()));
+    }
+
+    @Test
+    void twoServersProgressingOneQuestKeepEachOthersShare() {
+        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        QuestStorage onA = open(url, "a");
+        QuestStorage onB = open(url, "b");
+
+        try {
+            UUID alice = UUID.randomUUID();
+            UUID bob = UUID.randomUUID();
+            TestQuestProgression quest = new TestQuestProgression();
+            quest.setAssetId("CommunityHunt");
+            quest.onRegistered();
+
+            Replica.setLocalId("a");
+            onA.saveProgressions(List.of(quest));
+            TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
+
+            quest.move(alice, Membership.Status.JOINED).addShared(5);
+            onA.saveProgressions(List.of(quest));
+
+            Replica.setLocalId("b");
+            copyOnB.move(bob, Membership.Status.JOINED).addShared(3);
+            onB.saveProgressions(List.of(copyOnB));
+
+            TestQuestProgression read = (TestQuestProgression) onA.loadProgression(quest.getId());
+
+            assertEquals(8, read.getShared());
+            assertEquals(Set.of(alice, bob), read.getPlayers());
+        } finally {
+            Replica.setLocalId(Replica.DEFAULT_ID);
+            onA.close();
+            onB.close();
+        }
+    }
+
+    @Test
+    void onlyOneServerEndsAQuest() {
+        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        QuestStorage onA = open(url, "a");
+        QuestStorage onB = open(url, "b");
+
+        try {
+            TestQuestProgression quest = quest("Race");
+            onA.saveProgressions(List.of(quest));
+            TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
+
+            quest.setState(QuestState.SUCCESSFUL);
+            copyOnB.setState(QuestState.FAILED);
+
+            assertTrue(onA.claimEnd(quest));
+            assertFalse(onB.claimEnd(copyOnB));
+            assertEquals(QuestState.SUCCESSFUL, onB.loadEnd(quest.getId()));
+
+            // Whatever its own replica says, a copy read back ends the way the claim did
+            onB.saveProgressions(List.of(copyOnB));
+            assertEquals(QuestState.SUCCESSFUL, onB.loadProgression(quest.getId()).getState());
+        } finally {
+            onA.close();
+            onB.close();
+        }
+    }
+
+    @Test
+    void aPollBringsWhatAnotherServerWroteAndOnlyThat() {
+        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        QuestStorage onA = open(url, "a");
+        QuestStorage onB = open(url, "b");
+
+        try {
+            TestQuestProgression quest = quest("Polled");
+            onA.saveProgressions(List.of(quest));
+
+            ReplicaPoll first = onB.pollReplicas(Map.of(quest.getId(), Map.of()));
+            assertEquals(1, first.changed().size());
+            assertEquals("a", first.changed().getFirst().serverId());
+
+            long seen = first.changed().getFirst().revision();
+            assertTrue(onB.pollReplicas(Map.of(quest.getId(), Map.of("a", seen))).changed().isEmpty());
+
+            onA.saveProgressions(List.of(quest));
+            ReplicaPoll second = onB.pollReplicas(Map.of(quest.getId(), Map.of("a", seen)));
+            assertEquals(1, second.changed().size());
+            assertTrue(second.changed().getFirst().revision() > seen);
+
+            quest.setState(QuestState.SUCCESSFUL);
+            onA.claimEnd(quest);
+            assertEquals(QuestState.SUCCESSFUL, onB.pollReplicas(Map.of(quest.getId(), Map.of("a", Long.MAX_VALUE))).ended().get(quest.getId()));
+
+            // Nothing of a server's own replicas comes back to it
+            assertTrue(onA.pollReplicas(Map.of(quest.getId(), Map.of())).changed().isEmpty());
+        } finally {
+            onA.close();
+            onB.close();
+        }
+    }
+
+    @Test
+    void twoServersAddingToOneIndexKeepBoth() {
+        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        QuestStorage onA = open(url, "a");
+        QuestStorage onB = open(url, "b");
+
+        try {
+            UUID fromA = UUID.randomUUID();
+            UUID fromB = UUID.randomUUID();
+
+            onA.addToIndex("universe", Set.of(fromA));
+            onB.addToIndex("universe", Set.of(fromB));
+            assertEquals(Set.of(fromA, fromB), onA.loadIndex("universe"));
+
+            onA.removeFromIndex("universe", Set.of(fromA));
+            assertEquals(Map.of("universe", Set.of(fromB), "worlds:Arena", Set.of()), onB.loadIndexes(List.of("universe", "worlds:Arena")));
+        } finally {
+            onA.close();
+            onB.close();
+        }
+    }
+
+    @Test
+    void tablesAnOlderVersionWroteAreRefused() {
+        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        QuestStorage first = open(url, "a");
+        first.close();
+
+        try (java.sql.Connection connection = java.sql.DriverManager.getConnection(url);
+             java.sql.Statement statement = connection.createStatement()) {
+            statement.execute("DROP TABLE oqtest_schema_version");
+        } catch (java.sql.SQLException e) {
+            throw new AssertionError(e);
+        }
+
+        org.junit.jupiter.api.Assertions.assertThrows(QuestStorageException.class, () -> open(url, "a"));
+    }
+
+    /**
+     * What a server does as a player connects: reads their record, takes in what was left for them,
+     * and writes the record back, which lets go of the messages.
+     */
+    @Nonnull
+    private static PlayerQuestRecord takeInMessages(@Nonnull QuestStorage storage, @Nonnull UUID playerId) {
+        PlayerQuestRecord record = storage.loadPlayer(playerId);
+        List<UUID> delivered = new java.util.ArrayList<>();
+
+        for (PlayerMessage message : storage.loadMessages(List.of(playerId))) {
+            message.applyTo(record);
+            delivered.add(message.getId());
+        }
+
+        storage.savePlayer(playerId, record, delivered);
+        return storage.loadPlayer(playerId);
+    }
+
+    @Nonnull
+    private static QuestStorage open(@Nonnull String url, @Nonnull String serverId) {
+        QuestStorage storage = new JdbcQuestStorage(new JdbcQuestStorage.JdbcSettings(
+            url, null, null, null, null, "oqtest_", 4, 10, true, serverId, SqlDialect.fromUrl(url)));
+
+        storage.start();
+        return storage;
     }
 
     @Nonnull

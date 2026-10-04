@@ -113,7 +113,7 @@ public class WorldQuestService {
     }
 
     /**
-     * Writes out the index of every world that changed, for the save pass and for shutdown.
+     * Writes out what changed in the index of every world, for the save pass and for shutdown.
      */
     public void saveAll(boolean force) {
         for (World world : Universe.get().getWorlds().values()) {
@@ -122,7 +122,7 @@ public class WorldQuestService {
 
             if (!store.consumeChanges() && !force) continue;
 
-            storage.saveIndex(indexKey(world), store.questsRecord.getAllIds());
+            store.questsRecord.flush(storage, indexKey(world));
         }
     }
 
@@ -145,7 +145,7 @@ public class WorldQuestService {
      * Lets go of a world's index for good, in memory and in the storage.
      */
     void deleteIndex(@Nonnull World world) {
-        loadedRecord(world).replaceAll(Set.of());
+        loadedRecord(world).load(Set.of());
         getWorldQuestStoreFromWorld(world).consumeChanges();
         storage.deleteIndex(indexKey(world));
     }
@@ -242,7 +242,7 @@ public class WorldQuestService {
         WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
 
         if (store.consumeNeedsLoad()) {
-            store.questsRecord.replaceAll(storage.loadIndex(indexKey(world)));
+            store.questsRecord.load(storage.loadIndex(indexKey(world)));
         }
         return store.questsRecord;
     }

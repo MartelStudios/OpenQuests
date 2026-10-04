@@ -340,6 +340,20 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
+     * Takes in the outcome a server claimed for this quest, which every copy agrees on whatever it
+     * saw itself. Fires nothing: the server that claimed it ended it and paid for it.
+     *
+     * @return whether this copy's outcome changed.
+     */
+    public boolean settle(@Nonnull QuestState outcome, @Nullable Instant at) {
+        if (outcome == QuestState.IN_PROGRESS || outcome == state) return false;
+
+        state = outcome;
+        completedAt = at;
+        return true;
+    }
+
+    /**
      * Takes in the progress another copy of the same quest made. A type whose progress several
      * servers move overrides this; what it keeps for its own server alone, it leaves be.
      *
