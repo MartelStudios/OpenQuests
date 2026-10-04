@@ -19,6 +19,6 @@ public class PlayerConnectTrigger extends AssignmentTrigger {
     @Nonnull
     @Override
     public Occasion onConnect(@Nonnull UUID playerId, @Nonnull EntityComponents player) {
-        return Occasion.of(playerId, player, null, null);
+        return Occasion.connection(playerId, player);
     }
 }

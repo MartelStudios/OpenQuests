@@ -71,14 +71,14 @@ public class ScheduleTrigger extends AssignmentTrigger {
     @Override
     public Occasion onConnect(@Nonnull UUID playerId, @Nonnull EntityComponents player) {
         Instant current = currentPeriod(Instant.now());
-        return current == null ? null : Occasion.of(playerId, player, null, current.toString());
+        return current == null ? null : Occasion.connection(playerId, player).during(current.toString());
     }
 
     @Nullable
     @Override
     public Occasion onTick(@Nonnull Instant now) {
         Instant current = currentPeriod(now);
-        return current == null ? null : Occasion.of(null, null, null, current.toString());
+        return current == null ? null : Occasion.period(current.toString());
     }
 
     @Nullable

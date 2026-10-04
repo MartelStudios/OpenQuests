@@ -29,14 +29,12 @@ public class PlayerAssignmentScope extends AssignmentScope {
     @Override
     public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion) {
         QuestAssignmentService service = QuestAssignmentService.get();
-        String key = occasionKey(occasion);
+        String key = occasion.placeKey();
 
-        if (occasion.getPlayerId() != null && occasion.getPlayer() != null) {
+        if (occasion.getPlayer() != null) {
             service.offerAll(assignment, service.playerHolder(occasion.getPlayerId(), occasion.getPlayer()), key, occasion.isTimed());
             return;
         }
-
-        if (occasion.getPlayerId() != null) return;
 
         for (PlayerRef playerRef : Universe.get().getPlayers()) {
             UUID playerId = playerRef.getUuid();
@@ -44,16 +42,5 @@ public class PlayerAssignmentScope extends AssignmentScope {
 
             EntityComponents.update(playerId, player -> service.offerAll(assignment, service.playerHolder(playerId, player), key, occasion.isTimed()));
         }
-    }
-
-    /**
-     * The player moves, so the world they enter is part of what tells hand-outs apart.
-     *
-     * @return {@code world:<uuid>} for an entry, the occasion's time otherwise.
-     */
-    @Nonnull
-    public static String occasionKey(@Nonnull Occasion occasion) {
-        if (occasion.getWorld() != null) return "world:" + occasion.getWorld().getWorldConfig().getUuid();
-        return timeKey(occasion);
     }
 }

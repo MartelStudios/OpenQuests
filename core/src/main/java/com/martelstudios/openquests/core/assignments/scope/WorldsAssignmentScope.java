@@ -44,7 +44,7 @@ public class WorldsAssignmentScope extends AbstractWorldAssignmentScope {
     @Override
     public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion) {
         QuestAssignmentService service = QuestAssignmentService.get();
-        String key = timeKey(occasion);
+        String key = occasion.timeKey();
 
         if (occasion.isTimed() && service.isSettled(WorldQuestService.groupKey(assignment.getId()), assignment, key)) return;
 

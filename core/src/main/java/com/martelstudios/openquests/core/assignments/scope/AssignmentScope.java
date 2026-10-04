@@ -48,15 +48,4 @@ public abstract class AssignmentScope {
     public String findInconsistency(@Nonnull AssignmentTrigger trigger) {
         return null;
     }
-
-    /**
-     * The occasion's time alone, for the scopes whose holder is the place already: a world, the
-     * server.
-     *
-     * @return {@code period:<start>} for a timed occasion, {@code once} for any other.
-     */
-    @Nonnull
-    public static String timeKey(@Nonnull Occasion occasion) {
-        return occasion.getPeriod() != null ? "period:" + occasion.getPeriod() : "once";
-    }
 }

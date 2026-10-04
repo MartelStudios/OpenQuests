@@ -37,7 +37,7 @@ public class WorldAssignmentScope extends AbstractWorldAssignmentScope {
     @Override
     public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion) {
         QuestAssignmentService service = QuestAssignmentService.get();
-        String key = timeKey(occasion);
+        String key = occasion.timeKey();
         UUID entered = occasion.getWorld() == null ? null : occasion.getWorld().getWorldConfig().getUuid();
 
         for (World world : targets(occasion)) {

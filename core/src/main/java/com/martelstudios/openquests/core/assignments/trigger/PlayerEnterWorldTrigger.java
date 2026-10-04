@@ -43,7 +43,7 @@ public class PlayerEnterWorldTrigger extends AssignmentTrigger {
     @Nullable
     @Override
     public Occasion onEnterWorld(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull World world) {
-        return matches(world.getName()) ? Occasion.of(playerId, player, world, null) : null;
+        return matches(world.getName()) ? Occasion.entry(playerId, player, world) : null;
     }
 
     @Override

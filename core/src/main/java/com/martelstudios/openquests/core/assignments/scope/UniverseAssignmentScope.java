@@ -24,7 +24,7 @@ public class UniverseAssignmentScope extends AssignmentScope {
     @Override
     public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion) {
         QuestAssignmentService service = QuestAssignmentService.get();
-        String key = timeKey(occasion);
+        String key = occasion.timeKey();
 
         if (occasion.isTimed() && service.isSettled(UniverseQuestService.UNIVERSE_INDEX_KEY, assignment, key)) return;
 
