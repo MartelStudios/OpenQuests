@@ -187,7 +187,8 @@ instanced events:
 A world quest is created with `/oquest create world`, or by an [assignment](#assignments) with the
 `World` scope, which is how every copy of an instance opens with its own. A `GrantQuest` paid by
 a world quest hands its follow-ups to the same world, once however many players are paid, which
-keeps a dungeon line shared from its first quest to its last. A follow-up claimed by hand once
+keeps a dungeon line shared from its first quest to its last. A step of a `Composite` hands its
+follow-ups on the way its outermost quest is shared. A follow-up claimed by hand once
 that world has closed goes to the player claiming it, so a shared chain grants with `AutoClaim`.
 
 Only what is still running is removed: a quest that ended while the player was there stays in

@@ -141,6 +141,7 @@ Tags are how an asset says something no field covers. They carry down from a par
 | ---------- |---------------------------------------------------------- |
 | <code>OQ_HUD_DESC</code> |Shows its description under its title, greyed and smaller  |
 | <code>OQ_GRANTED_BY</code> |Written by <code>GrantQuest</code> on the quest it creates, naming the run that opened it |
+| <code>OQ_HANDED_ON</code> |Written by <code>GrantQuest</code> on a shared quest, naming what it already handed on, so its follow-ups are created once for all its players |
 | <code>OQ_PARENT_QUEST</code> |Written by a composite on each step it creates, naming the group it belongs to |
 
 The last two are written by the system, not by you.
