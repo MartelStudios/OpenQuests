@@ -50,7 +50,7 @@ A quest line through the goblin lair, the dungeon Hytale ships as an instance. T
 
 🕷️ **Two side quests** open alongside it: squash the spiders haunting the lair, and light its galleries with the torches from the entrance chest, counted by `PlaceBlock`.
 
-Each quest hands the next one over with `GrantQuest`, and since the one paying belongs to the lair, so does the next: the chain stays shared from the rats to the duke. Every quest of the line carries the *Dungeon* category, the side quests *Side quest* as well, and the journal shows both beside their titles.
+Each quest hands the next one over with a `GrantQuest` marked `"Shared": true`, so the quest paying hands it on once, to the lair it belongs to: the chain stays shared from the rats to the duke. Every quest of the line carries the *Dungeon* category, the side quests *Side quest* as well, and the journal shows both beside their titles.
 
 🗓️ **The day's cull** spans every copy at once: fifty goblins, counted across all the lairs run that day. Its assignment, `Assignments/GoblinLairDailyHunt.json`, hands it out each day on a `Schedule` to the `Worlds` scope, so one quest is shared by every copy of the lair, waits between runs, and is replaced the next day with `"Repeat": { "Type": "Replace" }`. It pays two gold bars to whoever is in the lair as it completes.
 

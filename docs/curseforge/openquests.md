@@ -103,7 +103,7 @@ Every counted type takes a target quantity, and a running quest can override it.
 | Type       |Effect                                                     |
 | ---------- |---------------------------------------------------------- |
 | <code>Item</code> |Gives items, hotbar first, all or nothing                  |
-| <code>GrantQuest</code> |Hands the next quests over, which is how a chain continues |
+| <code>GrantQuest</code> |Hands the next quests over, which is how a chain continues: to each player, or with <code>"Shared": true</code> once to the world or server sharing the quest |
 | <code>Command</code> |Runs a server command, as the console or as the player     |
 
 Each reward decides for itself whether it lands on its own or waits to be collected, with `"AutoClaim": true` written on the reward. A reward that could not be granted, because the inventory was full or the player logged off, waits on the completion record and is handed over the next time they enter a world. Nothing is silently dropped.
@@ -140,11 +140,6 @@ Tags are how an asset says something no field covers. They carry down from a par
 | Tag        |Effect                                                     |
 | ---------- |---------------------------------------------------------- |
 | <code>OQ_HUD_DESC</code> |Shows its description under its title, greyed and smaller  |
-| <code>OQ_GRANTED_BY</code> |Written by <code>GrantQuest</code> on the quest it creates, naming the run that opened it |
-| <code>OQ_HANDED_ON</code> |Written by <code>GrantQuest</code> on a shared quest, naming what it already handed on, so its follow-ups are created once for all its players |
-| <code>OQ_PARENT_QUEST</code> |Written by a composite on each step it creates, naming the group it belongs to |
-
-The last two are written by the system, not by you.
 
 ```
 { "Type": "Composite", "TitleKey": "…", "AutoTrack": true, "Tags": { "OQ_HUD_DESC": [] } }
@@ -219,7 +214,7 @@ An instance opens with its quests by itself, through an assignment:
 }
 ```
 
-Every copy of that dungeon gets its own, shared by the group inside. Each quest it hands over with `GrantQuest` stays in the same world, up to the last one.
+Every copy of that dungeon gets its own, shared by the group inside. Each quest it hands over with a shared `GrantQuest` stays in the same world, up to the last one.
 
 **🗺️ Worlds.** One quest shared by every copy at once: a daily hunt across all the goblin lairs run that day. Each run adds to the same counter, and the quest waits between runs instead of failing when a copy closes. It ends when it is completed, when its time runs out, or when the next day replaces it:
 
@@ -261,7 +256,7 @@ Drop them in `mods/`. Nothing else to configure.
 Three ways, and nothing else to set up:
 
 *   An assignment hands quests out on connection, as players enter given worlds or on a schedule, to each player or shared by a world, a group of worlds or the whole server, once or again each time the last one ends
-*   The `GrantQuest` reward hands the next one over when a quest completes, in the same scope: a world quest's next step is the world's too
+*   The `GrantQuest` reward hands the next one over when a quest completes: to each player, or with `"Shared": true` once in the same scope, so a world quest's next step is the world's too
 *   `/oquest create player|world|universe <assetId>` from the console or in game
 
 ### Commands
@@ -307,6 +302,10 @@ PostgreSQL, MySQL, MariaDB and SQLite are spoken natively. Drop the driver jar f
 **`StartOnConnection` became an asset of its own.** A quest no longer says when it starts: list it in an assignment under `OpenQuests/Assignments/`, `{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": [...] }`. The field is no longer read, so a quest still carrying it is simply never handed out on connection. Players keep what they were already given, but nothing recorded it under 3.x, so a quest handed out on connection back then is handed out once more.
 
 **Plugins storing quests their own way need three more methods.** A `QuestStorage` now keeps what each assignment handed out: `loadAssignments`, `claimAssignment` (a conditional write, so two servers never both hand the same occasion out) and `deleteAssignments`. The file and database storages that ship with OpenQuests already have them.
+
+**A shared quest's `GrantQuest` hands each player their own unless it says `"Shared": true`.** It used to follow the quest paying: a world quest's next step went to the world. Write `"Shared": true` on the reward to keep that; the quest then hands its follow-ups on once as it ends, and `AutoClaim` no longer applies to it.
+
+**Bookkeeping left the tags.** `OQ_GRANTED_BY` is now a field of the quest, `GrantedBy`, and `OQ_PARENT_QUEST` is no longer read: a composite step saved back when it carried its group as that tag is no longer handed back to it. `OQ_HUD_DESC` is the only tag left, and it is yours.
 
 ## ⚠️ Upgrading to 3.0
 

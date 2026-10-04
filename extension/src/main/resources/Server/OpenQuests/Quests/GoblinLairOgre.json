@@ -16,7 +16,7 @@
       "QuestAssetIds": [
         "GoblinLairDuke"
       ],
-      "AutoClaim": true
+      "Shared": true
     }
   ]
 }

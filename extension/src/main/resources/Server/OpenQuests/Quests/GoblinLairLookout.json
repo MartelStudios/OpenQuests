@@ -16,7 +16,7 @@
       "QuestAssetIds": [
         "GoblinLairOgre"
       ],
-      "AutoClaim": true
+      "Shared": true
     }
   ]
 }
