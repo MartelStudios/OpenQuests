@@ -1,7 +1,6 @@
 package com.martelstudios.openquests.core.assignments;
 
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
@@ -17,17 +16,49 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Builds each kind of holder: a player, whose records travel with their own, or a world, a group
- * of worlds or the server, whose records live in the shared store and whose quests are shared
- * through the scope of that kind.
+ * Builds each kind of holder and names it: a player, whose records travel with their own, or a
+ * world, a group of worlds or the server, whose records live in the shared store and whose quests
+ * are shared through the scope of that kind. A holder's key is the same as its index's.
  */
 public final class AssignmentHolders {
 
     @Nonnull
-    private final QuestStorage storage;
+    private final SharedAssignmentRecords records;
 
-    public AssignmentHolders(@Nonnull QuestStorage storage) {
-        this.storage = storage;
+    public AssignmentHolders(@Nonnull SharedAssignmentRecords records) {
+        this.records = records;
+    }
+
+    /**
+     * @return {@code player:<uuid>}.
+     */
+    @Nonnull
+    public static String playerKey(@Nonnull UUID playerId) {
+        return PlayerAssignmentHolder.keyOf(playerId);
+    }
+
+    /**
+     * @return {@code world:<uuid>}.
+     */
+    @Nonnull
+    public static String worldKey(@Nonnull World world) {
+        return WorldQuestService.indexKey(world);
+    }
+
+    /**
+     * @return {@code worlds:<group>}.
+     */
+    @Nonnull
+    public static String groupKey(@Nonnull String group) {
+        return WorldGroupIndex.keyOf(group);
+    }
+
+    /**
+     * @return {@code universe}.
+     */
+    @Nonnull
+    public static String universeKey() {
+        return UniverseQuestService.UNIVERSE_INDEX_KEY;
     }
 
     /**
@@ -43,7 +74,7 @@ public final class AssignmentHolders {
      */
     @Nonnull
     public AssignmentHolder world(@Nonnull World world, @Nullable UUID joining) {
-        return new SharedAssignmentHolder(storage, WorldQuestService.indexKey(world), new WorldQuestScope(List.of(world.getWorldConfig().getUuid())), joining);
+        return new SharedAssignmentHolder(records, worldKey(world), new WorldQuestScope(List.of(world.getWorldConfig().getUuid())), joining);
     }
 
     /**
@@ -51,7 +82,7 @@ public final class AssignmentHolders {
      */
     @Nonnull
     public AssignmentHolder group(@Nonnull String group, @Nullable UUID joining) {
-        return new SharedAssignmentHolder(storage, WorldGroupIndex.keyOf(group), new WorldsQuestScope(group), joining);
+        return new SharedAssignmentHolder(records, groupKey(group), new WorldsQuestScope(group), joining);
     }
 
     /**
@@ -59,6 +90,6 @@ public final class AssignmentHolders {
      */
     @Nonnull
     public AssignmentHolder universe(@Nullable UUID joining) {
-        return new SharedAssignmentHolder(storage, UniverseQuestService.UNIVERSE_INDEX_KEY, UniverseQuestScope.INSTANCE, joining);
+        return new SharedAssignmentHolder(records, universeKey(), UniverseQuestScope.INSTANCE, joining);
     }
 }

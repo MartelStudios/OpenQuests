@@ -47,4 +47,12 @@ public interface AssignmentHolder {
      * @return {@code false} if the quest was refused or another server handed this occasion out first.
      */
     boolean handOut(@Nonnull AbstractQuestProgression<?> quest, @Nonnull String assignmentId, @Nonnull String questAssetId, @Nullable AssignmentRecord expected, @Nonnull AssignmentRecord next);
+
+    /**
+     * Reads again what a refused hand-out may have been refused over: another server writing first.
+     *
+     * @return whether anything was read again, so that deciding once more may come out otherwise.
+     * A player refused by their constraints stays refused.
+     */
+    boolean refresh();
 }

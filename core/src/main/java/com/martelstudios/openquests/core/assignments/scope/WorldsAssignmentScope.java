@@ -5,15 +5,9 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.assignments.AssignmentTargets;
 import com.martelstudios.openquests.core.assignments.Occasion;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
-import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * One quest shared by every world the assignment gathers, the group named after the assignment:
@@ -50,24 +44,11 @@ public class WorldsAssignmentScope extends AbstractWorldAssignmentScope {
     }
 
     /**
-     * Counts a world of the group as entered, so that what the group starts next reaches it, and
-     * brings it the group's running quests, handed to that player, who is among its players only
-     * once in.
+     * The group is named after the assignment gathering it.
      */
+    @Nullable
     @Override
-    public void onEnterWorld(@Nonnull OpenQuestAssignment assignment, @Nonnull UUID playerId, @Nonnull World world) {
-        if (!gathers(assignment, world)) return;
-
-        String group = assignment.getId();
-        WorldGroupIndex.get().join(group, world);
-
-        for (UUID questId : List.copyOf(WorldGroupIndex.get().getQuestIds(group))) {
-            // Read back first: after a restart, nothing else has brought the group's quests into memory
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
-            if (quest == null || QuestProgressionService.get().getLiveQuest(questId) == null) continue;
-
-            WorldQuestService.get().addQuest(world, questId);
-            QuestProgressionService.get().joinQuest(quest, playerId);
-        }
+    public String groupOf(@Nonnull OpenQuestAssignment assignment, @Nonnull World world) {
+        return gathers(assignment, world) ? assignment.getId() : null;
     }
 }

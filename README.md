@@ -115,7 +115,10 @@ wherever it came from.
 What was handed out is written down per holder, by assignment and then by quest, as `Count`,
 `LastAt` and `Occasion`. A player's records travel in their own; a world's and the server's live in
 a store of their own, keyed like their index and written conditionally, so servers sharing a
-database never hand the same occasion out twice. The quest carries its `Origin` (assignment, quest
+database never hand the same occasion out twice. Those records are read once and kept in memory: a
+copy another server made stale only loses its claim, which reads them again and decides once more.
+The record is written before the quest is created, so a server stopping in between loses that
+occasion rather than handing it out twice. The quest carries its `Origin` (assignment, quest
 and occasion), which `GrantQuest` passes down its chain: everything one occasion opened is one
 line, the line `AfterEnd` waits for and `Replace` fails.
 

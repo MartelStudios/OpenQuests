@@ -2,7 +2,9 @@ package com.martelstudios.openquests.core.scopes.world;
 
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
@@ -77,10 +79,21 @@ public class WorldGroupIndex {
     }
 
     /**
-     * Counts a world of the group as entered, so that what the group starts next reaches it.
+     * Counts a world of the group as entered, so that what the group starts next reaches it, and
+     * brings it the group's running quests, handed to the player entering, who is among its
+     * players only once in.
      */
-    public void join(@Nonnull String group, @Nonnull World world) {
+    public void enter(@Nonnull String group, @Nonnull World world, @Nonnull UUID playerId) {
         joinedWorlds.computeIfAbsent(group, key -> ConcurrentHashMap.newKeySet()).add(world.getWorldConfig().getUuid());
+
+        for (UUID questId : List.copyOf(getQuestIds(group))) {
+            // Read back first: after a restart, nothing else has brought the group's quests into memory
+            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+            if (quest == null || QuestProgressionService.get().getLiveQuest(questId) == null) continue;
+
+            WorldQuestService.get().addQuest(world, questId);
+            QuestProgressionService.get().joinQuest(quest, playerId);
+        }
     }
 
     /**

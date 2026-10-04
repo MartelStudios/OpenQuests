@@ -13,7 +13,6 @@ import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
-import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.utils.EntityComponents;
@@ -24,6 +23,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Hands out what the {@link OpenQuestAssignment} assets ask for. Each part of an assignment does
@@ -41,6 +41,9 @@ public class QuestAssignmentService {
     private static final long TICK_SECONDS = 30;
 
     @Nonnull
+    private final SharedAssignmentRecords records;
+
+    @Nonnull
     private final AssignmentHolders holders;
 
     private final AssignmentOffer offer = new AssignmentOffer();
@@ -48,12 +51,13 @@ public class QuestAssignmentService {
     private final SettledOccasions settled = new SettledOccasions();
 
     public QuestAssignmentService(@Nonnull JavaPlugin plugin, @Nonnull QuestStorage storage) {
-        this.holders = new AssignmentHolders(storage);
+        this.records = new SharedAssignmentRecords(storage);
+        this.holders = new AssignmentHolders(records);
 
         plugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
         plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
-        plugin.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> settled.forget(PlayerAssignmentHolder.keyOf(event.getPlayerRef().getUuid())));
-        plugin.getEventRegistry().registerGlobal(RemoveWorldEvent.class, event -> settled.forget(WorldQuestService.indexKey(event.getWorld())));
+        plugin.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> settled.forget(AssignmentHolders.playerKey(event.getPlayerRef().getUuid())));
+        plugin.getEventRegistry().registerGlobal(RemoveWorldEvent.class, this::handleRemoveWorldEvent);
     }
 
     public static QuestAssignmentService get() {
@@ -79,10 +83,10 @@ public class QuestAssignmentService {
         try {
             Instant now = Instant.now();
 
-            for (OpenQuestAssignment assignment : List.copyOf(OpenQuestAssignment.getAssetMap().getAssetMap().values())) {
+            forEachAssignment("the schedule", assignment -> {
                 Occasion occasion = assignment.getTrigger().onTick(now);
                 if (occasion != null) evaluate(assignment, occasion);
-            }
+            });
         } catch (Throwable e) {
             // Anything thrown out of a scheduled task cancels every tick after it, silently
             LOGGER.atWarning().withCause(e).log("Handing out scheduled quests failed");
@@ -97,12 +101,16 @@ public class QuestAssignmentService {
         UUID playerId = playerConnectEvent.getPlayerRef().getUuid();
         EntityComponents player = EntityComponents.of(playerConnectEvent.getHolder());
 
-        for (OpenQuestAssignment assignment : List.copyOf(OpenQuestAssignment.getAssetMap().getAssetMap().values())) {
+        forEachAssignment("a connection", assignment -> {
             Occasion occasion = assignment.getTrigger().onConnect(playerId, player);
             if (occasion != null) evaluate(assignment, occasion);
-        }
+        });
     }
 
+    /**
+     * The group a world belongs to takes its running quests up first, so that an occasion the
+     * entry is finds the world already in its group.
+     */
     private void handleAddPlayerToWorldEvent(@Nonnull AddPlayerToWorldEvent addPlayerToWorldEvent) {
         PlayerRef playerRef = addPlayerToWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;
@@ -110,11 +118,35 @@ public class QuestAssignmentService {
         EntityComponents player = EntityComponents.of(addPlayerToWorldEvent.getHolder());
         World world = addPlayerToWorldEvent.getWorld();
 
-        for (OpenQuestAssignment assignment : List.copyOf(OpenQuestAssignment.getAssetMap().getAssetMap().values())) {
-            assignment.getScope().onEnterWorld(assignment, playerRef.getUuid(), world);
+        forEachAssignment("a world entry", assignment -> {
+            String group = assignment.getScope().groupOf(assignment, world);
+            if (group != null) WorldGroupIndex.get().enter(group, world, playerRef.getUuid());
 
             Occasion occasion = assignment.getTrigger().onEnterWorld(playerRef.getUuid(), player, world);
             if (occasion != null) evaluate(assignment, occasion);
+        });
+    }
+
+    /**
+     * A world closing for good takes its records with it, deleted from the store as it closes.
+     */
+    private void handleRemoveWorldEvent(@Nonnull RemoveWorldEvent removeWorldEvent) {
+        String key = AssignmentHolders.worldKey(removeWorldEvent.getWorld());
+        settled.forget(key);
+        records.forget(key);
+    }
+
+    /**
+     * Each assignment on its own: one that throws, a storage that failed, leaves the others to
+     * run, and never reaches the event it was answering.
+     */
+    private void forEachAssignment(@Nonnull String occasion, @Nonnull Consumer<OpenQuestAssignment> action) {
+        for (OpenQuestAssignment assignment : List.copyOf(OpenQuestAssignment.getAssetMap().getAssetMap().values())) {
+            try {
+                action.accept(assignment);
+            } catch (RuntimeException e) {
+                LOGGER.atWarning().withCause(e).log("Assignment %s failed on %s", assignment.getId(), occasion);
+            }
         }
     }
 
@@ -139,7 +171,7 @@ public class QuestAssignmentService {
         @Override
         public void player(@Nonnull UUID playerId, @Nonnull EntityComponents player) {
             String key = occasion.placeKey();
-            if (isSettled(PlayerAssignmentHolder.keyOf(playerId), key)) return;
+            if (isSettled(AssignmentHolders.playerKey(playerId), key)) return;
 
             offerAll(holders.player(playerId, player), key);
         }
@@ -150,7 +182,7 @@ public class QuestAssignmentService {
 
             for (PlayerRef playerRef : Universe.get().getPlayers()) {
                 UUID playerId = playerRef.getUuid();
-                if (isSettled(PlayerAssignmentHolder.keyOf(playerId), key)) continue;
+                if (isSettled(AssignmentHolders.playerKey(playerId), key)) continue;
 
                 EntityComponents.update(playerId, player -> offerAll(holders.player(playerId, player), key));
             }
@@ -159,7 +191,7 @@ public class QuestAssignmentService {
         @Override
         public void world(@Nonnull World world, @Nullable UUID joining) {
             String key = occasion.timeKey();
-            if (isSettled(WorldQuestService.indexKey(world), key)) return;
+            if (isSettled(AssignmentHolders.worldKey(world), key)) return;
 
             WorldQuestService.onThreadOf(world, () -> offerAll(holders.world(world, joining), key));
         }
@@ -167,7 +199,7 @@ public class QuestAssignmentService {
         @Override
         public void group(@Nonnull String group, @Nullable UUID joining) {
             String key = occasion.timeKey();
-            if (isSettled(WorldGroupIndex.keyOf(group), key)) return;
+            if (isSettled(AssignmentHolders.groupKey(group), key)) return;
 
             offerAll(holders.group(group, joining), key);
         }
@@ -175,7 +207,7 @@ public class QuestAssignmentService {
         @Override
         public void universe(@Nullable UUID joining) {
             String key = occasion.timeKey();
-            if (isSettled(UniverseQuestService.UNIVERSE_INDEX_KEY, key)) return;
+            if (isSettled(AssignmentHolders.universeKey(), key)) return;
 
             offerAll(holders.universe(joining), key);
         }
@@ -184,14 +216,21 @@ public class QuestAssignmentService {
             return occasion.isTimed() && settled.isSettled(holderKey, assignment, key);
         }
 
+        /**
+         * Often run later, on another thread, where nothing would report what it throws.
+         */
         private void offerAll(@Nonnull AssignmentHolder holder, @Nonnull String key) {
-            for (String questAssetId : assignment.getQuestAssetIds()) {
-                OpenQuestAsset asset = OpenQuestAsset.getAsset(questAssetId);
-                if (asset == null) continue;
+            try {
+                for (String questAssetId : assignment.getQuestAssetIds()) {
+                    OpenQuestAsset asset = OpenQuestAsset.getAsset(questAssetId);
+                    if (asset == null) continue;
 
-                if (offer.offer(assignment, asset, holder, key, occasion.isTimed()) && occasion.isTimed()) {
-                    settled.settle(holder.getKey(), assignment.getId(), questAssetId, key);
+                    if (offer.offer(assignment, asset, holder, key, occasion.isTimed()) && occasion.isTimed()) {
+                        settled.settle(holder.getKey(), assignment.getId(), questAssetId, key);
+                    }
                 }
+            } catch (RuntimeException e) {
+                LOGGER.atWarning().withCause(e).log("Assignment %s failed to reach %s", assignment.getId(), holder.getKey());
             }
         }
     }

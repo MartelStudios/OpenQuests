@@ -77,4 +77,12 @@ public final class PlayerAssignmentHolder implements AssignmentHolder {
         questStore.markDirty();
         return true;
     }
+
+    /**
+     * Nothing to read again: no other server writes a player's records while they are here.
+     */
+    @Override
+    public boolean refresh() {
+        return false;
+    }
 }

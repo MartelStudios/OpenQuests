@@ -11,6 +11,7 @@ import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +39,27 @@ public final class AssignmentOffer {
     }
 
     /**
-     * A replaced line fails only once the new quest is out, so a refused hand-out leaves it be.
+     * A replaced line fails only once the new quest is out, so a refused hand-out leaves it be. A
+     * hand-out another server wrote first is decided once more, on what it wrote.
      *
      * @param occasion the key of the occasion, as that holder tells hand-outs apart
      * @param timed whether the occasion is a period, which comes back each time the holder is reached
      * @return whether the holder now has this occasion handed out, by this call or an earlier one.
      */
     public boolean offer(@Nonnull OpenQuestAssignment assignment, @Nonnull OpenQuestAsset asset, @Nonnull AssignmentHolder holder, @Nonnull String occasion, boolean timed) {
+        for (int attempt = 0; ; attempt++) {
+            Boolean outcome = tryOffer(assignment, asset, holder, occasion, timed);
+            if (outcome != null) return outcome;
+            if (attempt > 0 || !holder.refresh()) return false;
+        }
+    }
+
+    /**
+     * @return the outcome of the offer, {@code null} for a hand-out refused, which may be decided
+     * once more.
+     */
+    @Nullable
+    private Boolean tryOffer(@Nonnull OpenQuestAssignment assignment, @Nonnull OpenQuestAsset asset, @Nonnull AssignmentHolder holder, @Nonnull String occasion, boolean timed) {
         String assignmentId = assignment.getId();
         String questAssetId = asset.getId();
 
@@ -60,7 +75,7 @@ public final class AssignmentOffer {
         AbstractQuestProgression<?> quest = asset.create();
         quest.setOrigin(new QuestOrigin(assignmentId, questAssetId, occasion));
 
-        if (!holder.handOut(quest, assignmentId, questAssetId, record, AssignmentRecord.next(record, occasion, Instant.now()))) return false;
+        if (!holder.handOut(quest, assignmentId, questAssetId, record, AssignmentRecord.next(record, occasion, Instant.now()))) return null;
 
         if (!replaced.isEmpty()) failLine.accept(replaced);
         return true;
