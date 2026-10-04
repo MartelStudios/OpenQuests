@@ -157,9 +157,10 @@ never depends on it, only the reverse.
 A scope sharing a quest writes itself on it as `getScope()`, data the quest never acts on: a
 `QuestScope` registered under a `"Type"` (`World` with its worlds, `Worlds` with its group as well,
 `Universe`), `null` for a quest
-its players hold on their own. Each kind says how a quest it holds is shared and let go of, so
-`GrantQuest` keeps a chain in its scope and a quest leaving for good leaves its indexes without
-anything telling the kinds apart. A plugin adds its own by registering it on `QuestScope.CODEC`.
+its players hold on their own. Each kind says how a quest it holds is shared, let go of, and
+whether it outlives a world closing, so `GrantQuest` keeps a chain in its scope, a quest leaving for
+good leaves its indexes, and a closing world settles its quests without anything telling the kinds
+apart. A plugin adds its own by registering it on `QuestScope.CODEC`.
 
 #### Player scope
 Quests assigned to named players, the default path.

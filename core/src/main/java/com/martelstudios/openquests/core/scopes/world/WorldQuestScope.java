@@ -18,7 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A quest shared by everyone inside the worlds holding it, joined on the way in and left on the
- * way out. Several worlds holding one quest push one progression together.
+ * way out. Several worlds holding one quest push one progression together, and it goes on as long
+ * as one of them is open.
  */
 public class WorldQuestScope extends QuestScope {
 
@@ -33,17 +34,16 @@ public class WorldQuestScope extends QuestScope {
 
     public WorldQuestScope() {}
 
-    public WorldQuestScope(@Nonnull UUID worldId) {
-        worlds.add(worldId);
+    public WorldQuestScope(@Nonnull Collection<UUID> worldIds) {
+        worlds.addAll(worldIds);
     }
 
     /**
-     * @return the live set of the worlds holding the quest, closed ones included. A caller changing
-     * it marks the quest dirty, so the change is written out.
+     * @return the worlds holding the quest, closed ones included.
      */
     @Nonnull
     public Set<UUID> getWorlds() {
-        return worlds;
+        return Set.copyOf(worlds);
     }
 
     @Override
@@ -61,9 +61,15 @@ public class WorldQuestScope extends QuestScope {
         return questIds;
     }
 
+    /**
+     * Into every world of this scope still open, each on its own thread.
+     */
     @Override
     public void share(@Nonnull AbstractQuestProgression<?> quest) {
-        for (World world : WorldQuestService.openWorlds(worlds)) {
+        List<World> open = WorldQuestService.openWorlds(worlds);
+
+        quest.setScope(new WorldQuestScope(open.stream().map(world -> world.getWorldConfig().getUuid()).toList()));
+        for (World world : open) {
             WorldQuestService.get().addQuest(world, quest.getId());
         }
     }
@@ -73,5 +79,26 @@ public class WorldQuestScope extends QuestScope {
         for (World world : WorldQuestService.openWorlds(worlds)) {
             WorldQuestService.get().removeQuest(world, quest.getId());
         }
+    }
+
+    /**
+     * A world is its own holder: the quest goes on only while another world holding it is open.
+     */
+    @Override
+    public boolean outlives(@Nonnull UUID closingWorldId) {
+        for (World world : WorldQuestService.openWorlds(worlds)) {
+            if (!world.getWorldConfig().getUuid().equals(closingWorldId)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean addWorld(@Nonnull UUID worldId) {
+        return worlds.add(worldId);
+    }
+
+    @Override
+    public boolean removeWorld(@Nonnull UUID worldId) {
+        return worlds.remove(worldId);
     }
 }

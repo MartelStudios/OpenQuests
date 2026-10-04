@@ -6,11 +6,13 @@ import com.martelstudios.openquests.core.assignments.Occasion;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
 import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -46,21 +48,25 @@ public class WorldsAssignmentScope extends AbstractWorldAssignmentScope {
         QuestAssignmentService service = QuestAssignmentService.get();
         String key = occasion.timeKey();
 
-        if (occasion.isTimed() && service.isSettled(WorldQuestService.groupKey(assignment.getId()), assignment, key)) return;
+        if (occasion.isTimed() && service.isSettled(WorldGroupIndex.keyOf(assignment.getId()), assignment, key)) return;
 
-        World entered = occasion.getWorld() != null && gathers(assignment, occasion.getWorld()) ? occasion.getWorld() : null;
-        service.offerAll(assignment, service.groupHolder(assignment.getId(), world -> gathers(assignment, world), entered, occasion.getPlayerId()), key, occasion.isTimed());
+        boolean entersGroup = occasion.getWorld() != null && gathers(assignment, occasion.getWorld());
+        service.offerAll(assignment, service.groupHolder(assignment.getId(), entersGroup ? occasion.getPlayerId() : null), key, occasion.isTimed());
     }
 
     /**
-     * Brings the group's running quests to a world of the group as someone enters it, and hands
-     * them to that player, who is among its players only once in.
+     * Counts a world of the group as entered, so that what the group starts next reaches it, and
+     * brings it the group's running quests, handed to that player, who is among its players only
+     * once in.
      */
     @Override
     public void onEnterWorld(@Nonnull OpenQuestAssignment assignment, @Nonnull UUID playerId, @Nonnull World world) {
         if (!gathers(assignment, world)) return;
 
-        for (UUID questId : WorldQuestService.get().getGroupQuestIds(assignment.getId())) {
+        String group = assignment.getId();
+        WorldGroupIndex.get().join(group, world);
+
+        for (UUID questId : List.copyOf(WorldGroupIndex.get().getQuestIds(group))) {
             // Read back first: after a restart, nothing else has brought the group's quests into memory
             AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
             if (quest == null || QuestProgressionService.get().getLiveQuest(questId) == null) continue;

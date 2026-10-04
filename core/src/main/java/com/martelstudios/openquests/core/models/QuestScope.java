@@ -38,8 +38,8 @@ public abstract class QuestScope {
     public abstract Collection<UUID> getQuestIds();
 
     /**
-     * Shares another quest the way this one is shared: with the same worlds, the same group or the
-     * whole server. The quest is registered already.
+     * Shares another quest the way this one is shared, with the same worlds, the same group or the
+     * whole server, and writes a scope of this kind on it. The quest is registered already.
      */
     public abstract void share(@Nonnull AbstractQuestProgression<?> quest);
 
@@ -47,4 +47,30 @@ public abstract class QuestScope {
      * Takes a quest leaving the store for good out of every index of this scope naming it.
      */
     public abstract void release(@Nonnull AbstractQuestProgression<?> quest);
+
+    /**
+     * Asked as a world closes for good with the quest in it: one that does not go on fails there.
+     *
+     * @param closingWorldId the world closing, no longer counted among the open ones
+     */
+    public abstract boolean outlives(@Nonnull UUID closingWorldId);
+
+    /**
+     * Notes that the quest is now played in that world as well. A scope not made of worlds keeps
+     * none and ignores it.
+     *
+     * @return whether the scope changed, and the quest has to be written again.
+     */
+    public boolean addWorld(@Nonnull UUID worldId) {
+        return false;
+    }
+
+    /**
+     * Notes that the quest is no longer played in that world.
+     *
+     * @return whether the scope changed, and the quest has to be written again.
+     */
+    public boolean removeWorld(@Nonnull UUID worldId) {
+        return false;
+    }
 }

@@ -30,6 +30,12 @@ public class WorldQuestStoreResource implements Resource<EntityStore> {
 
     private boolean dirty;
 
+    /**
+     * Set while the world closes for good: nothing is shared into it any more, so a quest paying
+     * with another on its way out leaves nothing behind in a world that is gone. Never copied.
+     */
+    private volatile boolean closing;
+
     public WorldQuestStoreResource() {
     }
 
@@ -56,6 +62,20 @@ public class WorldQuestStoreResource implements Resource<EntityStore> {
         if (loaded) return false;
         loaded = true;
         return true;
+    }
+
+    /**
+     * @return whether the world is closing for good, and no longer counts as open.
+     */
+    public boolean isClosing() {
+        return closing;
+    }
+
+    /**
+     * Written by the closing of the world alone, and cleared again if it is called off.
+     */
+    public void setClosing(boolean closing) {
+        this.closing = closing;
     }
 
     public void markDirty() {

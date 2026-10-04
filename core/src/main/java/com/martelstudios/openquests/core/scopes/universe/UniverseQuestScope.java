@@ -18,6 +18,11 @@ public class UniverseQuestScope extends QuestScope {
 
     public static final BuilderCodec<UniverseQuestScope> CODEC = BuilderCodec.builder(UniverseQuestScope.class, UniverseQuestScope::new, QuestScope.BASE_CODEC).build();
 
+    /**
+     * The scope holds nothing of its own, so one serves every quest the server shares.
+     */
+    public static final UniverseQuestScope INSTANCE = new UniverseQuestScope();
+
     @Override
     public boolean isReachable() {
         return true;
@@ -31,11 +36,20 @@ public class UniverseQuestScope extends QuestScope {
 
     @Override
     public void share(@Nonnull AbstractQuestProgression<?> quest) {
+        quest.setScope(INSTANCE);
         UniverseQuestService.get().addQuest(quest.getId());
     }
 
     @Override
     public void release(@Nonnull AbstractQuestProgression<?> quest) {
         UniverseQuestService.get().removeQuest(quest.getId());
+    }
+
+    /**
+     * The server outlives any of its worlds.
+     */
+    @Override
+    public boolean outlives(@Nonnull UUID closingWorldId) {
+        return true;
     }
 }

@@ -20,6 +20,9 @@ import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
+import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
+import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
+import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
@@ -35,7 +38,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 /**
  * Hands out what the {@link OpenQuestAssignment} assets ask for. Each part of an assignment does
@@ -138,10 +140,7 @@ public class QuestAssignmentService {
      */
     @Nonnull
     public AssignmentHolder worldHolder(@Nonnull World world, @Nullable UUID joining) {
-        return new SharedAssignmentHolder(storage, WorldQuestService.indexKey(world), () -> WorldQuestService.get().getQuestIds(world), quest -> {
-            WorldQuestService.get().addQuest(world, quest.getId());
-            if (joining != null) QuestProgressionService.get().joinQuest(quest, joining);
-        });
+        return new SharedAssignmentHolder(storage, WorldQuestService.indexKey(world), new WorldQuestScope(List.of(world.getWorldConfig().getUuid())), joining);
     }
 
     /**
@@ -151,10 +150,7 @@ public class QuestAssignmentService {
      */
     @Nonnull
     public AssignmentHolder universeHolder(@Nullable UUID joining) {
-        return new SharedAssignmentHolder(storage, UniverseQuestService.UNIVERSE_INDEX_KEY, () -> UniverseQuestService.get().getQuests().getAllIds(), quest -> {
-            UniverseQuestService.get().addQuest(quest.getId());
-            if (joining != null) QuestProgressionService.get().joinQuest(quest, joining);
-        });
+        return new SharedAssignmentHolder(storage, UniverseQuestService.UNIVERSE_INDEX_KEY, UniverseQuestScope.INSTANCE, joining);
     }
 
     private void tick() {
@@ -172,32 +168,13 @@ public class QuestAssignmentService {
     }
 
     /**
-     * Every world the group gathers, open now, takes the quest up on its own thread; the player
-     * whose entry this is joins it there, being among its players only once in.
-     *
-     * @param gathers whether a world belongs to the group
-     * @param entered the world the occasion happens in, if the group gathers it
-     * @param joining the player entering it
+     * @param joining the player entering a world of the group, who is not among its players until
+     * the entry is done
      * @return the group of worlds as a holder, its records and index under the group's key.
      */
     @Nonnull
-    public AssignmentHolder groupHolder(@Nonnull String group, @Nonnull Predicate<World> gathers, @Nullable World entered, @Nullable UUID joining) {
-        UUID enteredId = entered == null ? null : entered.getWorldConfig().getUuid();
-
-        return new SharedAssignmentHolder(storage, WorldQuestService.groupKey(group), () -> WorldQuestService.get().getGroupQuestIds(group), quest -> {
-            quest.setScope(new WorldsQuestScope(group));
-            WorldQuestService.get().addToGroup(group, quest.getId());
-
-            for (World world : Universe.get().getWorlds().values()) {
-                if (!gathers.test(world)) continue;
-
-                boolean joiningHere = joining != null && world.getWorldConfig().getUuid().equals(enteredId);
-                WorldQuestService.onThreadOf(world, () -> {
-                    WorldQuestService.get().addQuest(world, quest.getId());
-                    if (joiningHere) QuestProgressionService.get().joinQuest(quest, joining);
-                });
-            }
-        });
+    public AssignmentHolder groupHolder(@Nonnull String group, @Nullable UUID joining) {
+        return new SharedAssignmentHolder(storage, WorldGroupIndex.keyOf(group), new WorldsQuestScope(group), joining);
     }
 
     /**

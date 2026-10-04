@@ -3,6 +3,7 @@ package com.martelstudios.openquests.core.assignments;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.AssignmentRecords;
+import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 
@@ -12,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * A holder many players share, a world, a group of worlds or the server, whose records live in a
@@ -29,10 +28,10 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
     private final String key;
 
     @Nonnull
-    private final Supplier<Collection<UUID>> questIds;
+    private final QuestScope scope;
 
-    @Nonnull
-    private final Consumer<AbstractQuestProgression<?>> share;
+    @Nullable
+    private final UUID joining;
 
     @Nullable
     private AssignmentRecords records;
@@ -46,15 +45,15 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
 
     /**
      * @param key the holder's key in the store, the same as its index: {@code world:<uuid>},
-     * {@code universe}
-     * @param questIds the ids its index holds
-     * @param share what makes a registered quest the holder's, and reach whoever it is for
+     * {@code worlds:<group>}, {@code universe}
+     * @param scope the scope a quest handed out here is shared through, which indexes its quests
+     * @param joining the player whose arrival this is, not among those the scope reaches yet
      */
-    public SharedAssignmentHolder(@Nonnull QuestStorage storage, @Nonnull String key, @Nonnull Supplier<Collection<UUID>> questIds, @Nonnull Consumer<AbstractQuestProgression<?>> share) {
+    public SharedAssignmentHolder(@Nonnull QuestStorage storage, @Nonnull String key, @Nonnull QuestScope scope, @Nullable UUID joining) {
         this.storage = storage;
         this.key = key;
-        this.questIds = questIds;
-        this.share = share;
+        this.scope = scope;
+        this.joining = joining;
     }
 
     @Nonnull
@@ -75,7 +74,7 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
         if (quests != null) return quests;
 
         List<AbstractQuestProgression<?>> read = new ArrayList<>();
-        for (UUID questId : new ArrayList<>(questIds.get())) {
+        for (UUID questId : new ArrayList<>(scope.getQuestIds())) {
             AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
             if (quest != null) read.add(quest);
         }
@@ -94,7 +93,8 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
     }
 
     /**
-     * Claimed first: a quest is only created by the server whose write went through.
+     * Claimed first: a quest is only created by the server whose write went through. Shared the
+     * way any quest of that scope is, a chain's follow-ups included.
      */
     @Override
     public boolean handOut(@Nonnull AbstractQuestProgression<?> quest, @Nonnull String assignmentId, @Nonnull String questAssetId, @Nullable AssignmentRecord expected, @Nonnull AssignmentRecord next) {
@@ -103,7 +103,8 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
         records().put(assignmentId, questAssetId, next);
         quests = null;
         QuestProgressionService.get().registerQuest(quest);
-        share.accept(quest);
+        scope.share(quest);
+        if (joining != null) QuestProgressionService.get().joinQuest(quest, joining);
         return true;
     }
 

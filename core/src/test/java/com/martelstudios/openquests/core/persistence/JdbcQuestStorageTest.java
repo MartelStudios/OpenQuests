@@ -123,8 +123,8 @@ class JdbcQuestStorageTest {
         UUID lair = UUID.randomUUID();
         UUID arena = UUID.randomUUID();
         TestQuestProgression quest = quest("ClearTheRats", UUID.randomUUID());
-        WorldQuestScope scope = new WorldQuestScope(lair);
-        scope.getWorlds().add(arena);
+        WorldQuestScope scope = new WorldQuestScope(List.of(lair));
+        scope.addWorld(arena);
         quest.setScope(scope);
 
         storage.saveProgressions(List.of(quest));
@@ -141,7 +141,7 @@ class JdbcQuestStorageTest {
         UUID arena = UUID.randomUUID();
         TestQuestProgression quest = quest("ArenaGoal", UUID.randomUUID());
         WorldsQuestScope scope = new WorldsQuestScope("ArenaTogether");
-        scope.getWorlds().add(arena);
+        scope.addWorld(arena);
         quest.setScope(scope);
 
         storage.saveProgressions(List.of(quest));

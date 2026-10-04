@@ -46,6 +46,8 @@ import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
+import com.martelstudios.openquests.core.scopes.world.WorldClosingService;
+import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestStoreResource;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
@@ -96,6 +98,8 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     private QuestRewardService questRewardService;
     private UniverseQuestService universeQuestService;
     private WorldQuestService worldQuestService;
+
+    private WorldGroupIndex worldGroupIndex;
     private PlayerQuestService playerQuestService;
 
     public OpenQuestsCorePlugin(@Nonnull JavaPluginInit init) {
@@ -130,6 +134,8 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questRewardService = new QuestRewardService(this);
         universeQuestService = new UniverseQuestService(this, questStorage);
         worldQuestService = new WorldQuestService(this, questStorage);
+        worldGroupIndex = new WorldGroupIndex(questStorage);
+        new WorldClosingService(this, questStorage);
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
         QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);
@@ -215,6 +221,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         save("player records", () -> questPlayerStateService.saveAllOnline(force));
         save("the universe index", () -> universeQuestService.saveQuests(force));
         save("the world indexes", () -> worldQuestService.saveAll(force));
+        save("the world group indexes", () -> worldGroupIndex.saveAll(force));
     }
 
     /**
@@ -281,6 +288,10 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     public WorldQuestService getWorldQuestService() {
         return worldQuestService;
+    }
+
+    public WorldGroupIndex getWorldGroupIndex() {
+        return worldGroupIndex;
     }
 
     public PlayerQuestService getPlayerQuestService() {
