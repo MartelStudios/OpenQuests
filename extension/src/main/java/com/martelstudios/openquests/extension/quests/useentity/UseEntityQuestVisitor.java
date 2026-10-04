@@ -26,7 +26,7 @@ public class UseEntityQuestVisitor implements QuestVisitor<UseEntityQuestProgres
         if (quest.isCompleted() && quest.isStopOnComplete()) return;
         if (!quest.matchesTarget(target)) return;
 
-        quest.setCurrentQuantity(quest.getCurrentQuantity() + 1)
+        quest.addQuantity(1)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
     }

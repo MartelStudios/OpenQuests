@@ -29,7 +29,7 @@ public class CraftQuestVisitor implements QuestVisitor<CraftQuestProgression> {
         int crafted = countMatchingOutputs(quest);
         if (crafted == 0) return;
 
-        quest.setCurrentQuantity(quest.getCurrentQuantity() + crafted)
+        quest.addQuantity(crafted)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
     }

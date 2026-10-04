@@ -34,7 +34,7 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
             return;
         }
 
-        quest.setCurrentQuantity(quest.getCurrentQuantity() + event.getItemStack().getQuantity())
+        quest.addQuantity(event.getItemStack().getQuantity())
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
 

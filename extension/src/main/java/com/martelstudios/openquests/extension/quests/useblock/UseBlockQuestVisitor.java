@@ -28,7 +28,7 @@ public class UseBlockQuestVisitor implements QuestVisitor<UseBlockQuestProgressi
         var blockType = event.getBlockType();
         if (blockType == null || !quest.getBlockToUse().matches(blockType.getId())) return;
 
-        quest.setCurrentQuantity(quest.getCurrentQuantity() + 1)
+        quest.addQuantity(1)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
     }

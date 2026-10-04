@@ -69,6 +69,15 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     }
 
     /**
+     * Adds to this server's share in one step, so that two worlds counting the same quest at the
+     * same moment both count.
+     */
+    public Q addQuantity(int delta) {
+        quantity.add(delta);
+        return self();
+    }
+
+    /**
      * @return this instance's target if one was set on it, the asset's otherwise.
      */
     public int getTargetQuantity() {
