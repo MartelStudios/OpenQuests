@@ -162,6 +162,8 @@ goblin-lair-spiders.title=Squash the spiders
 goblin-lair-spiders.description=Spiders lurk all through the lair. Thin out their numbers.
 goblin-lair-torches.title=Light the way
 goblin-lair-torches.description=Mark your path through the dark galleries with torches.
+goblin-lair-daily-hunt.title=The day's cull
+goblin-lair-daily-hunt.description=The warrens refill as fast as they are emptied. Today's cull: fifty goblins, wherever the lair opens.
 
 category.tutorial=Tutorial
 category.survival=Survival

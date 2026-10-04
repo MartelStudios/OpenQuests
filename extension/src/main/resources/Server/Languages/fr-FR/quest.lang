@@ -162,6 +162,8 @@ goblin-lair-spiders.title=Écraser les araignées
 goblin-lair-spiders.description=Des araignées rôdent dans tout l'antre. Réduisez leur nombre.
 goblin-lair-torches.title=Éclairer le chemin
 goblin-lair-torches.description=Jalonnez votre route de torches à travers les galeries obscures.
+goblin-lair-daily-hunt.title=La battue du jour
+goblin-lair-daily-hunt.description=Les galeries se remplissent aussi vite qu'on les vide. La battue du jour : cinquante gobelins, où que s'ouvre le repaire.
 
 category.tutorial=Tutoriel
 category.survival=Survie

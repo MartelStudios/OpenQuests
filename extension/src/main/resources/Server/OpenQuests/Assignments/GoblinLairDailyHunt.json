@@ -1,0 +1,17 @@
+{
+  "Trigger": {
+    "Type": "Schedule",
+    "At": "2026-10-01T00:00:00+02:00",
+    "Every": "P1D"
+  },
+  "Scope": {
+    "Type": "Worlds",
+    "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*"
+  },
+  "Repeat": {
+    "Type": "Replace"
+  },
+  "QuestAssetIds": [
+    "GoblinLairDailyHunt"
+  ]
+}

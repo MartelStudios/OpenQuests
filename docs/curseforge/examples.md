@@ -52,6 +52,8 @@ A quest line through the goblin lair, the dungeon Hytale ships as an instance. T
 
 Each quest hands the next one over with `GrantQuest`, and since the one paying belongs to the lair, so does the next: the chain stays shared from the rats to the duke. Every quest of the line carries the *Dungeon* category, the side quests *Side quest* as well, and the journal shows both beside their titles.
 
+🗓️ **The day's cull** spans every copy at once: fifty goblins, counted across all the lairs run that day. Its assignment, `Assignments/GoblinLairDailyHunt.json`, hands it out each day on a `Schedule` to the `Worlds` scope, so one quest is shared by every copy of the lair, waits between runs, and is replaced the next day with `"Repeat": { "Type": "Replace" }`. It pays two gold bars to whoever is in the lair as it completes.
+
 ### 🌲 A server event
 
 🪓 **The Great Felling**, launched by an admin with `/oquest create universe GreatFelling`: five hundred trunks felled by the whole server, counting only while two players are online, before a closing date. `AntiAbuse` is on, so a trunk placed and felled again counts once.
@@ -70,7 +72,7 @@ Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, 
 
 ---
 
-All nineteen quest types are in there, along with every constraint (time limits, a closing date, a world, an area, conditions on the player, a minimum of players online, death, cooldowns and caps), the three scopes, all three reward types including rewards for failing, descriptions in the tracker, the three visibility modes, categories, and progressions carried by rewards alone. What starts by itself is handed out by assignments: `Assignments/OnConnection.json` on connection, `Assignments/DailyChores.json` again after each end, `Assignments/GoblinLair.json` in every copy of the lair.
+All nineteen quest types are in there, along with every constraint (time limits, a closing date, a world, an area, conditions on the player, a minimum of players online, death, cooldowns and caps), the four scopes, all three reward types including rewards for failing, descriptions in the tracker, the three visibility modes, categories, and progressions carried by rewards alone. What starts by itself is handed out by assignments: `Assignments/OnConnection.json` on connection, `Assignments/DailyChores.json` again after each end, `Assignments/GoblinLair.json` in every copy of the lair, `Assignments/GoblinLairDailyHunt.json` once a day across all of them.
 
 ---
 
