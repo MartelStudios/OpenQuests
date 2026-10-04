@@ -84,7 +84,7 @@ public class WorldQuestService {
     public void unindex(@Nonnull World world, @Nonnull UUID questId) {
         onThreadOf(world, () -> {
             WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
-            if (store.questsRecord.unregister(questId)) store.markDirty();
+            if (store.questsRecord.unregister(questId)) changed(world, store);
         });
     }
 
@@ -162,7 +162,7 @@ public class WorldQuestService {
         LOGGER.atInfo().log("Removing quest %s from world %s", questId, world.getName());
 
         WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
-        if (store.questsRecord.unregister(questId)) store.markDirty();
+        if (store.questsRecord.unregister(questId)) changed(world, store);
 
         // Gone already when it left for good, and nothing then is left to write on
         AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
@@ -176,7 +176,8 @@ public class WorldQuestService {
     void deleteIndex(@Nonnull World world) {
         loadedRecord(world).load(Set.of());
         getWorldQuestStoreFromWorld(world).consumeChanges();
-        storage.deleteIndex(indexKey(world));
+        String key = indexKey(world);
+        QuestReplicationService.get().execute("the " + key + " index", () -> storage.deleteIndex(key));
     }
 
     private void addQuestHere(@Nonnull World world, @Nonnull UUID questId) {
@@ -184,7 +185,7 @@ public class WorldQuestService {
         if (quest == null) return;
 
         if (!loadedRecord(world).register(questId)) return;
-        getWorldQuestStoreFromWorld(world).markDirty();
+        changed(world, getWorldQuestStoreFromWorld(world));
 
         LOGGER.atInfo().log("Added quest %s to world %s", questId, world.getName());
 
@@ -220,7 +221,7 @@ public class WorldQuestService {
                 if (QuestProgressionService.get().isSetAside(questId)) continue;
 
                 questsRecord.unregister(questId);
-                store.markDirty();
+                changed(world, store);
                 continue;
             }
 
@@ -239,7 +240,8 @@ public class WorldQuestService {
         var playerRef = removedPlayerFromWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;
 
-        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(removedPlayerFromWorldEvent.getWorld());
+        World world = removedPlayerFromWorldEvent.getWorld();
+        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
         QuestStoreComponent playerStore = removedPlayerFromWorldEvent.getHolder().getComponent(QuestStoreComponent.getComponentType());
         QuestsRecord questsRecord = store.questsRecord;
 
@@ -250,7 +252,7 @@ public class WorldQuestService {
                 if (QuestProgressionService.get().isSetAside(questId)) continue;
 
                 questsRecord.unregister(questId);
-                store.markDirty();
+                changed(world, store);
                 continue;
             }
 
@@ -260,6 +262,14 @@ public class WorldQuestService {
                 PlayerQuestService.get().removeQuestFromPlayerStore(playerStore, quest, playerRef.getUuid());
             }
         }
+    }
+
+    /**
+     * Marks a world's index changed and writes the change as it happens, off the world's thread.
+     */
+    private void changed(@Nonnull World world, @Nonnull WorldQuestStoreResource store) {
+        store.markDirty();
+        QuestReplicationService.get().flushIndex(store.questsRecord, indexKey(world));
     }
 
     /**

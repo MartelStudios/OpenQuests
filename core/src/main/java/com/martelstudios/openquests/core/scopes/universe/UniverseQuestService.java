@@ -8,6 +8,7 @@ import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.replication.QuestReplicationService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 
@@ -56,7 +57,7 @@ public class UniverseQuestService {
         if (quest == null) return;
 
         if (!quests.register(questId)) return;
-        dirty = true;
+        changed();
 
         LOGGER.atInfo().log("Added quest %s to universe", questId);
 
@@ -70,7 +71,7 @@ public class UniverseQuestService {
     public void removeQuest(@Nonnull UUID questId) {
         LOGGER.atInfo().log("Removing quest %s from universe", questId);
 
-        if (quests.unregister(questId)) dirty = true;
+        if (quests.unregister(questId)) changed();
 
         // Gone already when it left for good, and nothing then is left to write on
         AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
@@ -82,7 +83,7 @@ public class UniverseQuestService {
      * and the quest keeps its scope, which says it was the server's.
      */
     public void unindex(@Nonnull UUID questId) {
-        if (quests.unregister(questId)) dirty = true;
+        if (quests.unregister(questId)) changed();
     }
 
     /**
@@ -98,6 +99,14 @@ public class UniverseQuestService {
                 QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
             }
         }
+    }
+
+    /**
+     * Marks the index changed and writes the change as it happens, off the game threads.
+     */
+    private void changed() {
+        dirty = true;
+        QuestReplicationService.get().flushIndex(quests, UNIVERSE_INDEX_KEY);
     }
 
     /**

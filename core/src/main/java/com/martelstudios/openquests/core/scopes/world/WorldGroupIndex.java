@@ -4,6 +4,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.replication.QuestReplicationService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 
@@ -69,7 +70,7 @@ public class WorldGroupIndex {
      * Puts a quest in a group: the worlds it gathers take it up as they are entered.
      */
     public void add(@Nonnull String group, @Nonnull UUID questId) {
-        if (record(group).register(questId)) dirtyGroups.add(group);
+        if (record(group).register(questId)) changed(group);
     }
 
     /**
@@ -77,7 +78,7 @@ public class WorldGroupIndex {
      */
     public void remove(@Nonnull String group, @Nonnull UUID questId) {
         QuestsRecord record = groups.get(group);
-        if (record != null && record.unregister(questId)) dirtyGroups.add(group);
+        if (record != null && record.unregister(questId)) changed(group);
     }
 
     /**
@@ -165,6 +166,14 @@ public class WorldGroupIndex {
             QuestsRecord record = groups.get(group);
             if (record != null) record.flush(storage, keyOf(group));
         }
+    }
+
+    /**
+     * Marks a group changed and writes the change as it happens, off the game threads.
+     */
+    private void changed(@Nonnull String group) {
+        dirtyGroups.add(group);
+        QuestReplicationService.get().flushIndex(record(group), keyOf(group));
     }
 
     @Nonnull

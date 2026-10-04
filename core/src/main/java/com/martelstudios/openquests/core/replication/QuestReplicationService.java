@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
+import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,6 +30,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -106,13 +108,27 @@ public class QuestReplicationService {
      * @param what what the task does, for the log
      */
     public void execute(@Nonnull String what, @Nonnull Runnable task) {
-        worker.execute(() -> {
-            try {
-                task.run();
-            } catch (Throwable e) {
-                LOGGER.atWarning().withCause(e).log("Failed to read or write %s", what);
-            }
-        });
+        try {
+            worker.execute(() -> {
+                try {
+                    task.run();
+                } catch (Throwable e) {
+                    LOGGER.atWarning().withCause(e).log("Failed to read or write %s", what);
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            // The server is stopping: the last save pass writes what is still in memory
+            LOGGER.atFine().log("Left %s to the last save pass", what);
+        }
+    }
+
+    /**
+     * Writes what changed in an index as soon as it changes, off the game threads: a stopping
+     * server stops its worlds before the last save pass could read their indexes, and loses none
+     * of what was written this way. Written in order with the rest, a deletion included.
+     */
+    public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String indexKey) {
+        execute("the " + indexKey + " index", () -> record.flush(storage, indexKey));
     }
 
     /**
@@ -129,11 +145,17 @@ public class QuestReplicationService {
             return null;
         }
 
-        if (storage.claimEnd(quest)) {
-            apply(storage.pollReplicas(Map.of(quest.getId(), seenOf(quest.getId()))));
+        try {
+            if (storage.claimEnd(quest)) {
+                apply(storage.pollReplicas(Map.of(quest.getId(), seenOf(quest.getId()))));
+                return null;
+            }
+            return storage.loadEnd(quest.getId());
+        } catch (RuntimeException e) {
+            // A storage out of reach does not stop the game: this server ends the quest, as it would alone
+            LOGGER.atWarning().withCause(e).log("Failed to claim the end of quest %s, ending it here", quest.getId());
             return null;
         }
-        return storage.loadEnd(quest.getId());
     }
 
     private void tick() {
@@ -142,6 +164,11 @@ public class QuestReplicationService {
             for (AbstractQuestProgression<?> quest : QuestProgressionService.get().getAllQuests()) {
                 if (isReplicated(quest) && !quest.isCompleted()) shared.add(quest);
             }
+
+            // What was seen of quests no longer running here is of no use any more
+            Set<UUID> running = new HashSet<>();
+            for (AbstractQuestProgression<?> quest : shared) running.add(quest.getId());
+            seen.keySet().retainAll(running);
 
             // Written first, so that what this server did reaches the others a tick sooner
             progressionStore.save(shared);

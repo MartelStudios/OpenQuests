@@ -65,7 +65,7 @@ public class QuestsRecord {
     /**
      * Takes what the storage holds under this record's key, as read back from it.
      */
-    public void load(@Nonnull Set<UUID> storedIds) {
+    public synchronized void load(@Nonnull Set<UUID> storedIds) {
         replaceAll(storedIds);
         stored.retainAll(storedIds);
         stored.addAll(storedIds);
@@ -73,11 +73,12 @@ public class QuestsRecord {
 
     /**
      * Writes what was added and removed since the last write or read, member by member, so a
-     * server sharing the key loses nothing another one added meanwhile.
+     * server sharing the key loses nothing another one added meanwhile. One write or read at a
+     * time, so a write never undoes what a read just took in.
      *
      * @return whether anything was written.
      */
-    public boolean flush(@Nonnull IndexStore storage, @Nonnull String indexKey) {
+    public synchronized boolean flush(@Nonnull IndexStore storage, @Nonnull String indexKey) {
         Set<UUID> current = Set.copyOf(questIds);
 
         Set<UUID> added = new HashSet<>(current);
@@ -102,7 +103,7 @@ public class QuestsRecord {
      * @return the ids other servers added since, and those they removed.
      */
     @Nonnull
-    public Absorbed absorb(@Nonnull Set<UUID> storedNow) {
+    public synchronized Absorbed absorb(@Nonnull Set<UUID> storedNow) {
         Set<UUID> added = new HashSet<>(storedNow);
         added.removeAll(stored);
         Set<UUID> removed = new HashSet<>(stored);

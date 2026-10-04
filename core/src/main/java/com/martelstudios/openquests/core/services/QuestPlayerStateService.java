@@ -22,6 +22,7 @@ import com.martelstudios.openquests.core.rewards.stores.PendingRewardStore;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;
@@ -186,7 +187,12 @@ public class QuestPlayerStateService {
             Session session = sessions.get(message.getPlayerId());
             if (session == null || !session.delivered().add(message.getId())) continue;
 
-            if (message.getOwed() != null) QuestRewardService.get().deliver(message.getPlayerId(), message.getOwed());
+            // Into the component held here, so the debt is written with the record even if the player
+            // leaves before it is paid; then paid on their thread where it claims itself
+            if (message.getOwed() != null) {
+                session.rewards().pending.add(message.getOwed());
+                EntityComponents.update(message.getPlayerId(), QuestRewardService.get()::claimAuto);
+            }
 
             PlayerMessage.Ending ending = message.getEnding();
             if (ending != null) session.questStore().recordCompletion(ending.getAssetId(), ending.getOutcome(), ending.startedAt(), ending.completedAt());
