@@ -44,8 +44,9 @@ A quest is handed out in one of three ways, and the prerequisites of a quest are
 - **By an assignment**: an `OpenQuestAssignment` asset names quests, the moment they are handed
   out and who to ([assignments](#assignments)).
 - **As a reward**: the `GrantQuest` reward hands further quests over when a quest completes. This
-  is how a chain is written: finishing A grants B. The next quest stays in the scope of the one
-  paying for it, so a chain a world or the universe shares goes on shared.
+  is how a chain is written: finishing A grants B. Each player paid gets their own, unless the
+  reward is `Shared`: the quest then hands it on once, in its own scope, so a chain a world or the
+  universe shares goes on shared.
 - **Explicitly**: `QuestProgressionService.assignQuest(asset, playerId)`, from a command or from
   your own plugin.
 
@@ -148,12 +149,11 @@ step is registered. A step is an ordinary quest all the same, with its own recor
 and its own progression.
 
 What a group makes of how its steps end is left to the type built on it: `Composite`, in
-`OpenQuests`, is the one combining them with `AND` or `OR`. A step saved before the core kept
-parents carried its group as the `OQ_PARENT_QUEST` tag; it is handed back to its group as the two
-are read, and loses the tag.
+`OpenQuests`, is the one combining them with `AND` or `OR`.
 
 A quest a reward hands over is not a step of the one that paid for it: that is a lineage, written
-as the `OQ_GRANTED_BY` tag, not a part of a whole.
+as `getGrantedBy()` on the quest handed over, not a part of a whole. Tags are left to the assets:
+nothing the core or a built-in reward keeps track of is written as one.
 
 ### Scopes
 
@@ -166,7 +166,7 @@ A scope sharing a quest writes itself on it as `getScope()`, data the quest neve
 `QuestScope` registered under a `"Type"` (`World` with its worlds, `Worlds` with its group as well,
 `Universe`), `null` for a quest
 its players hold on their own. Each kind says how a quest it holds is shared, let go of, and
-whether it outlives a world closing, so `GrantQuest` keeps a chain in its scope, a quest leaving for
+whether it outlives a world closing, so a shared `GrantQuest` keeps a chain in its scope, a quest leaving for
 good leaves its indexes, and a closing world settles its quests without anything telling the kinds
 apart. A plugin adds its own by registering it on `QuestScope.CODEC`.
 
@@ -185,11 +185,11 @@ instanced events:
 - Reach the 10th zombie wave
 
 A world quest is created with `/oquest create world`, or by an [assignment](#assignments) with the
-`World` scope, which is how every copy of an instance opens with its own. A `GrantQuest` paid by
-a world quest hands its follow-ups to the same world, once however many players are paid, which
-keeps a dungeon line shared from its first quest to its last. A step of a `Composite` hands its
-follow-ups on the way its outermost quest is shared. A follow-up claimed by hand once
-that world has closed goes to the player claiming it, so a shared chain grants with `AutoClaim`.
+`World` scope, which is how every copy of an instance opens with its own. A `Shared` `GrantQuest`
+paid by a world quest hands its follow-ups to the same world, once as the quest ends, which keeps a
+dungeon line shared from its first quest to its last. A step of a `Composite` hands its follow-ups
+on the way its outermost quest is shared. A chain whose world has closed in the meantime hands each
+of its players their own.
 
 Only what is still running is removed: a quest that ended while the player was there stays in
 their journal, and one they left before its end does not.
@@ -522,8 +522,10 @@ reaches the sender's quests, so the wider group grants nothing over anybody else
 ## Built-in rewards
 
 - `Item`: gives items, hotbar first, all or nothing.
-- `GrantQuest`: hands further quests over, linked by id or written inline, in the scope of the
-  quest paying: to the player, or once to the world or the universe sharing it.
+- `GrantQuest`: hands further quests over, linked by id or written inline: to each player paid,
+  or with `"Shared": true` once by the quest as it ends, in the scope of its chain (the world, the
+  group of worlds or the universe sharing it). A shared one is never owed nor claimed, so
+  `AutoClaim` does not apply to it.
 - `Command`: runs a server or player command. `{player}` is replaced by the username, so
   `"Command": "give {player} Ingredient_Stick --quantity=5"` works; the optional arguments of a
   server command are named, never positional. A leading slash is optional. Runs as the console

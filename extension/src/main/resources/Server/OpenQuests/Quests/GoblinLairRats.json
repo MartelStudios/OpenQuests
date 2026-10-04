@@ -14,7 +14,7 @@
         "GoblinLairSpiders",
         "GoblinLairTorches"
       ],
-      "AutoClaim": true
+      "Shared": true
     }
   ]
 }

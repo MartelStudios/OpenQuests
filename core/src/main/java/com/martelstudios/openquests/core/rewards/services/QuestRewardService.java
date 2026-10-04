@@ -20,6 +20,7 @@ import com.martelstudios.openquests.core.utils.EntityComponents;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -60,8 +61,8 @@ public class QuestRewardService {
     }
 
     /**
-     * Writes down what the outcome owes each player holding the quest, and hands it over at once
-     * for a quest that claims itself.
+     * Pays what the outcome pays the quest as a whole, then writes down what it owes each player
+     * holding it, handed over at once for a reward that claims itself.
      */
     private void handleQuestCompletedEvent(QuestCompletedEvent questCompletedEvent) {
         AbstractQuestProgression<?> quest = questCompletedEvent.getQuest();
@@ -69,16 +70,25 @@ public class QuestRewardService {
         OpenQuestAsset asset = quest.getAsset();
         if (asset == null) return;
 
-        QuestReward[] rewards = asset.getRewards(questCompletedEvent.getState());
-        if (rewards.length == 0) return;
+        List<QuestReward> personal = new ArrayList<>();
+        for (QuestReward reward : asset.getRewards(questCompletedEvent.getState())) {
+            if (reward.isCollective()) {
+                reward.grantOnce(quest);
+            } else {
+                personal.add(reward);
+            }
+        }
+        if (personal.isEmpty()) return;
 
+        QuestReward[] rewards = personal.toArray(PendingRewards.NO_REWARDS);
         for (UUID playerId : quest.getPlayers()) {
             owe(playerId, new PendingRewards(quest, rewards));
         }
     }
 
     /**
-     * Pays one player for giving up, at the moment they do.
+     * Pays one player for giving up, at the moment they do, with what is theirs alone: a
+     * collective reward waits for the quest as a whole to be given up.
      */
     private void handleQuestPlayerAbandonedEvent(QuestPlayerAbandonedEvent questPlayerAbandonedEvent) {
         AbstractQuestProgression<?> quest = questPlayerAbandonedEvent.getQuest();
@@ -86,7 +96,7 @@ public class QuestRewardService {
         OpenQuestAsset asset = quest.getAsset();
         if (asset == null) return;
 
-        QuestReward[] rewards = asset.getRewards(QuestState.ABANDONED);
+        QuestReward[] rewards = Arrays.stream(asset.getRewards(QuestState.ABANDONED)).filter(reward -> !reward.isCollective()).toArray(QuestReward[]::new);
         if (rewards.length == 0) return;
 
         owe(questPlayerAbandonedEvent.getPlayerId(), new PendingRewards(quest, rewards));

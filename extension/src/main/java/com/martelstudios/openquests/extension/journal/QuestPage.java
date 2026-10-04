@@ -37,7 +37,6 @@ import com.martelstudios.openquests.extension.journal.navigation.routes.JournalR
 import com.martelstudios.openquests.extension.journal.navigation.routes.LabelledRoute;
 import com.martelstudios.openquests.extension.journal.navigation.routes.QuestRoute;
 import com.martelstudios.openquests.extension.journal.navigation.JournalRoutes;
-import com.martelstudios.openquests.extension.tags.OpenQuestsTags;
 import com.martelstudios.openquests.extension.track.QuestTrackService;
 
 import javax.annotation.Nonnull;
@@ -337,8 +336,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
             if (quest == null || !assetId.equals(quest.getAssetId())) continue;
 
-            String[] granter = quest.getTagValues(OpenQuestsTags.GRANTED_BY_TAG);
-            if (granter != null && granter.length > 0 && sourceQuestId.equals(granter[0])) return quest;
+            UUID grantedBy = quest.getGrantedBy();
+            if (grantedBy != null && sourceQuestId.equals(grantedBy.toString())) return quest;
         }
         return null;
     }

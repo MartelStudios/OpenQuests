@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.extension.rewards.grantquest;
 
 import com.hypixel.hytale.assetstore.codec.ContainedAssetCodec;
+import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
@@ -12,17 +13,19 @@ import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.utils.EntityComponents;
-import com.martelstudios.openquests.extension.tags.OpenQuestsTags;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Hands further quests on, to the player or to whatever shares the quest that pays. Each entry is
- * either the id of an existing asset or an inline definition, so a follow-up quest can be written
- * where it is granted.
+ * Hands further quests on. By default each player paid is handed their own; with {@code Shared},
+ * the quest hands them on once as it ends, shared the way its chain is, which is how a world or a
+ * server keeps a chain going together. Each entry is either the id of an existing asset or an
+ * inline definition, so a follow-up quest can be written where it is granted.
  */
 public class GrantQuestReward extends QuestReward {
 
@@ -32,78 +35,83 @@ public class GrantQuestReward extends QuestReward {
                     .addValidator(Validators.nonEmptyArray())
                     .addValidator(Validators.uniqueInArray())
                     .add()
+                    .append(new KeyedCodec<>("Shared", Codec.BOOLEAN), (reward, shared) -> reward.shared = shared, reward -> reward.shared ? Boolean.TRUE : null)
+                    .add()
                     .build();
 
     protected String[] questAssetIds = new String[0];
 
+    protected boolean shared;
+
     private GrantQuestReward() {}
 
     /**
-     * A follow-up stays in the scope of the chain paying for it, so one a world or the universe
-     * shares goes on shared, from any of its steps. An unknown asset is skipped rather than failing
-     * the whole grant: retrying would only hand out the quests that did resolve a second time.
+     * A quest of their own for the player paid, whoever else shares the one paying. An unknown
+     * asset is skipped rather than failing the whole grant: retrying would only hand out the
+     * quests that did resolve a second time.
      */
     @Override
     public boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
         var uuidComponent = playerComponents.getComponent(UUIDComponent.getComponentType());
         if (uuidComponent == null) return false;
 
-        UUID playerId = uuidComponent.getUuid();
-
         // Read back if need be: a reward collected by hand can come long after its quest left memory
         AbstractQuestProgression<?> source = QuestProgressionService.get().loadQuest(sourceQuestId);
         AbstractQuestProgression<?> head = source == null ? null : headOf(source);
-        QuestScope scope = head == null ? null : head.getScope();
-        boolean shared = scope != null && scope.isReachable();
 
-        for (String questAssetId : questAssetIds) {
-            OpenQuestAsset questAsset = OpenQuestAsset.getAsset(questAssetId);
-            if (questAsset == null) continue;
-
-            if (shared) {
-                handOnShared(source, head, questAsset, scope);
-            } else {
-                // A quest its constraints refuse is dropped rather than retried: the grant is what
-                // was owed, and it happened
-                QuestProgressionService.get().assignQuest(createFrom(questAsset, sourceQuestId, head), playerId);
-            }
+        for (OpenQuestAsset asset : assets()) {
+            // A quest its constraints refuse is dropped rather than retried: the grant is what
+            // was owed, and it happened
+            QuestProgressionService.get().assignQuest(createFrom(asset, sourceQuestId, head), uuidComponent.getUuid());
         }
-
         return true;
     }
 
+    @Override
+    public boolean isCollective() {
+        return shared;
+    }
+
+    /**
+     * Shared the way the chain paying is, from any of its steps. A chain nothing shares any more,
+     * its world closed, hands each of its players their own.
+     */
+    @Override
+    public void grantOnce(@Nonnull AbstractQuestProgression<?> quest) {
+        AbstractQuestProgression<?> head = headOf(quest);
+        QuestScope scope = head.getScope();
+
+        for (OpenQuestAsset asset : assets()) {
+            if (scope != null && scope.isReachable()) {
+                AbstractQuestProgression<?> followUp = createFrom(asset, quest.getId(), head);
+                QuestProgressionService.get().registerQuest(followUp);
+                scope.share(followUp);
+                continue;
+            }
+
+            for (UUID playerId : List.copyOf(quest.getPlayers())) {
+                QuestProgressionService.get().assignQuest(createFrom(asset, quest.getId(), head), playerId);
+            }
+        }
+    }
+
+    /**
+     * @return the ids of the quests handed on, in the order written.
+     */
     public String[] getQuestAssetIds() {
         return questAssetIds;
     }
 
     /**
-     * Every player of a shared quest is paid in turn, and only the first is meant to create its
-     * follow-up: the quest paying writes down what it handed on, so the next ones find it there.
+     * @return whether the quest hands them on once, shared, rather than to each player paid.
      */
-    private static void handOnShared(@Nonnull AbstractQuestProgression<?> source, @Nonnull AbstractQuestProgression<?> head, @Nonnull OpenQuestAsset asset, @Nonnull QuestScope scope) {
-        if (!claimHandOn(source, asset.getId())) return;
-
-        AbstractQuestProgression<?> quest = createFrom(asset, source.getId(), head);
-        QuestProgressionService.get().registerQuest(quest);
-        scope.share(quest);
+    public boolean isShared() {
+        return shared;
     }
 
-    /**
-     * Players of a group of worlds are paid on their own world's thread, so the check and the
-     * write happen as one.
-     *
-     * @return {@code false} if that quest already handed this asset on.
-     */
-    private static boolean claimHandOn(@Nonnull AbstractQuestProgression<?> source, @Nonnull String assetId) {
-        synchronized (source) {
-            String[] handedOn = source.getTags().getOrDefault(OpenQuestsTags.HANDED_ON_TAG, new String[0]);
-            if (Arrays.asList(handedOn).contains(assetId)) return false;
-
-            String[] next = Arrays.copyOf(handedOn, handedOn.length + 1);
-            next[handedOn.length] = assetId;
-            source.addTag(OpenQuestsTags.HANDED_ON_TAG, next);
-            return true;
-        }
+    @Nonnull
+    private List<OpenQuestAsset> assets() {
+        return Arrays.stream(questAssetIds).map(OpenQuestAsset::getAsset).filter(Objects::nonNull).toList();
     }
 
     /**
@@ -130,7 +138,7 @@ public class GrantQuestReward extends QuestReward {
     @Nonnull
     private static AbstractQuestProgression<?> createFrom(@Nonnull OpenQuestAsset asset, @Nonnull UUID sourceQuestId, @Nullable AbstractQuestProgression<?> head) {
         AbstractQuestProgression<?> quest = asset.create();
-        quest.addTag(OpenQuestsTags.GRANTED_BY_TAG, sourceQuestId.toString());
+        quest.setGrantedBy(sourceQuestId);
         if (head != null) quest.setOrigin(head.getOrigin());
         return quest;
     }

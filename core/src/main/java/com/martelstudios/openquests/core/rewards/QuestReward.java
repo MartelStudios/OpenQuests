@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
@@ -50,4 +51,19 @@ public abstract class QuestReward {
     public boolean isAutoClaim() {
         return autoClaim;
     }
+
+    /**
+     * A collective reward is paid once by the quest as it ends, never owed to a player: what it
+     * hands over belongs to whoever shares the quest, and claiming does not apply.
+     *
+     * @return whether this reward is collective, paid through {@link #grantOnce} only.
+     */
+    public boolean isCollective() {
+        return false;
+    }
+
+    /**
+     * Pays a collective reward for the whole quest, once, as it reaches the outcome paying it.
+     */
+    public void grantOnce(@Nonnull AbstractQuestProgression<?> quest) {}
 }

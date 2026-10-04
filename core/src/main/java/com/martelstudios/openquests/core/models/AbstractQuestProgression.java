@@ -92,6 +92,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("Origin", QuestOrigin.CODEC), (quest, origin) -> quest.origin = origin, quest -> quest.origin)
                                                                                         .add()
+                                                                                        .append(new KeyedCodec<>("GrantedBy", Codec.UUID_STRING), (quest, grantedBy) -> quest.grantedBy = grantedBy, quest -> quest.grantedBy)
+                                                                                        .add()
                                                                                         .append(TAGS_CODEC, TAGS_SETTER, TAGS_GETTER)
                                                                                         .add()
                                                                                         .build();
@@ -124,6 +126,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nullable
     protected QuestOrigin origin;
+
+    /**
+     * The quest whose completion handed this one over, {@code null} for one nothing handed over.
+     * Tells apart two runs of one chain, which share every asset.
+     */
+    @Nullable
+    protected UUID grantedBy;
 
     /**
      * Tags written on this instance, on top of those its asset declares, each with the values its
@@ -526,6 +535,25 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     public Q setOrigin(@Nullable QuestOrigin origin) {
         this.origin = origin;
+        markDirty();
+        return self();
+    }
+
+    /**
+     * @return the quest whose completion handed this one over, {@code null} for one nothing
+     * handed over.
+     */
+    @Nullable
+    public UUID getGrantedBy() {
+        return grantedBy;
+    }
+
+    /**
+     * Written before the quest is registered, by whatever hands it over, so everything hearing of
+     * it already knows which completion opened it.
+     */
+    public Q setGrantedBy(@Nullable UUID grantedBy) {
+        this.grantedBy = grantedBy;
         markDirty();
         return self();
     }
