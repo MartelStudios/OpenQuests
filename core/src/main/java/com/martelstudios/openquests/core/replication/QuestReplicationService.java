@@ -176,7 +176,9 @@ public class QuestReplicationService implements ScopeIndexes.Writer {
 
         try {
             StoredState stored = storage.claimState(quest);
-            if (stored == null && quest.isCompleted()) apply(storage.pollReplicas(Map.of(quest.getId(), seenOf(quest.getId()))));
+            // Who else holds it, not where it stands: this very claim is that, and the quest takes it in
+            // once it returns
+            if (stored == null && quest.isCompleted()) mergeReplicas(storage.pollReplicas(Map.of(quest.getId(), seenOf(quest.getId()))).changed());
             return stored;
         } catch (RuntimeException e) {
             // A storage out of reach does not stop the game: this server makes the change, as it would alone
@@ -199,7 +201,9 @@ public class QuestReplicationService implements ScopeIndexes.Writer {
 
             // Written first, so that what this server did reaches the others a tick sooner
             progressionStore.save(shared);
-            apply(storage.pollReplicas(seenOf(shared)));
+            ReplicaPoll poll = storage.pollReplicas(seenOf(shared));
+            mergeReplicas(poll.changed());
+            adoptStates(poll.states());
 
             followIndexes();
 
@@ -212,11 +216,10 @@ public class QuestReplicationService implements ScopeIndexes.Writer {
     }
 
     /**
-     * Merges in what other servers wrote, telling the players who see it, and moves the quests
-     * running here to where the storage says they stand, when that is later news.
+     * Merges in what other servers wrote, telling the players who see it.
      */
-    private void apply(@Nonnull ReplicaPoll poll) {
-        for (QuestReplica replica : poll.changed()) {
+    private void mergeReplicas(@Nonnull List<QuestReplica> changed) {
+        for (QuestReplica replica : changed) {
             seen.computeIfAbsent(replica.questId(), id -> new ConcurrentHashMap<>()).merge(replica.serverId(), replica.revision(), Math::max);
 
             AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(replica.questId());
@@ -227,8 +230,13 @@ public class QuestReplicationService implements ScopeIndexes.Writer {
                         .dispatchFor(QuestUpdatedEvent.class, quest.getId())
                         .dispatch(new QuestUpdatedEvent(quest));
         }
+    }
 
-        poll.states().forEach((questId, stored) -> {
+    /**
+     * Moves the quests running here to where the storage says they stand, when that is later news.
+     */
+    private void adoptStates(@Nonnull Map<UUID, StoredState> states) {
+        states.forEach((questId, stored) -> {
             AbstractQuestProgression<?> quest = QuestProgressionService.get().getLiveQuest(questId);
             if (quest != null) quest.adoptStoredState(stored);
         });

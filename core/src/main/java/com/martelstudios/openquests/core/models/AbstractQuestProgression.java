@@ -463,10 +463,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
             completedAt = isCompleted() ? Instant.now() : null;
             markDirty();
 
+            long from = stateEpoch;
             StoredState claimedElsewhere = QuestTransitions.claim(this);
-            boolean claimedHere = claimedElsewhere == null;
+
+            // A storage behind this copy, one out of reach for a while, has no later change to offer:
+            // the change stands, and the next write of the quest brings the storage up to it
+            boolean claimedHere = claimedElsewhere == null || claimedElsewhere.epoch() <= from;
             if (claimedHere) {
-                stateEpoch++;
+                stateEpoch = from + 1;
             } else {
                 state = claimedElsewhere.state();
                 completedAt = claimedElsewhere.at();
