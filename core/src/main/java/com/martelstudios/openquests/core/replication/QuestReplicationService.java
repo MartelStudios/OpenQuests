@@ -4,6 +4,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
+import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -139,10 +140,21 @@ public class QuestReplicationService {
     private void store(@Nonnull Set<UUID> questIds) {
         List<AbstractQuestProgression<?>> quests = new ArrayList<>();
         for (UUID questId : questIds) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
-            if (quest != null) quests.add(quest);
+            collect(QuestProgressionService.get().getQuest(questId), quests);
         }
         progressionStore.save(quests);
+    }
+
+    /**
+     * A group goes with its steps, which a server reading the group back loads along with it.
+     */
+    private static void collect(@Nullable AbstractQuestProgression<?> quest, @Nonnull List<AbstractQuestProgression<?>> into) {
+        if (quest == null) return;
+
+        into.add(quest);
+        if (quest instanceof AbstractCompositeQuestProgression<?> group) {
+            for (AbstractQuestProgression<?> step : group.getChildren()) collect(step, into);
+        }
     }
 
     /**
@@ -248,10 +260,10 @@ public class QuestReplicationService {
 
     /**
      * @return whether other servers may hold that quest at once, which is what makes it merged and
-     * its end claimed.
+     * its end claimed. A step is held wherever its group is.
      */
     private boolean isReplicated(@Nonnull AbstractQuestProgression<?> quest) {
-        QuestScope scope = quest.getScope();
+        QuestScope scope = quest.getHead().getScope();
         return storage.isShared() && scope != null && scope.isReplicated();
     }
 }
