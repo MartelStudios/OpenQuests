@@ -15,7 +15,7 @@ public class CompositeQuestVisitor implements QuestVisitor<CompositeQuestProgres
     private final AbstractQuestProgression<?> updatedChild;
 
     /**
-     * The outcome the child announced, rather than whatever it carries by the time this runs.
+     * The state the child moved to, rather than whatever it carries by the time this runs.
      */
     @Nonnull
     private final QuestState outcome;
@@ -27,7 +27,7 @@ public class CompositeQuestVisitor implements QuestVisitor<CompositeQuestProgres
 
     @Override
     public void progress(CompositeQuestProgression quest) {
-        if (quest.isCompleted() && quest.isStopOnComplete()) return;
+        if (quest.isOver()) return;
 
         if (quest.recordOutcome(updatedChild.getId(), outcome)) quest.markDirty();
 
@@ -36,25 +36,20 @@ public class CompositeQuestVisitor implements QuestVisitor<CompositeQuestProgres
         int failed = quest.countOutcomes(QuestState.FAILED);
         int abandoned = quest.countOutcomes(QuestState.ABANDONED);
 
-        switch (quest.getAsset().getOperator()) {
-            case AND -> {
-                if (abandoned > 0) {
-                    quest.setState(QuestState.ABANDONED).markDirty();
-                } else if (failed > 0) {
-                    quest.setState(QuestState.FAILED).markDirty();
-                } else if (successful >= children) {
-                    quest.setState(QuestState.SUCCESSFUL).markDirty();
-                }
-            }
-            case OR -> {
-                if (successful > 0) {
-                    quest.setState(QuestState.SUCCESSFUL).markDirty();
-                } else if (failed + abandoned >= children) {
-                    // A composite quest to be ABANDONED has to have all its subquest abandoned.
-                    quest.setState(failed == 0 ? QuestState.ABANDONED : QuestState.FAILED).markDirty();
-                }
-            }
-        }
+        // Weighed whole every time: a group kept alive by StopOnComplete:false whose rule no longer
+        // holds, a step having gone back to running, goes back to running too
+        QuestState target = switch (quest.getAsset().getOperator()) {
+            case AND -> abandoned > 0 ? QuestState.ABANDONED
+                      : failed > 0 ? QuestState.FAILED
+                      : successful >= children ? QuestState.SUCCESSFUL
+                      : QuestState.IN_PROGRESS;
+            // A composite quest to be ABANDONED has to have all its subquest abandoned.
+            case OR -> successful > 0 ? QuestState.SUCCESSFUL
+                     : failed + abandoned >= children ? (failed == 0 ? QuestState.ABANDONED : QuestState.FAILED)
+                     : QuestState.IN_PROGRESS;
+        };
+
+        if (target != quest.getState()) quest.setState(target).markDirty();
     }
 
     @Override

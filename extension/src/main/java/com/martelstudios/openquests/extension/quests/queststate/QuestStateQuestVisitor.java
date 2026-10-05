@@ -17,7 +17,7 @@ public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgr
 
     @Override
     public void progress(QuestStateQuestProgression quest) {
-        if (quest.isCompleted() && quest.isStopOnComplete()) return;
+        if (quest.isOver()) return;
 
         QuestState answer = quest.isNot() != matches(quest) ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS;
 

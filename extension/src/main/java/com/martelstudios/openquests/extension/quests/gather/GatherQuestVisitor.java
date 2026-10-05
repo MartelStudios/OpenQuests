@@ -40,7 +40,7 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuestProgression> 
     @Override
     public void progress(GatherQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.isCompleted() && quest.isStopOnComplete()) return;
+        if (quest.isOver()) return;
 
         int count = combinedItemContainer.countItemStacks(itemStack -> quest.getItemToGather()
                                                                             .matches(itemStack.getItemId()));

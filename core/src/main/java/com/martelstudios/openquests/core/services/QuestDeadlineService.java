@@ -11,6 +11,7 @@ import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
 import com.martelstudios.openquests.core.events.QuestRegisteredEvent;
+import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -73,6 +74,11 @@ public class QuestDeadlineService {
         plugin.getEventRegistry().registerGlobal(QuestUnloadedEvent.class, event -> forget(event.getQuest().getId()));
         plugin.getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, event -> forget(event.getQuest().getId()));
         plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+        // A quest kept running by StopOnComplete:false going back to running is on the clock again, here or
+        // wherever another server moved it
+        plugin.getEventRegistry().registerGlobal(QuestStateChangedEvent.class, event -> {
+            if (event.getState() == QuestState.IN_PROGRESS) watch(event.getQuest(), false);
+        });
     }
 
     /**

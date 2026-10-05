@@ -29,7 +29,7 @@ public class MovementQuestVisitor implements QuestVisitor<MovementQuestProgressi
     @Override
     public void progress(MovementQuestProgression<?> quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.isCompleted() && quest.isStopOnComplete()) return;
+        if (quest.isOver()) return;
 
         // Every sample is offered, even an empty one: a jump is counted from the tick it starts on,
         // which a quest can only tell apart by having been shown the tick before

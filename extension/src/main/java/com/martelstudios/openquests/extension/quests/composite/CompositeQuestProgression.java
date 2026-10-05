@@ -7,7 +7,7 @@ import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.martelstudios.openquests.core.events.QuestCompletedEvent;
+import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
@@ -45,10 +45,14 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      */
     protected final Map<UUID, QuestState> childOutcomes = new ConcurrentHashMap<>();
 
-    private final transient List<EventRegistration<UUID, QuestCompletedEvent>> childListeners = new ArrayList<>();
+    private final transient List<EventRegistration<UUID, QuestStateChangedEvent>> childListeners = new ArrayList<>();
 
-    private void handleQuestCompleted(QuestCompletedEvent questCompletedEvent) {
-        update(new CompositeQuestVisitor(questCompletedEvent.getQuest(), questCompletedEvent.getState()));
+    /**
+     * Every change of a step counts, not only its ends: a step kept alive by {@code StopOnComplete:
+     * false} running again takes its outcome back, and the group's own rule is weighed anew.
+     */
+    private void handleStepStateChanged(QuestStateChangedEvent questStateChangedEvent) {
+        update(new CompositeQuestVisitor(questStateChangedEvent.getQuest(), questStateChangedEvent.getState()));
     }
 
     /**
@@ -151,14 +155,30 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     }
 
     /**
-     * A step ends once, on the server whose claim ended it, so an outcome another copy took down
-     * and this one has not is simply taken in.
+     * A step in memory has the last word on how it stands, every change of it being claimed; the
+     * outcomes another copy wrote down can lag behind it. A step gone from memory ended for good,
+     * the same way everywhere, so the outcome another copy took down is simply taken in.
      */
     @Override
     protected boolean mergeProgress(@Nonnull CompositeQuestProgression other) {
         boolean changed = false;
         for (Map.Entry<UUID, QuestState> outcome : other.childOutcomes.entrySet()) {
-            changed |= childOutcomes.putIfAbsent(outcome.getKey(), outcome.getValue()) == null;
+            AbstractQuestProgression<?> step = QuestProgressionService.get().getQuest(outcome.getKey());
+            changed |= step != null ? recordOutcome(step.getId(), step.getState()) : childOutcomes.putIfAbsent(outcome.getKey(), outcome.getValue()) == null;
+        }
+        return changed;
+    }
+
+    /**
+     * Writes down where each step in memory stands, for a group read back: its replicas carry the
+     * outcomes their servers saw, its steps where they stand now.
+     *
+     * @return whether anything written down changed.
+     */
+    public boolean reconcileOutcomes() {
+        boolean changed = false;
+        for (AbstractQuestProgression<?> step : getChildren()) {
+            changed |= recordOutcome(step.getId(), step.getState());
         }
         return changed;
     }
@@ -218,7 +238,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
         for (UUID questId : getChildIds()) {
             var registration = HytaleServer.get()
                                            .getEventBus()
-                                           .register(QuestCompletedEvent.class, questId, this::handleQuestCompleted);
+                                           .register(QuestStateChangedEvent.class, questId, this::handleStepStateChanged);
             if (registration != null) childListeners.add(registration);
         }
     }

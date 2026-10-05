@@ -22,7 +22,7 @@ public class EnterWorldQuestVisitor implements QuestVisitor<EnterWorldQuestProgr
     @Override
     public void progress(EnterWorldQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.isCompleted() && quest.isStopOnComplete()) return;
+        if (quest.isOver()) return;
         if (!quest.matchesWorld(worldName)) return;
 
         quest.setState(QuestState.SUCCESSFUL).markDirty();

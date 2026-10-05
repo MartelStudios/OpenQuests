@@ -17,7 +17,8 @@ import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.replication.Membership;
-import com.martelstudios.openquests.core.replication.QuestEnds;
+import com.martelstudios.openquests.core.replication.QuestTransitions;
+import com.martelstudios.openquests.core.replication.StoredState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
@@ -159,6 +160,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     private UUID parentId;
 
     protected QuestState state = QuestState.IN_PROGRESS;
+
+    /**
+     * How many changes of state this copy went through, as the storage counts them: a change is
+     * only written over the epoch it started from, and a copy only takes in a later one. Never
+     * written with the quest: the storage keeps it next to the state.
+     */
+    private volatile long stateEpoch;
 
     /**
      * Overrides the asset for this instance alone. Boxed so that "not overridden" is a state of
@@ -324,9 +332,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     /**
      * Takes in what another copy of this quest knows, read from another server's share: who holds
-     * it and how far it went. Never marks this copy dirty, what is merged being stored already. How
-     * it ended is not taken from a copy: an end is claimed once for all, and heard through
-     * {@link #endAsClaimed}.
+     * it and how far it went. Never marks this copy dirty, what is merged being stored already. Where
+     * it stands is not taken from a copy: each change of state is claimed, and heard through
+     * {@link #adoptStoredState}.
      *
      * @return whether anything the players see moved.
      */
@@ -341,39 +349,45 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Takes in the outcome a server claimed for this quest, which every copy agrees on whatever it
-     * saw itself. Fires nothing: the server that claimed it ended it and paid for it.
-     *
-     * @return whether this copy's outcome changed.
+     * @return how many changes of state this copy went through, as the storage counts them.
      */
-    public boolean settle(@Nonnull QuestState outcome, @Nullable Instant at) {
-        if (outcome == QuestState.IN_PROGRESS || outcome == state) return false;
-
-        state = outcome;
-        completedAt = at;
-        announced.set(outcome);
-        return true;
+    public long getStateEpoch() {
+        return stateEpoch;
     }
 
     /**
-     * Ends the quest the way another server claimed it ended, which this one learns afterwards:
-     * everything here hears of it, to file the quest and tell its players, and nothing is paid
-     * twice.
-     *
-     * @return whether this copy's outcome changed.
+     * Takes in where the storage says the quest stands, as it is read back: that is where it
+     * stands, whatever the replica this copy was built from says. Fires nothing, nothing having
+     * changed for anyone: an outcome read back was announced by whichever server reached it.
      */
-    public boolean endAsClaimed(@Nonnull QuestState outcome, @Nullable Instant at) {
-        QuestState previous = state;
-        if (outcome == QuestState.IN_PROGRESS || outcome == previous) return false;
+    public void restoreStoredState(@Nonnull StoredState stored) {
+        state = stored.state();
+        completedAt = stored.at();
+        stateEpoch = stored.epoch();
+        announced.set(stored.state());
+    }
 
-        state = outcome;
-        completedAt = at;
+    /**
+     * Takes in a change of state another server claimed, which this one learns afterwards:
+     * everything here hears of it, to file the quest and tell its players, and nothing is paid
+     * twice. A change no later than what this copy holds already is no news.
+     *
+     * @return whether this copy's state changed.
+     */
+    public boolean adoptStoredState(@Nonnull StoredState stored) {
+        if (stored.epoch() <= stateEpoch) return false;
+
+        QuestState previous = state;
+        state = stored.state();
+        completedAt = stored.at();
+        stateEpoch = stored.epoch();
+        if (state == previous) return false;
 
         HytaleServer.get()
                     .getEventBus()
                     .dispatchFor(QuestUpdatedEvent.class, getId())
                     .dispatch(new QuestUpdatedEvent(this));
-        announceEnd(false);
+        if (isCompleted()) announceEnd(false);
         HytaleServer.get()
                     .getEventBus()
                     .dispatchFor(QuestStateChangedEvent.class, getId())
@@ -442,21 +456,24 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                         .dispatch(new QuestUpdatedEvent(this));
         }
 
-        // The outcome, not merely the first end: a quest kept alive by StopOnComplete:false can change.
-        if (isCompleted() && getState() != previousState) {
-            completedAt = Instant.now();
+        // Every change of state is claimed, an end as much as a quest kept alive by StopOnComplete:false
+        // going back to running or changing its outcome: servers holding the quest agree on each in
+        // turn, and a copy behind takes in where the quest stands rather than its own view.
+        if (getState() != previousState) {
+            completedAt = isCompleted() ? Instant.now() : null;
             markDirty();
 
-            // Only the first end is claimed: several servers holding the quest agree on that one
-            boolean claimedHere = true;
-            if (previousState == QuestState.IN_PROGRESS) {
-                QuestState claimedElsewhere = QuestEnds.claim(this);
-                if (claimedElsewhere != null) {
-                    state = claimedElsewhere;
-                    claimedHere = false;
-                }
+            StoredState claimedElsewhere = QuestTransitions.claim(this);
+            boolean claimedHere = claimedElsewhere == null;
+            if (claimedHere) {
+                stateEpoch++;
+            } else {
+                state = claimedElsewhere.state();
+                completedAt = claimedElsewhere.at();
+                stateEpoch = claimedElsewhere.epoch();
             }
-            announceEnd(claimedHere);
+
+            if (isCompleted()) announceEnd(claimedHere);
         }
 
         // Last, so a listener reacting to the transition reads a quest that has already been paid
@@ -582,6 +599,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     public boolean isCompleted() {
         return isSuccessful() || isFailed() || isAbandoned();
+    }
+
+    /**
+     * @return whether the quest stopped for good: ended, and not kept running by {@code
+     * StopOnComplete: false}, whose state can still change. Nothing moves a quest that is over.
+     */
+    public boolean isOver() {
+        return isCompleted() && isStopOnComplete();
     }
 
     /**

@@ -49,13 +49,18 @@ class ProgressionMergeTest {
     }
 
     @Test
-    void aClaimedOutcomeSettlesEveryCopyTheSameWay() {
+    void aCopyStandsWhereTheStorageSaysAndOnlyTakesInLaterNews() {
         TestQuestProgression onA = new TestQuestProgression();
         onA.setState(QuestState.FAILED);
 
-        assertTrue(onA.settle(QuestState.SUCCESSFUL, null));
-        assertEquals(QuestState.SUCCESSFUL, onA.getState());
-        assertFalse(onA.settle(QuestState.SUCCESSFUL, null));
+        onA.restoreStoredState(new StoredState(QuestState.IN_PROGRESS, null, 3));
+        assertEquals(QuestState.IN_PROGRESS, onA.getState());
+        assertEquals(3, onA.getStateEpoch());
+
+        // A change no later than what the copy holds is no news, whatever it says
+        assertFalse(onA.adoptStoredState(new StoredState(QuestState.SUCCESSFUL, null, 3)));
+        assertFalse(onA.adoptStoredState(new StoredState(QuestState.FAILED, null, 2)));
+        assertEquals(QuestState.IN_PROGRESS, onA.getState());
     }
 
     @Test

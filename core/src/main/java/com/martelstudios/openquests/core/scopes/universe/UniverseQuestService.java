@@ -90,11 +90,11 @@ public class UniverseQuestService {
 
     /**
      * Reads the universe index back and pulls every quest it lists into memory. The index holds
-     * running quests only: one that ended is left to its players' journals.
+     * running quests only: one that is over is left to its players' journals.
      */
     public void loadQuests() {
         for (AbstractQuestProgression<?> quest : indexes.resolve(UNIVERSE_INDEX_KEY)) {
-            if (quest.isCompleted()) indexes.remove(UNIVERSE_INDEX_KEY, quest.getId());
+            if (quest.isOver()) indexes.remove(UNIVERSE_INDEX_KEY, quest.getId());
         }
     }
 

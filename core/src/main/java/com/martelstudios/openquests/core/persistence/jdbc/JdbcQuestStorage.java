@@ -13,6 +13,7 @@ import com.martelstudios.openquests.core.persistence.QuestReplica;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.ReplicaPoll;
+import com.martelstudios.openquests.core.replication.StoredState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -40,11 +42,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * The quests in a relational database, for a server keeping tens of thousands of them or for
  * several servers sharing them.
  *
- * <p>A quest is a row of its own, carrying its asset and the outcome claimed for it, and one
- * replica row per server that ever wrote it, holding that server's document. A server only ever
- * writes its own replica, so servers sharing a quest never overwrite one another; reading a quest
- * merges its replicas. Who holds a quest is a table of its own, which makes "the quests of this
- * player" an index lookup rather than a scan.
+ * <p>A quest is a row of its own, carrying its asset and where it stands, moved one claimed change
+ * at a time, and one replica row per server that ever wrote it, holding that server's document. A
+ * server only ever writes its own replica, so servers sharing a quest never overwrite one another;
+ * reading a quest merges its replicas and puts it where its row says. Who holds a quest is a table
+ * of its own, which makes "the quests of this player" an index lookup rather than a scan.
  */
 public class JdbcQuestStorage implements QuestStorage {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -54,7 +56,7 @@ public class JdbcQuestStorage implements QuestStorage {
     /**
      * The layout this version writes. Tables written by another are refused rather than misread.
      */
-    private static final int SCHEMA_VERSION = 4;
+    private static final int SCHEMA_VERSION = 5;
 
     /**
      * How many ids go into one {@code IN (…)} list, past which another round trip is cheaper.
@@ -67,6 +69,11 @@ public class JdbcQuestStorage implements QuestStorage {
     private static final Duration ENDED_KEPT_FOR = Duration.ofDays(1);
 
     private static final String RUNNING = QuestState.IN_PROGRESS.name();
+
+    /**
+     * A quest's own row: what every server holding it agrees on.
+     */
+    private static final String QUEST_COLUMNS = "id, asset_id, state, completed_at, epoch, created_at";
 
     private final JdbcSettings settings;
     private final SqlDialect dialect;
@@ -121,7 +128,7 @@ public class JdbcQuestStorage implements QuestStorage {
 
         upsertReplicaSql = buildUpsert(replicaTable, "quest_id, server_id", "quest_id, server_id, revision, data, updated_at", "revision = ?, data = ?, updated_at = ?");
         upsertPlayerSql = buildUpsert(playerTable, "player_id", "player_id, data, updated_at", "data = ?, updated_at = ?");
-        insertQuestSql = dialect.insertIgnoring(questTable, "id, asset_id, state, created_at");
+        insertQuestSql = dialect.insertIgnoring(questTable, QUEST_COLUMNS);
         insertMemberSql = dialect.insertIgnoring(questIndexTable, "index_key, quest_id");
         insertLinkSql = dialect.insertIgnoring(questPlayerTable, "quest_id, player_id, abandoned");
 
@@ -224,8 +231,8 @@ public class JdbcQuestStorage implements QuestStorage {
     }
 
     /**
-     * One transaction, whatever the number of quests: their rows where missing, this server's
-     * replicas, and who holds each.
+     * One transaction, whatever the number of quests: their rows where missing, where each stands,
+     * this server's replicas, and who holds each.
      */
     @Override
     public void saveProgressions(@Nonnull Collection<AbstractQuestProgression<?>> quests) {
@@ -235,6 +242,7 @@ public class JdbcQuestStorage implements QuestStorage {
 
         pool.inTransaction(connection -> {
             insertQuestRows(connection, quests, now);
+            advanceStates(connection, quests);
 
             try (PreparedStatement deleteReplica = dialect.supportsUpsert() ? null : connection.prepareStatement("DELETE FROM " + replicaTable + " WHERE quest_id = ? AND server_id = ?");
                  PreparedStatement upsertReplica = connection.prepareStatement(upsertReplicaSql);
@@ -292,7 +300,7 @@ public class JdbcQuestStorage implements QuestStorage {
             execute(connection, "DELETE FROM " + replicaTable + " WHERE quest_id = ?", questId);
 
             if (quest.isCompleted()) {
-                writeEnd(connection, quest, System.currentTimeMillis());
+                advanceStates(connection, List.of(quest));
             } else {
                 execute(connection, "DELETE FROM " + questTable + " WHERE id = ?", questId);
             }
@@ -302,44 +310,103 @@ public class JdbcQuestStorage implements QuestStorage {
 
     /**
      * The row is made sure of first, so the claim is one conditional update whichever server
-     * wrote the quest first: only the update finding it still running writes. A losing claim
-     * reads the winner's outcome in the same transaction, while the row is sure to be there.
+     * wrote the quest first: only the update finding the epoch the quest changed from writes. A
+     * losing claim reads where the quest stands in the same transaction, while the row is there.
      */
     @Nullable
     @Override
-    public QuestState claimEnd(@Nonnull AbstractQuestProgression<?> quest) {
+    public StoredState claimState(@Nonnull AbstractQuestProgression<?> quest) {
         long now = System.currentTimeMillis();
+        long from = quest.getStateEpoch();
 
         return pool.inTransaction(connection -> {
             insertQuestRows(connection, List.of(quest), now);
-            if (writeEnd(connection, quest, now)) return null;
 
-            try (PreparedStatement statement = connection.prepareStatement("SELECT state FROM " + questTable + " WHERE id = ?")) {
-                statement.setString(1, quest.getId().toString());
-
-                try (ResultSet results = statement.executeQuery()) {
-                    QuestState outcome = results.next() ? ended(results.getString(1)) : null;
-
-                    // An outcome this version cannot read still ended the quest elsewhere: not paid twice
-                    return outcome != null ? outcome : quest.getState();
-                }
+            try (PreparedStatement update = connection.prepareStatement("UPDATE " + questTable + " SET state = ?, completed_at = ?, epoch = ? WHERE id = ? AND epoch = ?")) {
+                bindState(update, quest, from + 1);
+                update.setString(4, quest.getId().toString());
+                update.setLong(5, from);
+                if (update.executeUpdate() == 1) return null;
             }
+
+            StoredState stored = readStates(connection, List.of(quest.getId())).get(quest.getId());
+
+            // A state this version cannot read still moved the quest elsewhere: nothing is paid twice
+            return stored != null ? stored : new StoredState(quest.getState(), quest.getCompletedAt(), from + 1);
         });
     }
 
     /**
-     * @return whether the quest was still running, and now carries this server's outcome.
+     * Writes where each quest stands, over an earlier state only: a copy behind never takes the
+     * row back, and a quest only this server moves, whose changes are never claimed, catches up.
      */
-    private boolean writeEnd(@Nonnull Connection connection, @Nonnull AbstractQuestProgression<?> quest, long now) throws SQLException {
+    private void advanceStates(@Nonnull Connection connection, @Nonnull Collection<AbstractQuestProgression<?>> quests) throws SQLException {
+        try (PreparedStatement update = connection.prepareStatement("UPDATE " + questTable + " SET state = ?, completed_at = ?, epoch = ? WHERE id = ? AND epoch < ?")) {
+            for (AbstractQuestProgression<?> quest : quests) {
+                long epoch = quest.getStateEpoch();
+                bindState(update, quest, epoch);
+                update.setString(4, quest.getId().toString());
+                update.setLong(5, epoch);
+                update.addBatch();
+            }
+            update.executeBatch();
+        }
+    }
+
+    /**
+     * Binds the state, the moment it was reached and the epoch, as the first three parameters.
+     */
+    private static void bindState(@Nonnull PreparedStatement statement, @Nonnull AbstractQuestProgression<?> quest, long epoch) throws SQLException {
         Instant completedAt = quest.getCompletedAt();
 
-        try (PreparedStatement update = connection.prepareStatement("UPDATE " + questTable + " SET state = ?, completed_at = ? WHERE id = ? AND state = ?")) {
-            update.setString(1, quest.getState().name());
-            update.setLong(2, completedAt == null ? now : completedAt.toEpochMilli());
-            update.setString(3, quest.getId().toString());
-            update.setString(4, RUNNING);
-            return update.executeUpdate() == 1;
+        statement.setString(1, quest.getState().name());
+        if (completedAt == null) {
+            statement.setNull(2, Types.BIGINT);
+        } else {
+            statement.setLong(2, completedAt.toEpochMilli());
         }
+        statement.setLong(3, epoch);
+    }
+
+    /**
+     * @return where each of those quests stands, those with no row or a state this version cannot
+     * read left out.
+     */
+    @Nonnull
+    private Map<UUID, StoredState> readStates(@Nonnull Connection connection, @Nonnull List<UUID> questIds) throws SQLException {
+        Map<UUID, StoredState> states = new HashMap<>();
+        for (int from = 0; from < questIds.size(); from += IN_CLAUSE_CHUNK) {
+            List<UUID> chunk = questIds.subList(from, Math.min(from + IN_CLAUSE_CHUNK, questIds.size()));
+
+            try (PreparedStatement statement = connection.prepareStatement("SELECT id, state, completed_at, epoch FROM " + questTable + " WHERE id IN (" + placeholders(chunk.size()) + ")")) {
+                bindIds(statement, 1, chunk);
+
+                try (ResultSet results = statement.executeQuery()) {
+                    while (results.next()) {
+                        UUID questId = parseUuid(results.getString(1));
+                        StoredState stored = readState(results, 2);
+                        if (questId != null && stored != null) states.put(questId, stored);
+                    }
+                }
+            }
+        }
+        return states;
+    }
+
+    /**
+     * Reads the state, the moment it was reached and the epoch from three columns in a row.
+     *
+     * @return {@code null} for no row at all, or a state this version cannot read.
+     */
+    @Nullable
+    private static StoredState readState(@Nonnull ResultSet results, int column) throws SQLException {
+        QuestState state = stateOf(results.getString(column));
+        if (state == null) return null;
+
+        long completedAt = results.getLong(column + 1);
+        Instant at = results.wasNull() ? null : Instant.ofEpochMilli(completedAt);
+
+        return new StoredState(state, at, results.getLong(column + 2));
     }
 
     /**
@@ -380,7 +447,6 @@ public class JdbcQuestStorage implements QuestStorage {
 
         return pool.with(connection -> {
             List<QuestReplica> changed = new ArrayList<>();
-            Map<UUID, QuestState> ended = new HashMap<>();
 
             for (int from = 0; from < ids.size(); from += IN_CLAUSE_CHUNK) {
                 List<UUID> chunk = ids.subList(from, Math.min(from + IN_CLAUSE_CHUNK, ids.size()));
@@ -402,21 +468,8 @@ public class JdbcQuestStorage implements QuestStorage {
                 }
 
                 if (!moved.isEmpty()) readReplicas(connection, moved, changed);
-
-                try (PreparedStatement statement = connection.prepareStatement("SELECT id, state FROM " + questTable + " WHERE state <> ? AND id IN (" + placeholders(chunk.size()) + ")")) {
-                    statement.setString(1, RUNNING);
-                    bindIds(statement, 2, chunk);
-
-                    try (ResultSet results = statement.executeQuery()) {
-                        while (results.next()) {
-                            UUID questId = parseUuid(results.getString(1));
-                            QuestState outcome = ended(results.getString(2));
-                            if (questId != null && outcome != null) ended.put(questId, outcome);
-                        }
-                    }
-                }
             }
-            return new ReplicaPoll(changed, ended);
+            return new ReplicaPoll(changed, readStates(connection, ids));
         });
     }
 
@@ -694,8 +747,8 @@ public class JdbcQuestStorage implements QuestStorage {
     }
 
     /**
-     * Writes the row of each quest that has none yet, running: its outcome is only ever written
-     * by a claim.
+     * Writes the row of each quest that has none yet, standing where the quest stands. A row
+     * another server wrote first is left as it is: only a claim moves it on from there.
      */
     private void insertQuestRows(@Nonnull Connection connection, @Nonnull Collection<AbstractQuestProgression<?>> quests, long now) throws SQLException {
         List<AbstractQuestProgression<?>> missing = new ArrayList<>(quests);
@@ -704,12 +757,20 @@ public class JdbcQuestStorage implements QuestStorage {
             missing.removeIf(quest -> existing.contains(quest.getId()));
         }
 
-        try (PreparedStatement insert = connection.prepareStatement(insertQuestSql != null ? insertQuestSql : "INSERT INTO " + questTable + " (id, asset_id, state, created_at) VALUES (?, ?, ?, ?)")) {
+        try (PreparedStatement insert = connection.prepareStatement(insertQuestSql != null ? insertQuestSql : "INSERT INTO " + questTable + " (" + QUEST_COLUMNS + ") VALUES (?, ?, ?, ?, ?, ?)")) {
             for (AbstractQuestProgression<?> quest : missing) {
+                Instant completedAt = quest.getCompletedAt();
+
                 insert.setString(1, quest.getId().toString());
                 insert.setString(2, quest.getAssetId());
-                insert.setString(3, RUNNING);
-                insert.setLong(4, now);
+                insert.setString(3, quest.getState().name());
+                if (completedAt == null) {
+                    insert.setNull(4, Types.BIGINT);
+                } else {
+                    insert.setLong(4, completedAt.toEpochMilli());
+                }
+                insert.setLong(5, quest.getStateEpoch());
+                insert.setLong(6, now);
                 insert.addBatch();
             }
             insert.executeBatch();
@@ -756,21 +817,21 @@ public class JdbcQuestStorage implements QuestStorage {
     }
 
     /**
-     * Every replica of the quests asked for, with the outcome claimed for each, so one read builds
-     * them whole.
+     * Every replica of the quests asked for, with where each quest stands, so one read builds them
+     * whole.
      */
     @Nonnull
     private String selectMerged() {
-        return "SELECT r.quest_id, r.data, q.state, q.completed_at FROM " + replicaTable + " r LEFT JOIN " + questTable + " q ON q.id = r.quest_id";
+        return "SELECT r.quest_id, r.data, q.state, q.completed_at, q.epoch FROM " + replicaTable + " r LEFT JOIN " + questTable + " q ON q.id = r.quest_id";
     }
 
     /**
-     * Merges the replicas of each quest into the first read, then applies the outcome claimed for
-     * it, which every replica agrees on whatever it saw.
+     * Merges the replicas of each quest into the first read, then puts the quest where the row
+     * says it stands, which no replica has a say in: a replica holds the state its server last
+     * saw, the row every change claimed since.
      */
     private void readMerged(@Nonnull PreparedStatement statement, @Nonnull Map<String, AbstractQuestProgression<?>> into) throws SQLException {
-        Map<String, QuestState> ends = new HashMap<>();
-        Map<String, Long> endedAt = new HashMap<>();
+        Map<String, StoredState> states = new HashMap<>();
 
         try (ResultSet results = statement.executeQuery()) {
             while (results.next()) {
@@ -781,17 +842,14 @@ public class JdbcQuestStorage implements QuestStorage {
                 AbstractQuestProgression<?> first = into.putIfAbsent(questId, replica);
                 if (first != null) first.merge(replica);
 
-                QuestState outcome = ended(results.getString(3));
-                if (outcome != null) {
-                    ends.put(questId, outcome);
-                    endedAt.put(questId, results.getLong(4));
-                }
+                StoredState stored = readState(results, 3);
+                if (stored != null) states.put(questId, stored);
             }
         }
 
-        ends.forEach((questId, outcome) -> {
+        states.forEach((questId, stored) -> {
             AbstractQuestProgression<?> quest = into.get(questId);
-            if (quest != null) quest.settle(outcome, Instant.ofEpochMilli(endedAt.get(questId)));
+            if (quest != null) quest.restoreStoredState(stored);
         });
     }
 
@@ -859,11 +917,11 @@ public class JdbcQuestStorage implements QuestStorage {
     }
 
     /**
-     * @return the outcome a state column holds, {@code null} for a quest still running or none.
+     * @return the state a state column holds, {@code null} for none or one this version cannot read.
      */
     @Nullable
-    private static QuestState ended(@Nullable String state) {
-        if (state == null || RUNNING.equals(state)) return null;
+    private static QuestState stateOf(@Nullable String state) {
+        if (state == null) return null;
 
         try {
             return QuestState.valueOf(state);
@@ -968,6 +1026,7 @@ public class JdbcQuestStorage implements QuestStorage {
                 + "asset_id VARCHAR(255), "
                 + "state VARCHAR(32) NOT NULL, "
                 + "completed_at BIGINT, "
+                + "epoch BIGINT NOT NULL, "
                 + "created_at BIGINT NOT NULL)");
 
             statement.execute("CREATE TABLE IF NOT EXISTS " + replicaTable + " ("

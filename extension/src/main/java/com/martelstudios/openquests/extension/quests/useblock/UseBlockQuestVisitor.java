@@ -23,7 +23,7 @@ public class UseBlockQuestVisitor implements QuestVisitor<UseBlockQuestProgressi
     @Override
     public void progress(UseBlockQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.isCompleted() && quest.isStopOnComplete()) return;
+        if (quest.isOver()) return;
 
         var blockType = event.getBlockType();
         if (blockType == null || !quest.getBlockToUse().matches(blockType.getId())) return;

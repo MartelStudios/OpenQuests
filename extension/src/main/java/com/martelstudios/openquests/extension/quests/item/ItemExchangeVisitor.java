@@ -27,7 +27,7 @@ public class ItemExchangeVisitor implements QuestVisitor<ItemExchangeQuestProgre
     @Override
     public void progress(ItemExchangeQuestProgression<?> quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.isCompleted() && quest.isStopOnComplete()) return;
+        if (quest.isOver()) return;
 
         if (!quest.getItemFilter().matches(itemId)) return;
         if (!quest.exchange(playerId, exchange, quantity)) return;

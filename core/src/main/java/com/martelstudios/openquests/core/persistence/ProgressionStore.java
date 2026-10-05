@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.replication.StoredState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,8 +44,9 @@ public interface ProgressionStore {
     List<AbstractQuestProgression<?>> loadAllProgressions();
 
     /**
-     * Writes this server's replica of each quest as one batch. Who holds a quest is read off the
-     * quest itself, so dropping a player from one unlinks them by this call alone.
+     * Writes this server's replica of each quest as one batch, with where the quest stands unless
+     * the backend holds a later state already. Who holds a quest is read off the quest itself, so
+     * dropping a player from one unlinks them by this call alone.
      */
     void saveProgressions(@Nonnull Collection<AbstractQuestProgression<?>> quests);
 
@@ -59,17 +60,18 @@ public interface ProgressionStore {
     void deleteProgression(@Nonnull AbstractQuestProgression<?> quest);
 
     /**
-     * Ends a quest for every server at once, with the outcome and moment the quest carries.
+     * Moves a quest to the state it carries for every server at once, only if nothing moved it
+     * since the epoch it changed from: each change of state is made once, by one server, in turn.
      *
-     * @return {@code null} if this server's outcome is the one written, otherwise the outcome
-     * another server claimed first.
+     * @return {@code null} if this server's change is the one written, otherwise where the quest
+     * stands, which the quest takes instead.
      */
     @Nullable
-    QuestState claimEnd(@Nonnull AbstractQuestProgression<?> quest);
+    StoredState claimState(@Nonnull AbstractQuestProgression<?> quest);
 
     /**
      * What other servers wrote of these quests since what was last seen of them: the replicas
-     * newer than the revisions known, and the outcomes claimed meanwhile.
+     * newer than the revisions known, and where each quest stands.
      *
      * @param known for each quest, the revision last seen of each other server's replica
      */
