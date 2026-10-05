@@ -26,7 +26,7 @@ public class KillNpcQuestVisitor implements QuestVisitor<KillNpcQuestProgression
         if (quest.isCompleted() && quest.isStopOnComplete()) return;
         if (!quest.matchesVictim(victim)) return;
 
-        quest.setCurrentQuantity(quest.getCurrentQuantity() + 1)
+        quest.addQuantity(1)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
     }

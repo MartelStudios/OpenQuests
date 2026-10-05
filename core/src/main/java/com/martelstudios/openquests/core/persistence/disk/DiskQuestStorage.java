@@ -201,16 +201,10 @@ public class DiskQuestStorage implements QuestStorage {
      * Nobody else writes these files, so the outcome this server reached is the outcome: it is
      * written with the quest by the next save.
      */
-    @Override
-    public boolean claimEnd(@Nonnull AbstractQuestProgression<?> quest) {
-        return true;
-    }
-
     @Nullable
     @Override
-    public QuestState loadEnd(@Nonnull UUID questId) {
-        AbstractQuestProgression<?> quest = loadProgression(questId);
-        return quest == null || !quest.isCompleted() ? null : quest.getState();
+    public QuestState claimEnd(@Nonnull AbstractQuestProgression<?> quest) {
+        return null;
     }
 
     @Nonnull

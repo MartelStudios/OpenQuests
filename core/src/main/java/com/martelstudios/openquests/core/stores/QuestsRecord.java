@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * The quests of one holder, by id: a player, a world, the universe. None of them holds the
@@ -65,7 +66,7 @@ public class QuestsRecord {
     /**
      * Takes what the storage holds under this record's key, as read back from it.
      */
-    public void load(@Nonnull Set<UUID> storedIds) {
+    public synchronized void load(@Nonnull Set<UUID> storedIds) {
         replaceAll(storedIds);
         stored.retainAll(storedIds);
         stored.addAll(storedIds);
@@ -73,11 +74,22 @@ public class QuestsRecord {
 
     /**
      * Writes what was added and removed since the last write or read, member by member, so a
-     * server sharing the key loses nothing another one added meanwhile.
+     * server sharing the key loses nothing another one added meanwhile. One write or read at a
+     * time, so a write never undoes what a read just took in.
      *
      * @return whether anything was written.
      */
-    public boolean flush(@Nonnull IndexStore storage, @Nonnull String indexKey) {
+    public synchronized boolean flush(@Nonnull IndexStore storage, @Nonnull String indexKey) {
+        return flush(storage, indexKey, listed -> {});
+    }
+
+    /**
+     * Writes as above, first handing the ids about to be listed to {@code beforeListing}, which
+     * writes their quests: a server reading the index must find every quest it lists.
+     *
+     * @return whether anything was written.
+     */
+    public synchronized boolean flush(@Nonnull IndexStore storage, @Nonnull String indexKey, @Nonnull Consumer<Set<UUID>> beforeListing) {
         Set<UUID> current = Set.copyOf(questIds);
 
         Set<UUID> added = new HashSet<>(current);
@@ -86,12 +98,34 @@ public class QuestsRecord {
         removed.removeAll(current);
         if (added.isEmpty() && removed.isEmpty()) return false;
 
+        if (!added.isEmpty()) beforeListing.accept(added);
         storage.addToIndex(indexKey, added);
         storage.removeFromIndex(indexKey, removed);
 
         stored.addAll(added);
         stored.removeAll(removed);
         return true;
+    }
+
+    /**
+     * Takes in what the storage holds now under this record's key, as other servers wrote it:
+     * their adds and removals. What this server added or removed and has not written yet stays as
+     * it is, to be written next.
+     *
+     * @return the ids other servers added since, and those they removed.
+     */
+    @Nonnull
+    public synchronized Absorbed absorb(@Nonnull Set<UUID> storedNow) {
+        Set<UUID> added = new HashSet<>(storedNow);
+        added.removeAll(stored);
+        Set<UUID> removed = new HashSet<>(stored);
+        removed.removeAll(storedNow);
+
+        questIds.addAll(added);
+        questIds.removeAll(removed);
+        stored.addAll(added);
+        stored.removeAll(removed);
+        return new Absorbed(added, removed);
     }
 
     /**
@@ -111,4 +145,12 @@ public class QuestsRecord {
     public QuestsRecord clone() {
         return new QuestsRecord(this);
     }
+
+    /**
+     * What other servers changed under a key since this server last looked.
+     *
+     * @param added the ids they added
+     * @param removed the ids they removed
+     */
+    public record Absorbed(@Nonnull Set<UUID> added, @Nonnull Set<UUID> removed) {}
 }

@@ -28,7 +28,7 @@ public class ConsumeItemQuestVisitor implements QuestVisitor<ConsumeItemQuestPro
 
         if (!quest.getItemToConsume().matches(itemId)) return;
 
-        quest.setCurrentQuantity(quest.getCurrentQuantity() + quantity)
+        quest.addQuantity(quantity)
              .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
              .markDirty();
     }

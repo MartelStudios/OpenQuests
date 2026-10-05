@@ -81,6 +81,13 @@ public class WorldQuestScope extends QuestScope {
         }
     }
 
+    @Override
+    public void retire(@Nonnull AbstractQuestProgression<?> quest) {
+        for (World world : WorldQuestService.openWorlds(worlds)) {
+            WorldQuestService.get().unindex(world, quest.getId());
+        }
+    }
+
     /**
      * A world is its own holder: the quest goes on only while another world holding it is open.
      */

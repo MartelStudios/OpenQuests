@@ -29,12 +29,15 @@ import com.martelstudios.openquests.core.assignments.trigger.ScheduleTrigger;
 import com.martelstudios.openquests.core.commands.QuestCommand;
 import com.martelstudios.openquests.core.config.OpenQuestsConfig;
 import com.martelstudios.openquests.core.constraints.QuestConstraintValidator;
+import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.OpenQuestCategory;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.replication.Replica;
+import com.martelstudios.openquests.core.replication.QuestReplicationService;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.QuestStorageProvider;
 import com.martelstudios.openquests.core.persistence.disk.DiskQuestStorage;
@@ -63,6 +66,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -95,6 +100,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     private QuestProgressionService questProgressionService;
     private QuestPlayerStateService questPlayerStateService;
     private QuestAssignmentService questAssignmentService;
+    private QuestReplicationService questReplicationService;
     private QuestDeadlineService questDeadlineService;
     private QuestRewardService questRewardService;
     private UniverseQuestService universeQuestService;
@@ -130,6 +136,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         Replica.setLocalId(questStorage.getReplicaId());
 
         questProgressionStore = new QuestProgressionStore(questStorage);
+        questReplicationService = new QuestReplicationService(questStorage, questProgressionStore, settings.getReplicationSeconds());
 
         questProgressionService = new QuestProgressionService(this, questProgressionStore);
         questPlayerStateService = new QuestPlayerStateService(this, questProgressionStore);
@@ -147,6 +154,18 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, event -> {
             QuestScope scope = event.getQuest().getScope();
             if (scope != null) scope.release(event.getQuest());
+        });
+
+        // Indexes hold running quests only: one ending leaves them, its players keeping it in their
+        // journals, and one nobody holds any more is done away with, nothing being left to read it
+        getEventRegistry().registerGlobal(QuestCompletedEvent.class, event -> {
+            AbstractQuestProgression<?> quest = event.getQuest();
+            if (!quest.isStopOnComplete()) return;
+
+            QuestScope scope = quest.getScope();
+            if (scope != null) scope.retire(quest);
+
+            if (quest.getPlayers().isEmpty() && quest.getAbandonedPlayers().isEmpty()) questProgressionService.unregisterQuest(quest);
         });
 
         playerQuestService = new PlayerQuestService(this);
@@ -200,15 +219,32 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     @Override
     protected void start() {
         universeQuestService.loadQuests();
+        worldGroupIndex.preload(groupsOfAssignments());
         questAssignmentService.start();
 
         long interval = settings.getSaveIntervalMinutes();
 
         HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(() -> saveEverything(false), interval, interval, TimeUnit.MINUTES);
+
+        questReplicationService.start();
+    }
+
+    /**
+     * @return the groups of worlds the assignments gather, read back as the server starts.
+     */
+    @Nonnull
+    private Set<String> groupsOfAssignments() {
+        Set<String> groups = new HashSet<>();
+        for (OpenQuestAssignment assignment : OpenQuestAssignment.getAssetMap().getAssetMap().values()) {
+            if (assignment.getScope() instanceof WorldsAssignmentScope) groups.add(assignment.getId());
+        }
+        return groups;
     }
 
     @Override
     protected void shutdown() {
+        // First, so nothing is still being written behind the last pass
+        if (questReplicationService != null) questReplicationService.stop();
         saveEverything(true);
 
         if (questStorage != null) questStorage.close();
@@ -306,6 +342,10 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     public QuestAssignmentService getQuestAssignmentService() {
         return questAssignmentService;
+    }
+
+    public QuestReplicationService getQuestReplicationService() {
+        return questReplicationService;
     }
 
     public QuestDeadlineService getQuestDeadlineService() {

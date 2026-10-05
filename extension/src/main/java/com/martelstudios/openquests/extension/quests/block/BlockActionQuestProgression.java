@@ -76,7 +76,7 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
         }
 
         if (fresh && counts(action)) {
-            setCurrentQuantity(getCurrentQuantity() + 1);
+            addQuantity(1);
             changed = true;
         }
 

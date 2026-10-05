@@ -7,10 +7,12 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.hypixel.hytale.server.core.universe.world.events.StartWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.replication.QuestReplicationService;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
@@ -44,6 +46,7 @@ public class WorldQuestService {
 
         plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
         plugin.getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, this::handleRemovedPlayerFromWorldEvent);
+        plugin.getEventRegistry().registerGlobal(StartWorldEvent.class, event -> preload(event.getWorld()));
     }
 
     public static WorldQuestService get() {
@@ -75,8 +78,34 @@ public class WorldQuestService {
     }
 
     /**
-     * @return the ids on that world's index, those that ended included, read back first if no
-     * player has come in yet.
+     * Takes an ended quest off the world's index of running ones, on the world's own thread. The
+     * quest keeps the world in its scope, and its players keep it in their journals.
+     */
+    public void unindex(@Nonnull World world, @Nonnull UUID questId) {
+        onThreadOf(world, () -> {
+            WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
+            if (store.questsRecord.unregister(questId)) changed(world, store);
+        });
+    }
+
+    /**
+     * Reads a world's index and the quests it runs back off the game threads as the world starts,
+     * so the first player in finds them in memory. One entering first reads them on the spot.
+     */
+    public void preload(@Nonnull World world) {
+        QuestReplicationService.get().execute("the quests of world " + world.getName(), () -> {
+            Set<UUID> questIds = storage.loadIndex(indexKey(world));
+            QuestProgressionService.get().loadQuests(questIds);
+
+            onThreadOf(world, () -> {
+                WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
+                if (store.consumeNeedsLoad()) store.questsRecord.load(questIds);
+            });
+        });
+    }
+
+    /**
+     * @return the ids on that world's index of running quests, read back first if nothing did yet.
      */
     @Nonnull
     public Set<UUID> getQuestIds(@Nonnull World world) {
@@ -133,7 +162,7 @@ public class WorldQuestService {
         LOGGER.atInfo().log("Removing quest %s from world %s", questId, world.getName());
 
         WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
-        if (store.questsRecord.unregister(questId)) store.markDirty();
+        if (store.questsRecord.unregister(questId)) changed(world, store);
 
         // Gone already when it left for good, and nothing then is left to write on
         AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
@@ -147,7 +176,8 @@ public class WorldQuestService {
     void deleteIndex(@Nonnull World world) {
         loadedRecord(world).load(Set.of());
         getWorldQuestStoreFromWorld(world).consumeChanges();
-        storage.deleteIndex(indexKey(world));
+        String key = indexKey(world);
+        QuestReplicationService.get().execute("the " + key + " index", () -> storage.deleteIndex(key));
     }
 
     private void addQuestHere(@Nonnull World world, @Nonnull UUID questId) {
@@ -155,7 +185,7 @@ public class WorldQuestService {
         if (quest == null) return;
 
         if (!loadedRecord(world).register(questId)) return;
-        getWorldQuestStoreFromWorld(world).markDirty();
+        changed(world, getWorldQuestStoreFromWorld(world));
 
         LOGGER.atInfo().log("Added quest %s to world %s", questId, world.getName());
 
@@ -191,7 +221,7 @@ public class WorldQuestService {
                 if (QuestProgressionService.get().isSetAside(questId)) continue;
 
                 questsRecord.unregister(questId);
-                store.markDirty();
+                changed(world, store);
                 continue;
             }
 
@@ -210,7 +240,8 @@ public class WorldQuestService {
         var playerRef = removedPlayerFromWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;
 
-        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(removedPlayerFromWorldEvent.getWorld());
+        World world = removedPlayerFromWorldEvent.getWorld();
+        WorldQuestStoreResource store = getWorldQuestStoreFromWorld(world);
         QuestStoreComponent playerStore = removedPlayerFromWorldEvent.getHolder().getComponent(QuestStoreComponent.getComponentType());
         QuestsRecord questsRecord = store.questsRecord;
 
@@ -221,7 +252,7 @@ public class WorldQuestService {
                 if (QuestProgressionService.get().isSetAside(questId)) continue;
 
                 questsRecord.unregister(questId);
-                store.markDirty();
+                changed(world, store);
                 continue;
             }
 
@@ -231,6 +262,14 @@ public class WorldQuestService {
                 PlayerQuestService.get().removeQuestFromPlayerStore(playerStore, quest, playerRef.getUuid());
             }
         }
+    }
+
+    /**
+     * Marks a world's index changed and writes the change as it happens, off the world's thread.
+     */
+    private void changed(@Nonnull World world, @Nonnull WorldQuestStoreResource store) {
+        store.markDirty();
+        QuestReplicationService.get().flushIndex(store.questsRecord, indexKey(world));
     }
 
     /**

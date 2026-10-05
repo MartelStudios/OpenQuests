@@ -43,7 +43,7 @@ public abstract class MovementQuestProgression<Q extends MovementQuestProgressio
         if (whole <= 0) return false;
 
         pending -= whole;
-        setCurrentQuantity(getCurrentQuantity() + whole);
+        addQuantity(whole);
 
         return true;
     }

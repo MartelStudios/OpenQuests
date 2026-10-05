@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,6 +60,11 @@ public class JdbcQuestStorage implements QuestStorage {
      * How many ids go into one {@code IN (…)} list, past which another round trip is cheaper.
      */
     private static final int IN_CLAUSE_CHUNK = 500;
+
+    /**
+     * How long an ended quest nobody holds keeps its outcome, for servers that have not heard yet.
+     */
+    private static final Duration ENDED_KEPT_FOR = Duration.ofDays(1);
 
     private static final String RUNNING = QuestState.IN_PROGRESS.name();
 
@@ -128,6 +134,7 @@ public class JdbcQuestStorage implements QuestStorage {
         pool = new JdbcConnectionPool(driverLoader.getDriver(), settings.url(), properties, settings.poolSize(), settings.connectionTimeoutSeconds());
 
         prepareSchema();
+        dropLongEnded();
 
         LOGGER.atInfo().log("Quest storage: %s as %s, server id %s", settings.url(), dialect, settings.serverId());
     }
@@ -269,6 +276,11 @@ public class JdbcQuestStorage implements QuestStorage {
         });
     }
 
+    /**
+     * An ended quest keeps its row, outcome and all, for {@link #ENDED_KEPT_FOR}: deleted outright,
+     * it would read as never written to a server still running it, whose own end would then
+     * write it anew and claim it a second time.
+     */
     @Override
     public void deleteProgression(@Nonnull AbstractQuestProgression<?> quest) {
         String questId = quest.getId().toString();
@@ -278,44 +290,80 @@ public class JdbcQuestStorage implements QuestStorage {
             execute(connection, "DELETE FROM " + questPlayerTable + " WHERE quest_id = ?", questId);
             execute(connection, "DELETE FROM " + questIndexTable + " WHERE quest_id = ?", questId);
             execute(connection, "DELETE FROM " + replicaTable + " WHERE quest_id = ?", questId);
-            execute(connection, "DELETE FROM " + questTable + " WHERE id = ?", questId);
+
+            if (quest.isCompleted()) {
+                writeEnd(connection, quest, System.currentTimeMillis());
+            } else {
+                execute(connection, "DELETE FROM " + questTable + " WHERE id = ?", questId);
+            }
             return null;
         });
     }
 
     /**
      * The row is made sure of first, so the claim is one conditional update whichever server
-     * wrote the quest first: only the update finding it still running writes.
+     * wrote the quest first: only the update finding it still running writes. A losing claim
+     * reads the winner's outcome in the same transaction, while the row is sure to be there.
      */
+    @Nullable
     @Override
-    public boolean claimEnd(@Nonnull AbstractQuestProgression<?> quest) {
+    public QuestState claimEnd(@Nonnull AbstractQuestProgression<?> quest) {
         long now = System.currentTimeMillis();
-        Instant completedAt = quest.getCompletedAt();
 
         return pool.inTransaction(connection -> {
             insertQuestRows(connection, List.of(quest), now);
+            if (writeEnd(connection, quest, now)) return null;
 
-            try (PreparedStatement update = connection.prepareStatement("UPDATE " + questTable + " SET state = ?, completed_at = ? WHERE id = ? AND state = ?")) {
-                update.setString(1, quest.getState().name());
-                update.setLong(2, completedAt == null ? now : completedAt.toEpochMilli());
-                update.setString(3, quest.getId().toString());
-                update.setString(4, RUNNING);
-                return update.executeUpdate() == 1;
+            try (PreparedStatement statement = connection.prepareStatement("SELECT state FROM " + questTable + " WHERE id = ?")) {
+                statement.setString(1, quest.getId().toString());
+
+                try (ResultSet results = statement.executeQuery()) {
+                    QuestState outcome = results.next() ? ended(results.getString(1)) : null;
+
+                    // An outcome this version cannot read still ended the quest elsewhere: not paid twice
+                    return outcome != null ? outcome : quest.getState();
+                }
             }
         });
     }
 
-    @Nullable
-    @Override
-    public QuestState loadEnd(@Nonnull UUID questId) {
-        return pool.with(connection -> {
-            try (PreparedStatement statement = connection.prepareStatement("SELECT state FROM " + questTable + " WHERE id = ?")) {
-                statement.setString(1, questId.toString());
+    /**
+     * @return whether the quest was still running, and now carries this server's outcome.
+     */
+    private boolean writeEnd(@Nonnull Connection connection, @Nonnull AbstractQuestProgression<?> quest, long now) throws SQLException {
+        Instant completedAt = quest.getCompletedAt();
 
-                try (ResultSet results = statement.executeQuery()) {
-                    return results.next() ? ended(results.getString(1)) : null;
+        try (PreparedStatement update = connection.prepareStatement("UPDATE " + questTable + " SET state = ?, completed_at = ? WHERE id = ? AND state = ?")) {
+            update.setString(1, quest.getState().name());
+            update.setLong(2, completedAt == null ? now : completedAt.toEpochMilli());
+            update.setString(3, quest.getId().toString());
+            update.setString(4, RUNNING);
+            return update.executeUpdate() == 1;
+        }
+    }
+
+    /**
+     * Drops what is left of the quests that ended long enough ago for every server to have heard,
+     * and that nobody holds any more.
+     */
+    private void dropLongEnded() {
+        long before = System.currentTimeMillis() - ENDED_KEPT_FOR.toMillis();
+        String longEnded = "SELECT id FROM " + questTable + " WHERE state <> ? AND completed_at < ? AND id NOT IN (SELECT quest_id FROM " + questPlayerTable + ")";
+
+        pool.inTransaction(connection -> {
+            for (String table : List.of(replicaTable, questIndexTable)) {
+                try (PreparedStatement delete = connection.prepareStatement("DELETE FROM " + table + " WHERE quest_id IN (" + longEnded + ")")) {
+                    delete.setString(1, RUNNING);
+                    delete.setLong(2, before);
+                    delete.executeUpdate();
                 }
             }
+            try (PreparedStatement delete = connection.prepareStatement("DELETE FROM " + questTable + " WHERE state <> ? AND completed_at < ? AND id NOT IN (SELECT quest_id FROM " + questPlayerTable + ")")) {
+                delete.setString(1, RUNNING);
+                delete.setLong(2, before);
+                delete.executeUpdate();
+            }
+            return null;
         });
     }
 

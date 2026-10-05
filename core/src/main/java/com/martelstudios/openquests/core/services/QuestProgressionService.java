@@ -68,6 +68,14 @@ public class QuestProgressionService {
     }
 
     /**
+     * Brings those of the quests not in memory back in one read, for a world or a group coming up
+     * with everything it runs.
+     */
+    public void loadQuests(@Nonnull Collection<UUID> questIds) {
+        dataStore.loadMissing(questIds);
+    }
+
+    /**
      * @return whether that quest was read back and set aside, its asset gone or changed type. An
      * index naming it should keep it, so that it comes back with its asset.
      */

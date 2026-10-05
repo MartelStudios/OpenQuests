@@ -97,6 +97,14 @@ public final class PlayerMessage {
     }
 
     /**
+     * @return the ending it carries, {@code null} for a debt.
+     */
+    @Nullable
+    public Ending getEnding() {
+        return ending;
+    }
+
+    /**
      * Takes the message into a player's record: a debt replacing any for the same completion, an
      * ending counted like one seen here.
      */
@@ -122,7 +130,7 @@ public final class PlayerMessage {
     /**
      * How a quest from one asset ended for the player.
      */
-    private static final class Ending {
+    public static final class Ending {
 
         private static final BuilderCodec<Ending> CODEC = BuilderCodec.builder(Ending.class, Ending::new)
                                                                       .append(new KeyedCodec<>("AssetId", Codec.STRING), (ending, assetId) -> ending.assetId = assetId, ending -> ending.assetId)
@@ -154,13 +162,35 @@ public final class PlayerMessage {
             this.completedAt = completedAt == null ? null : completedAt.toEpochMilli();
         }
 
+        /**
+         * @return the asset the quest was made from.
+         */
+        @Nonnull
+        public String getAssetId() {
+            return assetId;
+        }
+
+        /**
+         * @return how it ended.
+         */
+        @Nonnull
+        public QuestState getOutcome() {
+            return outcome;
+        }
+
+        /**
+         * @return when it started, {@code null} if never recorded.
+         */
         @Nullable
-        private Instant startedAt() {
+        public Instant startedAt() {
             return startedAt == null ? null : Instant.ofEpochMilli(startedAt);
         }
 
+        /**
+         * @return when it ended, {@code null} if never recorded.
+         */
         @Nullable
-        private Instant completedAt() {
+        public Instant completedAt() {
             return completedAt == null ? null : Instant.ofEpochMilli(completedAt);
         }
     }

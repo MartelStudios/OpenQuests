@@ -75,6 +75,20 @@ public class WorldsQuestScope extends WorldQuestScope {
         super.release(quest);
     }
 
+    @Override
+    public void retire(@Nonnull AbstractQuestProgression<?> quest) {
+        WorldGroupIndex.get().remove(group, quest.getId());
+        super.retire(quest);
+    }
+
+    /**
+     * The worlds of a group may run on several servers sharing the storage.
+     */
+    @Override
+    public boolean isReplicated() {
+        return true;
+    }
+
     /**
      * The group is the holder, and a group never closes: its quests wait for the next of its worlds
      * to be entered, and end on their own terms or as their assignment replaces them.

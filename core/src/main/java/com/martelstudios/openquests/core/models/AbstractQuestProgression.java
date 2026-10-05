@@ -17,6 +17,7 @@ import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.replication.Membership;
+import com.martelstudios.openquests.core.replication.QuestEnds;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
@@ -31,6 +32,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -70,7 +72,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("ParentId", Codec.UUID_STRING), (quest, parentId) -> quest.parentId = parentId, quest -> quest.parentId)
                                                                                         .add()
-                                                                                        .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.state = state, quest -> quest.state)
+                                                                                        .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), AbstractQuestProgression::restoreState, quest -> quest.state)
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (quest, value) -> quest.persistHistory = value, quest -> quest.persistHistory)
                                                                                         .add()
@@ -130,6 +132,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nullable
     protected UUID grantedBy;
+
+    /**
+     * The outcome everyone here last heard of, so that an end reached here and the same end learnt
+     * from another server are announced once.
+     */
+    private final AtomicReference<QuestState> announced = new AtomicReference<>(QuestState.IN_PROGRESS);
 
     /**
      * Tags written on this instance, on top of those its asset declares, each with the values its
@@ -316,27 +324,20 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     /**
      * Takes in what another copy of this quest knows, read from another server's share: who holds
-     * it, how far it went, how it ended. Never marks this copy dirty, what is merged being stored
-     * already, and never ends it twice: an outcome taken in is one another server already paid.
+     * it and how far it went. Never marks this copy dirty, what is merged being stored already. How
+     * it ended is not taken from a copy: an end is claimed once for all, and heard through
+     * {@link #endAsClaimed}.
      *
-     * @return what merging moved here.
+     * @return whether anything the players see moved.
      */
-    @Nonnull
-    public final MergeOutcome merge(@Nonnull AbstractQuestProgression<?> other) {
-        if (other == this || other.getClass() != getClass() || !other.getId().equals(getId())) return MergeOutcome.NONE;
+    public final boolean merge(@Nonnull AbstractQuestProgression<?> other) {
+        if (other == this || other.getClass() != getClass() || !other.getId().equals(getId())) return false;
 
         @SuppressWarnings("unchecked")
         Q same = (Q) other;
 
         boolean progressed = membership.merge(other.membership);
-        progressed |= mergeProgress(same);
-
-        boolean ended = !isCompleted() && other.isCompleted();
-        if (ended) {
-            state = other.state;
-            completedAt = other.completedAt;
-        }
-        return new MergeOutcome(progressed, ended);
+        return mergeProgress(same) | progressed;
     }
 
     /**
@@ -350,7 +351,58 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
         state = outcome;
         completedAt = at;
+        announced.set(outcome);
         return true;
+    }
+
+    /**
+     * Ends the quest the way another server claimed it ended, which this one learns afterwards:
+     * everything here hears of it, to file the quest and tell its players, and nothing is paid
+     * twice.
+     *
+     * @return whether this copy's outcome changed.
+     */
+    public boolean endAsClaimed(@Nonnull QuestState outcome, @Nullable Instant at) {
+        QuestState previous = state;
+        if (outcome == QuestState.IN_PROGRESS || outcome == previous) return false;
+
+        state = outcome;
+        completedAt = at;
+
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestUpdatedEvent.class, getId())
+                    .dispatch(new QuestUpdatedEvent(this));
+        announceEnd(false);
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestStateChangedEvent.class, getId())
+                    .dispatch(new QuestStateChangedEvent(this, previous));
+        return true;
+    }
+
+    /**
+     * Tells everyone here the quest ended, once per outcome whichever way this server learnt of
+     * it: reaching the end itself, or hearing another server claimed it.
+     *
+     * @param claimedHere whether this server ended it, and pays what the end pays
+     */
+    private void announceEnd(boolean claimedHere) {
+        QuestState outcome = state;
+        if (announced.getAndSet(outcome) == outcome) return;
+
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestCompletedEvent.class, getId())
+                    .dispatch(new QuestCompletedEvent(this, claimedHere));
+    }
+
+    /**
+     * An outcome read back has already been announced, by whichever server reached it.
+     */
+    private void restoreState(@Nonnull QuestState restored) {
+        state = restored;
+        announced.set(restored);
     }
 
     /**
@@ -361,20 +413,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     protected boolean mergeProgress(@Nonnull Q other) {
         return false;
-    }
-
-    /**
-     * What merging another copy of a quest moved here.
-     *
-     * @param progressed whether what the players see moved: who holds it, how far it went
-     * @param ended whether it ended through that copy, having been running here
-     */
-    public record MergeOutcome(boolean progressed, boolean ended) {
-
-        /**
-         * Nothing moved.
-         */
-        public static final MergeOutcome NONE = new MergeOutcome(false, false);
     }
 
     /**
@@ -406,13 +444,19 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
         // The outcome, not merely the first end: a quest kept alive by StopOnComplete:false can change.
         if (isCompleted() && getState() != previousState) {
-            completedAt = isCompleted() ? Instant.now() : null;
+            completedAt = Instant.now();
             markDirty();
 
-            HytaleServer.get()
-                        .getEventBus()
-                        .dispatchFor(QuestCompletedEvent.class, getId())
-                        .dispatch(new QuestCompletedEvent(this));
+            // Only the first end is claimed: several servers holding the quest agree on that one
+            boolean claimedHere = true;
+            if (previousState == QuestState.IN_PROGRESS) {
+                QuestState claimedElsewhere = QuestEnds.claim(this);
+                if (claimedElsewhere != null) {
+                    state = claimedElsewhere;
+                    claimedHere = false;
+                }
+            }
+            announceEnd(claimedHere);
         }
 
         // Last, so a listener reacting to the transition reads a quest that has already been paid

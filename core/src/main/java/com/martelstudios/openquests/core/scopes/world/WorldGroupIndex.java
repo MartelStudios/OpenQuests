@@ -4,10 +4,13 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.replication.QuestReplicationService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,7 +70,7 @@ public class WorldGroupIndex {
      * Puts a quest in a group: the worlds it gathers take it up as they are entered.
      */
     public void add(@Nonnull String group, @Nonnull UUID questId) {
-        if (record(group).register(questId)) dirtyGroups.add(group);
+        if (record(group).register(questId)) changed(group);
     }
 
     /**
@@ -75,7 +78,7 @@ public class WorldGroupIndex {
      */
     public void remove(@Nonnull String group, @Nonnull UUID questId) {
         QuestsRecord record = groups.get(group);
-        if (record != null && record.unregister(questId)) dirtyGroups.add(group);
+        if (record != null && record.unregister(questId)) changed(group);
     }
 
     /**
@@ -115,6 +118,45 @@ public class WorldGroupIndex {
     }
 
     /**
+     * @return the keys of the groups read so far, the ones this server follows.
+     */
+    @Nonnull
+    public Set<String> getLoadedKeys() {
+        Set<String> keys = new HashSet<>();
+        for (String group : groups.keySet()) keys.add(keyOf(group));
+        return keys;
+    }
+
+    /**
+     * Takes in what other servers added to and removed from the groups this server follows: a
+     * quest one of them started reaches the worlds of the group someone is in here.
+     *
+     * @param storedNow the ids under each group's key, as {@link #keyOf} names it
+     */
+    public void refresh(@Nonnull Map<String, Set<UUID>> storedNow) {
+        groups.forEach((group, record) -> {
+            Set<UUID> stored = storedNow.get(keyOf(group));
+            if (stored == null) return;
+
+            for (UUID questId : record.absorb(stored).added()) {
+                for (World world : getJoinedWorlds(group)) {
+                    WorldQuestService.get().addQuest(world, questId);
+                }
+            }
+        });
+    }
+
+    /**
+     * Reads the groups named here back now, rather than on the first entry into one of their
+     * worlds, with the quests they run.
+     */
+    public void preload(@Nonnull Collection<String> groupNames) {
+        for (String group : groupNames) {
+            QuestProgressionService.get().loadQuests(record(group).getAllIds());
+        }
+    }
+
+    /**
      * Writes out the index of every group that changed, for the save pass and for shutdown.
      */
     public void saveAll(boolean force) {
@@ -124,6 +166,14 @@ public class WorldGroupIndex {
             QuestsRecord record = groups.get(group);
             if (record != null) record.flush(storage, keyOf(group));
         }
+    }
+
+    /**
+     * Marks a group changed and writes the change as it happens, off the game threads.
+     */
+    private void changed(@Nonnull String group) {
+        dirtyGroups.add(group);
+        QuestReplicationService.get().flushIndex(record(group), keyOf(group));
     }
 
     @Nonnull

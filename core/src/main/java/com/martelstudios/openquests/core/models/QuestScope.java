@@ -49,11 +49,26 @@ public abstract class QuestScope {
     public abstract void release(@Nonnull AbstractQuestProgression<?> quest);
 
     /**
+     * Takes an ended quest off the indexes of running quests this scope keeps, which only ever
+     * hold what runs. Its players keep it in their journals, and the quest keeps this scope.
+     */
+    public abstract void retire(@Nonnull AbstractQuestProgression<?> quest);
+
+    /**
      * Asked as a world closes for good with the quest in it: one that does not go on fails there.
      *
      * @param closingWorldId the world closing, no longer counted among the open ones
      */
     public abstract boolean outlives(@Nonnull UUID closingWorldId);
+
+    /**
+     * @return whether several servers may hold a quest of this scope at once, which is what makes
+     * its progress merged across them and its end claimed: a server, a group of worlds. A world
+     * lives on one server.
+     */
+    public boolean isReplicated() {
+        return false;
+    }
 
     /**
      * Notes that the quest is now played in that world as well. A scope not made of worlds keeps

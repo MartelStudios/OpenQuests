@@ -69,7 +69,7 @@ public abstract class ItemExchangeQuestProgression<Q extends ItemExchangeQuestPr
         if (guarded && exchange == ItemExchange.GROUND_PICKUP) fresh = counters.recordGroundPickup(playerId, quantity);
 
         int counted = counts(exchange) ? fresh : 0;
-        if (counted > 0) setCurrentQuantity(getCurrentQuantity() + counted);
+        if (counted > 0) addQuantity(counted);
 
         return counted > 0 || (guarded && exchange != ItemExchange.HARVEST);
     }
