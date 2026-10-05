@@ -3,7 +3,6 @@ package com.martelstudios.openquests.core;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.codec.util.RawJsonReader;
 import com.hypixel.hytale.component.ComponentType;
-import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
@@ -46,6 +45,7 @@ import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorageProvider;
 import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
+import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
@@ -53,7 +53,6 @@ import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldClosingService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
-import com.martelstudios.openquests.core.scopes.world.WorldQuestStoreResource;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.services.QuestDeadlineService;
 import com.martelstudios.openquests.core.services.QuestPlayerStateService;
@@ -94,7 +93,6 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     private QuestStorage questStorage;
     private QuestProgressionStore questProgressionStore;
     private ComponentType<EntityStore, QuestStoreComponent> questStoreComponentType;
-    private ResourceType<EntityStore, WorldQuestStoreResource> worldStoreResourceType;
     private ComponentType<EntityStore, PendingRewardStoreComponent> pendingRewardStoreComponentType;
 
     private QuestProgressionService questProgressionService;
@@ -106,6 +104,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     private UniverseQuestService universeQuestService;
     private WorldQuestService worldQuestService;
 
+    private ScopeIndexes scopeIndexes;
     private WorldGroupIndex worldGroupIndex;
     private PlayerQuestService playerQuestService;
 
@@ -141,9 +140,10 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questProgressionService = new QuestProgressionService(this, questProgressionStore);
         questPlayerStateService = new QuestPlayerStateService(this, questProgressionStore);
         questRewardService = new QuestRewardService(this);
-        universeQuestService = new UniverseQuestService(this, questStorage);
-        worldQuestService = new WorldQuestService(this, questStorage);
-        worldGroupIndex = new WorldGroupIndex(questStorage);
+        scopeIndexes = new ScopeIndexes(questStorage, questReplicationService);
+        universeQuestService = new UniverseQuestService(this, scopeIndexes);
+        worldQuestService = new WorldQuestService(this, scopeIndexes);
+        worldGroupIndex = new WorldGroupIndex(scopeIndexes);
         new WorldClosingService(this, questStorage);
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
@@ -186,7 +186,6 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         // Both indexes are rebuilt from the storage on connection and on world entry, so neither
         // is written to the entity files the server saves for us
         questStoreComponentType = getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, QuestStoreComponent::new);
-        worldStoreResourceType = getEntityStoreRegistry().registerResource(WorldQuestStoreResource.class, WorldQuestStoreResource::new);
         pendingRewardStoreComponentType = getEntityStoreRegistry().registerComponent(PendingRewardStoreComponent.class, PendingRewardStoreComponent::new);
 
         getCommandRegistry().registerCommand(new QuestCommand());
@@ -257,9 +256,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     private void saveEverything(boolean force) {
         save("quests", questProgressionStore::saveAll);
         save("player records", () -> questPlayerStateService.saveAllOnline(force));
-        save("the universe index", () -> universeQuestService.saveQuests(force));
-        save("the world indexes", () -> worldQuestService.saveAll(force));
-        save("the world group indexes", () -> worldGroupIndex.saveAll(force));
+        save("the quest indexes", scopeIndexes::flushAll);
     }
 
     /**
@@ -328,6 +325,10 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         return worldQuestService;
     }
 
+    public ScopeIndexes getScopeIndexes() {
+        return scopeIndexes;
+    }
+
     public WorldGroupIndex getWorldGroupIndex() {
         return worldGroupIndex;
     }
@@ -362,10 +363,6 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     public ComponentType<EntityStore, QuestStoreComponent> getQuestStoreComponentType() {
         return questStoreComponentType;
-    }
-
-    public ResourceType<EntityStore, WorldQuestStoreResource> getWorldStoreResourceType() {
-        return worldStoreResourceType;
     }
 
     public ComponentType<EntityStore, PendingRewardStoreComponent> getPendingRewardStoreComponentType() {

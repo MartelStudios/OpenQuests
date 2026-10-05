@@ -3,14 +3,11 @@ package com.martelstudios.openquests.core.scopes.world;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.persistence.QuestStorage;
-import com.martelstudios.openquests.core.replication.QuestReplicationService;
+import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,8 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The groups of worlds sharing quests, each named after the assignment gathering it. Unlike a
- * world's, a group's index lives on no world: it is kept here, read back the first time, and
- * written out with the rest. A group never closes; its worlds come and go.
+ * world's, a group's quests live on no world. A group never closes; its worlds come and go.
  */
 public class WorldGroupIndex {
 
@@ -30,11 +26,7 @@ public class WorldGroupIndex {
     public static final String GROUP_INDEX_PREFIX = "worlds:";
 
     @Nonnull
-    private final QuestStorage storage;
-
-    private final Map<String, QuestsRecord> groups = new ConcurrentHashMap<>();
-
-    private final Set<String> dirtyGroups = ConcurrentHashMap.newKeySet();
+    private final ScopeIndexes indexes;
 
     /**
      * The worlds of each group someone entered since they opened, in memory only: the ones a quest
@@ -42,8 +34,8 @@ public class WorldGroupIndex {
      */
     private final Map<String, Set<UUID>> joinedWorlds = new ConcurrentHashMap<>();
 
-    public WorldGroupIndex(@Nonnull QuestStorage storage) {
-        this.storage = storage;
+    public WorldGroupIndex(@Nonnull ScopeIndexes indexes) {
+        this.indexes = indexes;
     }
 
     public static WorldGroupIndex get() {
@@ -59,26 +51,25 @@ public class WorldGroupIndex {
     }
 
     /**
-     * @return the ids on that group's index, those that ended included, read back the first time.
+     * @return the ids of the group's running quests, read back the first time.
      */
     @Nonnull
     public Set<UUID> getQuestIds(@Nonnull String group) {
-        return record(group).getAllIds();
+        return indexes.getIds(keyOf(group));
     }
 
     /**
      * Puts a quest in a group: the worlds it gathers take it up as they are entered.
      */
     public void add(@Nonnull String group, @Nonnull UUID questId) {
-        if (record(group).register(questId)) changed(group);
+        indexes.add(keyOf(group), questId);
     }
 
     /**
-     * Takes a quest out of a group, for one leaving for good.
+     * Takes a quest out of a group, for one ending or leaving for good.
      */
     public void remove(@Nonnull String group, @Nonnull UUID questId) {
-        QuestsRecord record = groups.get(group);
-        if (record != null && record.unregister(questId)) changed(group);
+        indexes.remove(keyOf(group), questId);
     }
 
     /**
@@ -89,12 +80,10 @@ public class WorldGroupIndex {
     public void enter(@Nonnull String group, @Nonnull World world, @Nonnull UUID playerId) {
         joinedWorlds.computeIfAbsent(group, key -> ConcurrentHashMap.newKeySet()).add(world.getWorldConfig().getUuid());
 
-        for (UUID questId : List.copyOf(getQuestIds(group))) {
-            // Read back first: after a restart, nothing else has brought the group's quests into memory
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
-            if (quest == null || QuestProgressionService.get().getLiveQuest(questId) == null) continue;
+        for (AbstractQuestProgression<?> quest : indexes.resolve(keyOf(group))) {
+            if (QuestProgressionService.get().getLiveQuest(quest.getId()) == null) continue;
 
-            WorldQuestService.get().addQuest(world, questId);
+            WorldQuestService.get().addQuest(world, quest.getId());
             QuestProgressionService.get().joinQuest(quest, playerId);
         }
     }
@@ -105,7 +94,7 @@ public class WorldGroupIndex {
     @Nonnull
     public List<World> getJoinedWorlds(@Nonnull String group) {
         Set<UUID> worldIds = joinedWorlds.get(group);
-        return worldIds == null ? List.of() : WorldQuestService.openWorlds(worldIds);
+        return worldIds == null ? List.of() : WorldQuestService.get().openWorlds(worldIds);
     }
 
     /**
@@ -118,30 +107,17 @@ public class WorldGroupIndex {
     }
 
     /**
-     * @return the keys of the groups read so far, the ones this server follows.
-     */
-    @Nonnull
-    public Set<String> getLoadedKeys() {
-        Set<String> keys = new HashSet<>();
-        for (String group : groups.keySet()) keys.add(keyOf(group));
-        return keys;
-    }
-
-    /**
-     * Takes in what other servers added to and removed from the groups this server follows: a
-     * quest one of them started reaches the worlds of the group someone is in here.
+     * Brings the quests other servers started in a group to the worlds of it someone is in here.
      *
-     * @param storedNow the ids under each group's key, as {@link #keyOf} names it
+     * @param added the ids added under each key, as {@link ScopeIndexes#refresh} reports them
      */
-    public void refresh(@Nonnull Map<String, Set<UUID>> storedNow) {
-        groups.forEach((group, record) -> {
-            Set<UUID> stored = storedNow.get(keyOf(group));
-            if (stored == null) return;
+    public void spreadAdded(@Nonnull Map<String, Set<UUID>> added) {
+        added.forEach((key, questIds) -> {
+            if (!key.startsWith(GROUP_INDEX_PREFIX)) return;
 
-            for (UUID questId : record.absorb(stored).added()) {
-                for (World world : getJoinedWorlds(group)) {
-                    WorldQuestService.get().addQuest(world, questId);
-                }
+            List<World> worlds = getJoinedWorlds(key.substring(GROUP_INDEX_PREFIX.length()));
+            for (UUID questId : questIds) {
+                for (World world : worlds) WorldQuestService.get().addQuest(world, questId);
             }
         });
     }
@@ -152,39 +128,7 @@ public class WorldGroupIndex {
      */
     public void preload(@Nonnull Collection<String> groupNames) {
         for (String group : groupNames) {
-            QuestProgressionService.get().loadQuests(record(group).getAllIds());
+            QuestProgressionService.get().loadQuests(getQuestIds(group));
         }
-    }
-
-    /**
-     * Writes out the index of every group that changed, for the save pass and for shutdown.
-     */
-    public void saveAll(boolean force) {
-        for (String group : force ? Set.copyOf(groups.keySet()) : Set.copyOf(dirtyGroups)) {
-            dirtyGroups.remove(group);
-
-            QuestsRecord record = groups.get(group);
-            if (record != null) record.flush(storage, keyOf(group));
-        }
-    }
-
-    /**
-     * Marks a group changed and writes the change as it happens, off the game threads.
-     */
-    private void changed(@Nonnull String group) {
-        dirtyGroups.add(group);
-        QuestReplicationService.get().flushIndex(record(group), keyOf(group));
-    }
-
-    @Nonnull
-    private QuestsRecord record(@Nonnull String group) {
-        QuestsRecord record = groups.get(group);
-        if (record != null) return record;
-
-        // Read outside the map's lock, which a slow storage would otherwise hold for every group
-        QuestsRecord read = new QuestsRecord();
-        read.load(storage.loadIndex(keyOf(group)));
-        QuestsRecord raced = groups.putIfAbsent(group, read);
-        return raced != null ? raced : read;
     }
 }

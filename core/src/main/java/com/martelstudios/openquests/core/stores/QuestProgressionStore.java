@@ -262,13 +262,6 @@ public class QuestProgressionStore {
     }
 
     /**
-     * Reads back everything one player takes part in, in one go: a quest at a time would make
-     * connecting cost a round trip per quest.
-     *
-     * @return the quests now in memory for that player, those they were already holding included.
-     */
-    @Nonnull
-    /**
      * Reads back, in one go, those of the quests not in memory yet, so that a world or a group
      * coming up costs one read rather than one per quest.
      */
@@ -284,6 +277,13 @@ public class QuestProgressionStore {
         }
     }
 
+    /**
+     * Reads back everything one player takes part in, in one go: a quest at a time would make
+     * connecting cost a round trip per quest.
+     *
+     * @return the quests now in memory for that player, those they were already holding included.
+     */
+    @Nonnull
     public List<AbstractQuestProgression<?>> loadForPlayer(@Nonnull UUID playerId) {
         List<AbstractQuestProgression<?>> loaded = storage.loadPlayerProgressions(playerId);
 

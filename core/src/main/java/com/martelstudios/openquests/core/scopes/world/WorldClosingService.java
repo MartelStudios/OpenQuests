@@ -41,9 +41,8 @@ public class WorldClosingService {
         if (removeWorldEvent.getRemovalReason() != RemoveWorldEvent.RemovalReason.GENERAL) return;
 
         World world = removeWorldEvent.getWorld();
-        WorldQuestStoreResource store = WorldQuestService.getWorldQuestStoreFromWorld(world);
 
-        store.setClosing(true);
+        WorldQuestService.get().setClosing(world, true);
         try {
             for (UUID questId : new ArrayList<>(WorldQuestService.get().getQuestIds(world))) {
                 AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
@@ -56,7 +55,7 @@ public class WorldClosingService {
 
             LOGGER.atInfo().log("Closed the quests of world %s", world.getName());
         } finally {
-            store.setClosing(false);
+            WorldQuestService.get().setClosing(world, false);
         }
     }
 

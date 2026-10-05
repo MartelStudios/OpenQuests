@@ -48,14 +48,14 @@ public class WorldQuestScope extends QuestScope {
 
     @Override
     public boolean isReachable() {
-        return !WorldQuestService.openWorlds(worlds).isEmpty();
+        return !WorldQuestService.get().openWorlds(worlds).isEmpty();
     }
 
     @Nonnull
     @Override
     public Collection<UUID> getQuestIds() {
         Set<UUID> questIds = new HashSet<>();
-        for (World world : WorldQuestService.openWorlds(worlds)) {
+        for (World world : WorldQuestService.get().openWorlds(worlds)) {
             questIds.addAll(WorldQuestService.get().getQuestIds(world));
         }
         return questIds;
@@ -66,7 +66,7 @@ public class WorldQuestScope extends QuestScope {
      */
     @Override
     public void share(@Nonnull AbstractQuestProgression<?> quest) {
-        List<World> open = WorldQuestService.openWorlds(worlds);
+        List<World> open = WorldQuestService.get().openWorlds(worlds);
 
         quest.setScope(new WorldQuestScope(open.stream().map(world -> world.getWorldConfig().getUuid()).toList()));
         for (World world : open) {
@@ -76,14 +76,14 @@ public class WorldQuestScope extends QuestScope {
 
     @Override
     public void release(@Nonnull AbstractQuestProgression<?> quest) {
-        for (World world : WorldQuestService.openWorlds(worlds)) {
+        for (World world : WorldQuestService.get().openWorlds(worlds)) {
             WorldQuestService.get().removeQuest(world, quest.getId());
         }
     }
 
     @Override
     public void retire(@Nonnull AbstractQuestProgression<?> quest) {
-        for (World world : WorldQuestService.openWorlds(worlds)) {
+        for (World world : WorldQuestService.get().openWorlds(worlds)) {
             WorldQuestService.get().unindex(world, quest.getId());
         }
     }
@@ -93,7 +93,7 @@ public class WorldQuestScope extends QuestScope {
      */
     @Override
     public boolean outlives(@Nonnull UUID closingWorldId) {
-        for (World world : WorldQuestService.openWorlds(worlds)) {
+        for (World world : WorldQuestService.get().openWorlds(worlds)) {
             if (!world.getWorldConfig().getUuid().equals(closingWorldId)) return true;
         }
         return false;

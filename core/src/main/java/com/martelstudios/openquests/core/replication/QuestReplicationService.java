@@ -11,6 +11,7 @@ import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestReplica;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.ReplicaPoll;
+import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.services.QuestPlayerStateService;
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * players hosted here. It also claims the ends of shared quests, and runs whatever else is read
  * off the game threads, such as a world's quests as it starts.
  */
-public class QuestReplicationService {
+public class QuestReplicationService implements ScopeIndexes.Writer {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     @Nonnull
@@ -129,8 +130,17 @@ public class QuestReplicationService {
      * of what was written this way. Written in order with the rest, a deletion included, and a
      * quest always before the index listing it.
      */
+    @Override
     public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String indexKey) {
         execute("the " + indexKey + " index", () -> record.flush(storage, indexKey, this::store));
+    }
+
+    /**
+     * Written in order with the changes made to the index before.
+     */
+    @Override
+    public void deleteIndex(@Nonnull String key) {
+        execute("the " + key + " index", () -> storage.deleteIndex(key));
     }
 
     /**
@@ -235,13 +245,13 @@ public class QuestReplicationService {
      * The universe and the groups this server follows, read in one go.
      */
     private void followIndexes() {
-        Set<String> keys = new HashSet<>(WorldGroupIndex.get().getLoadedKeys());
+        Set<String> keys = new HashSet<>(ScopeIndexes.get().getLoadedKeys(WorldGroupIndex.GROUP_INDEX_PREFIX));
         keys.add(UniverseQuestService.UNIVERSE_INDEX_KEY);
 
-        Map<String, Set<UUID>> stored = storage.loadIndexes(keys);
+        Map<String, Set<UUID>> added = ScopeIndexes.get().refresh(keys);
 
-        UniverseQuestService.get().refresh(stored.getOrDefault(UniverseQuestService.UNIVERSE_INDEX_KEY, Set.of()));
-        WorldGroupIndex.get().refresh(stored);
+        UniverseQuestService.get().joinAdded(added.getOrDefault(UniverseQuestService.UNIVERSE_INDEX_KEY, Set.of()));
+        WorldGroupIndex.get().spreadAdded(added);
     }
 
     @Nonnull
