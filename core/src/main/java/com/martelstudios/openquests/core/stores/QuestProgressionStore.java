@@ -75,7 +75,7 @@ public class QuestProgressionStore {
             return;
         }
 
-        if (quest.isCompleted() && quest.isStopOnComplete()) {
+        if (quest.isOver()) {
             archived.put(quest.getId(), quest);
         } else {
             quests.put(quest.getId(), quest);

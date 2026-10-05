@@ -4,6 +4,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.replication.Membership;
 import com.martelstudios.openquests.core.replication.Replica;
+import com.martelstudios.openquests.core.replication.StoredState;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.jupiter.api.io.TempDir;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
@@ -175,7 +177,7 @@ class JdbcQuestStorageTest {
 
         storage.saveProgressions(List.of(quest));
 
-        quest.setCounter(42).setState(QuestState.SUCCESSFUL);
+        quest.setCounter(42).restoreStoredState(new StoredState(QuestState.SUCCESSFUL, Instant.now(), 1));
         storage.saveProgressions(List.of(quest));
 
         assertEquals(1, storage.loadAllProgressions().size());
@@ -456,7 +458,7 @@ class JdbcQuestStorageTest {
         target.saveProgressions(List.of(quest));
 
         // Twice, so the upsert is the statement being tested rather than the insert
-        quest.setCounter(9).setState(QuestState.SUCCESSFUL);
+        quest.setCounter(9).restoreStoredState(new StoredState(QuestState.SUCCESSFUL, Instant.now(), 1));
         target.saveProgressions(List.of(quest));
 
         AbstractQuestProgression<?> read = target.loadProgression(quest.getId());
@@ -520,7 +522,7 @@ class JdbcQuestStorageTest {
     }
 
     @Test
-    void onlyOneServerEndsAQuest() {
+    void onlyOneServerMakesAChangeOfState() {
         String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
         QuestStorage onA = open(url, "a");
         QuestStorage onB = open(url, "b");
@@ -530,13 +532,12 @@ class JdbcQuestStorageTest {
             onA.saveProgressions(List.of(quest));
             TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
 
-            quest.setState(QuestState.SUCCESSFUL);
+            assertNull(change(onA, quest, QuestState.SUCCESSFUL));
+            assertEquals(QuestState.SUCCESSFUL, change(onB, copyOnB, QuestState.FAILED).state());
+            assertEquals(QuestState.SUCCESSFUL, copyOnB.getState());
+
+            // Whatever its own replica says, a copy read back stands where the claims left it
             copyOnB.setState(QuestState.FAILED);
-
-            assertNull(onA.claimEnd(quest));
-            assertEquals(QuestState.SUCCESSFUL, onB.claimEnd(copyOnB));
-
-            // Whatever its own replica says, a copy read back ends the way the claim did
             onB.saveProgressions(List.of(copyOnB));
             assertEquals(QuestState.SUCCESSFUL, onB.loadProgression(quest.getId()).getState());
         } finally {
@@ -556,20 +557,70 @@ class JdbcQuestStorageTest {
             onA.saveProgressions(List.of(quest));
             TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
 
-            quest.setState(QuestState.SUCCESSFUL);
-            assertNull(onA.claimEnd(quest));
+            assertNull(change(onA, quest, QuestState.SUCCESSFUL));
             onA.deleteProgression(quest);
             assertNull(onA.loadProgression(quest.getId()));
 
             // B, still running it, hears of the end, and its own end, even written first, loses
-            assertEquals(QuestState.SUCCESSFUL, onB.pollReplicas(Map.of(quest.getId(), Map.of())).ended().get(quest.getId()));
-            copyOnB.setState(QuestState.FAILED);
+            assertEquals(QuestState.SUCCESSFUL, onB.pollReplicas(Map.of(quest.getId(), Map.of())).states().get(quest.getId()).state());
             onB.saveProgressions(List.of(copyOnB));
-            assertEquals(QuestState.SUCCESSFUL, onB.claimEnd(copyOnB));
+            assertEquals(QuestState.SUCCESSFUL, change(onB, copyOnB, QuestState.FAILED).state());
         } finally {
             onA.close();
             onB.close();
         }
+    }
+
+    @Test
+    void aQuestKeptRunningReopensAndEndsAgainAndACopyBehindFollows() {
+        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        QuestStorage onA = open(url, "a");
+        QuestStorage onB = open(url, "b");
+
+        try {
+            TestQuestProgression quest = quest("Holding");
+            onA.saveProgressions(List.of(quest));
+            TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
+
+            assertNull(change(onA, quest, QuestState.SUCCESSFUL));
+            assertNull(change(onA, quest, QuestState.IN_PROGRESS));
+            assertNull(change(onA, quest, QuestState.FAILED));
+
+            // Three changes behind, B is told where the quest stands rather than making its own
+            StoredState stored = change(onB, copyOnB, QuestState.SUCCESSFUL);
+            assertEquals(QuestState.FAILED, stored.state());
+            assertEquals(3, stored.epoch());
+            assertEquals(QuestState.FAILED, onB.loadProgression(quest.getId()).getState());
+        } finally {
+            onA.close();
+            onB.close();
+        }
+    }
+
+    @Test
+    void aChangeOnlyThisServerMakesIsNeverUndoneByAReload() {
+        TestQuestProgression quest = quest("NeverFailed");
+
+        // A quest this server alone moves claims nothing: where it stands goes out with its replica
+        quest.restoreStoredState(new StoredState(QuestState.SUCCESSFUL, Instant.now(), 1));
+        storage.saveProgressions(List.of(quest));
+        quest.restoreStoredState(new StoredState(QuestState.FAILED, Instant.now(), 2));
+        storage.saveProgressions(List.of(quest));
+        assertEquals(QuestState.FAILED, storage.loadProgression(quest.getId()).getState());
+
+        // An older copy written late never takes it back
+        AbstractQuestProgression<?> late = storage.loadProgression(quest.getId());
+        late.restoreStoredState(new StoredState(QuestState.SUCCESSFUL, Instant.now(), 1));
+        storage.saveProgressions(List.of(late));
+        assertEquals(QuestState.FAILED, storage.loadProgression(quest.getId()).getState());
+
+        // Back to running, it reads back running, with no end date left standing
+        quest.restoreStoredState(new StoredState(QuestState.IN_PROGRESS, null, 3));
+        storage.saveProgressions(List.of(quest));
+        AbstractQuestProgression<?> reopened = storage.loadProgression(quest.getId());
+        assertEquals(QuestState.IN_PROGRESS, reopened.getState());
+        assertNull(reopened.getCompletedAt());
+        assertEquals(3, reopened.getStateEpoch());
     }
 
     @Test
@@ -583,10 +634,10 @@ class JdbcQuestStorageTest {
         onA.saveProgressions(List.of(longAgo, lately, held));
 
         Instant twoDaysAgo = Instant.now().minus(Duration.ofDays(2));
-        longAgo.settle(QuestState.SUCCESSFUL, twoDaysAgo);
-        lately.settle(QuestState.SUCCESSFUL, Instant.now());
-        held.settle(QuestState.SUCCESSFUL, twoDaysAgo);
-        onA.claimEnd(held);
+        longAgo.restoreStoredState(new StoredState(QuestState.SUCCESSFUL, twoDaysAgo, 1));
+        lately.restoreStoredState(new StoredState(QuestState.SUCCESSFUL, Instant.now(), 1));
+        held.restoreStoredState(new StoredState(QuestState.SUCCESSFUL, twoDaysAgo, 1));
+        onA.saveProgressions(List.of(held));
         onA.deleteProgression(longAgo);
         onA.deleteProgression(lately);
         onA.close();
@@ -594,7 +645,7 @@ class JdbcQuestStorageTest {
         QuestStorage onB = open(url, "b");
         try {
             Map<UUID, Map<String, Long>> asked = Map.of(longAgo.getId(), Map.of(), lately.getId(), Map.of(), held.getId(), Map.of());
-            assertEquals(Set.of(lately.getId(), held.getId()), onB.pollReplicas(asked).ended().keySet());
+            assertEquals(Set.of(lately.getId(), held.getId()), onB.pollReplicas(asked).states().keySet());
             assertNotNull(onB.loadProgression(held.getId()));
         } finally {
             onB.close();
@@ -623,9 +674,8 @@ class JdbcQuestStorageTest {
             assertEquals(1, second.changed().size());
             assertTrue(second.changed().getFirst().revision() > seen);
 
-            quest.setState(QuestState.SUCCESSFUL);
-            onA.claimEnd(quest);
-            assertEquals(QuestState.SUCCESSFUL, onB.pollReplicas(Map.of(quest.getId(), Map.of("a", Long.MAX_VALUE))).ended().get(quest.getId()));
+            change(onA, quest, QuestState.SUCCESSFUL);
+            assertEquals(new StoredState(QuestState.SUCCESSFUL, quest.getCompletedAt(), 1), onB.pollReplicas(Map.of(quest.getId(), Map.of("a", Long.MAX_VALUE))).states().get(quest.getId()));
 
             // Nothing of a server's own replicas comes back to it
             assertTrue(onA.pollReplicas(Map.of(quest.getId(), Map.of())).changed().isEmpty());
@@ -689,6 +739,23 @@ class JdbcQuestStorageTest {
 
         storage.savePlayer(playerId, record, delivered);
         return storage.loadPlayer(playerId);
+    }
+
+    /**
+     * Moves a copy the way a quest changing state does: claimed from the epoch it stood at, then
+     * put where the storage says it stands, its own change or the one another server made first.
+     *
+     * @return {@code null} if the change was this copy's to make.
+     */
+    @Nullable
+    private static StoredState change(@Nonnull QuestStorage on, @Nonnull TestQuestProgression quest, @Nonnull QuestState state) {
+        long from = quest.getStateEpoch();
+        Instant at = state == QuestState.IN_PROGRESS ? null : Instant.ofEpochMilli(System.currentTimeMillis());
+        quest.restoreStoredState(new StoredState(state, at, from));
+
+        StoredState stored = on.claimState(quest);
+        quest.restoreStoredState(stored != null ? stored : new StoredState(state, at, from + 1));
+        return stored;
     }
 
     @Nonnull

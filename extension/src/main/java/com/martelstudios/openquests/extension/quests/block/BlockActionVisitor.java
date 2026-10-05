@@ -31,7 +31,7 @@ public class BlockActionVisitor implements QuestVisitor<BlockActionQuestProgress
     @Override
     public void progress(BlockActionQuestProgression<?> quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.isCompleted() && quest.isStopOnComplete()) return;
+        if (quest.isOver()) return;
 
         if (!quest.getBlockFilter().matches(blockId)) return;
         if (!quest.act(playerId, action, placedByPlayer)) return;

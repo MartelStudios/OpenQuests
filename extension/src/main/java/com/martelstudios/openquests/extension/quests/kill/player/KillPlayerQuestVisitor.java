@@ -27,7 +27,7 @@ public class KillPlayerQuestVisitor implements QuestVisitor<KillPlayerQuestProgr
     @Override
     public void progress(KillPlayerQuestProgression quest) {
         if (!quest.getPlayers().contains(killerId)) return;
-        if (quest.isCompleted() && quest.isStopOnComplete()) return;
+        if (quest.isOver()) return;
         if (!quest.matchesVictim(victim)) return;
 
         quest.addQuantity(1)

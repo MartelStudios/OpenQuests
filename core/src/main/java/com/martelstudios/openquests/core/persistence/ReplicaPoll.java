@@ -1,6 +1,6 @@
 package com.martelstudios.openquests.core.persistence;
 
-import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.replication.StoredState;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -11,9 +11,9 @@ import java.util.UUID;
  * What other servers wrote since a reader last looked.
  *
  * @param changed the replicas written since, each with its revision
- * @param ended the outcome claimed for each quest asked about that has ended
+ * @param states where each quest asked about stands, which a copy takes in if it is later news
  */
-public record ReplicaPoll(@Nonnull List<QuestReplica> changed, @Nonnull Map<UUID, QuestState> ended) {
+public record ReplicaPoll(@Nonnull List<QuestReplica> changed, @Nonnull Map<UUID, StoredState> states) {
 
     /**
      * Nothing written since.

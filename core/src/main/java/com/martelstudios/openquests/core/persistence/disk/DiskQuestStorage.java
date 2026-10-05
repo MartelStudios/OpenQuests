@@ -6,7 +6,6 @@ import com.hypixel.hytale.server.core.universe.datastore.DiskDataStore;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.AssignmentRecords;
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.PlayerMessage;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestProgressionRecord;
@@ -14,6 +13,7 @@ import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.ReplicaPoll;
 import com.martelstudios.openquests.core.replication.Replica;
+import com.martelstudios.openquests.core.replication.StoredState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -198,12 +198,12 @@ public class DiskQuestStorage implements QuestStorage {
     }
 
     /**
-     * Nobody else writes these files, so the outcome this server reached is the outcome: it is
-     * written with the quest by the next save.
+     * Nobody else writes these files, so where this server moved the quest is where it stands: it
+     * is written with the quest by the next save.
      */
     @Nullable
     @Override
-    public QuestState claimEnd(@Nonnull AbstractQuestProgression<?> quest) {
+    public StoredState claimState(@Nonnull AbstractQuestProgression<?> quest) {
         return null;
     }
 

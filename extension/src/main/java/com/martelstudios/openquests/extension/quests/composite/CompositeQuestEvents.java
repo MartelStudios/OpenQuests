@@ -18,12 +18,16 @@ public final class CompositeQuestEvents {
 
     /**
      * A group listens to its children for as long as it is in the store. A running one brings
-     * them in with it, so a player joining it, or a server following its index, reaches them too.
+     * them in with it, so a player joining it, or a server following its index, reaches them too,
+     * and writes down where they stand rather than what its replicas remembered.
      */
     public static void handleQuestLoaded(@Nonnull QuestLoadedEvent event) {
         if (!(event.getQuest() instanceof CompositeQuestProgression composite)) return;
 
-        if (!composite.isCompleted()) QuestProgressionService.get().loadQuests(Arrays.asList(composite.getChildIds()));
+        if (!composite.isCompleted()) {
+            QuestProgressionService.get().loadQuests(Arrays.asList(composite.getChildIds()));
+            if (composite.reconcileOutcomes()) composite.markDirty();
+        }
         composite.listenToChildren();
     }
 

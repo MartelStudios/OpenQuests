@@ -7,7 +7,6 @@ import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestReplica;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.ReplicaPoll;
@@ -21,7 +20,6 @@ import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,8 +38,8 @@ import java.util.concurrent.TimeUnit;
  * Keeps what several servers share in step, on a thread of its own so no game thread waits on the
  * storage: every few seconds it writes this server's replicas of the shared quests, reads the
  * others' and merges them in, follows the shared indexes, and takes in the messages left for the
- * players hosted here. It also claims the ends of shared quests, and runs whatever else is read
- * off the game threads, such as a world's quests as it starts.
+ * players hosted here. It also claims every change of state of the shared quests, and runs
+ * whatever else is read off the game threads, such as a world's quests as it starts.
  */
 public class QuestReplicationService implements ScopeIndexes.Writer {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -75,7 +73,7 @@ public class QuestReplicationService implements ScopeIndexes.Writer {
         this.progressionStore = progressionStore;
         this.intervalSeconds = Math.max(1, intervalSeconds);
 
-        QuestEnds.setArbiter(this::claim);
+        QuestTransitions.setArbiter(this::claim);
     }
 
     public static QuestReplicationService get() {
@@ -168,26 +166,23 @@ public class QuestReplicationService implements ScopeIndexes.Writer {
     }
 
     /**
-     * A quest only this server holds is ended here, the outcome written off the game thread for
-     * whoever queries the storage. A shared one is ended by whichever server claims it first; this
-     * server, winning, first takes in who else holds it, so that every one of them is paid.
+     * A quest only this server holds needs nobody's agreement: where it stands goes out with its next
+     * write. A shared one moves the way whichever server claims the change first moves it; this
+     * server, ending it, first takes in who else holds it, so that every one of them is paid.
      */
     @Nullable
-    private QuestState claim(@Nonnull AbstractQuestProgression<?> quest) {
-        if (!storage.isShared()) return null;
-
-        if (!isReplicated(quest)) {
-            execute("the end of quest " + quest.getId(), () -> storage.claimEnd(quest));
-            return null;
-        }
+    private StoredState claim(@Nonnull AbstractQuestProgression<?> quest) {
+        if (!isReplicated(quest)) return null;
 
         try {
-            QuestState claimed = storage.claimEnd(quest);
-            if (claimed == null) apply(storage.pollReplicas(Map.of(quest.getId(), seenOf(quest.getId()))));
-            return claimed;
+            StoredState stored = storage.claimState(quest);
+            // Who else holds it, not where it stands: this very claim is that, and the quest takes it in
+            // once it returns
+            if (stored == null && quest.isCompleted()) mergeReplicas(storage.pollReplicas(Map.of(quest.getId(), seenOf(quest.getId()))).changed());
+            return stored;
         } catch (RuntimeException e) {
-            // A storage out of reach does not stop the game: this server ends the quest, as it would alone
-            LOGGER.atWarning().withCause(e).log("Failed to claim the end of quest %s, ending it here", quest.getId());
+            // A storage out of reach does not stop the game: this server makes the change, as it would alone
+            LOGGER.atWarning().withCause(e).log("Failed to claim a change of state of quest %s, making it here", quest.getId());
             return null;
         }
     }
@@ -196,7 +191,7 @@ public class QuestReplicationService implements ScopeIndexes.Writer {
         try {
             List<AbstractQuestProgression<?>> shared = new ArrayList<>();
             for (AbstractQuestProgression<?> quest : QuestProgressionService.get().getAllQuests()) {
-                if (isReplicated(quest) && !quest.isCompleted()) shared.add(quest);
+                if (isReplicated(quest)) shared.add(quest);
             }
 
             // What was seen of quests no longer running here is of no use any more
@@ -206,7 +201,9 @@ public class QuestReplicationService implements ScopeIndexes.Writer {
 
             // Written first, so that what this server did reaches the others a tick sooner
             progressionStore.save(shared);
-            apply(storage.pollReplicas(seenOf(shared)));
+            ReplicaPoll poll = storage.pollReplicas(seenOf(shared));
+            mergeReplicas(poll.changed());
+            adoptStates(poll.states());
 
             followIndexes();
 
@@ -219,11 +216,10 @@ public class QuestReplicationService implements ScopeIndexes.Writer {
     }
 
     /**
-     * Merges in what other servers wrote, telling the players who see it, and ends the quests one
-     * of them ended.
+     * Merges in what other servers wrote, telling the players who see it.
      */
-    private void apply(@Nonnull ReplicaPoll poll) {
-        for (QuestReplica replica : poll.changed()) {
+    private void mergeReplicas(@Nonnull List<QuestReplica> changed) {
+        for (QuestReplica replica : changed) {
             seen.computeIfAbsent(replica.questId(), id -> new ConcurrentHashMap<>()).merge(replica.serverId(), replica.revision(), Math::max);
 
             AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(replica.questId());
@@ -234,10 +230,15 @@ public class QuestReplicationService implements ScopeIndexes.Writer {
                         .dispatchFor(QuestUpdatedEvent.class, quest.getId())
                         .dispatch(new QuestUpdatedEvent(quest));
         }
+    }
 
-        poll.ended().forEach((questId, outcome) -> {
+    /**
+     * Moves the quests running here to where the storage says they stand, when that is later news.
+     */
+    private void adoptStates(@Nonnull Map<UUID, StoredState> states) {
+        states.forEach((questId, stored) -> {
             AbstractQuestProgression<?> quest = QuestProgressionService.get().getLiveQuest(questId);
-            if (quest != null) quest.endAsClaimed(outcome, Instant.now());
+            if (quest != null) quest.adoptStoredState(stored);
         });
     }
 

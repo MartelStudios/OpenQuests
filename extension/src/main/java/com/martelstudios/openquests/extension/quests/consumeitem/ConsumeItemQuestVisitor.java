@@ -24,7 +24,7 @@ public class ConsumeItemQuestVisitor implements QuestVisitor<ConsumeItemQuestPro
     @Override
     public void progress(ConsumeItemQuestProgression quest) {
         if (!quest.getPlayers().contains(playerId)) return;
-        if (quest.isCompleted() && quest.isStopOnComplete()) return;
+        if (quest.isOver()) return;
 
         if (!quest.getItemToConsume().matches(itemId)) return;
 
