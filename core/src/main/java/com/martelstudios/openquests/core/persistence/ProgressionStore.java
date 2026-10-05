@@ -52,22 +52,20 @@ public interface ProgressionStore {
     /**
      * Does away with a quest, every replica and every link to it. Takes the quest rather than its
      * id: a backend may need the players it named, and nothing else still knows who they were.
+     *
+     * <p>A backend several servers share keeps an ended quest's outcome a while longer: a server
+     * still running the quest learns it ended, rather than ending it a second time.
      */
     void deleteProgression(@Nonnull AbstractQuestProgression<?> quest);
 
     /**
      * Ends a quest for every server at once, with the outcome and moment the quest carries.
      *
-     * @return whether this server's outcome is the one written; {@code false} if another server
-     * ended it first, which {@link #loadEnd} then reads.
-     */
-    boolean claimEnd(@Nonnull AbstractQuestProgression<?> quest);
-
-    /**
-     * @return the outcome a server claimed for that quest, {@code null} while it runs.
+     * @return {@code null} if this server's outcome is the one written, otherwise the outcome
+     * another server claimed first.
      */
     @Nullable
-    QuestState loadEnd(@Nonnull UUID questId);
+    QuestState claimEnd(@Nonnull AbstractQuestProgression<?> quest);
 
     /**
      * What other servers wrote of these quests since what was last seen of them: the replicas

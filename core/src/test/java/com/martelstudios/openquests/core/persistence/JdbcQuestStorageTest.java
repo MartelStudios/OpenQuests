@@ -22,6 +22,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.stream.Collectors;
 import java.util.HashMap;
@@ -532,15 +533,70 @@ class JdbcQuestStorageTest {
             quest.setState(QuestState.SUCCESSFUL);
             copyOnB.setState(QuestState.FAILED);
 
-            assertTrue(onA.claimEnd(quest));
-            assertFalse(onB.claimEnd(copyOnB));
-            assertEquals(QuestState.SUCCESSFUL, onB.loadEnd(quest.getId()));
+            assertNull(onA.claimEnd(quest));
+            assertEquals(QuestState.SUCCESSFUL, onB.claimEnd(copyOnB));
 
             // Whatever its own replica says, a copy read back ends the way the claim did
             onB.saveProgressions(List.of(copyOnB));
             assertEquals(QuestState.SUCCESSFUL, onB.loadProgression(quest.getId()).getState());
         } finally {
             onA.close();
+            onB.close();
+        }
+    }
+
+    @Test
+    void aQuestDoneAwayWithOnceEndedStaysEndedForTheOthers() {
+        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        QuestStorage onA = open(url, "a");
+        QuestStorage onB = open(url, "b");
+
+        try {
+            TestQuestProgression quest = quest("Unheld");
+            onA.saveProgressions(List.of(quest));
+            TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
+
+            quest.setState(QuestState.SUCCESSFUL);
+            assertNull(onA.claimEnd(quest));
+            onA.deleteProgression(quest);
+            assertNull(onA.loadProgression(quest.getId()));
+
+            // B, still running it, hears of the end, and its own end, even written first, loses
+            assertEquals(QuestState.SUCCESSFUL, onB.pollReplicas(Map.of(quest.getId(), Map.of())).ended().get(quest.getId()));
+            copyOnB.setState(QuestState.FAILED);
+            onB.saveProgressions(List.of(copyOnB));
+            assertEquals(QuestState.SUCCESSFUL, onB.claimEnd(copyOnB));
+        } finally {
+            onA.close();
+            onB.close();
+        }
+    }
+
+    @Test
+    void anOutcomeNobodyNeedsAnyMoreIsDroppedAtStart() {
+        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        QuestStorage onA = open(url, "a");
+
+        TestQuestProgression longAgo = quest("LongAgo");
+        TestQuestProgression lately = quest("Lately");
+        TestQuestProgression held = quest("Held", UUID.randomUUID());
+        onA.saveProgressions(List.of(longAgo, lately, held));
+
+        Instant twoDaysAgo = Instant.now().minus(Duration.ofDays(2));
+        longAgo.settle(QuestState.SUCCESSFUL, twoDaysAgo);
+        lately.settle(QuestState.SUCCESSFUL, Instant.now());
+        held.settle(QuestState.SUCCESSFUL, twoDaysAgo);
+        onA.claimEnd(held);
+        onA.deleteProgression(longAgo);
+        onA.deleteProgression(lately);
+        onA.close();
+
+        QuestStorage onB = open(url, "b");
+        try {
+            Map<UUID, Map<String, Long>> asked = Map.of(longAgo.getId(), Map.of(), lately.getId(), Map.of(), held.getId(), Map.of());
+            assertEquals(Set.of(lately.getId(), held.getId()), onB.pollReplicas(asked).ended().keySet());
+            assertNotNull(onB.loadProgression(held.getId()));
+        } finally {
             onB.close();
         }
     }

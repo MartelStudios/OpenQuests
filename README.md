@@ -326,7 +326,9 @@ shared without any of them overwriting another:
   over, and the players see the progress made elsewhere.
 - **An end is claimed once.** The first server to end a shared quest writes its outcome; it pays
   every player, and a player another server hosts finds the reward in a message that server takes
-  in. A server learning of the end files the quest and tells its own players, but pays nothing.
+  in. A server learning of the end files the quest and tells its own players, but pays nothing. An
+  ended quest nobody holds keeps its outcome for a day, so a server that has not heard yet learns
+  of the end rather than ending the quest a second time.
 - **Indexes are written member by member** and followed the same way, so a universe quest one
   server starts reaches the players of every other. A quest is written before any index lists it,
   so a server following the index always finds the quest.
@@ -387,9 +389,9 @@ QuestStorageProvider.CODEC.register("Redis", RedisStorageProvider.class, RedisSt
 The provider builds a `QuestStorage`, which is every port at once. Keep the guarantees the ports
 state, since several servers rely on them: a server writes only its own replica of a quest, an index
 only member by member, a player record only while it hosts the player; a claim, of an assignment
-hand-out or of a quest's end, writes only if nothing else wrote first; a message is let go of in
-the same write as the record that took it in. `isShared()` says whether other servers may write the
-backend at once.
+hand-out or of a quest's end, writes only if nothing else wrote first; an ended quest done away with
+leaves its outcome readable a while longer; a message is let go of in the same write as the record
+that took it in. `isShared()` says whether other servers may write the backend at once.
 
 ### Lifecycle
 

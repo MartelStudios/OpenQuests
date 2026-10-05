@@ -160,11 +160,9 @@ public class QuestReplicationService {
         }
 
         try {
-            if (storage.claimEnd(quest)) {
-                apply(storage.pollReplicas(Map.of(quest.getId(), seenOf(quest.getId()))));
-                return null;
-            }
-            return storage.loadEnd(quest.getId());
+            QuestState claimed = storage.claimEnd(quest);
+            if (claimed == null) apply(storage.pollReplicas(Map.of(quest.getId(), seenOf(quest.getId()))));
+            return claimed;
         } catch (RuntimeException e) {
             // A storage out of reach does not stop the game: this server ends the quest, as it would alone
             LOGGER.atWarning().withCause(e).log("Failed to claim the end of quest %s, ending it here", quest.getId());
