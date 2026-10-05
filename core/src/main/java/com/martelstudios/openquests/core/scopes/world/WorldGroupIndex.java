@@ -122,7 +122,7 @@ public class WorldGroupIndex {
             dirtyGroups.remove(group);
 
             QuestsRecord record = groups.get(group);
-            if (record != null) storage.saveIndex(keyOf(group), record.getAllIds());
+            if (record != null) record.flush(storage, keyOf(group));
         }
     }
 
@@ -132,7 +132,8 @@ public class WorldGroupIndex {
         if (record != null) return record;
 
         // Read outside the map's lock, which a slow storage would otherwise hold for every group
-        QuestsRecord read = new QuestsRecord(storage.loadIndex(keyOf(group)));
+        QuestsRecord read = new QuestsRecord();
+        read.load(storage.loadIndex(keyOf(group)));
         QuestsRecord raced = groups.putIfAbsent(group, read);
         return raced != null ? raced : read;
     }

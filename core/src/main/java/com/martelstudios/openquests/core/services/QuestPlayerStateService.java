@@ -13,6 +13,7 @@ import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.persistence.PlayerMessage;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
@@ -74,6 +75,13 @@ public class QuestPlayerStateService {
 
         PlayerQuestRecord record = storage.loadPlayer(playerId);
 
+        // What other servers left them while they were away, let go of once the record holding it is written
+        Set<UUID> delivered = ConcurrentHashMap.newKeySet();
+        for (PlayerMessage message : storage.loadMessages(List.of(playerId))) {
+            message.applyTo(record);
+            delivered.add(message.getId());
+        }
+
         List<AbstractQuestProgression<?>> held = progressionStore.loadForPlayer(playerId);
 
         Set<UUID> resolved = new HashSet<>(held.size());
@@ -96,7 +104,7 @@ public class QuestPlayerStateService {
         PendingRewardStoreComponent rewards = holder.ensureAndGetComponent(PendingRewardStoreComponent.getComponentType());
         rewards.pending.restore(record.getPendingRewards());
 
-        sessions.put(playerId, new Session(questStore, rewards));
+        sessions.put(playerId, new Session(questStore, rewards, delivered));
     }
 
     /**
@@ -148,21 +156,23 @@ public class QuestPlayerStateService {
         progressionStore.save(progressionStore.resolveAll(questIds));
 
         // Cleared only after the write, so one that fails leaves the player owed another pass
-        boolean changed = questStore.hasChanges() || rewards.hasChanges();
+        Set<UUID> delivered = Set.copyOf(session.delivered());
+        boolean changed = questStore.hasChanges() || rewards.hasChanges() || !delivered.isEmpty();
         if (!changed && !force) return;
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(questIds, questStore.getAssignments().snapshot(), rewards.snapshot(), questStore.getCompletions()));
+        storage.savePlayer(playerId, new PlayerQuestRecord(questIds, questStore.getAssignments().snapshot(), rewards.snapshot(), questStore.getCompletions()), delivered);
+        session.delivered().removeAll(delivered);
 
         questStore.consumeChanges();
         rewards.consumeChanges();
     }
 
     /**
-     * Writes down what an offline player is owed. Nothing holds their components while they are
-     * away, so the storage is the only place a debt can wait for them.
+     * Leaves a debt for a player this server does not host: whichever server hosts them, now or
+     * next, takes it into their record. Their record is never written from here.
      */
     public void addPendingRewards(@Nonnull UUID playerId, @Nonnull PendingRewards owed) {
-        storage.addPendingRewards(playerId, owed);
+        storage.postMessage(PlayerMessage.owed(playerId, owed));
     }
 
     /**
@@ -198,8 +208,8 @@ public class QuestPlayerStateService {
     }
 
     /**
-     * Into the session of an online player, written with the rest of their record; straight into
-     * the storage for one nobody is holding.
+     * Into the session of a player this server hosts, written with the rest of their record; left
+     * as a message for one it does not.
      */
     private void recordCompletion(@Nonnull UUID playerId, @Nonnull String assetId, @Nonnull QuestState outcome, @Nonnull AbstractQuestProgression<?> quest) {
         Session session = sessions.get(playerId);
@@ -208,7 +218,7 @@ public class QuestPlayerStateService {
             return;
         }
 
-        storage.recordCompletion(playerId, assetId, outcome, quest.getStartedAt(), quest.getCompletedAt());
+        storage.postMessage(PlayerMessage.ended(playerId, assetId, outcome, quest.getStartedAt(), quest.getCompletedAt()));
     }
 
     /**
@@ -237,7 +247,8 @@ public class QuestPlayerStateService {
     }
 
     /**
-     * What one player's session holds, as the components themselves rather than a way back to them.
+     * What one player's session holds, as the components themselves rather than a way back to them,
+     * and the messages taken into them that the next write lets go of.
      */
-    private record Session(@Nonnull QuestStoreComponent questStore, @Nonnull PendingRewardStoreComponent rewards) {}
+    private record Session(@Nonnull QuestStoreComponent questStore, @Nonnull PendingRewardStoreComponent rewards, @Nonnull Set<UUID> delivered) {}
 }

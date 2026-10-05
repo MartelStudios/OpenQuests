@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.core.persistence.jdbc;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Locale;
 
 /**
@@ -16,8 +17,8 @@ public enum SqlDialect {
     SQLITE("sqlite", "TEXT"),
 
     /**
-     * Takes {@code ON CONFLICT DO NOTHING} and no further, so it goes the long way round like a
-     * database this build has never heard of.
+     * Spells neither upsert nor {@code ON CONFLICT} in its default mode, so it goes the long way
+     * round like a database this build has never heard of.
      */
     H2("h2", "TEXT"),
 
@@ -72,6 +73,24 @@ public enum SqlDialect {
      */
     public boolean supportsUpsert() {
         return this != GENERIC && this != H2;
+    }
+
+    /**
+     * An insert leaving a row already under the same key as it is, which is how a member is added
+     * to a set two servers write: the second add is no error.
+     *
+     * @param columns the columns bound, comma separated, one placeholder each
+     * @return the statement, {@code null} where the dialect has none and the caller looks first.
+     */
+    @Nullable
+    public String insertIgnoring(@Nonnull String table, @Nonnull String columns) {
+        String values = " (" + columns + ") VALUES (" + "?, ".repeat(columns.split(",").length - 1) + "?)";
+
+        return switch (this) {
+            case MYSQL, MARIADB -> "INSERT IGNORE INTO " + table + values;
+            case GENERIC, H2 -> null;
+            default -> "INSERT INTO " + table + values + " ON CONFLICT DO NOTHING";
+        };
     }
 
     /**

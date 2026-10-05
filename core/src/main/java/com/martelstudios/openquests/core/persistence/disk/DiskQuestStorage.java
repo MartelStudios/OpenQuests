@@ -7,11 +7,13 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.AssignmentRecords;
 import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.persistence.PlayerMessage;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestProgressionRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
-import com.martelstudios.openquests.core.rewards.models.PendingRewards;
+import com.martelstudios.openquests.core.persistence.ReplicaPoll;
+import com.martelstudios.openquests.core.replication.Replica;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,9 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,9 +37,10 @@ import java.util.function.Consumer;
 
 /**
  * The quests as JSON files under the universe directory, which is where a server with no database
- * keeps them. Three directories: one file per progression, one per player, one per scope index.
+ * keeps them: one file per progression, per player, per index, per shared holder, per message.
  *
- * <p>A progression gets a file of its own whoever holds it.
+ * <p>Written by one server only, so a progression's file is that server's one replica, and every
+ * claim goes through.
  */
 public class DiskQuestStorage implements QuestStorage {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -53,15 +56,15 @@ public class DiskQuestStorage implements QuestStorage {
     private final Map<UUID, Object> playerLocks = new ConcurrentHashMap<>();
 
     /**
-     * One lock per shared holder, so reading a record and writing the next is one step for this
-     * server. A server is all a disk store is ever written by.
+     * One lock per index and per shared holder, so reading a file and writing it back is one step.
      */
-    private final Map<String, Object> assignmentLocks = new ConcurrentHashMap<>();
+    private final Map<String, Object> keyLocks = new ConcurrentHashMap<>();
 
     private DiskDataStore<QuestProgressionRecord> progressions;
     private DiskDataStore<PlayerQuestRecord> players;
     private DiskDataStore<QuestIndexRecord> indexes;
     private DiskDataStore<AssignmentRecordsFile> assignments;
+    private DiskDataStore<PlayerMessage> messages;
 
     public DiskQuestStorage(@Nonnull String rootPath) {
         this.rootPath = rootPath;
@@ -73,12 +76,14 @@ public class DiskQuestStorage implements QuestStorage {
         players = new DiskDataStore<>(child("players"), PlayerQuestRecord.CODEC);
         indexes = new DiskDataStore<>(child("indexes"), QuestIndexRecord.CODEC);
         assignments = new DiskDataStore<>(child("assignments"), AssignmentRecordsFile.CODEC);
+        messages = new DiskDataStore<>(child("messages"), PlayerMessage.CODEC);
 
         // list() and loadAll() walk a directory stream, which throws on one that is not there yet
         createDirectory(progressions.getPath());
         createDirectory(players.getPath());
         createDirectory(indexes.getPath());
         createDirectory(assignments.getPath());
+        createDirectory(messages.getPath());
 
         LOGGER.atInfo().log("Quest storage: JSON files under %s", rootPath);
     }
@@ -92,6 +97,17 @@ public class DiskQuestStorage implements QuestStorage {
     @Override
     public String getId() {
         return ID;
+    }
+
+    @Nonnull
+    @Override
+    public String getReplicaId() {
+        return Replica.DEFAULT_ID;
+    }
+
+    @Override
+    public boolean isShared() {
+        return false;
     }
 
     @Nullable
@@ -118,6 +134,21 @@ public class DiskQuestStorage implements QuestStorage {
             if (quest != null) quests.add(quest);
         }
         return quests;
+    }
+
+    /**
+     * Through the player's file, which names their quests; the quest has the last word on whether
+     * they still hold it.
+     */
+    @Nonnull
+    @Override
+    public List<AbstractQuestProgression<?>> loadPlayerProgressions(@Nonnull UUID playerId) {
+        List<AbstractQuestProgression<?>> held = new ArrayList<>();
+
+        for (AbstractQuestProgression<?> quest : loadProgressions(loadPlayer(playerId).getQuestIds())) {
+            if (quest.getPlayers().contains(playerId) || quest.getAbandonedPlayers().contains(playerId)) held.add(quest);
+        }
+        return held;
     }
 
     @Nonnull
@@ -164,6 +195,28 @@ public class DiskQuestStorage implements QuestStorage {
         for (UUID playerId : holders(quest)) {
             updatePlayer(playerId, record -> record.getQuestIds().remove(questId));
         }
+    }
+
+    /**
+     * Nobody else writes these files, so the outcome this server reached is the outcome: it is
+     * written with the quest by the next save.
+     */
+    @Override
+    public boolean claimEnd(@Nonnull AbstractQuestProgression<?> quest) {
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public QuestState loadEnd(@Nonnull UUID questId) {
+        AbstractQuestProgression<?> quest = loadProgression(questId);
+        return quest == null || !quest.isCompleted() ? null : quest.getState();
+    }
+
+    @Nonnull
+    @Override
+    public ReplicaPoll pollReplicas(@Nonnull Map<UUID, Map<String, Long>> known) {
+        return ReplicaPoll.NONE;
     }
 
     /**
@@ -227,15 +280,30 @@ public class DiskQuestStorage implements QuestStorage {
             record = indexes.load(fileName(indexKey));
         } catch (IOException e) {
             LOGGER.atWarning().withCause(e).log("Failed to read the %s quest index", indexKey);
-            return Set.of();
+            return new HashSet<>();
         }
 
-        return record == null ? Set.of() : record.getQuestIds();
+        return record == null ? new HashSet<>() : new HashSet<>(record.getQuestIds());
+    }
+
+    @Nonnull
+    @Override
+    public Map<String, Set<UUID>> loadIndexes(@Nonnull Collection<String> indexKeys) {
+        Map<String, Set<UUID>> loaded = new HashMap<>();
+        for (String indexKey : indexKeys) loaded.put(indexKey, loadIndex(indexKey));
+        return loaded;
     }
 
     @Override
-    public void saveIndex(@Nonnull String indexKey, @Nonnull Set<UUID> questIds) {
-        indexes.save(fileName(indexKey), new QuestIndexRecord(questIds));
+    public void addToIndex(@Nonnull String indexKey, @Nonnull Collection<UUID> questIds) {
+        if (questIds.isEmpty()) return;
+        updateIndex(indexKey, ids -> ids.addAll(questIds));
+    }
+
+    @Override
+    public void removeFromIndex(@Nonnull String indexKey, @Nonnull Collection<UUID> questIds) {
+        if (questIds.isEmpty()) return;
+        updateIndex(indexKey, ids -> ids.removeAll(questIds));
     }
 
     /**
@@ -243,12 +311,30 @@ public class DiskQuestStorage implements QuestStorage {
      */
     @Override
     public void deleteIndex(@Nonnull String indexKey) {
-        try {
-            indexes.remove(fileName(indexKey));
-        } catch (NoSuchFileException e) {
-            // Never written: a world nobody played a quest in
-        } catch (IOException e) {
-            LOGGER.atWarning().withCause(e).log("Failed to delete the %s quest index", indexKey);
+        synchronized (lockOf(indexKey)) {
+            try {
+                indexes.remove(fileName(indexKey));
+            } catch (NoSuchFileException e) {
+                // Never written: a world nobody played a quest in
+            } catch (IOException e) {
+                LOGGER.atWarning().withCause(e).log("Failed to delete the %s quest index", indexKey);
+            }
+        }
+    }
+
+    /**
+     * An index left empty loses its file, as a deleted one does.
+     */
+    private void updateIndex(@Nonnull String indexKey, @Nonnull Consumer<Set<UUID>> change) {
+        synchronized (lockOf(indexKey)) {
+            Set<UUID> ids = loadIndex(indexKey);
+            change.accept(ids);
+
+            if (ids.isEmpty()) {
+                deleteIndex(indexKey);
+            } else {
+                indexes.save(fileName(indexKey), new QuestIndexRecord(ids));
+            }
         }
     }
 
@@ -260,7 +346,7 @@ public class DiskQuestStorage implements QuestStorage {
 
     @Override
     public boolean claimAssignment(@Nonnull String holderKey, @Nonnull String assignmentId, @Nonnull String questAssetId, @Nullable AssignmentRecord expected, @Nonnull AssignmentRecord next) {
-        synchronized (assignmentLocks.computeIfAbsent(holderKey, key -> new Object())) {
+        synchronized (lockOf("assignments/" + holderKey)) {
             AssignmentRecords records = new AssignmentRecords(readAssignments(holderKey));
             if (!Objects.equals(records.get(assignmentId, questAssetId), expected)) return false;
 
@@ -275,7 +361,7 @@ public class DiskQuestStorage implements QuestStorage {
      */
     @Override
     public void deleteAssignments(@Nonnull String holderKey) {
-        synchronized (assignmentLocks.computeIfAbsent(holderKey, key -> new Object())) {
+        synchronized (lockOf("assignments/" + holderKey)) {
             try {
                 assignments.remove(fileName(holderKey));
             } catch (NoSuchFileException e) {
@@ -311,24 +397,62 @@ public class DiskQuestStorage implements QuestStorage {
         return record == null ? new PlayerQuestRecord() : record;
     }
 
+    /**
+     * The record first, then the messages it took in: a server stopping in between would take
+     * those in again next time, which a debt replacing its own copy and a disk written by one
+     * server make rare enough.
+     */
     @Override
-    public void savePlayer(@Nonnull UUID playerId, @Nonnull PlayerQuestRecord record) {
+    public void savePlayer(@Nonnull UUID playerId, @Nonnull PlayerQuestRecord record, @Nonnull Collection<UUID> delivered) {
         synchronized (playerLocks.computeIfAbsent(playerId, id -> new Object())) {
             players.save(playerId.toString(), record);
+        }
+
+        for (UUID messageId : delivered) {
+            try {
+                messages.remove(messageFile(playerId, messageId));
+            } catch (NoSuchFileException e) {
+                // Let go of already
+            } catch (IOException e) {
+                LOGGER.atWarning().withCause(e).log("Failed to let go of message %s of player %s", messageId, playerId);
+            }
         }
     }
 
     @Override
-    public void addPendingRewards(@Nonnull UUID playerId, @Nonnull PendingRewards owed) {
-        updatePlayer(playerId, record -> {
-            record.getPendingRewards().remove(owed);
-            record.getPendingRewards().add(owed);
-        });
+    public void postMessage(@Nonnull PlayerMessage message) {
+        messages.save(messageFile(message.getPlayerId(), message.getId()), message);
     }
 
+    @Nonnull
     @Override
-    public void recordCompletion(@Nonnull UUID playerId, @Nonnull String assetId, @Nonnull QuestState outcome, @Nullable Instant startedAt, @Nullable Instant completedAt) {
-        updatePlayer(playerId, record -> record.recordCompletion(assetId, outcome, startedAt, completedAt));
+    public List<PlayerMessage> loadMessages(@Nonnull Collection<UUID> playerIds) {
+        if (playerIds.isEmpty()) return List.of();
+
+        Map<String, PlayerMessage> all;
+        try {
+            all = messages.loadAll();
+        } catch (IOException e) {
+            LOGGER.atWarning().withCause(e).log("Failed to read the player messages");
+            return List.of();
+        }
+
+        List<PlayerMessage> waiting = new ArrayList<>();
+        for (PlayerMessage message : all.values()) {
+            if (message != null && playerIds.contains(message.getPlayerId())) waiting.add(message);
+        }
+        waiting.sort(Comparator.comparingLong(PlayerMessage::getAt));
+        return waiting;
+    }
+
+    @Nonnull
+    private Object lockOf(@Nonnull String key) {
+        return keyLocks.computeIfAbsent(key, ignored -> new Object());
+    }
+
+    @Nonnull
+    private static String messageFile(@Nonnull UUID playerId, @Nonnull UUID messageId) {
+        return playerId + "_" + messageId;
     }
 
     @Nonnull
