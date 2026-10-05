@@ -125,10 +125,24 @@ public class QuestReplicationService {
     /**
      * Writes what changed in an index as soon as it changes, off the game threads: a stopping
      * server stops its worlds before the last save pass could read their indexes, and loses none
-     * of what was written this way. Written in order with the rest, a deletion included.
+     * of what was written this way. Written in order with the rest, a deletion included, and a
+     * quest always before the index listing it.
      */
     public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String indexKey) {
-        execute("the " + indexKey + " index", () -> record.flush(storage, indexKey));
+        execute("the " + indexKey + " index", () -> record.flush(storage, indexKey, this::store));
+    }
+
+    /**
+     * Writes the quests an index is about to list, so another server reading the index never
+     * finds an id whose quest it cannot read yet, and drops it for good.
+     */
+    private void store(@Nonnull Set<UUID> questIds) {
+        List<AbstractQuestProgression<?>> quests = new ArrayList<>();
+        for (UUID questId : questIds) {
+            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            if (quest != null) quests.add(quest);
+        }
+        progressionStore.save(quests);
     }
 
     /**

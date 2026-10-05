@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * The quests of one holder, by id: a player, a world, the universe. None of them holds the
@@ -79,6 +80,16 @@ public class QuestsRecord {
      * @return whether anything was written.
      */
     public synchronized boolean flush(@Nonnull IndexStore storage, @Nonnull String indexKey) {
+        return flush(storage, indexKey, listed -> {});
+    }
+
+    /**
+     * Writes as above, first handing the ids about to be listed to {@code beforeListing}, which
+     * writes their quests: a server reading the index must find every quest it lists.
+     *
+     * @return whether anything was written.
+     */
+    public synchronized boolean flush(@Nonnull IndexStore storage, @Nonnull String indexKey, @Nonnull Consumer<Set<UUID>> beforeListing) {
         Set<UUID> current = Set.copyOf(questIds);
 
         Set<UUID> added = new HashSet<>(current);
@@ -87,6 +98,7 @@ public class QuestsRecord {
         removed.removeAll(current);
         if (added.isEmpty() && removed.isEmpty()) return false;
 
+        if (!added.isEmpty()) beforeListing.accept(added);
         storage.addToIndex(indexKey, added);
         storage.removeFromIndex(indexKey, removed);
 

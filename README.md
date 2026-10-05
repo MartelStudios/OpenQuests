@@ -328,7 +328,8 @@ shared without any of them overwriting another:
   every player, and a player another server hosts finds the reward in a message that server takes
   in. A server learning of the end files the quest and tells its own players, but pays nothing.
 - **Indexes are written member by member** and followed the same way, so a universe quest one
-  server starts reaches the players of every other.
+  server starts reaches the players of every other. A quest is written before any index lists it,
+  so a server following the index always finds the quest.
 - **A player record has one writer**, the server hosting the player. What another server owes them,
   a reward or an ending to count, is left as a message the host takes in, now or at their next
   connection, and lets go of in the same write as the record that took it in.

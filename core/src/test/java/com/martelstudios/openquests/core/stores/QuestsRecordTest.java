@@ -41,6 +41,25 @@ class QuestsRecordTest {
     }
 
     @Test
+    void questsAreWrittenBeforeTheIndexListsThem() {
+        MemoryIndexes storage = new MemoryIndexes();
+        QuestsRecord record = new QuestsRecord();
+        record.load(Set.of(first));
+
+        record.register(second);
+        record.unregister(first);
+
+        Set<UUID> listedWhenWritten = new HashSet<>();
+        record.flush(storage, KEY, listed -> {
+            listedWhenWritten.addAll(storage.loadIndex(KEY));
+            assertEquals(Set.of(second), listed);
+        });
+
+        assertFalse(listedWhenWritten.contains(second));
+        assertEquals(Set.of(second), storage.loadIndex(KEY));
+    }
+
+    @Test
     void aWriteNeverDropsWhatAnotherServerAdded() {
         MemoryIndexes storage = new MemoryIndexes();
         QuestsRecord onA = new QuestsRecord();
