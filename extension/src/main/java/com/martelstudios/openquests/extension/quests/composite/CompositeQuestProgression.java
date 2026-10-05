@@ -151,6 +151,19 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     }
 
     /**
+     * A step ends once, on the server whose claim ended it, so an outcome another copy took down
+     * and this one has not is simply taken in.
+     */
+    @Override
+    protected boolean mergeProgress(@Nonnull CompositeQuestProgression other) {
+        boolean changed = false;
+        for (Map.Entry<UUID, QuestState> outcome : other.childOutcomes.entrySet()) {
+            changed |= childOutcomes.putIfAbsent(outcome.getKey(), outcome.getValue()) == null;
+        }
+        return changed;
+    }
+
+    /**
      * @return how many children ended that way, which is what the group's own rule is written in.
      */
     public int countOutcomes(@Nonnull QuestState state) {

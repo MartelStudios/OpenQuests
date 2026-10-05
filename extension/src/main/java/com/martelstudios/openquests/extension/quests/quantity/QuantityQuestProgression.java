@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.replication.ReplicatedCounter;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 
 import javax.annotation.Nonnull;
@@ -13,21 +14,32 @@ import javax.annotation.Nullable;
 
 /**
  * Runtime state shared by every quest whose completion is "reach a target quantity of something".
- * Concrete subtypes only say how {@link #currentQuantity} is updated; the completion check lives
- * here once.
+ * Concrete subtypes only say how the quantity is updated; the completion check lives here once.
+ * The quantity is shared: each server sharing the quest moves its own share of it.
  *
  * @param <Q> the concrete quest type extending this class
  */
 public abstract class QuantityQuestProgression<Q extends QuantityQuestProgression<Q>> extends AbstractQuestProgression<Q> {
 
+    /**
+     * The slot a count written before counts were shared is read into, the same on every server
+     * reading it, so it is counted once.
+     */
+    private static final String LEGACY_SLOT = "";
+
     public static final BuilderCodec<QuantityQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(QuantityQuestProgression.class, AbstractQuestProgression.BASE_CODEC)
-                                                                                        .append(new KeyedCodec<>("CurrentQuantity", Codec.INTEGER), (quest, quantity) -> quest.currentQuantity = quantity, quest -> Integer.valueOf(quest.currentQuantity))
+                                                                                        .append(new KeyedCodec<>("Quantity", ReplicatedCounter.CODEC), (quest, counter) -> quest.quantity.merge(counter), quest -> quest.quantity)
+                                                                                        .add()
+                                                                                        .append(new KeyedCodec<>("CurrentQuantity", Codec.INTEGER), (quest, quantity) -> quest.quantity.restore(LEGACY_SLOT, quantity), quest -> null)
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("TargetQuantity", Codec.INTEGER), (quest, quantity) -> quest.targetQuantity = quantity, quest -> quest.targetQuantity)
                                                                                         .add()
                                                                                         .build();
 
-    protected int currentQuantity;
+    /**
+     * How far the quest went, every server sharing it moving its own share.
+     */
+    protected final ReplicatedCounter quantity = new ReplicatedCounter();
 
     /**
      * Overrides the asset's target for this instance alone. Boxed so that "not overridden" is a
@@ -41,12 +53,18 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
         return (QuantityQuestAsset) super.getAsset();
     }
 
+    /**
+     * @return how far the quest went, every server's share counted.
+     */
     public int getCurrentQuantity() {
-        return currentQuantity;
+        return (int) quantity.get();
     }
 
+    /**
+     * Moves this server's share so that the whole comes to that quantity.
+     */
     public Q setCurrentQuantity(int currentQuantity) {
-        this.currentQuantity = currentQuantity;
+        quantity.set(currentQuantity);
         return self();
     }
 
@@ -78,10 +96,10 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     }
 
     /**
-     * @return {@code true} once {@link #currentQuantity} reaches the target.
+     * @return {@code true} once the quantity reaches the target.
      */
     public boolean checkCompletion() {
-        return currentQuantity >= getTargetQuantity();
+        return getCurrentQuantity() >= getTargetQuantity();
     }
 
     /**
@@ -90,6 +108,11 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
      */
     @Override
     public boolean hasProgressed() {
-        return currentQuantity > 0 || super.hasProgressed();
+        return getCurrentQuantity() > 0 || super.hasProgressed();
+    }
+
+    @Override
+    protected boolean mergeProgress(@Nonnull Q other) {
+        return quantity.merge(other.quantity);
     }
 }
