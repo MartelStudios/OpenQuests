@@ -31,7 +31,7 @@ public class UniverseQuestScope extends QuestScope {
     @Nonnull
     @Override
     public Collection<UUID> getQuestIds() {
-        return List.copyOf(UniverseQuestService.get().getQuests().getAllIds());
+        return List.copyOf(UniverseQuestService.get().getQuestIds());
     }
 
     @Override

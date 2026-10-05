@@ -7,13 +7,11 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.persistence.QuestStorage;
-import com.martelstudios.openquests.core.replication.QuestReplicationService;
+import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,13 +27,11 @@ public class UniverseQuestService {
      */
     public static final String UNIVERSE_INDEX_KEY = "universe";
 
-    private final QuestStorage storage;
-    private final QuestsRecord quests = new QuestsRecord();
+    @Nonnull
+    private final ScopeIndexes indexes;
 
-    private boolean dirty;
-
-    public UniverseQuestService(@Nonnull JavaPlugin javaPlugin, @Nonnull QuestStorage storage) {
-        this.storage = storage;
+    public UniverseQuestService(@Nonnull JavaPlugin javaPlugin, @Nonnull ScopeIndexes indexes) {
+        this.indexes = indexes;
         javaPlugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
     }
 
@@ -44,34 +40,30 @@ public class UniverseQuestService {
     }
 
     /**
-     * @return the live index of universe quests. Mutating it is what gets persisted on the next
-     * pass, so a caller adding an id here should say so through {@link #addQuest}.
+     * @return the live ids of the running universe quests.
      */
     @Nonnull
-    public QuestsRecord getQuests() {
-        return quests;
+    public Set<UUID> getQuestIds() {
+        return indexes.getIds(UNIVERSE_INDEX_KEY);
     }
 
     public void addQuest(@Nonnull UUID questId) {
         AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
         if (quest == null) return;
 
-        if (!quests.register(questId)) return;
-        changed();
+        if (!indexes.add(UNIVERSE_INDEX_KEY, questId)) return;
 
         LOGGER.atInfo().log("Added quest %s to universe", questId);
 
         if (!(quest.getScope() instanceof UniverseQuestScope)) quest.setScope(UniverseQuestScope.INSTANCE);
 
-        for (PlayerRef playerRef : Universe.get().getPlayers()) {
-            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
-        }
+        joinEveryone(quest);
     }
 
     public void removeQuest(@Nonnull UUID questId) {
         LOGGER.atInfo().log("Removing quest %s from universe", questId);
 
-        if (quests.unregister(questId)) changed();
+        indexes.remove(UNIVERSE_INDEX_KEY, questId);
 
         // Gone already when it left for good, and nothing then is left to write on
         AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
@@ -83,67 +75,33 @@ public class UniverseQuestService {
      * and the quest keeps its scope, which says it was the server's.
      */
     public void unindex(@Nonnull UUID questId) {
-        if (quests.unregister(questId)) changed();
+        indexes.remove(UNIVERSE_INDEX_KEY, questId);
     }
 
     /**
-     * Takes in what other servers added to and removed from the index since: a quest one of them
-     * started is read back and joined by everyone online here.
+     * Has everyone online here join the quests another server started.
      */
-    public void refresh(@Nonnull Set<UUID> storedNow) {
-        for (UUID questId : quests.absorb(storedNow).added()) {
+    public void joinAdded(@Nonnull Collection<UUID> questIds) {
+        for (UUID questId : questIds) {
             AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
-            if (quest == null) continue;
-
-            for (PlayerRef playerRef : Universe.get().getPlayers()) {
-                QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
-            }
+            if (quest != null) joinEveryone(quest);
         }
     }
 
     /**
-     * Marks the index changed and writes the change as it happens, off the game threads.
-     */
-    private void changed() {
-        dirty = true;
-        QuestReplicationService.get().flushIndex(quests, UNIVERSE_INDEX_KEY);
-    }
-
-    /**
-     * Reads the universe index back and pulls every quest it lists into memory.
+     * Reads the universe index back and pulls every quest it lists into memory. The index holds
+     * running quests only: one that ended is left to its players' journals.
      */
     public void loadQuests() {
-        quests.load(storage.loadIndex(UNIVERSE_INDEX_KEY));
-
-        QuestProgressionService.get().loadQuests(quests.getAllIds());
-
-        for (UUID questId : new ArrayList<>(quests.getAllIds())) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
-
-            // The index holds running quests only: one that ended is left to its players' journals
-            if (quest != null && quest.isCompleted()) {
-                quests.unregister(questId);
-                dirty = true;
-            }
-            if (quest != null) continue;
-
-            // Left on the index, so that a quest set aside comes back with its asset
-            if (QuestProgressionService.get().isSetAside(questId)) continue;
-
-            quests.unregister(questId);
-            dirty = true;
+        for (AbstractQuestProgression<?> quest : indexes.resolve(UNIVERSE_INDEX_KEY)) {
+            if (quest.isCompleted()) indexes.remove(UNIVERSE_INDEX_KEY, quest.getId());
         }
     }
 
-    /**
-     * @param force writes the index even if nothing changed, for a shutdown that nothing will
-     * follow.
-     */
-    public void saveQuests(boolean force) {
-        if (!dirty && !force) return;
-
-        quests.flush(storage, UNIVERSE_INDEX_KEY);
-        dirty = false;
+    private static void joinEveryone(@Nonnull AbstractQuestProgression<?> quest) {
+        for (PlayerRef playerRef : Universe.get().getPlayers()) {
+            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
+        }
     }
 
     /**
@@ -155,16 +113,7 @@ public class UniverseQuestService {
         var playerRef = holder.getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;
 
-        for (UUID questId : new ArrayList<>(quests.getAllIds())) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
-            if (quest == null) {
-                if (QuestProgressionService.get().isSetAside(questId)) continue;
-
-                quests.unregister(questId);
-                dirty = true;
-                continue;
-            }
-
+        for (AbstractQuestProgression<?> quest : indexes.resolve(UNIVERSE_INDEX_KEY)) {
             QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
         }
     }
