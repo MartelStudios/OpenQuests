@@ -757,6 +757,19 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
+     * @return the outermost group this quest is a step of, or the quest itself: a step carries no
+     * scope of its own and is shared the way its head is. Never reads anything back.
+     */
+    @Nonnull
+    public AbstractQuestProgression<?> getHead() {
+        AbstractQuestProgression<?> head = this;
+        for (AbstractCompositeQuestProgression<?> parent = getParent(); parent != null; parent = parent.getParent()) {
+            head = parent;
+        }
+        return head;
+    }
+
+    /**
      * Written by {@link AbstractCompositeQuestProgression} alone, as it adopts or claims a step.
      */
     void setParentId(@Nullable UUID parentId) {
