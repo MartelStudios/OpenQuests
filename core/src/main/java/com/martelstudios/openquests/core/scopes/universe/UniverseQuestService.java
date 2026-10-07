@@ -51,11 +51,12 @@ public class UniverseQuestService {
         AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
         if (quest == null) return;
 
+        // Before the index lists it, which writes the quest: another server reading it finds it shared
+        if (!(quest.getScope() instanceof UniverseQuestScope)) quest.setScope(UniverseQuestScope.INSTANCE);
+
         if (!indexes.add(UNIVERSE_INDEX_KEY, questId)) return;
 
         LOGGER.atInfo().log("Added quest %s to universe", questId);
-
-        if (!(quest.getScope() instanceof UniverseQuestScope)) quest.setScope(UniverseQuestScope.INSTANCE);
 
         joinEveryone(quest);
     }

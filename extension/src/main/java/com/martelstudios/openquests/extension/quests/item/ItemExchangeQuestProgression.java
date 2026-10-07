@@ -30,7 +30,7 @@ public abstract class ItemExchangeQuestProgression<Q extends ItemExchangeQuestPr
                                                                                             .add()
                                                                                             .build();
 
-    protected final ExchangeCounters counters = new ExchangeCounters();
+    protected ExchangeCounters counters = new ExchangeCounters();
 
     /**
      * @return the items this quest counts.

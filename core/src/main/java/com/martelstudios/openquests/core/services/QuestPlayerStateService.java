@@ -69,13 +69,14 @@ public class QuestPlayerStateService {
     }
 
     /**
-     * Reads a player back: their record first, then every quest it names, in one go.
+     * Reads a player back: their record first, then every quest it names, in one go. Hosting them
+     * first, which waits for the server they come from to have written them out.
      */
     private void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
         UUID playerId = playerConnectEvent.getPlayerRef().getUuid();
         Holder<EntityStore> holder = playerConnectEvent.getHolder();
 
-        PlayerQuestRecord record = storage.loadPlayer(playerId);
+        PlayerQuestRecord record = storage.hostPlayer(playerId);
 
         // What other servers left them while they were away, let go of once the record holding it is written
         Set<UUID> delivered = ConcurrentHashMap.newKeySet();
@@ -120,7 +121,7 @@ public class QuestPlayerStateService {
         Session session = sessions.remove(playerId);
         if (session == null) return;
 
-        save(playerId, session, true);
+        save(playerId, session, true, true);
 
         for (UUID questId : session.questStore().getQuestIds()) {
             unloadIfUnheld(questId, playerId);
@@ -129,9 +130,11 @@ public class QuestPlayerStateService {
 
     /**
      * Writes out every player currently on the server, for the save pass and for shutdown.
+     *
+     * @param stopping whether the server is stopping, which ends every stay here
      */
-    public void saveAllOnline(boolean force) {
-        sessions.forEach((playerId, session) -> save(playerId, session, force));
+    public void saveAllOnline(boolean stopping) {
+        sessions.forEach((playerId, session) -> save(playerId, session, stopping, stopping));
     }
 
     /**
@@ -139,8 +142,9 @@ public class QuestPlayerStateService {
      * the other never stored.
      *
      * @param force writes the record even if nothing changed, for the last write of a session.
+     * @param leaving whether their stay here ends with this write, letting another server host them
      */
-    private void save(@Nonnull UUID playerId, @Nonnull Session session, boolean force) {
+    private void save(@Nonnull UUID playerId, @Nonnull Session session, boolean force, boolean leaving) {
         QuestStoreComponent questStore = session.questStore();
         PendingRewardStore rewards = session.rewards().pending;
 
@@ -162,7 +166,7 @@ public class QuestPlayerStateService {
         boolean changed = questStore.hasChanges() || rewards.hasChanges() || !delivered.isEmpty();
         if (!changed && !force) return;
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(questIds, questStore.getAssignments().snapshot(), rewards.snapshot(), questStore.getCompletions()), delivered);
+        storage.savePlayer(playerId, new PlayerQuestRecord(questIds, questStore.getAssignments().snapshot(), rewards.snapshot(), questStore.getCompletions()), delivered, leaving);
         session.delivered().removeAll(delivered);
 
         questStore.consumeChanges();

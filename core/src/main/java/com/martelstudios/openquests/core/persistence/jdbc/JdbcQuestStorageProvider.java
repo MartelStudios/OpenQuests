@@ -40,8 +40,6 @@ public class JdbcQuestStorageProvider implements QuestStorageProvider {
                                                                                    .add()
                                                                                    .append(new KeyedCodec<>("CreateSchema", Codec.BOOLEAN), (provider, create) -> provider.createSchema = create, provider -> Boolean.valueOf(provider.createSchema))
                                                                                    .add()
-                                                                                   .append(new KeyedCodec<>("ServerId", Codec.STRING), (provider, serverId) -> provider.serverId = serverId, provider -> provider.serverId)
-                                                                                   .add()
                                                                                    .append(new KeyedCodec<>("Dialect", Codec.STRING), (provider, dialect) -> provider.dialect = dialect, provider -> provider.dialect)
                                                                                    .add()
                                                                                    .build();
@@ -78,12 +76,6 @@ public class JdbcQuestStorageProvider implements QuestStorageProvider {
     private boolean createSchema = true;
 
     /**
-     * Written into {@code updated_by}, and the only thing telling one server's writes from
-     * another's on a shared database.
-     */
-    private String serverId = "server";
-
-    /**
      * Overrides what the URL says, for a database reached through a proxy that borrows another
      * vendor's URL scheme. {@code null} to go by the URL.
      */
@@ -99,12 +91,12 @@ public class JdbcQuestStorageProvider implements QuestStorageProvider {
 
         return new JdbcQuestStorage(new JdbcQuestStorage.JdbcSettings(
             url, user, password, driverClass, driverPath, tablePrefix,
-            poolSize, connectionTimeoutSeconds, createSchema, serverId, resolved));
+            poolSize, connectionTimeoutSeconds, createSchema, resolved));
     }
 
     @Nonnull
     @Override
     public String toString() {
-        return "Jdbc{url='" + url + "', prefix='" + tablePrefix + "', serverId='" + serverId + "'}";
+        return "Jdbc{url='" + url + "', prefix='" + tablePrefix + "'}";
     }
 }

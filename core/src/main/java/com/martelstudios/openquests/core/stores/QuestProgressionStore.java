@@ -7,6 +7,7 @@ import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.sync.QuestSync;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -178,6 +179,17 @@ public class QuestProgressionStore {
     }
 
     /**
+     * @return every quest in memory, running or ended alike, as it stands now.
+     */
+    @Nonnull
+    public List<AbstractQuestProgression<?>> getLoaded() {
+        List<AbstractQuestProgression<?>> loaded = new ArrayList<>(quests.size() + archived.size());
+        loaded.addAll(quests.values());
+        loaded.addAll(archived.values());
+        return loaded;
+    }
+
+    /**
      * @return those of the given quests that are in memory, running or ended alike. Never reads
      * anything back: a caller resolving an index wants what is there, not what could be.
      */
@@ -211,7 +223,8 @@ public class QuestProgressionStore {
     }
 
     /**
-     * Writes out those of the given quests that changed and are meant to be kept, as one batch.
+     * Writes out those of the given quests that changed and are meant to be kept, as one batch. A
+     * quest other servers write too is written apart, its changes made on the latest version.
      *
      * <p>A batch that fails is marked dirty again, so a database down for a minute does not take
      * an hour of play with it.
@@ -221,6 +234,12 @@ public class QuestProgressionStore {
 
         for (AbstractQuestProgression<?> quest : candidates) {
             if (!isPersisted(quest)) continue;
+
+            if (QuestSync.isShared(quest)) {
+                if (quest.hasChanges()) QuestSync.writeNow(quest);
+                continue;
+            }
+
             if (!quest.consumeChanges()) continue;
 
             dirty.add(quest);

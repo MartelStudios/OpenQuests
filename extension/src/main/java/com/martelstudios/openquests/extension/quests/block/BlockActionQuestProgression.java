@@ -24,7 +24,7 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
                                                                                            .add()
                                                                                            .build();
 
-    protected final BlockRecoveries recoveries = new BlockRecoveries();
+    protected BlockRecoveries recoveries = new BlockRecoveries();
 
     /**
      * @return the blocks this quest counts.

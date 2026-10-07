@@ -22,10 +22,17 @@ public class QuestStateChangedEvent implements IEvent<UUID> {
     @Nonnull
     private final QuestState state;
 
-    public QuestStateChangedEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState previousState) {
+    private final int transitions;
+
+    /**
+     * @param state the state reached, which the quest may have moved past by the time this is heard
+     * @param transitions how many changes of state the quest went through, this one included
+     */
+    public QuestStateChangedEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState previousState, @Nonnull QuestState state, int transitions) {
         this.quest = quest;
         this.previousState = previousState;
-        this.state = quest.getState();
+        this.state = state;
+        this.transitions = transitions;
     }
 
     @Nonnull
@@ -44,5 +51,13 @@ public class QuestStateChangedEvent implements IEvent<UUID> {
     @Nonnull
     public QuestState getState() {
         return state;
+    }
+
+    /**
+     * @return how many changes of state the quest went through, this one included: what tells
+     * older news of the quest from newer, heard in whatever order.
+     */
+    public int getTransitions() {
+        return transitions;
     }
 }

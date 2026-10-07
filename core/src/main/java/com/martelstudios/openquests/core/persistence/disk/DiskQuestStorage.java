@@ -11,9 +11,6 @@ import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestProgressionRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
-import com.martelstudios.openquests.core.persistence.ReplicaPoll;
-import com.martelstudios.openquests.core.replication.Replica;
-import com.martelstudios.openquests.core.replication.StoredState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -34,13 +32,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * The quests as JSON files under the universe directory, which is where a server with no database
  * keeps them: one file per progression, per player, per index, per shared holder, per message.
  *
- * <p>Written by one server only, so a progression's file is that server's one replica, and every
- * claim goes through.
+ * <p>Written by one server only, so a quest is always written over its file.
  */
 public class DiskQuestStorage implements QuestStorage {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -97,12 +95,6 @@ public class DiskQuestStorage implements QuestStorage {
     @Override
     public String getId() {
         return ID;
-    }
-
-    @Nonnull
-    @Override
-    public String getReplicaId() {
-        return Replica.DEFAULT_ID;
     }
 
     @Override
@@ -174,7 +166,10 @@ public class DiskQuestStorage implements QuestStorage {
         Map<UUID, Set<UUID>> newLinks = new HashMap<>();
 
         for (AbstractQuestProgression<?> quest : quests) {
-            progressions.save(quest.getId().toString(), new QuestProgressionRecord(quest));
+            // Encoded while nothing changes it, which a game thread otherwise could halfway through
+            synchronized (quest) {
+                progressions.save(quest.getId().toString(), new QuestProgressionRecord(quest));
+            }
 
             collectOfflineHolders(quest, newLinks);
         }
@@ -198,19 +193,25 @@ public class DiskQuestStorage implements QuestStorage {
     }
 
     /**
-     * Nobody else writes these files, so where this server moved the quest is where it stands: it
-     * is written with the quest by the next save.
+     * Nobody else writes these files, so the file read is the latest there is.
      */
     @Nullable
     @Override
-    public StoredState claimState(@Nonnull AbstractQuestProgression<?> quest) {
-        return null;
+    public AbstractQuestProgression<?> commitProgression(@Nonnull UUID questId, @Nonnull Predicate<AbstractQuestProgression<?>> changes) {
+        AbstractQuestProgression<?> stored = loadProgression(questId);
+        if (stored == null || !changes.test(stored)) return stored;
+
+        progressions.save(questId.toString(), new QuestProgressionRecord(stored));
+        return stored;
     }
 
+    /**
+     * No other server writes here, so there is never anything newer to look for.
+     */
     @Nonnull
     @Override
-    public ReplicaPoll pollReplicas(@Nonnull Map<UUID, Map<String, Long>> known) {
-        return ReplicaPoll.NONE;
+    public Map<UUID, Long> loadVersions(@Nonnull Collection<UUID> questIds) {
+        return Map.of();
     }
 
     /**
@@ -397,7 +398,7 @@ public class DiskQuestStorage implements QuestStorage {
      * server make rare enough.
      */
     @Override
-    public void savePlayer(@Nonnull UUID playerId, @Nonnull PlayerQuestRecord record, @Nonnull Collection<UUID> delivered) {
+    public boolean savePlayer(@Nonnull UUID playerId, @Nonnull PlayerQuestRecord record, @Nonnull Collection<UUID> delivered, boolean leaving) {
         synchronized (playerLocks.computeIfAbsent(playerId, id -> new Object())) {
             players.save(playerId.toString(), record);
         }
@@ -411,6 +412,21 @@ public class DiskQuestStorage implements QuestStorage {
                 LOGGER.atWarning().withCause(e).log("Failed to let go of message %s of player %s", messageId, playerId);
             }
         }
+        return true;
+    }
+
+    /**
+     * No other server reads these files, so the player is this server's to host already.
+     */
+    @Nonnull
+    @Override
+    public PlayerQuestRecord hostPlayer(@Nonnull UUID playerId) {
+        return loadPlayer(playerId);
+    }
+
+    @Override
+    public void renewHosting(@Nonnull Duration validFor) {
+        // Nobody else to hold the players against
     }
 
     @Override

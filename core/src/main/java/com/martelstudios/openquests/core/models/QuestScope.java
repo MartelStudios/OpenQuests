@@ -63,10 +63,10 @@ public abstract class QuestScope {
 
     /**
      * @return whether several servers may hold a quest of this scope at once, which is what makes
-     * its progress merged across them and its end claimed: a server, a group of worlds. A world
+     * each of its changes one to make on the latest version: a server, a group of worlds. A world
      * lives on one server.
      */
-    public boolean isReplicated() {
+    public boolean spansServers() {
         return false;
     }
 

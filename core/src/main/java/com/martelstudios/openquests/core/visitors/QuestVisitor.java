@@ -13,6 +13,11 @@ import java.util.UUID;
 public interface QuestVisitor<Q extends AbstractQuestProgression<?>> {
     Class<Q> getQuestType();
 
+    /**
+     * May run again on another copy of the quest, the one another server stored meanwhile: reads
+     * nothing but the quest it is handed and what this visitor carries, and works out anything
+     * else once.
+     */
     void progress(Q quest);
 
     /**

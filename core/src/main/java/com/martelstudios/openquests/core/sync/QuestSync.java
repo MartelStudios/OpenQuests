@@ -1,0 +1,83 @@
+package com.martelstudios.openquests.core.sync;
+
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+
+import javax.annotation.Nonnull;
+
+/**
+ * What a quest asks about the other servers that may write it, so the model knows nothing of where
+ * quests are stored: whether its changes are to be made again over theirs, and when to write them.
+ */
+public final class QuestSync {
+
+    /**
+     * Answers for the storage the quests are kept in.
+     */
+    public interface Policy {
+
+        /**
+         * @return whether other servers may write that quest too, which makes each change to it one
+         * to make again over what they stored meanwhile.
+         */
+        boolean isShared(@Nonnull AbstractQuestProgression<?> quest);
+
+        /**
+         * Writes what the quest is waiting to write off the caller's thread, for a change of state
+         * whose consequences wait on the write.
+         */
+        void writeSoon(@Nonnull AbstractQuestProgression<?> quest);
+
+        /**
+         * Writes it before returning, for a caller about to let go of the quest.
+         */
+        void writeNow(@Nonnull AbstractQuestProgression<?> quest);
+    }
+
+    /**
+     * A server alone writes its quests over themselves: nothing to make again.
+     */
+    private static final Policy ALONE = new Policy() {
+        @Override
+        public boolean isShared(@Nonnull AbstractQuestProgression<?> quest) {
+            return false;
+        }
+
+        @Override
+        public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {}
+
+        @Override
+        public void writeNow(@Nonnull AbstractQuestProgression<?> quest) {}
+    };
+
+    private static volatile Policy policy = ALONE;
+
+    private QuestSync() {}
+
+    /**
+     * Set once as the storage starts.
+     */
+    public static void setPolicy(@Nonnull Policy value) {
+        policy = value;
+    }
+
+    /**
+     * @return whether other servers may write that quest too.
+     */
+    public static boolean isShared(@Nonnull AbstractQuestProgression<?> quest) {
+        return policy.isShared(quest);
+    }
+
+    /**
+     * Writes what the quest is waiting to write, off the caller's thread.
+     */
+    public static void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {
+        policy.writeSoon(quest);
+    }
+
+    /**
+     * Writes what the quest is waiting to write before returning.
+     */
+    public static void writeNow(@Nonnull AbstractQuestProgression<?> quest) {
+        policy.writeNow(quest);
+    }
+}

@@ -4,14 +4,15 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.replication.Membership;
-import com.martelstudios.openquests.core.replication.ReplicatedCounter;
+import com.martelstudios.openquests.core.models.Membership;
+import com.martelstudios.openquests.core.models.QuestState;
 
 import java.util.UUID;
 
 /**
  * A quest type standing in for the ones the extension ships, so a backend can be exercised without
- * a server to register anything.
+ * a server to register anything. Its changes go through {@link #change}, as a shipped type's do,
+ * without the events a test has no server to send.
  */
 public class TestQuestProgression extends AbstractQuestProgression<TestQuestProgression> {
 
@@ -21,22 +22,15 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
         BuilderCodec.builder(TestQuestProgression.class, TestQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
                     .append(new KeyedCodec<>("Counter", Codec.INTEGER), (quest, counter) -> quest.counter = counter, quest -> Integer.valueOf(quest.counter))
                     .add()
-                    .append(new KeyedCodec<>("Shared", ReplicatedCounter.CODEC), (quest, shared) -> quest.shared.merge(shared), quest -> quest.shared)
-                    .add()
                     .build();
 
     private int counter;
 
     /**
-     * A count every server sharing the quest moves, standing in for a counted quest's.
-     */
-    private final ReplicatedCounter shared = new ReplicatedCounter();
-
-    /**
-     * Moves a player the way the quest would, without the events a test has no server to send.
+     * Moves a player the way the quest would.
      */
     public TestQuestProgression move(UUID playerId, Membership.Status status) {
-        membership.move(playerId, status);
+        change(quest -> quest.membership.move(playerId, status));
         return this;
     }
 
@@ -45,22 +39,34 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
     }
 
     public TestQuestProgression setCounter(int counter) {
-        this.counter = counter;
+        change(quest -> {
+            quest.counter = counter;
+            return true;
+        });
         return this;
     }
 
-    public long getShared() {
-        return shared.get();
-    }
-
-    public TestQuestProgression addShared(long delta) {
-        shared.add(delta);
+    /**
+     * Adds to the counter over whatever it stands at, the way a counted quest does.
+     */
+    public TestQuestProgression addToCounter(int delta) {
+        change(quest -> {
+            quest.counter += delta;
+            return delta != 0;
+        });
         return this;
     }
 
-    @Override
-    protected boolean mergeProgress(TestQuestProgression other) {
-        return shared.merge(other.shared);
+    /**
+     * Ends the quest once the counter reaches the target, the way a visitor settles a quest.
+     */
+    public TestQuestProgression addAndEndAt(int delta, int target) {
+        change(quest -> {
+            quest.counter += delta;
+            if (quest.counter >= target && !quest.isCompleted()) quest.setState(QuestState.SUCCESSFUL);
+            return true;
+        });
+        return this;
     }
 
     /**

@@ -54,7 +54,7 @@ public class UniverseQuestScope extends QuestScope {
      * Every server sharing the storage holds the same universe quests.
      */
     @Override
-    public boolean isReplicated() {
+    public boolean spansServers() {
         return true;
     }
 

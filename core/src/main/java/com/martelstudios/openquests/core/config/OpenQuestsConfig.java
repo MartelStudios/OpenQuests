@@ -19,11 +19,10 @@ import javax.annotation.Nonnull;
  *     "Url": "jdbc:postgresql://localhost:5432/openquests",
  *     "User": "openquests",
  *     "Password": "…",
- *     "DriverPath": "libs/postgresql-42.7.4.jar",
- *     "ServerId": "survival-1"
+ *     "DriverPath": "libs/postgresql-42.7.4.jar"
  *   },
  *   "SaveIntervalMinutes": 5,
- *   "ReplicationSeconds": 5
+ *   "SyncSeconds": 5
  * }
  * }</pre>
  */
@@ -34,7 +33,7 @@ public class OpenQuestsConfig {
                                                                            .add()
                                                                            .append(new KeyedCodec<>("SaveIntervalMinutes", Codec.INTEGER), (config, minutes) -> config.saveIntervalMinutes = minutes, config -> Integer.valueOf(config.saveIntervalMinutes))
                                                                            .add()
-                                                                           .append(new KeyedCodec<>("ReplicationSeconds", Codec.INTEGER), (config, seconds) -> config.replicationSeconds = seconds, config -> Integer.valueOf(config.replicationSeconds))
+                                                                           .append(new KeyedCodec<>("SyncSeconds", Codec.INTEGER), (config, seconds) -> config.syncSeconds = seconds, config -> Integer.valueOf(config.syncSeconds))
                                                                            .add()
                                                                            .build();
 
@@ -50,7 +49,7 @@ public class OpenQuestsConfig {
      * How often, with a storage several servers share, each writes what it shares and reads what
      * the others did: how late one server at most sees another's progress.
      */
-    private int replicationSeconds = 5;
+    private int syncSeconds = 5;
 
     @Nonnull
     public QuestStorageProvider getStorage() {
@@ -64,7 +63,7 @@ public class OpenQuestsConfig {
     /**
      * @return how often, in seconds, servers sharing a storage keep each other in step.
      */
-    public int getReplicationSeconds() {
-        return Math.max(1, replicationSeconds);
+    public int getSyncSeconds() {
+        return Math.max(1, syncSeconds);
     }
 }
