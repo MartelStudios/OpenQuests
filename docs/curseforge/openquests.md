@@ -10,119 +10,96 @@ No code required. Everything below works out of the box.
 
 _Combine quests as deep as you want and wire them together with AND and OR to get real branching progression. Beat the guardian with a sword, or find another way around._
 
-> 📦 **Everything in that screenshot is a free download.** Install **[OpenQuests Examples](https://www.curseforge.com/hytale/mods/openquests-examples)** next to OpenQuests and two quest lines are handed to your players the moment the server starts, in English and French. It is the quickest way to see what the system does, and the worked example to copy your own from.
->
-> OpenQuests itself installs with an empty quest list, on purpose: your server, your quests. Delete the examples the day your own chain replaces them.
+> 📦 **Want to see it in action ?** Install **[OpenQuests Examples](https://www.curseforge.com/hytale/mods/openquests-examples)** next to OpenQuests: ready-made quest lines, in English and French, handed to your players as soon as the server starts.
 
 ***
 
 ## ✨ What you get
 
-📖 **A quest journal.** A page of its own, opened with `/ojournal`, where a player reads what they are on, what they finished, and what they are still owed. New in 2.0.
+📝 **Everything in the Asset Editor.** Autocompletion, validation, and inline definitions so a whole chain fits in a single file.
 
-🧩 **Quests made of quests.** A step is a quest like any other, with its own rewards and its own progression. Nest them as deep as your story needs.
+🧩 **Quests made of quests.** A step is a quest like any other, with its own rewards. Nest them as deep as your story needs.
 
-🔀 **Branching paths.** `OR` gives two ways to finish the same chapter and lets the player choose. `AND` asks for all of them.
+🔀 **Branching paths.** `OR` lets the player choose their way through a chapter, `AND` asks for everything.
 
-📝 **Everything in the Asset Editor.** Autocompletion, validation, and inline definitions so a four step chain fits in a single file.
+📖 **A quest journal.** `/ojournal` opens a real page: what you are on, what you finished, what you are still owed.
+
+📊 **A tracker HUD.** Titles, counters, nesting and timers, exactly as the screenshot shows.
+
+⏳ **Rules on any quest.** Time limits, worlds, cooldowns, caps: add them to any quest and combine them freely.
 
 🌍 **Server-wide events.** "Kill 1,000,000 skeletons, together" is one quest, not a plugin.
 
-🎁 **Rewards on success, failure and abandon.** Give items, run a command, hand out the next quest.
+🔔 **An ending you can hear.** A finished quest takes over the middle of the screen and plays the sound you choose.
 
-⏳ **Rules on any quest.** A time limit, a world, a cooldown, a cap on how many times it can be done: add them to any quest type, and combine them as you like.
+🗄️ **Files or a database.** JSON files with nothing to configure, or PostgreSQL, MySQL, MariaDB and SQLite for large networks. Several servers can share the same quests.
 
-📊 **Tracker HUD included.** Titles, counters, nesting and OR rules, exactly as the screenshot shows.
-
-🔔 **An ending you can hear.** A quest that finishes takes over the middle of the screen, the way discovering a zone does, and plays a sound you choose. New in 2.0.
+🛡️ **Checked at boot.** A missing reference or a loop between quests stops the server with a clear reason, not in front of a player hours later.
 
 🈯 **English and French included.** Every line of text is translatable.
-
-🗄️ **Files or a database.** A small server keeps its quests as JSON and configures nothing. A large one, or several servers sharing the same players, points at PostgreSQL, MySQL, MariaDB or SQLite instead. New in 3.0. Since 4.0, servers sharing a database share universe quests and groups of worlds too, every change made once whichever server makes it, and a player moving between servers is picked up where the last one left them.
-
-🛡️ **Checked at boot.** A missing reference or a loop between quests stops the server with a clear reason, instead of breaking in front of a player hours later.
 
 ***
 
 ## 📖 The quest journal
 
-`/ojournal` opens a page built for reading a long chain, not just a list of titles.
-
-**Four tabs.** *Active* is what the player is on, *Finished* what became of the rest, *All* both, and *Rewards* what is still waiting to be collected.
-
-**Rows that open.** A folded row gives the title, the counter and the state. Open it and it gives the description, every objective with its own counter, the rewards on offer, and the buttons that act on it.
-
-**Tracking, from the journal.** A button puts a quest on the HUD or takes it off. A tracked quest wears a gold frame and rises to the top of *Active*, so the player decides what their journal opens on.
-
-**One step at a time.** Open a chain, pick the step you are on, and track that. It gets a line on the HUD like any other quest, so a long chain can be narrowed down to what you are doing now, with the chain still up beside it, or not, as you prefer.
-
-**Sorted the way you would look for them.** *Active* lists tracked quests first, then whatever was picked up most recently. *Finished* lists whatever ended last, first.
-
-**A debt is visible from anywhere.** The *Rewards* tab turns gold the moment something is owed, and so does the button that collects it.
-
-**Step into a chain.** An objective naming another quest is a link. Follow it and a trail across the top says where you are and takes you back, so a chain can be read step by step without losing the way out.
-
 ![The quest journal opened on Choose your weapon, reached through a trail reading Quest journal, Craft a workbench, Choose your weapon. The quest is marked Locked, and its four crafting objectives are separated by OR rules](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-breadcrumb.png?raw=true)
 
-_A step the player has not reached yet, read from the chain that grants it. The trail across the top is the way back._
+*   **Four tabs:** *Active*, *Finished*, *All*, and *Rewards*, which turns gold when something waits to be collected.
+*   **Rows that open** on the description, every objective with its counter, and the rewards on offer.
+*   **Tracking from the journal:** put a quest, or a single step of a long chain, on the HUD in one click.
+*   **Chains you can walk through:** an objective naming another quest is a link, and a trail at the top takes you back.
 
 ***
 
 ## 🎯 Quest types
 
-Items and blocks are named by <code>ItemId</code>, by <code>BlockTag</code> or by <code>ResourceTypeId</code>, a family such as any flower or any raw meat. <code>PickupItem</code> and <code>DropItem</code> take <code>"AntiAbuse": true</code>, so one item thrown and picked up over and over counts once, even across a reconnection. <code>BreakBlock</code> and <code>PlaceBlock</code> take it too, against one block placed and broken over and over.
-
 | Type                |Completes on                                                          |
 | ------------------- |--------------------------------------------------------------------- |
 | <code>Gather</code> |Holding a quantity of an item                                         |
-| <code>InteractivelyPickup</code> |Picking a quantity up by hand                                         |
+| <code>InteractivelyPickup</code> |Picking a quantity up by hand                            |
 | <code>Craft</code>  |Crafting a quantity of an item, whatever the recipe                   |
-| <code>Consume</code> |Eating or drinking a quantity of an item                              |
-| <code>DropItem</code> |Throwing a quantity of an item out of the inventory                   |
-| <code>PickupItem</code> |Picking a quantity of an item up, off the ground or by hand          |
-| <code>BreakBlock</code> |Breaking a number of blocks, named by id or by block tag              |
-| <code>PlaceBlock</code> |Placing a number of blocks, matched on the item they come from        |
-| <code>UseBlock</code> |Interacting with a block a number of times                            |
-| <code>UseEntity</code> |Interacting with NPCs of a group                                      |
-| <code>KillNpc</code> |Killing NPCs of a group                                               |
-| <code>KillPlayer</code> |Killing players, optionally a designated one                          |
-| <code>ReachLocation</code> |Entering a radius around a position                                   |
-| <code>EnterWorld</code> |Entering a world whose name matches a pattern                         |
-| <code>Walk</code> |Covering a distance at the slow pace, the one held with a key         |
-| <code>Run</code> |Covering a distance at the default pace                               |
-| <code>Sprint</code> |Covering a distance at the fast pace                                  |
-| <code>Jump</code> |Jumping a number of times                                             |
-| <code>Composite</code> |Its children, combined with <code>AND</code> or <code>OR</code>       |
-| <code>QuestState</code> |Another quest reaching a state, which is how you write a prerequisite |
-| <code>NoOp</code> |Nothing on its own: a command, a reward, a constraint or your own plugin ends it. |
+| <code>Consume</code> |Eating or drinking a quantity of an item                             |
+| <code>DropItem</code> |Throwing a quantity of an item out of the inventory                 |
+| <code>PickupItem</code> |Picking a quantity of an item up, off the ground or by hand       |
+| <code>BreakBlock</code> |Breaking a number of blocks                                       |
+| <code>PlaceBlock</code> |Placing a number of blocks                                        |
+| <code>UseBlock</code> |Interacting with a block a number of times                          |
+| <code>UseEntity</code> |Interacting with NPCs of a group                                   |
+| <code>KillNpc</code> |Killing NPCs of a group                                              |
+| <code>KillPlayer</code> |Killing players, optionally a designated one                      |
+| <code>ReachLocation</code> |Entering a radius around a position                            |
+| <code>EnterWorld</code> |Entering a world whose name matches a pattern                     |
+| <code>Walk</code>, <code>Run</code>, <code>Sprint</code> |Covering a distance, or a time, at that pace |
+| <code>Jump</code> |Jumping a number of times                                               |
+| <code>Composite</code> |Its children, combined with <code>AND</code> or <code>OR</code>    |
+| <code>QuestState</code> |Another quest reaching a state: a prerequisite                    |
+| <code>NoOp</code> |Nothing on its own: a command, a reward or your own plugin ends it      |
 
-Every counted type takes a target quantity, and a running quest can override it. One asset, handed out with different targets. <code>Walk</code>, <code>Run</code> and <code>Sprint</code> count metres, or seconds spent at their pace with <code>"Measure": "Seconds"</code>.
+Items and blocks are named by id, by tag, or by family, such as any flower or any raw meat. `"AntiAbuse": true` stops the same item thrown and picked up, or the same block placed and broken, from counting twice.
 
 ## 🎁 Rewards
 
 | Type       |Effect                                                     |
 | ---------- |---------------------------------------------------------- |
-| <code>Item</code> |Gives items, hotbar first, all or nothing                  |
-| <code>GrantQuest</code> |Hands the next quests over, which is how a chain continues: to each player, or with <code>"Shared": true</code> once to the world or server sharing the quest |
-| <code>Command</code> |Runs a server command, as the console or as the player     |
+| <code>Item</code> |Gives items                                         |
+| <code>GrantQuest</code> |Hands the next quests over: this is how a chain continues |
+| <code>Command</code> |Runs a server command, as the console or as the player |
 
-Each reward decides for itself whether it lands on its own or waits to be collected, with `"AutoClaim": true` written on the reward. A reward that could not be granted, because the inventory was full or the player logged off, waits on the completion record and is handed over the next time they enter a world. Nothing is silently dropped.
+Rewards can be paid on success, on failure or on abandon, handed over at once or collected from the journal. A reward that cannot be delivered, full inventory or player offline, waits for them. Nothing is lost.
 
 ## ⏳ Constraints
 
-Rules written under `"Constraints"`, on any quest type. They combine freely: a gathering quest can be timed, bound to a world and taken once a day, all at once.
-
 | Type       |Effect                                                     |
 | ---------- |---------------------------------------------------------- |
-| <code>TimeLimit</code> |Ends the quest a number of seconds after it started, failed by default or successful for a quest about holding out |
-| <code>Deadline</code> |Ends every quest from the asset at one moment, the close of an event |
-| <code>InWorld</code> |Progress only counts in a world whose name matches a pattern. Leaving can fail the quest instead |
-| <code>NearPosition</code> |Progress only counts within a radius of a position |
-| <code>EntityCondition</code> |Progress only counts while the player meets the game's own conditions: sprinting, out of combat, under an effect |
-| <code>MinPlayersOnline</code> |Progress only counts while enough players are online |
-| <code>FailOnDeath</code> |Dying fails the quest |
-| <code>Cooldown</code> |A player can take the quest at most once per period, a day for a daily quest |
-| <code>MaxCompletions</code> |A player can finish the quest a set number of times, and no more |
+| <code>TimeLimit</code> |Ends the quest after a number of seconds, failed or successful |
+| <code>Deadline</code> |Ends every quest from the asset at a set date        |
+| <code>InWorld</code> |Only counts in some worlds; leaving can fail the quest |
+| <code>NearPosition</code> |Only counts within a radius of a position        |
+| <code>EntityCondition</code> |Only counts while sprinting, out of combat, under an effect… |
+| <code>MinPlayersOnline</code> |Only counts while enough players are online    |
+| <code>FailOnDeath</code> |Dying fails the quest                             |
+| <code>Cooldown</code> |At most once per period, a day for a daily quest      |
+| <code>MaxCompletions</code> |A set number of times, and no more              |
 
 ```
 "Constraints": [
@@ -131,109 +108,24 @@ Rules written under `"Constraints"`, on any quest type. They combine freely: a g
 ]
 ```
 
-The journal lists them on the quest's page, with the time left, the players needed and how many tries are used, and the times keep counting down while it is open. On the tracker, a timed quest gets a gold bar and a clock under its title. A regular expression reads badly to a player, so any constraint takes a `DescriptionKey` to be described in your own words. Timed quests cost nothing while they wait: one timer serves the whole server.
-
-## 🏷️ Tags
-
-Tags are how an asset says something no field covers. They carry down from a parent asset, and a running quest can carry its own, with values exactly like an asset's, the instance answering alone once it declares one.
-
-| Tag        |Effect                                                     |
-| ---------- |---------------------------------------------------------- |
-| <code>OQ_HUD_DESC</code> |Shows its description under its title, greyed and smaller  |
-
-```
-{ "Type": "Composite", "TitleKey": "…", "AutoTrack": true, "Tags": { "OQ_HUD_DESC": [] } }
-```
-
-## 🗂️ Categories
-
-A category is a small asset of its own, in `Server/OpenQuests/Categories/`: a translated name and the colours it is drawn in. A quest lists its categories by id, and the journal shows them after its title, each on its own colour, wrapping onto another line when there are more than fit.
-
-```
-{ "NameKey": "quest.category.temple", "BackgroundColor": "#5b3f8c", "TextColor": "#f1eafb" }
-```
-
-```
-{ "Type": "Composite", "Categories": ["Temple", "Timed"], "TitleKey": "…" }
-```
-
-## 👁️ When a quest is shown
-
-`Visibility` says when a quest is worth putting in front of the player at all.
-
-| Value      |Listed                                                     |
-| ---------- |---------------------------------------------------------- |
-| <code>Always</code> |From the moment it is handed out. The default              |
-| <code>WhenProgressed</code> |Once the player has got somewhere with it                  |
-| <code>WhenCompleted</code> |Only once it is over: an achievement, earned before it is named |
-| <code>Never</code> |Not at all, whatever becomes of it                         |
-
-`WhenCompleted` is how a quest is made a secret: the player works towards something they were never told about, and it appears once it is theirs. `Never` is for a quest that carries a chain without asking the player for anything.
-
-What the quest owes is untouched by any of this: a quest nobody ever sees still pays out, and still announces how it ended.
-
-## 📌 The tracker
-
-`AutoTrack` on the asset puts every quest made from it on the panel. What the player does with it afterwards is written on the quest itself, so one run can be dropped without touching the rest.
-
-`QuestTrackService` is the way in: `track`, `untrack` and `toggle` on one quest, `reset` to hand the answer back to the asset, `getTracked(playerId)` for the whole list as quest ids, and `replaceTracked` to swap it for another and get back what it took, which is how a game mode borrows the tracker for a round and puts it back afterwards.
-
-## 🔔 Ending a quest
-
-A quest that ends says so: its title takes over the middle of the screen, over a line naming the outcome, and a sound plays. A quest a script abandons rather than the player passes in silence, as does one setting `"AnnounceOutcome": false`.
-
-Announcing and being listed are separate questions: a quest kept off the tracker and out of the journal still ends out loud unless it asked not to. `AnnounceOutcome` is overridable on the progression, so a chain can silence the steps it hands out without touching their asset.
-
-`SuccessfulSound`, `FailedSound` and `AbandonedSound` name the sound for each outcome, either a vanilla sound event or one shipped by an asset pack of your own. The empty string plays nothing, which is how a single quest is made to end quietly. The default sounds play one at a time, so quests ending together are heard once; a sound event of your own does the same with `"MaxInstance": 1` and `"PreventSoundInterruption": true`.
-
-```
-{ "SuccessfulSound": "SFX_Memories_Unlock_Local", "AbandonedSound": "" }
-```
+The journal shows them with the time left, and a timed quest gets a countdown bar on the tracker.
 
 ## 🌐 Who a quest belongs to
 
-The same quest asset behaves differently depending on who owns the progression.
+The same quest asset can be played four ways:
 
-**👤 Player.** The ordinary case. Everyone runs their own copy of the chain, at their own pace.
+*   **👤 Player.** Everyone runs their own copy, at their own pace.
+*   **🚪 World.** Shared by everyone inside a world, perfect for a dungeon: slay the boss, survive ten waves, light every brazier. Whoever is there at the end gets the reward.
+*   **🗺️ Worlds.** One quest across every copy of a dungeon: a daily hunt counting every run of the day.
+*   **🌍 Universe.** One counter the whole community pushes. This is where a quest becomes a server event.
 
-**🚪 World.** The quest is given to everyone entering the world and taken back from everyone leaving, so the group present is the group on the quest. This is the scope for instanced content:
+## 🎨 Make it yours
 
-*   Slay the boss of this dungeon
-*   Survive ten waves together
-*   Light every brazier in the temple before the torches burn out
-
-Rewards go to whoever is still there when it completes. Anyone who left early gets nothing, and you have no bookkeeping to do. A quest that ended while you were there stays in your journal once you leave. When the world closes for good, such as an instance once everyone has left, whatever it had not finished fails.
-
-An instance opens with its quests by itself, through an assignment:
-
-```json
-{
-  "Trigger": { "Type": "PlayerEnterWorld", "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*" },
-  "Scope": { "Type": "World" },
-  "QuestAssetIds": ["GoblinLairRats"]
-}
-```
-
-Every copy of that dungeon gets its own, shared by the group inside. Each quest it hands over with a shared `GrantQuest` stays in the same world, up to the last one.
-
-**🗺️ Worlds.** One quest shared by every copy at once: a daily hunt across all the goblin lairs run that day. Each run adds to the same counter, and the quest waits between runs instead of failing when a copy closes. It ends when it is completed, when its time runs out, or when the next day replaces it:
-
-```json
-{
-  "Trigger": { "Type": "Schedule", "At": "2026-10-05T00:00:00+02:00", "Every": "P1D" },
-  "Scope": { "Type": "Worlds", "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*" },
-  "Repeat": { "Type": "Replace" },
-  "QuestAssetIds": ["GoblinLairDailyHunt"]
-}
-```
-
-**🌍 Universe.** One counter the whole community pushes. This is where a quest stops being a chore and becomes a server event:
-
-*   Kill 1,000,000 skeletons, together
-*   Reach 1,000 unique players on the server
-*   Play 1,000 games
-
-The first needs nothing written. It is a `KillNpc` quest at universe scope.
+*   **Categories** colour-code quests in the journal: *Dungeon*, *Server event*, *Side quest*…
+*   **Secret quests** appear only once earned, with `"Visibility": "WhenCompleted"`.
+*   **Sounds** per outcome, from the game or your own asset pack.
+*   **Auto-tracking** puts a quest on the HUD the moment it is handed out.
+*   **Default titles** when you write none: a `Gather` quest reads _Gather 2 Sticks_ by itself.
 
 ***
 
@@ -241,105 +133,15 @@ The first needs nothing written. It is a `KillNpc` quest at universe scope.
 
 ### Installing
 
-Three parts. The first two are required, the third is where to start:
-
-| &nbsp;                 |&nbsp;                                                                    |
-| ---------------------- |------------------------------------------------------------------------- |
-| ⚔️ <strong>OpenQuests</strong> |this project: the quest types, the rewards, the journal and the tracker HUD |
-| ⚙️ <strong>OpenQuests Core</strong> |the system underneath, pulled in with it and usable on its own            |
-| 📦 <strong>OpenQuests Examples</strong> |two ready-made quest lines, the ones in the screenshots: play them, read them, delete them |
+*   ⚔️ **OpenQuests**: this project, the quest types, rewards, journal and HUD
+*   ⚙️ **OpenQuests Core**: the system underneath, pulled in with it
+*   📦 **OpenQuests Examples** (optional): the ready-made quest lines
 
 Drop them in `mods/`. Nothing else to configure.
 
-### Handing quests out
+### Writing a quest
 
-Three ways, and nothing else to set up:
-
-*   An assignment hands quests out on connection, as players enter given worlds or on a schedule, to each player or shared by a world, a group of worlds or the whole server, once or again each time the last one ends
-*   The `GrantQuest` reward hands the next one over when a quest completes: to each player, or with `"Shared": true` once in the same scope, so a world quest's next step is the world's too
-*   `/oquest create player|world|universe <assetId>` from the console or in game
-
-### Commands
-
-| Command                                             |Effect                        |Granted to                      |
-| --------------------------------------------------- |------------------------------ |------------------------------- |
-| <code>/ojournal</code> (<code>/journal</code>, <code>/quests</code>)         |Opens the quest journal       |<code>hytale:Adventurer</code>  |
-| <code>/oquest abandon &amp;lt;quest&amp;gt;</code>   |Gives your matching quests up |<code>hytale:Adventurer</code>  |
-| <code>/oquest complete &amp;lt;quest&amp;gt;</code>  |Ends them as successful       |<code>hytale:WorldEditor</code> |
-| <code>/oquest fail &amp;lt;quest&amp;gt;</code>      |Ends them as failed           |<code>hytale:WorldEditor</code> |
-| <code>/oquest create player|world|universe &amp;lt;assetId&amp;gt;</code> |Hands a quest out |<code>hytale:WorldEditor</code> |
-
-Each of the three outcome commands takes a quest id or an asset id, the second reaching every quest you hold from it. Reading your journal and giving up your own quest are things a player does; finishing a quest pays it out, so that one stays with the world editors. Change any of it from your own permissions file.
-
-`/oquest` also answers to `/quest` and `/q`. 
-
-### Storage
-
-Every quest is written on its own, as a JSON file under your universe. `PersistProgression` and `PersistHistory` turn that off for quests that should not outlive the session.
-
-That suits a solo world or a server among friends. Past a few dozen regular players, or as soon as two servers share the same players, point OpenQuests at a database instead, with `config.json` in the mod's folder:
-
-```json
-{
-  "Storage": {
-    "Type": "Jdbc",
-    "Url": "jdbc:postgresql://localhost:5432/openquests",
-    "User": "openquests",
-    "Password": "…",
-    "DriverPath": "libs/postgresql-42.7.4.jar"
-  }
-}
-```
-
-PostgreSQL, MySQL, MariaDB and SQLite are spoken natively. Drop the driver jar for your database beside the server and name it under `DriverPath`; none is bundled, so you choose your database and update its driver on your own schedule.
-
-`config.json` lives in `mods/MartelStudios_OpenQuestsCore/`. If a database password has no business sitting there, set the `OPENQUESTS_CONFIG` environment variable to a file anywhere else and it is read instead. A path that cannot be read stops the server rather than quietly falling back to files.
-
-***
-
-## ⚠️ Upgrading to 4.0
-
-**`StartOnConnection` became an asset of its own.** A quest no longer says when it starts: list it in an assignment under `OpenQuests/Assignments/`, `{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": [...] }`. The field is no longer read, so a quest still carrying it is simply never handed out on connection. Players keep what they were already given, but nothing recorded it under 3.x, so a quest handed out on connection back then is handed out once more.
-
-**Plugins storing quests their own way have more to write.** A `QuestStorage` now keeps what each assignment handed out (`loadAssignments`, `claimAssignment`, a conditional write so two servers never both hand the same occasion out, and `deleteAssignments`), writes a quest only over the version it was read at, saying which writes another one overtook (`writeProgressions` in place of `saveProgressions`, and `loadVersions`), and hosts a player on one server at a time (`hostPlayer`, `renewHosting`, and a `leaving` flag on `savePlayer`). The file and database storages that ship with OpenQuests already have them.
-
-**Plugins adding quest types change a quest through operations.** A visitor no longer sets a field and calls `markDirty()`: it says what happened with `quest.apply(...)`, an operation being a small record the type declares next to its fields, such as `QuantityQuestProgression.Add` for every counted type. `setState` is no longer public, and `addQuantity` and `setCurrentQuantity` are gone. Quest assets and their JSON are untouched.
-
-**A shared quest's `GrantQuest` hands each player their own unless it says `"Shared": true`.** It used to follow the quest paying: a world quest's next step went to the world. Write `"Shared": true` on the reward to keep that; the quest then hands its follow-ups on once as it ends, and `AutoClaim` no longer applies to it.
-
-**Bookkeeping left the tags.** `OQ_GRANTED_BY` is now a field of the quest, `GrantedBy`, and `OQ_PARENT_QUEST` is no longer read: a composite step saved back when it carried its group as that tag is no longer handed back to it. `OQ_HUD_DESC` is the only tag left, and it is yours.
-
-**A database written by 3.x is not read.** 4.0 lays quests and players out anew so that several servers can write them: a server finding the old ones stops and says so. Drop them, or name another `TablePrefix`. Files carry over: a quest saved by 3.x is read back with its players and its count.
-
-## ⚠️ Upgrading to 3.0
-
-3.0 is a breaking release. Read this before updating a live server.
-
-Every quest now gets a record of its own. Quests shared by several players carry over untouched; what used to travel inside a player's own file (their solo quests, the catalogue they had been offered, what they were still owed) is not read anymore, and those players start over. Nothing is deleted: the data is still in the entity files, waiting for a migration.
-
-**Plugins built on OpenQuests Core need recompiling.** Where a quest is stored moved behind one interface, so the storage classes changed shape.
-
-Back up your world and try the update on a copy first.
-
-***
-
-## ⚠️ Upgrading from 1.x
-
-2.0 is a breaking release. Read this before updating a live server.
-
-**Saved progression is not carried over.** Quest ids are written as strings now rather than as binary, and there is no migration step. Back up your world and try the update on a copy first.
-
-**`AutoClaim` moved from the quest to the reward.** It used to sit beside `TitleKey`; it now sits on each reward, so one quest can hand an item over on the spot and leave the next quest to be collected.
-
-**HUD tags are prefixed.** `HUD_DESC` is now `OQ_HUD_DESC`, and `HUD_TRACK` has become the `AutoTrack` field on the asset. An asset still carrying an old spelling is not refused, it is simply never read, so the quest quietly stops appearing on the tracker.
-
-**Command permissions moved.** `/quest` is granted to adventurers so that the subcommands they may use can be found at all, and `create`, `complete` and `fail` name `hytale:WorldEditor` themselves.
-
-***
-
-## 📝 Writing a quest
-
-A quest is a JSON asset:
+A quest is a JSON asset, steps included:
 
 ```
 {
@@ -356,25 +158,53 @@ A quest is a JSON asset:
 }
 ```
 
-Each entry is either the id of an existing asset or a definition written on the spot, so a whole chain can live in one file.
-
-Who gets a quest, and when, is written beside it rather than in it, as an assignment under `OpenQuests/Assignments/`:
+An assignment, beside it, says who gets it and when: on connection, on entering a world, or on a schedule, once or again and again.
 
 ```
-{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": ["Basics"] }
+{
+  "Trigger": { "Type": "PlayerEnterWorld", "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*" },
+  "Scope": { "Type": "World" },
+  "QuestAssetIds": ["GoblinLairRats"]
+}
 ```
 
-Titles and descriptions are optional. A quest with no title names itself from its own parameters, so a `Gather` quest reads _Gather 2 Sticks_ with nothing authored at all.
+### Commands
+
+| Command |Effect |Granted to |
+| ------- |------ |---------- |
+| <code>/ojournal</code> |Opens the quest journal, also <code>/journal</code> and <code>/quests</code> |<code>hytale:Adventurer</code> |
+| <code>/oquest abandon &lt;quest&gt;</code> |Gives your matching quests up |<code>hytale:Adventurer</code> |
+| <code>/oquest complete &lt;quest&gt;</code> |Ends them as successful |<code>hytale:WorldEditor</code> |
+| <code>/oquest fail &lt;quest&gt;</code> |Ends them as failed |<code>hytale:WorldEditor</code> |
+| <code>/oquest create player &lt;assetId&gt; &lt;player&gt;</code> |Hands a quest to a player |<code>hytale:WorldEditor</code> |
+| <code>/oquest create world &lt;assetId&gt; &lt;world&gt;</code> |Shares a quest with a world |<code>hytale:WorldEditor</code> |
+| <code>/oquest create universe &lt;assetId&gt;</code> |Shares a quest with the whole server |<code>hytale:WorldEditor</code> |
+
+`<quest>` is a quest id or an asset id. `/oquest` also answers to `/quest` and `/q`.
+
+### Storage
+
+Quests are saved as JSON under your universe, with nothing to set up. For a large server, or several servers sharing their players, use a database in `mods/MartelStudios_OpenQuestsCore/config.json`:
+
+```json
+{
+  "Storage": {
+    "Type": "Jdbc",
+    "Url": "jdbc:postgresql://localhost:5432/openquests",
+    "User": "openquests",
+    "Password": "…",
+    "DriverPath": "libs/postgresql-42.7.4.jar"
+  }
+}
+```
+
+PostgreSQL, MySQL, MariaDB and SQLite are supported; drop your database's driver beside the server. Servers sharing a database share server-wide quests and those spanning several worlds, and a player switching servers picks up where they left off. To keep the password out of `mods/`, point the `OPENQUESTS_CONFIG` environment variable at a file elsewhere.
 
 ***
 
 ## 💻 For developers
 
-OpenQuests ships as two plugins. **OpenQuestsCore** is the system itself, and deliberately ships no quest type of its own. **OpenQuests** is everything layered on top: the nineteen quest types, the three reward types, the journal and the tracker HUD. It doubles as the reference for writing your own, one package per feature.
-
-Depending on the core alone is enough to build a quest system of your own. Declare what you build on in the `manifest.json` your own mod ships: `"MartelStudios:OpenQuestsCore": "*"` for the system alone, `"MartelStudios:OpenQuests": "*"` if you also want the shipped types.
-
-A new quest type is one package and one entry point:
+**OpenQuests Core** is the system on its own, with no quest type, and **OpenQuests** adds the quest types, rewards, journal and HUD, one package per feature: the reference for writing your own. A new quest type is one call:
 
 ```
 QuestProgressionService.get().registerQuestType(
@@ -384,9 +214,7 @@ QuestProgressionService.get().registerQuestType(
 );
 ```
 
-Progression is delivered by **visitors**: an event builds one, the service carries it to the quests that can accept it, and each type decides what to do with it. Rewards are a **strategy** behind one `grant` call, so a new reward type is a codec and a method. Constraints are one too, composed onto any type: a new one overrides only the moments it cares about, handing a quest out, counting progress or running out of time. The tracker HUD and the journal both ask each type how it draws itself, so a type you add shows up with its own progress without either of them ever learning it exists.
-
-Registering a reward, a constraint, a HUD renderer or a journal renderer is a single line each. Everything a type needs beyond that stays in its own package.
+Rewards, constraints, HUD and journal renderers are one line each, and the tracker and journal draw your type without ever learning it exists. Declare `"MartelStudios:OpenQuestsCore"` or `"MartelStudios:OpenQuests"` in your `manifest.json`.
 
 ***
 

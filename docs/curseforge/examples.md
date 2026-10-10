@@ -72,7 +72,7 @@ Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, 
 
 ---
 
-All nineteen quest types are in there, along with every constraint (time limits, a closing date, a world, an area, conditions on the player, a minimum of players online, death, cooldowns and caps), the four scopes, all three reward types including rewards for failing, descriptions in the tracker, the three visibility modes, categories, and progressions carried by rewards alone. What starts by itself is handed out by assignments: `Assignments/OnConnection.json` on connection, `Assignments/DailyChores.json` again after each end, `Assignments/GoblinLair.json` in every copy of the lair, `Assignments/GoblinLairDailyHunt.json` once a day across all of them.
+All twenty-one quest types are in there, along with every constraint (time limits, a closing date, a world, an area, conditions on the player, a minimum of players online, death, cooldowns and caps), the four scopes, all three reward types including rewards for failing, descriptions in the tracker, the three visibility modes, categories, and progressions carried by rewards alone. What starts by itself is handed out by assignments: `Assignments/OnConnection.json` on connection, `Assignments/DailyChores.json` again after each end, `Assignments/GoblinLair.json` in every copy of the lair, `Assignments/GoblinLairDailyHunt.json` once a day across all of them.
 
 ---
 
