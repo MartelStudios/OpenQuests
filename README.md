@@ -488,12 +488,14 @@ A quest running against a deadline, whichever constraint set it, gets a gold bar
 its title. The bar empties from the moment the quest was handed out, and the panel redraws itself
 every second while the clock shows seconds, every minute once it counts in days.
 
-What the player then does with it is written on the quest rather than on the asset, through
-`QuestTrackService`: `track`, `untrack`, `toggle`, and `reset` to hand the answer back to the asset.
-`getTracked(playerId)` reads the list back as quest ids, and `replaceTracked` swaps it for another
-and returns what it took, which is how a game mode borrows the tracker for a round and gives it
-back. The core declares both fields and reads neither: what being tracked amounts to is the
-extension's business, the same way it owns what a `TitleKey` ends up drawn on.
+What the player then does with it is theirs: it is written in their own record, not on the quest,
+so each holder of a quest shared by a world or the whole server tracks it their own way. Through
+`QuestTrackService`: `track`, `untrack`, `toggle`, and `reset` to hand the answer back to the asset,
+each for one player. `getTracked(playerId)` reads the list back as quest ids, and `replaceTracked`
+swaps it for another and returns what it took, which is how a game mode borrows the tracker for a
+round and gives it back. The core keeps the player's answers and reads none of them: what being
+tracked amounts to is the extension's business, the same way it owns what a `TitleKey` ends up
+drawn on.
 
 A running quest carries tags of its own, through `addTag` and `removeTag`, and is asked before its
 asset: the same override as `PersistHistory`, so one quest can answer differently from everything

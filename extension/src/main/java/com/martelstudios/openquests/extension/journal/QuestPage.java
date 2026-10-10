@@ -719,7 +719,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         // Offered on every running quest, abandonable or not: what the tracker shows is the
         // player's to decide even where staying on the quest is not
-        boolean tracked = QuestTrackService.isTracked(entry.quest());
+        boolean tracked = QuestTrackService.isTracked(entry.quest(), playerRef.getUuid());
 
         context.getBuilder()
                .set(rowSelector + "#Track.Visible", true)
@@ -868,9 +868,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
-     * Puts a quest on the tracker or takes it off. Both tags are written, since the asset may have
-     * asked for either and a quest can only ever say otherwise by carrying the opposite tag:
-     * dropping one without adding the other would hand the answer straight back to the asset.
+     * Puts a quest on this player's tracker or takes it off, leaving everyone else holding it alone.
      */
     private void track(@Nonnull Ref<EntityStore> ref, String target) {
         UUID id = parse(target);
@@ -882,7 +880,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(id);
         if (quest == null) return;
 
-        QuestTrackService.toggle(quest);
+        QuestTrackService.toggle(quest, playerRef.getUuid());
     }
 
     /**

@@ -288,7 +288,7 @@ class JdbcQuestStorageTest {
 
         PendingRewards owed = new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")});
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet", "PickBerries"), Set.of(owed), Map.of()), List.of(), true);
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet", "PickBerries"), Set.of(owed), Map.of(), Map.of()), List.of(), true);
 
         PlayerQuestRecord read = storage.loadPlayer(playerId);
 
@@ -308,7 +308,7 @@ class JdbcQuestStorageTest {
         UUID playerId = UUID.randomUUID();
         TestQuestProgression quest = quest("Owed", playerId);
         storage.writeProgressions(List.of(quest));
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of()), List.of(), true);
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of(), Map.of()), List.of(), true);
 
         storage.postMessage(PlayerMessage.owed(playerId, new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")})));
         // The same completion, now owing less: taken in, it replaces rather than piling up
@@ -320,6 +320,20 @@ class JdbcQuestStorageTest {
         assertEquals(1, read.getPendingRewards().size());
         assertEquals(0, read.getPendingRewards().iterator().next().getRewards().length);
         assertTrue(storage.loadMessages(List.of(playerId)).isEmpty());
+    }
+
+    @Test
+    void eachHolderOfAQuestKeepsTheirOwnTracking() {
+        UUID alice = UUID.randomUUID();
+        UUID bob = UUID.randomUUID();
+        TestQuestProgression quest = quest("Shared", alice, bob);
+        storage.writeProgressions(List.of(quest));
+
+        storage.savePlayer(alice, new PlayerQuestRecord(Set.of(), Map.of(), Set.of(), Map.of(), Map.of(quest.getId(), true)), List.of(), true);
+        storage.savePlayer(bob, new PlayerQuestRecord(Set.of(), Map.of(), Set.of(), Map.of(), Map.of(quest.getId(), false)), List.of(), true);
+
+        assertEquals(Map.of(quest.getId(), true), storage.loadPlayer(alice).getTracking());
+        assertEquals(Map.of(quest.getId(), false), storage.loadPlayer(bob).getTracking());
     }
 
     @Test
@@ -344,7 +358,7 @@ class JdbcQuestStorageTest {
     @Test
     void anEndingLeftForAPlayerCountsLikeOneSeenThere() {
         UUID playerId = UUID.randomUUID();
-        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of()), List.of(), true);
+        storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of(), Map.of()), List.of(), true);
 
         storage.postMessage(PlayerMessage.ended(playerId, "DailyWood", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000), Instant.ofEpochMilli(2_000)));
         storage.postMessage(PlayerMessage.ended(playerId, "DailyWood", QuestState.ABANDONED, Instant.ofEpochMilli(3_000), Instant.ofEpochMilli(4_000)));
@@ -474,8 +488,8 @@ class JdbcQuestStorageTest {
         target.addToIndex("universe", Set.of(quest.getId()));
         assertEquals(Set.of(quest.getId()), target.loadIndex("universe"));
 
-        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain"), Set.of(), Map.of()), List.of(), true);
-        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of()), List.of(), true);
+        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain"), Set.of(), Map.of(), Map.of()), List.of(), true);
+        target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of(), Map.of()), List.of(), true);
         assertEquals(handed("OnConnection", "Chain", "Other"), target.loadPlayer(alice).getAssignments());
 
         quest.leave(bob);
@@ -793,13 +807,13 @@ class JdbcQuestStorageTest {
         try {
             UUID alice = UUID.randomUUID();
             onA.hostPlayer(alice);
-            onA.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain"), Set.of(), Map.of()), List.of(), false);
+            onA.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain"), Set.of(), Map.of(), Map.of()), List.of(), false);
 
             CompletableFuture<PlayerQuestRecord> readByB = CompletableFuture.supplyAsync(() -> onB.hostPlayer(alice));
             Thread.sleep(500);
             assertFalse(readByB.isDone());
 
-            onA.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of()), List.of(), true);
+            onA.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of(), Map.of()), List.of(), true);
 
             assertEquals(handed("OnConnection", "Chain", "Other"), readByB.get(5, TimeUnit.SECONDS).getAssignments());
         } finally {
@@ -821,9 +835,9 @@ class JdbcQuestStorageTest {
             // A stops renewing: its hold runs out, and B takes Alice without waiting
             onA.renewHosting(Duration.ZERO);
             onB.hostPlayer(alice);
-            assertTrue(onB.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of()), List.of(), false));
+            assertTrue(onB.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of(), Map.of()), List.of(), false));
 
-            assertFalse(onA.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain"), Set.of(), Map.of()), List.of(), true));
+            assertFalse(onA.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain"), Set.of(), Map.of(), Map.of()), List.of(), true));
             assertEquals(handed("OnConnection", "Chain", "Other"), onA.loadPlayer(alice).getAssignments());
         } finally {
             onA.close();

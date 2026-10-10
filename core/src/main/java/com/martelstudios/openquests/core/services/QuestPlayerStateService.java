@@ -25,6 +25,7 @@ import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +103,7 @@ public class QuestPlayerStateService {
         }
 
         QuestStoreComponent questStore = holder.ensureAndGetComponent(QuestStoreComponent.getComponentType());
-        questStore.restore(resolved, record.getAssignments(), record.getCompletions());
+        questStore.restore(resolved, record.getAssignments(), record.getCompletions(), record.getTracking());
 
         PendingRewardStoreComponent rewards = holder.ensureAndGetComponent(PendingRewardStoreComponent.getComponentType());
         rewards.pending.restore(record.getPendingRewards());
@@ -166,7 +167,7 @@ public class QuestPlayerStateService {
         boolean changed = questStore.hasChanges() || rewards.hasChanges() || !delivered.isEmpty();
         if (!changed && !force) return;
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(questIds, questStore.getAssignments().snapshot(), rewards.snapshot(), questStore.getCompletions()), delivered, leaving);
+        storage.savePlayer(playerId, new PlayerQuestRecord(questIds, questStore.getAssignments().snapshot(), rewards.snapshot(), questStore.getCompletions(), questStore.getTracking()), delivered, leaving);
         session.delivered().removeAll(delivered);
 
         questStore.consumeChanges();
@@ -209,6 +210,16 @@ public class QuestPlayerStateService {
     @Nonnull
     public Set<UUID> getHostedPlayers() {
         return Set.copyOf(sessions.keySet());
+    }
+
+    /**
+     * @return the quests of a player this server hosts, held by reference and safe to read from any
+     * thread, or {@code null} for one it does not.
+     */
+    @Nullable
+    public QuestStoreComponent getQuestStore(@Nonnull UUID playerId) {
+        Session session = sessions.get(playerId);
+        return session == null ? null : session.questStore();
     }
 
     /**
