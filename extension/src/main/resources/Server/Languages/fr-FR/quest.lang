@@ -114,8 +114,8 @@ temple-offering.in-temple=Dans le Temple oublié
 temple-offering.near-altar=À moins de 6 blocs de l'autel des runes
 temple-race.title=Courir jusqu'à l'autel des runes
 temple-race.description=Rejoignez l'autel des runes sous la porte centrale du temple.
-temple-run.title=Courez 60 secondes dans le temple
-temple-run.description=Courez 60 secondes en explorant les alentours du temple.
+temple-run.title=Courez 20 secondes dans le temple
+temple-run.description=Courez 20 secondes en explorant les alentours du temple.
 temple-hold.title=Restez une minute à explorer le temple
 temple-hold.description=Passez au moins une minute dans le temple à le parcourir.
 

@@ -114,8 +114,8 @@ temple-offering.in-temple=Inside the Forgotten Temple
 temple-offering.near-altar=Within 6 blocks of the rune altar
 temple-race.title=Run to the rune altar
 temple-race.description=Reach the rune altar under the temple's central gate.
-temple-run.title=Run through the temple for 60 seconds
-temple-run.description=Run for 60 seconds, exploring the temple grounds.
+temple-run.title=Run through the temple for 20 seconds
+temple-run.description=Run for 20 seconds, exploring the temple grounds.
 temple-hold.title=Explore the temple for a minute
 temple-hold.description=Spend at least one minute inside the temple, looking around.
 

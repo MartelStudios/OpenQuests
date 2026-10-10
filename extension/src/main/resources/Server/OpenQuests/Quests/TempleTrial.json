@@ -51,7 +51,7 @@
       "TitleKey": "quest.temple-run.title",
       "DescriptionKey": "quest.temple-run.description",
       "Measure": "Seconds",
-      "TargetQuantity": 60,
+      "TargetQuantity": 20,
       "AnnounceOutcome": false
     },
     {
