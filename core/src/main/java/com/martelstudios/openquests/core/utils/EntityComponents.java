@@ -188,10 +188,15 @@ public interface EntityComponents {
             return reference.getStore().getComponent(reference, componentType);
         }
 
+        /**
+         * Reads first: while one of its systems runs, the store refuses even an ensure that would
+         * find the component already there, and a journal redrawing on a tick asks for some.
+         */
         @Nonnull
         @Override
         public <T extends Component<EntityStore>> T ensureAndGetComponent(@Nonnull ComponentType<EntityStore, T> componentType) {
-            return reference.getStore().ensureAndGetComponent(reference, componentType);
+            T component = getComponent(componentType);
+            return component != null ? component : reference.getStore().ensureAndGetComponent(reference, componentType);
         }
 
         @Override
