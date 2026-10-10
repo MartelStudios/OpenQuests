@@ -67,7 +67,7 @@ public class QuestRewardService {
      */
     private void handleQuestCompletedEvent(QuestCompletedEvent questCompletedEvent) {
         AbstractQuestProgression<?> quest = questCompletedEvent.getQuest();
-        if (!questCompletedEvent.isClaimedHere()) return;
+        if (!questCompletedEvent.isEndedHere()) return;
 
 
         OpenQuestAsset asset = quest.getAsset();

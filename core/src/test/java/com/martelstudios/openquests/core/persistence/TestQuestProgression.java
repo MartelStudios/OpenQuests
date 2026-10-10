@@ -4,7 +4,6 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.Membership;
 import com.martelstudios.openquests.core.models.QuestState;
 
 import java.util.UUID;
@@ -27,10 +26,36 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
     private int counter;
 
     /**
-     * Moves a player the way the quest would.
+     * Hands the quest to a player the way the quest would.
      */
-    public TestQuestProgression move(UUID playerId, Membership.Status status) {
-        change(quest -> quest.membership.move(playerId, status));
+    public TestQuestProgression join(UUID playerId) {
+        change(quest -> {
+            if (!quest.players.add(playerId)) return false;
+
+            quest.abandonedPlayers.remove(playerId);
+            return true;
+        });
+        return this;
+    }
+
+    /**
+     * Takes a player off the quest, the way a world left behind does.
+     */
+    public TestQuestProgression leave(UUID playerId) {
+        change(quest -> quest.players.remove(playerId));
+        return this;
+    }
+
+    /**
+     * Has a player give the quest up.
+     */
+    public TestQuestProgression giveUp(UUID playerId) {
+        change(quest -> {
+            if (!quest.players.remove(playerId)) return false;
+
+            quest.abandonedPlayers.add(playerId);
+            return true;
+        });
         return this;
     }
 

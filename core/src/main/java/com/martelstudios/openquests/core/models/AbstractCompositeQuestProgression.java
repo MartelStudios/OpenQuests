@@ -83,28 +83,14 @@ public abstract class AbstractCompositeQuestProgression<Q extends AbstractCompos
     }
 
     /**
-     * Names this group as the parent of a step it already lists, for a step written before quests
-     * kept their parent. A quest it does not list, or one naming a parent already, is left alone.
-     *
-     * @return {@code true} if the step now names this group.
-     */
-    public boolean claim(@Nonnull AbstractQuestProgression<?> child) {
-        if (child.getParentId() != null) return false;
-        if (!Arrays.asList(childIds).contains(child.getId())) return false;
-
-        child.setParentId(getId());
-        child.markDirty();
-        return true;
-    }
-
-    /**
      * Whoever takes the group on takes its steps on too: a step is played by the group's players.
      */
     @Override
     public boolean addPlayer(@Nonnull UUID playerId) {
         if (!super.addPlayer(playerId)) return false;
 
-        getChildren().forEach(child -> child.addPlayer(playerId));
+        // Made again on a stored copy, it leaves the steps to their own copies
+        if (!isReplaying()) getChildren().forEach(child -> child.addPlayer(playerId));
         return true;
     }
 
@@ -115,7 +101,7 @@ public abstract class AbstractCompositeQuestProgression<Q extends AbstractCompos
     public boolean removePlayer(@Nonnull UUID playerId) {
         if (!super.removePlayer(playerId)) return false;
 
-        getChildren().forEach(child -> child.removePlayer(playerId));
+        if (!isReplaying()) getChildren().forEach(child -> child.removePlayer(playerId));
         return true;
     }
 
@@ -126,7 +112,7 @@ public abstract class AbstractCompositeQuestProgression<Q extends AbstractCompos
     public boolean abandonPlayer(@Nonnull UUID playerId) {
         if (!super.abandonPlayer(playerId)) return false;
 
-        getChildren().forEach(child -> child.abandonPlayer(playerId));
+        if (!isReplaying()) getChildren().forEach(child -> child.abandonPlayer(playerId));
         return true;
     }
 }

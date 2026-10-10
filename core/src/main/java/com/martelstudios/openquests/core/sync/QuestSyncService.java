@@ -24,13 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 /**
@@ -45,11 +42,6 @@ import java.util.function.Predicate;
  */
 public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
-
-    /**
-     * How long a caller about to let go of a quest waits for its write.
-     */
-    private static final long WRITE_NOW_TIMEOUT_SECONDS = 10;
 
     @Nonnull
     private final QuestStorage storage;
@@ -96,7 +88,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
     }
 
     /**
-     * Lets what is queued finish, so a shutdown writes nothing over a storage still being written.
+     * Lets what is queued finish, the shared quests the last save pass handed over included.
      */
     public void stop() {
         worker.shutdown();
@@ -122,8 +114,8 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
                 }
             });
         } catch (RejectedExecutionException e) {
-            // The server is stopping: the last save pass writes what is still in memory
-            LOGGER.atFine().log("Left %s to the last save pass", what);
+            // The last save pass ran before the thread stopped, and wrote what was in memory
+            LOGGER.atFine().log("Left %s as the server stopped", what);
         }
     }
 
@@ -182,34 +174,21 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
         return scope != null && scope.spansServers();
     }
 
-    @Override
-    public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {
-        execute("quest " + quest.getId(), () -> commit(quest));
-    }
-
     /**
-     * On the storage thread like every other write of a shared quest, the caller waiting for it,
-     * unless that thread is the caller or is gone.
+     * On the storage thread, like every write of a shared quest, so this server never writes one
+     * twice at once. Once that thread is stopping, written in place by whatever runs on it or after
+     * it, and by nothing else, which would race it.
      */
     @Override
-    public void writeNow(@Nonnull AbstractQuestProgression<?> quest) {
-        if (Thread.currentThread() == workerThread || worker.isTerminated()) {
-            commit(quest);
-            return;
-        }
-
+    public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {
         try {
-            Future<?> written = worker.submit(() -> commit(quest));
-            written.get(WRITE_NOW_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            worker.execute(() -> commitLogged(quest));
         } catch (RejectedExecutionException e) {
-            // Stopping, and the thread is not done yet: the write waits for it rather than racing it
-            LOGGER.atWarning().log("Quest %s was left unwritten as the server stopped", quest.getId());
-        } catch (ExecutionException e) {
-            LOGGER.atWarning().withCause(e.getCause()).log("Failed to write quest %s", quest.getId());
-        } catch (TimeoutException e) {
-            LOGGER.atWarning().log("Quest %s is still being written", quest.getId());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            if (Thread.currentThread() == workerThread || worker.isTerminated()) {
+                commitLogged(quest);
+            } else {
+                LOGGER.atWarning().log("Quest %s was left unwritten as the server stopped", quest.getId());
+            }
         }
     }
 

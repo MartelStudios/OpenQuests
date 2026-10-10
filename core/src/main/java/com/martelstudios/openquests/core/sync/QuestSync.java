@@ -22,15 +22,10 @@ public final class QuestSync {
         boolean isShared(@Nonnull AbstractQuestProgression<?> quest);
 
         /**
-         * Writes what the quest is waiting to write off the caller's thread, for a change of state
-         * whose consequences wait on the write.
+         * Writes what the quest is waiting to write off the caller's thread, the caller never
+         * waiting on the storage.
          */
         void writeSoon(@Nonnull AbstractQuestProgression<?> quest);
-
-        /**
-         * Writes it before returning, for a caller about to let go of the quest.
-         */
-        void writeNow(@Nonnull AbstractQuestProgression<?> quest);
     }
 
     /**
@@ -44,9 +39,6 @@ public final class QuestSync {
 
         @Override
         public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {}
-
-        @Override
-        public void writeNow(@Nonnull AbstractQuestProgression<?> quest) {}
     };
 
     private static volatile Policy policy = ALONE;
@@ -72,12 +64,5 @@ public final class QuestSync {
      */
     public static void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {
         policy.writeSoon(quest);
-    }
-
-    /**
-     * Writes what the quest is waiting to write before returning.
-     */
-    public static void writeNow(@Nonnull AbstractQuestProgression<?> quest) {
-        policy.writeNow(quest);
     }
 }

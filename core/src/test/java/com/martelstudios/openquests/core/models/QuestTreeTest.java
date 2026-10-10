@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,25 +54,6 @@ class QuestTreeTest {
         assertThrows(IllegalStateException.class, () -> second.adopt(step));
         assertEquals(first.getId(), step.getParentId());
         assertEquals(0, second.getChildIds().length);
-    }
-
-    @Test
-    void aGroupClaimsOnlyAStepItListsThatNamesNoParent() {
-        TestComposite group = new TestComposite();
-        TestQuestProgression listed = new TestQuestProgression();
-        TestQuestProgression stranger = new TestQuestProgression();
-
-        // A step written before quests kept their parent: listed by its group, naming nobody
-        TestComposite written = CodecJson.decode(TestComposite.CODEC, "{\"Id\": \"" + group.getId() + "\", \"QuestIds\": [\"" + listed.getId() + "\"]}", "group");
-        assertNotNull(written);
-
-        assertFalse(written.claim(stranger));
-        assertNull(stranger.getParentId());
-
-        assertTrue(written.claim(listed));
-        assertEquals(group.getId(), listed.getParentId());
-
-        assertFalse(written.claim(listed));
     }
 
     @Test

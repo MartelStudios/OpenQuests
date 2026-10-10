@@ -12,7 +12,7 @@ import java.util.UUID;
  * listener can watch one specific quest rather than filtering every completion.
  *
  * <p>Every server holding the quest hears it, but only the one whose write ended it pays what the
- * end pays: a listener with an effect that must happen once checks {@link #isClaimedHere()}.
+ * end pays: a listener with an effect that must happen once checks {@link #isEndedHere()}.
  */
 public class QuestCompletedEvent implements IEvent<UUID> {
     @Nonnull
@@ -21,16 +21,16 @@ public class QuestCompletedEvent implements IEvent<UUID> {
     @Nonnull
     private final QuestState state;
 
-    private final boolean claimedHere;
+    private final boolean endedHere;
 
     /**
      * @param state the outcome reached, which the quest may have moved past by the time this is heard
-     * @param claimedHere whether this server ended the quest, rather than learning another did
+     * @param endedHere whether this server ended the quest, rather than learning another did
      */
-    public QuestCompletedEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state, boolean claimedHere) {
+    public QuestCompletedEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state, boolean endedHere) {
         this.quest = quest;
         this.state = state;
-        this.claimedHere = claimedHere;
+        this.endedHere = endedHere;
     }
 
     @Nonnull
@@ -48,7 +48,7 @@ public class QuestCompletedEvent implements IEvent<UUID> {
      * whatever must happen once. {@code false} on a server only learning of it, which files the
      * quest away and tells its own players.
      */
-    public boolean isClaimedHere() {
-        return claimedHere;
+    public boolean isEndedHere() {
+        return endedHere;
     }
 }

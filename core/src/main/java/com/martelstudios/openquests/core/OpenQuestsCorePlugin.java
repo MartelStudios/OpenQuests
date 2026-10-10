@@ -240,9 +240,10 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     @Override
     protected void shutdown() {
-        // First, so nothing is still being written behind the last pass
-        if (questSyncService != null) questSyncService.stop();
         saveEverything(true);
+
+        // After the last pass, which hands the shared quests to the storage thread to write
+        if (questSyncService != null) questSyncService.stop();
 
         if (questStorage != null) questStorage.close();
     }

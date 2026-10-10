@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.quests.movement;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.protocol.MovementStates;
-import com.martelstudios.openquests.core.models.Membership;
 import com.martelstudios.openquests.core.persistence.CodecJson;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,7 @@ class MovementReplayTest {
         static final BuilderCodec<PaceQuest> CODEC = BuilderCodec.builder(PaceQuest.class, PaceQuest::new, QuantityQuestProgression.BASE_CODEC).build();
 
         void join(@Nonnull UUID playerId) {
-            change(quest -> quest.membership.move(playerId, Membership.Status.JOINED));
+            change(quest -> quest.players.add(playerId));
         }
 
         @Override

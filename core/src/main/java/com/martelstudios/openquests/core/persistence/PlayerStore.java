@@ -11,9 +11,10 @@ import java.util.UUID;
  * messages other servers leave them meanwhile: a server never writes a record it does not host,
  * it leaves a message the host takes in.
  *
- * <p>Hosting a player is held for a while and renewed, so a player moving between servers is
- * read by the next one only once the last one wrote them out, and a server that stopped answering
- * gives its players up.
+ * <p>A player moving between servers is read by the next one once the last one wrote them out and
+ * let go, or once it waited long enough: the record is then the next one's, and a write from the
+ * last one is refused. Hosting is renewed while it lasts, so a server that stopped answering spares
+ * the next one the wait.
  */
 public interface PlayerStore {
 
@@ -26,7 +27,7 @@ public interface PlayerStore {
 
     /**
      * Hosts a player on this server, then reads their record: waits a while for the server they
-     * come from to write them out and let go, and takes them over from one that stopped renewing.
+     * come from to write them out and let go, and takes them over once done waiting.
      *
      * @return their record, as the last server hosting them left it. Never {@code null}.
      */

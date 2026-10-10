@@ -7,15 +7,22 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
 /**
- * The progressions, one stored copy per quest with a version that grows with every write. A quest
- * only one server writes is written over; one several servers write is written one change at a
- * time, each server making its own on the latest version, so nobody's change is ever undone.
+ * The progressions, one stored copy per quest with a version that grows with every write, each
+ * only ever written over the version it was read at. A quest only one server writes is written
+ * whole; one several servers write has each server make its own changes on the latest version, so
+ * nobody's change is ever undone.
  */
 public interface ProgressionStore {
+
+    /**
+     * How many times a change is made on a newer version before it is left for the next pass.
+     */
+    int COMMIT_ATTEMPTS = 10;
 
     /**
      * @return the quest under that id, standing on the version it was read at, or {@code null} for
@@ -44,24 +51,37 @@ public interface ProgressionStore {
     List<AbstractQuestProgression<?>> loadAllProgressions();
 
     /**
-     * Writes each quest over what is stored, as one batch, for quests only this server writes. Who
-     * holds a quest is read off the quest itself, so dropping a player from one unlinks them by
-     * this call alone.
+     * Writes each quest over the version it stands on, a new one created, as one batch with who
+     * holds them. Each quest written then stands on the version it is stored at.
+     *
+     * @return the ids of those that another write moved first, left as stored: never written over.
      */
-    void saveProgressions(@Nonnull Collection<AbstractQuestProgression<?>> quests);
+    @Nonnull
+    Set<UUID> writeProgressions(@Nonnull Collection<? extends AbstractQuestProgression<?>> quests);
 
     /**
-     * Writes a quest several servers write: reads the latest version, has {@code changes} make this
-     * server's changes on it, and writes it only over that version, reading again and making them
-     * again if another server wrote in between. Changes that make no difference write nothing.
+     * Makes changes on the latest version and writes it over that version alone, reading again and
+     * making them again whenever another write came first. Changes that make no difference write
+     * nothing.
      *
-     * @param changes makes this server's changes on the stored copy it is handed and says whether
-     * they changed it, which may happen more than once: the last copy handed over is the one kept
+     * @param changes makes the changes on the stored copy it is handed and says whether they
+     * changed it, which may happen more than once: the last copy handed over is the one kept
      * @return that copy, standing on the version it is stored at, or {@code null} if nothing is
      * stored under that id any more
      */
     @Nullable
-    AbstractQuestProgression<?> commitProgression(@Nonnull UUID questId, @Nonnull Predicate<AbstractQuestProgression<?>> changes);
+    default AbstractQuestProgression<?> commitProgression(@Nonnull UUID questId, @Nonnull Predicate<AbstractQuestProgression<?>> changes) {
+        for (int attempt = 0; attempt < COMMIT_ATTEMPTS; attempt++) {
+            AbstractQuestProgression<?> stored = loadProgression(questId);
+            if (stored == null) return null;
+
+            // Made already by whoever wrote this version: nothing for the others to read again
+            if (!changes.test(stored)) return stored;
+
+            if (writeProgressions(List.of(stored)).isEmpty()) return stored;
+        }
+        throw new QuestStorageException("Quest " + questId + " kept being written by other servers; its changes wait for the next pass");
+    }
 
     /**
      * @return the version each of those quests is stored at, those with nothing stored left out.

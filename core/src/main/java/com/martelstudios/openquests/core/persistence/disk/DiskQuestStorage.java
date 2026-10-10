@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * The quests as JSON files under the universe directory, which is where a server with no database
@@ -161,8 +160,12 @@ public class DiskQuestStorage implements QuestStorage {
         return quests;
     }
 
+    /**
+     * Nobody else writes these files, so no write is ever overtaken.
+     */
+    @Nonnull
     @Override
-    public void saveProgressions(@Nonnull Collection<AbstractQuestProgression<?>> quests) {
+    public Set<UUID> writeProgressions(@Nonnull Collection<? extends AbstractQuestProgression<?>> quests) {
         Map<UUID, Set<UUID>> newLinks = new HashMap<>();
 
         for (AbstractQuestProgression<?> quest : quests) {
@@ -175,6 +178,7 @@ public class DiskQuestStorage implements QuestStorage {
         }
 
         newLinks.forEach((playerId, questIds) -> updatePlayer(playerId, record -> record.getQuestIds().addAll(questIds)));
+        return Set.of();
     }
 
     @Override
@@ -190,19 +194,6 @@ public class DiskQuestStorage implements QuestStorage {
         for (UUID playerId : holders(quest)) {
             updatePlayer(playerId, record -> record.getQuestIds().remove(questId));
         }
-    }
-
-    /**
-     * Nobody else writes these files, so the file read is the latest there is.
-     */
-    @Nullable
-    @Override
-    public AbstractQuestProgression<?> commitProgression(@Nonnull UUID questId, @Nonnull Predicate<AbstractQuestProgression<?>> changes) {
-        AbstractQuestProgression<?> stored = loadProgression(questId);
-        if (stored == null || !changes.test(stored)) return stored;
-
-        progressions.save(questId.toString(), new QuestProgressionRecord(stored));
-        return stored;
     }
 
     /**

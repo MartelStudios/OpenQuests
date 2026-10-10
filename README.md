@@ -396,12 +396,13 @@ QuestStorageProvider.CODEC.register("Redis", RedisStorageProvider.class, RedisSt
 ```
 
 The provider builds a `QuestStorage`, which is every port at once. Keep the guarantees the ports
-state, since several servers rely on them: a shared quest is written only over the version its
-changes were made on, with who holds it in the same write; an index only member by member; a
-player record only while the server hosts the player, hosting held for a while and taken over once
-it runs out; an assignment hand-out only if nothing else wrote first; an ended quest done away with
-stays readable a while longer; a message is let go of in the same write as the record that took it
-in. `isShared()` says whether other servers may write the backend at once.
+state, since several servers rely on them: a quest is written only over the version it was read
+at, with who holds it in the same write, and a write overtaken says so; an index only member by
+member; a player record only while the server hosts the player, the next server waiting a while
+for the last one to let go before taking over; an assignment hand-out only if nothing else wrote
+first; an ended quest done away with stays readable a while longer; a message is let go of in the
+same write as the record that took it in. `isShared()` says whether other servers may write the
+backend at once.
 
 ### Lifecycle
 

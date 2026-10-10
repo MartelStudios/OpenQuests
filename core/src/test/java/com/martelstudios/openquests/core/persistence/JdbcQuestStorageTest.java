@@ -2,7 +2,6 @@ package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
-import com.martelstudios.openquests.core.models.Membership;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -76,7 +75,7 @@ class JdbcQuestStorageTest {
         TestQuestProgression quest = quest("CollectStick", playerId);
         quest.setCounter(7).setState(QuestState.IN_PROGRESS).addTag("OQ_TEST", "a", "b");
 
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
 
         AbstractQuestProgression<?> read = storage.loadProgression(quest.getId());
 
@@ -134,7 +133,7 @@ class JdbcQuestStorageTest {
         scope.addWorld(arena);
         quest.setScope(scope);
 
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
 
         AbstractQuestProgression<?> read = storage.loadProgression(quest.getId());
 
@@ -151,7 +150,7 @@ class JdbcQuestStorageTest {
         scope.addWorld(arena);
         quest.setScope(scope);
 
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
 
         AbstractQuestProgression<?> read = storage.loadProgression(quest.getId());
 
@@ -165,7 +164,7 @@ class JdbcQuestStorageTest {
     void aQuestNobodySharesHasNoScope() {
         TestQuestProgression quest = quest("CollectStick", UUID.randomUUID());
 
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
 
         AbstractQuestProgression<?> read = storage.loadProgression(quest.getId());
 
@@ -177,10 +176,10 @@ class JdbcQuestStorageTest {
     void savingTheSameQuestTwiceUpdatesIt() {
         TestQuestProgression quest = quest("CollectStick", UUID.randomUUID());
 
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
 
         quest.setCounter(42).setState(QuestState.SUCCESSFUL);
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
 
         assertEquals(1, storage.loadAllProgressions().size());
 
@@ -199,7 +198,7 @@ class JdbcQuestStorageTest {
         TestQuestProgression his = quest("His", bob);
         TestQuestProgression shared = quest("Shared", alice, bob);
 
-        storage.saveProgressions(List.of(hers, his, shared));
+        storage.writeProgressions(List.of(hers, his, shared));
 
         assertEquals(Set.of(hers.getId(), shared.getId()), ids(storage.loadPlayerProgressions(alice)));
         assertEquals(Set.of(his.getId(), shared.getId()), ids(storage.loadPlayerProgressions(bob)));
@@ -209,9 +208,9 @@ class JdbcQuestStorageTest {
     void aPlayerWhoGaveUpStillHoldsTheQuest() {
         UUID playerId = UUID.randomUUID();
         TestQuestProgression quest = quest("Abandoned", playerId);
-        quest.move(playerId, Membership.Status.ABANDONED);
+        quest.giveUp(playerId);
 
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
 
         assertEquals(Set.of(quest.getId()), ids(storage.loadPlayerProgressions(playerId)));
 
@@ -226,10 +225,10 @@ class JdbcQuestStorageTest {
         UUID bob = UUID.randomUUID();
         TestQuestProgression quest = quest("Shared", alice, bob);
 
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
 
-        quest.move(bob, Membership.Status.LEFT);
-        storage.saveProgressions(List.of(quest));
+        quest.leave(bob);
+        storage.writeProgressions(List.of(quest));
 
         assertEquals(Set.of(quest.getId()), ids(storage.loadPlayerProgressions(alice)));
         assertTrue(storage.loadPlayerProgressions(bob).isEmpty());
@@ -240,7 +239,7 @@ class JdbcQuestStorageTest {
         UUID playerId = UUID.randomUUID();
         TestQuestProgression quest = quest("Gone", playerId);
 
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
         storage.addToIndex("universe", Set.of(quest.getId()));
 
         storage.deleteProgression(quest);
@@ -284,7 +283,7 @@ class JdbcQuestStorageTest {
     void writesAndReadsBackWhatAPlayerCarries() {
         UUID playerId = UUID.randomUUID();
         TestQuestProgression quest = quest("Owed", playerId);
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
 
         PendingRewards owed = new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")});
 
@@ -307,7 +306,7 @@ class JdbcQuestStorageTest {
     void aDebtLeftForAPlayerWaitsUntilTheirRecordTakesItIn() {
         UUID playerId = UUID.randomUUID();
         TestQuestProgression quest = quest("Owed", playerId);
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
         storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of()), List.of(), true);
 
         storage.postMessage(PlayerMessage.owed(playerId, new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")})));
@@ -457,11 +456,11 @@ class JdbcQuestStorageTest {
         TestQuestProgression quest = quest("Chain", alice, bob);
         quest.setCounter(3);
 
-        target.saveProgressions(List.of(quest));
+        target.writeProgressions(List.of(quest));
 
         // Twice, so the upsert is the statement being tested rather than the insert
         quest.setCounter(9).setState(QuestState.SUCCESSFUL);
-        target.saveProgressions(List.of(quest));
+        target.writeProgressions(List.of(quest));
 
         AbstractQuestProgression<?> read = target.loadProgression(quest.getId());
         assertNotNull(read);
@@ -478,8 +477,8 @@ class JdbcQuestStorageTest {
         target.savePlayer(alice, new PlayerQuestRecord(Set.of(), handed("OnConnection", "Chain", "Other"), Set.of(), Map.of()), List.of(), true);
         assertEquals(handed("OnConnection", "Chain", "Other"), target.loadPlayer(alice).getAssignments());
 
-        quest.move(bob, Membership.Status.LEFT);
-        target.saveProgressions(List.of(quest));
+        quest.leave(bob);
+        target.writeProgressions(List.of(quest));
         assertTrue(target.loadPlayerProgressions(bob).isEmpty());
 
         // Ended, it stays readable a while for servers that have not heard, but nobody holds it
@@ -500,11 +499,11 @@ class JdbcQuestStorageTest {
             UUID alice = UUID.randomUUID();
             UUID bob = UUID.randomUUID();
             TestQuestProgression quest = quest("CommunityHunt");
-            onA.saveProgressions(List.of(quest));
+            onA.writeProgressions(List.of(quest));
             TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
 
-            quest.move(alice, Membership.Status.JOINED).addToCounter(5);
-            copyOnB.move(bob, Membership.Status.JOINED).addToCounter(3);
+            quest.join(alice).addToCounter(5);
+            copyOnB.join(bob).addToCounter(3);
 
             write(onA, quest);
             write(onB, copyOnB);
@@ -535,7 +534,7 @@ class JdbcQuestStorageTest {
 
         try {
             TestQuestProgression quest = quest("Race");
-            onA.saveProgressions(List.of(quest));
+            onA.writeProgressions(List.of(quest));
             AtomicInteger attempts = new AtomicInteger();
 
             AbstractQuestProgression<?> written = onB.commitProgression(quest.getId(), stored -> {
@@ -563,7 +562,7 @@ class JdbcQuestStorageTest {
 
         try {
             TestQuestProgression quest = quest("Race");
-            onA.saveProgressions(List.of(quest));
+            onA.writeProgressions(List.of(quest));
             TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
 
             quest.addAndEndAt(10, 10);
@@ -602,11 +601,11 @@ class JdbcQuestStorageTest {
         try {
             UUID alice = UUID.randomUUID();
             TestQuestProgression quest = quest("Joined");
-            onA.saveProgressions(List.of(quest));
+            onA.writeProgressions(List.of(quest));
             TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
 
-            quest.move(alice, Membership.Status.JOINED);
-            copyOnB.move(alice, Membership.Status.JOINED);
+            quest.join(alice);
+            copyOnB.join(alice);
             write(onA, quest);
             write(onB, copyOnB);
 
@@ -630,7 +629,7 @@ class JdbcQuestStorageTest {
 
         try {
             TestQuestProgression quest = quest("Holding");
-            onA.saveProgressions(List.of(quest));
+            onA.writeProgressions(List.of(quest));
             TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
 
             quest.addToCounter(5);
@@ -658,7 +657,7 @@ class JdbcQuestStorageTest {
 
         try {
             TestQuestProgression quest = quest("Bypassed");
-            storage.saveProgressions(List.of(quest));
+            storage.writeProgressions(List.of(quest));
 
             quest.setState(QuestState.FAILED).markDirty();
             write(storage, quest);
@@ -670,13 +669,65 @@ class JdbcQuestStorageTest {
     }
 
     @Test
+    void aCopyOvertakenByAnotherOfTheSameVersionIsNotTakenForWritten() {
+        TestQuestProgression quest = quest("Doubled");
+        storage.writeProgressions(List.of(quest));
+
+        // Two passes of one server, each with its own copy of version 1: the older writes first
+        TestQuestProgression older = (TestQuestProgression) quest.copy();
+        older.setCounter(1);
+        quest.setCounter(2);
+        assertTrue(storage.writeProgressions(List.of(older)).isEmpty());
+
+        assertEquals(Set.of(quest.getId()), storage.writeProgressions(List.of(quest)));
+        assertEquals(1, quest.getStoredVersion());
+
+        // Written over what overtook it, as a quest only this server writes is
+        AbstractQuestProgression.Change<?> whole = quest.overwrite();
+        storage.commitProgression(quest.getId(), stored -> stored.replay(whole));
+        assertEquals(2, ((TestQuestProgression) storage.loadProgression(quest.getId())).getCounter());
+    }
+
+    @Test
+    void aQuestNoLongerSharedForgetsWhatItKept() {
+        QuestSync.setPolicy(SHARED_ONCE_STORED);
+
+        try {
+            TestQuestProgression quest = quest("Unshared");
+            storage.writeProgressions(List.of(quest));
+            quest.addToCounter(5);
+
+            QuestSync.setPolicy(ALONE);
+            quest.addToCounter(1);
+
+            QuestSync.setPolicy(SHARED_ONCE_STORED);
+            write(storage, quest);
+
+            assertEquals(6, ((TestQuestProgression) storage.loadProgression(quest.getId())).getCounter());
+        } finally {
+            QuestSync.setPolicy(ALONE);
+        }
+    }
+
+    @Test
+    void aChangeMadeAgainOnACopyTellsNobody() {
+        UUID alice = UUID.randomUUID();
+        TestQuestProgression quest = quest("Quiet", alice);
+        AbstractQuestProgression.Change<TestQuestProgression> giveUp = copy -> copy.abandonPlayer(alice);
+
+        // Told, the copy would reach for a server a test does not have
+        assertTrue(quest.replay(giveUp));
+        assertTrue(quest.isAbandonedBy(alice));
+    }
+
+    @Test
     void aVersionGrowsWithEveryWrite() {
         TestQuestProgression quest = quest("Counted");
 
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
         assertEquals(1, quest.getStoredVersion());
 
-        storage.saveProgressions(List.of(quest));
+        storage.writeProgressions(List.of(quest));
         assertEquals(2, quest.getStoredVersion());
 
         storage.commitProgression(quest.getId(), stored -> addTo(stored, 1));
@@ -693,11 +744,11 @@ class JdbcQuestStorageTest {
         try {
             UUID alice = UUID.randomUUID();
             TestQuestProgression quest = quest("Unheld", alice);
-            onA.saveProgressions(List.of(quest));
+            onA.writeProgressions(List.of(quest));
             long seenByB = onB.loadProgression(quest.getId()).getStoredVersion();
 
             quest.setState(QuestState.SUCCESSFUL);
-            onA.saveProgressions(List.of(quest));
+            onA.writeProgressions(List.of(quest));
             onA.deleteProgression(quest);
 
             // B, still running it, sees it moved and reads the end
@@ -718,7 +769,7 @@ class JdbcQuestStorageTest {
         TestQuestProgression longAgo = quest("LongAgo");
         TestQuestProgression lately = quest("Lately");
         TestQuestProgression held = quest("Held", UUID.randomUUID());
-        onA.saveProgressions(List.of(longAgo, lately, held));
+        onA.writeProgressions(List.of(longAgo, lately, held));
 
         long twoDaysAgo = Instant.now().minus(Duration.ofDays(2)).toEpochMilli();
         try (java.sql.Connection connection = java.sql.DriverManager.getConnection(url);
@@ -880,9 +931,6 @@ class JdbcQuestStorageTest {
 
         @Override
         public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {}
-
-        @Override
-        public void writeNow(@Nonnull AbstractQuestProgression<?> quest) {}
     };
 
     private static final QuestSync.Policy ALONE = new QuestSync.Policy() {
@@ -893,9 +941,6 @@ class JdbcQuestStorageTest {
 
         @Override
         public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {}
-
-        @Override
-        public void writeNow(@Nonnull AbstractQuestProgression<?> quest) {}
     };
 
     @Nonnull
@@ -938,7 +983,7 @@ class JdbcQuestStorageTest {
     private static TestQuestProgression quest(@Nonnull String assetId, @Nonnull UUID... playerIds) {
         TestQuestProgression quest = new TestQuestProgression();
         quest.setAssetId(assetId);
-        for (UUID playerId : playerIds) quest.move(playerId, Membership.Status.JOINED);
+        for (UUID playerId : playerIds) quest.join(playerId);
 
         // The one field a record cannot invent later
         quest.onRegistered();

@@ -230,7 +230,7 @@ public class QuestPlayerStateService {
      * ended it alone, so that every server learning of the end does not count it again.
      */
     private void handleQuestCompletedEvent(@Nonnull QuestCompletedEvent questCompletedEvent) {
-        if (!questCompletedEvent.isClaimedHere()) return;
+        if (!questCompletedEvent.isEndedHere()) return;
 
         AbstractQuestProgression<?> quest = questCompletedEvent.getQuest();
 

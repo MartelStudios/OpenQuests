@@ -2,6 +2,7 @@ package com.martelstudios.openquests.core.persistence.jdbc;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression.Stored;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.AssignmentRecords;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -32,17 +33,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 /**
  * The quests in a relational database, for a server keeping tens of thousands of them or for
  * several servers sharing them.
  *
- * <p>A quest is one row holding its whole document and a version that grows with every write. A
- * quest several servers write is only ever written over the version its changes were made on, so
- * no server undoes another's: the loser reads the row again and makes its changes on it. Who holds
- * a quest is a table of its own, written with the row from the same document, which makes "the
- * quests of this player" an index lookup rather than a scan.
+ * <p>A quest is one row holding its whole document and a version that grows with every write, and
+ * a row is only ever written over the version its writer read: a write another one overtook is
+ * refused, for the caller to make again on what overtook it. Who holds a quest is a table of its
+ * own, written with the row from the same document, which makes "the quests of this player" an
+ * index lookup rather than a scan.
  */
 public class JdbcQuestStorage implements QuestStorage {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -59,11 +59,7 @@ public class JdbcQuestStorage implements QuestStorage {
      */
     private static final int IN_CLAUSE_CHUNK = 500;
 
-    /**
-     * How many times a write to a quest several servers write is tried over a newer version before
-     * its changes are left for the next pass.
-     */
-    private static final int COMMIT_ATTEMPTS = 10;
+    private static final String QUEST_COLUMNS = "id, asset_id, state, completed_at, data, version, updated_at, created_at";
 
     /**
      * How long an ended quest nobody holds keeps its outcome, for servers that have not heard yet.
@@ -110,6 +106,13 @@ public class JdbcQuestStorage implements QuestStorage {
     @Nullable
     private String insertLinkSql;
 
+    /**
+     * Inserts a quest unless another write inserted it first, {@code null} where the database has
+     * no such statement.
+     */
+    @Nullable
+    private String insertQuestSql;
+
     public JdbcQuestStorage(@Nonnull JdbcSettings settings) {
         this.settings = settings;
         this.dialect = settings.dialect();
@@ -129,6 +132,7 @@ public class JdbcQuestStorage implements QuestStorage {
 
         insertMemberSql = dialect.insertIgnoring(questIndexTable, "index_key, quest_id");
         insertLinkSql = dialect.insertIgnoring(questPlayerTable, "quest_id, player_id, abandoned");
+        insertQuestSql = dialect.insertIgnoring(questTable, QUEST_COLUMNS);
 
         driverLoader = JdbcDriverLoader.load(settings.url(), settings.driverPath(), settings.driverClass());
 
@@ -225,170 +229,122 @@ public class JdbcQuestStorage implements QuestStorage {
 
     /**
      * One transaction, whatever the number of quests: each written over the version it stands on,
-     * with who holds it. A row another server moved is written over all the same, these quests
-     * being this server's alone, and the mistake reported.
+     * with who holds it. A commit whose answer is lost on the way is looked up rather than reported
+     * failed, which would have a change made twice.
      */
+    @Nonnull
     @Override
-    public void saveProgressions(@Nonnull Collection<AbstractQuestProgression<?>> quests) {
-        if (quests.isEmpty()) return;
+    public Set<UUID> writeProgressions(@Nonnull Collection<? extends AbstractQuestProgression<?>> quests) {
+        if (quests.isEmpty()) return Set.of();
 
-        long now = System.currentTimeMillis();
         List<Snapshot> snapshots = new ArrayList<>(quests.size());
         for (AbstractQuestProgression<?> quest : quests) snapshots.add(Snapshot.of(quest));
 
-        long[] written = pool.inTransaction(connection -> {
-            long[] versions = new long[snapshots.size()];
-            List<Integer> missed = new ArrayList<>();
-
-            try (PreparedStatement update = connection.prepareStatement("UPDATE " + questTable + " SET state = ?, completed_at = ?, data = ?, version = ?, updated_at = ? WHERE id = ? AND version = ?")) {
-                for (Snapshot snapshot : snapshots) {
-                    bindRow(update, snapshot, snapshot.version() + 1, now);
-                    update.setString(6, snapshot.id());
-                    update.setLong(7, snapshot.version());
-                    update.addBatch();
-                }
-
-                int[] counts = update.executeBatch();
-                for (int i = 0; i < counts.length; i++) {
-                    if (counts[i] == 1) {
-                        versions[i] = snapshots.get(i).version() + 1;
-                    } else {
-                        missed.add(i);
-                    }
-                }
-            }
-
-            for (int i : missed) {
-                versions[i] = writeMissed(connection, snapshots.get(i), now);
-            }
-
-            relinkWhole(connection, snapshots);
-            return versions;
-        });
-
-        for (int i = 0; i < snapshots.size(); i++) {
-            snapshots.get(i).quest().markStored(written[i], snapshots.get(i).state());
-        }
-    }
-
-    /**
-     * A row the batch did not write: one never written, or one at another version than this copy's,
-     * which a driver not counting batched rows also lands here to find out.
-     *
-     * @return the version written
-     */
-    private long writeMissed(@Nonnull Connection connection, @Nonnull Snapshot snapshot, long now) throws SQLException {
-        Long stored = readVersion(connection, snapshot.id());
-
-        if (stored == null) {
-            try (PreparedStatement insert = connection.prepareStatement("INSERT INTO " + questTable + " (id, asset_id, state, completed_at, data, version, updated_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
-                long version = snapshot.version() + 1;
-                insert.setString(1, snapshot.id());
-                insert.setString(2, snapshot.assetId());
-                insert.setString(3, snapshot.state().name());
-                bindInstant(insert, 4, snapshot.completedAt());
-                insert.setString(5, snapshot.data());
-                insert.setLong(6, version);
-                insert.setLong(7, now);
-                insert.setLong(8, now);
-                insert.executeUpdate();
-                return version;
-            }
-        }
-
-        // Counted or not, the batch wrote it
-        if (stored == snapshot.version() + 1) return stored;
-
-        LOGGER.atWarning().log("Quest %s, which only this server writes, was written by another at version %d: writing over it", snapshot.id(), stored);
-
-        try (PreparedStatement update = connection.prepareStatement("UPDATE " + questTable + " SET state = ?, completed_at = ?, data = ?, version = ?, updated_at = ? WHERE id = ?")) {
-            bindRow(update, snapshot, stored + 1, now);
-            update.setString(6, snapshot.id());
-            update.executeUpdate();
-        }
-        return stored + 1;
-    }
-
-    /**
-     * Reads the latest version, makes the changes on it and writes it over that version alone, in a
-     * transaction taking who holds the quest along. Another server writing in between only costs a
-     * read: the changes are made again on what it wrote.
-     */
-    @Nullable
-    @Override
-    public AbstractQuestProgression<?> commitProgression(@Nonnull UUID questId, @Nonnull Predicate<AbstractQuestProgression<?>> changes) {
-        for (int attempt = 0; attempt < COMMIT_ATTEMPTS; attempt++) {
-            AbstractQuestProgression<?> stored = loadProgression(questId);
-            if (stored == null) return null;
-
-            long from = stored.getStoredVersion();
-            Set<UUID> playersBefore = Set.copyOf(stored.getPlayers());
-            Set<UUID> abandonedBefore = Set.copyOf(stored.getAbandonedPlayers());
-
-            // Made already by whoever wrote this version: nothing for the others to read again
-            if (!changes.test(stored)) return stored;
-
-            Snapshot snapshot = Snapshot.of(stored);
-            if (writeOver(snapshot, from, playersBefore, abandonedBefore)) {
-                stored.markStored(from + 1, snapshot.state());
-                return stored;
-            }
-        }
-        throw new QuestStorageException("Quest " + questId + " kept being written by other servers; its changes wait for the next pass");
-    }
-
-    /**
-     * @return {@code false} if another server wrote the quest since that version, nothing then
-     * written. A commit whose answer is lost on the way is looked up rather than tried again, which
-     * would make its changes twice.
-     */
-    private boolean writeOver(@Nonnull Snapshot snapshot, long from, @Nonnull Set<UUID> playersBefore, @Nonnull Set<UUID> abandonedBefore) {
-        long now = System.currentTimeMillis();
-
-        return pool.with(connection -> {
-            connection.setAutoCommit(false);
-
-            try (PreparedStatement update = connection.prepareStatement("UPDATE " + questTable + " SET state = ?, completed_at = ?, data = ?, version = ?, updated_at = ? WHERE id = ? AND version = ?")) {
-                bindRow(update, snapshot, from + 1, now);
-                update.setString(6, snapshot.id());
-                update.setLong(7, from);
-
-                if (update.executeUpdate() != 1) {
-                    connection.rollback();
-                    return false;
-                }
-            }
-
-            relink(connection, snapshot, playersBefore, abandonedBefore);
-
-            try {
-                connection.commit();
-            } catch (SQLException e) {
-                if (wasWritten(snapshot, from + 1)) return true;
-                throw e;
-            }
-            return true;
-        });
-    }
-
-    /**
-     * @return whether the row stands at that version holding exactly that document, which only this
-     * write could have left.
-     */
-    private boolean wasWritten(@Nonnull Snapshot snapshot, long version) {
+        List<Snapshot> written;
         try {
-            return pool.with(connection -> {
-                try (PreparedStatement statement = connection.prepareStatement("SELECT data FROM " + questTable + " WHERE id = ? AND version = ?")) {
-                    statement.setString(1, snapshot.id());
-                    statement.setLong(2, version);
-
-                    try (ResultSet results = statement.executeQuery()) {
-                        return results.next() && snapshot.data().equals(results.getString(1));
-                    }
-                }
+            written = pool.inTransaction(connection -> {
+                List<Snapshot> rows = writeRows(connection, snapshots, System.currentTimeMillis());
+                relink(connection, rows);
+                return rows;
             });
         } catch (QuestStorageException e) {
-            return false;
+            written = writtenAmong(snapshots);
+            if (written.isEmpty()) throw e;
+        }
+
+        Set<UUID> moved = new HashSet<>();
+        for (Snapshot snapshot : snapshots) moved.add(snapshot.quest().getId());
+
+        for (Snapshot snapshot : written) {
+            snapshot.quest().markStored(snapshot.written());
+            moved.remove(snapshot.quest().getId());
+        }
+        return moved;
+    }
+
+    /**
+     * Writes the rows alone, each over the version it stands on.
+     *
+     * @return those written, leaving out a row another write moved and one inserted first elsewhere
+     */
+    @Nonnull
+    private List<Snapshot> writeRows(@Nonnull Connection connection, @Nonnull List<Snapshot> snapshots, long now) throws SQLException {
+        List<Snapshot> written = new ArrayList<>();
+        List<Snapshot> updates = new ArrayList<>();
+
+        for (Snapshot snapshot : snapshots) {
+            if (snapshot.version() > 0) {
+                updates.add(snapshot);
+            } else if (insert(connection, snapshot, now)) {
+                written.add(snapshot);
+            }
+        }
+        if (updates.isEmpty()) return written;
+
+        try (PreparedStatement update = connection.prepareStatement("UPDATE " + questTable + " SET state = ?, completed_at = ?, data = ?, version = ?, updated_at = ? WHERE id = ? AND version = ?")) {
+            for (Snapshot snapshot : updates) {
+                bindRow(update, snapshot, snapshot.version() + 1, now);
+                update.setString(6, snapshot.id());
+                update.setLong(7, snapshot.version());
+                update.addBatch();
+            }
+
+            int[] counts = update.executeBatch();
+            for (int i = 0; i < counts.length; i++) {
+                // A driver that does not count batched rows says so, and the row tells what happened
+                if (counts[i] == 1 || counts[i] == Statement.SUCCESS_NO_INFO && holds(connection, updates.get(i))) written.add(updates.get(i));
+            }
+        }
+        return written;
+    }
+
+    /**
+     * @return {@code false} if another write inserted the quest first.
+     */
+    private boolean insert(@Nonnull Connection connection, @Nonnull Snapshot snapshot, long now) throws SQLException {
+        if (insertQuestSql == null && readVersion(connection, snapshot.id()) != null) return false;
+
+        String sql = insertQuestSql != null ? insertQuestSql : "INSERT INTO " + questTable + " (" + QUEST_COLUMNS + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement insert = connection.prepareStatement(sql)) {
+            insert.setString(1, snapshot.id());
+            insert.setString(2, snapshot.assetId());
+            insert.setString(3, snapshot.state().name());
+            bindInstant(insert, 4, snapshot.completedAt());
+            insert.setString(5, snapshot.data());
+            insert.setLong(6, 1);
+            insert.setLong(7, now);
+            insert.setLong(8, now);
+            return insert.executeUpdate() == 1;
+        }
+    }
+
+    /**
+     * @return those whose row stands at the version they were written as, holding exactly their
+     * document, which only their write could have left. None when the database cannot say.
+     */
+    @Nonnull
+    private List<Snapshot> writtenAmong(@Nonnull List<Snapshot> snapshots) {
+        try {
+            return pool.with(connection -> {
+                List<Snapshot> written = new ArrayList<>();
+                for (Snapshot snapshot : snapshots) {
+                    if (holds(connection, snapshot)) written.add(snapshot);
+                }
+                return written;
+            });
+        } catch (QuestStorageException e) {
+            return List.of();
+        }
+    }
+
+    private boolean holds(@Nonnull Connection connection, @Nonnull Snapshot snapshot) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT data FROM " + questTable + " WHERE id = ? AND version = ?")) {
+            statement.setString(1, snapshot.id());
+            statement.setLong(2, snapshot.version() + 1);
+
+            try (ResultSet results = statement.executeQuery()) {
+                return results.next() && snapshot.data().equals(results.getString(1));
+            }
         }
     }
 
@@ -429,8 +385,10 @@ public class JdbcQuestStorage implements QuestStorage {
     public void deleteProgression(@Nonnull AbstractQuestProgression<?> quest) {
         String questId = quest.getId().toString();
         boolean ended = quest.isCompleted();
-        Snapshot snapshot = ended && (quest.hasChanges() || !quest.getStoredState().isCompleted()) ? Snapshot.of(quest) : null;
-        long now = System.currentTimeMillis();
+
+        // A quest never written has nobody to tell
+        boolean untold = quest.getStoredVersion() > 0 && (quest.hasChanges() || !quest.getStoredState().isCompleted());
+        Snapshot snapshot = ended && untold ? Snapshot.of(quest) : null;
 
         pool.inTransaction(connection -> {
             execute(connection, "DELETE FROM " + questPlayerTable + " WHERE quest_id = ?", questId);
@@ -438,15 +396,8 @@ public class JdbcQuestStorage implements QuestStorage {
 
             if (!ended) {
                 execute(connection, "DELETE FROM " + questTable + " WHERE id = ?", questId);
-                return null;
-            }
-            if (snapshot == null) return null;
-
-            try (PreparedStatement update = connection.prepareStatement("UPDATE " + questTable + " SET state = ?, completed_at = ?, data = ?, version = ?, updated_at = ? WHERE id = ? AND version = ?")) {
-                bindRow(update, snapshot, snapshot.version() + 1, now);
-                update.setString(6, questId);
-                update.setLong(7, snapshot.version());
-                update.executeUpdate();
+            } else if (snapshot != null) {
+                writeRows(connection, List.of(snapshot), System.currentTimeMillis());
             }
             return null;
         });
@@ -476,52 +427,31 @@ public class JdbcQuestStorage implements QuestStorage {
     }
 
     /**
-     * Who holds each quest, written whole from the copy being written.
+     * Who holds each quest, moved from who held the version written over: the links of a row always
+     * follow its document, being written with it, so only the players who moved are written.
      */
-    private void relinkWhole(@Nonnull Connection connection, @Nonnull List<Snapshot> snapshots) throws SQLException {
-        try (PreparedStatement deleteLinks = connection.prepareStatement("DELETE FROM " + questPlayerTable + " WHERE quest_id = ?");
-             PreparedStatement insertLink = connection.prepareStatement(insertLinkSql())) {
-
-            for (Snapshot snapshot : snapshots) {
-                deleteLinks.setString(1, snapshot.id());
-                deleteLinks.addBatch();
-
-                for (UUID playerId : snapshot.players()) bindLink(insertLink, snapshot.id(), playerId, false);
-                for (UUID playerId : snapshot.abandoned()) bindLink(insertLink, snapshot.id(), playerId, true);
-            }
-
-            // Deletes first: a row still standing is one the insert would collide with
-            deleteLinks.executeBatch();
-            insertLink.executeBatch();
-        }
-    }
-
-    /**
-     * Who holds a quest, moved from what the version it was made on said to what it says now: the
-     * links of the stored row always follow its document, being written with it.
-     */
-    private void relink(@Nonnull Connection connection, @Nonnull Snapshot snapshot, @Nonnull Set<UUID> playersBefore, @Nonnull Set<UUID> abandonedBefore) throws SQLException {
-        Set<UUID> moved = new HashSet<>();
-        for (UUID playerId : playersBefore) if (!snapshot.players().contains(playerId)) moved.add(playerId);
-        for (UUID playerId : abandonedBefore) if (!snapshot.abandoned().contains(playerId)) moved.add(playerId);
-        for (UUID playerId : snapshot.players()) if (!playersBefore.contains(playerId)) moved.add(playerId);
-        for (UUID playerId : snapshot.abandoned()) if (!abandonedBefore.contains(playerId)) moved.add(playerId);
-        if (moved.isEmpty()) return;
-
+    private void relink(@Nonnull Connection connection, @Nonnull List<Snapshot> snapshots) throws SQLException {
         try (PreparedStatement deleteLink = connection.prepareStatement("DELETE FROM " + questPlayerTable + " WHERE quest_id = ? AND player_id = ?");
              PreparedStatement insertLink = connection.prepareStatement(insertLinkSql())) {
 
-            for (UUID playerId : moved) {
-                deleteLink.setString(1, snapshot.id());
-                deleteLink.setString(2, playerId.toString());
-                deleteLink.addBatch();
+            int deletes = 0;
+            int inserts = 0;
+            for (Snapshot snapshot : snapshots) {
+                for (UUID playerId : snapshot.movedHolders()) {
+                    deleteLink.setString(1, snapshot.id());
+                    deleteLink.setString(2, playerId.toString());
+                    deleteLink.addBatch();
+                    deletes++;
 
-                if (snapshot.players().contains(playerId)) bindLink(insertLink, snapshot.id(), playerId, false);
-                if (snapshot.abandoned().contains(playerId)) bindLink(insertLink, snapshot.id(), playerId, true);
+                    if (snapshot.players().contains(playerId)) bindLink(insertLink, snapshot.id(), playerId, false);
+                    if (snapshot.abandoned().contains(playerId)) bindLink(insertLink, snapshot.id(), playerId, true);
+                    if (snapshot.players().contains(playerId) || snapshot.abandoned().contains(playerId)) inserts++;
+                }
             }
 
-            deleteLink.executeBatch();
-            insertLink.executeBatch();
+            // Deletes first: a link still standing is one the insert would collide with
+            if (deletes > 0) deleteLink.executeBatch();
+            if (inserts > 0) insertLink.executeBatch();
         }
     }
 
@@ -571,7 +501,7 @@ public class JdbcQuestStorage implements QuestStorage {
                 AbstractQuestProgression<?> quest = readQuest(results.getString(2), results.getString(1));
                 if (quest == null) continue;
 
-                quest.markStored(results.getLong(3), quest.getState());
+                quest.markStored(AbstractQuestProgression.Stored.of(quest, results.getLong(3)));
                 into.add(quest);
             }
         }
@@ -1117,20 +1047,48 @@ public class JdbcQuestStorage implements QuestStorage {
     /**
      * A quest as it is written, taken in one go while nothing changes it.
      *
-     * @param version the version the copy stands on
+     * @param before the stored copy it is written over
      */
     private record Snapshot(@Nonnull AbstractQuestProgression<?> quest, @Nonnull String id, @Nullable String assetId, @Nonnull String data,
-                            @Nonnull QuestState state, @Nullable Instant completedAt, long version,
-                            @Nonnull Set<UUID> players, @Nonnull Set<UUID> abandoned) {
+                            @Nonnull QuestState state, @Nullable Instant completedAt,
+                            @Nonnull Set<UUID> players, @Nonnull Set<UUID> abandoned, @Nonnull Stored before) {
 
         @Nonnull
         static Snapshot of(@Nonnull AbstractQuestProgression<?> quest) {
             synchronized (quest) {
                 return new Snapshot(quest, quest.getId().toString(), quest.getAssetId(),
                     CodecJson.encode(QuestProgressionRecord.CODEC, new QuestProgressionRecord(quest)),
-                    quest.getState(), quest.getCompletedAt(), quest.getStoredVersion(),
-                    Set.copyOf(quest.getPlayers()), Set.copyOf(quest.getAbandonedPlayers()));
+                    quest.getState(), quest.getCompletedAt(),
+                    Set.copyOf(quest.getPlayers()), Set.copyOf(quest.getAbandonedPlayers()), quest.getStored());
             }
+        }
+
+        /**
+         * @return the version the copy stands on, {@code 0} for one never written.
+         */
+        long version() {
+            return before.version();
+        }
+
+        /**
+         * @return what the quest stands on once this is written.
+         */
+        @Nonnull
+        Stored written() {
+            return new Stored(version() + 1, state, players, abandoned);
+        }
+
+        /**
+         * @return the players whose link changes with this write.
+         */
+        @Nonnull
+        Set<UUID> movedHolders() {
+            Set<UUID> moved = new HashSet<>();
+            for (UUID playerId : before.players()) if (!players.contains(playerId)) moved.add(playerId);
+            for (UUID playerId : before.abandoned()) if (!abandoned.contains(playerId)) moved.add(playerId);
+            for (UUID playerId : players) if (!before.players().contains(playerId)) moved.add(playerId);
+            for (UUID playerId : abandoned) if (!before.abandoned().contains(playerId)) moved.add(playerId);
+            return moved;
         }
     }
 
