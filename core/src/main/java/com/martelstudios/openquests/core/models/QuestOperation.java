@@ -3,7 +3,6 @@ package com.martelstudios.openquests.core.models;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -81,19 +80,6 @@ public interface QuestOperation<Q extends AbstractQuestProgression<?>> {
             if (!quest.players.remove(playerId)) return false;
 
             quest.abandonedPlayers.add(playerId);
-            return true;
-        }
-    }
-
-    /**
-     * @param track {@code null} hands the answer back to the asset
-     */
-    record Track(@Nullable Boolean track) implements QuestOperation<AbstractQuestProgression<?>> {
-        @Override
-        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
-            if (Objects.equals(quest.track, track)) return false;
-
-            quest.track = track;
             return true;
         }
     }

@@ -35,6 +35,8 @@ public class PlayerQuestRecord {
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Completions", new MapCodec<>(QuestCompletions.CODEC, HashMap<String, QuestCompletions>::new)), (record, completions) -> record.completions.putAll(completions), record -> record.completions)
                                                                             .add()
+                                                                            .append(new KeyedCodec<>("Tracking", new MapCodec<>(Codec.BOOLEAN, HashMap<String, Boolean>::new)), PlayerQuestRecord::readTracking, PlayerQuestRecord::writeTracking)
+                                                                            .add()
                                                                             .build();
 
     private final Set<UUID> questIds = new HashSet<>();
@@ -45,13 +47,19 @@ public class PlayerQuestRecord {
 
     private final Map<String, QuestCompletions> completions = new HashMap<>();
 
+    /**
+     * Whether the player tracks a quest, by quest id, for those they said so of.
+     */
+    private final Map<UUID, Boolean> tracking = new HashMap<>();
+
     public PlayerQuestRecord() {}
 
-    public PlayerQuestRecord(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Set<PendingRewards> pendingRewards, @Nonnull Map<String, QuestCompletions> completions) {
+    public PlayerQuestRecord(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Set<PendingRewards> pendingRewards, @Nonnull Map<String, QuestCompletions> completions, @Nonnull Map<UUID, Boolean> tracking) {
         this.questIds.addAll(questIds);
         this.assignments.putAll(assignments);
         this.pendingRewards.addAll(pendingRewards);
         this.completions.putAll(completions);
+        this.tracking.putAll(tracking);
     }
 
     /**
@@ -90,6 +98,40 @@ public class PlayerQuestRecord {
     }
 
     /**
+     * @return whether the player tracks a quest, by quest id, for those they said so of: the asset
+     * answers for the others.
+     */
+    @Nonnull
+    public Map<UUID, Boolean> getTracking() {
+        return tracking;
+    }
+
+    /**
+     * A key that is no quest id is left out rather than costing the player their whole record.
+     */
+    private void readTracking(@Nonnull Map<String, Boolean> written) {
+        written.forEach((questId, track) -> {
+            try {
+                tracking.put(UUID.fromString(questId), track);
+            } catch (IllegalArgumentException e) {
+                // Not a quest id
+            }
+        });
+    }
+
+    /**
+     * Left out of the record while the player said nothing.
+     */
+    @Nullable
+    private Map<String, Boolean> writeTracking() {
+        if (tracking.isEmpty()) return null;
+
+        Map<String, Boolean> written = new HashMap<>();
+        tracking.forEach((questId, track) -> written.put(questId.toString(), track));
+        return written;
+    }
+
+    /**
      * Counts one more quest from that asset ended that way.
      */
     public void recordCompletion(@Nonnull String assetId, @Nonnull QuestState outcome, @Nullable Instant startedAt, @Nullable Instant completedAt) {
@@ -101,6 +143,6 @@ public class PlayerQuestRecord {
      * backend may answer without having anything written down.
      */
     public boolean isEmpty() {
-        return questIds.isEmpty() && assignments.isEmpty() && pendingRewards.isEmpty() && completions.isEmpty();
+        return questIds.isEmpty() && assignments.isEmpty() && pendingRewards.isEmpty() && completions.isEmpty() && tracking.isEmpty();
     }
 }

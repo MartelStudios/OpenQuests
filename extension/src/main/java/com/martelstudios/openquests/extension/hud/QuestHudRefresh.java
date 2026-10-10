@@ -68,11 +68,11 @@ public final class QuestHudRefresh {
      * would sit on a stale line until the quest next moved.
      */
     public static void handleQuestTracked(@Nonnull QuestTrackedEvent event) {
-        markHolders(event.getQuest());
+        mark(event.getPlayerId());
     }
 
     public static void handleQuestUntracked(@Nonnull QuestUntrackedEvent event) {
-        markHolders(event.getQuest());
+        mark(event.getPlayerId());
     }
 
     public static void handleQuestAddedToPlayerStore(@Nonnull QuestAddedToPlayerStoreEvent event) {

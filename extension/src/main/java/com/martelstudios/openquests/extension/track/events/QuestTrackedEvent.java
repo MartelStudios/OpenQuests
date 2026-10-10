@@ -7,20 +7,31 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * Fired when a quest starts being tracked, for everyone holding it. Tracking changes nothing
- * about the quest itself, so nothing else announces it: anything drawing a player's quests has
- * this and only this to go on.
+ * Fired when a player starts tracking a quest. Tracking changes nothing about the quest itself, so
+ * nothing else announces it: anything drawing a player's quests has this and only this to go on.
  */
 public class QuestTrackedEvent implements IEvent<UUID> {
     @Nonnull
     private final AbstractQuestProgression<?> quest;
 
-    public QuestTrackedEvent(@Nonnull AbstractQuestProgression<?> quest) {
+    @Nonnull
+    private final UUID playerId;
+
+    public QuestTrackedEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         this.quest = quest;
+        this.playerId = playerId;
     }
 
     @Nonnull
     public AbstractQuestProgression<?> getQuest() {
         return quest;
+    }
+
+    /**
+     * @return the player whose tracker this is about: the quest's other holders keep theirs.
+     */
+    @Nonnull
+    public UUID getPlayerId() {
+        return playerId;
     }
 }

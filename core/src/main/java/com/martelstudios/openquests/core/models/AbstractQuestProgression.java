@@ -106,8 +106,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (quest, value) -> quest.persistHistory = value, quest -> quest.persistHistory)
                                                                                         .add()
-                                                                                        .append(new KeyedCodec<>("Track", Codec.BOOLEAN), (quest, value) -> quest.track = value, quest -> quest.track)
-                                                                                        .add()
                                                                                         .append(new KeyedCodec<>("Visibility", new EnumCodec<>(QuestVisibility.class)), (quest, value) -> quest.visibility = value, quest -> quest.visibility)
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("AnnounceOutcome", Codec.BOOLEAN), (quest, value) -> quest.announceOutcome = value, quest -> quest.announceOutcome)
@@ -223,13 +221,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nullable
     protected Boolean persistHistory;
-
-    /**
-     * Whether the player is tracking this quest, {@code null} while they have not said either way
-     * and the asset still answers for it.
-     */
-    @Nullable
-    protected Boolean track;
 
     /**
      * Overrides the asset on when this one run is worth listing, { null} while the asset
@@ -352,26 +343,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public Q setAnnounceOutcome(@Nullable Boolean announceOutcome) {
         this.announceOutcome = announceOutcome;
         return self();
-    }
-
-    /**
-     * @return what the quest says about being tracked, its asset answering while it says nothing
-     * itself. What follows from it is left to whoever draws the quest somewhere.
-     */
-    public boolean isTracked() {
-        if (track != null) return track;
-
-        OpenQuestAsset asset = getAsset();
-        return asset != null && asset.isAutoTrack();
-    }
-
-    /**
-     * @param track {@code null} to hand the answer back to the asset, which is not the same as
-     * saying no: the quest stops having an opinion of its own.
-     * @return {@code false} if the quest already said exactly that.
-     */
-    public boolean setTracked(@Nullable Boolean track) {
-        return apply(new QuestOperation.Track(track));
     }
 
     /**
