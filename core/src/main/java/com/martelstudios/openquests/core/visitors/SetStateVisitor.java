@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.core.visitors;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
@@ -14,7 +15,7 @@ public class SetStateVisitor implements QuestVisitor<AbstractQuestProgression<?>
 
     @Override
     public void progress(AbstractQuestProgression<?> quest) {
-        quest.setState(state).markDirty();
+        quest.apply(new QuestOperation.SetState(state));
     }
 
     @Override

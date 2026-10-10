@@ -6,6 +6,7 @@ import com.martelstudios.openquests.core.events.QuestLoadedEvent;
 import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.sync.QuestSync;
 
@@ -273,7 +274,7 @@ public class QuestProgressionStore {
     private void writeOver(@Nonnull AbstractQuestProgression<?> quest) {
         LOGGER.atFine().log("Quest %s was written meanwhile: writing this copy over it", quest.getId());
 
-        AbstractQuestProgression.Change<?> whole = quest.overwrite();
+        QuestOperation<?> whole = quest.overwrite();
         try {
             AbstractQuestProgression<?> written = storage.commitProgression(quest.getId(), stored -> stored.replay(whole));
 

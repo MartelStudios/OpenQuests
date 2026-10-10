@@ -14,9 +14,9 @@ public interface QuestVisitor<Q extends AbstractQuestProgression<?>> {
     Class<Q> getQuestType();
 
     /**
-     * May run again on another copy of the quest, the one another server stored meanwhile: reads
-     * nothing but the quest it is handed and what this visitor carries, and works out anything
-     * else once.
+     * Runs once, on the copy here, reading whatever it needs, and says what happened through
+     * {@link AbstractQuestProgression#apply}: the operation, not the visitor, is what another copy
+     * makes again.
      */
     void progress(Q quest);
 

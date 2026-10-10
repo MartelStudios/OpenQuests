@@ -1,8 +1,8 @@
 package com.martelstudios.openquests.extension.quests.useentity;
 
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -26,9 +26,7 @@ public class UseEntityQuestVisitor implements QuestVisitor<UseEntityQuestProgres
         if (quest.isOver()) return;
         if (!quest.matchesTarget(target)) return;
 
-        quest.addQuantity(1)
-             .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
-             .markDirty();
+        quest.apply(new QuantityQuestProgression.Add(1));
     }
 
     @Override

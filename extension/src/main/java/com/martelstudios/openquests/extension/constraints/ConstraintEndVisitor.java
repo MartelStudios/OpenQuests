@@ -3,6 +3,7 @@ package com.martelstudios.openquests.extension.constraints;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
@@ -45,7 +46,7 @@ public class ConstraintEndVisitor implements QuestVisitor<AbstractQuestProgressi
             QuestState outcome = outcomeOf.apply(constraint);
             if (outcome == null) continue;
 
-            quest.setState(outcome).markDirty();
+            quest.apply(new QuestOperation.SetState(outcome));
             return;
         }
     }

@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
@@ -57,11 +58,24 @@ public abstract class ItemExchangeQuestProgression<Q extends ItemExchangeQuestPr
     }
 
     /**
+     * A move of items this quest counts.
+     */
+    public record Exchange(@Nonnull UUID playerId, @Nonnull ItemExchange exchange, int quantity) implements QuestOperation<ItemExchangeQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull ItemExchangeQuestProgression<?> quest) {
+            if (quest.isOver() || !quest.exchange(playerId, exchange, quantity)) return false;
+
+            quest.settle();
+            return true;
+        }
+    }
+
+    /**
      * Records a move of items this quest counts, keeping the counters only when guarding against abuse.
      *
      * @return whether anything changed, the count or the counters, which is what is worth saving.
      */
-    public boolean exchange(@Nonnull UUID playerId, @Nonnull ItemExchange exchange, int quantity) {
+    private boolean exchange(@Nonnull UUID playerId, @Nonnull ItemExchange exchange, int quantity) {
         boolean guarded = isAntiAbuse();
 
         int fresh = quantity;
@@ -69,7 +83,7 @@ public abstract class ItemExchangeQuestProgression<Q extends ItemExchangeQuestPr
         if (guarded && exchange == ItemExchange.GROUND_PICKUP) fresh = counters.recordGroundPickup(playerId, quantity);
 
         int counted = counts(exchange) ? fresh : 0;
-        if (counted > 0) addQuantity(counted);
+        this.quantity += counted;
 
         return counted > 0 || (guarded && exchange != ItemExchange.HARVEST);
     }

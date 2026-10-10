@@ -1,6 +1,5 @@
 package com.martelstudios.openquests.extension.quests.item;
 
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -30,10 +29,7 @@ public class ItemExchangeVisitor implements QuestVisitor<ItemExchangeQuestProgre
         if (quest.isOver()) return;
 
         if (!quest.getItemFilter().matches(itemId)) return;
-        if (!quest.exchange(playerId, exchange, quantity)) return;
-
-        quest.setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
-             .markDirty();
+        quest.apply(new ItemExchangeQuestProgression.Exchange(playerId, exchange, quantity));
     }
 
     @Override

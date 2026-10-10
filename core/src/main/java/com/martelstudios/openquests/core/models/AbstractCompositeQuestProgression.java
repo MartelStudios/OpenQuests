@@ -89,8 +89,7 @@ public abstract class AbstractCompositeQuestProgression<Q extends AbstractCompos
     public boolean addPlayer(@Nonnull UUID playerId) {
         if (!super.addPlayer(playerId)) return false;
 
-        // Made again on a stored copy, it leaves the steps to their own copies
-        if (!isReplaying()) getChildren().forEach(child -> child.addPlayer(playerId));
+        getChildren().forEach(child -> child.addPlayer(playerId));
         return true;
     }
 
@@ -101,7 +100,7 @@ public abstract class AbstractCompositeQuestProgression<Q extends AbstractCompos
     public boolean removePlayer(@Nonnull UUID playerId) {
         if (!super.removePlayer(playerId)) return false;
 
-        if (!isReplaying()) getChildren().forEach(child -> child.removePlayer(playerId));
+        getChildren().forEach(child -> child.removePlayer(playerId));
         return true;
     }
 
@@ -112,7 +111,7 @@ public abstract class AbstractCompositeQuestProgression<Q extends AbstractCompos
     public boolean abandonPlayer(@Nonnull UUID playerId) {
         if (!super.abandonPlayer(playerId)) return false;
 
-        if (!isReplaying()) getChildren().forEach(child -> child.abandonPlayer(playerId));
+        getChildren().forEach(child -> child.abandonPlayer(playerId));
         return true;
     }
 }

@@ -9,8 +9,28 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExchangeCountersTest {
+
+    @Test
+    void anExchangeCountsTheItemsItMoves() {
+        PickupItemQuestProgression quest = new PickupItemQuestProgression() {
+            @Override
+            public boolean isAntiAbuse() {
+                return false;
+            }
+
+            @Override
+            public boolean isStopOnComplete() {
+                return true;
+            }
+        };
+        quest.setTargetQuantity(10);
+
+        assertTrue(quest.replay(new ItemExchangeQuestProgression.Exchange(UUID.randomUUID(), ItemExchange.GROUND_PICKUP, 3)));
+        assertEquals(3, quest.getCurrentQuantity());
+    }
 
     @Test
     void aThrowAndPickupLoopOnlyCountsTheFirstThrow() {

@@ -342,11 +342,14 @@ an end.
 A world lives on one server, so a world quest is that server's alone; so is a player's own quest
 while they are on it.
 
-A quest type takes nothing special to be shared, but three rules: its visitors read only the quest
-they are handed and what they carry, which is what lets a change be made again on another copy; it
-changes the quest only through `update()` or `change()`; and no field it is written as is `final`.
-A type with a `final` field is refused as it registers, and a change made past those two methods is
-reported, then only ever written as a copy of the whole quest.
+A quest type takes nothing special to be shared, but two rules. It changes the quest only through
+operations: a visitor reads whatever it needs, once, and says what happened with
+`quest.apply(operation)`, an operation being a small record that reads nothing but the quest it is
+made on, so that another copy makes it again the same way. A type declares the operations it
+understands next to its fields, `QuantityQuestProgression.Add` for every counted type, and its
+subtypes inherit them. And no field it is written as is `final`. A type with a `final` field is
+refused as it registers, and a change made past `apply()` is reported, then only ever written as a
+copy of the whole quest.
 
 #### Where the config file lives
 

@@ -303,6 +303,8 @@ PostgreSQL, MySQL, MariaDB and SQLite are spoken natively. Drop the driver jar f
 
 **Plugins storing quests their own way have more to write.** A `QuestStorage` now keeps what each assignment handed out (`loadAssignments`, `claimAssignment`, a conditional write so two servers never both hand the same occasion out, and `deleteAssignments`), writes a quest only over the version it was read at, saying which writes another one overtook (`writeProgressions` in place of `saveProgressions`, and `loadVersions`), and hosts a player on one server at a time (`hostPlayer`, `renewHosting`, and a `leaving` flag on `savePlayer`). The file and database storages that ship with OpenQuests already have them.
 
+**Plugins adding quest types change a quest through operations.** A visitor no longer sets a field and calls `markDirty()`: it says what happened with `quest.apply(...)`, an operation being a small record the type declares next to its fields, such as `QuantityQuestProgression.Add` for every counted type. `setState` is no longer public, and `addQuantity` and `setCurrentQuantity` are gone. Quest assets and their JSON are untouched.
+
 **A shared quest's `GrantQuest` hands each player their own unless it says `"Shared": true`.** It used to follow the quest paying: a world quest's next step went to the world. Write `"Shared": true` on the reward to keep that; the quest then hands its follow-ups on once as it ends, and `AutoClaim` no longer applies to it.
 
 **Bookkeeping left the tags.** `OQ_GRANTED_BY` is now a field of the quest, `GrantedBy`, and `OQ_PARENT_QUEST` is no longer read: a composite step saved back when it carried its group as that tag is no longer handed back to it. `OQ_HUD_DESC` is the only tag left, and it is yours.

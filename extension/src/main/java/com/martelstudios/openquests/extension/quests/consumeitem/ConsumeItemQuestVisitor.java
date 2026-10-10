@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.consumeitem;
 
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -28,9 +28,7 @@ public class ConsumeItemQuestVisitor implements QuestVisitor<ConsumeItemQuestPro
 
         if (!quest.getItemToConsume().matches(itemId)) return;
 
-        quest.addQuantity(quantity)
-             .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
-             .markDirty();
+        quest.apply(new QuantityQuestProgression.Add(quantity));
     }
 
     @Override

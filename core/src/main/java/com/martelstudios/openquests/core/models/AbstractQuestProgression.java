@@ -28,18 +28,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * Defines the quest progression. Extend it to create new quest types or to add runtime progression data.
@@ -204,11 +201,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     private transient volatile Stored storedCopy = Stored.NONE;
 
     /**
-     * The changes made here since the stored copy, in order, for a quest other servers write too:
-     * each is made again over whatever they stored meanwhile, which a copy written over it would
-     * undo. Guarded by the quest itself.
+     * The operations made here since the stored copy, in order, for a quest other servers write
+     * too: each is made again over whatever they stored meanwhile, which a copy written over it
+     * would undo. Guarded by the quest itself.
      */
-    private final transient List<Change<Q>> pending = new ArrayList<>();
+    private final transient List<QuestOperation<? super Q>> pending = new ArrayList<>();
 
     /**
      * Grows with every change, so that one update can tell whether it changed anything.
@@ -216,15 +213,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     private transient int changeCount;
 
     /**
-     * Above zero while a change is being made, where marking the quest dirty is expected.
+     * Above zero while an operation is being made, where marking the quest dirty is expected.
      */
     private transient int applying;
-
-    /**
-     * Above zero while a change kept on another copy is made again on this one, which then tells
-     * nobody and reaches no other quest: that was done where the change was first made.
-     */
-    private transient int replaying;
 
     /**
      * Overrides the asset for this instance alone. Boxed so that "not overridden" is a state of
@@ -380,148 +371,122 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the quest already said exactly that.
      */
     public boolean setTracked(@Nullable Boolean track) {
-        return change(quest -> {
-            if (Objects.equals(quest.track, track)) return false;
-
-            quest.track = track;
-            return true;
-        });
+        return apply(new QuestOperation.Track(track));
     }
 
     /**
-     * Applies the visitor, then settles the quest before anyone hears of it. A player's action is
-     * first put to the constraints of the asset, and leaves no trace if one objects. A quest other
-     * servers write too hears of a change of state once the write making it for all of them is done.
+     * Has the visitor say what happened to the quest, then gives up a quest nobody runs any more.
+     * A player's action is first put to the constraints of the asset, and leaves no trace if one
+     * objects. A quest that is over takes no more.
      *
      * @param visitor the visitor to apply
      */
     public void update(QuestVisitor<Q> visitor) {
         UUID actorId = visitor.getActorId();
         if (actorId != null && !allowsProgress(actorId)) return;
+        if (isOver()) return;
 
+        int before = changeCount;
+        visitor.progress(self());
+
+        // If no player remains and some has abandoned set the quest as abandoned
+        if (!isCompleted() && players.isEmpty() && !abandonedPlayers.isEmpty()) apply(new QuestOperation.SetState(QuestState.ABANDONED));
+
+        if (changeCount != before) announceUpdate();
+    }
+
+    /**
+     * Makes an operation on the quest, the one way anything about it changes. A quest other
+     * servers write too keeps it, to make it again over whatever they stored meanwhile, and hears
+     * of a change of state once the write making it for all of them is done.
+     *
+     * @return whether it changed anything, the quest then waiting to be written
+     */
+    public boolean apply(@Nonnull QuestOperation<? super Q> operation) {
         QuestState previousState;
         QuestState newState;
         int newTransitions;
         boolean kept;
         synchronized (this) {
             previousState = state;
-            int before = changeCount;
             boolean unsaved = dirty;
 
-            applying++;
-            try {
-                progress(visitor);
-            } finally {
-                applying--;
-            }
-            if (changeCount == before) return;
+            if (!make(operation)) return false;
 
             newState = state;
             newTransitions = transitions;
-            kept = keep(quest -> {
-                AbstractQuestProgression<Q> same = quest;
-                int unchanged = same.changeCount;
-                same.progress(visitor);
-                return same.changeCount != unchanged;
-            }, unsaved);
+            kept = keep(operation, unsaved);
         }
 
-        announceUpdate();
-
-        if (newState == previousState) return;
+        if (newState == previousState) return true;
 
         if (kept) {
             QuestSync.writeSoon(this);
         } else {
             announce(previousState, newState, newTransitions, true);
         }
-    }
-
-    /**
-     * Applies the visitor and settles the quest, telling nobody: what an update does to this copy,
-     * and makes again over the stored one. A quest that is over takes no more.
-     */
-    private void progress(@Nonnull QuestVisitor<Q> visitor) {
-        if (isOver()) return;
-
-        QuestState previousState = state;
-        visitor.progress(self());
-
-        // If no player remains and some has abandoned set the quest as abandoned
-        if (!isCompleted() && getPlayers().isEmpty() && !getAbandonedPlayers().isEmpty()) {
-            setState(QuestState.ABANDONED).markDirty();
-        }
-
-        if (state != previousState) {
-            completedAt = isCompleted() ? Instant.now() : null;
-            transitions++;
-            markDirty();
-        }
-    }
-
-    /**
-     * Makes a change to the quest. Every write to a quest goes through here or {@link #update}: a
-     * quest other servers write too keeps the change, to make it again over whatever they stored
-     * meanwhile, where writing this copy over theirs would undo it.
-     *
-     * @param change makes the change on the quest it is handed, and says whether it changed anything
-     * @return whether it changed anything, the quest then waiting to be written
-     */
-    protected final boolean change(@Nonnull Change<Q> change) {
-        synchronized (this) {
-            boolean unsaved = dirty;
-
-            applying++;
-            try {
-                if (!change.apply(self())) return false;
-                markDirty();
-            } finally {
-                applying--;
-            }
-
-            keep(change, unsaved);
-        }
         return true;
     }
 
     /**
-     * Keeps a change just made, for a quest other servers write too. What this copy changed before
-     * and nothing could make again, before the quest was shared or past {@link #change}, rides
-     * along instead as a copy of the whole quest.
-     *
-     * @param unsaved whether the quest was waiting to be written before the change
-     * @return whether the change was kept, the quest being shared
+     * Makes the operation and dates a change of state, telling nobody.
      */
-    private boolean keep(@Nonnull Change<Q> change, boolean unsaved) {
+    private boolean make(@Nonnull QuestOperation<? super Q> operation) {
+        QuestState previousState = state;
+
+        applying++;
+        try {
+            if (!operation.applyTo(self())) return false;
+
+            if (state != previousState) {
+                completedAt = isCompleted() ? Instant.now() : null;
+                transitions++;
+            }
+            markDirty();
+            return true;
+        } finally {
+            applying--;
+        }
+    }
+
+    /**
+     * Keeps an operation just made, for a quest other servers write too. What this copy changed
+     * before and nothing could make again, before the quest was shared or past {@link #apply},
+     * rides along instead as a copy of the whole quest.
+     *
+     * @param unsaved whether the quest was waiting to be written before the operation
+     * @return whether the operation was kept, the quest being shared
+     */
+    private boolean keep(@Nonnull QuestOperation<? super Q> operation, boolean unsaved) {
         if (!QuestSync.isShared(this)) {
             // Written whole from now on: what was kept would be made twice were it shared again
             pending.clear();
             return false;
         }
 
-        pending.add(pending.isEmpty() && unsaved ? overwriteWith(copy()) : change);
+        pending.add(pending.isEmpty() && unsaved ? new Overwrite(copy()) : operation);
         return true;
     }
 
     /**
-     * @return a change writing this quest, as it stands now, over whichever copy it is made on:
-     * how a quest whose copy here has the last word is written over one that moved under it.
+     * @return an operation writing this quest, as it stands now, over whichever copy it is made
+     * on: how a quest whose copy here has the last word is written over one that moved under it.
      */
     @Nonnull
-    public Change<Q> overwrite() {
-        return overwriteWith(copy());
+    public QuestOperation<AbstractQuestProgression<?>> overwrite() {
+        return new Overwrite(copy());
     }
 
     /**
-     * @return a change writing that copy over whichever it is made on, every field of it.
+     * Writes that copy over whichever it is made on, every field of it.
      */
-    @Nonnull
-    private Change<Q> overwriteWith(@Nonnull AbstractQuestProgression<?> snapshot) {
-        // A copy of the copy each time: one write may be tried again on another stored copy
-        return quest -> {
-            ((AbstractQuestProgression<Q>) quest).copyStoredFields(snapshot.copy());
+    private record Overwrite(@Nonnull AbstractQuestProgression<?> snapshot) implements QuestOperation<AbstractQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
+            // A copy of the copy each time: one write may be tried again on another stored copy
+            quest.copyStoredFields(snapshot.copy());
             return true;
-        };
+        }
     }
 
     /**
@@ -589,48 +554,46 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * @return the changes waiting to be written, in order. A quest waiting to be written with none
-     * kept, changed past {@link #change}, hands a copy of itself instead.
+     * @return the operations waiting to be written, in order, those that add up made one: what a
+     * quest keeps between writes stays as small as what it would write. A quest waiting to be
+     * written with none kept, changed past {@link #apply}, hands a copy of itself instead.
      */
     @Nonnull
-    public synchronized List<Change<Q>> getPendingChanges() {
-        if (pending.isEmpty() && dirty && QuestSync.isShared(this)) pending.add(overwriteWith(copy()));
+    public synchronized List<QuestOperation<? super Q>> getPendingOperations() {
+        if (pending.isEmpty() && dirty && QuestSync.isShared(this)) pending.add(new Overwrite(copy()));
+
+        // Merged here rather than as they are kept: a write already under way holds the ones before
+        List<QuestOperation<? super Q>> merged = new ArrayList<>(pending.size());
+        for (QuestOperation<? super Q> operation : pending) {
+            QuestOperation<? super Q> both = merged.isEmpty() ? null : merged.getLast().followedBy(operation);
+            if (both != null) {
+                merged.set(merged.size() - 1, both);
+            } else {
+                merged.add(operation);
+            }
+        }
+        pending.clear();
+        pending.addAll(merged);
 
         return List.copyOf(pending);
     }
 
     /**
-     * Makes on this copy a change another copy of the quest kept, telling nobody: how a stored
+     * Makes on this copy an operation another copy of the quest kept, telling nobody: how a stored
      * copy takes on what a server is waiting to write.
      *
      * @return whether it changed anything.
      */
     @SuppressWarnings("unchecked")
-    public boolean replay(@Nonnull Change<?> change) {
-        applying++;
-        replaying++;
-        try {
-            if (!((Change<Q>) change).apply(self())) return false;
-            markDirty();
-            return true;
-        } finally {
-            replaying--;
-            applying--;
-        }
+    public boolean replay(@Nonnull QuestOperation<?> operation) {
+        return make((QuestOperation<? super Q>) operation);
     }
 
     /**
-     * @return whether a change kept on another copy is being made again on this one.
-     */
-    boolean isReplaying() {
-        return replaying > 0;
-    }
-
-    /**
-     * Takes on a stored copy, written or read back, then makes again on it the changes made here
-     * that it does not carry: this copy stands on what is stored, plus what is still to write.
+     * Takes on a stored copy, written or read back, then makes again on it the operations made
+     * here that it does not carry: this copy stands on what is stored, plus what is still to write.
      *
-     * @param written how many of the changes waiting here the stored copy carries, the first ones
+     * @param written how many of the operations waiting here the stored copy carries, the first ones
      */
     public synchronized void restack(@Nonnull AbstractQuestProgression<?> stored, int written) {
         pending.subList(0, written).clear();
@@ -638,7 +601,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         copyStoredFields(stored);
         markStored(stored.storedCopy);
 
-        for (Change<Q> change : pending) replay(change);
+        for (QuestOperation<? super Q> operation : pending) make(operation);
         dirty = !pending.isEmpty();
     }
 
@@ -696,22 +659,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * One change to a quest, which a quest other servers write too keeps, to make it again on
-     * whichever stored copy it is written over.
-     */
-    @FunctionalInterface
-    public interface Change<Q extends AbstractQuestProgression<Q>> {
-
-        /**
-         * Reads what it changes off the quest it is handed, never off the copy it was first made
-         * on: the two may differ.
-         *
-         * @return whether it changed anything.
-         */
-        boolean apply(@Nonnull Q quest);
-    }
-
-    /**
      * @return whether what that player did may count towards this quest, every constraint of its
      * asset agreeing, and those of every group it is a step of: a step is played inside its group.
      * An asset that is gone holds nothing back.
@@ -760,14 +707,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player already held this quest.
      */
     public boolean addPlayer(@Nonnull UUID playerId) {
-        boolean added = change(quest -> {
-            if (!quest.players.add(playerId)) return false;
-
-            // Handed the quest again after walking away from it: they are running it, not done with it
-            quest.abandonedPlayers.remove(playerId);
-            return true;
-        });
-        if (!added || isReplaying()) return added;
+        if (!apply(new QuestOperation.Join(playerId))) return false;
 
         HytaleServer.get()
                     .getEventBus()
@@ -782,8 +722,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player did not hold this quest.
      */
     public boolean removePlayer(@Nonnull UUID playerId) {
-        boolean removed = change(quest -> quest.players.remove(playerId));
-        if (!removed || isReplaying()) return removed;
+        if (!apply(new QuestOperation.Leave(playerId))) return false;
 
         HytaleServer.get()
                     .getEventBus()
@@ -800,13 +739,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player was not running this quest.
      */
     public boolean abandonPlayer(@Nonnull UUID playerId) {
-        boolean abandoned = change(quest -> {
-            if (!quest.players.remove(playerId)) return false;
-
-            quest.abandonedPlayers.add(playerId);
-            return true;
-        });
-        if (!abandoned || isReplaying()) return abandoned;
+        if (!apply(new QuestOperation.Abandon(playerId))) return false;
 
         HytaleServer.get()
                     .getEventBus()
@@ -876,21 +809,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Written by the scope holding the quest, never by the quest itself.
      */
     public Q setScope(@Nullable QuestScope scope) {
-        change(quest -> {
-            quest.scope = scope;
-            return true;
-        });
+        apply(new QuestOperation.SetScope(scope));
         return self();
-    }
-
-    /**
-     * Changes the scope the quest carries in place, such as the worlds it reached.
-     *
-     * @param change says whether it changed the scope
-     * @return whether it changed the scope, the quest then waiting to be written
-     */
-    public boolean changeScope(@Nonnull Predicate<QuestScope> change) {
-        return change(quest -> quest.scope != null && change.test(quest.scope));
     }
 
     /**
@@ -907,10 +827,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * passing its own on.
      */
     public Q setOrigin(@Nullable QuestOrigin origin) {
-        change(quest -> {
-            quest.origin = origin;
-            return true;
-        });
+        this.origin = origin;
         return self();
     }
 
@@ -928,10 +845,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * it already knows which completion opened it.
      */
     public Q setGrantedBy(@Nullable UUID grantedBy) {
-        change(quest -> {
-            quest.grantedBy = grantedBy;
-            return true;
-        });
+        this.grantedBy = grantedBy;
         return self();
     }
 
@@ -1093,14 +1007,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the quest already carried exactly that.
      */
     public boolean addTag(@Nonnull String tag, @Nonnull String... values) {
-        return change(quest -> !Arrays.equals(quest.tags.put(tag, values), values));
+        return apply(new QuestOperation.PutTag(tag, values));
     }
 
     /**
      * @return {@code false} if the quest did not carry the tag.
      */
     public boolean removeTag(@Nonnull String tag) {
-        return change(quest -> quest.tags.remove(tag) != null);
+        return apply(new QuestOperation.RemoveTag(tag));
     }
 
     /**
@@ -1123,7 +1037,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return state;
     }
 
-    public Q setState(QuestState state) {
+    protected Q setState(QuestState state) {
         this.state = state;
         return self();
     }
@@ -1171,15 +1085,15 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     /**
      * Marks this quest as needing to be persisted on the next save pass. A quest other servers
-     * write too changes through {@link #change} or {@link #update}: a change made past them is
-     * reported, and only ever written as a copy of the whole quest.
+     * write too changes through {@link #apply}: a change made past it is reported, and only ever
+     * written as a copy of the whole quest.
      */
     public void markDirty() {
         this.dirty = true;
         changeCount++;
 
         if (applying == 0 && getStoredVersion() > 0 && QuestSync.isShared(this) && REPORTED_UNKEPT.add(getClass())) {
-            LOGGER.atWarning().log("A %s other servers write too was changed past change(): written as a copy of the whole quest, it may undo what another server wrote", getClass().getSimpleName());
+            LOGGER.atWarning().log("A %s other servers write too was changed past apply(): written as a copy of the whole quest, it may undo what another server wrote", getClass().getSimpleName());
         }
     }
 
