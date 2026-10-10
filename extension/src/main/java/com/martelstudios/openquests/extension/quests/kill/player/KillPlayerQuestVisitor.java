@@ -2,8 +2,8 @@ package com.martelstudios.openquests.extension.quests.kill.player;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -30,9 +30,7 @@ public class KillPlayerQuestVisitor implements QuestVisitor<KillPlayerQuestProgr
         if (quest.isOver()) return;
         if (!quest.matchesVictim(victim)) return;
 
-        quest.addQuantity(1)
-             .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
-             .markDirty();
+        quest.apply(new QuantityQuestProgression.Add(1));
 
         LOGGER.at(Level.FINE).log("Quest %s progress for %s: %d/%d", quest.getId(), killerId, quest.getCurrentQuantity(), quest.getTargetQuantity());
     }

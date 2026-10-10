@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.extension.quests.movement;
 
 import com.hypixel.hytale.protocol.MovementStates;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
@@ -42,5 +43,13 @@ public abstract class MovementQuestProgression<Q extends MovementQuestProgressio
         int whole = (int) pending;
         pending -= whole;
         return whole;
+    }
+
+    /**
+     * Movement only ever brings the quest to its end, never back from one.
+     */
+    @Override
+    protected void settle() {
+        if (checkCompletion()) setState(QuestState.SUCCESSFUL);
     }
 }

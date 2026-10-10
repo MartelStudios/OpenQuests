@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.quests.reachlocation;
 
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 import org.joml.Vector3d;
@@ -29,8 +30,7 @@ public class ReachLocationQuestVisitor implements QuestVisitor<ReachLocationQues
         double radius = asset.getRadius();
         if (position.distanceSquared(asset.getPosition()) > radius * radius) return;
 
-        quest.setState(QuestState.SUCCESSFUL);
-        quest.markDirty();
+        quest.apply(new QuestOperation.SetState(QuestState.SUCCESSFUL));
     }
 
     @Override

@@ -5,6 +5,8 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestOperation;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 
 import javax.annotation.Nonnull;
@@ -50,17 +52,51 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
         return quantity;
     }
 
-    public Q setCurrentQuantity(int currentQuantity) {
-        quantity = currentQuantity;
-        return self();
+    /**
+     * Weighs where the quest stands after its count moved: done once the target is reached, running
+     * again below it, which only a quest kept running by {@code StopOnComplete: false} can be.
+     */
+    protected void settle() {
+        setState(checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS);
     }
 
     /**
-     * Adds to the count, over whatever it stands at on the copy being moved.
+     * Adds to the count, over whatever it stands at on the copy it is made on.
      */
-    public Q addQuantity(int delta) {
-        quantity += delta;
-        return self();
+    public record Add(int amount) implements QuestOperation<QuantityQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull QuantityQuestProgression<?> quest) {
+            if (quest.isOver() || amount <= 0) return false;
+
+            quest.quantity += amount;
+            quest.settle();
+            return true;
+        }
+
+        /**
+         * Two counts in a row are one count of both, steps walked between two writes going as one.
+         */
+        @Nullable
+        @Override
+        public QuestOperation<QuantityQuestProgression<?>> followedBy(@Nonnull QuestOperation<?> next) {
+            return next instanceof Add more ? new Add(amount + more.amount) : null;
+        }
+    }
+
+    /**
+     * Sets the count outright, for a quest counting what the player holds rather than what they did.
+     */
+    public record Count(int quantity) implements QuestOperation<QuantityQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull QuantityQuestProgression<?> quest) {
+            if (quest.isOver()) return false;
+
+            QuestState before = quest.getState();
+            boolean moved = quest.quantity != quantity;
+            quest.quantity = quantity;
+            quest.settle();
+            return moved || quest.getState() != before;
+        }
     }
 
     /**

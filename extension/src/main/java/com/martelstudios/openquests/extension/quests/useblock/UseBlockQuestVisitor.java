@@ -1,8 +1,8 @@
 package com.martelstudios.openquests.extension.quests.useblock;
 
 import com.hypixel.hytale.server.core.event.events.ecs.UseBlockEvent;
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -28,9 +28,7 @@ public class UseBlockQuestVisitor implements QuestVisitor<UseBlockQuestProgressi
         var blockType = event.getBlockType();
         if (blockType == null || !quest.getBlockToUse().matches(blockType.getId())) return;
 
-        quest.addQuantity(1)
-             .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
-             .markDirty();
+        quest.apply(new QuantityQuestProgression.Add(1));
     }
 
     @Override

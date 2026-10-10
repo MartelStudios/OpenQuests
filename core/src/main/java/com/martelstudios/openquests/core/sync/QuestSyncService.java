@@ -4,6 +4,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
@@ -198,20 +199,20 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
      * once, by the write that made it: an end this write found already made pays nothing.
      */
     private void commit(@Nonnull AbstractQuestProgression<?> quest) {
-        List<? extends AbstractQuestProgression.Change<?>> changes = quest.getPendingChanges();
-        if (changes.isEmpty()) return;
+        List<? extends QuestOperation<?>> operations = quest.getPendingOperations();
+        if (operations.isEmpty()) return;
 
         long read = quest.getStoredVersion();
         QuestState storedBefore = quest.getStoredState();
 
-        Rebase rebase = new Rebase(changes);
+        Rebase rebase = new Rebase(operations);
         AbstractQuestProgression<?> written = storage.commitProgression(quest.getId(), rebase);
         if (written == null) {
             gone(quest);
             return;
         }
 
-        quest.restack(written, changes.size());
+        quest.restack(written, operations.size());
 
         if (rebase.foundVersion > read) {
             quest.announceUpdate();
@@ -331,7 +332,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
     private static final class Rebase implements Predicate<AbstractQuestProgression<?>> {
 
         @Nonnull
-        private final List<? extends AbstractQuestProgression.Change<?>> changes;
+        private final List<? extends QuestOperation<?>> operations;
 
         private final List<Transition> made = new ArrayList<>();
 
@@ -341,8 +342,8 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
 
         private int foundTransitions;
 
-        private Rebase(@Nonnull List<? extends AbstractQuestProgression.Change<?>> changes) {
-            this.changes = changes;
+        private Rebase(@Nonnull List<? extends QuestOperation<?>> operations) {
+            this.operations = operations;
         }
 
         /**
@@ -356,9 +357,9 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
             made.clear();
 
             boolean changed = false;
-            for (AbstractQuestProgression.Change<?> change : changes) {
+            for (QuestOperation<?> operation : operations) {
                 QuestState before = stored.getState();
-                changed |= stored.replay(change);
+                changed |= stored.replay(operation);
                 if (stored.getState() != before) made.add(new Transition(before, stored.getState(), stored.getTransitions()));
             }
             return changed;

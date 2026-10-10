@@ -2,8 +2,8 @@ package com.martelstudios.openquests.extension.quests.interactivelypickup;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.ecs.InteractivelyPickupItemEvent;
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import java.util.UUID;
 import java.util.logging.Level;
@@ -34,9 +34,7 @@ public class InteractivelyPickupQuestVisitor implements QuestVisitor<Interactive
             return;
         }
 
-        quest.addQuantity(event.getItemStack().getQuantity())
-             .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
-             .markDirty();
+        quest.apply(new QuantityQuestProgression.Add(event.getItemStack().getQuantity()));
 
         LOGGER.at(Level.FINE).log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCurrentQuantity(), quest.getTargetQuantity());
     }

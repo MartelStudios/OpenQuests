@@ -4,13 +4,14 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestState;
 
 import java.util.UUID;
 
 /**
  * A quest type standing in for the ones the extension ships, so a backend can be exercised without
- * a server to register anything. Its changes go through {@link #change}, as a shipped type's do,
+ * a server to register anything. Its changes go through {@link #apply}, as a shipped type's do,
  * without the events a test has no server to send.
  */
 public class TestQuestProgression extends AbstractQuestProgression<TestQuestProgression> {
@@ -26,15 +27,10 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
     private int counter;
 
     /**
-     * Hands the quest to a player the way the quest would.
+     * Hands the quest to a player the way the quest would, without the event a test has no server for.
      */
     public TestQuestProgression join(UUID playerId) {
-        change(quest -> {
-            if (!quest.players.add(playerId)) return false;
-
-            quest.abandonedPlayers.remove(playerId);
-            return true;
-        });
+        apply(new QuestOperation.Join(playerId));
         return this;
     }
 
@@ -42,7 +38,7 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
      * Takes a player off the quest, the way a world left behind does.
      */
     public TestQuestProgression leave(UUID playerId) {
-        change(quest -> quest.players.remove(playerId));
+        apply(new QuestOperation.Leave(playerId));
         return this;
     }
 
@@ -50,12 +46,15 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
      * Has a player give the quest up.
      */
     public TestQuestProgression giveUp(UUID playerId) {
-        change(quest -> {
-            if (!quest.players.remove(playerId)) return false;
+        apply(new QuestOperation.Abandon(playerId));
+        return this;
+    }
 
-            quest.abandonedPlayers.add(playerId);
-            return true;
-        });
+    /**
+     * Ends the quest without telling anyone, there being no server in a test to tell.
+     */
+    public TestQuestProgression end(QuestState state) {
+        replay(new QuestOperation.SetState(state));
         return this;
     }
 
@@ -64,10 +63,7 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
     }
 
     public TestQuestProgression setCounter(int counter) {
-        change(quest -> {
-            quest.counter = counter;
-            return true;
-        });
+        apply(new SetCounter(counter));
         return this;
     }
 
@@ -75,23 +71,53 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
      * Adds to the counter over whatever it stands at, the way a counted quest does.
      */
     public TestQuestProgression addToCounter(int delta) {
-        change(quest -> {
-            quest.counter += delta;
-            return delta != 0;
-        });
+        apply(new AddToCounter(delta));
         return this;
     }
 
     /**
-     * Ends the quest once the counter reaches the target, the way a visitor settles a quest.
+     * Ends the quest once the counter reaches the target, the way a counted quest settles.
      */
     public TestQuestProgression addAndEndAt(int delta, int target) {
-        change(quest -> {
-            quest.counter += delta;
-            if (quest.counter >= target && !quest.isCompleted()) quest.setState(QuestState.SUCCESSFUL);
-            return true;
-        });
+        apply(new AddAndEndAt(delta, target));
         return this;
+    }
+
+    /**
+     * Changes the counter past {@link #apply}, the way a type ignoring operations would.
+     */
+    public void forceCounter(int counter) {
+        this.counter = counter;
+        markDirty();
+    }
+
+    record SetCounter(int counter) implements QuestOperation<TestQuestProgression> {
+        @Override
+        public boolean applyTo(TestQuestProgression quest) {
+            if (quest.counter == counter) return false;
+
+            quest.counter = counter;
+            return true;
+        }
+    }
+
+    record AddToCounter(int delta) implements QuestOperation<TestQuestProgression> {
+        @Override
+        public boolean applyTo(TestQuestProgression quest) {
+            quest.counter += delta;
+            return delta != 0;
+        }
+    }
+
+    record AddAndEndAt(int delta, int target) implements QuestOperation<TestQuestProgression> {
+        @Override
+        public boolean applyTo(TestQuestProgression quest) {
+            if (quest.isOver()) return false;
+
+            quest.counter += delta;
+            if (quest.counter >= target) quest.setState(QuestState.SUCCESSFUL);
+            return true;
+        }
     }
 
     /**

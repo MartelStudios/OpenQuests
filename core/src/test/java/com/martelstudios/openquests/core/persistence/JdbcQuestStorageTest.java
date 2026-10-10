@@ -2,6 +2,7 @@ package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -73,7 +74,7 @@ class JdbcQuestStorageTest {
     void writesAndReadsBackAQuestWhole() {
         UUID playerId = UUID.randomUUID();
         TestQuestProgression quest = quest("CollectStick", playerId);
-        quest.setCounter(7).setState(QuestState.IN_PROGRESS).addTag("OQ_TEST", "a", "b");
+        quest.setCounter(7).end(QuestState.IN_PROGRESS).addTag("OQ_TEST", "a", "b");
 
         storage.writeProgressions(List.of(quest));
 
@@ -178,7 +179,7 @@ class JdbcQuestStorageTest {
 
         storage.writeProgressions(List.of(quest));
 
-        quest.setCounter(42).setState(QuestState.SUCCESSFUL);
+        quest.setCounter(42).end(QuestState.SUCCESSFUL);
         storage.writeProgressions(List.of(quest));
 
         assertEquals(1, storage.loadAllProgressions().size());
@@ -459,7 +460,7 @@ class JdbcQuestStorageTest {
         target.writeProgressions(List.of(quest));
 
         // Twice, so the upsert is the statement being tested rather than the insert
-        quest.setCounter(9).setState(QuestState.SUCCESSFUL);
+        quest.setCounter(9).end(QuestState.SUCCESSFUL);
         target.writeProgressions(List.of(quest));
 
         AbstractQuestProgression<?> read = target.loadProgression(quest.getId());
@@ -572,7 +573,7 @@ class JdbcQuestStorageTest {
             write(onA, quest);
             List<QuestState> foundByB = new ArrayList<>();
             List<QuestState> leftByB = new ArrayList<>();
-            List<? extends AbstractQuestProgression.Change<?>> changes = copyOnB.getPendingChanges();
+            List<? extends QuestOperation<?>> changes = copyOnB.getPendingOperations();
             AbstractQuestProgression<?> written = onB.commitProgression(quest.getId(), stored -> {
                 foundByB.add(stored.getState());
                 boolean changed = replay(stored, changes);
@@ -652,17 +653,17 @@ class JdbcQuestStorageTest {
     }
 
     @Test
-    void aChangeMadePastChangeIsWrittenAsTheWholeQuest() {
+    void aChangeMadePastApplyIsWrittenAsTheWholeQuest() {
         QuestSync.setPolicy(SHARED_ONCE_STORED);
 
         try {
             TestQuestProgression quest = quest("Bypassed");
             storage.writeProgressions(List.of(quest));
 
-            quest.setState(QuestState.FAILED).markDirty();
+            quest.forceCounter(7);
             write(storage, quest);
 
-            assertEquals(QuestState.FAILED, storage.loadProgression(quest.getId()).getState());
+            assertEquals(7, ((TestQuestProgression) storage.loadProgression(quest.getId())).getCounter());
         } finally {
             QuestSync.setPolicy(ALONE);
         }
@@ -683,7 +684,7 @@ class JdbcQuestStorageTest {
         assertEquals(1, quest.getStoredVersion());
 
         // Written over what overtook it, as a quest only this server writes is
-        AbstractQuestProgression.Change<?> whole = quest.overwrite();
+        QuestOperation<?> whole = quest.overwrite();
         storage.commitProgression(quest.getId(), stored -> stored.replay(whole));
         assertEquals(2, ((TestQuestProgression) storage.loadProgression(quest.getId())).getCounter());
     }
@@ -707,17 +708,6 @@ class JdbcQuestStorageTest {
         } finally {
             QuestSync.setPolicy(ALONE);
         }
-    }
-
-    @Test
-    void aChangeMadeAgainOnACopyTellsNobody() {
-        UUID alice = UUID.randomUUID();
-        TestQuestProgression quest = quest("Quiet", alice);
-        AbstractQuestProgression.Change<TestQuestProgression> giveUp = copy -> copy.abandonPlayer(alice);
-
-        // Told, the copy would reach for a server a test does not have
-        assertTrue(quest.replay(giveUp));
-        assertTrue(quest.isAbandonedBy(alice));
     }
 
     @Test
@@ -747,7 +737,7 @@ class JdbcQuestStorageTest {
             onA.writeProgressions(List.of(quest));
             long seenByB = onB.loadProgression(quest.getId()).getStoredVersion();
 
-            quest.setState(QuestState.SUCCESSFUL);
+            quest.end(QuestState.SUCCESSFUL);
             onA.writeProgressions(List.of(quest));
             onA.deleteProgression(quest);
 
@@ -902,16 +892,16 @@ class JdbcQuestStorageTest {
      * without the events a test has no server to send.
      */
     private static void write(@Nonnull QuestStorage on, @Nonnull AbstractQuestProgression<?> quest) {
-        List<? extends AbstractQuestProgression.Change<?>> changes = quest.getPendingChanges();
+        List<? extends QuestOperation<?>> changes = quest.getPendingOperations();
         AbstractQuestProgression<?> written = on.commitProgression(quest.getId(), stored -> replay(stored, changes));
 
         assertNotNull(written);
         quest.restack(written, changes.size());
     }
 
-    private static boolean replay(@Nonnull AbstractQuestProgression<?> stored, @Nonnull List<? extends AbstractQuestProgression.Change<?>> changes) {
+    private static boolean replay(@Nonnull AbstractQuestProgression<?> stored, @Nonnull List<? extends QuestOperation<?>> changes) {
         boolean changed = false;
-        for (AbstractQuestProgression.Change<?> change : changes) changed |= stored.replay(change);
+        for (QuestOperation<?> change : changes) changed |= stored.replay(change);
         return changed;
     }
 

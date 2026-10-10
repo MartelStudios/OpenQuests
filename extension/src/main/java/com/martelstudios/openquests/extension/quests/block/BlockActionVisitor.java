@@ -1,6 +1,5 @@
 package com.martelstudios.openquests.extension.quests.block;
 
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -34,10 +33,7 @@ public class BlockActionVisitor implements QuestVisitor<BlockActionQuestProgress
         if (quest.isOver()) return;
 
         if (!quest.getBlockFilter().matches(blockId)) return;
-        if (!quest.act(playerId, action, placedByPlayer)) return;
-
-        quest.setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
-             .markDirty();
+        quest.apply(new BlockActionQuestProgression.Act(playerId, action, placedByPlayer));
     }
 
     @Override

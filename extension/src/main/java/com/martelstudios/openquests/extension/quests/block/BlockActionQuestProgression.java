@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
@@ -51,13 +52,27 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
     }
 
     /**
+     * An action on a block this quest counts.
+     *
+     * @param placedByPlayer for a break, whether a player had placed the block, as the world remembers
+     */
+    public record Act(@Nonnull UUID playerId, @Nonnull BlockAction action, boolean placedByPlayer) implements QuestOperation<BlockActionQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull BlockActionQuestProgression<?> quest) {
+            if (quest.isOver() || !quest.act(playerId, action, placedByPlayer)) return false;
+
+            quest.settle();
+            return true;
+        }
+    }
+
+    /**
      * Records an action on a block this quest counts. Guarding against abuse, a block a player placed
      * does not count once broken, and placing it again does not count either.
      *
-     * @param placedByPlayer for a break, whether a player had placed the block, as the world remembers.
      * @return whether anything changed, the count or the counters, which is what is worth saving.
      */
-    public boolean act(@Nonnull UUID playerId, @Nonnull BlockAction action, boolean placedByPlayer) {
+    private boolean act(@Nonnull UUID playerId, @Nonnull BlockAction action, boolean placedByPlayer) {
         boolean guarded = isAntiAbuse();
         boolean changed = false;
         boolean fresh = true;
@@ -76,7 +91,7 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
         }
 
         if (fresh && counts(action)) {
-            addQuantity(1);
+            quantity++;
             changed = true;
         }
 

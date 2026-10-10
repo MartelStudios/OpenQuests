@@ -1,9 +1,9 @@
 package com.martelstudios.openquests.extension.quests.craft;
 
-import com.hypixel.hytale.server.core.inventory.MaterialQuantity;
 import com.hypixel.hytale.server.core.event.events.ecs.CraftRecipeEvent;
-import com.martelstudios.openquests.core.models.QuestState;
+import com.hypixel.hytale.server.core.inventory.MaterialQuantity;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -29,9 +29,7 @@ public class CraftQuestVisitor implements QuestVisitor<CraftQuestProgression> {
         int crafted = countMatchingOutputs(quest);
         if (crafted == 0) return;
 
-        quest.addQuantity(crafted)
-             .setState(quest.checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS)
-             .markDirty();
+        quest.apply(new QuantityQuestProgression.Add(crafted));
     }
 
     /**

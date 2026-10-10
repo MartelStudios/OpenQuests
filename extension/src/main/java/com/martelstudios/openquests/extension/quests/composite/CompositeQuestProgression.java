@@ -12,6 +12,7 @@ import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
@@ -159,7 +160,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * @param transitions how many changes of state the child had been through
      * @return {@code true} when this changed anything, so the group is only marked dirty on news.
      */
-    public boolean recordOutcome(@Nonnull UUID childId, @Nonnull QuestState state, int transitions) {
+    private boolean recordOutcome(@Nonnull UUID childId, @Nonnull QuestState state, int transitions) {
         Integer known = childTransitions.get(childId);
 
         // A child that never changed state is running, which is what no entry says already
@@ -186,11 +187,53 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * Writes down news of children as one change of the group.
      */
     private void hear(@Nonnull List<Heard> heard) {
-        change(quest -> {
+        apply(new Hear(heard));
+    }
+
+    /**
+     * News of children, written down without weighing the group: what it makes of them is {@link
+     * Weigh}'s to say.
+     */
+    public record Hear(@Nonnull List<Heard> news) implements QuestOperation<CompositeQuestProgression> {
+        @Override
+        public boolean applyTo(@Nonnull CompositeQuestProgression quest) {
             boolean changed = false;
-            for (Heard news : heard) changed |= quest.recordOutcome(news.childId(), news.state(), news.transitions());
+            for (Heard heard : news) changed |= quest.recordOutcome(heard.childId(), heard.state(), heard.transitions());
             return changed;
-        });
+        }
+    }
+
+    /**
+     * Settles the group from how its children went. Weighed whole every time: a group kept alive
+     * by {@code StopOnComplete:false} whose rule no longer holds, a step having gone back to
+     * running, goes back to running too.
+     */
+    public record Weigh() implements QuestOperation<CompositeQuestProgression> {
+        @Override
+        public boolean applyTo(@Nonnull CompositeQuestProgression quest) {
+            if (quest.isOver()) return false;
+
+            int children = quest.getChildIds().length;
+            int successful = quest.countOutcomes(QuestState.SUCCESSFUL);
+            int failed = quest.countOutcomes(QuestState.FAILED);
+            int abandoned = quest.countOutcomes(QuestState.ABANDONED);
+
+            QuestState target = switch (quest.getAsset().getOperator()) {
+                case AND -> abandoned > 0 ? QuestState.ABANDONED
+                          : failed > 0 ? QuestState.FAILED
+                          : successful >= children ? QuestState.SUCCESSFUL
+                          : QuestState.IN_PROGRESS;
+                // A composite quest to be ABANDONED has to have all its subquest abandoned.
+                case OR -> successful > 0 ? QuestState.SUCCESSFUL
+                         : failed + abandoned >= children ? (failed == 0 ? QuestState.ABANDONED : QuestState.FAILED)
+                         : QuestState.IN_PROGRESS;
+            };
+
+            if (target == quest.getState()) return false;
+
+            quest.setState(target);
+            return true;
+        }
     }
 
     /**
@@ -251,7 +294,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     /**
      * What was heard of one child: how it stood after that many changes of state.
      */
-    private record Heard(@Nonnull UUID childId, @Nonnull QuestState state, int transitions) {}
+    public record Heard(@Nonnull UUID childId, @Nonnull QuestState state, int transitions) {}
 
     @Override
     public CompositeQuestAsset getAsset() {

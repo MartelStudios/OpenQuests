@@ -10,12 +10,13 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.StartWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestScope;
-import com.martelstudios.openquests.core.sync.QuestSyncService;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.sync.QuestSyncService;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -154,7 +155,7 @@ public class WorldQuestService {
         // Gone already when it left for good, and nothing then is left to write on
         AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
         UUID worldId = world.getWorldConfig().getUuid();
-        if (quest != null) quest.changeScope(scope -> scope.removeWorld(worldId));
+        if (quest != null) quest.apply(new QuestOperation.RemoveWorld(worldId));
     }
 
     /**
@@ -177,7 +178,7 @@ public class WorldQuestService {
         if (scope == null) {
             quest.setScope(new WorldQuestScope(List.of(worldId)));
         } else {
-            quest.changeScope(held -> held.addWorld(worldId));
+            quest.apply(new QuestOperation.AddWorld(worldId));
         }
 
         for (PlayerRef playerRef : world.getPlayerRefs()) {
