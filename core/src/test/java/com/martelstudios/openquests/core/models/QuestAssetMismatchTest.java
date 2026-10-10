@@ -3,8 +3,12 @@ package com.martelstudios.openquests.core.models;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class QuestAssetMismatchTest {
@@ -45,7 +49,19 @@ class QuestAssetMismatchTest {
         assertNull(new StepQuest().findAssetMismatch());
     }
 
+    @Test
+    void aTypeWithAFinalFieldItIsWrittenAsIsRefused() {
+        assertThrows(IllegalStateException.class, () -> AbstractQuestProgression.registerAssetClass(FrozenQuest.class, GatherAsset.class));
+    }
+
     private static final class StepQuest extends AbstractQuestProgression<StepQuest> {}
+
+    /**
+     * Could never take on a stored copy: its list would stay the one it was built with.
+     */
+    private static final class FrozenQuest extends AbstractQuestProgression<FrozenQuest> {
+        private final List<String> kept = new ArrayList<>();
+    }
 
     private static class GatherAsset extends OpenQuestAsset {
         @Override

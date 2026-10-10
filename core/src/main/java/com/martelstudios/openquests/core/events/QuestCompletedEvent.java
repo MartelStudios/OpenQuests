@@ -11,8 +11,8 @@ import java.util.UUID;
  * Fired once a quest reached a terminal state and left the store. Keyed by quest id, so a
  * listener can watch one specific quest rather than filtering every completion.
  *
- * <p>Every server holding the quest hears it, but only the one whose claim ended it pays what the
- * end pays: a listener with an effect that must happen once checks {@link #isClaimedHere()}.
+ * <p>Every server holding the quest hears it, but only the one whose write ended it pays what the
+ * end pays: a listener with an effect that must happen once checks {@link #isEndedHere()}.
  */
 public class QuestCompletedEvent implements IEvent<UUID> {
     @Nonnull
@@ -21,19 +21,16 @@ public class QuestCompletedEvent implements IEvent<UUID> {
     @Nonnull
     private final QuestState state;
 
-    private final boolean claimedHere;
-
-    public QuestCompletedEvent(@Nonnull AbstractQuestProgression<?> quest) {
-        this(quest, true);
-    }
+    private final boolean endedHere;
 
     /**
-     * @param claimedHere whether this server ended the quest, rather than learning another did
+     * @param state the outcome reached, which the quest may have moved past by the time this is heard
+     * @param endedHere whether this server ended the quest, rather than learning another did
      */
-    public QuestCompletedEvent(@Nonnull AbstractQuestProgression<?> quest, boolean claimedHere) {
+    public QuestCompletedEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state, boolean endedHere) {
         this.quest = quest;
-        this.state = quest.getState();
-        this.claimedHere = claimedHere;
+        this.state = state;
+        this.endedHere = endedHere;
     }
 
     @Nonnull
@@ -51,7 +48,7 @@ public class QuestCompletedEvent implements IEvent<UUID> {
      * whatever must happen once. {@code false} on a server only learning of it, which files the
      * quest away and tells its own players.
      */
-    public boolean isClaimedHere() {
-        return claimedHere;
+    public boolean isEndedHere() {
+        return endedHere;
     }
 }

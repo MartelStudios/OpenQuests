@@ -28,23 +28,19 @@ public abstract class MovementQuestProgression<Q extends MovementQuestProgressio
     protected abstract double advance(@Nonnull MovementStates states, double metres, double seconds);
 
     /**
-     * Adds a sample to the counter, keeping what is left of a unit for the next one: a counter
-     * moving by whole steps is what the panel and the journal are able to draw.
+     * Adds a sample to what the samples are worth, keeping what is left of a unit for the next one:
+     * a counter moving by whole steps is what the panel and the journal are able to draw.
      *
-     * @return {@code true} if the counter moved, which is the only thing worth writing down.
+     * @return the whole units the sample completes, for the caller to count.
      */
-    public boolean accumulate(@Nonnull MovementStates states, double metres, double seconds) {
+    public int accumulate(@Nonnull MovementStates states, double metres, double seconds) {
         double advance = advance(states, metres, seconds);
-        if (advance <= 0) return false;
+        if (advance <= 0) return 0;
 
         pending += advance;
 
         int whole = (int) pending;
-        if (whole <= 0) return false;
-
         pending -= whole;
-        addQuantity(whole);
-
-        return true;
+        return whole;
     }
 }

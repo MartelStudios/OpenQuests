@@ -5,11 +5,19 @@ import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgression> {
 
     private final UUID playerId;
+
+    /**
+     * The state each quest is to stand at, worked out once on the copy running here, where the
+     * quests it watches are: a stored copy this runs again on settles the same way.
+     */
+    private final Map<UUID, QuestState> answers = new ConcurrentHashMap<>();
 
     public QuestStateQuestVisitor(@Nonnull UUID playerId) {
         this.playerId = playerId;
@@ -19,7 +27,7 @@ public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgr
     public void progress(QuestStateQuestProgression quest) {
         if (quest.isOver()) return;
 
-        QuestState answer = quest.isNot() != matches(quest) ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS;
+        QuestState answer = answers.computeIfAbsent(quest.getId(), id -> quest.isNot() != matches(quest) ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS);
 
         // Marking it anyway would announce a change nobody made, and rewrite the quest on every save
         if (quest.getState() == answer) return;

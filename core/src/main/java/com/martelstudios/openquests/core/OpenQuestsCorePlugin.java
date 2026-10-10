@@ -35,8 +35,6 @@ import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.OpenQuestCategory;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
-import com.martelstudios.openquests.core.replication.Replica;
-import com.martelstudios.openquests.core.replication.QuestReplicationService;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.QuestStorageProvider;
 import com.martelstudios.openquests.core.persistence.disk.DiskQuestStorage;
@@ -59,6 +57,7 @@ import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.sync.QuestSyncService;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -98,7 +97,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     private QuestProgressionService questProgressionService;
     private QuestPlayerStateService questPlayerStateService;
     private QuestAssignmentService questAssignmentService;
-    private QuestReplicationService questReplicationService;
+    private QuestSyncService questSyncService;
     private QuestDeadlineService questDeadlineService;
     private QuestRewardService questRewardService;
     private UniverseQuestService universeQuestService;
@@ -132,15 +131,14 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         getLogger().atInfo().log("Quest storage: %s", settings.getStorage());
         questStorage = settings.getStorage().create();
         questStorage.start();
-        Replica.setLocalId(questStorage.getReplicaId());
 
         questProgressionStore = new QuestProgressionStore(questStorage);
-        questReplicationService = new QuestReplicationService(questStorage, questProgressionStore, settings.getReplicationSeconds());
+        questSyncService = new QuestSyncService(questStorage, questProgressionStore, settings.getSyncSeconds());
 
         questProgressionService = new QuestProgressionService(this, questProgressionStore);
         questPlayerStateService = new QuestPlayerStateService(this, questProgressionStore);
         questRewardService = new QuestRewardService(this);
-        scopeIndexes = new ScopeIndexes(questStorage, questReplicationService);
+        scopeIndexes = new ScopeIndexes(questStorage, questSyncService);
         universeQuestService = new UniverseQuestService(this, scopeIndexes);
         worldQuestService = new WorldQuestService(this, scopeIndexes);
         worldGroupIndex = new WorldGroupIndex(scopeIndexes);
@@ -225,7 +223,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
         HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(() -> saveEverything(false), interval, interval, TimeUnit.MINUTES);
 
-        questReplicationService.start();
+        questSyncService.start();
     }
 
     /**
@@ -242,9 +240,10 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     @Override
     protected void shutdown() {
-        // First, so nothing is still being written behind the last pass
-        if (questReplicationService != null) questReplicationService.stop();
         saveEverything(true);
+
+        // After the last pass, which hands the shared quests to the storage thread to write
+        if (questSyncService != null) questSyncService.stop();
 
         if (questStorage != null) questStorage.close();
     }
@@ -345,8 +344,8 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         return questAssignmentService;
     }
 
-    public QuestReplicationService getQuestReplicationService() {
-        return questReplicationService;
+    public QuestSyncService getQuestSyncService() {
+        return questSyncService;
     }
 
     public QuestDeadlineService getQuestDeadlineService() {

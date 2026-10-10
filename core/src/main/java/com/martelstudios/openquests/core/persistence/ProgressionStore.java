@@ -1,25 +1,32 @@
 package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.replication.StoredState;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
- * The progressions. Each server writes its own replica of a quest and nothing else of it, so
- * servers sharing a quest never overwrite one another: a quest read back is every replica merged.
- * Its end is the one thing written once for all, by whichever server claims it first.
+ * The progressions, one stored copy per quest with a version that grows with every write, each
+ * only ever written over the version it was read at. A quest only one server writes is written
+ * whole; one several servers write has each server make its own changes on the latest version, so
+ * nobody's change is ever undone.
  */
 public interface ProgressionStore {
 
     /**
-     * @return the quest under that id, every replica merged and its claimed end applied, or
-     * {@code null} for one nothing answers to.
+     * How many times a change is made on a newer version before it is left for the next pass.
+     */
+    int COMMIT_ATTEMPTS = 10;
+
+    /**
+     * @return the quest under that id, standing on the version it was read at, or {@code null} for
+     * one nothing answers to.
      */
     @Nullable
     AbstractQuestProgression<?> loadProgression(@Nonnull UUID questId);
@@ -44,37 +51,50 @@ public interface ProgressionStore {
     List<AbstractQuestProgression<?>> loadAllProgressions();
 
     /**
-     * Writes this server's replica of each quest as one batch, with where the quest stands unless
-     * the backend holds a later state already. Who holds a quest is read off the quest itself, so
-     * dropping a player from one unlinks them by this call alone.
-     */
-    void saveProgressions(@Nonnull Collection<AbstractQuestProgression<?>> quests);
-
-    /**
-     * Does away with a quest, every replica and every link to it. Takes the quest rather than its
-     * id: a backend may need the players it named, and nothing else still knows who they were.
+     * Writes each quest over the version it stands on, a new one created, as one batch with who
+     * holds them. Each quest written then stands on the version it is stored at.
      *
-     * <p>A backend several servers share keeps an ended quest's outcome a while longer: a server
-     * still running the quest learns it ended, rather than ending it a second time.
-     */
-    void deleteProgression(@Nonnull AbstractQuestProgression<?> quest);
-
-    /**
-     * Moves a quest to the state it carries for every server at once, only if nothing moved it
-     * since the epoch it changed from: each change of state is made once, by one server, in turn.
-     *
-     * @return {@code null} if this server's change is the one written, otherwise where the quest
-     * stands, which the quest takes instead.
-     */
-    @Nullable
-    StoredState claimState(@Nonnull AbstractQuestProgression<?> quest);
-
-    /**
-     * What other servers wrote of these quests since what was last seen of them: the replicas
-     * newer than the revisions known, and where each quest stands.
-     *
-     * @param known for each quest, the revision last seen of each other server's replica
+     * @return the ids of those that another write moved first, left as stored: never written over.
      */
     @Nonnull
-    ReplicaPoll pollReplicas(@Nonnull Map<UUID, Map<String, Long>> known);
+    Set<UUID> writeProgressions(@Nonnull Collection<? extends AbstractQuestProgression<?>> quests);
+
+    /**
+     * Makes changes on the latest version and writes it over that version alone, reading again and
+     * making them again whenever another write came first. Changes that make no difference write
+     * nothing.
+     *
+     * @param changes makes the changes on the stored copy it is handed and says whether they
+     * changed it, which may happen more than once: the last copy handed over is the one kept
+     * @return that copy, standing on the version it is stored at, or {@code null} if nothing is
+     * stored under that id any more
+     */
+    @Nullable
+    default AbstractQuestProgression<?> commitProgression(@Nonnull UUID questId, @Nonnull Predicate<AbstractQuestProgression<?>> changes) {
+        for (int attempt = 0; attempt < COMMIT_ATTEMPTS; attempt++) {
+            AbstractQuestProgression<?> stored = loadProgression(questId);
+            if (stored == null) return null;
+
+            // Made already by whoever wrote this version: nothing for the others to read again
+            if (!changes.test(stored)) return stored;
+
+            if (writeProgressions(List.of(stored)).isEmpty()) return stored;
+        }
+        throw new QuestStorageException("Quest " + questId + " kept being written by other servers; its changes wait for the next pass");
+    }
+
+    /**
+     * @return the version each of those quests is stored at, those with nothing stored left out.
+     */
+    @Nonnull
+    Map<UUID, Long> loadVersions(@Nonnull Collection<UUID> questIds);
+
+    /**
+     * Does away with a quest and every link to it. Takes the quest rather than its id: a backend
+     * may need the players it named, and nothing else still knows who they were.
+     *
+     * <p>A backend several servers share keeps an ended quest a while longer: a server still
+     * running the quest learns it ended, rather than ending it a second time.
+     */
+    void deleteProgression(@Nonnull AbstractQuestProgression<?> quest);
 }

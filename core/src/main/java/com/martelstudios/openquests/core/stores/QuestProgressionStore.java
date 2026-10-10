@@ -7,6 +7,7 @@ import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.sync.QuestSync;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -90,7 +91,8 @@ public class QuestProgressionStore {
 
     /**
      * Drops a quest from memory, leaving it where it is stored: the next lookup by id reads it
-     * back. What it changed is written out first, since nothing else will now hold it.
+     * back. What it changed is written out first, a shared one by the storage thread, since nothing
+     * else will now hold it.
      *
      * @return {@code null} for a quest the store was not holding.
      */
@@ -178,6 +180,17 @@ public class QuestProgressionStore {
     }
 
     /**
+     * @return every quest in memory, running or ended alike, as it stands now.
+     */
+    @Nonnull
+    public List<AbstractQuestProgression<?>> getLoaded() {
+        List<AbstractQuestProgression<?>> loaded = new ArrayList<>(quests.size() + archived.size());
+        loaded.addAll(quests.values());
+        loaded.addAll(archived.values());
+        return loaded;
+    }
+
+    /**
      * @return those of the given quests that are in memory, running or ended alike. Never reads
      * anything back: a caller resolving an index wants what is there, not what could be.
      */
@@ -211,7 +224,9 @@ public class QuestProgressionStore {
     }
 
     /**
-     * Writes out those of the given quests that changed and are meant to be kept, as one batch.
+     * Writes out those of the given quests that changed and are meant to be kept, as one batch. A
+     * quest other servers write too is handed to the storage thread, its changes made there on the
+     * latest version; nobody waits for it.
      *
      * <p>A batch that fails is marked dirty again, so a database down for a minute does not take
      * an hour of play with it.
@@ -221,6 +236,12 @@ public class QuestProgressionStore {
 
         for (AbstractQuestProgression<?> quest : candidates) {
             if (!isPersisted(quest)) continue;
+
+            if (QuestSync.isShared(quest)) {
+                if (quest.hasChanges()) QuestSync.writeSoon(quest);
+                continue;
+            }
+
             if (!quest.consumeChanges()) continue;
 
             dirty.add(quest);
@@ -228,14 +249,42 @@ public class QuestProgressionStore {
 
         if (dirty.isEmpty()) return;
 
+        Set<UUID> moved;
         try {
-            storage.saveProgressions(dirty);
+            moved = storage.writeProgressions(dirty);
         } catch (RuntimeException e) {
             for (AbstractQuestProgression<?> quest : dirty) {
                 quest.markDirty();
             }
 
             throw e;
+        }
+
+        for (AbstractQuestProgression<?> quest : dirty) {
+            if (moved.contains(quest.getId())) writeOver(quest);
+        }
+    }
+
+    /**
+     * Writes a quest only this server writes over a version that moved under it, written meanwhile
+     * by another thread here or, against the rule, by another server: the copy here has the last
+     * word on it.
+     */
+    private void writeOver(@Nonnull AbstractQuestProgression<?> quest) {
+        LOGGER.atFine().log("Quest %s was written meanwhile: writing this copy over it", quest.getId());
+
+        AbstractQuestProgression.Change<?> whole = quest.overwrite();
+        try {
+            AbstractQuestProgression<?> written = storage.commitProgression(quest.getId(), stored -> stored.replay(whole));
+
+            if (written == null) {
+                LOGGER.atWarning().log("Quest %s is no longer stored, done away with elsewhere: left unwritten", quest.getId());
+            } else {
+                quest.markStored(written.getStored());
+            }
+        } catch (RuntimeException e) {
+            quest.markDirty();
+            LOGGER.atWarning().withCause(e).log("Failed to write quest %s, trying again next pass", quest.getId());
         }
     }
 

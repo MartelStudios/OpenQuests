@@ -1,12 +1,14 @@
 package com.martelstudios.openquests.core.models;
 
 import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
@@ -16,16 +18,18 @@ import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
-import com.martelstudios.openquests.core.replication.Membership;
-import com.martelstudios.openquests.core.replication.QuestTransitions;
-import com.martelstudios.openquests.core.replication.StoredState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.sync.QuestSync;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,23 +37,21 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Defines the quest progression. Extend it to create new quest types or to add runtime progression data.
  * Avoid using it to declare static serialized data. Look at {@link OpenQuestAsset} for static serialized data declaration.
  */
 public abstract class AbstractQuestProgression<Q extends AbstractQuestProgression<Q>> {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
     public static final CodecMapCodec<AbstractQuestProgression<?>> CODEC = new CodecMapCodec<>("Type");
 
-    /**
-     * Players written as plain lists before moves were kept, read back but never written: whatever
-     * a copy with moves says of them wins.
-     */
-    private static final KeyedCodec<UUID[]> PLAIN_PLAYERS_CODEC = new KeyedCodec<>("Players", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
-    private static final KeyedCodec<UUID[]> PLAIN_ABANDONED_CODEC = new KeyedCodec<>("AbandonedPlayers", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
+    private static final KeyedCodec<UUID[]> PLAYERS_CODEC = new KeyedCodec<>("Players", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
+    private static final KeyedCodec<UUID[]> ABANDONED_PLAYERS_CODEC = new KeyedCodec<>("AbandonedPlayers", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new));
 
     private static final KeyedCodec<Map<String, String[]>> TAGS_CODEC = new KeyedCodec<>("Tags", new MapCodec<>(new ArrayCodec<>(Codec.STRING, String[]::new), HashMap<String, String[]>::new));
     private static final BiConsumer<AbstractQuestProgression, Map<String, String[]>> TAGS_SETTER = (quest, tags) -> ((AbstractQuestProgression<?>) quest).tags.putAll(tags);
@@ -64,6 +66,34 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     private static final Map<Class<?>, Class<? extends OpenQuestAsset>> ASSET_CLASSES = new ConcurrentHashMap<>();
 
     /**
+     * The fields each quest type is written as, its own and those it inherits: whatever is neither
+     * static nor transient.
+     */
+    private static final ClassValue<List<Field>> STORED_FIELDS = new ClassValue<>() {
+        @Override
+        protected List<Field> computeValue(@Nonnull Class<?> type) {
+            List<Field> fields = new ArrayList<>();
+            for (Class<?> c = type; c != null && AbstractQuestProgression.class.isAssignableFrom(c); c = c.getSuperclass()) {
+                for (Field field : c.getDeclaredFields()) {
+                    int modifiers = field.getModifiers();
+                    if (Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers)) continue;
+                    if (Modifier.isFinal(modifiers)) {
+                        throw new IllegalStateException(c.getName() + "." + field.getName() + " is final: a quest takes on a stored copy field by field, so a field it is written as cannot be. Make it transient if it is not written.");
+                    }
+                    field.setAccessible(true);
+                    fields.add(field);
+                }
+            }
+            return List.copyOf(fields);
+        }
+    };
+
+    /**
+     * Quest types already reported for changing a shared quest past {@link #change}, reported once.
+     */
+    private static final Set<Class<?>> REPORTED_UNKEPT = ConcurrentHashMap.newKeySet();
+
+    /**
      * Serializes the fields shared by every quest progression; concrete codecs chain from this.
      */
     public static final BuilderCodec<AbstractQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(AbstractQuestProgression.class)
@@ -73,7 +103,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("ParentId", Codec.UUID_STRING), (quest, parentId) -> quest.parentId = parentId, quest -> quest.parentId)
                                                                                         .add()
-                                                                                        .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), AbstractQuestProgression::restoreState, quest -> quest.state)
+                                                                                        .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.state = state, quest -> quest.state)
+                                                                                        .add()
+                                                                                        .append(new KeyedCodec<>("Transitions", Codec.INTEGER), (quest, count) -> quest.transitions = count, quest -> Integer.valueOf(quest.transitions))
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (quest, value) -> quest.persistHistory = value, quest -> quest.persistHistory)
                                                                                         .add()
@@ -87,11 +119,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("CompletedAt", Codec.LONG), (quest, millis) -> quest.completedAt = Instant.ofEpochMilli(millis), quest -> quest.completedAt == null ? null : Long.valueOf(quest.completedAt.toEpochMilli()))
                                                                                         .add()
-                                                                                        .append(new KeyedCodec<>("Membership", Membership.CODEC), (quest, moves) -> quest.membership.putAll(moves), quest -> quest.membership.toMap())
+                                                                                        .append(PLAYERS_CODEC, (quest, ids) -> ((AbstractQuestProgression<?>) quest).players.addAll(List.of(ids)), quest -> ((AbstractQuestProgression<?>) quest).players.toArray(UUID[]::new))
                                                                                         .add()
-                                                                                        .append(PLAIN_PLAYERS_CODEC, (quest, ids) -> quest.membership.putPlain(List.of(ids), List.of()), quest -> null)
-                                                                                        .add()
-                                                                                        .append(PLAIN_ABANDONED_CODEC, (quest, ids) -> quest.membership.putPlain(List.of(), List.of(ids)), quest -> null)
+                                                                                        .append(ABANDONED_PLAYERS_CODEC, (quest, ids) -> ((AbstractQuestProgression<?>) quest).abandonedPlayers.addAll(List.of(ids)), quest -> ((AbstractQuestProgression<?>) quest).abandonedPlayers.toArray(UUID[]::new))
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("Scope", QuestScope.CODEC), (quest, scope) -> quest.scope = scope, quest -> quest.scope)
                                                                                         .add()
@@ -109,9 +139,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     protected UUID id = UUID.randomUUID();
 
     /**
-     * Who runs the quest and who gave it up, merged move by move with what other servers saw.
+     * Ids of the players running the quest.
      */
-    protected final Membership membership = new Membership();
+    protected Set<UUID> players = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Ids of the players who gave it up, never also running it.
+     */
+    protected Set<UUID> abandonedPlayers = ConcurrentHashMap.newKeySet();
 
     /**
      * Who shares this quest beyond its players, written by the scope holding it. Data only: the
@@ -135,12 +170,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     protected UUID grantedBy;
 
     /**
-     * The outcome everyone here last heard of, so that an end reached here and the same end learnt
-     * from another server are announced once.
-     */
-    private final AtomicReference<QuestState> announced = new AtomicReference<>(QuestState.IN_PROGRESS);
-
-    /**
      * Tags written on this instance, on top of those its asset declares, each with the values its
      * asset counterpart would carry. What became of this one quest belongs here, since an asset is
      * shared by everyone holding it.
@@ -162,11 +191,40 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     protected QuestState state = QuestState.IN_PROGRESS;
 
     /**
-     * How many changes of state this copy went through, as the storage counts them: a change is
-     * only written over the epoch it started from, and a copy only takes in a later one. Never
-     * written with the quest: the storage keeps it next to the state.
+     * How many times the quest changed state, written with it: what tells an older outcome from a
+     * newer one, for a group keeping how its steps went.
      */
-    private volatile long stateEpoch;
+    private int transitions;
+
+    /**
+     * The stored copy this one stands on, which this one may have moved past with changes not
+     * written yet.
+     */
+    @Nonnull
+    private transient volatile Stored storedCopy = Stored.NONE;
+
+    /**
+     * The changes made here since the stored copy, in order, for a quest other servers write too:
+     * each is made again over whatever they stored meanwhile, which a copy written over it would
+     * undo. Guarded by the quest itself.
+     */
+    private final transient List<Change<Q>> pending = new ArrayList<>();
+
+    /**
+     * Grows with every change, so that one update can tell whether it changed anything.
+     */
+    private transient int changeCount;
+
+    /**
+     * Above zero while a change is being made, where marking the quest dirty is expected.
+     */
+    private transient int applying;
+
+    /**
+     * Above zero while a change kept on another copy is made again on this one, which then tells
+     * nobody and reaches no other quest: that was done where the change was first made.
+     */
+    private transient int replaying;
 
     /**
      * Overrides the asset for this instance alone. Boxed so that "not overridden" is a state of
@@ -322,117 +380,18 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the quest already said exactly that.
      */
     public boolean setTracked(@Nullable Boolean track) {
-        if (Objects.equals(this.track, track)) return false;
+        return change(quest -> {
+            if (Objects.equals(quest.track, track)) return false;
 
-        this.track = track;
-        markDirty();
-
-        return true;
+            quest.track = track;
+            return true;
+        });
     }
 
     /**
-     * Takes in what another copy of this quest knows, read from another server's share: who holds
-     * it and how far it went. Never marks this copy dirty, what is merged being stored already. Where
-     * it stands is not taken from a copy: each change of state is claimed, and heard through
-     * {@link #adoptStoredState}.
-     *
-     * @return whether anything the players see moved.
-     */
-    public final boolean merge(@Nonnull AbstractQuestProgression<?> other) {
-        if (other == this || other.getClass() != getClass() || !other.getId().equals(getId())) return false;
-
-        @SuppressWarnings("unchecked")
-        Q same = (Q) other;
-
-        boolean progressed = membership.merge(other.membership);
-        return mergeProgress(same) | progressed;
-    }
-
-    /**
-     * @return how many changes of state this copy went through, as the storage counts them.
-     */
-    public long getStateEpoch() {
-        return stateEpoch;
-    }
-
-    /**
-     * Takes in where the storage says the quest stands, as it is read back: that is where it
-     * stands, whatever the replica this copy was built from says. Fires nothing, nothing having
-     * changed for anyone: an outcome read back was announced by whichever server reached it.
-     */
-    public void restoreStoredState(@Nonnull StoredState stored) {
-        state = stored.state();
-        completedAt = stored.at();
-        stateEpoch = stored.epoch();
-        announced.set(stored.state());
-    }
-
-    /**
-     * Takes in a change of state another server claimed, which this one learns afterwards:
-     * everything here hears of it, to file the quest and tell its players, and nothing is paid
-     * twice. A change no later than what this copy holds already is no news.
-     *
-     * @return whether this copy's state changed.
-     */
-    public boolean adoptStoredState(@Nonnull StoredState stored) {
-        if (stored.epoch() <= stateEpoch) return false;
-
-        QuestState previous = state;
-        state = stored.state();
-        completedAt = stored.at();
-        stateEpoch = stored.epoch();
-        if (state == previous) return false;
-
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestUpdatedEvent.class, getId())
-                    .dispatch(new QuestUpdatedEvent(this));
-        if (isCompleted()) announceEnd(false);
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestStateChangedEvent.class, getId())
-                    .dispatch(new QuestStateChangedEvent(this, previous));
-        return true;
-    }
-
-    /**
-     * Tells everyone here the quest ended, once per outcome whichever way this server learnt of
-     * it: reaching the end itself, or hearing another server claimed it.
-     *
-     * @param claimedHere whether this server ended it, and pays what the end pays
-     */
-    private void announceEnd(boolean claimedHere) {
-        QuestState outcome = state;
-        if (announced.getAndSet(outcome) == outcome) return;
-
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestCompletedEvent.class, getId())
-                    .dispatch(new QuestCompletedEvent(this, claimedHere));
-    }
-
-    /**
-     * An outcome read back has already been announced, by whichever server reached it.
-     */
-    private void restoreState(@Nonnull QuestState restored) {
-        state = restored;
-        announced.set(restored);
-    }
-
-    /**
-     * Takes in the progress another copy of the same quest made. A type whose progress several
-     * servers move overrides this; what it keeps for its own server alone, it leaves be.
-     *
-     * @return whether anything moved.
-     */
-    protected boolean mergeProgress(@Nonnull Q other) {
-        return false;
-    }
-
-    /**
-     * Updates the quest progression by applying the visitor to it.
-     * After the visitor's pass, the quest settles before anyone hears about it.
-     * A player's action is first put to the constraints of the asset, and leaves no trace if one objects.
+     * Applies the visitor, then settles the quest before anyone hears of it. A player's action is
+     * first put to the constraints of the asset, and leaves no trace if one objects. A quest other
+     * servers write too hears of a change of state once the write making it for all of them is done.
      *
      * @param visitor the visitor to apply
      */
@@ -440,8 +399,52 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         UUID actorId = visitor.getActorId();
         if (actorId != null && !allowsProgress(actorId)) return;
 
-        QuestState previousState = getState();
+        QuestState previousState;
+        QuestState newState;
+        int newTransitions;
+        boolean kept;
+        synchronized (this) {
+            previousState = state;
+            int before = changeCount;
+            boolean unsaved = dirty;
 
+            applying++;
+            try {
+                progress(visitor);
+            } finally {
+                applying--;
+            }
+            if (changeCount == before) return;
+
+            newState = state;
+            newTransitions = transitions;
+            kept = keep(quest -> {
+                AbstractQuestProgression<Q> same = quest;
+                int unchanged = same.changeCount;
+                same.progress(visitor);
+                return same.changeCount != unchanged;
+            }, unsaved);
+        }
+
+        announceUpdate();
+
+        if (newState == previousState) return;
+
+        if (kept) {
+            QuestSync.writeSoon(this);
+        } else {
+            announce(previousState, newState, newTransitions, true);
+        }
+    }
+
+    /**
+     * Applies the visitor and settles the quest, telling nobody: what an update does to this copy,
+     * and makes again over the stored one. A quest that is over takes no more.
+     */
+    private void progress(@Nonnull QuestVisitor<Q> visitor) {
+        if (isOver()) return;
+
+        QuestState previousState = state;
         visitor.progress(self());
 
         // If no player remains and some has abandoned set the quest as abandoned
@@ -449,45 +452,263 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
             setState(QuestState.ABANDONED).markDirty();
         }
 
-        if (hasChanges()) {
-            HytaleServer.get()
-                        .getEventBus()
-                        .dispatchFor(QuestUpdatedEvent.class, getId())
-                        .dispatch(new QuestUpdatedEvent(this));
-        }
-
-        // Every change of state is claimed, an end as much as a quest kept alive by StopOnComplete:false
-        // going back to running or changing its outcome: servers holding the quest agree on each in
-        // turn, and a copy behind takes in where the quest stands rather than its own view.
-        if (getState() != previousState) {
+        if (state != previousState) {
             completedAt = isCompleted() ? Instant.now() : null;
+            transitions++;
             markDirty();
+        }
+    }
 
-            long from = stateEpoch;
-            StoredState claimedElsewhere = QuestTransitions.claim(this);
+    /**
+     * Makes a change to the quest. Every write to a quest goes through here or {@link #update}: a
+     * quest other servers write too keeps the change, to make it again over whatever they stored
+     * meanwhile, where writing this copy over theirs would undo it.
+     *
+     * @param change makes the change on the quest it is handed, and says whether it changed anything
+     * @return whether it changed anything, the quest then waiting to be written
+     */
+    protected final boolean change(@Nonnull Change<Q> change) {
+        synchronized (this) {
+            boolean unsaved = dirty;
 
-            // A storage behind this copy, one out of reach for a while, has no later change to offer:
-            // the change stands, and the next write of the quest brings the storage up to it
-            boolean claimedHere = claimedElsewhere == null || claimedElsewhere.epoch() <= from;
-            if (claimedHere) {
-                stateEpoch = from + 1;
-            } else {
-                state = claimedElsewhere.state();
-                completedAt = claimedElsewhere.at();
-                stateEpoch = claimedElsewhere.epoch();
+            applying++;
+            try {
+                if (!change.apply(self())) return false;
+                markDirty();
+            } finally {
+                applying--;
             }
 
-            if (isCompleted()) announceEnd(claimedHere);
+            keep(change, unsaved);
+        }
+        return true;
+    }
+
+    /**
+     * Keeps a change just made, for a quest other servers write too. What this copy changed before
+     * and nothing could make again, before the quest was shared or past {@link #change}, rides
+     * along instead as a copy of the whole quest.
+     *
+     * @param unsaved whether the quest was waiting to be written before the change
+     * @return whether the change was kept, the quest being shared
+     */
+    private boolean keep(@Nonnull Change<Q> change, boolean unsaved) {
+        if (!QuestSync.isShared(this)) {
+            // Written whole from now on: what was kept would be made twice were it shared again
+            pending.clear();
+            return false;
+        }
+
+        pending.add(pending.isEmpty() && unsaved ? overwriteWith(copy()) : change);
+        return true;
+    }
+
+    /**
+     * @return a change writing this quest, as it stands now, over whichever copy it is made on:
+     * how a quest whose copy here has the last word is written over one that moved under it.
+     */
+    @Nonnull
+    public Change<Q> overwrite() {
+        return overwriteWith(copy());
+    }
+
+    /**
+     * @return a change writing that copy over whichever it is made on, every field of it.
+     */
+    @Nonnull
+    private Change<Q> overwriteWith(@Nonnull AbstractQuestProgression<?> snapshot) {
+        // A copy of the copy each time: one write may be tried again on another stored copy
+        return quest -> {
+            ((AbstractQuestProgression<Q>) quest).copyStoredFields(snapshot.copy());
+            return true;
+        };
+    }
+
+    /**
+     * Tells everyone here the quest changed state: as it changes, for a quest only this server
+     * writes; once written, for one other servers write too, by the write that made the change or
+     * brought news of it.
+     *
+     * @param transitions how many changes of state the quest went through, this one included
+     * @param madeHere whether this server made the change, and pays what an end pays
+     */
+    public void announce(@Nonnull QuestState previousState, @Nonnull QuestState newState, int transitions, boolean madeHere) {
+        if (newState.isCompleted()) {
+            HytaleServer.get()
+                        .getEventBus()
+                        .dispatchFor(QuestCompletedEvent.class, getId())
+                        .dispatch(new QuestCompletedEvent(this, newState, madeHere));
         }
 
         // Last, so a listener reacting to the transition reads a quest that has already been paid
         // and filed rather than one still being settled.
-        if (getState() != previousState) {
-            HytaleServer.get()
-                        .getEventBus()
-                        .dispatchFor(QuestStateChangedEvent.class, getId())
-                        .dispatch(new QuestStateChangedEvent(this, previousState));
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestStateChangedEvent.class, getId())
+                    .dispatch(new QuestStateChangedEvent(this, previousState, newState, transitions));
+    }
+
+    /**
+     * Tells whatever draws the quest that it moved.
+     */
+    public void announceUpdate() {
+        HytaleServer.get()
+                    .getEventBus()
+                    .dispatchFor(QuestUpdatedEvent.class, getId())
+                    .dispatch(new QuestUpdatedEvent(this));
+    }
+
+    /**
+     * @return the stored copy this one stands on, {@link Stored#NONE} for a quest never written.
+     */
+    @Nonnull
+    public Stored getStored() {
+        return storedCopy;
+    }
+
+    /**
+     * @return the version of the stored copy this one stands on, {@code 0} for a quest never written.
+     */
+    public long getStoredVersion() {
+        return storedCopy.version();
+    }
+
+    /**
+     * @return where the stored copy stands, which this one may have moved past.
+     */
+    @Nonnull
+    public QuestState getStoredState() {
+        return storedCopy.state();
+    }
+
+    /**
+     * Notes what this copy was written or read back as. For the storage alone.
+     */
+    public void markStored(@Nonnull Stored stored) {
+        storedCopy = stored;
+    }
+
+    /**
+     * @return the changes waiting to be written, in order. A quest waiting to be written with none
+     * kept, changed past {@link #change}, hands a copy of itself instead.
+     */
+    @Nonnull
+    public synchronized List<Change<Q>> getPendingChanges() {
+        if (pending.isEmpty() && dirty && QuestSync.isShared(this)) pending.add(overwriteWith(copy()));
+
+        return List.copyOf(pending);
+    }
+
+    /**
+     * Makes on this copy a change another copy of the quest kept, telling nobody: how a stored
+     * copy takes on what a server is waiting to write.
+     *
+     * @return whether it changed anything.
+     */
+    @SuppressWarnings("unchecked")
+    public boolean replay(@Nonnull Change<?> change) {
+        applying++;
+        replaying++;
+        try {
+            if (!((Change<Q>) change).apply(self())) return false;
+            markDirty();
+            return true;
+        } finally {
+            replaying--;
+            applying--;
         }
+    }
+
+    /**
+     * @return whether a change kept on another copy is being made again on this one.
+     */
+    boolean isReplaying() {
+        return replaying > 0;
+    }
+
+    /**
+     * Takes on a stored copy, written or read back, then makes again on it the changes made here
+     * that it does not carry: this copy stands on what is stored, plus what is still to write.
+     *
+     * @param written how many of the changes waiting here the stored copy carries, the first ones
+     */
+    public synchronized void restack(@Nonnull AbstractQuestProgression<?> stored, int written) {
+        pending.subList(0, written).clear();
+
+        copyStoredFields(stored);
+        markStored(stored.storedCopy);
+
+        for (Change<Q> change : pending) replay(change);
+        dirty = !pending.isEmpty();
+    }
+
+    /**
+     * Takes every field the other copy is written as.
+     */
+    private void copyStoredFields(@Nonnull AbstractQuestProgression<?> from) {
+        if (from.getClass() != getClass()) throw new IllegalArgumentException("Quest " + id + " is a " + getClass().getSimpleName() + ", not a " + from.getClass().getSimpleName());
+
+        try {
+            for (Field field : STORED_FIELDS.get(getClass())) {
+                field.set(this, field.get(from));
+            }
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Failed to take on a stored copy of quest " + id, e);
+        }
+    }
+
+    /**
+     * @return a copy of what this quest is written as, by way of its codec, standing on the same
+     * stored version.
+     */
+    @Nonnull
+    public AbstractQuestProgression<?> copy() {
+        ExtraInfo extraInfo = ExtraInfo.THREAD_LOCAL.get();
+        AbstractQuestProgression<?> copy = CODEC.decode(CODEC.encode(this, extraInfo), extraInfo);
+        copy.markStored(storedCopy);
+        return copy;
+    }
+
+    /**
+     * What the stored copy a quest stands on holds: its version, its state, and who held it, which
+     * the storage moves the quest's links from as it writes the next version.
+     *
+     * @param version {@code 0} for a quest never written
+     */
+    public record Stored(long version, @Nonnull QuestState state, @Nonnull Set<UUID> players, @Nonnull Set<UUID> abandoned) {
+
+        public static final Stored NONE = new Stored(0, QuestState.IN_PROGRESS, Set.of(), Set.of());
+
+        /**
+         * @return what that quest holds now, as stored at that version.
+         */
+        @Nonnull
+        public static Stored of(@Nonnull AbstractQuestProgression<?> quest, long version) {
+            return new Stored(version, quest.getState(), Set.copyOf(quest.getPlayers()), Set.copyOf(quest.getAbandonedPlayers()));
+        }
+    }
+
+    /**
+     * @return how many times the quest changed state, which orders what became of it.
+     */
+    public int getTransitions() {
+        return transitions;
+    }
+
+    /**
+     * One change to a quest, which a quest other servers write too keeps, to make it again on
+     * whichever stored copy it is written over.
+     */
+    @FunctionalInterface
+    public interface Change<Q extends AbstractQuestProgression<Q>> {
+
+        /**
+         * Reads what it changes off the quest it is handed, never off the copy it was first made
+         * on: the two may differ.
+         *
+         * @return whether it changed anything.
+         */
+        boolean apply(@Nonnull Q quest);
     }
 
     /**
@@ -539,9 +760,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player already held this quest.
      */
     public boolean addPlayer(@Nonnull UUID playerId) {
-        // Handed the quest again after walking away from it: they are running it, not done with it
-        if (!membership.move(playerId, Membership.Status.JOINED)) return false;
-        markDirty();
+        boolean added = change(quest -> {
+            if (!quest.players.add(playerId)) return false;
+
+            // Handed the quest again after walking away from it: they are running it, not done with it
+            quest.abandonedPlayers.remove(playerId);
+            return true;
+        });
+        if (!added || isReplaying()) return added;
 
         HytaleServer.get()
                     .getEventBus()
@@ -556,10 +782,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player did not hold this quest.
      */
     public boolean removePlayer(@Nonnull UUID playerId) {
-        if (!membership.is(playerId, Membership.Status.JOINED)) return false;
-
-        membership.move(playerId, Membership.Status.LEFT);
-        markDirty();
+        boolean removed = change(quest -> quest.players.remove(playerId));
+        if (!removed || isReplaying()) return removed;
 
         HytaleServer.get()
                     .getEventBus()
@@ -576,10 +800,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player was not running this quest.
      */
     public boolean abandonPlayer(@Nonnull UUID playerId) {
-        if (!membership.is(playerId, Membership.Status.JOINED)) return false;
+        boolean abandoned = change(quest -> {
+            if (!quest.players.remove(playerId)) return false;
 
-        membership.move(playerId, Membership.Status.ABANDONED);
-        markDirty();
+            quest.abandonedPlayers.add(playerId);
+            return true;
+        });
+        if (!abandoned || isReplaying()) return abandoned;
 
         HytaleServer.get()
                     .getEventBus()
@@ -602,7 +829,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     public boolean isCompleted() {
-        return isSuccessful() || isFailed() || isAbandoned();
+        return state.isCompleted();
     }
 
     /**
@@ -617,7 +844,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code true} if this player gave the quest up.
      */
     public boolean isAbandonedBy(@Nonnull UUID playerId) {
-        return membership.is(playerId, Membership.Status.ABANDONED);
+        return abandonedPlayers.contains(playerId);
     }
 
     /**
@@ -634,7 +861,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nonnull
     public Set<UUID> getAbandonedPlayers() {
-        return membership.getAbandoned();
+        return Collections.unmodifiableSet(abandonedPlayers);
     }
 
     /**
@@ -649,9 +876,21 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Written by the scope holding the quest, never by the quest itself.
      */
     public Q setScope(@Nullable QuestScope scope) {
-        this.scope = scope;
-        markDirty();
+        change(quest -> {
+            quest.scope = scope;
+            return true;
+        });
         return self();
+    }
+
+    /**
+     * Changes the scope the quest carries in place, such as the worlds it reached.
+     *
+     * @param change says whether it changed the scope
+     * @return whether it changed the scope, the quest then waiting to be written
+     */
+    public boolean changeScope(@Nonnull Predicate<QuestScope> change) {
+        return change(quest -> quest.scope != null && change.test(quest.scope));
     }
 
     /**
@@ -668,8 +907,10 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * passing its own on.
      */
     public Q setOrigin(@Nullable QuestOrigin origin) {
-        this.origin = origin;
-        markDirty();
+        change(quest -> {
+            quest.origin = origin;
+            return true;
+        });
         return self();
     }
 
@@ -687,8 +928,10 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * it already knows which completion opened it.
      */
     public Q setGrantedBy(@Nullable UUID grantedBy) {
-        this.grantedBy = grantedBy;
-        markDirty();
+        change(quest -> {
+            quest.grantedBy = grantedBy;
+            return true;
+        });
         return self();
     }
 
@@ -722,9 +965,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     /**
      * Records the asset class a quest type casts its asset to, which {@link #findAssetMismatch()}
-     * checks a quest read back against.
+     * checks a quest read back against. Refuses a type with a final field it is written as, which
+     * no stored copy could be taken on through.
      */
     public static void registerAssetClass(@Nonnull Class<?> questClass, @Nonnull Class<? extends OpenQuestAsset> assetClass) {
+        STORED_FIELDS.get(questClass);
         ASSET_CLASSES.put(questClass, assetClass);
     }
 
@@ -799,7 +1044,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Written by {@link AbstractCompositeQuestProgression} alone, as it adopts or claims a step.
+     * Written by {@link AbstractCompositeQuestProgression} alone, as it adopts a step.
      */
     void setParentId(@Nullable UUID parentId) {
         this.parentId = parentId;
@@ -848,21 +1093,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the quest already carried exactly that.
      */
     public boolean addTag(@Nonnull String tag, @Nonnull String... values) {
-        String[] previous = tags.put(tag, values);
-        if (previous != null && Arrays.equals(previous, values)) return false;
-
-        markDirty();
-        return true;
+        return change(quest -> !Arrays.equals(quest.tags.put(tag, values), values));
     }
 
     /**
      * @return {@code false} if the quest did not carry the tag.
      */
     public boolean removeTag(@Nonnull String tag) {
-        if (tags.remove(tag) == null) return false;
-        markDirty();
-
-        return true;
+        return change(quest -> quest.tags.remove(tag) != null);
     }
 
     /**
@@ -878,7 +1116,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nonnull
     public Set<UUID> getPlayers() {
-        return membership.getPlayers();
+        return Collections.unmodifiableSet(players);
     }
 
     public QuestState getState() {
@@ -932,10 +1170,17 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Marks this quest as needing to be persisted on the next save pass.
+     * Marks this quest as needing to be persisted on the next save pass. A quest other servers
+     * write too changes through {@link #change} or {@link #update}: a change made past them is
+     * reported, and only ever written as a copy of the whole quest.
      */
     public void markDirty() {
         this.dirty = true;
+        changeCount++;
+
+        if (applying == 0 && getStoredVersion() > 0 && QuestSync.isShared(this) && REPORTED_UNKEPT.add(getClass())) {
+            LOGGER.atWarning().log("A %s other servers write too was changed past change(): written as a copy of the whole quest, it may undo what another server wrote", getClass().getSimpleName());
+        }
     }
 
     /**

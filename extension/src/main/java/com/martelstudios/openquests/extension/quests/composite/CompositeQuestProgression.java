@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
+import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
@@ -32,6 +33,8 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     public static final BuilderCodec<CompositeQuestProgression> CODEC = BuilderCodec.builder(CompositeQuestProgression.class, CompositeQuestProgression::new, AbstractCompositeQuestProgression.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("ChildOutcomes", new MapCodec<>(new EnumCodec<>(QuestState.class), HashMap<String, QuestState>::new)), CompositeQuestProgression::decodeOutcomes, CompositeQuestProgression::encodeOutcomes)
                                                                                     .add()
+                                                                                    .append(new KeyedCodec<>("ChildTransitions", new MapCodec<>(Codec.INTEGER, HashMap<String, Integer>::new)), CompositeQuestProgression::decodeTransitions, CompositeQuestProgression::encodeTransitions)
+                                                                                    .add()
                                                                                     .build();
 
     /**
@@ -43,7 +46,13 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * that cannot say otherwise saves everyone reading it from wondering what two sets holding the
      * same id would have meant.
      */
-    protected final Map<UUID, QuestState> childOutcomes = new ConcurrentHashMap<>();
+    protected Map<UUID, QuestState> childOutcomes = new ConcurrentHashMap<>();
+
+    /**
+     * How many changes of state each child had been through when last heard of, so that news of a
+     * child, which may come late or twice, is only ever taken over older news.
+     */
+    protected Map<UUID, Integer> childTransitions = new ConcurrentHashMap<>();
 
     private final transient List<EventRegistration<UUID, QuestStateChangedEvent>> childListeners = new ArrayList<>();
 
@@ -52,7 +61,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * false} running again takes its outcome back, and the group's own rule is weighed anew.
      */
     private void handleStepStateChanged(QuestStateChangedEvent questStateChangedEvent) {
-        update(new CompositeQuestVisitor(questStateChangedEvent.getQuest(), questStateChangedEvent.getState()));
+        update(new CompositeQuestVisitor(questStateChangedEvent.getQuest().getId(), questStateChangedEvent.getState(), questStateChangedEvent.getTransitions()));
     }
 
     /**
@@ -127,7 +136,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
 
             QuestProgressionService.get().progress(new SetStateVisitor(QuestState.ABANDONED), List.of(questId));
 
-            if (recordOutcome(questId, QuestState.ABANDONED)) markDirty();
+            hear(List.of(new Heard(questId, child.getState(), child.getTransitions())));
         }
     }
 
@@ -142,45 +151,46 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     }
 
     /**
-     * Writes down how a child ended. A child that is running again (which one kept alive by
+     * Writes down how a child stands, unless what is written already is news as late: a child
+     * that changed state that many times. A child that is running again (which one kept alive by
      * {@code StopOnComplete:false} can be) has its outcome struck out rather than left standing:
      * the group would otherwise keep counting an end the child has moved past.
      *
+     * @param transitions how many changes of state the child had been through
      * @return {@code true} when this changed anything, so the group is only marked dirty on news.
      */
-    public boolean recordOutcome(@Nonnull UUID childId, @Nonnull QuestState state) {
-        if (state == QuestState.IN_PROGRESS) return childOutcomes.remove(childId) != null;
+    public boolean recordOutcome(@Nonnull UUID childId, @Nonnull QuestState state, int transitions) {
+        Integer known = childTransitions.get(childId);
 
-        return childOutcomes.put(childId, state) != state;
+        // A child that never changed state is running, which is what no entry says already
+        if (known == null ? transitions == 0 : known >= transitions) return false;
+
+        childTransitions.put(childId, transitions);
+        if (state == QuestState.IN_PROGRESS) childOutcomes.remove(childId); else childOutcomes.put(childId, state);
+        return true;
     }
 
     /**
-     * A step in memory has the last word on how it stands, every change of it being claimed; the
-     * outcomes another copy wrote down can lag behind it. A step gone from memory ended for good,
-     * the same way everywhere, so the outcome another copy took down is simply taken in.
+     * Writes down where each step in memory stands, for a group read back: a step may have moved
+     * on after its group was last written.
      */
-    @Override
-    protected boolean mergeProgress(@Nonnull CompositeQuestProgression other) {
-        boolean changed = false;
-        for (Map.Entry<UUID, QuestState> outcome : other.childOutcomes.entrySet()) {
-            AbstractQuestProgression<?> step = QuestProgressionService.get().getQuest(outcome.getKey());
-            changed |= step != null ? recordOutcome(step.getId(), step.getState()) : childOutcomes.putIfAbsent(outcome.getKey(), outcome.getValue()) == null;
-        }
-        return changed;
-    }
-
-    /**
-     * Writes down where each step in memory stands, for a group read back: its replicas carry the
-     * outcomes their servers saw, its steps where they stand now.
-     *
-     * @return whether anything written down changed.
-     */
-    public boolean reconcileOutcomes() {
-        boolean changed = false;
+    public void reconcileOutcomes() {
+        List<Heard> heard = new ArrayList<>();
         for (AbstractQuestProgression<?> step : getChildren()) {
-            changed |= recordOutcome(step.getId(), step.getState());
+            heard.add(new Heard(step.getId(), step.getState(), step.getTransitions()));
         }
-        return changed;
+        hear(heard);
+    }
+
+    /**
+     * Writes down news of children as one change of the group.
+     */
+    private void hear(@Nonnull List<Heard> heard) {
+        change(quest -> {
+            boolean changed = false;
+            for (Heard news : heard) changed |= quest.recordOutcome(news.childId(), news.state(), news.transitions());
+            return changed;
+        });
     }
 
     /**
@@ -219,6 +229,29 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
             }
         });
     }
+
+    @Nonnull
+    private Map<String, Integer> encodeTransitions() {
+        Map<String, Integer> encoded = new HashMap<>(childTransitions.size());
+        childTransitions.forEach((childId, count) -> encoded.put(childId.toString(), count));
+
+        return encoded;
+    }
+
+    private void decodeTransitions(@Nonnull Map<String, Integer> encoded) {
+        encoded.forEach((childId, count) -> {
+            try {
+                childTransitions.put(UUID.fromString(childId), count);
+            } catch (IllegalArgumentException e) {
+                LOGGER.atWarning().log("Dropping what was heard of '%s' on quest %s: not a quest id.", childId, getId());
+            }
+        });
+    }
+
+    /**
+     * What was heard of one child: how it stood after that many changes of state.
+     */
+    private record Heard(@Nonnull UUID childId, @Nonnull QuestState state, int transitions) {}
 
     @Override
     public CompositeQuestAsset getAsset() {

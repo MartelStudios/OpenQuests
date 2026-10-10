@@ -11,7 +11,7 @@ import com.hypixel.hytale.server.core.universe.world.events.StartWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
-import com.martelstudios.openquests.core.replication.QuestReplicationService;
+import com.martelstudios.openquests.core.sync.QuestSyncService;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -94,7 +94,7 @@ public class WorldQuestService {
      * so the first player in finds them in memory. One entering first reads them on the spot.
      */
     public void preload(@Nonnull World world) {
-        QuestReplicationService.get().execute("the quests of world " + world.getName(), () -> QuestProgressionService.get().loadQuests(getQuestIds(world)));
+        QuestSyncService.get().execute("the quests of world " + world.getName(), () -> QuestProgressionService.get().loadQuests(getQuestIds(world)));
     }
 
     /**
@@ -153,8 +153,8 @@ public class WorldQuestService {
 
         // Gone already when it left for good, and nothing then is left to write on
         AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
-        QuestScope scope = quest == null ? null : quest.getScope();
-        if (scope != null && scope.removeWorld(world.getWorldConfig().getUuid())) quest.markDirty();
+        UUID worldId = world.getWorldConfig().getUuid();
+        if (quest != null) quest.changeScope(scope -> scope.removeWorld(worldId));
     }
 
     /**
@@ -176,8 +176,8 @@ public class WorldQuestService {
         QuestScope scope = quest.getScope();
         if (scope == null) {
             quest.setScope(new WorldQuestScope(List.of(worldId)));
-        } else if (scope.addWorld(worldId)) {
-            quest.markDirty();
+        } else {
+            quest.changeScope(held -> held.addWorld(worldId));
         }
 
         for (PlayerRef playerRef : world.getPlayerRefs()) {

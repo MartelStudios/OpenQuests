@@ -85,7 +85,7 @@ public class WorldsQuestScope extends WorldQuestScope {
      * The worlds of a group may run on several servers sharing the storage.
      */
     @Override
-    public boolean isReplicated() {
+    public boolean spansServers() {
         return true;
     }
 

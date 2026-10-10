@@ -9,8 +9,8 @@ import javax.annotation.Nonnull;
  * the players and their messages, the assignment records.
  *
  * <p>Several servers may share one backend. Every record has one writer, or is written through an
- * operation that cannot lose what another server wrote: a replica per server, a member added or
- * removed, a message left, a conditional claim.
+ * operation that cannot lose what another server wrote: a change made on the latest version, a
+ * member added or removed, a message left, a conditional claim.
  *
  * <p>Reads block, and writes are durable once they return. They are meant for a thread of their
  * own, never a world's, but for a player connecting and a world loading.
@@ -36,13 +36,6 @@ public interface QuestStorage extends ProgressionStore, IndexStore, PlayerStore,
      */
     @Nonnull
     String getId();
-
-    /**
-     * @return the name this server writes its replicas under, unique among the servers sharing
-     * the backend.
-     */
-    @Nonnull
-    String getReplicaId();
 
     /**
      * @return whether other servers may write the backend at the same time, which is what makes

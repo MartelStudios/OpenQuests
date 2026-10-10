@@ -1,6 +1,8 @@
 package com.martelstudios.openquests.extension.hud;
 
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -83,9 +85,13 @@ public final class QuestHudRefresh {
 
     /**
      * Those who gave the quest up too: a line leaving the panel is as much a change as one arriving.
+     * Only the players online, a few hundred at most, where a universe quest is held by everyone
+     * who ever connected.
      */
     private static void markHolders(@Nonnull AbstractQuestProgression<?> quest) {
-        quest.getPlayers().forEach(QuestHudRefresh::mark);
-        quest.getAbandonedPlayers().forEach(QuestHudRefresh::mark);
+        for (PlayerRef playerRef : Universe.get().getPlayers()) {
+            UUID playerId = playerRef.getUuid();
+            if (quest.getPlayers().contains(playerId) || quest.isAbandonedBy(playerId)) mark(playerId);
+        }
     }
 }

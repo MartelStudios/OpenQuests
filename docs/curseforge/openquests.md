@@ -38,7 +38,7 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 
 🈯 **English and French included.** Every line of text is translatable.
 
-🗄️ **Files or a database.** A small server keeps its quests as JSON and configures nothing. A large one, or several servers sharing the same players, points at PostgreSQL, MySQL, MariaDB or SQLite instead. New in 3.0. Since 4.0, servers sharing a database share universe quests and groups of worlds too, each counting its own part of the progress.
+🗄️ **Files or a database.** A small server keeps its quests as JSON and configures nothing. A large one, or several servers sharing the same players, points at PostgreSQL, MySQL, MariaDB or SQLite instead. New in 3.0. Since 4.0, servers sharing a database share universe quests and groups of worlds too, every change made once whichever server makes it, and a player moving between servers is picked up where the last one left them.
 
 🛡️ **Checked at boot.** A missing reference or a loop between quests stops the server with a clear reason, instead of breaking in front of a player hours later.
 
@@ -301,13 +301,13 @@ PostgreSQL, MySQL, MariaDB and SQLite are spoken natively. Drop the driver jar f
 
 **`StartOnConnection` became an asset of its own.** A quest no longer says when it starts: list it in an assignment under `OpenQuests/Assignments/`, `{ "Trigger": { "Type": "PlayerConnect" }, "QuestAssetIds": [...] }`. The field is no longer read, so a quest still carrying it is simply never handed out on connection. Players keep what they were already given, but nothing recorded it under 3.x, so a quest handed out on connection back then is handed out once more.
 
-**Plugins storing quests their own way need three more methods.** A `QuestStorage` now keeps what each assignment handed out: `loadAssignments`, `claimAssignment` (a conditional write, so two servers never both hand the same occasion out) and `deleteAssignments`. The file and database storages that ship with OpenQuests already have them.
+**Plugins storing quests their own way have more to write.** A `QuestStorage` now keeps what each assignment handed out (`loadAssignments`, `claimAssignment`, a conditional write so two servers never both hand the same occasion out, and `deleteAssignments`), writes a quest only over the version it was read at, saying which writes another one overtook (`writeProgressions` in place of `saveProgressions`, and `loadVersions`), and hosts a player on one server at a time (`hostPlayer`, `renewHosting`, and a `leaving` flag on `savePlayer`). The file and database storages that ship with OpenQuests already have them.
 
 **A shared quest's `GrantQuest` hands each player their own unless it says `"Shared": true`.** It used to follow the quest paying: a world quest's next step went to the world. Write `"Shared": true` on the reward to keep that; the quest then hands its follow-ups on once as it ends, and `AutoClaim` no longer applies to it.
 
 **Bookkeeping left the tags.** `OQ_GRANTED_BY` is now a field of the quest, `GrantedBy`, and `OQ_PARENT_QUEST` is no longer read: a composite step saved back when it carried its group as that tag is no longer handed back to it. `OQ_HUD_DESC` is the only tag left, and it is yours.
 
-**A database written by 3.x is not read.** 4.0 keeps one replica of a shared quest per server, so the tables are laid out anew: a server finding the old ones stops and says so. Drop them, or name another `TablePrefix`. Files carry over: a quest saved by 3.x is read back with its players and its count.
+**A database written by 3.x is not read.** 4.0 lays quests and players out anew so that several servers can write them: a server finding the old ones stops and says so. Drop them, or name another `TablePrefix`. Files carry over: a quest saved by 3.x is read back with its players and its count.
 
 ## ⚠️ Upgrading to 3.0
 

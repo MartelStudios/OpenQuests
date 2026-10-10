@@ -227,8 +227,9 @@ if two servers share the same players: files cannot do that at all.
 A backend answers for four kinds of record, each through a port of its own, so a caller depends on
 the one it uses:
 
-- **progressions** (`ProgressionStore`): one replica per quest and per server that wrote it,
-  merged when read, and where the quest stands, moved one claimed change at a time;
+- **progressions** (`ProgressionStore`): one document per quest, with a version that grows with
+  every write. A quest several servers write is written one change at a time over its latest
+  version;
 - **indexes** (`IndexStore`), a named set of running quest ids, which is how a scope remembers
   what it shares: `universe`, `world:<uuid>` per world, `worlds:<group>` per group of worlds. Written
   member by member, never replaced whole;
@@ -262,11 +263,10 @@ For JDBC:
     "Url": "jdbc:postgresql://localhost:5432/openquests",
     "User": "openquests",
     "Password": "…",
-    "DriverPath": "libs/postgresql-42.7.4.jar",
-    "ServerId": "survival-1"
+    "DriverPath": "libs/postgresql-42.7.4.jar"
   },
   "SaveIntervalMinutes": 5,
-  "ReplicationSeconds": 5
+  "SyncSeconds": 5
 }
 ```
 
@@ -280,11 +280,11 @@ For JDBC:
 | `PoolSize` | `8` | Connections held open. |
 | `ConnectionTimeoutSeconds` | `10` | How long a caller waits for one. |
 | `CreateSchema` | `true` | Turn off where the schema is managed elsewhere. |
-| `ServerId` | `server` | Names this server's replicas. Every server sharing the database needs its own: two under one name write over each other's progress. |
 | `Dialect` | from the URL | `Postgresql`, `Mysql`, `Mariadb`, `Sqlite`, `H2`, `Generic`. Only for a database reached through a proxy borrowing another vendor's URL scheme. |
 
-`ReplicationSeconds`, at the top level, is how often servers sharing the database keep each other in
-step (5 by default), which bounds how late one sees another's progress.
+`SyncSeconds`, at the top level, is how often servers sharing the database look for each other's
+writes (5 by default), which bounds how late one sees another's progress. A server needs no name:
+it tells itself apart on its own each time it starts.
 
 PostgreSQL, MySQL, MariaDB and SQLite are spoken natively; anything else falls back to plain
 SQL-92 and works.
@@ -293,54 +293,60 @@ SQL-92 and works.
 
 ```
 openquests_schema_version (version)
-openquests_quest          (id, asset_id, state, completed_at, epoch, created_at)
-openquests_quest_replica  (quest_id, server_id, revision, data, updated_at)
+openquests_quest          (id, asset_id, state, completed_at, data, version, updated_at, created_at)
 openquests_quest_player   (quest_id, player_id, abandoned)
 openquests_quest_index    (index_key, quest_id)
-openquests_player         (player_id, data, updated_at)
+openquests_player         (player_id, data, updated_at, host, host_until)
 openquests_player_message (id, player_id, data, created_at)
 openquests_quest_assignment (holder_key, assignment_id, quest_asset_id, handed_count, last_at, occasion)
 ```
 
-A quest document lives in a replica's `data` as the same JSON the disk backend writes, so a quest
-written by one backend is readable by the other. Each server writes its own replica of a quest and
-no other; reading a quest merges them. `quest` holds what every server agrees on: the asset, and
-where the quest stands, with the number of changes of state that led there (`epoch`), so counting
-what is running is a query rather than a scan. Tables an older version wrote, or of another layout, stop the server with a message
-rather than being misread: drop them, or name another `TablePrefix`.
+A quest's `data` is the same JSON the disk backend writes, so a quest written by one backend is
+readable by the other. `version` grows with every write of the quest. `state` and `completed_at`
+repeat what the document says, so counting what is running is a query rather than a scan. Tables
+an older version wrote, or of another layout, stop the server with a message rather than being
+misread: drop them, or name another `TablePrefix`.
 
 #### Several servers on one database
 
-A player is handed over cleanly: their session is written out when they disconnect and read back
-when they connect, quests, catalogue and debts alike. Nothing of theirs is left in the entity file
-of the server they were on.
+The database is the one source of truth, and every record in it has a single writer at a time.
 
-A quest several servers hold **at once**, a universe quest or one a group of worlds shares, is
-shared without any of them overwriting another:
+**A player** is hosted by one server. Connecting takes the player for this server, after the server
+they come from has written them out and let go: their quests, catalogue and debts are read as that
+server left them, never before. The hold is renewed every few seconds, so a server that stops
+answering gives its players up within a minute, and a write from a server that lost a player is
+refused rather than undoing the newer one. What another server owes a player, a reward or an ending
+to count, is left as a message the host takes in, now or at their next connection, and lets go of
+in the same write as the record that took it in.
 
-- **Each server writes its own replica** of the quest, its share of the progress: its own slot of
-  a counter, the moves of the players it hosts. Reading the quest merges the replicas, so two
-  servers counting at once both count.
-- **Every few seconds** (`ReplicationSeconds`) each server writes its replicas of the shared quests
-  and reads what the others wrote since, on a thread of its own: only the replicas that moved come
-  over, and the players see the progress made elsewhere.
-- **Every change of state is claimed once.** A shared quest moves only from where it stands: the
-  first server to claim a change (an end, a quest kept running by `StopOnComplete: false` going back
-  to running or changing its outcome) writes it over the epoch it started from, and any other
-  server, behind, takes in where the quest stands instead. The server ending a quest pays every
-  player, and a player another server hosts finds the reward in a message that server takes in. A
-  server learning of the end files the quest and tells its own players, but pays nothing. An ended
-  quest nobody holds keeps its outcome for a day, so a server that has not heard yet learns of the
-  end rather than ending the quest a second time.
+**A quest several servers hold at once**, a universe quest or one a group of worlds shares, is
+written one change at a time, whatever the change: progress, a player joining or giving up, a tag,
+an end.
+
+- **A change is made here at once**, so the players see it straight away, and kept.
+- **Writing the quest makes the kept changes again on its latest version**, then writes it over
+  that version only. A server that wrote in between costs one more read: nothing it wrote is
+  undone, and two servers counting at once both count. Who holds the quest is written in the same
+  transaction, from the same document.
+- **A change of state is heard once it is written**, by the write that made it: that server pays
+  what an end pays, a player another server hosts finding the reward in a message. A write that
+  finds the change made already pays nothing, and the server learns of it like any other news.
+- **Every few seconds** (`SyncSeconds`) each server writes what it kept and reads back the shared
+  quests whose version moved: the players see the progress made elsewhere. An ended quest nobody
+  holds stays readable for a day, so a server that has not heard yet learns of the end rather than
+  ending the quest a second time.
 - **Indexes are written member by member** and followed the same way, so a universe quest one
   server starts reaches the players of every other. A quest is written before any index lists it,
   so a server following the index always finds the quest.
-- **A player record has one writer**, the server hosting the player. What another server owes them,
-  a reward or an ending to count, is left as a message the host takes in, now or at their next
-  connection, and lets go of in the same write as the record that took it in.
 
 A world lives on one server, so a world quest is that server's alone; so is a player's own quest
 while they are on it.
+
+A quest type takes nothing special to be shared, but three rules: its visitors read only the quest
+they are handed and what they carry, which is what lets a change be made again on another copy; it
+changes the quest only through `update()` or `change()`; and no field it is written as is `final`.
+A type with a `final` field is refused as it registers, and a change made past those two methods is
+reported, then only ever written as a copy of the whole quest.
 
 #### Where the config file lives
 
@@ -390,12 +396,13 @@ QuestStorageProvider.CODEC.register("Redis", RedisStorageProvider.class, RedisSt
 ```
 
 The provider builds a `QuestStorage`, which is every port at once. Keep the guarantees the ports
-state, since several servers rely on them: a server writes only its own replica of a quest, an index
-only member by member, a player record only while it hosts the player; a claim, of an assignment
-hand-out or of a change of a quest's state, writes only if nothing else wrote first; where a quest
-stands is never written back to an earlier epoch; an ended quest done away with leaves its outcome
-readable a while longer; a message is let go of in the same write as the record that took it in.
-`isShared()` says whether other servers may write the backend at once.
+state, since several servers rely on them: a quest is written only over the version it was read
+at, with who holds it in the same write, and a write overtaken says so; an index only member by
+member; a player record only while the server hosts the player, the next server waiting a while
+for the last one to let go before taking over; an assignment hand-out only if nothing else wrote
+first; an ended quest done away with stays readable a while longer; a message is let go of in the
+same write as the record that took it in. `isShared()` says whether other servers may write the
+backend at once.
 
 ### Lifecycle
 
