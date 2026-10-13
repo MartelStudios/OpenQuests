@@ -6,6 +6,7 @@ import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.openquests.core.scopes.player.events.QuestRemovedFromPlayerStoreEvent;
+import com.martelstudios.openquests.extension.hud.commands.HudCommand;
 import com.martelstudios.openquests.extension.track.events.QuestTrackedEvent;
 import com.martelstudios.openquests.extension.track.events.QuestUntrackedEvent;
 
@@ -20,7 +21,10 @@ public final class HudFeature {
     private HudFeature() {}
 
     public static void register(@Nonnull JavaPlugin plugin) {
+        QuestHudSettings.load(plugin.getDataDirectory());
+
         plugin.getEntityStoreRegistry().registerSystem(new QuestHudTickingSystem());
+        plugin.getCommandRegistry().registerCommand(new HudCommand());
 
         plugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, QuestHudRefresh::handlePlayerConnect);
         plugin.getEventRegistry().registerGlobal(QuestUpdatedEvent.class, QuestHudRefresh::handleQuestUpdated);

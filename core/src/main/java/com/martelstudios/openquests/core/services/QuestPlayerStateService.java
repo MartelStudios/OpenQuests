@@ -103,7 +103,7 @@ public class QuestPlayerStateService {
         }
 
         QuestStoreComponent questStore = holder.ensureAndGetComponent(QuestStoreComponent.getComponentType());
-        questStore.restore(resolved, record.getAssignments(), record.getCompletions(), record.getTracking());
+        questStore.restore(resolved, record.getAssignments(), record.getCompletions(), record.getTracking(), record.getHud());
 
         PendingRewardStoreComponent rewards = holder.ensureAndGetComponent(PendingRewardStoreComponent.getComponentType());
         rewards.pending.restore(record.getPendingRewards());
@@ -167,7 +167,10 @@ public class QuestPlayerStateService {
         boolean changed = questStore.hasChanges() || rewards.hasChanges() || !delivered.isEmpty();
         if (!changed && !force) return;
 
-        storage.savePlayer(playerId, new PlayerQuestRecord(questIds, questStore.getAssignments().snapshot(), rewards.snapshot(), questStore.getCompletions(), questStore.getTracking()), delivered, leaving);
+        PlayerQuestRecord record = new PlayerQuestRecord(questIds, questStore.getAssignments().snapshot(), rewards.snapshot(), questStore.getCompletions(), questStore.getTracking());
+        record.setHud(questStore.getHud());
+
+        storage.savePlayer(playerId, record, delivered, leaving);
         session.delivered().removeAll(delivered);
 
         questStore.consumeChanges();

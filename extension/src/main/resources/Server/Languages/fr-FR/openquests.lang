@@ -1,4 +1,12 @@
 hud.or = OU
+hud.yours = Votre suivi des quêtes : {state}, {side}, à {offset, number} du bord et {top, number} du haut
+hud.defaults = Suivi des quêtes par défaut : {state}, {side}, à {offset, number} du bord et {top, number} du haut
+hud.shown = affiché
+hud.hidden = masqué
+hud.left = à gauche
+hud.right = à droite
+hud.players-only = Seul un joueur a son propre suivi des quêtes : /ohud default change celui de tout le monde
+hud.move-nothing = Rien à déplacer : précisez --side, --offset ou --top
 page.or = OU
 
 quest.default.something = quelque chose

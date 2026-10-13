@@ -570,6 +570,21 @@ category answers to fails the asset at load.
 { "Type": "Composite", "Categories": ["Temple", "Timed"], "TitleKey": "…" }
 ```
 
+### Quest tracker
+
+Whether the tracker shows and where it sits is what the player chose with `/ohud`, kept in their
+record, over the server's defaults, each key falling through. The defaults live in `hud.json`, in
+the OpenQuests plugin's data directory, written with the built-in values on first boot:
+
+```json
+{ "Visible": true, "Side": "Right", "Offset": 24, "Top": 120 }
+```
+
+`Side` is the edge the tracker hangs from (`Left` or `Right`), `Offset` how far from it and `Top`
+how far from the top of the screen, in UI pixels. `/ohud default …` and
+`QuestHudSettings.overrideDefaults` rewrite the file and apply at once. It is a file of its own so
+that it stays writable when `config.json` is read from elsewhere.
+
 ### Commands
 
 `/oquest create player|world|universe <assetId> …` hands a quest out. `/oquest complete`,
@@ -581,6 +596,10 @@ Permissions are generated from the plugin and the command path, so `/oquest comp
 `martelstudios.openquestscore.command.oquest.complete`. The whole tree is granted to
 `hytale:WorldEditor` except `/oquest abandon` granted to `hytale:Adventurer`. A player can give up a quest of their own. Each command only ever
 reaches the sender's quests, so the wider group grants nothing over anybody else.
+
+`/ohud show|hide|reset` and `/ohud move [--side=Left|Right] [--offset=N] [--top=N]` change the
+sender's own [tracker](#quest-tracker), granted to `hytale:Adventurer`. `/ohud default` takes the
+same words for everyone's defaults, granted to `hytale:WorldEditor`.
 
 ## Built-in rewards
 

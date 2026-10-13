@@ -7,6 +7,7 @@ import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.codec.codecs.set.SetCodec;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.AssignmentRecords;
+import com.martelstudios.openquests.core.models.HudSettings;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
@@ -37,6 +38,8 @@ public class PlayerQuestRecord {
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Tracking", new MapCodec<>(Codec.BOOLEAN, HashMap<String, Boolean>::new)), PlayerQuestRecord::readTracking, PlayerQuestRecord::writeTracking)
                                                                             .add()
+                                                                            .append(new KeyedCodec<>("Hud", HudSettings.CODEC), (record, hud) -> record.hud = hud, record -> record.hud.isEmpty() ? null : record.hud)
+                                                                            .add()
                                                                             .build();
 
     private final Set<UUID> questIds = new HashSet<>();
@@ -51,6 +54,12 @@ public class PlayerQuestRecord {
      * Whether the player tracks a quest, by quest id, for those they said so of.
      */
     private final Map<UUID, Boolean> tracking = new HashMap<>();
+
+    /**
+     * What the player chose for their quest tracker, field by field.
+     */
+    @Nonnull
+    private HudSettings hud = HudSettings.NONE;
 
     public PlayerQuestRecord() {}
 
@@ -107,6 +116,18 @@ public class PlayerQuestRecord {
     }
 
     /**
+     * @return what the player chose for their quest tracker, {@link HudSettings#NONE} if nothing.
+     */
+    @Nonnull
+    public HudSettings getHud() {
+        return hud;
+    }
+
+    public void setHud(@Nonnull HudSettings hud) {
+        this.hud = hud;
+    }
+
+    /**
      * A key that is no quest id is left out rather than costing the player their whole record.
      */
     private void readTracking(@Nonnull Map<String, Boolean> written) {
@@ -143,6 +164,6 @@ public class PlayerQuestRecord {
      * backend may answer without having anything written down.
      */
     public boolean isEmpty() {
-        return questIds.isEmpty() && assignments.isEmpty() && pendingRewards.isEmpty() && completions.isEmpty() && tracking.isEmpty();
+        return questIds.isEmpty() && assignments.isEmpty() && pendingRewards.isEmpty() && completions.isEmpty() && tracking.isEmpty() && hud.isEmpty();
     }
 }

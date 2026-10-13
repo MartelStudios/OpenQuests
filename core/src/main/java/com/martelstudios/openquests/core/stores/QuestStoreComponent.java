@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.AssignmentRecords;
+import com.martelstudios.openquests.core.models.HudSettings;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
 
@@ -52,6 +53,12 @@ public class QuestStoreComponent implements Component<EntityStore> {
     private final Map<UUID, Boolean> tracking = new ConcurrentHashMap<>();
 
     /**
+     * What this player chose for their quest tracker, field by field.
+     */
+    @Nonnull
+    private volatile HudSettings hud = HudSettings.NONE;
+
+    /**
      * Set when something here changed and the player's record is owed a write.
      */
     private transient boolean dirty;
@@ -65,6 +72,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
         this.assignments.replaceAll(other.assignments.snapshot());
         this.completions.putAll(other.completions);
         this.tracking.putAll(other.tracking);
+        this.hud = other.hud;
         this.dirty = other.dirty;
     }
 
@@ -156,17 +164,29 @@ public class QuestStoreComponent implements Component<EntityStore> {
         return held;
     }
 
+    @Nonnull
+    public HudSettings getHud() {
+        return hud;
+    }
+
+    public void setHud(@Nonnull HudSettings hud) {
+        HudSettings before = this.hud;
+        this.hud = hud;
+        if (!before.equals(hud)) markDirty();
+    }
+
     /**
      * Takes over what was read back for this player, which is how a session starts.
      *
      * @param questIds the quests that answered, not the ids their record listed, so a dead id is
      * dropped here rather than carried another session.
      */
-    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Map<String, QuestCompletions> completions, @Nonnull Map<UUID, Boolean> tracking) {
+    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Map<String, QuestCompletions> completions, @Nonnull Map<UUID, Boolean> tracking, @Nonnull HudSettings hud) {
         quests.replaceAll(questIds);
         this.assignments.replaceAll(assignments);
         this.completions.putAll(completions);
         this.tracking.putAll(tracking);
+        this.hud = hud;
         dirty = false;
     }
 

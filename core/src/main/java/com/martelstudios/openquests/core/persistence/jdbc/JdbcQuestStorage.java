@@ -744,6 +744,7 @@ public class JdbcQuestStorage implements QuestStorage {
     public boolean savePlayer(@Nonnull UUID playerId, @Nonnull PlayerQuestRecord record, @Nonnull Collection<UUID> delivered, boolean leaving) {
         // The link table owns the ids; a copy here could only disagree with it
         PlayerQuestRecord stored = new PlayerQuestRecord(Set.of(), record.getAssignments(), record.getPendingRewards(), record.getCompletions(), record.getTracking());
+        stored.setHud(record.getHud());
         String data = CodecJson.encode(PlayerQuestRecord.CODEC, stored);
         long now = System.currentTimeMillis();
         String letGo = leaving ? ", host = NULL, host_until = NULL" : "";
