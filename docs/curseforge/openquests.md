@@ -30,7 +30,7 @@ needs.
 
 📖 **A quest journal.** `/ojournal` opens a real page: what you are on, what you finished, what you are still owed.
 
-📊 **A tracker HUD.** Titles, counters, nesting and timers, exactly as the screenshot shows.
+📊 **A tracker HUD.** Titles, counters, nesting and timers, exactly as the screenshot shows. Players can hide or move it, and the server picks where it starts.
 
 ⏳ **Rules on any quest.** Time limits, worlds, cooldowns, caps: add them to any quest and combine them freely.
 
@@ -191,6 +191,10 @@ and again.
 | <code>/oquest create player <assetId> <player></code> | Hands a quest to a player                                                    | <code>hytale:WorldEditor</code> |
 | <code>/oquest create world <assetId> <world></code>   | Shares a quest with a world                                                  | <code>hytale:WorldEditor</code> |
 | <code>/oquest create universe <assetId></code>        | Shares a quest with the whole server                                         | <code>hytale:WorldEditor</code> |
+| <code>/ohud show</code>, <code>/ohud hide</code>      | Shows or hides your quest tracker                                            | <code>hytale:Adventurer</code>  |
+| <code>/ohud move --side=<side> --top=<n></code>       | Moves it, also <code>--offset=<n></code> from the side                       | <code>hytale:Adventurer</code>  |
+| <code>/ohud reset</code>                              | Puts it back where the server wants it                                       | <code>hytale:Adventurer</code>  |
+| <code>/ohud default show</code> and so on             | The same for everyone who chose nothing, kept in <code>hud.json</code>       | <code>hytale:WorldEditor</code> |
 
 `<quest>` is a quest id or an asset id. `/oquest` also answers to `/quest` and `/q`.
 

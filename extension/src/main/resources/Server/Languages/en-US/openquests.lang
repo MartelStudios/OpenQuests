@@ -1,4 +1,12 @@
 hud.or = OR
+hud.yours = Your quest tracker: {state}, {side}, {offset, number} from the edge and {top, number} from the top
+hud.defaults = Default quest tracker: {state}, {side}, {offset, number} from the edge and {top, number} from the top
+hud.shown = shown
+hud.hidden = hidden
+hud.left = on the left
+hud.right = on the right
+hud.players-only = Only a player has a quest tracker of their own: /ohud default changes everyone's
+hud.move-nothing = Nothing to move: give --side, --offset or --top
 page.or = OR
 
 quest.default.something = something

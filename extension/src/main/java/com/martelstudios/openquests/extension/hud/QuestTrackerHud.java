@@ -2,9 +2,12 @@ package com.martelstudios.openquests.extension.hud;
 
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
+import com.hypixel.hytale.server.core.ui.Anchor;
+import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.HudSettings;
 import com.martelstudios.openquests.extension.track.QuestTrackService;
 
 import javax.annotation.Nonnull;
@@ -13,13 +16,18 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Top-right panel listing the quests a player is tracking. Decides which five get in and hands
+ * Panel listing the quests a player is tracking, wherever {@link QuestHudSettings} puts it. Decides which five get in and hands
  * each one to its {@link QuestHudRenderer}, which draws it however its type sees fit.
  */
 public class QuestTrackerHud extends CustomUIHud {
     public static final String KEY = "openquests:quest_tracker";
 
     private static final int MAX_QUESTS = 5;
+
+    /**
+     * The width {@code QuestTrackerHud.ui} gives the panel.
+     */
+    private static final int PANEL_WIDTH = 350;
 
     /**
      * A floor between two pushes, not a heartbeat: the panel is redrawn when something changed,
@@ -105,11 +113,28 @@ public class QuestTrackerHud extends CustomUIHud {
             shown++;
         }
 
-        builder.set("#QuestTrackerPanel.Visible", context.getRowCount() > 0);
+        HudSettings settings = QuestHudSettings.resolve(viewer);
+        builder.set("#QuestTrackerPanel.Visible", settings.getVisible() && context.getRowCount() > 0);
+        builder.setObject("#QuestTrackerPanel.Anchor", anchorOf(settings));
         update(true, builder);
 
         long refreshMillis = context.getRefreshMillis();
         refreshAtMs = refreshMillis == 0 ? 0 : now + refreshMillis;
+    }
+
+    /**
+     * An anchor goes out whole, so the panel's width is restated along with its position.
+     */
+    @Nonnull
+    private static Anchor anchorOf(@Nonnull HudSettings settings) {
+        Anchor anchor = new Anchor();
+        anchor.setWidth(Value.of(PANEL_WIDTH));
+        anchor.setTop(Value.of(Math.max(0, settings.getTop())));
+
+        Value<Integer> offset = Value.of(Math.max(0, settings.getOffset()));
+        if (settings.getSide() == HudSettings.Side.LEFT) anchor.setLeft(offset); else anchor.setRight(offset);
+
+        return anchor;
     }
 
 }
