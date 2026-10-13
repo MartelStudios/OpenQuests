@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension.feedback;
 
 import com.hypixel.hytale.assetstore.map.AssetMapWithIndexes;
 import com.hypixel.hytale.protocol.SoundCategory;
+import com.hypixel.hytale.protocol.packets.interface_.EventTitleStyle;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -52,7 +53,7 @@ public class QuestFeedbackService {
     /**
      * Majors get the larger treatment client-side, which is what a finished quest is worth.
      */
-    private static final boolean TITLE_MAJOR = true;
+    private static final EventTitleStyle TITLE_STYLE = EventTitleStyle.Major;
 
     @Nullable
     private static final String TITLE_ICON = null;
@@ -107,7 +108,7 @@ public class QuestFeedbackService {
             default -> Message.empty();
         };
 
-        EventTitleUtil.showEventTitleToPlayer(playerRef, quest.getTitle(), outcome, TITLE_MAJOR, TITLE_ICON, TITLE_DURATION, TITLE_FADE_DURATION, TITLE_FADE_DURATION);
+        EventTitleUtil.showEventTitleToPlayer(playerRef, quest.getTitle(), outcome, TITLE_STYLE, TITLE_ICON, TITLE_DURATION, TITLE_FADE_DURATION, TITLE_FADE_DURATION);
     }
 
     /**
