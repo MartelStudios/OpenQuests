@@ -4,6 +4,7 @@ import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -135,12 +136,24 @@ public interface EntityComponents {
      * over their stored data. Asynchronous in every case but the holder.
      */
     static void update(@Nonnull UUID playerId, @Nonnull Consumer<EntityComponents> action) {
+        update(playerId, action, 3);
+    }
+
+    /**
+     * A player who leaves the world before the queued write runs is followed to wherever they went,
+     * a few times at most so that a player bouncing between worlds cannot keep it going.
+     */
+    private static void update(@Nonnull UUID playerId, @Nonnull Consumer<EntityComponents> action, int handovers) {
         PlayerRef online = Universe.get().getPlayer(playerId);
 
         if (online != null) {
             Ref<EntityStore> reference = online.getReference();
             if (reference != null) {
-                reference.getStore().getExternalData().getWorld().execute(() -> action.accept(of(reference)));
+                reference.getStore().getExternalData().getWorld().execute(() -> {
+                    if (reference.isValid()) action.accept(of(reference));
+                    else if (handovers > 0) update(playerId, action, handovers - 1);
+                    else HytaleLogger.forEnclosingClass().atWarning().log("Dropped a write for player %s, who kept changing worlds", playerId);
+                });
                 return;
             }
 
