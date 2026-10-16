@@ -2,7 +2,7 @@ package com.martelstudios.openquests.core.persistence.jdbc;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression.Stored;
+import com.martelstudios.openquests.core.models.QuestReplica.Stored;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.AssignmentRecords;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -256,7 +256,7 @@ public class JdbcQuestStorage implements QuestStorage {
         for (Snapshot snapshot : snapshots) moved.add(snapshot.quest().getId());
 
         for (Snapshot snapshot : written) {
-            snapshot.quest().markStored(snapshot.written());
+            snapshot.quest().getReplica().markStored(snapshot.written());
             moved.remove(snapshot.quest().getId());
         }
         return moved;
@@ -387,7 +387,7 @@ public class JdbcQuestStorage implements QuestStorage {
         boolean ended = quest.isCompleted();
 
         // A quest never written has nobody to tell
-        boolean untold = quest.getStoredVersion() > 0 && (quest.hasChanges() || !quest.getStoredState().isCompleted());
+        boolean untold = quest.getReplica().getVersion() > 0 && (quest.hasChanges() || !quest.getReplica().getState().isCompleted());
         Snapshot snapshot = ended && untold ? Snapshot.of(quest) : null;
 
         pool.inTransaction(connection -> {
@@ -501,7 +501,7 @@ public class JdbcQuestStorage implements QuestStorage {
                 AbstractQuestProgression<?> quest = readQuest(results.getString(2), results.getString(1));
                 if (quest == null) continue;
 
-                quest.markStored(AbstractQuestProgression.Stored.of(quest, results.getLong(3)));
+                quest.getReplica().markStored(Stored.of(quest, results.getLong(3)));
                 into.add(quest);
             }
         }
@@ -1060,7 +1060,7 @@ public class JdbcQuestStorage implements QuestStorage {
                 return new Snapshot(quest, quest.getId().toString(), quest.getAssetId(),
                     CodecJson.encode(QuestProgressionRecord.CODEC, new QuestProgressionRecord(quest)),
                     quest.getState(), quest.getCompletedAt(),
-                    Set.copyOf(quest.getPlayers()), Set.copyOf(quest.getAbandonedPlayers()), quest.getStored());
+                    Set.copyOf(quest.getPlayers()), Set.copyOf(quest.getAbandonedPlayers()), quest.getReplica().getStored());
             }
         }
 

@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.protocol.MovementStates;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestOperation;
+import com.martelstudios.openquests.core.models.QuestReplica;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.CodecJson;
 import com.martelstudios.openquests.core.sync.QuestSync;
@@ -37,7 +38,7 @@ class MovementReplayTest {
         here.join(PLAYER);
         here.setTargetQuantity(10);
         // Written as it stands, so what follows is kept operation by operation
-        here.markStored(new AbstractQuestProgression.Stored(1, QuestState.IN_PROGRESS, Set.of(PLAYER), Set.of()));
+        here.getReplica().markStored(new QuestReplica.Stored(1, QuestState.IN_PROGRESS, Set.of(PLAYER), Set.of()));
         here.consumeChanges();
 
         new MovementQuestVisitor(PLAYER, new MovementStates(), 0.6, 0.05).progress(here);
@@ -45,7 +46,7 @@ class MovementReplayTest {
 
         // The second sample makes a whole metre here, from the fraction only this copy carries
         new MovementQuestVisitor(PLAYER, new MovementStates(), 0.6, 0.05).progress(here);
-        for (QuestOperation<?> operation : here.getPendingOperations()) stored.replay(operation);
+        for (QuestOperation<?> operation : here.getReplica().getPendingOperations()) stored.getReplica().replay(operation);
 
         assertEquals(1, here.getCurrentQuantity());
         assertEquals(1, stored.getCurrentQuantity());
@@ -57,12 +58,12 @@ class MovementReplayTest {
 
         PaceQuest quest = new PaceQuest();
         quest.setTargetQuantity(10);
-        quest.markStored(new AbstractQuestProgression.Stored(1, QuestState.IN_PROGRESS, Set.of(), Set.of()));
+        quest.getReplica().markStored(new QuestReplica.Stored(1, QuestState.IN_PROGRESS, Set.of(), Set.of()));
 
         quest.apply(new QuantityQuestProgression.Add(1));
         quest.apply(new QuantityQuestProgression.Add(2));
 
-        assertEquals(List.of(new QuantityQuestProgression.Add(3)), quest.getPendingOperations());
+        assertEquals(List.of(new QuantityQuestProgression.Add(3)), quest.getReplica().getPendingOperations());
     }
 
     @Test
@@ -70,10 +71,10 @@ class MovementReplayTest {
         PaceQuest ended = new PaceQuest();
         ended.setTargetQuantity(2);
 
-        assertTrue(ended.replay(new QuantityQuestProgression.Add(2)));
+        assertTrue(ended.getReplica().replay(new QuantityQuestProgression.Add(2)));
         assertEquals(QuestState.SUCCESSFUL, ended.getState());
 
-        assertFalse(ended.replay(new QuantityQuestProgression.Add(1)));
+        assertFalse(ended.getReplica().replay(new QuantityQuestProgression.Add(1)));
         assertEquals(2, ended.getCurrentQuantity());
     }
 
@@ -85,7 +86,7 @@ class MovementReplayTest {
         return new QuestSync.Policy() {
             @Override
             public boolean isShared(@Nonnull AbstractQuestProgression<?> quest) {
-                return stored && quest.getStoredVersion() > 0;
+                return stored && quest.getReplica().getVersion() > 0;
             }
 
             @Override

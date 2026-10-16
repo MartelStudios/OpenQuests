@@ -533,7 +533,7 @@ class JdbcQuestStorageTest {
 
             // The copy that wrote last stands on what it wrote
             assertEquals(8, copyOnB.getCounter());
-            assertEquals(3, copyOnB.getStoredVersion());
+            assertEquals(3, copyOnB.getReplica().getVersion());
         } finally {
             QuestSync.setPolicy(ALONE);
             onA.close();
@@ -587,7 +587,7 @@ class JdbcQuestStorageTest {
             write(onA, quest);
             List<QuestState> foundByB = new ArrayList<>();
             List<QuestState> leftByB = new ArrayList<>();
-            List<? extends QuestOperation<?>> changes = copyOnB.getPendingOperations();
+            List<? extends QuestOperation<?>> changes = copyOnB.getReplica().getPendingOperations();
             AbstractQuestProgression<?> written = onB.commitProgression(quest.getId(), stored -> {
                 foundByB.add(stored.getState());
                 boolean changed = replay(stored, changes);
@@ -626,7 +626,7 @@ class JdbcQuestStorageTest {
 
             // B stands on what A wrote, and the others have nothing new to read
             assertEquals(Map.of(quest.getId(), 2L), onA.loadVersions(List.of(quest.getId())));
-            assertEquals(2, copyOnB.getStoredVersion());
+            assertEquals(2, copyOnB.getReplica().getVersion());
             assertFalse(copyOnB.hasChanges());
         } finally {
             QuestSync.setPolicy(ALONE);
@@ -651,9 +651,9 @@ class JdbcQuestStorageTest {
             write(onA, quest);
 
             copyOnB.addToCounter(3);
-            copyOnB.restack(onB.loadProgression(quest.getId()), 0);
+            copyOnB.getReplica().restack(onB.loadProgression(quest.getId()), 0);
             assertEquals(8, copyOnB.getCounter());
-            assertEquals(2, copyOnB.getStoredVersion());
+            assertEquals(2, copyOnB.getReplica().getVersion());
             assertTrue(copyOnB.hasChanges());
 
             write(onB, copyOnB);
@@ -689,17 +689,17 @@ class JdbcQuestStorageTest {
         storage.writeProgressions(List.of(quest));
 
         // Two passes of one server, each with its own copy of version 1: the older writes first
-        TestQuestProgression older = (TestQuestProgression) quest.copy();
+        TestQuestProgression older = (TestQuestProgression) quest.getReplica().copy();
         older.setCounter(1);
         quest.setCounter(2);
         assertTrue(storage.writeProgressions(List.of(older)).isEmpty());
 
         assertEquals(Set.of(quest.getId()), storage.writeProgressions(List.of(quest)));
-        assertEquals(1, quest.getStoredVersion());
+        assertEquals(1, quest.getReplica().getVersion());
 
         // Written over what overtook it, as a quest only this server writes is
-        QuestOperation<?> whole = quest.overwrite();
-        storage.commitProgression(quest.getId(), stored -> stored.replay(whole));
+        QuestOperation<?> whole = quest.getReplica().overwrite();
+        storage.commitProgression(quest.getId(), stored -> stored.getReplica().replay(whole));
         assertEquals(2, ((TestQuestProgression) storage.loadProgression(quest.getId())).getCounter());
     }
 
@@ -729,10 +729,10 @@ class JdbcQuestStorageTest {
         TestQuestProgression quest = quest("Counted");
 
         storage.writeProgressions(List.of(quest));
-        assertEquals(1, quest.getStoredVersion());
+        assertEquals(1, quest.getReplica().getVersion());
 
         storage.writeProgressions(List.of(quest));
-        assertEquals(2, quest.getStoredVersion());
+        assertEquals(2, quest.getReplica().getVersion());
 
         storage.commitProgression(quest.getId(), stored -> addTo(stored, 1));
         assertEquals(Map.of(quest.getId(), 3L), storage.loadVersions(List.of(quest.getId(), UUID.randomUUID())));
@@ -749,7 +749,7 @@ class JdbcQuestStorageTest {
             UUID alice = UUID.randomUUID();
             TestQuestProgression quest = quest("Unheld", alice);
             onA.writeProgressions(List.of(quest));
-            long seenByB = onB.loadProgression(quest.getId()).getStoredVersion();
+            long seenByB = onB.loadProgression(quest.getId()).getReplica().getVersion();
 
             quest.end(QuestState.SUCCESSFUL);
             onA.writeProgressions(List.of(quest));
@@ -906,16 +906,16 @@ class JdbcQuestStorageTest {
      * without the events a test has no server to send.
      */
     private static void write(@Nonnull QuestStorage on, @Nonnull AbstractQuestProgression<?> quest) {
-        List<? extends QuestOperation<?>> changes = quest.getPendingOperations();
+        List<? extends QuestOperation<?>> changes = quest.getReplica().getPendingOperations();
         AbstractQuestProgression<?> written = on.commitProgression(quest.getId(), stored -> replay(stored, changes));
 
         assertNotNull(written);
-        quest.restack(written, changes.size());
+        quest.getReplica().restack(written, changes.size());
     }
 
     private static boolean replay(@Nonnull AbstractQuestProgression<?> stored, @Nonnull List<? extends QuestOperation<?>> changes) {
         boolean changed = false;
-        for (QuestOperation<?> change : changes) changed |= stored.replay(change);
+        for (QuestOperation<?> change : changes) changed |= stored.getReplica().replay(change);
         return changed;
     }
 
@@ -930,7 +930,7 @@ class JdbcQuestStorageTest {
     private static final QuestSync.Policy SHARED_ONCE_STORED = new QuestSync.Policy() {
         @Override
         public boolean isShared(@Nonnull AbstractQuestProgression<?> quest) {
-            return quest.getStoredVersion() > 0;
+            return quest.getReplica().getVersion() > 0;
         }
 
         @Override

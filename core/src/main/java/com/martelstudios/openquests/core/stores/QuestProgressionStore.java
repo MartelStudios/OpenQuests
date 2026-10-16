@@ -274,14 +274,14 @@ public class QuestProgressionStore {
     private void writeOver(@Nonnull AbstractQuestProgression<?> quest) {
         LOGGER.atFine().log("Quest %s was written meanwhile: writing this copy over it", quest.getId());
 
-        QuestOperation<?> whole = quest.overwrite();
+        QuestOperation<?> whole = quest.getReplica().overwrite();
         try {
-            AbstractQuestProgression<?> written = storage.commitProgression(quest.getId(), stored -> stored.replay(whole));
+            AbstractQuestProgression<?> written = storage.commitProgression(quest.getId(), stored -> stored.getReplica().replay(whole));
 
             if (written == null) {
                 LOGGER.atWarning().log("Quest %s is no longer stored, done away with elsewhere: left unwritten", quest.getId());
             } else {
-                quest.markStored(written.getStored());
+                quest.getReplica().markStored(written.getReplica().getStored());
             }
         } catch (RuntimeException e) {
             quest.markDirty();

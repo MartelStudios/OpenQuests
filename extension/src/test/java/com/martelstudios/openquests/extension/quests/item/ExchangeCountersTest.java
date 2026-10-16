@@ -28,7 +28,7 @@ class ExchangeCountersTest {
         };
         quest.setTargetQuantity(10);
 
-        assertTrue(quest.replay(new ItemExchangeQuestProgression.Exchange(UUID.randomUUID(), ItemExchange.GROUND_PICKUP, 3)));
+        assertTrue(quest.getReplica().replay(new ItemExchangeQuestProgression.Exchange(UUID.randomUUID(), ItemExchange.GROUND_PICKUP, 3)));
         assertEquals(3, quest.getCurrentQuantity());
     }
 
