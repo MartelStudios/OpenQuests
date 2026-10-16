@@ -8,6 +8,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.services.QuestTypeRegistry;
 import com.martelstudios.openquests.core.sync.QuestSync;
 
 import javax.annotation.Nonnull;
@@ -71,7 +72,7 @@ public class QuestProgressionStore {
     public void add(@Nonnull AbstractQuestProgression<?> quest) {
         if (quests.containsKey(quest.getId()) || archived.containsKey(quest.getId())) return;
 
-        String mismatch = quest.findAssetMismatch();
+        String mismatch = QuestTypeRegistry.findAssetMismatch(quest);
         if (mismatch != null) {
             if (setAside.add(quest.getId())) LOGGER.atWarning().log("Quest %s set aside, its asset no longer fits: %s", quest.getId(), mismatch);
             return;
