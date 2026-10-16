@@ -7,6 +7,7 @@ import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
+import com.hypixel.hytale.event.IEvent;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
@@ -381,28 +382,23 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     public void announce(@Nonnull QuestState previousState, @Nonnull QuestState newState, int transitions, boolean madeHere) {
         if (newState.isCompleted()) {
-            HytaleServer.get()
-                        .getEventBus()
-                        .dispatchFor(QuestCompletedEvent.class, getId())
-                        .dispatch(new QuestCompletedEvent(this, newState, madeHere));
+            dispatch(QuestCompletedEvent.class, getId(), new QuestCompletedEvent(this, newState, madeHere));
         }
 
         // Last, so a listener reacting to the transition reads a quest that has already been paid
         // and filed rather than one still being settled.
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestStateChangedEvent.class, getId())
-                    .dispatch(new QuestStateChangedEvent(this, previousState, newState, transitions));
+        dispatch(QuestStateChangedEvent.class, getId(), new QuestStateChangedEvent(this, previousState, newState, transitions));
     }
 
     /**
      * Tells whatever draws the quest that it moved.
      */
     public void announceUpdate() {
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestUpdatedEvent.class, getId())
-                    .dispatch(new QuestUpdatedEvent(this));
+        dispatch(QuestUpdatedEvent.class, getId(), new QuestUpdatedEvent(this));
+    }
+
+    private static <E extends IEvent<UUID>> void dispatch(@Nonnull Class<E> type, @Nonnull UUID key, @Nonnull E event) {
+        HytaleServer.get().getEventBus().dispatchFor(type, key).dispatch(event);
     }
 
     /**
@@ -471,10 +467,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public boolean addPlayer(@Nonnull UUID playerId) {
         if (!apply(new QuestOperation.Join(playerId))) return false;
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestPlayerAddedEvent.class, playerId)
-                    .dispatch(new QuestPlayerAddedEvent(this, playerId));
+        dispatch(QuestPlayerAddedEvent.class, playerId, new QuestPlayerAddedEvent(this, playerId));
 
         return true;
     }
@@ -486,10 +479,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public boolean removePlayer(@Nonnull UUID playerId) {
         if (!apply(new QuestOperation.Leave(playerId))) return false;
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestPlayerRemovedEvent.class, playerId)
-                    .dispatch(new QuestPlayerRemovedEvent(this, playerId));
+        dispatch(QuestPlayerRemovedEvent.class, playerId, new QuestPlayerRemovedEvent(this, playerId));
 
         return true;
     }
@@ -503,10 +493,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public boolean abandonPlayer(@Nonnull UUID playerId) {
         if (!apply(new QuestOperation.Abandon(playerId))) return false;
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestPlayerAbandonedEvent.class, playerId)
-                    .dispatch(new QuestPlayerAbandonedEvent(this, playerId));
+        dispatch(QuestPlayerAbandonedEvent.class, playerId, new QuestPlayerAbandonedEvent(this, playerId));
 
         return true;
     }
