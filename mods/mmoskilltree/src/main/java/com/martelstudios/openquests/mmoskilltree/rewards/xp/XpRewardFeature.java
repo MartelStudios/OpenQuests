@@ -11,20 +11,23 @@ import com.ziggfreed.mmoskilltree.skill.SkillRegistry;
 import javax.annotation.Nonnull;
 
 /**
- * XP in an MMO Skill Tree skill.
+ * XP in an MMO Skill Tree skill, as an amount or as whole levels.
  */
 public final class XpRewardFeature {
-    public static final String TYPE_ID = "MMOSkillTreeXp";
+    public static final String XP_TYPE_ID = "MMOSkillTreeXp";
+    public static final String LEVEL_TYPE_ID = "MMOSkillTreeLevel";
 
     private XpRewardFeature() {}
 
     /**
-     * Registers the reward, its line in the journal and the check of its skill.
+     * Registers both rewards, their lines in the journal and the check of their skill.
      */
     public static void register(@Nonnull JavaPlugin plugin) {
-        QuestReward.CODEC.register(TYPE_ID, XpReward.class, XpReward.CODEC);
+        QuestReward.CODEC.register(XP_TYPE_ID, XpReward.class, XpReward.CODEC);
+        QuestReward.CODEC.register(LEVEL_TYPE_ID, LevelReward.class, LevelReward.CODEC);
 
         QuestPageService.register(new XpRewardRenderer());
+        QuestPageService.register(new LevelRewardRenderer());
         plugin.getEventRegistry().registerGlobal(LoadAssetEvent.PRIORITY_LOAD_LATE, LoadAssetEvent.class, XpRewardFeature::handleLoadAsset);
     }
 
@@ -35,8 +38,10 @@ public final class XpRewardFeature {
         for (OpenQuestAsset asset : OpenQuestAsset.getAssetMap().getAssetMap().values()) {
             for (QuestState state : QuestState.values()) {
                 for (QuestReward reward : asset.getRewards(state)) {
-                    if (reward instanceof XpReward xp && !SkillRegistry.getInstance().isKnownSkill(xp.getSkill())) {
-                        event.failed(true, "Quest asset '" + asset.getId() + "' rewards XP in an unknown MMO Skill Tree skill '" + xp.getSkill() + "'");
+                    String skill = reward instanceof XpReward xp ? xp.getSkill() : reward instanceof LevelReward level ? level.getSkill() : null;
+
+                    if (skill != null && !SkillRegistry.getInstance().isKnownSkill(skill)) {
+                        event.failed(true, "Quest asset '" + asset.getId() + "' rewards an unknown MMO Skill Tree skill '" + skill + "'");
                     }
                 }
             }

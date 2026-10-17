@@ -4,6 +4,6 @@
   "TargetQuantity": 5,
   "SuccessfulRewards": [
     { "Type": "MMOSkillTreeXp", "Skill": "Mining", "Amount": 250, "AutoClaim": true },
-    { "Type": "MMOSkillTreeCurrency", "Currency": "mastery_point", "Amount": 2, "AutoClaim": true }
+    { "Type": "MMOSkillTreeCurrency", "Currency": "Mastery_Point", "Amount": 2, "AutoClaim": true }
   ]
 }
