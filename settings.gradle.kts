@@ -14,4 +14,4 @@ plugins {
 }
 
 rootProject.name = "OpenQuests"
-include("core", "extension")
+include("core", "extension", "mods:mmoskilltree")

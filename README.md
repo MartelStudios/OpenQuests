@@ -730,6 +730,10 @@ public final class MyFeature {
 
 Your plugin's `setup()` then only lists its features, and never grows past that.
 
+The quest types built on another mod live under `mods/`, one plugin per mod (`mods/mmoskilltree`
+for MMO Skill Tree), each published as a CurseForge project of its own. They use only the public
+API of the core and the extension, the way a plugin outside this repository would.
+
 An asset makes its quests through `builder()`. A type with nothing to override returns
 `AbstractQuestProgression.Builder.of(new MyQuestProgression(), getId())`; one with parameters of its
 own nests a `Builder` setting them. What a builder sets is the quest's configuration, fixed once it
