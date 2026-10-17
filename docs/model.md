@@ -474,8 +474,8 @@ classDiagram
     OpenQuestAsset <|-- NoOpQuestAsset
     AbstractQuestProgression <|-- NoOpQuestProgression
 
-    note for GatherQuestProgression "1. every parameter copied from the asset, never written outside the codec"
-    note for ReachLocationQuestProgression "1. reads its asset only, no copy"
+    note for GatherQuestProgression "1. instance override of the asset parameter, ignored by the default title"
+    note for ReachLocationQuestProgression "1. no instance override"
     note for JumpQuestAsset "2. no MovementQuestAsset: asset and progression trees diverge"
     note for UseBlockQuestAsset "2. a block action outside BlockAction"
     note for GatherQuestAsset "2. item quests split between ItemExchange and Quantity"
@@ -484,11 +484,18 @@ classDiagram
 
 ## Inconsistencies
 
-1. **Asset parameters copied onto the progression.** Thirteen types carry their asset's parameter
-   a second time (`itemToGather`, `npcGroupId`, `worldNamePattern`...), and every counted quest its
-   `targetQuantity`, as an instance override falling back to the asset. Outside the codec, only tests ever write one
-   (`setTargetQuantity`). Every save carries them, and `getDefaultTitle` reads the asset's value,
-   so an override would not even show. `ReachLocation`, `Travel` and `Composite` do without it.
+1. **Instance overrides of asset parameters, unevenly honoured.** Thirteen types let an instance
+   override its asset's parameter (`itemToGather`, `npcGroupId`, `playerToKill`...), and every
+   counted quest its `targetQuantity`, so that a script can hand out a quest generated from a
+   template asset (a daily bounty board, say). Nothing writes them yet, and they fall short of that
+   use:
+   - `getDefaultTitle` reads the asset's value, not the instance's, and kill player has no default
+     title at all, so a generated quest reads the same as its template.
+   - `ReachLocation`, `Travel` and `Composite` take no override; rewards, title and description
+     cannot be overridden at all (`QuestRewardService` reads the asset's rewards).
+   - The setters write the field directly: set after registration, the change is never marked
+     dirty, and on a quest other servers write too it is never written at all. They hold only
+     before registration, like `setPersistHistory`, but nothing says or checks so.
 2. **Asset and progression trees do not mirror each other.** `JumpQuestProgression` sits under
    `MovementQuestProgression`, `JumpQuestAsset` straight under `QuantityQuestAsset`. Block quests:
    break and place share `BlockAction`, use does not. Item quests: drop and pickup share
