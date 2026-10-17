@@ -34,9 +34,23 @@ public class InteractivelyPickupQuestProgression extends QuantityQuestProgressio
         return itemToPickup != null ? itemToPickup : getAsset().getItemToPickup();
     }
 
-    public InteractivelyPickupQuestProgression setItemToPickup(@Nullable QuestItemFilter itemToPickup) {
-        this.itemToPickup = itemToPickup;
-        return this;
+    protected InteractivelyPickupQuestProgression() {}
+
+    /**
+     * Sets up an interactive pickup quest, whose item can be overridden for that quest alone.
+     */
+    public static final class Builder extends QuantityQuestProgression.Builder<InteractivelyPickupQuestProgression, Builder> {
+        Builder(@Nonnull InteractivelyPickupQuestAsset asset) {
+            super(new InteractivelyPickupQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's item for this quest alone.
+         */
+        public Builder itemToPickup(@Nullable QuestItemFilter itemToPickup) {
+            quest().itemToPickup = itemToPickup;
+            return this;
+        }
     }
 
     @Nonnull

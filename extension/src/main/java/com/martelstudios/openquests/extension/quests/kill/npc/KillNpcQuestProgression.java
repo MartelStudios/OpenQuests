@@ -37,9 +37,30 @@ public class KillNpcQuestProgression extends QuantityQuestProgression<KillNpcQue
         return npcGroupId != null ? npcGroupId : getAsset().getNpcGroupId();
     }
 
-    public KillNpcQuestProgression setNpcGroupId(@Nullable String npcGroupId) {
-        this.npcGroupId = npcGroupId;
-        return this;
+    protected KillNpcQuestProgression() {}
+
+    /**
+     * Sets up a kill quest, whose NPC group can be overridden for that quest alone.
+     */
+    public static final class Builder extends QuantityQuestProgression.Builder<KillNpcQuestProgression, Builder> {
+        Builder(@Nonnull KillNpcQuestAsset asset) {
+            super(new KillNpcQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's NPC group for this quest alone.
+         */
+        public Builder npcGroupId(@Nullable String npcGroupId) {
+            quest().npcGroupId = npcGroupId;
+            return this;
+        }
+
+        @Override
+        protected void validate(@Nonnull KillNpcQuestProgression quest) {
+            super.validate(quest);
+
+            if (quest.npcGroupId != null && NPCGroup.getAssetMap().getIndex(quest.npcGroupId) < 0) throw new IllegalStateException("No NPC group '" + quest.npcGroupId + "'");
+        }
     }
 
     /**

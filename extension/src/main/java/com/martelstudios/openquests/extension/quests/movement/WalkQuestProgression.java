@@ -12,6 +12,8 @@ public class WalkQuestProgression extends TravelQuestProgression<WalkQuestProgre
         BuilderCodec.builder(WalkQuestProgression.class, WalkQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                     .build();
 
+    protected WalkQuestProgression() {}
+
     @Override
     public WalkQuestAsset getAsset() {
         return (WalkQuestAsset) super.getAsset();

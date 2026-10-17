@@ -7,6 +7,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 
 /**
@@ -40,8 +41,8 @@ public class CompositeQuestAsset extends OpenQuestAsset {
     private CompositeQuestAsset() {}
 
     @Override
-    public CompositeQuestProgression create() {
-        return new CompositeQuestProgression().setAssetId(getId());
+    public AbstractQuestProgression.Builder<CompositeQuestProgression, ?> builder() {
+        return AbstractQuestProgression.Builder.of(new CompositeQuestProgression(), getId());
     }
 
     public String[] getAssetIds() {

@@ -25,8 +25,12 @@ class ExchangeCountersTest {
             public boolean isStopOnComplete() {
                 return true;
             }
+
+            @Override
+            public int getTargetQuantity() {
+                return 10;
+            }
         };
-        quest.setTargetQuantity(10);
 
         assertTrue(quest.getReplica().replay(new ItemExchangeQuestProgression.Exchange(UUID.randomUUID(), ItemExchange.GROUND_PICKUP, 3)));
         assertEquals(3, quest.getCurrentQuantity());
@@ -75,7 +79,7 @@ class ExchangeCountersTest {
     @Test
     void aThrowOutlivesTheSessionItWasMadeIn() {
         UUID player = UUID.randomUUID();
-        PickupItemQuestProgression quest = new PickupItemQuestProgression();
+        PickupItemQuestProgression quest = new PickupItemQuestProgression() {};
         quest.counters.recordThrow(player, 5);
 
         String saved = CodecJson.encode(PickupItemQuestProgression.CODEC, quest);
@@ -88,7 +92,7 @@ class ExchangeCountersTest {
     @Test
     void spentCountsAreLeftOutOfTheSave() {
         UUID player = UUID.randomUUID();
-        PickupItemQuestProgression quest = new PickupItemQuestProgression();
+        PickupItemQuestProgression quest = new PickupItemQuestProgression() {};
         quest.counters.recordThrow(player, 5);
         quest.counters.recordGroundPickup(player, 5);
         quest.counters.recordThrow(player, 5);

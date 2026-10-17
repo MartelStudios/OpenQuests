@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.quests.interactivelypickup;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
@@ -19,8 +18,8 @@ public class InteractivelyPickupQuestAsset extends QuantityQuestAsset {
     private InteractivelyPickupQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new InteractivelyPickupQuestProgression().setAssetId(getId());
+    public InteractivelyPickupQuestProgression.Builder builder() {
+        return new InteractivelyPickupQuestProgression.Builder(this);
     }
 
     public QuestItemFilter getItemToPickup() {

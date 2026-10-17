@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.extension.quests.item.ItemExchange;
 import com.martelstudios.openquests.extension.quests.item.ItemExchangeQuestProgression;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,12 +34,23 @@ public class DropItemQuestProgression extends ItemExchangeQuestProgression<DropI
         return itemToDrop != null ? itemToDrop : getAsset().getItemToDrop();
     }
 
+    protected DropItemQuestProgression() {}
+
     /**
-     * Overrides the asset's item for this instance only.
+     * Sets up a drop quest, whose item can be overridden for that quest alone.
      */
-    public DropItemQuestProgression setItemToDrop(@Nullable QuestItemFilter itemToDrop) {
-        this.itemToDrop = itemToDrop;
-        return this;
+    public static final class Builder extends QuantityQuestProgression.Builder<DropItemQuestProgression, Builder> {
+        Builder(@Nonnull DropItemQuestAsset asset) {
+            super(new DropItemQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's item for this quest alone.
+         */
+        public Builder itemToDrop(@Nullable QuestItemFilter itemToDrop) {
+            quest().itemToDrop = itemToDrop;
+            return this;
+        }
     }
 
     @Nonnull

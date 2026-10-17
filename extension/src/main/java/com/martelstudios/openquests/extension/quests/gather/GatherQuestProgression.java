@@ -36,9 +36,23 @@ public class GatherQuestProgression extends QuantityQuestProgression<GatherQuest
         return itemToGather != null ? itemToGather : getAsset().getItemToGather();
     }
 
-    public GatherQuestProgression setItemToGather(@Nullable QuestItemFilter itemToGather) {
-        this.itemToGather = itemToGather;
-        return this;
+    protected GatherQuestProgression() {}
+
+    /**
+     * Sets up a gather quest, whose item can be overridden for that quest alone.
+     */
+    public static final class Builder extends QuantityQuestProgression.Builder<GatherQuestProgression, Builder> {
+        Builder(@Nonnull GatherQuestAsset asset) {
+            super(new GatherQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's item for this quest alone.
+         */
+        public Builder itemToGather(@Nullable QuestItemFilter itemToGather) {
+            quest().itemToGather = itemToGather;
+            return this;
+        }
     }
 
     @Nonnull

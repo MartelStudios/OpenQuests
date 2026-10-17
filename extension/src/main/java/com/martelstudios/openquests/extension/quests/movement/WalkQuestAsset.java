@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.movement;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 /**
  * Walk a number of metres, or for a number of seconds. {@code TargetQuantity} is the distance or the
@@ -16,7 +16,7 @@ public class WalkQuestAsset extends TravelQuestAsset {
     private WalkQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new WalkQuestProgression().setAssetId(getId());
+    public QuantityQuestProgression.Builder<WalkQuestProgression, ?> builder() {
+        return QuantityQuestProgression.Builder.of(new WalkQuestProgression(), getId());
     }
 }

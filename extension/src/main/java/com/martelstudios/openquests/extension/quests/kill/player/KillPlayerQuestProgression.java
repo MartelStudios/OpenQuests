@@ -36,9 +36,23 @@ public class KillPlayerQuestProgression extends QuantityQuestProgression<KillPla
         return playerToKill != null ? playerToKill : getAsset().getPlayerToKill();
     }
 
-    public KillPlayerQuestProgression setPlayerToKill(@Nullable String playerToKill) {
-        this.playerToKill = playerToKill;
-        return this;
+    protected KillPlayerQuestProgression() {}
+
+    /**
+     * Sets up a player kill quest, whose target can be overridden for that quest alone.
+     */
+    public static final class Builder extends QuantityQuestProgression.Builder<KillPlayerQuestProgression, Builder> {
+        Builder(@Nonnull KillPlayerQuestAsset asset) {
+            super(new KillPlayerQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's target for this quest alone.
+         */
+        public Builder playerToKill(@Nullable String playerToKill) {
+            quest().playerToKill = playerToKill;
+            return this;
+        }
     }
 
     /**

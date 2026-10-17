@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.extension.quests.queststate.QuestStateQuestAsset.QuestStateRequirement;
 
 import javax.annotation.Nonnull;
@@ -48,16 +49,6 @@ public class QuestStateQuestProgression extends AbstractQuestProgression<QuestSt
         return questAssetId != null ? questAssetId : getAsset().getQuestAssetId();
     }
 
-    /**
-     * Re-indexed as it is set: the quest would otherwise stay filed under what it used to watch.
-     */
-    public QuestStateQuestProgression setQuestAssetId(@Nullable String questAssetId) {
-        String previous = getAsset() == null ? null : getQuestAssetId();
-        this.questAssetId = questAssetId;
-
-        QuestStateIndex.get().rewatch(this, previous);
-        return this;
-    }
 
     /**
      * @return this instance's requirement if one was set on it, the asset's otherwise.
@@ -67,9 +58,40 @@ public class QuestStateQuestProgression extends AbstractQuestProgression<QuestSt
         return questStateRequirement != null ? questStateRequirement : getAsset().getQuestStateRequirement();
     }
 
-    public QuestStateQuestProgression setQuestStateRequirement(@Nullable QuestStateRequirement questStateRequirement) {
-        this.questStateRequirement = questStateRequirement;
-        return this;
+    protected QuestStateQuestProgression() {}
+
+    /**
+     * Sets up a quest state quest, whose watched quest and requirement can be overridden for that
+     * quest alone. Set before anyone holds it, so the index files it once, under what it watches.
+     */
+    public static final class Builder extends AbstractQuestProgression.Builder<QuestStateQuestProgression, Builder> {
+        Builder(@Nonnull QuestStateQuestAsset asset) {
+            super(new QuestStateQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's watched quest for this quest alone.
+         */
+        public Builder questAssetId(@Nullable String questAssetId) {
+            quest().questAssetId = questAssetId;
+            return this;
+        }
+
+        /**
+         * Overrides the asset's requirement for this quest alone.
+         */
+        public Builder questStateRequirement(@Nullable QuestStateRequirement questStateRequirement) {
+            quest().questStateRequirement = questStateRequirement;
+            return this;
+        }
+
+        @Override
+        protected void validate(@Nonnull QuestStateQuestProgression quest) {
+            super.validate(quest);
+
+            String watched = quest.questAssetId;
+            if (watched != null && OpenQuestAsset.getAsset(watched) == null) throw new IllegalStateException("No quest asset '" + watched + "' to watch");
+        }
     }
 
     public boolean isNot() {

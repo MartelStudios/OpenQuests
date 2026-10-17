@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.quests.useblock;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
@@ -22,8 +21,8 @@ public class UseBlockQuestAsset extends QuantityQuestAsset {
     private UseBlockQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new UseBlockQuestProgression().setAssetId(getId());
+    public UseBlockQuestProgression.Builder builder() {
+        return new UseBlockQuestProgression.Builder(this);
     }
 
     public QuestItemFilter getBlockToUse() {

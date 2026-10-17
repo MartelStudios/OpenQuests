@@ -265,9 +265,19 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
     }
 
     /**
-     * Factory to instantiate the associated QuestProgression
+     * @return a builder for one quest made from this asset, whose parameters it may override for
+     * that quest alone.
      */
-    public abstract AbstractQuestProgression<?> create();
+    @Nonnull
+    public abstract AbstractQuestProgression.Builder<?, ?> builder();
+
+    /**
+     * @return a quest made from this asset, nothing overridden.
+     */
+    @Nonnull
+    public final AbstractQuestProgression<?> create() {
+        return builder().build();
+    }
 
     public static AssetStore<String, OpenQuestAsset, DefaultAssetMap<String, OpenQuestAsset>> getAssetStore() {
         return AssetRegistry.getAssetStore(OpenQuestAsset.class);

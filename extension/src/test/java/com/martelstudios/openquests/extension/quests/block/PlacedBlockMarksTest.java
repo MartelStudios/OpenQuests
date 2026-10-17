@@ -73,7 +73,7 @@ class PlacedBlockMarksTest {
     @Test
     void recoveriesOutliveTheSessionTheyWereMadeIn() {
         UUID player = UUID.randomUUID();
-        PlaceBlockQuestProgression quest = new PlaceBlockQuestProgression();
+        PlaceBlockQuestProgression quest = new PlaceBlockQuestProgression() {};
         quest.recoveries.record(player);
         quest.recoveries.record(player);
 

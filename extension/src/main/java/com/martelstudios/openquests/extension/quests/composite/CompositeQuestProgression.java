@@ -80,8 +80,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
         for (String assetId : getAsset().getAssetIds()) {
             OpenQuestAsset childAsset = OpenQuestAsset.getAsset(assetId);
 
-            AbstractQuestProgression<?> child = childAsset.create();
-            if (!getAsset().isPersistChildrenHistory()) child.setPersistHistory(false);
+            AbstractQuestProgression<?> child = childAsset.builder().persistHistory(getAsset().isPersistChildrenHistory() ? null : false).build();
             adopt(child);
 
             QuestProgressionService.get().registerQuest(child);
@@ -293,6 +292,8 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * What was heard of one child: how it stood, at which state version.
      */
     public record Heard(@Nonnull UUID childId, @Nonnull QuestStateVersion stateVersion) {}
+
+    protected CompositeQuestProgression() {}
 
     @Override
     public CompositeQuestAsset getAsset() {

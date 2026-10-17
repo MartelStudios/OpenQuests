@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.movement;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
 /**
@@ -16,7 +16,7 @@ public class JumpQuestAsset extends QuantityQuestAsset {
     private JumpQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new JumpQuestProgression().setAssetId(getId());
+    public QuantityQuestProgression.Builder<JumpQuestProgression, ?> builder() {
+        return QuantityQuestProgression.Builder.of(new JumpQuestProgression(), getId());
     }
 }

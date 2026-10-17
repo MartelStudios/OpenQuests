@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.extension.quests.block.BlockAction;
 import com.martelstudios.openquests.extension.quests.block.BlockActionQuestProgression;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,12 +36,23 @@ public class BreakBlockQuestProgression extends BlockActionQuestProgression<Brea
         return blockToBreak != null ? blockToBreak : getAsset().getBlockToBreak();
     }
 
+    protected BreakBlockQuestProgression() {}
+
     /**
-     * Overrides the asset's block for this instance only.
+     * Sets up a break quest, whose block can be overridden for that quest alone.
      */
-    public BreakBlockQuestProgression setBlockToBreak(@Nullable QuestItemFilter blockToBreak) {
-        this.blockToBreak = blockToBreak;
-        return this;
+    public static final class Builder extends QuantityQuestProgression.Builder<BreakBlockQuestProgression, Builder> {
+        Builder(@Nonnull BreakBlockQuestAsset asset) {
+            super(new BreakBlockQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's block for this quest alone.
+         */
+        public Builder blockToBreak(@Nullable QuestItemFilter blockToBreak) {
+            quest().blockToBreak = blockToBreak;
+            return this;
+        }
     }
 
     @Nonnull

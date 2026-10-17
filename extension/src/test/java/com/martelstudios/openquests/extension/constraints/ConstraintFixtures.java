@@ -58,8 +58,8 @@ public final class ConstraintFixtures {
 
     private static final class TestAsset extends OpenQuestAsset {
         @Override
-        public AbstractQuestProgression<?> create() {
-            return new TestQuest();
+        public AbstractQuestProgression.Builder<?, ?> builder() {
+            return AbstractQuestProgression.Builder.of(new TestQuest(), "Test");
         }
     }
 }

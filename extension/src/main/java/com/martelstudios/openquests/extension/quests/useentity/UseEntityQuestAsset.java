@@ -4,7 +4,6 @@ import com.hypixel.hytale.builtin.tagset.config.NPCGroup;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
 /**
@@ -25,8 +24,8 @@ public class UseEntityQuestAsset extends QuantityQuestAsset {
     private UseEntityQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new UseEntityQuestProgression().setAssetId(getId());
+    public UseEntityQuestProgression.Builder builder() {
+        return new UseEntityQuestProgression.Builder(this);
     }
 
     public String getNpcGroupId() {

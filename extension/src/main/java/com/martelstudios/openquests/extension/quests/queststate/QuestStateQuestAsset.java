@@ -6,7 +6,6 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 
 /**
  * Succeeds while the player holds, or once held, a quest built from {@code QuestAssetId} in a
@@ -33,8 +32,8 @@ public class QuestStateQuestAsset extends OpenQuestAsset {
     private QuestStateQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new QuestStateQuestProgression().setAssetId(getId());
+    public QuestStateQuestProgression.Builder builder() {
+        return new QuestStateQuestProgression.Builder(this);
     }
 
     public String getQuestAssetId() {

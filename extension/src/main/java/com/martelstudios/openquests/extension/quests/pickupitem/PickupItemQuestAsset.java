@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.quests.pickupitem;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.item.ItemExchangeQuestAsset;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 
@@ -22,8 +21,8 @@ public class PickupItemQuestAsset extends ItemExchangeQuestAsset {
     private PickupItemQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new PickupItemQuestProgression().setAssetId(getId());
+    public PickupItemQuestProgression.Builder builder() {
+        return new PickupItemQuestProgression.Builder(this);
     }
 
     /**

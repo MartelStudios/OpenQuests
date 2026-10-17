@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -237,11 +238,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return asset == null || asset.canBeAbandoned();
     }
 
-    public Q setPersistHistory(@Nullable Boolean persistHistory) {
-        this.persistHistory = persistHistory;
-        return self();
-    }
-
     /**
      * @return when this quest is worth putting in front of the player, its asset answering while
      * the quest says nothing itself.
@@ -252,11 +248,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
         OpenQuestAsset asset = getAsset();
         return asset == null ? QuestVisibility.ALWAYS : asset.getVisibility();
-    }
-
-    public Q setVisibility(@Nullable QuestVisibility visibility) {
-        this.visibility = visibility;
-        return self();
     }
 
     /**
@@ -289,11 +280,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
         OpenQuestAsset asset = getAsset();
         return asset == null || asset.isAnnounceOutcome();
-    }
-
-    public Q setAnnounceOutcome(@Nullable Boolean announceOutcome) {
-        this.announceOutcome = announceOutcome;
-        return self();
     }
 
     /**
@@ -567,30 +553,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Written before the quest is registered, by the assignment handing it out or by a chain
-     * passing its own on.
-     */
-    public Q setOrigin(@Nullable QuestOrigin origin) {
-        this.origin = origin;
-        return self();
-    }
-
-    /**
      * @return the quest whose completion handed this one over, {@code null} for one nothing
      * handed over.
      */
     @Nullable
     public UUID getGrantedBy() {
         return grantedBy;
-    }
-
-    /**
-     * Written before the quest is registered, by whatever hands it over, so everything hearing of
-     * it already knows which completion opened it.
-     */
-    public Q setGrantedBy(@Nullable UUID grantedBy) {
-        this.grantedBy = grantedBy;
-        return self();
     }
 
     /**
@@ -627,11 +595,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     public String getAssetId() {
         return assetId;
-    }
-
-    public Q setAssetId(String assetId) {
-        this.assetId = assetId;
-        return self();
     }
 
     /**
@@ -825,6 +788,117 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         if (!dirty) return false;
         dirty = false;
         return true;
+    }
+
+    /**
+     * Sets a quest up before anyone holds it. What it is given here is its configuration, fixed
+     * once built: every later change is a {@link QuestOperation} made through {@link #apply}.
+     *
+     * @param <Q> the quest being built
+     * @param <B> the concrete builder, so that chained calls keep its own methods
+     */
+    public abstract static class Builder<Q extends AbstractQuestProgression<Q>, B extends Builder<Q, B>> {
+        @Nullable
+        private Q quest;
+
+        protected Builder(@Nonnull Q quest, @Nonnull String assetId) {
+            ((AbstractQuestProgression<?>) quest).assetId = Objects.requireNonNull(assetId, "assetId");
+            this.quest = quest;
+        }
+
+        /**
+         * @return the quest under construction, for a subtype's builder to configure.
+         * @throws IllegalStateException once the quest is built and handed over
+         */
+        @Nonnull
+        protected Q quest() {
+            if (quest == null) throw new IllegalStateException("This builder already handed its quest over");
+            return quest;
+        }
+
+        /**
+         * Overrides the asset on whether completing this quest is recorded in its players history.
+         */
+        public B persistHistory(@Nullable Boolean persistHistory) {
+            base().persistHistory = persistHistory;
+            return self();
+        }
+
+        /**
+         * Overrides the asset on when this quest is worth listing.
+         */
+        public B visibility(@Nullable QuestVisibility visibility) {
+            base().visibility = visibility;
+            return self();
+        }
+
+        /**
+         * Overrides the asset on whether this quest announces how it ended.
+         */
+        public B announceOutcome(@Nullable Boolean announceOutcome) {
+            base().announceOutcome = announceOutcome;
+            return self();
+        }
+
+        /**
+         * The assignment and occasion handing this quest out, carried down a chain.
+         */
+        public B origin(@Nullable QuestOrigin origin) {
+            base().origin = origin;
+            return self();
+        }
+
+        /**
+         * The quest whose completion hands this one over.
+         */
+        public B grantedBy(@Nullable UUID grantedBy) {
+            base().grantedBy = grantedBy;
+            return self();
+        }
+
+        /**
+         * Hands the quest over, after which this builder refuses everything.
+         *
+         * @throws IllegalStateException for an override no quest could run with
+         */
+        @Nonnull
+        public Q build() {
+            Q built = quest();
+            validate(built);
+            quest = null;
+            return built;
+        }
+
+        /**
+         * Refuses an override no quest could run with, each subtype checking its own.
+         *
+         * @throws IllegalStateException naming what is wrong
+         */
+        protected void validate(@Nonnull Q quest) {}
+
+        @SuppressWarnings("unchecked")
+        protected B self() {
+            return (B) this;
+        }
+
+        @Nonnull
+        private AbstractQuestProgression<?> base() {
+            return quest();
+        }
+
+        /**
+         * @return a builder for a quest type with nothing of its own to override.
+         */
+        @Nonnull
+        public static <Q extends AbstractQuestProgression<Q>> Builder<Q, ?> of(@Nonnull Q quest, @Nonnull String assetId) {
+            return new PlainBuilder<>(quest, assetId);
+        }
+    }
+
+    private static final class PlainBuilder<Q extends AbstractQuestProgression<Q>> extends Builder<Q, PlainBuilder<Q>> {
+        private PlainBuilder(@Nonnull Q quest, @Nonnull String assetId) {
+            super(quest, assetId);
+        }
     }
 
     /**

@@ -985,8 +985,7 @@ class JdbcQuestStorageTest {
     }
 
     private static TestQuestProgression quest(@Nonnull String assetId, @Nonnull UUID... playerIds) {
-        TestQuestProgression quest = new TestQuestProgression();
-        quest.setAssetId(assetId);
+        TestQuestProgression quest = AbstractQuestProgression.Builder.of(new TestQuestProgression(), assetId).build();
         for (UUID playerId : playerIds) quest.join(playerId);
 
         // The one field a record cannot invent later

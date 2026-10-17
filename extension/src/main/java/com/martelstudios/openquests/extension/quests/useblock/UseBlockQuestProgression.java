@@ -34,8 +34,22 @@ public class UseBlockQuestProgression extends QuantityQuestProgression<UseBlockQ
         return blockToUse != null ? blockToUse : getAsset().getBlockToUse();
     }
 
-    public UseBlockQuestProgression setBlockToUse(@Nullable QuestItemFilter blockToUse) {
-        this.blockToUse = blockToUse;
-        return this;
+    protected UseBlockQuestProgression() {}
+
+    /**
+     * Sets up a use block quest, whose block can be overridden for that quest alone.
+     */
+    public static final class Builder extends QuantityQuestProgression.Builder<UseBlockQuestProgression, Builder> {
+        Builder(@Nonnull UseBlockQuestAsset asset) {
+            super(new UseBlockQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's block for this quest alone.
+         */
+        public Builder blockToUse(@Nullable QuestItemFilter blockToUse) {
+            quest().blockToUse = blockToUse;
+            return this;
+        }
     }
 }

@@ -730,6 +730,17 @@ public final class MyFeature {
 
 Your plugin's `setup()` then only lists its features, and never grows past that.
 
+An asset makes its quests through `builder()`. A type with nothing to override returns
+`AbstractQuestProgression.Builder.of(new MyQuestProgression(), getId())`; one with parameters of its
+own nests a `Builder` setting them. What a builder sets is the quest's configuration, fixed once it
+is built: everything after that changes through the operations made with `apply()`. That is how a
+plugin makes a quest of its own at runtime, a bounty board picking its target:
+
+```java
+KillPlayerQuestProgression bounty = bountyAsset.builder().playerToKill(target.getUsername()).targetQuantity(1).build();
+QuestProgressionService.get().registerQuest(bounty);
+```
+
 A reward type is registered the same way:
 
 ```java

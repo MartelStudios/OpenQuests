@@ -35,9 +35,23 @@ public class ConsumeItemQuestProgression extends QuantityQuestProgression<Consum
         return itemToConsume != null ? itemToConsume : getAsset().getItemToConsume();
     }
 
-    public ConsumeItemQuestProgression setItemToConsume(@Nullable QuestItemFilter itemToConsume) {
-        this.itemToConsume = itemToConsume;
-        return this;
+    protected ConsumeItemQuestProgression() {}
+
+    /**
+     * Sets up a consume quest, whose item can be overridden for that quest alone.
+     */
+    public static final class Builder extends QuantityQuestProgression.Builder<ConsumeItemQuestProgression, Builder> {
+        Builder(@Nonnull ConsumeItemQuestAsset asset) {
+            super(new ConsumeItemQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's item for this quest alone.
+         */
+        public Builder itemToConsume(@Nullable QuestItemFilter itemToConsume) {
+            quest().itemToConsume = itemToConsume;
+            return this;
+        }
     }
 
     @Nonnull
