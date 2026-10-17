@@ -176,7 +176,7 @@ public class WorldQuestService {
         UUID worldId = world.getWorldConfig().getUuid();
         QuestScope scope = quest.getScope();
         if (scope == null) {
-            quest.setScope(new WorldQuestScope(List.of(worldId)));
+            quest.apply(new AbstractQuestProgression.SetScope(new WorldQuestScope(List.of(worldId))));
         } else {
             quest.apply(new AbstractQuestProgression.AddWorld(worldId));
         }

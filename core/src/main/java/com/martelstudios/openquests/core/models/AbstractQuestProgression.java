@@ -537,14 +537,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Written by the scope holding the quest, never by the quest itself.
-     */
-    public Q setScope(@Nullable QuestScope scope) {
-        apply(new AbstractQuestProgression.SetScope(scope));
-        return self();
-    }
-
-    /**
      * @return which assignment handed this quest out and on which occasion, {@code null} for one
      * no assignment handed out.
      */
@@ -667,33 +659,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Declares a tag carrying nothing.
-     *
-     * @return {@code false} if the quest already carried it.
-     */
-    public boolean addTag(@Nonnull String tag) {
-        return addTag(tag, NO_TAG_VALUES);
-    }
-
-    /**
-     * Writes a tag and what it carries, replacing whatever the quest held under it.
-     *
-     * @return {@code false} if the quest already carried exactly that.
-     */
-    public boolean addTag(@Nonnull String tag, @Nonnull String... values) {
-        return apply(new AbstractQuestProgression.PutTag(tag, values));
-    }
-
-    /**
-     * @return {@code false} if the quest did not carry the tag.
-     */
-    public boolean removeTag(@Nonnull String tag) {
-        return apply(new AbstractQuestProgression.RemoveTag(tag));
-    }
-
-    /**
      * @return the tags written on this quest alone, without those of its asset, read only: writes
-     * go through {@link #addTag} and {@link #removeTag}.
+     * are {@link PutTag} and {@link RemoveTag} operations.
      */
     @Nonnull
     public Map<String, String[]> getTags() {
@@ -772,6 +739,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         @Override
         public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
             return !Arrays.equals(quest.tags.put(tag, values), values);
+        }
+
+        /**
+         * Declares a tag carrying nothing.
+         */
+        public PutTag(@Nonnull String tag) {
+            this(tag, NO_TAG_VALUES);
         }
     }
 

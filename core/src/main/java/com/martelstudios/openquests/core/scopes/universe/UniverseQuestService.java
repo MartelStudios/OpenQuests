@@ -52,7 +52,7 @@ public class UniverseQuestService {
         if (quest == null) return;
 
         // Before the index lists it, which writes the quest: another server reading it finds it shared
-        if (!(quest.getScope() instanceof UniverseQuestScope)) quest.setScope(UniverseQuestScope.INSTANCE);
+        if (!(quest.getScope() instanceof UniverseQuestScope)) quest.apply(new AbstractQuestProgression.SetScope(UniverseQuestScope.INSTANCE));
 
         if (!indexes.add(UNIVERSE_INDEX_KEY, questId)) return;
 
@@ -68,7 +68,7 @@ public class UniverseQuestService {
 
         // Gone already when it left for good, and nothing then is left to write on
         AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
-        if (quest != null && quest.getScope() instanceof UniverseQuestScope) quest.setScope(null);
+        if (quest != null && quest.getScope() instanceof UniverseQuestScope) quest.apply(new AbstractQuestProgression.SetScope(null));
     }
 
     /**

@@ -497,7 +497,7 @@ round and gives it back. The core keeps the player's answers and reads none of t
 tracked amounts to is the extension's business, the same way it owns what a `TitleKey` ends up
 drawn on.
 
-A running quest carries tags of its own, through `addTag` and `removeTag`, and is asked before its
+A running quest carries tags of its own, written by `PutTag` and `RemoveTag`, and is asked before its
 asset: the same override as `PersistHistory`, so one quest can answer differently from everything
 sharing its template. Its tags carry values just as an asset's do, and the instance answers alone
 once it declares one, so a quest can be written over at runtime rather than only added to.

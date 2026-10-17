@@ -68,7 +68,7 @@ public class WorldQuestScope extends QuestScope {
     public void share(@Nonnull AbstractQuestProgression<?> quest) {
         List<World> open = WorldQuestService.get().openWorlds(worlds);
 
-        quest.setScope(new WorldQuestScope(open.stream().map(world -> world.getWorldConfig().getUuid()).toList()));
+        quest.apply(new AbstractQuestProgression.SetScope(new WorldQuestScope(open.stream().map(world -> world.getWorldConfig().getUuid()).toList())));
         for (World world : open) {
             WorldQuestService.get().addQuest(world, quest.getId());
         }

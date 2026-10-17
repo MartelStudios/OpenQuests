@@ -61,7 +61,7 @@ public class WorldsQuestScope extends WorldQuestScope {
      */
     @Override
     public void share(@Nonnull AbstractQuestProgression<?> quest) {
-        quest.setScope(new WorldsQuestScope(group));
+        quest.apply(new AbstractQuestProgression.SetScope(new WorldsQuestScope(group)));
         WorldGroupIndex.get().add(group, quest.getId());
 
         for (World world : WorldGroupIndex.get().getJoinedWorlds(group)) {

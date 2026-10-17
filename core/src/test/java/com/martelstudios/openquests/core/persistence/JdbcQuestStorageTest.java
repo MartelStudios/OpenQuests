@@ -74,7 +74,8 @@ class JdbcQuestStorageTest {
     void writesAndReadsBackAQuestWhole() {
         UUID playerId = UUID.randomUUID();
         TestQuestProgression quest = quest("CollectStick", playerId);
-        quest.setCounter(7).end(QuestState.IN_PROGRESS).addTag("OQ_TEST", "a", "b");
+        quest.setCounter(7).end(QuestState.IN_PROGRESS);
+        quest.apply(new AbstractQuestProgression.PutTag("OQ_TEST", new String[] {"a", "b"}));
 
         storage.writeProgressions(List.of(quest));
 
@@ -132,7 +133,7 @@ class JdbcQuestStorageTest {
         TestQuestProgression quest = quest("ClearTheRats", UUID.randomUUID());
         WorldQuestScope scope = new WorldQuestScope(List.of(lair));
         scope.addWorld(arena);
-        quest.setScope(scope);
+        quest.apply(new AbstractQuestProgression.SetScope(scope));
 
         storage.writeProgressions(List.of(quest));
 
@@ -149,7 +150,7 @@ class JdbcQuestStorageTest {
         TestQuestProgression quest = quest("ArenaGoal", UUID.randomUUID());
         WorldsQuestScope scope = new WorldsQuestScope("ArenaTogether");
         scope.addWorld(arena);
-        quest.setScope(scope);
+        quest.apply(new AbstractQuestProgression.SetScope(scope));
 
         storage.writeProgressions(List.of(quest));
 
