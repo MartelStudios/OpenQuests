@@ -68,8 +68,8 @@ public class DropItemQuestProgression extends ItemExchangeQuestProgression<DropI
     @Override
     public Message getDefaultTitle() {
         var asset = getAsset();
-        if (asset == null || asset.getItemToDrop() == null) return super.getDefaultTitle();
+        if (asset == null || getItemToDrop() == null) return super.getDefaultTitle();
 
-        return countedTitle("openquests.quest.default.drop", asset.getItemToDrop());
+        return countedTitle("openquests.quest.default.drop", getItemToDrop());
     }
 }

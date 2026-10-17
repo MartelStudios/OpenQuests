@@ -57,8 +57,8 @@ public class InteractivelyPickupQuestProgression extends QuantityQuestProgressio
     @Override
     public Message getDefaultTitle() {
         var asset = getAsset();
-        if (asset == null || asset.getItemToPickup() == null) return super.getDefaultTitle();
+        if (asset == null || getItemToPickup() == null) return super.getDefaultTitle();
 
-        return countedTitle("openquests.quest.default.pickup", asset.getItemToPickup());
+        return countedTitle("openquests.quest.default.pickup", getItemToPickup());
     }
 }

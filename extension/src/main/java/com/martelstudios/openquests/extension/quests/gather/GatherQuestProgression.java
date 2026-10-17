@@ -59,8 +59,8 @@ public class GatherQuestProgression extends QuantityQuestProgression<GatherQuest
     @Override
     public Message getDefaultTitle() {
         var asset = getAsset();
-        if (asset == null || asset.getItemToGather() == null) return super.getDefaultTitle();
+        if (asset == null || getItemToGather() == null) return super.getDefaultTitle();
 
-        return countedTitle("openquests.quest.default.gather", asset.getItemToGather());
+        return countedTitle("openquests.quest.default.gather", getItemToGather());
     }
 }

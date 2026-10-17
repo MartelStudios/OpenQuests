@@ -58,8 +58,8 @@ public class CraftQuestProgression extends QuantityQuestProgression<CraftQuestPr
     @Override
     public Message getDefaultTitle() {
         var asset = getAsset();
-        if (asset == null || asset.getItemToCraft() == null) return super.getDefaultTitle();
+        if (asset == null || getItemToCraft() == null) return super.getDefaultTitle();
 
-        return countedTitle("openquests.quest.default.craft", asset.getItemToCraft());
+        return countedTitle("openquests.quest.default.craft", getItemToCraft());
     }
 }

@@ -58,8 +58,8 @@ public class ConsumeItemQuestProgression extends QuantityQuestProgression<Consum
     @Override
     public Message getDefaultTitle() {
         var asset = getAsset();
-        if (asset == null || asset.getItemToConsume() == null) return super.getDefaultTitle();
+        if (asset == null || getItemToConsume() == null) return super.getDefaultTitle();
 
-        return countedTitle("openquests.quest.default.consume", asset.getItemToConsume());
+        return countedTitle("openquests.quest.default.consume", getItemToConsume());
     }
 }
