@@ -4,6 +4,6 @@
   "TargetQuantity": 3,
   "SuccessfulRewards": [
     { "Type": "MMOSkillTreeLevel", "Skill": "Mining", "Levels": 1, "AutoClaim": true },
-    { "Type": "MMOSkillTreeReward", "Kind": "Reputation", "Params": { "Reputation": "Mmo_Mastery_Trainer", "Amount": 1000 }, "AutoClaim": true }
+    { "Type": "MMOSkillTreeReputation", "Reputation": "Mmo_Mastery_Trainer", "Amount": 1000, "AutoClaim": true }
   ]
 }

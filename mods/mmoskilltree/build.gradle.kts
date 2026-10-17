@@ -34,9 +34,9 @@ dependencies {
     compileOnly(project(":core"))
     compileOnly(project(":extension"))
 
-    // MMO Skill Tree 1.7.2 and the CommonLib it requires, for the dev run and decompiled sources
+    // MMO Skill Tree 1.7.2 and CommonLib 2.4.1, whose schema no longer breaks the asset editor, for the dev run and decompiled sources
     vineImplementation("curse.maven:mmo-skill-tree-1431313:9215826")
-    vineImplementation("curse.maven:ziggfreeds-commonlib-1580260:9215812")
+    vineImplementation("curse.maven:ziggfreeds-commonlib-1580260:9224293")
 }
 
 tasks.named<Jar>("jar") {

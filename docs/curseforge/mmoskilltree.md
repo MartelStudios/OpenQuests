@@ -16,7 +16,9 @@ Write your quests once in OpenQuests and let them speak MMO Skill Tree. This plu
 
 🎚️ **Whole levels.** `MMOSkillTreeLevel` raises a skill by whole levels, however far up the curve the player is.
 
-💎 **Mastery points, trainer favour and the rest.** `MMOSkillTreeReward` pays any reward of MMO Skill Tree's own quests, written the same way: mastery points (`Currency`), standing with the Mastery Trainer, whose ranks pay mastery points and open lessons on the trainer's board (`Reputation`), lootables, titles, effects. Copy a row from one of its quests and it works.
+💎 **Mastery points.** `MMOSkillTreeCurrency` pays any currency, `Mastery_Point` first, to spend in the mastery trees. The asset editor lists the currencies the server knows.
+
+🤝 **Trainer favour.** `MMOSkillTreeReputation` adds standing with a reputation, such as the Mastery Trainer, whose ranks pay mastery points and open lessons on the trainer's board.
 
 ```json
 {
@@ -25,7 +27,7 @@ Write your quests once in OpenQuests and let them speak MMO Skill Tree. This plu
   "TargetQuantity": 5,
   "SuccessfulRewards": [
     { "Type": "MMOSkillTreeXp", "Skill": "Mining", "Amount": 250, "AutoClaim": true },
-    { "Type": "MMOSkillTreeReward", "Kind": "Currency", "Params": { "Currency": "mastery_point", "Amount": 2 }, "AutoClaim": true }
+    { "Type": "MMOSkillTreeCurrency", "Currency": "Mastery_Point", "Amount": 2, "AutoClaim": true }
   ]
 }
 ```
@@ -33,5 +35,5 @@ Write your quests once in OpenQuests and let them speak MMO Skill Tree. This plu
 ## 📦 Requirements
 
 - OpenQuests and OpenQuests Core
-- MMO Skill Tree 1.7.2 or newer, with its CommonLib
+- MMO Skill Tree 1.7.2 or newer, with CommonLib 2.4.1 or newer
 - The MMO Skill Tree Mastery Pack for mastery points and the Mastery Trainer: it is what defines them
