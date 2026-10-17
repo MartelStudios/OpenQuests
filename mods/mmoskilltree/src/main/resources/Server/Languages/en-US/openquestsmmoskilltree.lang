@@ -1,0 +1,2 @@
+quest.default.reach-level = Reach level {quantity, number} in {skill}
+reward.xp = {skill} XP

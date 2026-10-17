@@ -43,3 +43,20 @@ tasks.named<Jar>("jar") {
     archiveBaseName.set(project.property("mod_id").toString())
     archiveVersion.set(project.property("version").toString())
 }
+
+// The Mastery Pack defines the mastery_point currency, so the currency reward can be tried in the
+// dev run. It ships as a zip, which the workspace does not stage the way it stages a jar.
+val devPacks by configurations.creating
+
+dependencies {
+    devPacks("curse.maven:mmo-skill-tree-mastery-pack-1551899:9216039@zip")
+}
+
+val stageDevPacks by tasks.registering(Copy::class) {
+    from(devPacks)
+    into(rootProject.layout.projectDirectory.dir("run/mods"))
+}
+
+rootProject.tasks.matching { it.name == "runAllMods" }.configureEach {
+    dependsOn(stageDevPacks)
+}
