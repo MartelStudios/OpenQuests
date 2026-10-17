@@ -7,6 +7,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.models.QuestStateVersion;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
@@ -216,10 +217,10 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
 
         if (rebase.foundVersion > read) {
             quest.announceUpdate();
-            if (rebase.foundState != storedBefore) quest.announce(storedBefore, rebase.foundState, rebase.foundTransitions, false);
+            if (rebase.found.state() != storedBefore) quest.announce(storedBefore, rebase.found, false);
         }
         for (Transition transition : rebase.made) {
-            quest.announce(transition.from(), transition.to(), transition.count(), true);
+            quest.announce(transition.from(), transition.to(), true);
         }
     }
 
@@ -296,12 +297,11 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
         if (stored.getReplica().getVersion() <= quest.getReplica().getVersion()) return;
 
         QuestState before = quest.getReplica().getState();
-        QuestState after = stored.getState();
-        int transitions = stored.getTransitions();
+        QuestStateVersion after = stored.getStateVersion();
         quest.getReplica().restack(stored, 0);
 
         quest.announceUpdate();
-        if (after != before) quest.announce(before, after, transitions, false);
+        if (after.state() != before) quest.announce(before, after, false);
     }
 
     /**
@@ -338,9 +338,8 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
 
         private long foundVersion;
 
-        private QuestState foundState = QuestState.IN_PROGRESS;
-
-        private int foundTransitions;
+        @Nonnull
+        private QuestStateVersion found = QuestStateVersion.INITIAL;
 
         private Rebase(@Nonnull List<? extends QuestOperation<?>> operations) {
             this.operations = operations;
@@ -352,22 +351,18 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
         @Override
         public boolean test(@Nonnull AbstractQuestProgression<?> stored) {
             foundVersion = stored.getReplica().getVersion();
-            foundState = stored.getState();
-            foundTransitions = stored.getTransitions();
+            found = stored.getStateVersion();
             made.clear();
 
             boolean changed = false;
             for (QuestOperation<?> operation : operations) {
                 QuestState before = stored.getState();
                 changed |= stored.getReplica().replay(operation);
-                if (stored.getState() != before) made.add(new Transition(before, stored.getState(), stored.getTransitions()));
+                if (stored.getState() != before) made.add(new Transition(before, stored.getStateVersion()));
             }
             return changed;
         }
     }
 
-    /**
-     * @param count how many changes of state the quest went through, this one included
-     */
-    private record Transition(@Nonnull QuestState from, @Nonnull QuestState to, int count) {}
+    private record Transition(@Nonnull QuestState from, @Nonnull QuestStateVersion to) {}
 }

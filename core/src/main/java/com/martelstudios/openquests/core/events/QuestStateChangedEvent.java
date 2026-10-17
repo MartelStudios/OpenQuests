@@ -3,6 +3,7 @@ package com.martelstudios.openquests.core.events;
 import com.hypixel.hytale.event.IEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.models.QuestStateVersion;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -20,19 +21,16 @@ public class QuestStateChangedEvent implements IEvent<UUID> {
     private final QuestState previousState;
 
     @Nonnull
-    private final QuestState state;
-
-    private final int transitions;
+    private final QuestStateVersion stateVersion;
 
     /**
-     * @param state the state reached, which the quest may have moved past by the time this is heard
-     * @param transitions how many changes of state the quest went through, this one included
+     * @param stateVersion the state reached, which the quest may have moved past by the time this
+     * is heard, at the version this change made
      */
-    public QuestStateChangedEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState previousState, @Nonnull QuestState state, int transitions) {
+    public QuestStateChangedEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState previousState, @Nonnull QuestStateVersion stateVersion) {
         this.quest = quest;
         this.previousState = previousState;
-        this.state = state;
-        this.transitions = transitions;
+        this.stateVersion = stateVersion;
     }
 
     @Nonnull
@@ -50,14 +48,15 @@ public class QuestStateChangedEvent implements IEvent<UUID> {
 
     @Nonnull
     public QuestState getState() {
-        return state;
+        return stateVersion.state();
     }
 
     /**
-     * @return how many changes of state the quest went through, this one included: what tells
-     * older news of the quest from newer, heard in whatever order.
+     * @return the state reached and its version: what tells older news of the quest from newer,
+     * heard in whatever order.
      */
-    public int getTransitions() {
-        return transitions;
+    @Nonnull
+    public QuestStateVersion getStateVersion() {
+        return stateVersion;
     }
 }

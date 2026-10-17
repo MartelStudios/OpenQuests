@@ -60,9 +60,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("ParentId", Codec.UUID_STRING), (quest, parentId) -> quest.parentId = parentId, quest -> quest.parentId)
                                                                                         .add()
-                                                                                        .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.state = state, quest -> quest.state)
+                                                                                        .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (quest, state) -> quest.stateVersion = new QuestStateVersion(state, quest.stateVersion.version()), quest -> quest.stateVersion.state())
                                                                                         .add()
-                                                                                        .append(new KeyedCodec<>("Transitions", Codec.INTEGER), (quest, count) -> quest.transitions = count, quest -> Integer.valueOf(quest.transitions))
+                                                                                        .append(new KeyedCodec<>("Transitions", Codec.INTEGER), (quest, count) -> quest.stateVersion = new QuestStateVersion(quest.stateVersion.state(), count), quest -> Integer.valueOf(quest.stateVersion.version()))
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("PersistHistory", Codec.BOOLEAN), (quest, value) -> quest.persistHistory = value, quest -> quest.persistHistory)
                                                                                         .add()
@@ -143,13 +143,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     @Nullable
     private UUID parentId;
 
-    protected QuestState state = QuestState.IN_PROGRESS;
-
     /**
-     * How many times the quest changed state, written with it: what tells an older outcome from a
-     * newer one, for a group keeping how its steps went.
+     * Written with the quest: the version tells an older outcome from a newer one, for a group
+     * keeping how its steps went.
      */
-    private int transitions;
+    @Nonnull
+    private QuestStateVersion stateVersion = QuestStateVersion.INITIAL;
 
     /**
      * What this copy knows of the stored copy it stands on, for a quest other servers write too.
@@ -327,26 +326,24 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     public boolean apply(@Nonnull QuestOperation<? super Q> operation) {
         QuestState previousState;
-        QuestState newState;
-        int newTransitions;
+        QuestStateVersion now;
         boolean kept;
         synchronized (this) {
-            previousState = state;
+            previousState = getState();
             boolean unsaved = dirty;
 
             if (!make(operation)) return false;
 
-            newState = state;
-            newTransitions = transitions;
+            now = stateVersion;
             kept = replica.keep(operation, unsaved);
         }
 
-        if (newState == previousState) return true;
+        if (now.state() == previousState) return true;
 
         if (kept) {
             QuestSync.writeSoon(this);
         } else {
-            announce(previousState, newState, newTransitions, true);
+            announce(previousState, now, true);
         }
         return true;
     }
@@ -355,16 +352,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * Makes the operation and dates a change of state, telling nobody.
      */
     boolean make(@Nonnull QuestOperation<? super Q> operation) {
-        QuestState previousState = state;
+        QuestState previousState = getState();
 
         applying++;
         try {
             if (!operation.applyTo(self())) return false;
 
-            if (state != previousState) {
-                completedAt = isCompleted() ? Instant.now() : null;
-                transitions++;
-            }
+            if (getState() != previousState) completedAt = isCompleted() ? Instant.now() : null;
             markDirty();
             return true;
         } finally {
@@ -377,17 +371,17 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * writes; once written, for one other servers write too, by the write that made the change or
      * brought news of it.
      *
-     * @param transitions how many changes of state the quest went through, this one included
+     * @param now where the quest stands after the change, at the version this change made
      * @param madeHere whether this server made the change, and pays what an end pays
      */
-    public void announce(@Nonnull QuestState previousState, @Nonnull QuestState newState, int transitions, boolean madeHere) {
-        if (newState.isCompleted()) {
-            dispatch(QuestCompletedEvent.class, getId(), new QuestCompletedEvent(this, newState, madeHere));
+    public void announce(@Nonnull QuestState previousState, @Nonnull QuestStateVersion now, boolean madeHere) {
+        if (now.state().isCompleted()) {
+            dispatch(QuestCompletedEvent.class, getId(), new QuestCompletedEvent(this, now.state(), madeHere));
         }
 
         // Last, so a listener reacting to the transition reads a quest that has already been paid
         // and filed rather than one still being settled.
-        dispatch(QuestStateChangedEvent.class, getId(), new QuestStateChangedEvent(this, previousState, newState, transitions));
+        dispatch(QuestStateChangedEvent.class, getId(), new QuestStateChangedEvent(this, previousState, now));
     }
 
     /**
@@ -410,10 +404,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * @return how many times the quest changed state, which orders what became of it.
+     * @return where the quest stands, with the version ordering it against older news of it.
      */
-    public int getTransitions() {
-        return transitions;
+    @Nonnull
+    public QuestStateVersion getStateVersion() {
+        return stateVersion;
     }
 
     /**
@@ -499,19 +494,19 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     public boolean isSuccessful() {
-        return state == QuestState.SUCCESSFUL;
+        return getState() == QuestState.SUCCESSFUL;
     }
 
     public boolean isFailed() {
-        return state == QuestState.FAILED;
+        return getState() == QuestState.FAILED;
     }
 
     public boolean isAbandoned() {
-        return state == QuestState.ABANDONED;
+        return getState() == QuestState.ABANDONED;
     }
 
     public boolean isCompleted() {
-        return state.isCompleted();
+        return getState().isCompleted();
     }
 
     /**
@@ -748,12 +743,17 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return Collections.unmodifiableSet(players);
     }
 
+    @Nonnull
     public QuestState getState() {
-        return state;
+        return stateVersion.state();
     }
 
-    protected Q setState(QuestState state) {
-        this.state = state;
+    /**
+     * Moves the quest to that state, one version later. Only from within a {@link QuestOperation},
+     * which every copy of the quest makes alike.
+     */
+    protected Q setState(@Nonnull QuestState state) {
+        stateVersion = stateVersion.with(state);
         return self();
     }
 
