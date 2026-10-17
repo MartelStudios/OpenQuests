@@ -1,0 +1,10 @@
+{
+  "Type": "MMOSkillTreeReachLevel",
+  "Skill": "Mining",
+  "TargetQuantity": 10,
+  "SuccessfulRewards": [
+    { "Type": "MMOSkillTreeLootable", "Lootable": "Mmo_Mastery_Offering", "AutoClaim": true },
+    { "Type": "MMOSkillTreeBoostToken", "Skill": "MINING", "Multiplier": 2, "DurationMinutes": 30, "AutoClaim": true },
+    { "Type": "MMOSkillTreeLamp", "Amount": 500, "Skills": "GATHERING", "AutoClaim": true }
+  ]
+}

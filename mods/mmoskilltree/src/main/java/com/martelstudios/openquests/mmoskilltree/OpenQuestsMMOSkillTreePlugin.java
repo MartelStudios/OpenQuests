@@ -22,6 +22,8 @@ public class OpenQuestsMMOSkillTreePlugin extends JavaPlugin {
     protected void setup() {
         super.setup();
 
+        SkillDataSets.register(this);
+
         // Quests
         ReachLevelFeature.register(this);
 

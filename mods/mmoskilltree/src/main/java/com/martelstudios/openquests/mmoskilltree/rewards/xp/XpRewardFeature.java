@@ -23,8 +23,8 @@ public final class XpRewardFeature {
      * Registers both rewards, their lines in the journal and the check of their skill.
      */
     public static void register(@Nonnull JavaPlugin plugin) {
-        QuestReward.CODEC.register(XP_TYPE_ID, XpReward.class, XpReward.CODEC);
-        QuestReward.CODEC.register(LEVEL_TYPE_ID, LevelReward.class, LevelReward.CODEC);
+        QuestReward.CODEC.register(XP_TYPE_ID, MMOSkillTreeXpReward.class, MMOSkillTreeXpReward.CODEC);
+        QuestReward.CODEC.register(LEVEL_TYPE_ID, MMOSkillTreeLevelReward.class, MMOSkillTreeLevelReward.CODEC);
 
         QuestPageService.register(new XpRewardRenderer());
         QuestPageService.register(new LevelRewardRenderer());
@@ -38,7 +38,7 @@ public final class XpRewardFeature {
         for (OpenQuestAsset asset : OpenQuestAsset.getAssetMap().getAssetMap().values()) {
             for (QuestState state : QuestState.values()) {
                 for (QuestReward reward : asset.getRewards(state)) {
-                    String skill = reward instanceof XpReward xp ? xp.getSkill() : reward instanceof LevelReward level ? level.getSkill() : null;
+                    String skill = reward instanceof MMOSkillTreeXpReward xp ? xp.getSkill() : reward instanceof MMOSkillTreeLevelReward level ? level.getSkill() : null;
 
                     if (skill != null && !SkillRegistry.getInstance().isKnownSkill(skill)) {
                         event.failed(true, "Quest asset '" + asset.getId() + "' rewards an unknown MMO Skill Tree skill '" + skill + "'");
