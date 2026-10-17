@@ -1,0 +1,10 @@
+{
+  "Type": "MMOSkillTreeAbilityCast",
+  "Skill": "MINING",
+  "TargetQuantity": 5,
+  "SuccessfulRewards": [
+    { "Type": "MMOSkillTreeBoostToken", "Skill": "MINING", "Multiplier": 2, "DurationMinutes": 30, "AutoClaim": true },
+    { "Type": "MMOSkillTreeAbilityMod", "ModId": "Mmo_Gear_Extended_Reach", "AutoClaim": true },
+    { "Type": "GrantQuest", "QuestAssetIds": ["MMOSkillTree_Prospector4_Lessons"], "AutoClaim": true }
+  ]
+}

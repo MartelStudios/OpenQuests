@@ -1,0 +1,9 @@
+{
+  "Type": "MMOSkillTreeGainXp",
+  "TargetQuantity": 300,
+  "SuccessfulRewards": [
+    { "Type": "MMOSkillTreeLamp", "Amount": 300, "Skills": "GATHERING", "AutoClaim": true },
+    { "Type": "MMOSkillTreeEffect", "Effect": "Food_Stamina_Boost_Medium", "AutoClaim": true },
+    { "Type": "GrantQuest", "QuestAssetIds": ["MMOSkillTree_Prospector2_Mining"], "AutoClaim": true }
+  ]
+}

@@ -1,9 +1,0 @@
-{
-  "Type": "MMOSkillTreeReachLevel",
-  "Skill": "Woodcutting",
-  "TargetQuantity": 3,
-  "SuccessfulRewards": [
-    { "Type": "MMOSkillTreeLevel", "Skill": "Mining", "Levels": 1, "AutoClaim": true },
-    { "Type": "MMOSkillTreeReputation", "Reputation": "Mmo_Mastery_Trainer", "Amount": 1000, "AutoClaim": true }
-  ]
-}

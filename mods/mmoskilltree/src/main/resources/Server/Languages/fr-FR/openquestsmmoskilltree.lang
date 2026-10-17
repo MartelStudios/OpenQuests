@@ -7,3 +7,6 @@ quest.default.ability-cast-skill = Utilisez des capacités de {skill} {quantity,
 quest.default.ability-cast-any = Utilisez des capacités {quantity, plural, one {une fois} other {# fois}}
 quest.default.complete-bounty = Terminez {quantity, plural, one {un contrat} other {# contrats}} de {board}
 quest.default.complete-bounty-any = Terminez {quantity, plural, one {un contrat} other {# contrats}}
+title.openquestsmmoskilltree_prospector.name = Prospecteur
+title.openquestsmmoskilltree_prospector.flavor = A suivi le chemin du prospecteur jusqu'au bout.
+flair.openquestsmmoskilltree_prospector.name = Prospecteur

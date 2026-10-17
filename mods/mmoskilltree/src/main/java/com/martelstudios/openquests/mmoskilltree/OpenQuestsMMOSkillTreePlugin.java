@@ -2,10 +2,26 @@ package com.martelstudios.openquests.mmoskilltree;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
-import com.martelstudios.openquests.mmoskilltree.quests.moment.MomentFeature;
+import com.martelstudios.openquests.mmoskilltree.editor.EditorFeature;
+import com.martelstudios.openquests.mmoskilltree.quests.moment.abilitycast.AbilityCastFeature;
+import com.martelstudios.openquests.mmoskilltree.quests.moment.completebounty.CompleteBountyFeature;
+import com.martelstudios.openquests.mmoskilltree.quests.moment.gainxp.GainXpFeature;
 import com.martelstudios.openquests.mmoskilltree.quests.reachlevel.ReachLevelFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.abilitymod.AbilityModRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.boosttoken.BoostTokenRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.costume.CostumeRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.currency.CurrencyRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.droplist.DroplistRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.effect.EffectRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.flair.FlairRewardFeature;
 import com.martelstudios.openquests.mmoskilltree.rewards.kind.KindRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.lamp.LampRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.level.LevelRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.lootable.LootableRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.reputation.ReputationRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.title.TitleRewardFeature;
 import com.martelstudios.openquests.mmoskilltree.rewards.xp.XpRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.skills.SkillsFeature;
 
 import javax.annotation.Nonnull;
 
@@ -23,21 +39,37 @@ public class OpenQuestsMMOSkillTreePlugin extends JavaPlugin {
     protected void setup() {
         super.setup();
 
-        DataSets.register(this);
+        // Shared machinery
+        EditorFeature.register(this);
+        SkillsFeature.register(this);
+        KindRewardFeature.register(this);
 
         // Quests
         ReachLevelFeature.register(this);
-        MomentFeature.register(this);
+        GainXpFeature.register(this);
+        AbilityCastFeature.register(this);
+        CompleteBountyFeature.register(this);
 
         // Rewards
         XpRewardFeature.register(this);
-        KindRewardFeature.register(this);
+        LevelRewardFeature.register(this);
+        CurrencyRewardFeature.register(this);
+        ReputationRewardFeature.register(this);
+        LootableRewardFeature.register(this);
+        DroplistRewardFeature.register(this);
+        EffectRewardFeature.register(this);
+        CostumeRewardFeature.register(this);
+        TitleRewardFeature.register(this);
+        FlairRewardFeature.register(this);
+        BoostTokenRewardFeature.register(this);
+        LampRewardFeature.register(this);
+        AbilityModRewardFeature.register(this);
     }
 
     @Override
     protected void shutdown() {
         ReachLevelFeature.unregister();
-        MomentFeature.unregister();
+        GainXpFeature.unregister();
 
         super.shutdown();
     }

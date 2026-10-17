@@ -1,6 +1,5 @@
 package com.martelstudios.openquests.mmoskilltree.quests.reachlevel;
 
-import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -25,7 +24,6 @@ public final class ReachLevelFeature {
 
         MMOSkillTreeAPI.addXpListener(ReachLevelEvents.XP_LISTENER);
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, ReachLevelEvents::handleQuestAssignedToPlayer);
-        plugin.getEventRegistry().registerGlobal(LoadAssetEvent.PRIORITY_LOAD_LATE, LoadAssetEvent.class, ReachLevelEvents::handleLoadAsset);
     }
 
     /**

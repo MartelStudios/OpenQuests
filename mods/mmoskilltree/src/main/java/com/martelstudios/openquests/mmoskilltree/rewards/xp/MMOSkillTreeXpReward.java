@@ -4,9 +4,10 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.openquests.mmoskilltree.DataSets;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.mmoskilltree.editor.DataSets;
+import com.martelstudios.openquests.mmoskilltree.skills.SkillReference;
 import com.ziggfreed.mmoskilltree.api.MMOSkillTreeAPI;
 import com.ziggfreed.mmoskilltree.skill.SkillService;
 
@@ -17,7 +18,7 @@ import java.util.UUID;
 /**
  * XP in an MMO Skill Tree skill.
  */
-public class MMOSkillTreeXpReward extends QuestReward {
+public class MMOSkillTreeXpReward extends QuestReward implements SkillReference {
     public static final BuilderCodec<MMOSkillTreeXpReward> CODEC = BuilderCodec.builder(MMOSkillTreeXpReward.class, MMOSkillTreeXpReward::new, QuestReward.BASE_CODEC)
                                                                    .append(new KeyedCodec<>("Skill", Codec.STRING, true), (reward, skill) -> reward.skill = skill, reward -> reward.skill)
                                                                    .addValidator(Validators.nonNull())
@@ -51,6 +52,7 @@ public class MMOSkillTreeXpReward extends QuestReward {
         return true;
     }
 
+    @Override
     public String getSkill() {
         return skill;
     }

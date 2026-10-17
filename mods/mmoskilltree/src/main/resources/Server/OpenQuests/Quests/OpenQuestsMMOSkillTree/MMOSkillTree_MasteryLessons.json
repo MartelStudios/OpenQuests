@@ -1,8 +1,0 @@
-{
-  "Type": "MMOSkillTreeCompleteBounty",
-  "Board": "Mmo_Mastery_Lessons",
-  "TargetQuantity": 3,
-  "SuccessfulRewards": [
-    { "Type": "MMOSkillTreeReputation", "Reputation": "Mmo_Mastery_Trainer", "Amount": 500, "AutoClaim": true }
-  ]
-}
