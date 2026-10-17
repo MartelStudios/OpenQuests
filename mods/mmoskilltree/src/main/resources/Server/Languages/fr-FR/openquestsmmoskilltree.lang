@@ -1,2 +1,3 @@
 quest.default.reach-level = Atteignez le niveau {quantity, number} en {skill}
 reward.xp = XP de {skill}
+reward.level = {levels, plural, one {Niveau} other {Niveaux}} de {skill}
