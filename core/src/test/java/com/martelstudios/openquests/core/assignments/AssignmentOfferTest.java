@@ -136,8 +136,8 @@ class AssignmentOfferTest {
         }
 
         @Override
-        public AbstractQuestProgression<?> create() {
-            return new TestQuestProgression();
+        public AbstractQuestProgression.Builder<?, ?> builder() {
+            return AbstractQuestProgression.Builder.of(new TestQuestProgression(), getId());
         }
     }
 

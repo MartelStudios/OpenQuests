@@ -24,8 +24,8 @@ public class ReachLocationQuestAsset extends OpenQuestAsset {
     private ReachLocationQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new ReachLocationQuestProgression().setAssetId(getId());
+    public AbstractQuestProgression.Builder<ReachLocationQuestProgression, ?> builder() {
+        return AbstractQuestProgression.Builder.of(new ReachLocationQuestProgression(), getId());
     }
 
     public Vector3d getPosition() {

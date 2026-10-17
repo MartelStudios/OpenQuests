@@ -68,8 +68,8 @@ class QuestAssetMismatchTest {
 
     private static class GatherAsset extends OpenQuestAsset {
         @Override
-        public AbstractQuestProgression<?> create() {
-            return new StepQuest();
+        public AbstractQuestProgression.Builder<?, ?> builder() {
+            return AbstractQuestProgression.Builder.of(new StepQuest(), "GatherMeat");
         }
     }
 
@@ -77,8 +77,8 @@ class QuestAssetMismatchTest {
 
     private static final class CompositeAsset extends OpenQuestAsset {
         @Override
-        public AbstractQuestProgression<?> create() {
-            return new StepQuest();
+        public AbstractQuestProgression.Builder<?, ?> builder() {
+            return AbstractQuestProgression.Builder.of(new StepQuest(), "GatherMeat");
         }
     }
 }

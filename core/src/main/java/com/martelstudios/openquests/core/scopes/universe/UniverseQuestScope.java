@@ -36,7 +36,7 @@ public class UniverseQuestScope extends QuestScope {
 
     @Override
     public void share(@Nonnull AbstractQuestProgression<?> quest) {
-        quest.setScope(INSTANCE);
+        quest.apply(new AbstractQuestProgression.SetScope(INSTANCE));
         UniverseQuestService.get().addQuest(quest.getId());
     }
 

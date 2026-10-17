@@ -41,26 +41,6 @@ public class QuestStateIndex {
     }
 
     /**
-     * Moves a quest that changed what it watches, for everyone holding it.
-     *
-     * @param previousAssetId what it watched until now, without which the old entry could only be
-     * found by walking the whole index.
-     */
-    public void rewatch(@Nonnull QuestStateQuestProgression quest, @Nullable String previousAssetId) {
-        String assetId = watchedAssetOf(quest);
-
-        for (UUID playerId : quest.getPlayers()) {
-            remove(watchers, previousAssetId, playerId, quest.getId());
-            add(watchers, assetId, playerId, quest.getId());
-        }
-
-        for (UUID playerId : quest.getAbandonedPlayers()) {
-            remove(watchers, previousAssetId, playerId, quest.getId());
-            add(watchers, assetId, playerId, quest.getId());
-        }
-    }
-
-    /**
      * @return the quest-state quests this player holds that read the asset's outcome.
      */
     @Nonnull

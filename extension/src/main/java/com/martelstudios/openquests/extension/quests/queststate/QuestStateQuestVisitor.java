@@ -1,6 +1,6 @@
 package com.martelstudios.openquests.extension.quests.queststate;
 
-import com.martelstudios.openquests.core.models.QuestOperation;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
@@ -22,7 +22,7 @@ public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgr
 
         QuestState answer = quest.isNot() != matches(quest) ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS;
 
-        quest.apply(new QuestOperation.SetState(answer));
+        quest.apply(new AbstractQuestProgression.SetState(answer));
     }
 
     /**

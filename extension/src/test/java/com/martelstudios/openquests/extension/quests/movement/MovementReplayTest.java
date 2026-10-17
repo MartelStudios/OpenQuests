@@ -34,9 +34,8 @@ class MovementReplayTest {
     void aSampleCountsOnAStoredCopyWhatItCountedHere() {
         QuestSync.setPolicy(shared(true));
 
-        PaceQuest here = new PaceQuest();
+        PaceQuest here = new PaceQuest.Builder().targetQuantity(10).build();
         here.join(PLAYER);
-        here.setTargetQuantity(10);
         // Written as it stands, so what follows is kept operation by operation
         here.getReplica().markStored(new QuestReplica.Stored(1, QuestState.IN_PROGRESS, Set.of(PLAYER), Set.of()));
         here.consumeChanges();
@@ -56,8 +55,7 @@ class MovementReplayTest {
     void countsKeptBetweenTwoWritesGoAsOne() {
         QuestSync.setPolicy(shared(true));
 
-        PaceQuest quest = new PaceQuest();
-        quest.setTargetQuantity(10);
+        PaceQuest quest = new PaceQuest.Builder().targetQuantity(10).build();
         quest.getReplica().markStored(new QuestReplica.Stored(1, QuestState.IN_PROGRESS, Set.of(), Set.of()));
 
         quest.apply(new QuantityQuestProgression.Add(1));
@@ -68,8 +66,7 @@ class MovementReplayTest {
 
     @Test
     void aCountMadeAgainOnACopyEndedElsewhereCountsNothing() {
-        PaceQuest ended = new PaceQuest();
-        ended.setTargetQuantity(2);
+        PaceQuest ended = new PaceQuest.Builder().targetQuantity(2).build();
 
         assertTrue(ended.getReplica().replay(new QuantityQuestProgression.Add(2)));
         assertEquals(QuestState.SUCCESSFUL, ended.getState());
@@ -100,8 +97,14 @@ class MovementReplayTest {
     static final class PaceQuest extends MovementQuestProgression<PaceQuest> {
         static final BuilderCodec<PaceQuest> CODEC = BuilderCodec.builder(PaceQuest.class, PaceQuest::new, QuantityQuestProgression.BASE_CODEC).build();
 
+        static final class Builder extends QuantityQuestProgression.Builder<PaceQuest, Builder> {
+            Builder() {
+                super(new PaceQuest(), "Pace");
+            }
+        }
+
         void join(@Nonnull UUID playerId) {
-            apply(new QuestOperation.Join(playerId));
+            apply(new AbstractQuestProgression.Join(playerId));
         }
 
         @Override

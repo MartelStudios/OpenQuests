@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.extension.quests.item.ItemExchange;
 import com.martelstudios.openquests.extension.quests.item.ItemExchangeQuestProgression;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -18,7 +19,7 @@ public class PickupItemQuestProgression extends ItemExchangeQuestProgression<Pic
                                                                               .build();
 
     @Nullable
-    protected QuestItemFilter itemToPickup;
+    private QuestItemFilter itemToPickup;
 
     @Override
     public PickupItemQuestAsset getAsset() {
@@ -33,12 +34,23 @@ public class PickupItemQuestProgression extends ItemExchangeQuestProgression<Pic
         return itemToPickup != null ? itemToPickup : getAsset().getItemToPickup();
     }
 
+    protected PickupItemQuestProgression() {}
+
     /**
-     * Overrides the asset's item for this instance only.
+     * Sets up a pickup quest, whose item can be overridden for that quest alone.
      */
-    public PickupItemQuestProgression setItemToPickup(@Nullable QuestItemFilter itemToPickup) {
-        this.itemToPickup = itemToPickup;
-        return this;
+    public static final class Builder extends QuantityQuestProgression.Builder<PickupItemQuestProgression, Builder> {
+        Builder(@Nonnull PickupItemQuestAsset asset) {
+            super(new PickupItemQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's item for this quest alone.
+         */
+        public Builder itemToPickup(@Nullable QuestItemFilter itemToPickup) {
+            quest().itemToPickup = itemToPickup;
+            return this;
+        }
     }
 
     @Nonnull
@@ -56,8 +68,8 @@ public class PickupItemQuestProgression extends ItemExchangeQuestProgression<Pic
     @Override
     public Message getDefaultTitle() {
         var asset = getAsset();
-        if (asset == null || asset.getItemToPickup() == null) return super.getDefaultTitle();
+        if (asset == null || getItemToPickup() == null) return super.getDefaultTitle();
 
-        return countedTitle("openquests.quest.default.pickup", asset.getItemToPickup());
+        return countedTitle("openquests.quest.default.pickup", getItemToPickup());
     }
 }

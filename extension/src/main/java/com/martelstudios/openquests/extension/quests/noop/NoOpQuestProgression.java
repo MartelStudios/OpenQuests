@@ -11,6 +11,8 @@ public class NoOpQuestProgression extends AbstractQuestProgression<NoOpQuestProg
     public static final BuilderCodec<NoOpQuestProgression> CODEC = BuilderCodec.builder(NoOpQuestProgression.class, NoOpQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
                                                                                .build();
 
+    protected NoOpQuestProgression() {}
+
     @Override
     public NoOpQuestAsset getAsset() {
         return (NoOpQuestAsset) super.getAsset();

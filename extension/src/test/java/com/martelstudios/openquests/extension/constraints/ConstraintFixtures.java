@@ -49,17 +49,28 @@ public final class ConstraintFixtures {
     }
 
     public static final class TestQuest extends AbstractQuestProgression<TestQuest> {
-        TestQuest() {}
+        @Nullable
+        private final transient Instant startedAt;
+
+        TestQuest() {
+            this(null);
+        }
 
         private TestQuest(@Nullable Instant startedAt) {
             this.startedAt = startedAt;
+        }
+
+        @Nullable
+        @Override
+        public Instant getStartedAt() {
+            return startedAt;
         }
     }
 
     private static final class TestAsset extends OpenQuestAsset {
         @Override
-        public AbstractQuestProgression<?> create() {
-            return new TestQuest();
+        public AbstractQuestProgression.Builder<?, ?> builder() {
+            return AbstractQuestProgression.Builder.of(new TestQuest(), "Test");
         }
     }
 }

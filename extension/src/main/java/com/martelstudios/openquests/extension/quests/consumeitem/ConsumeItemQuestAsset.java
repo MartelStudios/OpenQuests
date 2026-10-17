@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.quests.consumeitem;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
@@ -22,8 +21,8 @@ public class ConsumeItemQuestAsset extends QuantityQuestAsset {
     private ConsumeItemQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new ConsumeItemQuestProgression().setAssetId(getId());
+    public ConsumeItemQuestProgression.Builder builder() {
+        return new ConsumeItemQuestProgression.Builder(this);
     }
 
     public QuestItemFilter getItemToConsume() {

@@ -12,6 +12,8 @@ public class SprintQuestProgression extends TravelQuestProgression<SprintQuestPr
         BuilderCodec.builder(SprintQuestProgression.class, SprintQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                     .build();
 
+    protected SprintQuestProgression() {}
+
     @Override
     public SprintQuestAsset getAsset() {
         return (SprintQuestAsset) super.getAsset();

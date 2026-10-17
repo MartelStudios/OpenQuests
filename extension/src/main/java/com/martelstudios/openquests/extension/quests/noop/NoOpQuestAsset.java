@@ -15,7 +15,7 @@ public class NoOpQuestAsset extends OpenQuestAsset {
     protected NoOpQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new NoOpQuestProgression().setAssetId(getId());
+    public AbstractQuestProgression.Builder<NoOpQuestProgression, ?> builder() {
+        return AbstractQuestProgression.Builder.of(new NoOpQuestProgression(), getId());
     }
 }

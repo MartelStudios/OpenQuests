@@ -23,7 +23,7 @@ public class EnterWorldQuestProgression extends AbstractQuestProgression<EnterWo
      * Overrides the asset's pattern for this instance alone.
      */
     @Nullable
-    protected WorldNamePattern worldNamePattern;
+    private WorldNamePattern worldNamePattern;
 
     @Override
     public EnterWorldQuestAsset getAsset() {
@@ -38,9 +38,23 @@ public class EnterWorldQuestProgression extends AbstractQuestProgression<EnterWo
         return worldNamePattern != null ? worldNamePattern : getAsset().getWorldNamePattern();
     }
 
-    public EnterWorldQuestProgression setWorldNamePattern(@Nullable String worldNamePattern) {
-        this.worldNamePattern = WorldNamePattern.ofNullable(worldNamePattern);
-        return this;
+    protected EnterWorldQuestProgression() {}
+
+    /**
+     * Sets up an enter world quest, whose pattern can be overridden for that quest alone.
+     */
+    public static final class Builder extends AbstractQuestProgression.Builder<EnterWorldQuestProgression, Builder> {
+        Builder(@Nonnull EnterWorldQuestAsset asset) {
+            super(new EnterWorldQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's pattern for this quest alone, matched against the whole world name.
+         */
+        public Builder worldNamePattern(@Nullable String worldNamePattern) {
+            quest().worldNamePattern = WorldNamePattern.ofNullable(worldNamePattern);
+            return this;
+        }
     }
 
     /**

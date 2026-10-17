@@ -20,6 +20,8 @@ public class JumpQuestProgression extends MovementQuestProgression<JumpQuestProg
      */
     private transient boolean wasJumping;
 
+    protected JumpQuestProgression() {}
+
     @Override
     public JumpQuestAsset getAsset() {
         return (JumpQuestAsset) super.getAsset();

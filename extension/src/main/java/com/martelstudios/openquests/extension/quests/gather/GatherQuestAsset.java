@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.quests.gather;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
@@ -19,8 +18,8 @@ public class GatherQuestAsset extends QuantityQuestAsset {
     private GatherQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new GatherQuestProgression().setAssetId(getId());
+    public GatherQuestProgression.Builder builder() {
+        return new GatherQuestProgression.Builder(this);
     }
 
     public QuestItemFilter getItemToGather() {

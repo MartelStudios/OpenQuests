@@ -31,14 +31,14 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     /**
      * How far the quest went.
      */
-    protected int quantity;
+    private int quantity;
 
     /**
      * Overrides the asset's target for this instance alone. Boxed so that "not overridden" is a
      * state of its own, and so the codec leaves it out entirely.
      */
     @Nullable
-    protected Integer targetQuantity;
+    private Integer targetQuantity;
 
     @Override
     public QuantityQuestAsset getAsset() {
@@ -57,7 +57,7 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
      * again below it, which only a quest kept running by {@code StopOnComplete: false} can be.
      */
     protected void settle() {
-        setState(checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS);
+        new SetState(checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS).applyTo(this);
     }
 
     /**
@@ -106,9 +106,44 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
         return targetQuantity != null ? targetQuantity : getAsset().getTargetQuantity();
     }
 
-    public Q setTargetQuantity(@Nullable Integer targetQuantity) {
-        this.targetQuantity = targetQuantity;
-        return self();
+    /**
+     * Sets up a counted quest, whose target can be overridden for that quest alone.
+     */
+    public abstract static class Builder<Q extends QuantityQuestProgression<Q>, B extends Builder<Q, B>> extends AbstractQuestProgression.Builder<Q, B> {
+
+        protected Builder(@Nonnull Q quest, @Nonnull String assetId) {
+            super(quest, assetId);
+        }
+
+        /**
+         * Overrides the asset's target for this quest alone.
+         */
+        public B targetQuantity(@Nullable Integer targetQuantity) {
+            ((QuantityQuestProgression<?>) quest()).targetQuantity = targetQuantity;
+            return self();
+        }
+
+        @Override
+        protected void validate(@Nonnull Q quest) {
+            super.validate(quest);
+
+            Integer target = ((QuantityQuestProgression<?>) quest).targetQuantity;
+            if (target != null && target < 1) throw new IllegalStateException("A target quantity of " + target + " leaves nothing to count");
+        }
+
+        /**
+         * @return a builder for a counted type with nothing of its own to override.
+         */
+        @Nonnull
+        public static <Q extends QuantityQuestProgression<Q>> Builder<Q, ?> of(@Nonnull Q quest, @Nonnull String assetId) {
+            return new PlainBuilder<>(quest, assetId);
+        }
+    }
+
+    private static final class PlainBuilder<Q extends QuantityQuestProgression<Q>> extends Builder<Q, PlainBuilder<Q>> {
+        private PlainBuilder(@Nonnull Q quest, @Nonnull String assetId) {
+            super(quest, assetId);
+        }
     }
 
     /**

@@ -25,8 +25,12 @@ class ExchangeCountersTest {
             public boolean isStopOnComplete() {
                 return true;
             }
+
+            @Override
+            public int getTargetQuantity() {
+                return 10;
+            }
         };
-        quest.setTargetQuantity(10);
 
         assertTrue(quest.getReplica().replay(new ItemExchangeQuestProgression.Exchange(UUID.randomUUID(), ItemExchange.GROUND_PICKUP, 3)));
         assertEquals(3, quest.getCurrentQuantity());
@@ -75,26 +79,30 @@ class ExchangeCountersTest {
     @Test
     void aThrowOutlivesTheSessionItWasMadeIn() {
         UUID player = UUID.randomUUID();
-        PickupItemQuestProgression quest = new PickupItemQuestProgression();
-        quest.counters.recordThrow(player, 5);
+        PickupItemQuestProgression quest = new PickupItemQuestProgression() {};
+        counters(quest).recordThrow(player, 5);
 
         String saved = CodecJson.encode(PickupItemQuestProgression.CODEC, quest);
         PickupItemQuestProgression loaded = CodecJson.decode(PickupItemQuestProgression.CODEC, saved, "quest");
 
         assertNotNull(loaded);
-        assertEquals(0, loaded.counters.recordGroundPickup(player, 5));
+        assertEquals(0, counters(loaded).recordGroundPickup(player, 5));
     }
 
     @Test
     void spentCountsAreLeftOutOfTheSave() {
         UUID player = UUID.randomUUID();
-        PickupItemQuestProgression quest = new PickupItemQuestProgression();
-        quest.counters.recordThrow(player, 5);
-        quest.counters.recordGroundPickup(player, 5);
-        quest.counters.recordThrow(player, 5);
-        quest.counters.recordGroundPickup(player, 5);
-        quest.counters.recordThrow(player, 5);
+        PickupItemQuestProgression quest = new PickupItemQuestProgression() {};
+        counters(quest).recordThrow(player, 5);
+        counters(quest).recordGroundPickup(player, 5);
+        counters(quest).recordThrow(player, 5);
+        counters(quest).recordGroundPickup(player, 5);
+        counters(quest).recordThrow(player, 5);
 
         assertFalse(CodecJson.encode(PickupItemQuestProgression.CODEC, quest).contains("Recovered"));
+    }
+
+    private static ExchangeCounters counters(ItemExchangeQuestProgression<?> quest) {
+        return quest.counters;
     }
 }

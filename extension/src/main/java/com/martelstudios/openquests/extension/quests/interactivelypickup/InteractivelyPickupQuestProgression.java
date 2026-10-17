@@ -19,7 +19,7 @@ public class InteractivelyPickupQuestProgression extends QuantityQuestProgressio
                                                                                               .build();
 
     @Nullable
-    protected QuestItemFilter itemToPickup;
+    private QuestItemFilter itemToPickup;
 
     @Override
     public InteractivelyPickupQuestAsset getAsset() {
@@ -34,17 +34,31 @@ public class InteractivelyPickupQuestProgression extends QuantityQuestProgressio
         return itemToPickup != null ? itemToPickup : getAsset().getItemToPickup();
     }
 
-    public InteractivelyPickupQuestProgression setItemToPickup(@Nullable QuestItemFilter itemToPickup) {
-        this.itemToPickup = itemToPickup;
-        return this;
+    protected InteractivelyPickupQuestProgression() {}
+
+    /**
+     * Sets up an interactive pickup quest, whose item can be overridden for that quest alone.
+     */
+    public static final class Builder extends QuantityQuestProgression.Builder<InteractivelyPickupQuestProgression, Builder> {
+        Builder(@Nonnull InteractivelyPickupQuestAsset asset) {
+            super(new InteractivelyPickupQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's item for this quest alone.
+         */
+        public Builder itemToPickup(@Nullable QuestItemFilter itemToPickup) {
+            quest().itemToPickup = itemToPickup;
+            return this;
+        }
     }
 
     @Nonnull
     @Override
     public Message getDefaultTitle() {
         var asset = getAsset();
-        if (asset == null || asset.getItemToPickup() == null) return super.getDefaultTitle();
+        if (asset == null || getItemToPickup() == null) return super.getDefaultTitle();
 
-        return countedTitle("openquests.quest.default.pickup", asset.getItemToPickup());
+        return countedTitle("openquests.quest.default.pickup", getItemToPickup());
     }
 }

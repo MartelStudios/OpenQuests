@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.extension.quests.block.BlockAction;
 import com.martelstudios.openquests.extension.quests.block.BlockActionQuestProgression;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,7 +21,7 @@ public class PlaceBlockQuestProgression extends BlockActionQuestProgression<Plac
      * Overrides the asset's block for this instance alone.
      */
     @Nullable
-    protected QuestItemFilter blockToPlace;
+    private QuestItemFilter blockToPlace;
 
     @Override
     public PlaceBlockQuestAsset getAsset() {
@@ -35,12 +36,23 @@ public class PlaceBlockQuestProgression extends BlockActionQuestProgression<Plac
         return blockToPlace != null ? blockToPlace : getAsset().getBlockToPlace();
     }
 
+    protected PlaceBlockQuestProgression() {}
+
     /**
-     * Overrides the asset's block for this instance only.
+     * Sets up a place quest, whose block can be overridden for that quest alone.
      */
-    public PlaceBlockQuestProgression setBlockToPlace(@Nullable QuestItemFilter blockToPlace) {
-        this.blockToPlace = blockToPlace;
-        return this;
+    public static final class Builder extends QuantityQuestProgression.Builder<PlaceBlockQuestProgression, Builder> {
+        Builder(@Nonnull PlaceBlockQuestAsset asset) {
+            super(new PlaceBlockQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's block for this quest alone.
+         */
+        public Builder blockToPlace(@Nullable QuestItemFilter blockToPlace) {
+            quest().blockToPlace = blockToPlace;
+            return this;
+        }
     }
 
     @Nonnull

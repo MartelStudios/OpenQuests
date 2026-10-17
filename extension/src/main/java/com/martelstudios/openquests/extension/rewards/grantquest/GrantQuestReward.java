@@ -137,9 +137,6 @@ public class GrantQuestReward extends QuestReward {
      */
     @Nonnull
     private static AbstractQuestProgression<?> createFrom(@Nonnull OpenQuestAsset asset, @Nonnull UUID sourceQuestId, @Nullable AbstractQuestProgression<?> head) {
-        AbstractQuestProgression<?> quest = asset.create();
-        quest.setGrantedBy(sourceQuestId);
-        if (head != null) quest.setOrigin(head.getOrigin());
-        return quest;
+        return asset.builder().grantedBy(sourceQuestId).origin(head == null ? null : head.getOrigin()).build();
     }
 }

@@ -24,10 +24,12 @@ import com.martelstudios.openquests.core.visitors.QuestVisitor;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -91,50 +93,50 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     /**
      * Unique identity used to reference and persist this quest. Overwritten on load.
      */
-    protected UUID id = UUID.randomUUID();
+    private UUID id = UUID.randomUUID();
 
     /**
      * Ids of the players running the quest.
      */
-    protected Set<UUID> players = ConcurrentHashMap.newKeySet();
+    private Set<UUID> players = ConcurrentHashMap.newKeySet();
 
     /**
      * Ids of the players who gave it up, never also running it.
      */
-    protected Set<UUID> abandonedPlayers = ConcurrentHashMap.newKeySet();
+    private Set<UUID> abandonedPlayers = ConcurrentHashMap.newKeySet();
 
     /**
      * Who shares this quest beyond its players, written by the scope holding it. Data only: the
      * quest does nothing with it. {@code null} for a quest its players hold on their own.
      */
     @Nullable
-    protected QuestScope scope;
+    private QuestScope scope;
 
     /**
      * Which assignment handed this quest out and on which occasion, carried down a chain.
      * {@code null} for a quest no assignment handed out.
      */
     @Nullable
-    protected QuestOrigin origin;
+    private QuestOrigin origin;
 
     /**
      * The quest whose completion handed this one over, {@code null} for one nothing handed over.
      * Tells apart two runs of one chain, which share every asset.
      */
     @Nullable
-    protected UUID grantedBy;
+    private UUID grantedBy;
 
     /**
      * Tags written on this instance, on top of those its asset declares, each with the values its
      * asset counterpart would carry. What became of this one quest belongs here, since an asset is
      * shared by everyone holding it.
      */
-    protected Map<String, String[]> tags = new ConcurrentHashMap<>();
+    private Map<String, String[]> tags = new ConcurrentHashMap<>();
 
     /**
      * The {@link OpenQuestAsset#getId()}
      */
-    protected String assetId;
+    private String assetId;
 
     /**
      * The composite this quest is a step of, {@code null} for a quest standing on its own. Only a
@@ -171,28 +173,28 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * its own, and so the codec leaves it out entirely.
      */
     @Nullable
-    protected Boolean persistHistory;
+    private Boolean persistHistory;
 
     /**
      * Overrides the asset on when this one run is worth listing, { null} while the asset
      * answers for it.
      */
     @Nullable
-    protected QuestVisibility visibility;
+    private QuestVisibility visibility;
 
     /**
      * Overrides the asset on whether this one run announces how it ended. Set on a step by the
      * chain that handed it out, the way {@code PersistHistory} is.
      */
     @Nullable
-    protected Boolean announceOutcome;
+    private Boolean announceOutcome;
 
     /**
      * When the player was handed this quest, written once as it enters the store. Null for a quest
      * registered before this was kept, which is a date nobody can invent after the fact.
      */
     @Nullable
-    protected Instant startedAt;
+    private Instant startedAt;
 
     /**
      * When it reached the outcome it now carries. Rewritten whenever that outcome changes, and
@@ -200,7 +202,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * false} can, and a date left standing would say it ended when it did not.
      */
     @Nullable
-    protected Instant completedAt;
+    private Instant completedAt;
 
     /**
      * Set when the runtime state changed; drives incremental disk saves. Not serialized.
@@ -237,11 +239,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return asset == null || asset.canBeAbandoned();
     }
 
-    public Q setPersistHistory(@Nullable Boolean persistHistory) {
-        this.persistHistory = persistHistory;
-        return self();
-    }
-
     /**
      * @return when this quest is worth putting in front of the player, its asset answering while
      * the quest says nothing itself.
@@ -252,11 +249,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
         OpenQuestAsset asset = getAsset();
         return asset == null ? QuestVisibility.ALWAYS : asset.getVisibility();
-    }
-
-    public Q setVisibility(@Nullable QuestVisibility visibility) {
-        this.visibility = visibility;
-        return self();
     }
 
     /**
@@ -291,11 +283,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return asset == null || asset.isAnnounceOutcome();
     }
 
-    public Q setAnnounceOutcome(@Nullable Boolean announceOutcome) {
-        this.announceOutcome = announceOutcome;
-        return self();
-    }
-
     /**
      * Has the visitor say what happened to the quest, then gives up a quest nobody runs any more.
      * A player's action is first put to the constraints of the asset, and leaves no trace if one
@@ -312,7 +299,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         visitor.progress(self());
 
         // If no player remains and some has abandoned set the quest as abandoned
-        if (!isCompleted() && players.isEmpty() && !abandonedPlayers.isEmpty()) apply(new QuestOperation.SetState(QuestState.ABANDONED));
+        if (!isCompleted() && players.isEmpty() && !abandonedPlayers.isEmpty()) apply(new AbstractQuestProgression.SetState(QuestState.ABANDONED));
 
         if (changeCount != before) announceUpdate();
     }
@@ -460,7 +447,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player already held this quest.
      */
     public boolean addPlayer(@Nonnull UUID playerId) {
-        if (!apply(new QuestOperation.Join(playerId))) return false;
+        if (!apply(new AbstractQuestProgression.Join(playerId))) return false;
 
         dispatch(QuestPlayerAddedEvent.class, playerId, new QuestPlayerAddedEvent(this, playerId));
 
@@ -472,7 +459,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player did not hold this quest.
      */
     public boolean removePlayer(@Nonnull UUID playerId) {
-        if (!apply(new QuestOperation.Leave(playerId))) return false;
+        if (!apply(new AbstractQuestProgression.Leave(playerId))) return false;
 
         dispatch(QuestPlayerRemovedEvent.class, playerId, new QuestPlayerRemovedEvent(this, playerId));
 
@@ -486,7 +473,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @return {@code false} if the player was not running this quest.
      */
     public boolean abandonPlayer(@Nonnull UUID playerId) {
-        if (!apply(new QuestOperation.Abandon(playerId))) return false;
+        if (!apply(new AbstractQuestProgression.Abandon(playerId))) return false;
 
         dispatch(QuestPlayerAbandonedEvent.class, playerId, new QuestPlayerAbandonedEvent(this, playerId));
 
@@ -550,14 +537,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Written by the scope holding the quest, never by the quest itself.
-     */
-    public Q setScope(@Nullable QuestScope scope) {
-        apply(new QuestOperation.SetScope(scope));
-        return self();
-    }
-
-    /**
      * @return which assignment handed this quest out and on which occasion, {@code null} for one
      * no assignment handed out.
      */
@@ -567,30 +546,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Written before the quest is registered, by the assignment handing it out or by a chain
-     * passing its own on.
-     */
-    public Q setOrigin(@Nullable QuestOrigin origin) {
-        this.origin = origin;
-        return self();
-    }
-
-    /**
      * @return the quest whose completion handed this one over, {@code null} for one nothing
      * handed over.
      */
     @Nullable
     public UUID getGrantedBy() {
         return grantedBy;
-    }
-
-    /**
-     * Written before the quest is registered, by whatever hands it over, so everything hearing of
-     * it already knows which completion opened it.
-     */
-    public Q setGrantedBy(@Nullable UUID grantedBy) {
-        this.grantedBy = grantedBy;
-        return self();
     }
 
     /**
@@ -627,11 +588,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     public String getAssetId() {
         return assetId;
-    }
-
-    public Q setAssetId(String assetId) {
-        this.assetId = assetId;
-        return self();
     }
 
     /**
@@ -703,35 +659,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Declares a tag carrying nothing.
-     *
-     * @return {@code false} if the quest already carried it.
+     * @return the tags written on this quest alone, without those of its asset, read only: writes
+     * are {@link PutTag} and {@link RemoveTag} operations.
      */
-    public boolean addTag(@Nonnull String tag) {
-        return addTag(tag, NO_TAG_VALUES);
-    }
-
-    /**
-     * Writes a tag and what it carries, replacing whatever the quest held under it.
-     *
-     * @return {@code false} if the quest already carried exactly that.
-     */
-    public boolean addTag(@Nonnull String tag, @Nonnull String... values) {
-        return apply(new QuestOperation.PutTag(tag, values));
-    }
-
-    /**
-     * @return {@code false} if the quest did not carry the tag.
-     */
-    public boolean removeTag(@Nonnull String tag) {
-        return apply(new QuestOperation.RemoveTag(tag));
-    }
-
-    /**
-     * @return the live, mutable tags written on this quest alone, without those of its asset.
-     */
+    @Nonnull
     public Map<String, String[]> getTags() {
-        return tags;
+        return Collections.unmodifiableMap(tags);
     }
 
     /**
@@ -749,12 +682,111 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Moves the quest to that state, one version later. Only from within a {@link QuestOperation},
-     * which every copy of the quest makes alike.
+     * Ends the quest on that state, or brings one kept running by {@code StopOnComplete: false}
+     * back. A quest that is over takes no more. An operation of a subtype settling the quest makes
+     * this one within its own.
      */
-    protected Q setState(@Nonnull QuestState state) {
-        stateVersion = stateVersion.with(state);
-        return self();
+    public record SetState(@Nonnull QuestState state) implements QuestOperation<AbstractQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
+            if (quest.isOver() || quest.getState() == state) return false;
+
+            quest.stateVersion = quest.stateVersion.with(state);
+            return true;
+        }
+    }
+
+    /**
+     * Hands the quest to a player, one who walked away from it included: they run it again.
+     */
+    public record Join(@Nonnull UUID playerId) implements QuestOperation<AbstractQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
+            if (!quest.players.add(playerId)) return false;
+
+            quest.abandonedPlayers.remove(playerId);
+            return true;
+        }
+    }
+
+    /**
+     * Takes a player off the quest without them giving it up, as a world left behind does.
+     */
+    public record Leave(@Nonnull UUID playerId) implements QuestOperation<AbstractQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
+            return quest.players.remove(playerId);
+        }
+    }
+
+    /**
+     * A player running the quest gives it up.
+     */
+    public record Abandon(@Nonnull UUID playerId) implements QuestOperation<AbstractQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
+            if (!quest.players.remove(playerId)) return false;
+
+            quest.abandonedPlayers.add(playerId);
+            return true;
+        }
+    }
+
+    /**
+     * Writes a tag and what it carries, replacing whatever the quest held under it.
+     */
+    public record PutTag(@Nonnull String tag, @Nonnull String[] values) implements QuestOperation<AbstractQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
+            return !Arrays.equals(quest.tags.put(tag, values), values);
+        }
+
+        /**
+         * Declares a tag carrying nothing.
+         */
+        public PutTag(@Nonnull String tag) {
+            this(tag, NO_TAG_VALUES);
+        }
+    }
+
+    public record RemoveTag(@Nonnull String tag) implements QuestOperation<AbstractQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
+            return quest.tags.remove(tag) != null;
+        }
+    }
+
+    /**
+     * Written by the scope holding the quest, never by the quest itself.
+     */
+    public record SetScope(@Nullable QuestScope scope) implements QuestOperation<AbstractQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
+            if (quest.scope == scope) return false;
+
+            quest.scope = scope;
+            return true;
+        }
+    }
+
+    /**
+     * The quest reached one more world of the scope holding it.
+     */
+    public record AddWorld(@Nonnull UUID worldId) implements QuestOperation<AbstractQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
+            return quest.scope != null && quest.scope.addWorld(worldId);
+        }
+    }
+
+    /**
+     * A world of the scope holding the quest closed.
+     */
+    public record RemoveWorld(@Nonnull UUID worldId) implements QuestOperation<AbstractQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
+            return quest.scope != null && quest.scope.removeWorld(worldId);
+        }
     }
 
     /**
@@ -825,6 +857,117 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         if (!dirty) return false;
         dirty = false;
         return true;
+    }
+
+    /**
+     * Sets a quest up before anyone holds it. What it is given here is its configuration, fixed
+     * once built: every later change is a {@link QuestOperation} made through {@link #apply}.
+     *
+     * @param <Q> the quest being built
+     * @param <B> the concrete builder, so that chained calls keep its own methods
+     */
+    public abstract static class Builder<Q extends AbstractQuestProgression<Q>, B extends Builder<Q, B>> {
+        @Nullable
+        private Q quest;
+
+        protected Builder(@Nonnull Q quest, @Nonnull String assetId) {
+            ((AbstractQuestProgression<?>) quest).assetId = Objects.requireNonNull(assetId, "assetId");
+            this.quest = quest;
+        }
+
+        /**
+         * @return the quest under construction, for a subtype's builder to configure.
+         * @throws IllegalStateException once the quest is built and handed over
+         */
+        @Nonnull
+        protected Q quest() {
+            if (quest == null) throw new IllegalStateException("This builder already handed its quest over");
+            return quest;
+        }
+
+        /**
+         * Overrides the asset on whether completing this quest is recorded in its players history.
+         */
+        public B persistHistory(@Nullable Boolean persistHistory) {
+            base().persistHistory = persistHistory;
+            return self();
+        }
+
+        /**
+         * Overrides the asset on when this quest is worth listing.
+         */
+        public B visibility(@Nullable QuestVisibility visibility) {
+            base().visibility = visibility;
+            return self();
+        }
+
+        /**
+         * Overrides the asset on whether this quest announces how it ended.
+         */
+        public B announceOutcome(@Nullable Boolean announceOutcome) {
+            base().announceOutcome = announceOutcome;
+            return self();
+        }
+
+        /**
+         * The assignment and occasion handing this quest out, carried down a chain.
+         */
+        public B origin(@Nullable QuestOrigin origin) {
+            base().origin = origin;
+            return self();
+        }
+
+        /**
+         * The quest whose completion hands this one over.
+         */
+        public B grantedBy(@Nullable UUID grantedBy) {
+            base().grantedBy = grantedBy;
+            return self();
+        }
+
+        /**
+         * Hands the quest over, after which this builder refuses everything.
+         *
+         * @throws IllegalStateException for an override no quest could run with
+         */
+        @Nonnull
+        public Q build() {
+            Q built = quest();
+            validate(built);
+            quest = null;
+            return built;
+        }
+
+        /**
+         * Refuses an override no quest could run with, each subtype checking its own.
+         *
+         * @throws IllegalStateException naming what is wrong
+         */
+        protected void validate(@Nonnull Q quest) {}
+
+        @SuppressWarnings("unchecked")
+        protected B self() {
+            return (B) this;
+        }
+
+        @Nonnull
+        private AbstractQuestProgression<?> base() {
+            return quest();
+        }
+
+        /**
+         * @return a builder for a quest type with nothing of its own to override.
+         */
+        @Nonnull
+        public static <Q extends AbstractQuestProgression<Q>> Builder<Q, ?> of(@Nonnull Q quest, @Nonnull String assetId) {
+            return new PlainBuilder<>(quest, assetId);
+        }
+    }
+
+    private static final class PlainBuilder<Q extends AbstractQuestProgression<Q>> extends Builder<Q, PlainBuilder<Q>> {
+        private PlainBuilder(@Nonnull Q quest, @Nonnull String assetId) {
+            super(quest, assetId);
+        }
     }
 
     /**

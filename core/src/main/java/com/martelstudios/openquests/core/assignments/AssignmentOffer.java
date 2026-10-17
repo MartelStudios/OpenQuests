@@ -72,8 +72,7 @@ public final class AssignmentOffer {
         // Read before the new quest is out, which would otherwise count as part of the line
         List<UUID> replaced = decision == AssignmentRepeat.Decision.REPLACE ? history.getRunningLine() : List.of();
 
-        AbstractQuestProgression<?> quest = asset.create();
-        quest.setOrigin(new QuestOrigin(assignmentId, questAssetId, occasion));
+        AbstractQuestProgression<?> quest = asset.builder().origin(new QuestOrigin(assignmentId, questAssetId, occasion)).build();
 
         if (!holder.handOut(quest, assignmentId, questAssetId, record, AssignmentRecord.next(record, occasion, Instant.now()))) return null;
 

@@ -48,13 +48,13 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * that cannot say otherwise saves everyone reading it from wondering what two sets holding the
      * same id would have meant.
      */
-    protected Map<UUID, QuestState> childOutcomes = new ConcurrentHashMap<>();
+    private Map<UUID, QuestState> childOutcomes = new ConcurrentHashMap<>();
 
     /**
      * The state version of each child when last heard of, so that news of a child, which may come
      * late or twice, is only ever taken over older news.
      */
-    protected Map<UUID, Integer> childVersions = new ConcurrentHashMap<>();
+    private Map<UUID, Integer> childVersions = new ConcurrentHashMap<>();
 
     private final transient List<EventRegistration<UUID, QuestStateChangedEvent>> childListeners = new ArrayList<>();
 
@@ -80,8 +80,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
         for (String assetId : getAsset().getAssetIds()) {
             OpenQuestAsset childAsset = OpenQuestAsset.getAsset(assetId);
 
-            AbstractQuestProgression<?> child = childAsset.create();
-            if (!getAsset().isPersistChildrenHistory()) child.setPersistHistory(false);
+            AbstractQuestProgression<?> child = childAsset.builder().persistHistory(getAsset().isPersistChildrenHistory() ? null : false).build();
             adopt(child);
 
             QuestProgressionService.get().registerQuest(child);
@@ -227,10 +226,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
                          : QuestState.IN_PROGRESS;
             };
 
-            if (target == quest.getState()) return false;
-
-            quest.setState(target);
-            return true;
+            return new SetState(target).applyTo(quest);
         }
     }
 
@@ -293,6 +289,8 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * What was heard of one child: how it stood, at which state version.
      */
     public record Heard(@Nonnull UUID childId, @Nonnull QuestStateVersion stateVersion) {}
+
+    protected CompositeQuestProgression() {}
 
     @Override
     public CompositeQuestAsset getAsset() {

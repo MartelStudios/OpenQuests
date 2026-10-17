@@ -3,7 +3,6 @@ package com.martelstudios.openquests.extension.quests.enterworld;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.utils.WorldNamePattern;
 
@@ -24,8 +23,8 @@ public class EnterWorldQuestAsset extends OpenQuestAsset {
     private EnterWorldQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new EnterWorldQuestProgression().setAssetId(getId());
+    public EnterWorldQuestProgression.Builder builder() {
+        return new EnterWorldQuestProgression.Builder(this);
     }
 
     public WorldNamePattern getWorldNamePattern() {

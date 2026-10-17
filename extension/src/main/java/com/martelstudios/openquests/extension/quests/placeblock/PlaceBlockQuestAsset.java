@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.quests.placeblock;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.block.BlockActionQuestAsset;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 
@@ -22,8 +21,8 @@ public class PlaceBlockQuestAsset extends BlockActionQuestAsset {
     private PlaceBlockQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new PlaceBlockQuestProgression().setAssetId(getId());
+    public PlaceBlockQuestProgression.Builder builder() {
+        return new PlaceBlockQuestProgression.Builder(this);
     }
 
     /**

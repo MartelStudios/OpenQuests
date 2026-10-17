@@ -3,7 +3,6 @@ package com.martelstudios.openquests.extension.quests.kill.player;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
 import javax.annotation.Nullable;
@@ -26,8 +25,8 @@ public class KillPlayerQuestAsset extends QuantityQuestAsset {
     private KillPlayerQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new KillPlayerQuestProgression().setAssetId(getId());
+    public KillPlayerQuestProgression.Builder builder() {
+        return new KillPlayerQuestProgression.Builder(this);
     }
 
     /**

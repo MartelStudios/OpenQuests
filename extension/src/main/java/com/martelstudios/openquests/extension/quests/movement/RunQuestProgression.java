@@ -12,6 +12,8 @@ public class RunQuestProgression extends TravelQuestProgression<RunQuestProgress
         BuilderCodec.builder(RunQuestProgression.class, RunQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                     .build();
 
+    protected RunQuestProgression() {}
+
     @Override
     public RunQuestAsset getAsset() {
         return (RunQuestAsset) super.getAsset();

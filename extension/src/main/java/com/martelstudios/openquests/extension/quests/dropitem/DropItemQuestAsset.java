@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.quests.dropitem;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.item.ItemExchangeQuestAsset;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 
@@ -22,8 +21,8 @@ public class DropItemQuestAsset extends ItemExchangeQuestAsset {
     private DropItemQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new DropItemQuestProgression().setAssetId(getId());
+    public DropItemQuestProgression.Builder builder() {
+        return new DropItemQuestProgression.Builder(this);
     }
 
     /**

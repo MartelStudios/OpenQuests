@@ -4,7 +4,6 @@ import com.hypixel.hytale.builtin.tagset.config.NPCGroup;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
 /**
@@ -24,8 +23,8 @@ public class KillNpcQuestAsset extends QuantityQuestAsset {
     private KillNpcQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new KillNpcQuestProgression().setAssetId(getId());
+    public KillNpcQuestProgression.Builder builder() {
+        return new KillNpcQuestProgression.Builder(this);
     }
 
     public String getNpcGroupId() {

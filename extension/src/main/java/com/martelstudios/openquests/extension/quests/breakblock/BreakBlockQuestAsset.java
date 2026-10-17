@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.quests.breakblock;
 
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.extension.quests.block.BlockActionQuestAsset;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 
@@ -22,8 +21,8 @@ public class BreakBlockQuestAsset extends BlockActionQuestAsset {
     private BreakBlockQuestAsset() {}
 
     @Override
-    public AbstractQuestProgression<?> create() {
-        return new BreakBlockQuestProgression().setAssetId(getId());
+    public BreakBlockQuestProgression.Builder builder() {
+        return new BreakBlockQuestProgression.Builder(this);
     }
 
     /**

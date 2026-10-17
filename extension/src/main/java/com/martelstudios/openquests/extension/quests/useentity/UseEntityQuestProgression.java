@@ -22,7 +22,7 @@ public class UseEntityQuestProgression extends QuantityQuestProgression<UseEntit
      * Overrides the asset's group for this instance alone.
      */
     @Nullable
-    protected String npcGroupId;
+    private String npcGroupId;
 
     @Override
     public UseEntityQuestAsset getAsset() {
@@ -37,9 +37,30 @@ public class UseEntityQuestProgression extends QuantityQuestProgression<UseEntit
         return npcGroupId != null ? npcGroupId : getAsset().getNpcGroupId();
     }
 
-    public UseEntityQuestProgression setNpcGroupId(@Nullable String npcGroupId) {
-        this.npcGroupId = npcGroupId;
-        return this;
+    protected UseEntityQuestProgression() {}
+
+    /**
+     * Sets up a use entity quest, whose NPC group can be overridden for that quest alone.
+     */
+    public static final class Builder extends QuantityQuestProgression.Builder<UseEntityQuestProgression, Builder> {
+        Builder(@Nonnull UseEntityQuestAsset asset) {
+            super(new UseEntityQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's NPC group for this quest alone.
+         */
+        public Builder npcGroupId(@Nullable String npcGroupId) {
+            quest().npcGroupId = npcGroupId;
+            return this;
+        }
+
+        @Override
+        protected void validate(@Nonnull UseEntityQuestProgression quest) {
+            super.validate(quest);
+
+            if (quest.npcGroupId != null && NPCGroup.getAssetMap().getIndex(quest.npcGroupId) < 0) throw new IllegalStateException("No NPC group '" + quest.npcGroupId + "'");
+        }
     }
 
     /**

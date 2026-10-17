@@ -14,6 +14,8 @@ public class ReachLocationQuestProgression extends AbstractQuestProgression<Reac
     public static final BuilderCodec<ReachLocationQuestProgression> CODEC = BuilderCodec.builder(ReachLocationQuestProgression.class, ReachLocationQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
                                                                                         .build();
 
+    protected ReachLocationQuestProgression() {}
+
     @Override
     public ReachLocationQuestAsset getAsset() {
         return (ReachLocationQuestAsset) super.getAsset();

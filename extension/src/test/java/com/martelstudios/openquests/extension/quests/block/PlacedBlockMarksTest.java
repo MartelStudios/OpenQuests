@@ -73,14 +73,18 @@ class PlacedBlockMarksTest {
     @Test
     void recoveriesOutliveTheSessionTheyWereMadeIn() {
         UUID player = UUID.randomUUID();
-        PlaceBlockQuestProgression quest = new PlaceBlockQuestProgression();
-        quest.recoveries.record(player);
-        quest.recoveries.record(player);
+        PlaceBlockQuestProgression quest = new PlaceBlockQuestProgression() {};
+        recoveries(quest).record(player);
+        recoveries(quest).record(player);
 
         String saved = CodecJson.encode(PlaceBlockQuestProgression.CODEC, quest);
         PlaceBlockQuestProgression loaded = CodecJson.decode(PlaceBlockQuestProgression.CODEC, saved, "quest");
 
         assertNotNull(loaded);
-        assertEquals(2, loaded.recoveries.recovered.get(player.toString()));
+        assertEquals(2, recoveries(loaded).recovered.get(player.toString()));
+    }
+
+    private static BlockRecoveries recoveries(BlockActionQuestProgression<?> quest) {
+        return quest.recoveries;
     }
 }

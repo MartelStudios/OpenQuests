@@ -20,7 +20,7 @@ public class CraftQuestProgression extends QuantityQuestProgression<CraftQuestPr
      * Overrides the asset's item for this instance alone.
      */
     @Nullable
-    protected QuestItemFilter itemToCraft;
+    private QuestItemFilter itemToCraft;
 
     @Override
     public CraftQuestAsset getAsset() {
@@ -35,17 +35,31 @@ public class CraftQuestProgression extends QuantityQuestProgression<CraftQuestPr
         return itemToCraft != null ? itemToCraft : getAsset().getItemToCraft();
     }
 
-    public CraftQuestProgression setItemToCraft(@Nullable QuestItemFilter itemToCraft) {
-        this.itemToCraft = itemToCraft;
-        return this;
+    protected CraftQuestProgression() {}
+
+    /**
+     * Sets up a craft quest, whose item can be overridden for that quest alone.
+     */
+    public static final class Builder extends QuantityQuestProgression.Builder<CraftQuestProgression, Builder> {
+        Builder(@Nonnull CraftQuestAsset asset) {
+            super(new CraftQuestProgression(), asset.getId());
+        }
+
+        /**
+         * Overrides the asset's item for this quest alone.
+         */
+        public Builder itemToCraft(@Nullable QuestItemFilter itemToCraft) {
+            quest().itemToCraft = itemToCraft;
+            return this;
+        }
     }
 
     @Nonnull
     @Override
     public Message getDefaultTitle() {
         var asset = getAsset();
-        if (asset == null || asset.getItemToCraft() == null) return super.getDefaultTitle();
+        if (asset == null || getItemToCraft() == null) return super.getDefaultTitle();
 
-        return countedTitle("openquests.quest.default.craft", asset.getItemToCraft());
+        return countedTitle("openquests.quest.default.craft", getItemToCraft());
     }
 }
