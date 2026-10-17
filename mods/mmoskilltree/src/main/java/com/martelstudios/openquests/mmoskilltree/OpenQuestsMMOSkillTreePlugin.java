@@ -3,8 +3,7 @@ package com.martelstudios.openquests.mmoskilltree;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.openquests.mmoskilltree.quests.reachlevel.ReachLevelFeature;
-import com.martelstudios.openquests.mmoskilltree.rewards.currency.CurrencyRewardFeature;
-import com.martelstudios.openquests.mmoskilltree.rewards.reputation.ReputationRewardFeature;
+import com.martelstudios.openquests.mmoskilltree.rewards.kind.KindRewardFeature;
 import com.martelstudios.openquests.mmoskilltree.rewards.xp.XpRewardFeature;
 
 import javax.annotation.Nonnull;
@@ -28,8 +27,7 @@ public class OpenQuestsMMOSkillTreePlugin extends JavaPlugin {
 
         // Rewards
         XpRewardFeature.register(this);
-        CurrencyRewardFeature.register(this);
-        ReputationRewardFeature.register(this);
+        KindRewardFeature.register(this);
     }
 
     @Override

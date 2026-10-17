@@ -7,7 +7,6 @@ import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.ziggfreed.mmoskilltree.api.MMOSkillTreeAPI;
-import com.ziggfreed.mmoskilltree.data.SkillComponent;
 import com.ziggfreed.mmoskilltree.skill.SkillService;
 
 import javax.annotation.Nonnull;
@@ -54,7 +53,7 @@ public class LevelReward extends QuestReward {
         if (skills == null) return false;
 
         String skillId = skill.toUpperCase(Locale.ROOT);
-        long target = SkillComponent.getXpForLevel(skills.getLevelByName(skillId) + levels);
+        long target = MMOSkillTreeAPI.getXpRequiredForLevel(skills.getLevelByName(skillId) + levels);
 
         for (int i = 0; i < MAX_AWARDS; i++) {
             long missing = target - skills.getXpByName(skillId);
