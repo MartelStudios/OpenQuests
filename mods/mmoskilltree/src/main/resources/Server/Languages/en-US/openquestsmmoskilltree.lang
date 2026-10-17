@@ -1,2 +1,9 @@
 quest.default.reach-level = Reach level {quantity, number} in {skill}
 reward.level = {skill} {levels, plural, one {level} other {levels}}
+quest.default.gain-xp = Gain {quantity, number} {skill} XP
+quest.default.gain-xp-any = Gain {quantity, number} XP
+quest.default.ability-cast = Use {ability} {quantity, plural, one {once} other {# times}}
+quest.default.ability-cast-skill = Use {skill} abilities {quantity, plural, one {once} other {# times}}
+quest.default.ability-cast-any = Use abilities {quantity, plural, one {once} other {# times}}
+quest.default.complete-bounty = Complete {quantity, plural, one {a bounty} other {# bounties}} from {board}
+quest.default.complete-bounty-any = Complete {quantity, plural, one {a bounty} other {# bounties}}

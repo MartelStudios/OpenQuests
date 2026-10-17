@@ -2,6 +2,7 @@ package com.martelstudios.openquests.mmoskilltree;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.martelstudios.openquests.mmoskilltree.quests.moment.MomentFeature;
 import com.martelstudios.openquests.mmoskilltree.quests.reachlevel.ReachLevelFeature;
 import com.martelstudios.openquests.mmoskilltree.rewards.kind.KindRewardFeature;
 import com.martelstudios.openquests.mmoskilltree.rewards.xp.XpRewardFeature;
@@ -22,10 +23,11 @@ public class OpenQuestsMMOSkillTreePlugin extends JavaPlugin {
     protected void setup() {
         super.setup();
 
-        SkillDataSets.register(this);
+        DataSets.register(this);
 
         // Quests
         ReachLevelFeature.register(this);
+        MomentFeature.register(this);
 
         // Rewards
         XpRewardFeature.register(this);
@@ -35,6 +37,7 @@ public class OpenQuestsMMOSkillTreePlugin extends JavaPlugin {
     @Override
     protected void shutdown() {
         ReachLevelFeature.unregister();
+        MomentFeature.unregister();
 
         super.shutdown();
     }

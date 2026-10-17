@@ -4,7 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.openquests.mmoskilltree.SkillDataSets;
+import com.martelstudios.openquests.mmoskilltree.DataSets;
 import com.ziggfreed.common.loot.reward.RewardSpec;
 
 import javax.annotation.Nonnull;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class MMOSkillTreeBoostTokenReward extends KindReward {
     public static final BuilderCodec<MMOSkillTreeBoostTokenReward> CODEC = BuilderCodec.builder(MMOSkillTreeBoostTokenReward.class, MMOSkillTreeBoostTokenReward::new, KindReward.BASE_CODEC)
                                                                            .append(new KeyedCodec<>("Skill", Codec.STRING), (reward, skill) -> reward.skill = skill, reward -> reward.skill)
-                                                                           .metadata(SkillDataSets.SKILL_POOL_DROPDOWN)
+                                                                           .metadata(DataSets.SKILL_POOL_DROPDOWN)
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Multiplier", Codec.DOUBLE, true), (reward, multiplier) -> reward.multiplier = multiplier, reward -> Double.valueOf(reward.multiplier))
                                                                            .addValidator(Validators.greaterThan(1.0))

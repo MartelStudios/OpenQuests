@@ -1,0 +1,7 @@
+{
+  "Type": "MMOSkillTreeAbilityCast",
+  "TargetQuantity": 10,
+  "SuccessfulRewards": [
+    { "Type": "MMOSkillTreeBoostToken", "Multiplier": 1.5, "DurationMinutes": 15, "AutoClaim": true }
+  ]
+}

@@ -5,7 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
-import com.martelstudios.openquests.mmoskilltree.SkillDataSets;
+import com.martelstudios.openquests.mmoskilltree.DataSets;
 
 /**
  * Reach a level in an MMO Skill Tree skill. {@code TargetQuantity} is the level, so the counter
@@ -17,7 +17,7 @@ public class MMOSkillTreeReachLevelQuestAsset extends QuantityQuestAsset {
         BuilderCodec.builder(MMOSkillTreeReachLevelQuestAsset.class, MMOSkillTreeReachLevelQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("Skill", Codec.STRING, true), (asset, skill) -> asset.skill = skill, asset -> asset.skill)
                     .addValidator(Validators.nonNull())
-                    .metadata(SkillDataSets.SKILL_DROPDOWN)
+                    .metadata(DataSets.SKILL_DROPDOWN)
                     .add()
                     .build();
 

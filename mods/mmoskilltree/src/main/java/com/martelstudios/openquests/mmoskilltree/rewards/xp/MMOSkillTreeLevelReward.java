@@ -4,7 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.openquests.mmoskilltree.SkillDataSets;
+import com.martelstudios.openquests.mmoskilltree.DataSets;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.ziggfreed.mmoskilltree.api.MMOSkillTreeAPI;
@@ -22,7 +22,7 @@ public class MMOSkillTreeLevelReward extends QuestReward {
     public static final BuilderCodec<MMOSkillTreeLevelReward> CODEC = BuilderCodec.builder(MMOSkillTreeLevelReward.class, MMOSkillTreeLevelReward::new, QuestReward.BASE_CODEC)
                                                                       .append(new KeyedCodec<>("Skill", Codec.STRING, true), (reward, skill) -> reward.skill = skill, reward -> reward.skill)
                                                                       .addValidator(Validators.nonNull())
-                                                                      .metadata(SkillDataSets.SKILL_DROPDOWN)
+                                                                      .metadata(DataSets.SKILL_DROPDOWN)
                                                                       .add()
                                                                       .append(new KeyedCodec<>("Levels", Codec.INTEGER), (reward, levels) -> reward.levels = levels, reward -> Integer.valueOf(reward.levels))
                                                                       .addValidator(Validators.greaterThan(0))

@@ -4,7 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.openquests.mmoskilltree.SkillDataSets;
+import com.martelstudios.openquests.mmoskilltree.DataSets;
 import com.ziggfreed.common.loot.reward.RewardSpec;
 
 import javax.annotation.Nonnull;
@@ -23,7 +23,7 @@ public class MMOSkillTreeLampReward extends KindReward {
                                                                      .addValidator(Validators.greaterThan(0))
                                                                      .add()
                                                                      .append(new KeyedCodec<>("Skills", Codec.STRING), (reward, skills) -> reward.skills = skills, reward -> reward.skills)
-                                                                     .metadata(SkillDataSets.SKILL_POOL_DROPDOWN)
+                                                                     .metadata(DataSets.SKILL_POOL_DROPDOWN)
                                                                      .add()
                                                                      .build();
 

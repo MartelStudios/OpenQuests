@@ -1,2 +1,9 @@
 quest.default.reach-level = Atteignez le niveau {quantity, number} en {skill}
 reward.level = {levels, plural, one {Niveau} other {Niveaux}} de {skill}
+quest.default.gain-xp = Gagnez {quantity, number} XP de {skill}
+quest.default.gain-xp-any = Gagnez {quantity, number} XP
+quest.default.ability-cast = Utilisez {ability} {quantity, plural, one {une fois} other {# fois}}
+quest.default.ability-cast-skill = Utilisez des capacités de {skill} {quantity, plural, one {une fois} other {# fois}}
+quest.default.ability-cast-any = Utilisez des capacités {quantity, plural, one {une fois} other {# fois}}
+quest.default.complete-bounty = Terminez {quantity, plural, one {un contrat} other {# contrats}} de {board}
+quest.default.complete-bounty-any = Terminez {quantity, plural, one {un contrat} other {# contrats}}
