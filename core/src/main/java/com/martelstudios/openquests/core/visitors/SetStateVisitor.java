@@ -15,7 +15,7 @@ public class SetStateVisitor implements QuestVisitor<AbstractQuestProgression<?>
 
     @Override
     public void progress(AbstractQuestProgression<?> quest) {
-        quest.apply(new QuestOperation.SetState(state));
+        quest.apply(new AbstractQuestProgression.SetState(state));
     }
 
     @Override

@@ -28,13 +28,13 @@ public class QuestStateQuestProgression extends AbstractQuestProgression<QuestSt
      * Overrides the asset's watched quest for this instance alone.
      */
     @Nullable
-    protected String questAssetId;
+    private String questAssetId;
 
     /**
      * Overrides the asset's requirement for this instance alone.
      */
     @Nullable
-    protected QuestStateRequirement questStateRequirement;
+    private QuestStateRequirement questStateRequirement;
 
     @Override
     public QuestStateQuestAsset getAsset() {

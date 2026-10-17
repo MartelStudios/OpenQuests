@@ -31,14 +31,14 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     /**
      * How far the quest went.
      */
-    protected int quantity;
+    private int quantity;
 
     /**
      * Overrides the asset's target for this instance alone. Boxed so that "not overridden" is a
      * state of its own, and so the codec leaves it out entirely.
      */
     @Nullable
-    protected Integer targetQuantity;
+    private Integer targetQuantity;
 
     @Override
     public QuantityQuestAsset getAsset() {
@@ -57,7 +57,7 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
      * again below it, which only a quest kept running by {@code StopOnComplete: false} can be.
      */
     protected void settle() {
-        setState(checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS);
+        new SetState(checkCompletion() ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS).applyTo(this);
     }
 
     /**

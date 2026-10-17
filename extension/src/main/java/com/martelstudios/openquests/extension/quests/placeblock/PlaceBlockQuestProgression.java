@@ -21,7 +21,7 @@ public class PlaceBlockQuestProgression extends BlockActionQuestProgression<Plac
      * Overrides the asset's block for this instance alone.
      */
     @Nullable
-    protected QuestItemFilter blockToPlace;
+    private QuestItemFilter blockToPlace;
 
     @Override
     public PlaceBlockQuestAsset getAsset() {

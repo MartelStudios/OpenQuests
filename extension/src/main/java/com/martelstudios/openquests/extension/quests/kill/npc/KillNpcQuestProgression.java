@@ -22,7 +22,7 @@ public class KillNpcQuestProgression extends QuantityQuestProgression<KillNpcQue
      * Overrides the asset's group for this instance alone.
      */
     @Nullable
-    protected String npcGroupId;
+    private String npcGroupId;
 
     @Override
     public KillNpcQuestAsset getAsset() {

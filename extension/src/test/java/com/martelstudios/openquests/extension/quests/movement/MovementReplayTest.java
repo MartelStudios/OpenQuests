@@ -104,7 +104,7 @@ class MovementReplayTest {
         }
 
         void join(@Nonnull UUID playerId) {
-            apply(new QuestOperation.Join(playerId));
+            apply(new AbstractQuestProgression.Join(playerId));
         }
 
         @Override

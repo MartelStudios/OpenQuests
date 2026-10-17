@@ -20,7 +20,7 @@ public class ConsumeItemQuestProgression extends QuantityQuestProgression<Consum
      * Overrides the asset's item for this instance alone.
      */
     @Nullable
-    protected QuestItemFilter itemToConsume;
+    private QuestItemFilter itemToConsume;
 
     @Override
     public ConsumeItemQuestAsset getAsset() {

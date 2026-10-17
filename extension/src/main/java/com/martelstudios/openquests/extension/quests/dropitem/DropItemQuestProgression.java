@@ -19,7 +19,7 @@ public class DropItemQuestProgression extends ItemExchangeQuestProgression<DropI
                                                                               .build();
 
     @Nullable
-    protected QuestItemFilter itemToDrop;
+    private QuestItemFilter itemToDrop;
 
     @Override
     public DropItemQuestAsset getAsset() {

@@ -155,7 +155,7 @@ public class WorldQuestService {
         // Gone already when it left for good, and nothing then is left to write on
         AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
         UUID worldId = world.getWorldConfig().getUuid();
-        if (quest != null) quest.apply(new QuestOperation.RemoveWorld(worldId));
+        if (quest != null) quest.apply(new AbstractQuestProgression.RemoveWorld(worldId));
     }
 
     /**
@@ -178,7 +178,7 @@ public class WorldQuestService {
         if (scope == null) {
             quest.setScope(new WorldQuestScope(List.of(worldId)));
         } else {
-            quest.apply(new QuestOperation.AddWorld(worldId));
+            quest.apply(new AbstractQuestProgression.AddWorld(worldId));
         }
 
         for (PlayerRef playerRef : world.getPlayerRefs()) {

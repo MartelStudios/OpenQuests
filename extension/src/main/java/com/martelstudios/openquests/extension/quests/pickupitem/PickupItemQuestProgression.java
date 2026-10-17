@@ -19,7 +19,7 @@ public class PickupItemQuestProgression extends ItemExchangeQuestProgression<Pic
                                                                               .build();
 
     @Nullable
-    protected QuestItemFilter itemToPickup;
+    private QuestItemFilter itemToPickup;
 
     @Override
     public PickupItemQuestAsset getAsset() {

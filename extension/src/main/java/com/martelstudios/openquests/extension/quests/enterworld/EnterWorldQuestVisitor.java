@@ -1,6 +1,6 @@
 package com.martelstudios.openquests.extension.quests.enterworld;
 
-import com.martelstudios.openquests.core.models.QuestOperation;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
@@ -26,7 +26,7 @@ public class EnterWorldQuestVisitor implements QuestVisitor<EnterWorldQuestProgr
         if (quest.isOver()) return;
         if (!quest.matchesWorld(worldName)) return;
 
-        quest.apply(new QuestOperation.SetState(QuestState.SUCCESSFUL));
+        quest.apply(new AbstractQuestProgression.SetState(QuestState.SUCCESSFUL));
     }
 
     @Override

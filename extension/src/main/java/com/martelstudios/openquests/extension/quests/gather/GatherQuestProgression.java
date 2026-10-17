@@ -21,7 +21,7 @@ public class GatherQuestProgression extends QuantityQuestProgression<GatherQuest
                                                                                  .build();
 
     @Nullable
-    protected QuestItemFilter itemToGather;
+    private QuestItemFilter itemToGather;
 
     @Override
     public GatherQuestAsset getAsset() {

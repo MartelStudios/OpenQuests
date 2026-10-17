@@ -30,7 +30,7 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
      * Hands the quest to a player the way the quest would, without the event a test has no server for.
      */
     public TestQuestProgression join(UUID playerId) {
-        apply(new QuestOperation.Join(playerId));
+        apply(new AbstractQuestProgression.Join(playerId));
         return this;
     }
 
@@ -38,7 +38,7 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
      * Takes a player off the quest, the way a world left behind does.
      */
     public TestQuestProgression leave(UUID playerId) {
-        apply(new QuestOperation.Leave(playerId));
+        apply(new AbstractQuestProgression.Leave(playerId));
         return this;
     }
 
@@ -46,7 +46,7 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
      * Has a player give the quest up.
      */
     public TestQuestProgression giveUp(UUID playerId) {
-        apply(new QuestOperation.Abandon(playerId));
+        apply(new AbstractQuestProgression.Abandon(playerId));
         return this;
     }
 
@@ -54,7 +54,7 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
      * Ends the quest without telling anyone, there being no server in a test to tell.
      */
     public TestQuestProgression end(QuestState state) {
-        getReplica().replay(new QuestOperation.SetState(state));
+        getReplica().replay(new AbstractQuestProgression.SetState(state));
         return this;
     }
 
@@ -115,7 +115,7 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
             if (quest.isOver()) return false;
 
             quest.counter += delta;
-            if (quest.counter >= target) quest.setState(QuestState.SUCCESSFUL);
+            if (quest.counter >= target) new SetState(QuestState.SUCCESSFUL).applyTo(quest);
             return true;
         }
     }

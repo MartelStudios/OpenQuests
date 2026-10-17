@@ -23,7 +23,7 @@ public class EnterWorldQuestProgression extends AbstractQuestProgression<EnterWo
      * Overrides the asset's pattern for this instance alone.
      */
     @Nullable
-    protected WorldNamePattern worldNamePattern;
+    private WorldNamePattern worldNamePattern;
 
     @Override
     public EnterWorldQuestAsset getAsset() {

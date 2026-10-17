@@ -48,7 +48,7 @@ public class PlayerSetStateVisitor implements QuestVisitor<AbstractQuestProgress
                 }
             }
             default -> {
-                quest.apply(new QuestOperation.SetState(state));
+                quest.apply(new AbstractQuestProgression.SetState(state));
                 matched++;
             }
         }

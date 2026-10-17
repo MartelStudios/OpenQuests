@@ -19,7 +19,7 @@ public class UseBlockQuestProgression extends QuantityQuestProgression<UseBlockQ
      * Overrides the asset's block for this instance alone.
      */
     @Nullable
-    protected QuestItemFilter blockToUse;
+    private QuestItemFilter blockToUse;
 
     @Override
     public UseBlockQuestAsset getAsset() {

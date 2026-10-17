@@ -31,7 +31,7 @@ public abstract class ItemExchangeQuestProgression<Q extends ItemExchangeQuestPr
                                                                                             .add()
                                                                                             .build();
 
-    protected ExchangeCounters counters = new ExchangeCounters();
+    ExchangeCounters counters = new ExchangeCounters();
 
     /**
      * @return the items this quest counts.
@@ -82,10 +82,9 @@ public abstract class ItemExchangeQuestProgression<Q extends ItemExchangeQuestPr
         if (guarded && exchange == ItemExchange.THROW) fresh = counters.recordThrow(playerId, quantity);
         if (guarded && exchange == ItemExchange.GROUND_PICKUP) fresh = counters.recordGroundPickup(playerId, quantity);
 
-        int counted = counts(exchange) ? fresh : 0;
-        this.quantity += counted;
+        boolean counted = counts(exchange) && new Add(fresh).applyTo(this);
 
-        return counted > 0 || (guarded && exchange != ItemExchange.HARVEST);
+        return counted || (guarded && exchange != ItemExchange.HARVEST);
     }
 
     /**

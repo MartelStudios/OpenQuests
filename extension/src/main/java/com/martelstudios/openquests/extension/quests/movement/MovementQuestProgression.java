@@ -50,6 +50,6 @@ public abstract class MovementQuestProgression<Q extends MovementQuestProgressio
      */
     @Override
     protected void settle() {
-        if (checkCompletion()) setState(QuestState.SUCCESSFUL);
+        if (checkCompletion()) new SetState(QuestState.SUCCESSFUL).applyTo(this);
     }
 }

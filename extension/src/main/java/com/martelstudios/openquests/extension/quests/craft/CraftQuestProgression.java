@@ -20,7 +20,7 @@ public class CraftQuestProgression extends QuantityQuestProgression<CraftQuestPr
      * Overrides the asset's item for this instance alone.
      */
     @Nullable
-    protected QuestItemFilter itemToCraft;
+    private QuestItemFilter itemToCraft;
 
     @Override
     public CraftQuestAsset getAsset() {

@@ -21,7 +21,7 @@ public class BreakBlockQuestProgression extends BlockActionQuestProgression<Brea
      * Overrides the asset's block for this instance alone.
      */
     @Nullable
-    protected QuestItemFilter blockToBreak;
+    private QuestItemFilter blockToBreak;
 
     @Override
     public BreakBlockQuestAsset getAsset() {

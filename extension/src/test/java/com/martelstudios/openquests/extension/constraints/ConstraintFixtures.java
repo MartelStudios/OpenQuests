@@ -49,10 +49,21 @@ public final class ConstraintFixtures {
     }
 
     public static final class TestQuest extends AbstractQuestProgression<TestQuest> {
-        TestQuest() {}
+        @Nullable
+        private final transient Instant startedAt;
+
+        TestQuest() {
+            this(null);
+        }
 
         private TestQuest(@Nullable Instant startedAt) {
             this.startedAt = startedAt;
+        }
+
+        @Nullable
+        @Override
+        public Instant getStartedAt() {
+            return startedAt;
         }
     }
 

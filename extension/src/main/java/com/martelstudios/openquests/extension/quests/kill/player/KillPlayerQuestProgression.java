@@ -20,7 +20,7 @@ public class KillPlayerQuestProgression extends QuantityQuestProgression<KillPla
      * Overrides the asset's target for this instance alone.
      */
     @Nullable
-    protected String playerToKill;
+    private String playerToKill;
 
     @Override
     public KillPlayerQuestAsset getAsset() {

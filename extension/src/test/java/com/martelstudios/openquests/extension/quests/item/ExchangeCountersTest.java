@@ -80,25 +80,29 @@ class ExchangeCountersTest {
     void aThrowOutlivesTheSessionItWasMadeIn() {
         UUID player = UUID.randomUUID();
         PickupItemQuestProgression quest = new PickupItemQuestProgression() {};
-        quest.counters.recordThrow(player, 5);
+        counters(quest).recordThrow(player, 5);
 
         String saved = CodecJson.encode(PickupItemQuestProgression.CODEC, quest);
         PickupItemQuestProgression loaded = CodecJson.decode(PickupItemQuestProgression.CODEC, saved, "quest");
 
         assertNotNull(loaded);
-        assertEquals(0, loaded.counters.recordGroundPickup(player, 5));
+        assertEquals(0, counters(loaded).recordGroundPickup(player, 5));
     }
 
     @Test
     void spentCountsAreLeftOutOfTheSave() {
         UUID player = UUID.randomUUID();
         PickupItemQuestProgression quest = new PickupItemQuestProgression() {};
-        quest.counters.recordThrow(player, 5);
-        quest.counters.recordGroundPickup(player, 5);
-        quest.counters.recordThrow(player, 5);
-        quest.counters.recordGroundPickup(player, 5);
-        quest.counters.recordThrow(player, 5);
+        counters(quest).recordThrow(player, 5);
+        counters(quest).recordGroundPickup(player, 5);
+        counters(quest).recordThrow(player, 5);
+        counters(quest).recordGroundPickup(player, 5);
+        counters(quest).recordThrow(player, 5);
 
         assertFalse(CodecJson.encode(PickupItemQuestProgression.CODEC, quest).contains("Recovered"));
+    }
+
+    private static ExchangeCounters counters(ItemExchangeQuestProgression<?> quest) {
+        return quest.counters;
     }
 }

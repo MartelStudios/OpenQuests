@@ -19,7 +19,7 @@ public class InteractivelyPickupQuestProgression extends QuantityQuestProgressio
                                                                                               .build();
 
     @Nullable
-    protected QuestItemFilter itemToPickup;
+    private QuestItemFilter itemToPickup;
 
     @Override
     public InteractivelyPickupQuestAsset getAsset() {

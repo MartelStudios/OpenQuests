@@ -22,7 +22,7 @@ public class UseEntityQuestProgression extends QuantityQuestProgression<UseEntit
      * Overrides the asset's group for this instance alone.
      */
     @Nullable
-    protected String npcGroupId;
+    private String npcGroupId;
 
     @Override
     public UseEntityQuestAsset getAsset() {

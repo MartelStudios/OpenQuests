@@ -25,7 +25,7 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
                                                                                            .add()
                                                                                            .build();
 
-    protected BlockRecoveries recoveries = new BlockRecoveries();
+    BlockRecoveries recoveries = new BlockRecoveries();
 
     /**
      * @return the blocks this quest counts.
@@ -90,10 +90,7 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
             changed = true;
         }
 
-        if (fresh && counts(action)) {
-            quantity++;
-            changed = true;
-        }
+        if (fresh && counts(action) && new Add(1).applyTo(this)) changed = true;
 
         if (guarded && checkCompletion() && isStopOnComplete()) recoveries.clear();
 
