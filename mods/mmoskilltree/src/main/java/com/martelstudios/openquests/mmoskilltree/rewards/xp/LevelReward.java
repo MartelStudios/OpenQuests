@@ -28,9 +28,10 @@ public class LevelReward extends QuestReward {
                                                                       .build();
 
     /**
-     * How many times the XP is topped up at most, for a multiplier below one that keeps it short.
+     * The first award measures the multipliers, the second asks for what is missing divided by
+     * them, the third covers rounding.
      */
-    private static final int MAX_AWARDS = 5;
+    private static final int MAX_AWARDS = 3;
 
     protected String skill;
 
@@ -55,9 +56,17 @@ public class LevelReward extends QuestReward {
         String skillId = skill.toUpperCase(Locale.ROOT);
         long target = MMOSkillTreeAPI.getXpRequiredForLevel(skills.getLevelByName(skillId) + levels);
 
+        // What one award grants over what it asked: class, world, boost and rested XP multipliers
+        double ratio = 1;
         for (int i = 0; i < MAX_AWARDS; i++) {
             long missing = target - skills.getXpByName(skillId);
-            if (missing <= 0 || SkillService.awardXpByName(store, ref, skills, skillId, missing) <= 0) break;
+            if (missing <= 0) break;
+
+            long asked = (long) Math.ceil(missing / ratio);
+            long granted = SkillService.awardXpByName(store, ref, skills, skillId, asked);
+            if (granted <= 0) break;
+
+            ratio = (double) granted / asked;
         }
         return true;
     }
