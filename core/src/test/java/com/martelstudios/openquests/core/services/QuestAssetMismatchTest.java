@@ -1,4 +1,7 @@
-package com.martelstudios.openquests.core.models;
+package com.martelstudios.openquests.core.services;
+
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,12 +18,12 @@ class QuestAssetMismatchTest {
 
     @BeforeAll
     static void registerTheStepType() {
-        AbstractQuestProgression.registerAssetClass(StepQuest.class, GatherAsset.class);
+        QuestTypeRegistry.registerAssetClass(StepQuest.class, GatherAsset.class);
     }
 
     @Test
     void aQuestWhoseAssetIsGoneIsSetAside() {
-        String mismatch = AbstractQuestProgression.findAssetMismatch(StepQuest.class, "GatherMeat", null);
+        String mismatch = QuestTypeRegistry.findAssetMismatch(StepQuest.class, "GatherMeat", null);
 
         assertNotNull(mismatch);
         assertTrue(mismatch.contains("GatherMeat"));
@@ -28,7 +31,7 @@ class QuestAssetMismatchTest {
 
     @Test
     void aQuestWhoseAssetChangedTypeIsSetAside() {
-        String mismatch = AbstractQuestProgression.findAssetMismatch(StepQuest.class, "GatherMeat", new CompositeAsset());
+        String mismatch = QuestTypeRegistry.findAssetMismatch(StepQuest.class, "GatherMeat", new CompositeAsset());
 
         assertNotNull(mismatch);
         assertTrue(mismatch.contains("CompositeAsset"));
@@ -36,22 +39,22 @@ class QuestAssetMismatchTest {
 
     @Test
     void aQuestOnTheAssetTypeItReadsRuns() {
-        assertNull(AbstractQuestProgression.findAssetMismatch(StepQuest.class, "GatherMeat", new GatherAsset()));
+        assertNull(QuestTypeRegistry.findAssetMismatch(StepQuest.class, "GatherMeat", new GatherAsset()));
     }
 
     @Test
     void anAssetExtendingTheOneReadStillFits() {
-        assertNull(AbstractQuestProgression.findAssetMismatch(StepQuest.class, "GatherMeat", new SpecialGatherAsset()));
+        assertNull(QuestTypeRegistry.findAssetMismatch(StepQuest.class, "GatherMeat", new SpecialGatherAsset()));
     }
 
     @Test
     void aQuestBuiltWithoutAnAssetIdIsLeftAlone() {
-        assertNull(new StepQuest().findAssetMismatch());
+        assertNull(QuestTypeRegistry.findAssetMismatch(new StepQuest()));
     }
 
     @Test
     void aTypeWithAFinalFieldItIsWrittenAsIsRefused() {
-        assertThrows(IllegalStateException.class, () -> AbstractQuestProgression.registerAssetClass(FrozenQuest.class, GatherAsset.class));
+        assertThrows(IllegalStateException.class, () -> QuestTypeRegistry.registerAssetClass(FrozenQuest.class, GatherAsset.class));
     }
 
     private static final class StepQuest extends AbstractQuestProgression<StepQuest> {}

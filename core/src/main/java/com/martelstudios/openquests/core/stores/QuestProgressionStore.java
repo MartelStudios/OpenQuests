@@ -8,6 +8,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.services.QuestTypeRegistry;
 import com.martelstudios.openquests.core.sync.QuestSync;
 
 import javax.annotation.Nonnull;
@@ -71,7 +72,7 @@ public class QuestProgressionStore {
     public void add(@Nonnull AbstractQuestProgression<?> quest) {
         if (quests.containsKey(quest.getId()) || archived.containsKey(quest.getId())) return;
 
-        String mismatch = quest.findAssetMismatch();
+        String mismatch = QuestTypeRegistry.findAssetMismatch(quest);
         if (mismatch != null) {
             if (setAside.add(quest.getId())) LOGGER.atWarning().log("Quest %s set aside, its asset no longer fits: %s", quest.getId(), mismatch);
             return;
@@ -274,14 +275,14 @@ public class QuestProgressionStore {
     private void writeOver(@Nonnull AbstractQuestProgression<?> quest) {
         LOGGER.atFine().log("Quest %s was written meanwhile: writing this copy over it", quest.getId());
 
-        QuestOperation<?> whole = quest.overwrite();
+        QuestOperation<?> whole = quest.getReplica().overwrite();
         try {
-            AbstractQuestProgression<?> written = storage.commitProgression(quest.getId(), stored -> stored.replay(whole));
+            AbstractQuestProgression<?> written = storage.commitProgression(quest.getId(), stored -> stored.getReplica().replay(whole));
 
             if (written == null) {
                 LOGGER.atWarning().log("Quest %s is no longer stored, done away with elsewhere: left unwritten", quest.getId());
             } else {
-                quest.markStored(written.getStored());
+                quest.getReplica().markStored(written.getReplica().getStored());
             }
         } catch (RuntimeException e) {
             quest.markDirty();

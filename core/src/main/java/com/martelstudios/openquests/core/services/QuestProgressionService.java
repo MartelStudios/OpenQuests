@@ -54,7 +54,7 @@ public class QuestProgressionService {
     public <Q extends AbstractQuestProgression<Q>, QAsset extends OpenQuestAsset> void registerQuestType(String id, Class<QAsset> questAssetClass, BuilderCodec<QAsset> questAssetCodec, Class<Q> questClass, BuilderCodec<Q> questCodec) {
         OpenQuestAsset.CODEC.register(id, questAssetClass, questAssetCodec);
         AbstractQuestProgression.CODEC.register(id, questClass, questCodec);
-        AbstractQuestProgression.registerAssetClass(questClass, questAssetClass);
+        QuestTypeRegistry.registerAssetClass(questClass, questAssetClass);
     }
 
     /**

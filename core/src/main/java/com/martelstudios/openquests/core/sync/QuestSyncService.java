@@ -169,7 +169,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
      */
     @Override
     public boolean isShared(@Nonnull AbstractQuestProgression<?> quest) {
-        if (!storage.isShared() || quest.getStoredVersion() == 0) return false;
+        if (!storage.isShared() || quest.getReplica().getVersion() == 0) return false;
 
         QuestScope scope = quest.getHead().getScope();
         return scope != null && scope.spansServers();
@@ -199,11 +199,11 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
      * once, by the write that made it: an end this write found already made pays nothing.
      */
     private void commit(@Nonnull AbstractQuestProgression<?> quest) {
-        List<? extends QuestOperation<?>> operations = quest.getPendingOperations();
+        List<? extends QuestOperation<?>> operations = quest.getReplica().getPendingOperations();
         if (operations.isEmpty()) return;
 
-        long read = quest.getStoredVersion();
-        QuestState storedBefore = quest.getStoredState();
+        long read = quest.getReplica().getVersion();
+        QuestState storedBefore = quest.getReplica().getState();
 
         Rebase rebase = new Rebase(operations);
         AbstractQuestProgression<?> written = storage.commitProgression(quest.getId(), rebase);
@@ -212,7 +212,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
             return;
         }
 
-        quest.restack(written, operations.size());
+        quest.getReplica().restack(written, operations.size());
 
         if (rebase.foundVersion > read) {
             quest.announceUpdate();
@@ -277,7 +277,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
             Long version = versions.get(quest.getId());
             if (version == null) {
                 gone(quest);
-            } else if (version > quest.getStoredVersion()) {
+            } else if (version > quest.getReplica().getVersion()) {
                 moved.add(quest.getId());
             }
         }
@@ -293,12 +293,12 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
      * tells everyone here.
      */
     private void take(@Nonnull AbstractQuestProgression<?> quest, @Nonnull AbstractQuestProgression<?> stored) {
-        if (stored.getStoredVersion() <= quest.getStoredVersion()) return;
+        if (stored.getReplica().getVersion() <= quest.getReplica().getVersion()) return;
 
-        QuestState before = quest.getStoredState();
+        QuestState before = quest.getReplica().getState();
         QuestState after = stored.getState();
         int transitions = stored.getTransitions();
-        quest.restack(stored, 0);
+        quest.getReplica().restack(stored, 0);
 
         quest.announceUpdate();
         if (after != before) quest.announce(before, after, transitions, false);
@@ -351,7 +351,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
          */
         @Override
         public boolean test(@Nonnull AbstractQuestProgression<?> stored) {
-            foundVersion = stored.getStoredVersion();
+            foundVersion = stored.getReplica().getVersion();
             foundState = stored.getState();
             foundTransitions = stored.getTransitions();
             made.clear();
@@ -359,7 +359,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
             boolean changed = false;
             for (QuestOperation<?> operation : operations) {
                 QuestState before = stored.getState();
-                changed |= stored.replay(operation);
+                changed |= stored.getReplica().replay(operation);
                 if (stored.getState() != before) made.add(new Transition(before, stored.getState(), stored.getTransitions()));
             }
             return changed;

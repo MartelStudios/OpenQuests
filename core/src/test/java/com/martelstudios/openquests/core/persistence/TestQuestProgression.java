@@ -54,7 +54,7 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
      * Ends the quest without telling anyone, there being no server in a test to tell.
      */
     public TestQuestProgression end(QuestState state) {
-        replay(new QuestOperation.SetState(state));
+        getReplica().replay(new QuestOperation.SetState(state));
         return this;
     }
 
