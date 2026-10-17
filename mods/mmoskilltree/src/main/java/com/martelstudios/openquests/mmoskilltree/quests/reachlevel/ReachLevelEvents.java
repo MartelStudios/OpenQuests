@@ -60,7 +60,7 @@ public final class ReachLevelEvents {
      */
     public static void handleLoadAsset(@Nonnull LoadAssetEvent event) {
         for (OpenQuestAsset asset : OpenQuestAsset.getAssetMap().getAssetMap().values()) {
-            if (asset instanceof ReachLevelQuestAsset reachLevel && !SkillRegistry.getInstance().isKnownSkill(reachLevel.getSkill())) {
+            if (asset instanceof MMOSkillTreeReachLevelQuestAsset reachLevel && !SkillRegistry.getInstance().isKnownSkill(reachLevel.getSkill())) {
                 event.failed(true, "Quest asset '" + asset.getId() + "' names an unknown MMO Skill Tree skill '" + reachLevel.getSkill() + "'");
             }
         }

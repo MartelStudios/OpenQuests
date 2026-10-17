@@ -14,8 +14,8 @@ import java.util.Map;
  * Standing with a reputation, such as the Mastery Trainer's favour, whose ranks pay mastery points
  * and open lessons on the trainer's board. A negative amount takes standing away.
  */
-public class ReputationReward extends KindReward {
-    public static final BuilderCodec<ReputationReward> CODEC = BuilderCodec.builder(ReputationReward.class, ReputationReward::new, KindReward.BASE_CODEC)
+public class MMOSkillTreeReputationReward extends KindReward {
+    public static final BuilderCodec<MMOSkillTreeReputationReward> CODEC = BuilderCodec.builder(MMOSkillTreeReputationReward.class, MMOSkillTreeReputationReward::new, KindReward.BASE_CODEC)
                                                                            .append(new KeyedCodec<>("Reputation", Codec.STRING, true), (reward, reputation) -> reward.reputation = reputation, reward -> reward.reputation)
                                                                            .addValidator(Validators.nonNull())
                                                                            .addValidatorLate(() -> ReputationGroup.VALIDATOR_CACHE.getValidator().late())
@@ -29,7 +29,7 @@ public class ReputationReward extends KindReward {
 
     protected int amount;
 
-    private ReputationReward() {}
+    private MMOSkillTreeReputationReward() {}
 
     @Nonnull
     @Override

@@ -21,7 +21,7 @@ public final class ReachLevelFeature {
      */
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, ReachLevelQuestAsset.class, ReachLevelQuestAsset.CODEC, ReachLevelQuestProgression.class, ReachLevelQuestProgression.CODEC);
+                               .registerQuestType(TYPE_ID, MMOSkillTreeReachLevelQuestAsset.class, MMOSkillTreeReachLevelQuestAsset.CODEC, ReachLevelQuestProgression.class, ReachLevelQuestProgression.CODEC);
 
         MMOSkillTreeAPI.addXpListener(ReachLevelEvents.XP_LISTENER);
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, ReachLevelEvents::handleQuestAssignedToPlayer);

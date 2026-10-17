@@ -20,6 +20,10 @@ Write your quests once in OpenQuests and let them speak MMO Skill Tree. This plu
 
 🤝 **Trainer favour.** `MMOSkillTreeReputation` adds standing with a reputation, such as the Mastery Trainer, whose ranks pay mastery points and open lessons on the trainer's board.
 
+🎁 **Everything else its own quests pay.** XP boost tokens (`MMOSkillTreeBoostToken`), skill lamps (`MMOSkillTreeLamp`), ability modifiers (`MMOSkillTreeAbilityMod`), loot tables (`MMOSkillTreeLootable`), drop lists (`MMOSkillTreeDroplist`), effects (`MMOSkillTreeEffect`), costumes (`MMOSkillTreeCostume`), titles (`MMOSkillTreeTitle`) and flairs (`MMOSkillTreeFlair`), each drawn in the journal the way MMO Skill Tree draws it.
+
+✍️ **Written in the asset editor.** Skills, currencies, reputations, loot tables, titles and the rest are picked from a list rather than typed by hand, and a wrong id fails at load instead of in a player's hands.
+
 ```json
 {
   "Type": "MMOSkillTreeReachLevel",

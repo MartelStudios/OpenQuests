@@ -30,8 +30,8 @@ public class ReachLevelQuestProgression extends QuantityQuestProgression<ReachLe
     protected ReachLevelQuestProgression() {}
 
     @Override
-    public ReachLevelQuestAsset getAsset() {
-        return (ReachLevelQuestAsset) super.getAsset();
+    public MMOSkillTreeReachLevelQuestAsset getAsset() {
+        return (MMOSkillTreeReachLevelQuestAsset) super.getAsset();
     }
 
     /**
@@ -56,7 +56,7 @@ public class ReachLevelQuestProgression extends QuantityQuestProgression<ReachLe
      * Sets up a reach level quest, whose skill can be overridden for that quest alone.
      */
     public static final class Builder extends QuantityQuestProgression.Builder<ReachLevelQuestProgression, Builder> {
-        Builder(@Nonnull ReachLevelQuestAsset asset) {
+        Builder(@Nonnull MMOSkillTreeReachLevelQuestAsset asset) {
             super(new ReachLevelQuestProgression(), asset.getId());
         }
 

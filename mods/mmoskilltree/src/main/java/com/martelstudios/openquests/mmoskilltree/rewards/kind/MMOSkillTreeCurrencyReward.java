@@ -17,10 +17,10 @@ import java.util.Map;
  * A currency, mastery points ({@code Mastery_Point}) first: they are what MMO Skill Tree's mastery
  * nodes cost. Its Mastery Pack defines them, MMO Skill Tree itself defines none.
  */
-public class CurrencyReward extends KindReward {
+public class MMOSkillTreeCurrencyReward extends KindReward {
     private static final ValidatorCache<String> CURRENCIES = new ValidatorCache<>(new AssetKeyValidator<>(() -> AssetRegistry.getAssetStore(CurrencyAsset.class)));
 
-    public static final BuilderCodec<CurrencyReward> CODEC = BuilderCodec.builder(CurrencyReward.class, CurrencyReward::new, KindReward.BASE_CODEC)
+    public static final BuilderCodec<MMOSkillTreeCurrencyReward> CODEC = BuilderCodec.builder(MMOSkillTreeCurrencyReward.class, MMOSkillTreeCurrencyReward::new, KindReward.BASE_CODEC)
                                                                          .append(new KeyedCodec<>("Currency", Codec.STRING, true), (reward, currency) -> reward.currency = currency, reward -> reward.currency)
                                                                          .addValidator(Validators.nonNull())
                                                                          .addValidatorLate(() -> CURRENCIES.getValidator().late())
@@ -34,7 +34,7 @@ public class CurrencyReward extends KindReward {
 
     protected long amount;
 
-    private CurrencyReward() {}
+    private MMOSkillTreeCurrencyReward() {}
 
     @Nonnull
     @Override

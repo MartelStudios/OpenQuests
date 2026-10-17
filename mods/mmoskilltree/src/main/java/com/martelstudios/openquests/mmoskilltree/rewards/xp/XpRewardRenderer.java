@@ -18,12 +18,12 @@ public final class XpRewardRenderer implements QuestRewardRenderer {
     @Nonnull
     @Override
     public Class<?> getRewardType() {
-        return XpReward.class;
+        return MMOSkillTreeXpReward.class;
     }
 
     @Override
     public void renderPreview(@Nonnull QuestPageContext context, @Nonnull QuestReward reward) {
-        var xpReward = (XpReward) reward;
+        var xpReward = (MMOSkillTreeXpReward) reward;
         var chip = RewardChips.chipFor(RewardSpec.of("Mmo_Xp", Map.of("skill", xpReward.getSkill(), "amount", Long.toString(xpReward.getAmount()))));
         if (chip == null) return;
 
