@@ -1,6 +1,6 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
-import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.models.QuestStateVersion;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -16,25 +16,20 @@ public class CompositeQuestVisitor implements QuestVisitor<CompositeQuestProgres
     private final UUID childId;
 
     /**
-     * The state the child moved to, rather than whatever it carries by the time this runs.
+     * The state the child moved to, rather than whatever it carries by the time this runs, with the
+     * version ordering this news among the rest.
      */
     @Nonnull
-    private final QuestState outcome;
+    private final QuestStateVersion outcome;
 
-    /**
-     * How many changes of state the child had been through, which orders this news among the rest.
-     */
-    private final int transitions;
-
-    public CompositeQuestVisitor(@Nonnull UUID childId, @Nonnull QuestState outcome, int transitions) {
+    public CompositeQuestVisitor(@Nonnull UUID childId, @Nonnull QuestStateVersion outcome) {
         this.childId = childId;
         this.outcome = outcome;
-        this.transitions = transitions;
     }
 
     @Override
     public void progress(CompositeQuestProgression quest) {
-        quest.apply(new CompositeQuestProgression.Hear(List.of(new CompositeQuestProgression.Heard(childId, outcome, transitions))));
+        quest.apply(new CompositeQuestProgression.Hear(List.of(new CompositeQuestProgression.Heard(childId, outcome))));
         quest.apply(new CompositeQuestProgression.Weigh());
     }
 

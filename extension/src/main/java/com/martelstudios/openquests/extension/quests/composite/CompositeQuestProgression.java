@@ -14,6 +14,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.models.QuestStateVersion;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
@@ -34,7 +35,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     public static final BuilderCodec<CompositeQuestProgression> CODEC = BuilderCodec.builder(CompositeQuestProgression.class, CompositeQuestProgression::new, AbstractCompositeQuestProgression.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("ChildOutcomes", new MapCodec<>(new EnumCodec<>(QuestState.class), HashMap<String, QuestState>::new)), CompositeQuestProgression::decodeOutcomes, CompositeQuestProgression::encodeOutcomes)
                                                                                     .add()
-                                                                                    .append(new KeyedCodec<>("ChildTransitions", new MapCodec<>(Codec.INTEGER, HashMap<String, Integer>::new)), CompositeQuestProgression::decodeTransitions, CompositeQuestProgression::encodeTransitions)
+                                                                                    .append(new KeyedCodec<>("ChildTransitions", new MapCodec<>(Codec.INTEGER, HashMap<String, Integer>::new)), CompositeQuestProgression::decodeVersions, CompositeQuestProgression::encodeVersions)
                                                                                     .add()
                                                                                     .build();
 
@@ -50,10 +51,10 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     protected Map<UUID, QuestState> childOutcomes = new ConcurrentHashMap<>();
 
     /**
-     * How many changes of state each child had been through when last heard of, so that news of a
-     * child, which may come late or twice, is only ever taken over older news.
+     * The state version of each child when last heard of, so that news of a child, which may come
+     * late or twice, is only ever taken over older news.
      */
-    protected Map<UUID, Integer> childTransitions = new ConcurrentHashMap<>();
+    protected Map<UUID, Integer> childVersions = new ConcurrentHashMap<>();
 
     private final transient List<EventRegistration<UUID, QuestStateChangedEvent>> childListeners = new ArrayList<>();
 
@@ -62,7 +63,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * false} running again takes its outcome back, and the group's own rule is weighed anew.
      */
     private void handleStepStateChanged(QuestStateChangedEvent questStateChangedEvent) {
-        update(new CompositeQuestVisitor(questStateChangedEvent.getQuest().getId(), questStateChangedEvent.getState(), questStateChangedEvent.getTransitions()));
+        update(new CompositeQuestVisitor(questStateChangedEvent.getQuest().getId(), questStateChangedEvent.getStateVersion()));
     }
 
     /**
@@ -137,7 +138,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
 
             QuestProgressionService.get().progress(new SetStateVisitor(QuestState.ABANDONED), List.of(questId));
 
-            hear(List.of(new Heard(questId, child.getState(), child.getTransitions())));
+            hear(List.of(new Heard(questId, child.getStateVersion())));
         }
     }
 
@@ -152,22 +153,19 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     }
 
     /**
-     * Writes down how a child stands, unless what is written already is news as late: a child
-     * that changed state that many times. A child that is running again (which one kept alive by
-     * {@code StopOnComplete:false} can be) has its outcome struck out rather than left standing:
-     * the group would otherwise keep counting an end the child has moved past.
+     * Writes down how a child stands, unless what is written already is news as late. A child that
+     * is running again (which one kept alive by {@code StopOnComplete:false} can be) has its outcome
+     * struck out rather than left standing: the group would otherwise keep counting an end the
+     * child has moved past.
      *
-     * @param transitions how many changes of state the child had been through
      * @return {@code true} when this changed anything, so the group is only marked dirty on news.
      */
-    private boolean recordOutcome(@Nonnull UUID childId, @Nonnull QuestState state, int transitions) {
-        Integer known = childTransitions.get(childId);
-
+    private boolean recordOutcome(@Nonnull UUID childId, @Nonnull QuestStateVersion news) {
         // A child that never changed state is running, which is what no entry says already
-        if (known == null ? transitions == 0 : known >= transitions) return false;
+        if (!news.isNewerThan(childVersions.getOrDefault(childId, 0))) return false;
 
-        childTransitions.put(childId, transitions);
-        if (state == QuestState.IN_PROGRESS) childOutcomes.remove(childId); else childOutcomes.put(childId, state);
+        childVersions.put(childId, news.version());
+        if (news.state() == QuestState.IN_PROGRESS) childOutcomes.remove(childId); else childOutcomes.put(childId, news.state());
         return true;
     }
 
@@ -178,7 +176,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     public void reconcileOutcomes() {
         List<Heard> heard = new ArrayList<>();
         for (AbstractQuestProgression<?> step : getChildren()) {
-            heard.add(new Heard(step.getId(), step.getState(), step.getTransitions()));
+            heard.add(new Heard(step.getId(), step.getStateVersion()));
         }
         hear(heard);
     }
@@ -198,7 +196,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
         @Override
         public boolean applyTo(@Nonnull CompositeQuestProgression quest) {
             boolean changed = false;
-            for (Heard heard : news) changed |= quest.recordOutcome(heard.childId(), heard.state(), heard.transitions());
+            for (Heard heard : news) changed |= quest.recordOutcome(heard.childId(), heard.stateVersion());
             return changed;
         }
     }
@@ -274,17 +272,17 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     }
 
     @Nonnull
-    private Map<String, Integer> encodeTransitions() {
-        Map<String, Integer> encoded = new HashMap<>(childTransitions.size());
-        childTransitions.forEach((childId, count) -> encoded.put(childId.toString(), count));
+    private Map<String, Integer> encodeVersions() {
+        Map<String, Integer> encoded = new HashMap<>(childVersions.size());
+        childVersions.forEach((childId, count) -> encoded.put(childId.toString(), count));
 
         return encoded;
     }
 
-    private void decodeTransitions(@Nonnull Map<String, Integer> encoded) {
+    private void decodeVersions(@Nonnull Map<String, Integer> encoded) {
         encoded.forEach((childId, count) -> {
             try {
-                childTransitions.put(UUID.fromString(childId), count);
+                childVersions.put(UUID.fromString(childId), count);
             } catch (IllegalArgumentException e) {
                 LOGGER.atWarning().log("Dropping what was heard of '%s' on quest %s: not a quest id.", childId, getId());
             }
@@ -292,9 +290,9 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     }
 
     /**
-     * What was heard of one child: how it stood after that many changes of state.
+     * What was heard of one child: how it stood, at which state version.
      */
-    public record Heard(@Nonnull UUID childId, @Nonnull QuestState state, int transitions) {}
+    public record Heard(@Nonnull UUID childId, @Nonnull QuestStateVersion stateVersion) {}
 
     @Override
     public CompositeQuestAsset getAsset() {

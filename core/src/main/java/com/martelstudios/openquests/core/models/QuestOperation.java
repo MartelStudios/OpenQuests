@@ -41,9 +41,9 @@ public interface QuestOperation<Q extends AbstractQuestProgression<?>> {
     record SetState(@Nonnull QuestState state) implements QuestOperation<AbstractQuestProgression<?>> {
         @Override
         public boolean applyTo(@Nonnull AbstractQuestProgression<?> quest) {
-            if (quest.isOver() || quest.state == state) return false;
+            if (quest.isOver() || quest.getState() == state) return false;
 
-            quest.state = state;
+            quest.setState(state);
             return true;
         }
     }
