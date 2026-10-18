@@ -50,10 +50,13 @@ $C = "../../Common.ui";
 // The client's own dropdown caret, borrowed to say that finishing a quest opens onto another
 @QuestIconNext = PatchStyle(TexturePath: "../../Common/DropdownPressedCaret.png");
 
-@ToggleStyle = TextButtonStyle(
-  Default: (Background: #1e2a38, LabelStyle: (FontSize: 14, RenderBold: true, TextColor: @ColorMuted, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #2a3a4e, LabelStyle: (FontSize: 14, RenderBold: true, TextColor: @ColorTitle, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #142030, LabelStyle: (FontSize: 14, RenderBold: true, TextColor: @ColorAccent, HorizontalAlignment: Center, VerticalAlignment: Center)),
+// The fold mark at the head of a row, and the row's header, which is what a click folds on
+@ToggleLabelStyle = (FontSize: 14, RenderBold: true, TextColor: @ColorMuted, HorizontalAlignment: Center, VerticalAlignment: Center);
+
+@HeaderStyle = ButtonStyle(
+  Default: (Background: #000000(0)),
+  Hovered: (Background: #ffffff(0.03)),
+  Pressed: (Background: #000000(0.1)),
   Sounds: $C.@ButtonSounds
 );
 

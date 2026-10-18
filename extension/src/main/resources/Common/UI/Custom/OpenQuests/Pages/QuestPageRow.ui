@@ -10,14 +10,17 @@ Group #QuestPageRow {
   Anchor: (Bottom: 4);
 
   // No height of its own: categories that do not fit beside the title wrap under it and the header
-  // grows with them, while everything either side keeps to the first line
-  Group #Header {
+  // grows with them, while everything either side keeps to the first line. The whole header is the
+  // fold button, so the mark inside it is a label: a button in a button would toggle twice.
+  Button #Header {
     LayoutMode: Left;
+    Style: $P.@HeaderStyle;
 
-    TextButton #Toggle {
+    Label #Toggle {
       Text: "+";
       Anchor: (Width: 28, Height: 24, Top: 0);
-      Style: $P.@ToggleStyle;
+      Background: #1e2a38;
+      Style: $P.@ToggleLabelStyle;
     }
 
     Group { Anchor: (Width: 8); }

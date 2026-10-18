@@ -760,7 +760,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         int objectives = renderObjectives(context, rowSelector, entry, shape);
 
         context.getEventBuilder()
-               .addEventBinding(CustomUIEventBindingType.Activating, rowSelector + "#Toggle", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_TOGGLE)
+               .addEventBinding(CustomUIEventBindingType.Activating, rowSelector + "#Header", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_TOGGLE)
                                                                                                        .append(QuestPageEventData.KEY_TARGET, entry.id()), false);
 
         if (!open) return;
