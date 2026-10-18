@@ -1,5 +1,6 @@
 {
   "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Goblin_Scrapper.png",
   "Categories": ["Dungeon", "Event"],
   "TitleKey": "quest.goblin-lair-daily-hunt.title",
   "DescriptionKey": "quest.goblin-lair-daily-hunt.description",

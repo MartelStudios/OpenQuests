@@ -1,5 +1,6 @@
 {
   "Type": "Composite",
+  "Icon": "Icons/ModelsGenerated/Goblin_Duke.png",
   "Categories": ["Dungeon"],
   "TitleKey": "quest.goblin-lair-duke.title",
   "DescriptionKey": "quest.goblin-lair-duke.description",

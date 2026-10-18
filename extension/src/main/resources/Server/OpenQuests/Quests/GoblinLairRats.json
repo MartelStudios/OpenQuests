@@ -1,5 +1,6 @@
 {
   "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Rat.png",
   "Categories": ["Dungeon"],
   "TitleKey": "quest.goblin-lair-rats.title",
   "DescriptionKey": "quest.goblin-lair-rats.description",

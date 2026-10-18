@@ -13,6 +13,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.ValidatorCache;
+import com.hypixel.hytale.server.core.asset.common.CommonAssetValidator;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 
@@ -26,6 +27,12 @@ import java.util.Map;
  */
 public abstract class OpenQuestAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenQuestAsset>> {
     public static final ValidatorCache<String> VALIDATOR_CACHE = new ValidatorCache<>(new AssetKeyValidator<>(OpenQuestAsset::getAssetStore));
+
+    /**
+     * Any icon any pack ships under {@code Common/Icons}, which is also what the asset editor's
+     * file picker offers. A UI asset, so an icon shipped only as {@code @2x} passes too.
+     */
+    public static final CommonAssetValidator ICON_VALIDATOR = new CommonAssetValidator("png", true, "Icons");
 
     public static final AssetCodecMapCodec<String, OpenQuestAsset> CODEC = new AssetCodecMapCodec<>(Codec.STRING, (asset, value) -> asset.id = value, asset -> asset.id, (asset, value) -> asset.data = value, asset -> asset.data);
 
@@ -68,6 +75,9 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
                                                                           .append(new KeyedCodec<>("Categories", new ArrayCodec<>(Codec.STRING, String[]::new)), (asset, categories) -> asset.categories = categories, asset -> asset.categories)
                                                                           .addValidator(OpenQuestCategory.VALIDATOR_CACHE.getArrayValidator())
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("Icon", Codec.STRING), (asset, icon) -> asset.icon = icon, asset -> asset.icon)
+                                                                          .addValidator(ICON_VALIDATOR)
+                                                                          .add()
                                                                           .build();
 
 
@@ -91,6 +101,9 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
     protected QuestReward[] abandonedRewards = NO_REWARDS;
 
     protected QuestVisibility visibility = QuestVisibility.ALWAYS;
+
+    @Nullable
+    protected String icon;
     protected boolean announceOutcome = true;
 
     /**
@@ -221,6 +234,15 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
     @Nonnull
     public QuestVisibility getVisibility() {
         return visibility;
+    }
+
+    /**
+     * @return the icon a chapter's graph draws the quest as, a path under {@code Common/}, or
+     * {@code null} for the plain mark of its state.
+     */
+    @Nullable
+    public String getIcon() {
+        return icon;
     }
 
     /**

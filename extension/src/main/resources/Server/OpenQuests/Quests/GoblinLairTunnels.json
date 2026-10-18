@@ -1,5 +1,6 @@
 {
   "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Goblin_Miner.png",
   "Categories": ["Dungeon"],
   "TitleKey": "quest.goblin-lair-tunnels.title",
   "DescriptionKey": "quest.goblin-lair-tunnels.description",

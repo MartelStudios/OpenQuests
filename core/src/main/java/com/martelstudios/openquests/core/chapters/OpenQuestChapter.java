@@ -39,10 +39,12 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
                                                                                              .append(new KeyedCodec<>("Order", Codec.INTEGER), (chapter, order) -> chapter.order = order, chapter -> chapter.order)
                                                                                              .add()
                                                                                              .append(new KeyedCodec<>("Icon", Codec.STRING), (chapter, icon) -> chapter.icon = icon, chapter -> chapter.icon)
-                                                                                             .addValidator(OpenQuestChapterGroup.ICON_VALIDATOR)
+                                                                                             .addValidator(OpenQuestAsset.ICON_VALIDATOR)
                                                                                              .add()
                                                                                              .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(Codec.STRING, String[]::new)), (chapter, ids) -> chapter.questAssetIds = ids, chapter -> chapter.questAssetIds)
                                                                                              .addValidator(OpenQuestAsset.VALIDATOR_CACHE.getArrayValidator())
+                                                                                             .add()
+                                                                                             .append(new KeyedCodec<>("Layout", new ArrayCodec<>(ChapterPlacement.CODEC, ChapterPlacement[]::new)), (chapter, layout) -> chapter.layout = layout, chapter -> chapter.layout)
                                                                                              .add()
                                                                                              .build();
 
@@ -58,7 +60,22 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
     @Nonnull
     protected String[] questAssetIds = NO_QUESTS;
 
+    @Nonnull
+    protected ChapterPlacement[] layout = new ChapterPlacement[0];
+
     protected OpenQuestChapter() {}
+
+    /**
+     * @return the cell the graph draws that quest in, or {@code null} for a quest the layout does
+     * not place, which the graph places by itself.
+     */
+    @Nullable
+    public ChapterPlacement getPlacement(@Nonnull String questAssetId) {
+        for (ChapterPlacement placement : layout) {
+            if (placement.getQuest().equals(questAssetId)) return placement;
+        }
+        return null;
+    }
 
     /**
      * @param runOf the player's run of a quest asset, or {@code null} for one they were never handed.

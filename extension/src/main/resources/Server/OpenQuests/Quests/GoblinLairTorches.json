@@ -1,5 +1,6 @@
 {
   "Type": "PlaceBlock",
+  "Icon": "Icons/ItemsGenerated/Furniture_Crude_Torch.png",
   "Categories": ["Dungeon", "SideQuest"],
   "TitleKey": "quest.goblin-lair-torches.title",
   "DescriptionKey": "quest.goblin-lair-torches.description",
