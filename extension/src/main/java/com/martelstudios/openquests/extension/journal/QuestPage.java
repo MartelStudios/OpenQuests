@@ -1071,7 +1071,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                 graph.reset();
             }
             case QuestPageEventData.ACTION_VIEW -> graphMode = !graphMode;
-            case QuestPageEventData.ACTION_SCROLL -> graph.scrollTo(Math.round(data.getNumber()));
+            case QuestPageEventData.ACTION_SCROLL -> {
+                if (!graph.scrollTo(data.getNumber())) return;
+            }
 
             // Recolours the lines in place: a redraw would replace the node under the mouse
             case QuestPageEventData.ACTION_HOVER -> {

@@ -109,7 +109,7 @@ $C.@DecoratedContainer {
         $C.@Slider #GraphSlider {
           @Anchor = (Width: 552, Top: 14, Bottom: 6);
           Min: 0;
-          Max: 0;
+          Max: 100;
           Step: 1;
           Visible: false;
         }

@@ -138,3 +138,8 @@ $C = "../../Common.ui";
 @GraphArrowLeft = PatchStyle(TexturePath: "Graph/ArrowLeft.png");
 @GraphArrowUp = PatchStyle(TexturePath: "Graph/ArrowUp.png");
 @GraphArrowDown = PatchStyle(TexturePath: "Graph/ArrowDown.png");
+
+// Laid over the tiles of the quests linked to the hovered one, in the colours of their links
+@GraphTintNone = PatchStyle(Color: #000000(0));
+@GraphTintNext = PatchStyle(Color: #f2d14b(0.22));
+@GraphTintPrevious = PatchStyle(Color: #4b9cf2(0.22));

@@ -7,6 +7,8 @@ import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
+import com.hypixel.hytale.server.core.Message;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.extension.journal.QuestPage.QuestPageEventData;
 
@@ -44,6 +46,15 @@ final class ChapterGraphView {
      */
     private static final int ARROW_STEP = 16;
 
+    /**
+     * The slider's maximum in QuestPage.ui.
+     */
+    private static final int SLIDER_RANGE = 100;
+
+    private static final Value<String> TINT_NONE = Value.ref(COMMON_DOCUMENT, "GraphTintNone");
+    private static final Value<String> TINT_NEXT = Value.ref(COMMON_DOCUMENT, "GraphTintNext");
+    private static final Value<String> TINT_PREVIOUS = Value.ref(COMMON_DOCUMENT, "GraphTintPrevious");
+
     private static final String COLOR_IDLE = "#55657d";
     private static final String COLOR_SUCCESSFUL = "#4caf50";
     private static final String COLOR_FAILED = "#d9534f";
@@ -76,18 +87,38 @@ final class ChapterGraphView {
     private List<Segment> segments = List.of();
 
     /**
+     * The tiles drawn last, by asset id, so hovering tints them in place.
+     */
+    @Nonnull
+    private Map<String, Integer> tiles = Map.of();
+
+    /**
+     * Whether the slider's handle has to be put back, which only a chapter opened afresh asks for:
+     * written on every redraw, it would fight the player dragging it.
+     */
+    private boolean sliderStale = true;
+
+    /**
      * Back to the first column, for a chapter opened afresh.
      */
     void reset() {
         originColumn = 0;
+        sliderStale = true;
     }
 
     /**
-     * Moves the window to the column the slider points at.
+     * Moves the window to where the slider points. The slider runs over a fixed range, so a chapter
+     * of any width is drawn over the same stretch of it.
+     *
+     * @param position the slider's position, from 0 to {@link #SLIDER_RANGE}.
+     * @return whether the window moved, which is what a redraw is needed for.
      */
-    void scrollTo(int column) {
-        originColumn = column;
+    boolean scrollTo(float position) {
+        int before = originColumn;
+
+        originColumn = Math.round(position * lastOrigin() / SLIDER_RANGE);
         clamp();
+        return originColumn != before;
     }
 
     private int lastOrigin() {
@@ -115,10 +146,11 @@ final class ChapterGraphView {
         commandBuilder.clear(CONTAINER)
                       .setObject(CONTAINER + ".Anchor", anchor(0, 0, COLUMNS * CELL, rows * CELL));
 
-        int lastOrigin = lastOrigin();
-        commandBuilder.set(SLIDER + ".Visible", lastOrigin > 0)
-                      .set(SLIDER + ".Max", lastOrigin)
-                      .set(SLIDER + ".Value", originColumn);
+        commandBuilder.set(SLIDER + ".Visible", lastOrigin() > 0);
+        if (sliderStale) {
+            commandBuilder.set(SLIDER + ".Value", 0);
+            sliderStale = false;
+        }
 
         Map<String, Boolean> sideways = sideways(graph);
         List<Segment> drawn = new ArrayList<>();
@@ -155,16 +187,19 @@ final class ChapterGraphView {
         }
         segments = List.copyOf(drawn);
 
+        Map<String, Integer> drawnTiles = new HashMap<>();
         for (ChapterGraph.Node node : graph.nodes()) {
             int column = node.column() - originColumn;
             if (column < 0 || column >= COLUMNS) continue;
 
+            drawnTiles.put(node.assetId(), index);
             String selector = CONTAINER + "[" + index++ + "]";
             int offset = (CELL - NODE) / 2;
 
             commandBuilder.append(CONTAINER, NODE_DOCUMENT)
                           .setObject(selector + ".Anchor", anchor(column * CELL + offset, node.row() * CELL + offset, NODE, NODE))
-                          .set(selector + " #Mark.Background", QuestPageRows.iconOf(node.mark()));
+                          .set(selector + " #Mark.Background", QuestPageRows.iconOf(node.mark()))
+                          .set(selector + ".TooltipTextSpans", tooltip(node));
 
             String icon = node.asset().getIcon();
             if (icon != null) {
@@ -179,8 +214,28 @@ final class ChapterGraphView {
             eventBuilder.addEventBinding(CustomUIEventBindingType.MouseExited, selector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_HOVER), false);
         }
 
+        tiles = Map.copyOf(drawnTiles);
+
         eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, SLIDER, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_SCROLL)
                                                                                              .append(QuestPageEventData.KEY_NUMBER, SLIDER + ".Value"), false);
+    }
+
+    /**
+     * The quest's title in bold, then its description and where the player stands. Rich text is all
+     * a native tooltip holds, so the two lines stand in for a titled panel.
+     */
+    @Nonnull
+    private static Message tooltip(@Nonnull ChapterGraph.Node node) {
+        Message tooltip = Message.empty()
+                                 .insert(AbstractQuestProgression.titleOf(node.asset()).bold(true))
+                                 .insert("\n")
+                                 .insert(Message.translation(node.mark().getStatusKey()).color(COLOR_NEXT));
+
+        Message description = AbstractQuestProgression.descriptionOf(node.asset());
+        if (description.getMessageId() != null || (description.getRawText() != null && !description.getRawText().isEmpty())) {
+            tooltip.insert("\n").insert(description);
+        }
+        return tooltip;
     }
 
     /**
@@ -214,20 +269,35 @@ final class ChapterGraphView {
     }
 
     /**
-     * Recolours the lines drawn last: those leaving the hovered quest in yellow, those reaching it
-     * in blue, and everything back to its own colour when the mouse leaves.
+     * Recolours what was drawn last: the links leaving the hovered quest and the tiles they reach
+     * in yellow, the links reaching it and the tiles they leave in blue, and everything back as it
+     * was when the mouse leaves. A tile is tinted too, since a link can pass behind another tile.
      *
      * @param hovered the asset id under the mouse, or {@code null} when it left.
      */
     void hover(@Nonnull UICommandBuilder commandBuilder, @Nullable String hovered) {
+        Map<String, Value<String>> tints = new HashMap<>();
+        for (String assetId : tiles.keySet()) tints.put(assetId, TINT_NONE);
+
         for (Segment segment : segments) {
             ChapterGraph.Edge edge = segment.edge();
-            String color = edge.from().assetId().equals(hovered) ? COLOR_NEXT
-                         : edge.to().assetId().equals(hovered) ? COLOR_PREVIOUS
-                         : baseColor(edge);
+            String color = baseColor(edge);
+
+            if (edge.from().assetId().equals(hovered)) {
+                color = COLOR_NEXT;
+                tints.put(edge.to().assetId(), TINT_NEXT);
+            } else if (edge.to().assetId().equals(hovered)) {
+                color = COLOR_PREVIOUS;
+                tints.put(edge.from().assetId(), TINT_PREVIOUS);
+            }
 
             paint(commandBuilder, CONTAINER + "[" + segment.index() + "]", color);
         }
+
+        tints.forEach((assetId, tint) -> {
+            Integer tile = tiles.get(assetId);
+            if (tile != null) commandBuilder.set(CONTAINER + "[" + tile + "] #Tint.Background", tint);
+        });
     }
 
     /**
