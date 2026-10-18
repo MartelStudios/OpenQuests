@@ -631,7 +631,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * @param tab the open tab, or {@code null} where the page shows a single quest.
      */
     private void renderSearch(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nullable Tab tab) {
-        commandBuilder.set(SEARCH_FIELD + ".Visible", tab != null);
+        commandBuilder.set("#ListTools.Visible", tab != null);
         if (tab == null) return;
 
         if (tab != searchShown) {

@@ -22,27 +22,30 @@ $C.@DecoratedContainer {
 
     $C.@ContentSeparator { Anchor: (Top: 4, Bottom: 8); }
 
-    Group #Toolbar {
+    // Filled by the page rather than declared here, so the tab standing open follows the state
+    Group #Tabs {
       LayoutMode: Left;
       Anchor: (Height: 32);
+    }
 
-      // Filled by the page rather than declared here, so the tab standing open follows the state
-      Group #Tabs {
-        LayoutMode: Left;
-        FlexWeight: 1;
-      }
+    // Tools of the open list, on a line of their own so the tabs keep the whole width. Hidden by
+    // the page where it shows a single quest.
+    Group #ListTools {
+      LayoutMode: Left;
+      Anchor: (Height: 32, Top: 8);
+      Visible: false;
 
       // Narrows the open list by title. Each tab keeps its own text, which the page writes back
       // on switching tab and otherwise leaves to the player typing in it
       $C.@TextField #Search {
-        Anchor: (Width: 180, Height: 32, Right: 8);
+        FlexWeight: 1;
+        Anchor: (Height: 32);
         PlaceholderText: %server.customUI.searchPlaceholder;
-        Visible: false;
       }
 
       // Which quest states the open list shows, hidden where there is no such list
       $C.@DropdownBox #QuestFilter {
-        Anchor: (Width: 200, Height: 32);
+        Anchor: (Width: 200, Height: 32, Left: 8);
         Visible: false;
       }
     }
