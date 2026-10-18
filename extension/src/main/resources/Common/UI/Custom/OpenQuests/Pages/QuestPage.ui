@@ -43,17 +43,8 @@ $C.@DecoratedContainer {
         PlaceholderText: %server.customUI.searchPlaceholder;
       }
 
-      // Moves the chapter graph's window a cell at a time, in place of the search in that view
-      Group #GraphPan {
-        LayoutMode: Left;
-        FlexWeight: 1;
-        Visible: false;
-
-        $C.@SmallSecondaryTextButton #PanLeft { @Anchor = (Width: 44, Right: 4); @Text = "<"; }
-        $C.@SmallSecondaryTextButton #PanUp { @Anchor = (Width: 44, Right: 4); @Text = "^"; }
-        $C.@SmallSecondaryTextButton #PanDown { @Anchor = (Width: 44, Right: 4); @Text = "v"; }
-        $C.@SmallSecondaryTextButton #PanRight { @Anchor = (Width: 44); @Text = ">"; }
-      }
+      // Holds the search field's place where the page hides it
+      Group #ToolsSpacer { FlexWeight: 1; Visible: false; }
 
       // Which quest states the open list shows, hidden where there is no such list
       $C.@DropdownBox #QuestFilter {
@@ -102,11 +93,24 @@ $C.@DecoratedContainer {
           Padding: (Right: 8);
         }
 
-        // The open chapter as a graph. No layout mode: the page places every node and line by its
-        // anchor. Exactly 6 by 4 cells of 92, the window ChapterGraphView draws.
-        Group #Graph {
-          Anchor: (Width: 552, Height: 368);
+        // The open chapter as a graph. Rows scroll here; columns go through the slider under it, a
+        // container scrolling one way only. #Graph has no layout mode: the page places
+        // every node and line by its anchor, and sizes it to the chapter's rows.
+        Group #GraphScroll {
+          FlexWeight: 1;
+          LayoutMode: TopScrolling;
+          ScrollbarStyle: $C.@DefaultScrollbarStyle;
           Background: #0d141f(0.5);
+          Visible: false;
+
+          Group #Graph { Anchor: (Width: 552, Height: 368); }
+        }
+
+        $C.@Slider #GraphSlider {
+          @Anchor = (Width: 552, Top: 14, Bottom: 6);
+          Min: 0;
+          Max: 0;
+          Step: 1;
           Visible: false;
         }
       }

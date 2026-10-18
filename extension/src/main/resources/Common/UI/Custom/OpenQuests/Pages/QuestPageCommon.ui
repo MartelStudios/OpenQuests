@@ -131,3 +131,10 @@ $C = "../../Common.ui";
   Pressed: (Background: #1a2538),
   Sounds: $C.@ButtonSounds
 );
+
+// The chevrons laid along a link of the graph, pointing from the quest handing out to the one
+// handed. Dark and half transparent, so they read over every colour a link takes.
+@GraphArrowRight = PatchStyle(TexturePath: "Graph/ArrowRight.png");
+@GraphArrowLeft = PatchStyle(TexturePath: "Graph/ArrowLeft.png");
+@GraphArrowUp = PatchStyle(TexturePath: "Graph/ArrowUp.png");
+@GraphArrowDown = PatchStyle(TexturePath: "Graph/ArrowDown.png");

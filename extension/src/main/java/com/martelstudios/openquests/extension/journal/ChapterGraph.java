@@ -157,26 +157,4 @@ final class ChapterGraph {
     private static long key(int column, int row) {
         return ((long) column << 32) | (row & 0xffffffffL);
     }
-
-    /**
-     * @return the quests reachable from {@code start} by following edges forwards, or backwards
-     * when {@code forwards} is false, {@code start} included.
-     */
-    @Nonnull
-    Set<String> reach(@Nonnull String start, boolean forwards) {
-        Set<String> reached = new HashSet<>();
-        Deque<String> pending = new ArrayDeque<>(List.of(start));
-
-        while (!pending.isEmpty()) {
-            String current = pending.pop();
-            if (!reached.add(current)) continue;
-
-            for (Edge edge : edges) {
-                Node from = forwards ? edge.from() : edge.to();
-                Node to = forwards ? edge.to() : edge.from();
-                if (from.assetId().equals(current)) pending.push(to.assetId());
-            }
-        }
-        return reached;
-    }
 }

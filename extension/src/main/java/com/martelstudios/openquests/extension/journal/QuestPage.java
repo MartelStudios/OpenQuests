@@ -250,26 +250,20 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
-     * The chapters tab's switch between list and graph, and in the graph the buttons moving its
-     * window, which take the search field's place: the graph shows every quest of the chapter.
+     * The chapters tab's switch between list and graph. The graph shows every quest of the
+     * chapter, so the search field gives way to an empty stretch there.
      */
     private void renderViewTools(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, boolean chapters, boolean graphShown) {
         commandBuilder.set(SEARCH_FIELD + ".Visible", !graphShown)
-                      .set("#GraphPan.Visible", graphShown)
+                      .set("#ToolsSpacer.Visible", graphShown)
                       .set(QuestPageContext.ROOT_CONTAINER + ".Visible", !graphShown)
-                      .set(ChapterGraphView.CONTAINER + ".Visible", graphShown)
+                      .set("#GraphScroll.Visible", graphShown)
+                      .set(ChapterGraphView.SLIDER + ".Visible", false)
                       .set("#ViewToggle.Visible", chapters);
         if (!chapters) return;
 
         commandBuilder.set("#ViewToggle.Text", Message.translation(graphShown ? "openquests.page.view.list" : "openquests.page.view.graph"));
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ViewToggle", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_VIEW), false);
-
-        if (!graphShown) return;
-
-        for (String direction : List.of("Left", "Up", "Down", "Right")) {
-            eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#Pan" + direction, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_PAN)
-                                                                                                          .append(QuestPageEventData.KEY_TARGET, direction.toLowerCase(Locale.ROOT)), false);
-        }
     }
 
     /**
@@ -1077,7 +1071,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                 graph.reset();
             }
             case QuestPageEventData.ACTION_VIEW -> graphMode = !graphMode;
-            case QuestPageEventData.ACTION_PAN -> graph.pan(data.getTarget());
+            case QuestPageEventData.ACTION_SCROLL -> graph.scrollTo(Math.round(data.getNumber()));
 
             // Recolours the lines in place: a redraw would replace the node under the mouse
             case QuestPageEventData.ACTION_HOVER -> {
@@ -1434,6 +1428,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         /** Read off the element on the client: the {@code @} asks for its value rather than a constant. */
         static final String KEY_VALUE = "@Value";
 
+        /** A number read off the element, such as a slider's position. */
+        static final String KEY_NUMBER = "@Number";
+
         static final String ACTION_TOGGLE = "toggle";
         static final String ACTION_OPEN = "open";
         static final String ACTION_CLAIM = "claim";
@@ -1445,7 +1442,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         static final String ACTION_GROUP = "group";
         static final String ACTION_CHAPTER = "chapter";
         static final String ACTION_VIEW = "view";
-        static final String ACTION_PAN = "pan";
+        static final String ACTION_SCROLL = "scroll";
         static final String ACTION_HOVER = "hover";
         static final String ACTION_CRUMB = "crumb";
         static final String ACTION_CLOSE = "close";
@@ -1459,11 +1456,14 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>(KEY_VALUE, Codec.STRING), (data, value) -> data.value = value, data -> data.value)
                                                                                  .add()
+                                                                                 .append(new KeyedCodec<>(KEY_NUMBER, Codec.FLOAT), (data, number) -> data.number = number, data -> data.number)
+                                                                                 .add()
                                                                                  .build();
 
         private String action;
         private String target;
         private String value;
+        private float number;
 
         /**
          * What the line that was clicked said the quest was worth, for one nothing else can tell.
@@ -1485,6 +1485,13 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
          */
         public String getValue() {
             return value;
+        }
+
+        /**
+         * @return the number the element that sent the event held, such as a slider's position.
+         */
+        public float getNumber() {
+            return number;
         }
 
         /**

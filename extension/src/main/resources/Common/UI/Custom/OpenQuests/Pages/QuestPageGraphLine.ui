@@ -1,4 +1,4 @@
 // One straight stretch of a link between two quests, sized, placed and coloured by the page.
 Group #Line {
-  Background: #3a475c;
+  Background: #55657d;
 }
