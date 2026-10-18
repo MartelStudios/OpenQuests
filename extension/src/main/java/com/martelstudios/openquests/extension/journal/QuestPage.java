@@ -270,7 +270,6 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                       .set("#ToolsSpacer.Visible", graphShown)
                       .set(QuestPageContext.ROOT_CONTAINER + ".Visible", !graphShown)
                       .set("#GraphScroll.Visible", graphShown)
-                      .set(ChapterGraphView.SLIDER + ".Visible", false)
                       .set("#ViewToggle.Visible", chapters);
 
         boolean editable = graphShown && canEdit();
@@ -1122,7 +1121,6 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             case QuestPageEventData.ACTION_GROUP -> toggleGroup(data.getTarget());
             case QuestPageEventData.ACTION_CHAPTER -> {
                 if (data.getTarget() != null) openChapter = data.getTarget();
-                graph.reset();
             }
             case QuestPageEventData.ACTION_VIEW -> graphMode = !graphMode;
             case QuestPageEventData.ACTION_EDIT -> editMode = !editMode && canEdit();
@@ -1134,14 +1132,6 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
                 var commandBuilder = new UICommandBuilder();
                 graph.select(commandBuilder, data.getTarget());
-                sendUpdate(commandBuilder, false);
-                return;
-            }
-
-            // Shifts the graph in place: a redraw would take the slider from under the mouse
-            case QuestPageEventData.ACTION_SCROLL -> {
-                var commandBuilder = new UICommandBuilder();
-                graph.scroll(commandBuilder, data.getNumber());
                 sendUpdate(commandBuilder, false);
                 return;
             }
@@ -1505,9 +1495,6 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         /** Read off the element on the client: the {@code @} asks for its value rather than a constant. */
         static final String KEY_VALUE = "@Value";
 
-        /** A number read off the element, such as a slider's position. */
-        static final String KEY_NUMBER = "@Number";
-
         static final String ACTION_TOGGLE = "toggle";
         static final String ACTION_OPEN = "open";
         static final String ACTION_CLAIM = "claim";
@@ -1523,7 +1510,6 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         static final String ACTION_EDIT = "edit";
         static final String ACTION_SELECT = "select";
         static final String ACTION_MOVE = "move";
-        static final String ACTION_SCROLL = "scroll";
         static final String ACTION_HOVER = "hover";
         static final String ACTION_CRUMB = "crumb";
         static final String ACTION_CLOSE = "close";
@@ -1537,14 +1523,11 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>(KEY_VALUE, Codec.STRING), (data, value) -> data.value = value, data -> data.value)
                                                                                  .add()
-                                                                                 .append(new KeyedCodec<>(KEY_NUMBER, Codec.FLOAT), (data, number) -> data.number = number, data -> data.number)
-                                                                                 .add()
                                                                                  .build();
 
         private String action;
         private String target;
         private String value;
-        private float number;
 
         /**
          * What the line that was clicked said the quest was worth, for one nothing else can tell.
@@ -1566,13 +1549,6 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
          */
         public String getValue() {
             return value;
-        }
-
-        /**
-         * @return the number the element that sent the event held, such as a slider's position.
-         */
-        public float getNumber() {
-            return number;
         }
 
         /**

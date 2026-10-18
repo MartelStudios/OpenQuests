@@ -18,8 +18,8 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 /**
- * Draws a whole {@link ChapterGraph} into the journal's graph area. Rows scroll natively; columns
- * through a slider that shifts the graph, a container scrolling one way only.
+ * Draws a whole {@link ChapterGraph} into the journal's graph area, which scrolls natively both
+ * ways: rows in the area, columns in a row inside it, a container scrolling one way only.
  *
  * <p>Links are cut into pieces one cell long, each drawn once whatever number of links runs along
  * it, with a dot where pieces meet away from a quest. Links sharing a stretch then share its piece
@@ -27,7 +27,6 @@ import java.util.*;
  */
 final class ChapterGraphView {
     static final String CONTAINER = "#Graph";
-    static final String SLIDER = "#GraphSlider";
 
     private static final String COMMON_DOCUMENT = "OpenQuests/Pages/QuestPageCommon.ui";
     private static final String NODE_DOCUMENT = "OpenQuests/Pages/QuestPageGraphNode.ui";
@@ -41,17 +40,12 @@ final class ChapterGraphView {
     private static final int NODE = 52;
     private static final int LINE = 8;
 
-    /**
-     * The width the graph area gets in the journal, less its vertical scrollbar: measured rather
-     * than declared, the area taking whatever room the chapter list leaves. Too low leaves a little
-     * blank past the last column, too high hides some of it.
-     */
-    private static final int VIEW_WIDTH = 695;
+    private static final String ROW = "#GraphRow";
 
     /**
-     * The slider's maximum in QuestPage.ui.
+     * The room a horizontal scrollbar takes under the graph: the default style's size and spacing.
      */
-    private static final int SLIDER_RANGE = 100;
+    private static final int SCROLLBAR = 12;
 
     /**
      * From the start of one chevron to the next along a line.
@@ -135,50 +129,6 @@ final class ChapterGraphView {
     @Nullable
     private ChapterGraph graph;
 
-    private int width;
-    private int height;
-
-    /**
-     * How far the slider shifted the graph left, in UI pixels.
-     */
-    private int offset;
-
-    /**
-     * Whether the slider's handle has to be put back, which only a chapter opened afresh asks for:
-     * written on every redraw, it would fight the player dragging it.
-     */
-    private boolean sliderStale = true;
-
-    /**
-     * Back to the left edge, for a chapter opened afresh.
-     */
-    void reset() {
-        offset = 0;
-        sliderStale = true;
-    }
-
-    /**
-     * Shifts the graph to where the slider points, moving it rather than drawing it again, so the
-     * slider keeps the mouse while dragged.
-     *
-     * @param position the slider's position, from 0 to {@link #SLIDER_RANGE}.
-     */
-    void scroll(@Nonnull UICommandBuilder commandBuilder, float position) {
-        offset = Math.round(position * maxOffset() / SLIDER_RANGE);
-        place(commandBuilder);
-    }
-
-    /**
-     * @return how far the graph can shift before its last column reaches the right edge.
-     */
-    private int maxOffset() {
-        return Math.max(0, width - VIEW_WIDTH);
-    }
-
-    private void place(@Nonnull UICommandBuilder commandBuilder) {
-        commandBuilder.setObject(CONTAINER + ".Anchor", anchor(-offset, 0, Math.max(width, VIEW_WIDTH), height));
-    }
-
     /**
      * Draws the graph: the grid when editing, then the lines, the dots joining them, and the tiles
      * over their ends.
@@ -204,18 +154,13 @@ final class ChapterGraphView {
             rows += EDIT_MARGIN;
         }
 
-        width = columns * CELL;
-        height = rows * CELL;
-        offset = Math.min(offset, maxOffset());
+        int width = columns * CELL;
+        int height = rows * CELL;
 
-        commandBuilder.clear(CONTAINER);
-        place(commandBuilder);
-
-        commandBuilder.set(SLIDER + ".Visible", true);
-        if (sliderStale) {
-            commandBuilder.set(SLIDER + ".Value", 0);
-            sliderStale = false;
-        }
+        // The row of columns is as tall as the graph and its horizontal scrollbar under it
+        commandBuilder.clear(CONTAINER)
+                      .setObject(CONTAINER + ".Anchor", size(width, height))
+                      .setObject(ROW + ".Anchor", heightOnly(height + SCROLLBAR));
 
         Map<Piece, Run> pieces = pieces(graph);
         Set<Long> occupied = new HashSet<>();
@@ -301,8 +246,6 @@ final class ChapterGraphView {
         }
         tiles = Map.copyOf(drawnTiles);
 
-        eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, SLIDER, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_SCROLL)
-                                                                                             .append(QuestPageEventData.KEY_NUMBER, SLIDER + ".Value"), false);
     }
 
     /**
@@ -524,6 +467,13 @@ final class ChapterGraphView {
         Anchor anchor = size(width, height);
         anchor.setLeft(Value.of(left));
         anchor.setTop(Value.of(top));
+        return anchor;
+    }
+
+    @Nonnull
+    private static Anchor heightOnly(int height) {
+        Anchor anchor = new Anchor();
+        anchor.setHeight(Value.of(height));
         return anchor;
     }
 

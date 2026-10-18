@@ -2,7 +2,7 @@ package com.martelstudios.openquests.extension.journal;
 
 import com.hypixel.hytale.assetstore.AssetExtraInfo;
 import com.martelstudios.openquests.core.chapters.OpenQuestChapter;
-import org.bson.BsonValue;
+import org.bson.BsonDocument;
 import org.bson.json.JsonMode;
 import org.bson.json.JsonWriterSettings;
 
@@ -42,8 +42,12 @@ final class ChapterLayoutWriter {
             throw new IOException("Chapter " + chapter.getId() + " is not a file that can be written: " + path);
         }
 
-        BsonValue encoded = OpenQuestChapter.CODEC.encode(chapter, new AssetExtraInfo<>(path, new AssetExtraInfo.Data(OpenQuestChapter.class, chapter.getId(), null)));
-        Files.writeString(path, encoded.asDocument().toJson(PRETTY) + System.lineSeparator());
+        BsonDocument encoded = OpenQuestChapter.CODEC.encode(chapter, new AssetExtraInfo<>(path, new AssetExtraInfo.Data(OpenQuestChapter.class, chapter.getId(), null))).asDocument();
+
+        // Every asset carries tags; a chapter naming none would otherwise gain an empty block
+        if (encoded.isDocument("Tags") && encoded.getDocument("Tags").isEmpty()) encoded.remove("Tags");
+
+        Files.writeString(path, encoded.toJson(PRETTY) + System.lineSeparator());
 
         store.loadAssetsFromPaths(pack, List.of(path));
     }
