@@ -8,7 +8,7 @@
     {
       "Type": "InWorld",
       "DescriptionKey": "quest.talk-merchant.in-temple",
-      "WorldNamePattern": "instance-Forgotten_Temple-.*"
+      "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)"
     }
   ],
   "SuccessfulRewards": [
