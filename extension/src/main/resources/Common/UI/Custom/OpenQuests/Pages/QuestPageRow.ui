@@ -80,9 +80,11 @@ Group #QuestPageRow {
         Visible: false;
       }
 
-      $C.@SmallSecondaryTextButton #Abandon {
-        @Anchor = (MinWidth: 110, Top: 8, Right: 8);
+      TextButton #Abandon {
         Text: "";
+        Anchor: (MinWidth: 110, Height: $C.@SmallButtonHeight, Top: 8, Right: 8);
+        Padding: (Horizontal: 16);
+        Style: $P.@DestructiveButtonStyle;
         Visible: false;
       }
 

@@ -115,3 +115,11 @@ $C = "../../Common.ui";
   Pressed: (Background: #2c3a52),
   Sounds: $C.@ButtonSounds
 );
+
+// The client's own red for a button that cannot be taken back, at the small button's size
+@DestructiveButtonStyle = TextButtonStyle(
+  Default: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
+  Hovered: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive_Hovered.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
+  Pressed: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive_Pressed.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
+  Sounds: $C.@ButtonDestructiveSounds
+);
