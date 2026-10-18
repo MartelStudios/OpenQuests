@@ -107,7 +107,13 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private String openChapter;
 
     @Nonnull
-    private Filter filter = Filter.ACTIVE;
+    private Filter questsFilter = Filter.ACTIVE;
+
+    /**
+     * Every state by default: a chapter is read as a whole, locked quests included.
+     */
+    @Nonnull
+    private Filter chaptersFilter = Filter.ALL;
 
     @Nonnull
     private Route route;
@@ -185,8 +191,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private void render(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder) {
         var playerComponents = EntityComponents.of(ref);
 
-        JournalRoute journal = journal();
-        Tab tab = Tab.ofTab(journal == null ? JournalRoutes.TAB_QUESTS : journal.getOpenTabName());
+        Tab tab = openTab();
 
         // Standing on a quest is reading that one quest; standing on the journal is reading a list
         boolean alone = route instanceof QuestRoute;
@@ -199,7 +204,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         renderBreadcrumb(commandBuilder, eventBuilder);
         renderTabs(commandBuilder, eventBuilder, tab, isOwedAnything(playerComponents));
-        renderFilter(commandBuilder, eventBuilder, !alone && tab == Tab.QUESTS);
+        renderFilter(commandBuilder, eventBuilder, alone || tab == Tab.PENDING ? null : filterOf(tab));
         renderChapters(commandBuilder, eventBuilder, !alone && tab == Tab.CHAPTERS);
         commandBuilder.clear(QuestPageContext.ROOT_CONTAINER);
 
@@ -223,6 +228,31 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     @Nullable
     private JournalRoute journal() {
         return route.getRoot() instanceof JournalRoute journal ? journal : null;
+    }
+
+    @Nonnull
+    private Tab openTab() {
+        JournalRoute journal = journal();
+        return Tab.ofTab(journal == null ? JournalRoutes.TAB_QUESTS : journal.getOpenTabName());
+    }
+
+    /**
+     * @return the state filter of that tab. Each list keeps its own, since they default differently.
+     */
+    @Nonnull
+    private Filter filterOf(@Nonnull Tab tab) {
+        return tab == Tab.CHAPTERS ? chaptersFilter : questsFilter;
+    }
+
+    private void setFilter(@Nullable String value) {
+        Tab tab = openTab();
+        Filter filter = Filter.parse(value, filterOf(tab));
+
+        if (tab == Tab.CHAPTERS) {
+            chaptersFilter = filter;
+        } else {
+            questsFilter = filter;
+        }
     }
 
     /**
@@ -300,7 +330,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private List<Entry> list(@Nonnull EntityComponents playerComponents, @Nonnull Tab tab) {
         return switch (tab) {
             case CHAPTERS -> collectChapter(playerComponents);
-            case QUESTS -> collect(playerComponents, filter);
+            case QUESTS -> collect(playerComponents, questsFilter);
             case PENDING -> collectOwed(playerComponents);
         };
     }
@@ -320,7 +350,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             if (entry == null) continue;
 
             boolean listed = entry.quest() != null ? entry.quest().isVisible() : entry.asset().getVisibility() == QuestVisibility.ALWAYS;
-            if (listed) entries.add(entry);
+            if (listed && chaptersFilter.accepts(entry.mark())) entries.add(entry);
         }
         return entries;
     }
@@ -557,12 +587,14 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
-     * The quests tab's choice between running, finished and every quest. A dropdown rather than a
-     * second row of tabs, which the page has no room left for.
+     * The open list's choice of quest states. A dropdown rather than a second row of tabs, which
+     * the page has no room left for.
+     *
+     * @param filter the open list's filter, or {@code null} where the page shows no such list.
      */
-    private void renderFilter(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, boolean shown) {
-        commandBuilder.set(FILTER_DROPDOWN + ".Visible", shown);
-        if (!shown) return;
+    private void renderFilter(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nullable Filter filter) {
+        commandBuilder.set(FILTER_DROPDOWN + ".Visible", filter != null);
+        if (filter == null) return;
 
         List<DropdownEntryInfo> entries = Arrays.stream(Filter.values())
                                                 .map(choice -> new DropdownEntryInfo(LocalizableString.fromMessageId(choice.labelKey), choice.name()))
@@ -663,13 +695,13 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         List<Entry> entries = new ArrayList<>();
 
         List<AbstractQuestProgression<?>> held = topLevel(questStore.getQuestIds());
-        held.sort(filter == Filter.DONE ? BY_RECENTLY_COMPLETED : byTrackedThenRecent(viewer));
+        held.sort(filter.isEnded() ? BY_RECENTLY_COMPLETED : byTrackedThenRecent(viewer));
 
         // One pass over everything the player holds: a quest that ended is set aside rather than
         // deleted, so the finished half of the journal is read the same way as the running half
         for (AbstractQuestProgression<?> quest : held) {
             if (!quest.isVisible()) continue;
-            if (!filter.accepts(quest.getStateFor(viewer))) continue;
+            if (!filter.accepts(QuestMark.of(quest.getStateFor(viewer)))) continue;
 
             entries.add(Entry.held(quest, viewer, isOwed(playerComponents, quest.getId())));
         }
@@ -897,7 +929,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             case QuestPageEventData.ACTION_CLAIM -> claim(ref, data.getTarget());
             case QuestPageEventData.ACTION_ABANDON -> abandon(ref, data.getTarget());
             case QuestPageEventData.ACTION_TRACK -> track(ref, data.getTarget());
-            case QuestPageEventData.ACTION_FILTER -> filter = Filter.parse(data.getValue(), filter);
+            case QuestPageEventData.ACTION_FILTER -> setFilter(data.getValue());
             case QuestPageEventData.ACTION_GROUP -> toggleGroup(data.getTarget());
             case QuestPageEventData.ACTION_CHAPTER -> {
                 if (data.getTarget() != null) openChapter = data.getTarget();
@@ -1190,10 +1222,16 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
-     * Which of the player's quests the quests tab lists.
+     * Which quests a list shows, by what became of them. Declaration order is the dropdown's.
      */
     private enum Filter {
-        ACTIVE("openquests.page.filter.active"), DONE("openquests.page.filter.done"), ALL("openquests.page.filter.all");
+        ALL("openquests.page.filter.all"),
+        ACTIVE("openquests.page.filter.active"),
+        DONE("openquests.page.filter.done"),
+        SUCCESSFUL("openquests.page.filter.successful"),
+        FAILED("openquests.page.filter.failed"),
+        ABANDONED("openquests.page.filter.abandoned"),
+        LOCKED("openquests.page.filter.locked");
 
         private final String labelKey;
 
@@ -1202,15 +1240,26 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         }
 
         /**
-         * @return whether a quest in that state belongs on this list. Read off the quest itself
-         * rather than off which store it came from, now that both halves live in the same one.
+         * @return whether a quest marked so belongs on this list. A quest whose record was lost
+         * still ended, so it counts as done without matching any one outcome.
          */
-        boolean accepts(@Nonnull QuestState state) {
+        boolean accepts(@Nonnull QuestMark mark) {
             return switch (this) {
-                case ACTIVE -> state == QuestState.IN_PROGRESS;
-                case DONE -> state != QuestState.IN_PROGRESS;
                 case ALL -> true;
+                case ACTIVE -> mark == QuestMark.IN_PROGRESS;
+                case DONE -> mark != QuestMark.IN_PROGRESS && mark != QuestMark.LOCKED;
+                case SUCCESSFUL -> mark == QuestMark.SUCCESSFUL;
+                case FAILED -> mark == QuestMark.FAILED;
+                case ABANDONED -> mark == QuestMark.ABANDONED;
+                case LOCKED -> mark == QuestMark.LOCKED;
             };
+        }
+
+        /**
+         * @return whether this list only holds quests that ended, which are read latest first.
+         */
+        boolean isEnded() {
+            return this == DONE || this == SUCCESSFUL || this == FAILED || this == ABANDONED;
         }
 
         /**
