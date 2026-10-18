@@ -1,0 +1,8 @@
+{
+  "Type": "Jump",
+  "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Raw.png",
+  "TargetQuantity": 2,
+  "SuccessfulRewards": [
+    { "Type": "GrantQuest", "AutoClaim": true, "QuestAssetIds": ["GraphTest_Chain1"] }
+  ]
+}

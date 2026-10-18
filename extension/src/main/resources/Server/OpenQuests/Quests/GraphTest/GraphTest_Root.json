@@ -1,0 +1,8 @@
+{
+  "Type": "Jump",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Stick.png",
+  "TargetQuantity": 1,
+  "SuccessfulRewards": [
+    { "Type": "GrantQuest", "AutoClaim": true, "QuestAssetIds": ["GraphTest_Branch1", "GraphTest_Branch2", "GraphTest_Branch3", "GraphTest_Branch4", "GraphTest_Branch5", "GraphTest_Branch6"] }
+  ]
+}

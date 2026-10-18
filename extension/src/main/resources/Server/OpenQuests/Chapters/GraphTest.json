@@ -1,0 +1,12 @@
+{
+  "NameKey": "quest.chapter.graph-test",
+  "Group": "Adventure",
+  "Order": 99,
+  "Icon": "Icons/ItemCategories/Editor.png",
+  "QuestAssetIds": ["GraphTest_Root", "GraphTest_Branch1", "GraphTest_Branch2", "GraphTest_Branch3", "GraphTest_Branch4", "GraphTest_Branch5", "GraphTest_Branch6", "GraphTest_Chain1", "GraphTest_Chain2", "GraphTest_Chain3", "GraphTest_Chain4", "GraphTest_Chain5", "GraphTest_Chain6", "GraphTest_Chain7", "GraphTest_Chain8", "GraphTest_Chain9", "GraphTest_Chain10", "GraphTest_Leaf2a", "GraphTest_Leaf2b", "GraphTest_Down", "GraphTest_Back"],
+  "Layout": [
+    { "Quest": "GraphTest_Root", "Column": 0, "Row": 2 },
+    { "Quest": "GraphTest_Down", "Column": 1, "Row": 7 },
+    { "Quest": "GraphTest_Back", "Column": 4, "Row": 3 }
+  ]
+}

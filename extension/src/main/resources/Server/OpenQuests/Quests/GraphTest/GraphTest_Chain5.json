@@ -1,0 +1,8 @@
+{
+  "Type": "Jump",
+  "Icon": "Icons/ItemsGenerated/Weapon_Club_Crude.png",
+  "TargetQuantity": 15,
+  "SuccessfulRewards": [
+    { "Type": "GrantQuest", "AutoClaim": true, "QuestAssetIds": ["GraphTest_Chain6", "GraphTest_Back"] }
+  ]
+}

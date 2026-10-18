@@ -1,0 +1,8 @@
+{
+  "Type": "Jump",
+  "Icon": "Icons/ItemsGenerated/Bench_Campfire.png",
+  "TargetQuantity": 16,
+  "SuccessfulRewards": [
+    { "Type": "GrantQuest", "AutoClaim": true, "QuestAssetIds": ["GraphTest_Chain7"] }
+  ]
+}
