@@ -33,6 +33,13 @@
       }
     },
     {
+      "Quest": "GoblinBreachWatchtower",
+      "Position": {
+        "X": 4,
+        "Y": 0
+      }
+    },
+    {
       "Quest": "GoblinBreachLobbers",
       "Position": {
         "X": 3,
