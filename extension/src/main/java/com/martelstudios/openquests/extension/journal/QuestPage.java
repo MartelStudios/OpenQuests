@@ -365,7 +365,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             Entry entry = resolve(playerComponents, assetId, null);
             if (entry == null) continue;
 
-            boolean listed = entry.quest() != null ? entry.quest().isVisible() : entry.asset().getVisibility().isReachedBy(null);
+            boolean listed = OpenQuestChapter.isShown(assetId, entry.quest());
             if (listed && chaptersFilter.accepts(entry.mark())) entries.add(entry);
         }
         return entries;

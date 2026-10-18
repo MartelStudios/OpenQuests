@@ -588,9 +588,9 @@ quests, drawn in the order listed. Groups and chapters sort by `Order`, then by 
 in several chapters, or in none. A quest the player was never given shows as locked, unless its
 `Visibility` keeps it hidden until then.
 
-A chapter takes a `Visibility` too, with the same values read against its quests: it shows once
-one of them reaches it (`WhenSuccessful`: once one succeeded), and from the start with `Always`,
-the default. A group shows while one of its chapters does.
+A chapter has no visibility of its own: it shows while one of its quests does, and a group while
+one of its chapters does. A quest kept out of sight cannot be glimpsed through its chapter, and a
+chapter of quests set to `WhenStarted` or later stays hidden until the player reaches one.
 
 ```json
 { "NameKey": "quest.chapter.goblin-lair", "Group": "Adventure", "Order": 2, "QuestAssetIds": ["GoblinLairRats", "GoblinLairTunnels"] }

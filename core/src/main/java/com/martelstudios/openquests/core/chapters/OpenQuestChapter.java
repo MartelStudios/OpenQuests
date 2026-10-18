@@ -8,12 +8,10 @@ import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.assetstore.map.JsonAssetWithMap;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.models.QuestVisibility;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,8 +41,6 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
                                                                                              .append(new KeyedCodec<>("Icon", Codec.STRING), (chapter, icon) -> chapter.icon = icon, chapter -> chapter.icon)
                                                                                              .addValidator(OpenQuestChapterGroup.ICON_VALIDATOR)
                                                                                              .add()
-                                                                                             .append(new KeyedCodec<>("Visibility", new EnumCodec<>(QuestVisibility.class)), (chapter, visibility) -> chapter.visibility = visibility, chapter -> chapter.visibility)
-                                                                                             .add()
                                                                                              .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(Codec.STRING, String[]::new)), (chapter, ids) -> chapter.questAssetIds = ids, chapter -> chapter.questAssetIds)
                                                                                              .addValidator(OpenQuestAsset.VALIDATOR_CACHE.getArrayValidator())
                                                                                              .add()
@@ -60,25 +56,32 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
     protected String icon;
 
     @Nonnull
-    protected QuestVisibility visibility = QuestVisibility.ALWAYS;
-
-    @Nonnull
     protected String[] questAssetIds = NO_QUESTS;
 
     protected OpenQuestChapter() {}
 
     /**
      * @param runOf the player's run of a quest asset, or {@code null} for one they were never handed.
-     * @return whether this chapter is shown to that player: once one of its quests reaches what its
-     * {@code Visibility} asks for, read the way a quest's own visibility is.
+     * @return whether this chapter is shown to that player: once one of its quests is. A chapter has
+     * no visibility of its own, so a quest kept out of sight cannot be glimpsed through it.
      */
     public boolean isVisible(@Nonnull Function<String, AbstractQuestProgression<?>> runOf) {
-        if (visibility.isReachedBy(null)) return true;
-
         for (String questAssetId : questAssetIds) {
-            if (visibility.isReachedBy(runOf.apply(questAssetId))) return true;
+            if (isShown(questAssetId, runOf.apply(questAssetId))) return true;
         }
         return false;
+    }
+
+    /**
+     * @param run the player's run of that quest, or {@code null} for one they were never handed.
+     * @return whether a chapter lists that quest: the run's own visibility where there is one, and
+     * otherwise its asset's, which only {@code Always} lets through, as a locked quest.
+     */
+    public static boolean isShown(@Nonnull String questAssetId, @Nullable AbstractQuestProgression<?> run) {
+        if (run != null) return run.isVisible();
+
+        OpenQuestAsset asset = OpenQuestAsset.getAsset(questAssetId);
+        return asset != null && asset.getVisibility().isReachedBy(null);
     }
 
     /**

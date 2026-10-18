@@ -1,6 +1,7 @@
 {
   "Type": "Run",
   "Categories": ["Achievement"],
+  "Visibility": "WhenStarted",
   "TitleKey": "quest.run-master.title",
   "DescriptionKey": "quest.run-master.description",
   "TargetQuantity": 10000,
