@@ -1,5 +1,6 @@
 {
   "Type": "MMOSkillTreeGainXp",
+  "Categories": ["MMOSkillTree"],
   "Skill": "MINING",
   "TargetQuantity": 5000,
   "SuccessfulRewards": [

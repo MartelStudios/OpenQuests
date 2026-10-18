@@ -10,3 +10,7 @@ quest.default.complete-bounty-any = Terminez {quantity, plural, one {un contrat}
 title.openquestsmmoskilltree_prospector.name = Prospecteur
 title.openquestsmmoskilltree_prospector.flavor = A suivi le chemin du prospecteur jusqu'au bout.
 flair.openquestsmmoskilltree_prospector.name = Prospecteur
+
+category.mmoskilltree = MMO Skill Tree
+chapter-group.mmoskilltree = MMO Skill Tree
+chapter.prospector = Le prospecteur

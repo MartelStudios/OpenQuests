@@ -1,5 +1,6 @@
 {
   "Type": "MMOSkillTreeAbilityCast",
+  "Categories": ["MMOSkillTree"],
   "Skill": "MINING",
   "TargetQuantity": 5,
   "SuccessfulRewards": [

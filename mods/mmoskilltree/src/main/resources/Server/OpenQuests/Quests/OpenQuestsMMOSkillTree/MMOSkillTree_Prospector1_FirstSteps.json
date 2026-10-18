@@ -1,5 +1,6 @@
 {
   "Type": "MMOSkillTreeGainXp",
+  "Categories": ["MMOSkillTree"],
   "TargetQuantity": 300,
   "SuccessfulRewards": [
     { "Type": "MMOSkillTreeLamp", "Amount": 300, "Skills": "GATHERING", "AutoClaim": true },
