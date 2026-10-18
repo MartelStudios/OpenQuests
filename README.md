@@ -670,6 +670,23 @@ same words for everyone's defaults, granted to `hytale:WorldEditor`.
 }
 ```
 
+- `Choice`: opens a popup where the player picks `Choices` (1 by default) of its `Rewards`, each a
+  `Reward` that can be picked up to `Count` times (1 by default). The popup closes once the picks
+  are spent or nothing is left to pick. Each pick is kept as it is made, so a popup closed early
+  reopens with what is left on the next claim. With `AutoClaim` it opens as the quest ends; a
+  player who is not in a world then claims it from the journal.
+
+```json
+{
+  "Type": "Choice",
+  "Choices": 2,
+  "Rewards": [
+    { "Reward": { "Type": "Item", "ItemId": "Ingredient_Bar_Gold", "Quantity": 5 } },
+    { "Count": 2, "Reward": { "Type": "Item", "ItemId": "Potion_Health_Greater", "Quantity": 2 } }
+  ]
+}
+```
+
 ## Constraints
 
 An asset can lay rules on the quests made from it, on top of what its type asks for, under

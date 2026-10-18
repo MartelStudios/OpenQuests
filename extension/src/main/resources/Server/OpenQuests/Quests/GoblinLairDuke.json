@@ -29,10 +29,20 @@
   ],
   "SuccessfulRewards": [
     {
-      "Type": "Item",
-      "ItemId": "Ingredient_Bar_Gold",
-      "Quantity": 5,
-      "AutoClaim": false
+      "Type": "Choice",
+      "Choices": 2,
+      "Rewards": [
+        {
+          "Reward": { "Type": "Item", "ItemId": "Ingredient_Bar_Gold", "Quantity": 5 }
+        },
+        {
+          "Count": 2,
+          "Reward": { "Type": "Item", "ItemId": "Potion_Health_Greater", "Quantity": 2 }
+        },
+        {
+          "Reward": { "Type": "Item", "ItemId": "Weapon_Crossbow_Iron" }
+        }
+      ]
     }
   ]
 }
