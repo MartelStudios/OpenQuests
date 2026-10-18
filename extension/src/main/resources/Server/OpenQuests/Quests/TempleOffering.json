@@ -13,7 +13,7 @@
     {
       "Type": "InWorld",
       "DescriptionKey": "quest.temple-offering.in-temple",
-      "WorldNamePattern": "instance-Forgotten_Temple-.*"
+      "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)"
     },
     {
       "Type": "NearPosition",
