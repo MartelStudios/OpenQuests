@@ -42,7 +42,7 @@ Write your quests once in OpenQuests and let them speak MMO Skill Tree. This plu
 
 🧪 **`MMOSkillTreeEffect`** puts an effect on the player, a food buff or a potion, for its own duration or one you set.
 
-🐸 **`MMOSkillTreeCostume`** dresses the player in a costume, such as a potion's morph.
+🐸 **`MMOSkillTreeCostume`** dresses the player in a costume, such as a potion's morph, and can roll a loot table instead when they cannot wear it.
 
 🏷️ **`MMOSkillTreeTitle`** unlocks a title the player can wear by their name.
 
