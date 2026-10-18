@@ -74,7 +74,7 @@ public class ChoiceRewardPage extends InteractiveCustomUIPage<ChoiceRewardPage.E
 
             context.into(optionSelector + "#Preview", () -> QuestPageRows.renderReward(context, entry.getReward()));
 
-            if (entry.getCount() > 1) commandBuilder.set(optionSelector + "#Count.Text", "x" + entry.getCount());
+            if (entry.getCount() > 1) commandBuilder.set(optionSelector + "#Count.TextSpans", Message.translation("openquests.choice.count").param("count", entry.getCount()));
 
             commandBuilder.set(optionSelector + "#Choose.Text", Message.translation("openquests.choice.pick"));
             eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, optionSelector + "#Choose", EventData.of(EventDataModel.KEY_ACTION, EventDataModel.ACTION_PICK)

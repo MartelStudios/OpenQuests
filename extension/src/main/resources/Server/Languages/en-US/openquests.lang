@@ -55,6 +55,7 @@ page.reward.choice = {count, plural, one {One of these, your choice} other {{cou
 choice.title = Choose your reward
 choice.left = {count, plural, one {1 pick left} other {{count, number} picks left}}
 choice.pick = Choose
+choice.count = {count, number} left
 page.claim = Claim
 page.abandon = Abandon
 page.track = Track

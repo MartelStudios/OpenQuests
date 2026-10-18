@@ -15,7 +15,7 @@ Group #ChoiceRewardOption {
     FlexWeight: 1;
   }
 
-  Label #Count { Text: ""; Anchor: (Width: 50, Height: $C.@SmallButtonHeight, Left: 8, Right: 8); Style: $P.@ProgressStyle; }
+  Label #Count { Text: ""; Anchor: (Width: 70, Height: $C.@SmallButtonHeight, Left: 8, Right: 8); Style: $P.@ProgressStyle; }
 
   TextButton #Choose {
     Text: "";
