@@ -52,7 +52,11 @@ Every reward is listed in the journal the way MMO Skill Tree lists it, icon incl
 
 ### 🧰 And
 
-⛏️ **An example line to start from.** *The prospector's path* runs five quests, from a first bit of XP to Mining mastery, and between them uses every quest type and pays every reward above, down to a Prospector title and flair of its own.
+⛏️ **An example line to start from.** *The prospector's path* runs five quests, from a first bit of XP to Mining mastery, and between them uses every quest type and pays every reward above, down to a Prospector title and flair of its own. Hand it to a player from the console or in game; each quest hands over the next:
+
+```
+/oquest create player MMOSkillTree_Prospector1_FirstSteps <player>
+```
 
 ✍️ **Written in the asset editor.** Skills, abilities, boards, currencies, reputations, loot tables, titles and the rest are picked from a list rather than typed by hand, and a wrong id fails at load instead of in a player's hands.
 
