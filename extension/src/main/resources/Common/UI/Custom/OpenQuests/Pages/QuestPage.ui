@@ -35,21 +35,19 @@ $C.@DecoratedContainer {
       Anchor: (Height: 32, Top: 8);
       Visible: false;
 
-      // Narrows the open list by title. Each tab keeps its own text, which the page writes back
-      // on switching tab and otherwise leaves to the player typing in it
-      $C.@TextField #Search {
-        FlexWeight: 1;
-        Anchor: (Height: 32);
-        PlaceholderText: %server.customUI.searchPlaceholder;
-      }
-
-      // Holds the search field's place where the page hides it
-      Group #ToolsSpacer { FlexWeight: 1; Visible: false; }
-
       // Which quest states the open list shows, hidden where there is no such list
       $C.@DropdownBox #QuestFilter {
-        Anchor: (Width: 200, Height: 32, Left: 8);
+        Anchor: (Width: 200, Height: 32, Right: 8);
         Visible: false;
+      }
+
+      Group { FlexWeight: 1; }
+
+      // Narrows the open list by title: the client's own header search, folded to its icon against the
+      // right of its box and unfolding leftwards inside it. Each tab keeps its own text, which the page
+      // writes back on switching tab and otherwise leaves to the player typing in it
+      $C.@HeaderSearch #SearchBox {
+        @MarginRight = 0;
       }
 
       // Lays the open chapter out on its grid, for players allowed to; shown in the graph only

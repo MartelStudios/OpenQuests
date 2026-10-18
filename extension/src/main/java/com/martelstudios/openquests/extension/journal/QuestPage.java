@@ -78,7 +78,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private static final String BREADCRUMB_CONTAINER = "#Breadcrumb";
     private static final String CHAPTERS_CONTAINER = "#ChapterList";
     private static final String FILTER_DROPDOWN = "#QuestFilter";
-    private static final String SEARCH_FIELD = "#Search";
+    private static final String SEARCH_FIELD = "#SearchInput";
 
     private static final Value<String> CHAPTER_OPEN_STYLE = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ChapterOpenStyle");
     private static final Value<String> CHAPTER_OPEN_LABEL_STYLE = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ChapterOpenLabelStyle");
@@ -263,11 +263,10 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     /**
      * The chapters tab's switch between list and graph. The graph shows every quest of the
-     * chapter, so the search field gives way to an empty stretch there.
+     * chapter, so the search field is hidden there.
      */
     private void renderViewTools(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, boolean chapters, boolean graphShown) {
-        commandBuilder.set(SEARCH_FIELD + ".Visible", !graphShown)
-                      .set("#ToolsSpacer.Visible", graphShown)
+        commandBuilder.set("#SearchBox.Visible", !graphShown)
                       .set(QuestPageContext.ROOT_CONTAINER + ".Visible", !graphShown)
                       .set("#GraphScroll.Visible", graphShown)
                       .set("#ViewToggle.Visible", chapters);
