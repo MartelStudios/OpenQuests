@@ -1,8 +1,0 @@
-{
-  "Type": "Jump",
-  "Icon": "Icons/ItemsGenerated/Tool_Hatchet_Crude.png",
-  "TargetQuantity": 14,
-  "SuccessfulRewards": [
-    { "Type": "GrantQuest", "AutoClaim": true, "QuestAssetIds": ["GraphTest_Chain5"] }
-  ]
-}

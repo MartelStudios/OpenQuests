@@ -1,8 +1,0 @@
-{
-  "Type": "Jump",
-  "Icon": "Icons/ItemsGenerated/Ingredient_Fibre.png",
-  "TargetQuantity": 18,
-  "SuccessfulRewards": [
-    { "Type": "GrantQuest", "AutoClaim": true, "QuestAssetIds": ["GraphTest_Chain9"] }
-  ]
-}

@@ -1,8 +1,0 @@
-{
-  "Type": "Jump",
-  "Icon": "Icons/ItemsGenerated/Plant_Flower_Common_Blue.png",
-  "TargetQuantity": 19,
-  "SuccessfulRewards": [
-    { "Type": "GrantQuest", "AutoClaim": true, "QuestAssetIds": ["GraphTest_Chain10"] }
-  ]
-}

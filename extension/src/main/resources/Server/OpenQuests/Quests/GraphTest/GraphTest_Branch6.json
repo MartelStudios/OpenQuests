@@ -1,8 +1,0 @@
-{
-  "Type": "Jump",
-  "Icon": "Icons/ItemsGenerated/Furniture_Crude_Torch.png",
-  "TargetQuantity": 7,
-  "SuccessfulRewards": [
-    { "Type": "GrantQuest", "AutoClaim": true, "QuestAssetIds": ["GraphTest_Down"] }
-  ]
-}
