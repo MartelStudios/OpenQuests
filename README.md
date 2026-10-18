@@ -656,6 +656,19 @@ same words for everyone's defaults, granted to `hytale:WorldEditor`.
   `"Command": "give {player} Ingredient_Stick --quantity=5"` works; the optional arguments of a
   server command are named, never positional. A leading slash is optional. Runs as the console
   unless `"AsPlayer": true`, which runs it with the permissions of the player instead.
+- `Random`: grants one of its `Rewards`, each a `Reward` and a `Weight` (1 by default) drawn
+  against the others: weights 6, 3 and 1 are 60, 30 and 10 percent. A draw that cannot be granted
+  (a full inventory) grants nothing and is drawn again on the next attempt.
+
+```json
+{
+  "Type": "Random",
+  "Rewards": [
+    { "Weight": 3, "Reward": { "Type": "Item", "ItemId": "Ingredient_Bar_Gold", "Quantity": 2 } },
+    { "Weight": 1, "Reward": { "Type": "Item", "ItemId": "Potion_Health_Greater" } }
+  ]
+}
+```
 
 ## Constraints
 

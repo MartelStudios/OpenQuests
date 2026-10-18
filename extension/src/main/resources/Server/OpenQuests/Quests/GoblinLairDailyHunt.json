@@ -8,10 +8,22 @@
   "NpcGroupId": "Goblin_No_Bosses",
   "SuccessfulRewards": [
     {
-      "Type": "Item",
-      "ItemId": "Ingredient_Bar_Gold",
-      "Quantity": 2,
-      "AutoClaim": true
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 6,
+          "Reward": { "Type": "Item", "ItemId": "Ingredient_Bar_Gold", "Quantity": 2 }
+        },
+        {
+          "Weight": 3,
+          "Reward": { "Type": "Item", "ItemId": "Ingredient_Bar_Silver", "Quantity": 5 }
+        },
+        {
+          "Weight": 1,
+          "Reward": { "Type": "Item", "ItemId": "Potion_Health_Greater", "Quantity": 2 }
+        }
+      ]
     }
   ]
 }

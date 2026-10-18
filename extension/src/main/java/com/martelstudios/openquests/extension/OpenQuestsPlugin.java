@@ -33,6 +33,7 @@ import com.martelstudios.openquests.extension.quests.useentity.UseEntityFeature;
 import com.martelstudios.openquests.extension.rewards.command.CommandRewardFeature;
 import com.martelstudios.openquests.extension.rewards.grantquest.GrantQuestRewardFeature;
 import com.martelstudios.openquests.extension.rewards.item.ItemRewardFeature;
+import com.martelstudios.openquests.extension.rewards.random.RandomRewardFeature;
 
 import javax.annotation.Nonnull;
 
@@ -80,6 +81,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         ItemRewardFeature.register(this);
         GrantQuestRewardFeature.register(this);
         CommandRewardFeature.register(this);
+        RandomRewardFeature.register(this);
 
         // Constraints
         TimeConstraintsFeature.register(this);
