@@ -1,12 +1,13 @@
 package com.martelstudios.openquests.extension.journal;
 
-import com.martelstudios.openquests.core.chapters.ChapterPlacement;
+import com.martelstudios.openquests.core.chapters.ChapterQuest;
 import com.martelstudios.openquests.core.chapters.OpenQuestChapter;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.extension.rewards.grantquest.GrantQuestReward;
+import org.joml.Vector2i;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -24,7 +25,24 @@ final class ChapterGraph {
      */
     private static final QuestState[] OUTCOMES = {QuestState.SUCCESSFUL, QuestState.FAILED, QuestState.ABANDONED};
 
-    record Node(@Nonnull String assetId, @Nonnull OpenQuestAsset asset, int column, int row, @Nonnull QuestMark mark) {}
+    /**
+     * What a quest wearing no icon of its own, in a chapter giving it none, is drawn as.
+     */
+    private static final String DEFAULT_ICON = "Icons/ResourceTypes/Books.png";
+
+    /**
+     * @param icon the path under {@code Common/} the tile draws, always set.
+     */
+    record Node(@Nonnull String assetId, @Nonnull OpenQuestAsset asset, @Nonnull String icon, int column, int row, @Nonnull QuestMark mark) {}
+
+    /**
+     * @return the chapter's icon for the quest, else the quest's own, else a book.
+     */
+    @Nonnull
+    private static String iconOf(@Nonnull ChapterQuest entry, @Nonnull OpenQuestAsset asset) {
+        if (entry.getIcon() != null) return entry.getIcon();
+        return asset.getIcon() != null ? asset.getIcon() : DEFAULT_ICON;
+    }
 
     /**
      * @param outcomes the outcomes of {@code from} that hand {@code to} out, one or several.
@@ -65,24 +83,27 @@ final class ChapterGraph {
     @Nonnull
     static ChapterGraph of(@Nonnull OpenQuestChapter chapter, @Nonnull Function<String, AbstractQuestProgression<?>> runOf, @Nonnull UUID viewer) {
         Map<String, OpenQuestAsset> shown = new LinkedHashMap<>();
+        Map<String, ChapterQuest> entries = new HashMap<>();
         Map<String, QuestMark> marks = new HashMap<>();
 
-        for (String assetId : chapter.getQuestAssetIds()) {
+        for (ChapterQuest entry : chapter.getQuests()) {
+            String assetId = entry.getQuest();
             AbstractQuestProgression<?> run = runOf.apply(assetId);
             OpenQuestAsset asset = OpenQuestAsset.getAsset(assetId);
-            if (asset == null || !OpenQuestChapter.isShown(assetId, run)) continue;
+            if (asset == null || shown.containsKey(assetId) || !OpenQuestChapter.isShown(assetId, run)) continue;
 
             shown.put(assetId, asset);
+            entries.put(assetId, entry);
             marks.put(assetId, run == null ? QuestMark.LOCKED : QuestMark.of(run.getStateFor(viewer)));
         }
 
         Map<String, Map<String, Set<QuestState>>> grants = grants(shown);
-        Map<String, int[]> cells = place(chapter, shown.keySet(), grants);
+        Map<String, int[]> cells = place(entries, shown.keySet(), grants);
 
         Map<String, Node> nodes = new LinkedHashMap<>();
         shown.forEach((assetId, asset) -> {
             int[] cell = cells.get(assetId);
-            nodes.put(assetId, new Node(assetId, asset, cell[0], cell[1], marks.get(assetId)));
+            nodes.put(assetId, new Node(assetId, asset, iconOf(entries.get(assetId), asset), cell[0], cell[1], marks.get(assetId)));
         });
 
         List<Edge> edges = new ArrayList<>();
@@ -118,22 +139,22 @@ final class ChapterGraph {
     }
 
     /**
-     * Cells for every shown quest: the chapter's layout first, then the rest in chapter order, each
+     * Cells for every shown quest: the positions the chapter gives first, then the rest in chapter order, each
      * one column right of the furthest quest handing it out and in the first free row there.
      *
      * @return {column, row} by asset id.
      */
     @Nonnull
-    private static Map<String, int[]> place(@Nonnull OpenQuestChapter chapter, @Nonnull Set<String> shown, @Nonnull Map<String, Map<String, Set<QuestState>>> grants) {
+    private static Map<String, int[]> place(@Nonnull Map<String, ChapterQuest> entries, @Nonnull Set<String> shown, @Nonnull Map<String, Map<String, Set<QuestState>>> grants) {
         Map<String, int[]> cells = new HashMap<>();
         Set<Long> taken = new HashSet<>();
 
         for (String assetId : shown) {
-            ChapterPlacement placement = chapter.getPlacement(assetId);
-            if (placement == null) continue;
+            Vector2i position = entries.get(assetId).getPosition();
+            if (position == null) continue;
 
-            cells.put(assetId, new int[]{placement.getColumn(), placement.getRow()});
-            taken.add(key(placement.getColumn(), placement.getRow()));
+            cells.put(assetId, new int[]{position.x, position.y});
+            taken.add(key(position.x, position.y));
         }
 
         for (String assetId : shown) {

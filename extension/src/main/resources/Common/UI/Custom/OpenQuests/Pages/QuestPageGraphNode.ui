@@ -10,8 +10,8 @@ Button #Node {
   // Laid under the icon and recoloured by the page while a linked quest is hovered
   Group #Tint { Background: #000000(0); }
 
-  // Hidden by the page for a quest naming no icon
-  AssetImage #Icon { Anchor: (Left: 8, Top: 8, Width: 36, Height: 36); Visible: false; }
+  // The icon the chapter gives the quest, else its own, else a book
+  AssetImage #Icon { Anchor: (Left: 8, Top: 8, Width: 36, Height: 36); }
 
   Group #Mark { Anchor: (Right: 3, Top: 3, Width: 12, Height: 12); }
 }

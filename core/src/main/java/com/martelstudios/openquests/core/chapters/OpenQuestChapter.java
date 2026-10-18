@@ -26,8 +26,6 @@ import java.util.function.Function;
  */
 public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenQuestChapter>> {
 
-    private static final String[] NO_QUESTS = new String[0];
-
     public static final AssetBuilderCodec<String, OpenQuestChapter> CODEC = AssetBuilderCodec.builder(OpenQuestChapter.class, OpenQuestChapter::new, Codec.STRING, (chapter, id) -> chapter.id = id, chapter -> chapter.id, (chapter, data) -> chapter.data = data, chapter -> chapter.data)
                                                                                              .append(new KeyedCodec<>("NameKey", Codec.STRING), (chapter, key) -> chapter.nameKey = key, chapter -> chapter.nameKey)
                                                                                              .addValidator(Validators.nonNull())
@@ -41,10 +39,7 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
                                                                                              .append(new KeyedCodec<>("Icon", Codec.STRING), (chapter, icon) -> chapter.icon = icon, chapter -> chapter.icon)
                                                                                              .addValidator(OpenQuestAsset.ICON_VALIDATOR)
                                                                                              .add()
-                                                                                             .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(Codec.STRING, String[]::new)), (chapter, ids) -> chapter.questAssetIds = ids, chapter -> chapter.questAssetIds)
-                                                                                             .addValidator(OpenQuestAsset.VALIDATOR_CACHE.getArrayValidator())
-                                                                                             .add()
-                                                                                             .append(new KeyedCodec<>("Layout", new ArrayCodec<>(ChapterPlacement.CODEC, ChapterPlacement[]::new)), (chapter, layout) -> chapter.layout = layout, chapter -> chapter.layout)
+                                                                                             .append(new KeyedCodec<>("Quests", new ArrayCodec<>(ChapterQuest.CODEC, ChapterQuest[]::new)), (chapter, quests) -> chapter.quests = quests, chapter -> chapter.quests)
                                                                                              .add()
                                                                                              .build();
 
@@ -58,23 +53,16 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
     protected String icon;
 
     @Nonnull
-    protected String[] questAssetIds = NO_QUESTS;
-
-    @Nonnull
-    protected ChapterPlacement[] layout = new ChapterPlacement[0];
+    protected ChapterQuest[] quests = new ChapterQuest[0];
 
     protected OpenQuestChapter() {}
 
     /**
-     * @return the cell the graph draws that quest in, or {@code null} for a quest the layout does
-     * not place, which the graph places by itself.
+     * @return the quests of this chapter as it shows them, in the order they are read.
      */
-    @Nullable
-    public ChapterPlacement getPlacement(@Nonnull String questAssetId) {
-        for (ChapterPlacement placement : layout) {
-            if (placement.getQuest().equals(questAssetId)) return placement;
-        }
-        return null;
+    @Nonnull
+    public ChapterQuest[] getQuests() {
+        return quests;
     }
 
     /**
@@ -83,8 +71,8 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
      * no visibility of its own, so a quest kept out of sight cannot be glimpsed through it.
      */
     public boolean isVisible(@Nonnull Function<String, AbstractQuestProgression<?>> runOf) {
-        for (String questAssetId : questAssetIds) {
-            if (isShown(questAssetId, runOf.apply(questAssetId))) return true;
+        for (ChapterQuest quest : quests) {
+            if (isShown(quest.getQuest(), runOf.apply(quest.getQuest()))) return true;
         }
         return false;
     }
@@ -135,14 +123,6 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
      */
     public int getOrder() {
         return order;
-    }
-
-    /**
-     * @return the quests of this chapter, in the order they are read.
-     */
-    @Nonnull
-    public String[] getQuestAssetIds() {
-        return questAssetIds;
     }
 
     /**

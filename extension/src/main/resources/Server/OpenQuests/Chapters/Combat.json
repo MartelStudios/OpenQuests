@@ -3,5 +3,7 @@
   "Group": "Feats",
   "Order": 1,
   "Icon": "Icons/ItemsGenerated/Weapon_Club_Crude.png",
-  "QuestAssetIds": ["FirstBlood"]
+  "Quests": [
+    { "Quest": "FirstBlood" }
+  ]
 }

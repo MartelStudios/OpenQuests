@@ -26,6 +26,7 @@ import com.hypixel.hytale.server.core.util.MessageUtil;
 import com.martelstudios.opennavigation.routes.Route;
 import com.martelstudios.opennavigation.routes.TabRoute;
 import com.martelstudios.opennavigation.services.NavigationService;
+import com.martelstudios.openquests.core.chapters.ChapterQuest;
 import com.martelstudios.openquests.core.chapters.OpenQuestChapter;
 import com.martelstudios.openquests.core.chapters.OpenQuestChapterGroup;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
@@ -404,7 +405,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         if (chapter == null) return List.of();
 
         List<Entry> entries = new ArrayList<>();
-        for (String assetId : chapter.getQuestAssetIds()) {
+        for (ChapterQuest chapterQuest : chapter.getQuests()) {
+            String assetId = chapterQuest.getQuest();
             Entry entry = resolve(playerComponents, assetId, null);
             if (entry == null) continue;
 

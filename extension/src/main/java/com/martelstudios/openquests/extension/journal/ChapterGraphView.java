@@ -184,11 +184,7 @@ final class ChapterGraphView {
                           .set(selector + " #Mark.Background", QuestPageRows.iconOf(node.mark()))
                           .set(selector + ".TooltipTextSpans", tooltip(node));
 
-            String icon = node.asset().getIcon();
-            if (icon != null) {
-                commandBuilder.set(selector + " #Icon.AssetPath", icon)
-                              .set(selector + " #Icon.Visible", true);
-            }
+            commandBuilder.set(selector + " #Icon.AssetPath", node.icon());
 
             eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, selector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_OPEN)
                                                                                                  .append(QuestPageEventData.KEY_TARGET, node.assetId()), false);

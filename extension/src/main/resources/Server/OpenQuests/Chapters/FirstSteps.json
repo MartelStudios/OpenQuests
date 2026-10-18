@@ -3,5 +3,10 @@
   "Group": "Adventure",
   "Order": 0,
   "Icon": "Icons/ItemsGenerated/Tool_Hatchet_Crude.png",
-  "QuestAssetIds": ["Intro", "CraftTools", "CraftWorkbench", "ChooseYourWeapon"]
+  "Quests": [
+    { "Quest": "Intro" },
+    { "Quest": "CraftTools" },
+    { "Quest": "CraftWorkbench" },
+    { "Quest": "ChooseYourWeapon" }
+  ]
 }

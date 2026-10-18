@@ -3,5 +3,10 @@
   "Group": "Survival",
   "Order": 0,
   "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Raw.png",
-  "QuestAssetIds": ["GatherMeat", "CraftCampfire", "CookMeat", "EatMeat"]
+  "Quests": [
+    { "Quest": "GatherMeat", "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Raw.png" },
+    { "Quest": "CraftCampfire", "Icon": "Icons/ItemsGenerated/Bench_Campfire.png" },
+    { "Quest": "CookMeat", "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Cooked.png" },
+    { "Quest": "EatMeat", "Icon": "Icons/ItemsGenerated/Food_Skewer_Meat.png" }
+  ]
 }

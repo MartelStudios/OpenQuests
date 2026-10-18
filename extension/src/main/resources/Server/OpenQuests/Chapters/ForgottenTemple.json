@@ -3,5 +3,12 @@
   "Group": "Adventure",
   "Order": 1,
   "Icon": "Icons/ItemsGenerated/Furniture_Temple_Emerald_Torch.png",
-  "QuestAssetIds": ["DefeatForgottenTempleGuardian", "EnterForgottenTemple", "TalkToRootlingMerchant", "TempleTrial", "TempleOffering", "Flawless"]
+  "Quests": [
+    { "Quest": "DefeatForgottenTempleGuardian" },
+    { "Quest": "EnterForgottenTemple" },
+    { "Quest": "TalkToRootlingMerchant" },
+    { "Quest": "TempleTrial" },
+    { "Quest": "TempleOffering" },
+    { "Quest": "Flawless" }
+  ]
 }
