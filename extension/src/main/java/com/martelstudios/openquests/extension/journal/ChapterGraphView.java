@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.extension.journal.QuestPage.QuestPageEventData;
+import org.joml.Vector2i;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -60,6 +61,14 @@ final class ChapterGraphView {
     private static final Value<String> TINT_NONE = Value.ref(COMMON_DOCUMENT, "GraphTintNone");
     private static final Value<String> TINT_NEXT = Value.ref(COMMON_DOCUMENT, "GraphTintNext");
     private static final Value<String> TINT_PREVIOUS = Value.ref(COMMON_DOCUMENT, "GraphTintPrevious");
+    private static final Value<String> TINT_SELECTED = Value.ref(COMMON_DOCUMENT, "GraphTintSelected");
+
+    private static final String CELL_DOCUMENT = "OpenQuests/Pages/QuestPageGraphCell.ui";
+
+    /**
+     * Empty columns and rows drawn past the last quest in edit mode, to move a quest out there.
+     */
+    private static final int EDIT_MARGIN = 2;
 
     private static final String COLOR_IDLE = "#55657d";
     private static final String COLOR_SUCCESSFUL = "#4caf50";
@@ -117,6 +126,15 @@ final class ChapterGraphView {
     @Nullable
     private String hovered;
 
+    /**
+     * The quest picked up in edit mode, waiting for the cell it goes to.
+     */
+    @Nullable
+    private String selected;
+
+    @Nullable
+    private ChapterGraph graph;
+
     private int width;
     private int height;
 
@@ -162,16 +180,28 @@ final class ChapterGraphView {
     }
 
     /**
-     * Draws the graph: the lines first, then the dots joining them, then the tiles over their ends.
+     * Draws the graph: the grid when editing, then the lines, the dots joining them, and the tiles
+     * over their ends.
+     *
+     * @param editing whether every cell is drawn with its coordinates, a click on a tile picking it
+     *                up and a click on a cell putting it down, rather than opening the quest.
      */
-    void render(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull ChapterGraph graph) {
+    void render(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull ChapterGraph graph, boolean editing) {
+        this.graph = graph;
         hovered = null;
+        if (!editing) selected = null;
 
         int columns = 1;
         int rows = 1;
         for (ChapterGraph.Node node : graph.nodes()) {
             columns = Math.max(columns, node.column() + 1);
             rows = Math.max(rows, node.row() + 1);
+        }
+
+        // Room to move a quest past the last column or row
+        if (editing) {
+            columns += EDIT_MARGIN;
+            rows += EDIT_MARGIN;
         }
 
         width = columns * CELL;
@@ -192,6 +222,21 @@ final class ChapterGraphView {
         for (ChapterGraph.Node node : graph.nodes()) occupied.add(key(node.column(), node.row()));
 
         int index = 0;
+        if (editing) {
+            for (int row = 0; row < rows; row++) {
+                for (int column = 0; column < columns; column++) {
+                    String selector = CONTAINER + "[" + index++ + "]";
+
+                    commandBuilder.append(CONTAINER, CELL_DOCUMENT)
+                                  .setObject(selector + ".Anchor", anchor(column * CELL + 1, row * CELL + 1, CELL - 2, CELL - 2))
+                                  .set(selector + " #Coordinates.Text", column + ", " + row);
+
+                    eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, selector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_MOVE)
+                                                                                                         .append(QuestPageEventData.KEY_TARGET, column + "," + row), false);
+                }
+            }
+        }
+
         Map<Long, List<Run>> ends = new LinkedHashMap<>();
 
         for (var entry : pieces.entrySet()) {
@@ -244,8 +289,10 @@ final class ChapterGraphView {
                           .set(selector + ".TooltipTextSpans", tooltip(node));
 
             commandBuilder.set(selector + " #Icon.AssetPath", node.icon());
+            if (node.assetId().equals(selected)) commandBuilder.set(selector + " #Tint.Background", TINT_SELECTED);
 
-            eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, selector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_OPEN)
+            String click = editing ? QuestPageEventData.ACTION_SELECT : QuestPageEventData.ACTION_OPEN;
+            eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, selector, EventData.of(QuestPageEventData.KEY_ACTION, click)
                                                                                                  .append(QuestPageEventData.KEY_TARGET, node.assetId()), false);
             eventBuilder.addEventBinding(CustomUIEventBindingType.MouseEntered, selector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_HOVER)
                                                                                                    .append(QuestPageEventData.KEY_TARGET, node.assetId()), false);
@@ -368,9 +415,45 @@ final class ChapterGraphView {
         repaint(commandBuilder);
     }
 
+    /**
+     * Picks a quest up in edit mode, or puts it back down when picked again.
+     */
+    void select(@Nonnull UICommandBuilder commandBuilder, @Nullable String assetId) {
+        selected = assetId == null || assetId.equals(selected) ? null : assetId;
+        repaint(commandBuilder);
+    }
+
+    /**
+     * Puts the quest picked up into a cell. A quest already there takes the cell the moved one
+     * left. Every quest drawn is given its cell, so the ones placed by themselves stay where they
+     * were seen rather than being placed again around the move.
+     *
+     * @param target the cell as the grid wrote it, {@code "column,row"}.
+     * @return the cell of every quest drawn, or {@code null} when nothing was picked up.
+     */
+    @Nullable
+    Map<String, Vector2i> move(@Nullable String target) {
+        if (selected == null || graph == null || target == null) return null;
+
+        String[] parts = target.split(",");
+        Vector2i destination = new Vector2i(Integer.parseInt(parts[0].trim()), Integer.parseInt(parts[1].trim()));
+
+        Map<String, Vector2i> positions = new HashMap<>();
+        for (ChapterGraph.Node node : graph.nodes()) positions.put(node.assetId(), new Vector2i(node.column(), node.row()));
+
+        Vector2i origin = positions.get(selected);
+        if (origin == null) return null;
+
+        positions.replaceAll((assetId, position) -> position.equals(destination) ? new Vector2i(origin) : position);
+        positions.put(selected, destination);
+
+        selected = null;
+        return positions;
+    }
+
     private void repaint(@Nonnull UICommandBuilder commandBuilder) {
         Map<String, Value<String>> tints = new HashMap<>();
-        for (String assetId : tiles.keySet()) tints.put(assetId, TINT_NONE);
+        for (String assetId : tiles.keySet()) tints.put(assetId, assetId.equals(selected) ? TINT_SELECTED : TINT_NONE);
 
         for (Run run : runs) {
             for (ChapterGraph.Edge edge : run.edges) {
@@ -379,6 +462,7 @@ final class ChapterGraphView {
             }
             paint(commandBuilder, CONTAINER + "[" + run.index + "]", color(run));
         }
+        if (selected != null && tiles.containsKey(selected)) tints.put(selected, TINT_SELECTED);
 
         for (Junction junction : junctions) {
             paint(commandBuilder, CONTAINER + "[" + junction.index() + "]", color(junction));

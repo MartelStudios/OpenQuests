@@ -608,6 +608,12 @@ column right of the quest handing it out, in the first free row. Its `Icon` over
 own `Icon` in this chapter; a quest with neither is drawn as a book. Links between quests come from
 their `GrantQuest` rewards, nothing more to write.
 
+A player holding `martelstudios.openquests.journal.edit`, granted to `hytale:WorldEditor`, gets an
+Edit button over the graph. Edit mode draws the grid with each cell's coordinates and every quest of
+the chapter, hidden ones included: click a quest, then a cell, to move it there, swapping with any
+quest already in it. The chapter's file is rewritten at once, every quest pinned where it was seen;
+a chapter that cannot be written, inside an archive, keeps the change until the server restarts.
+
 ### Quest tracker
 
 Whether the tracker shows and where it sits is what the player chose with `/ohud`, kept in their

@@ -52,6 +52,12 @@ $C.@DecoratedContainer {
         Visible: false;
       }
 
+      // Lays the open chapter out on its grid, for players allowed to; shown in the graph only
+      $C.@SmallSecondaryTextButton #EditToggle {
+        @Anchor = (MinWidth: 100, Left: 8);
+        Visible: false;
+      }
+
       // Switches the chapters tab between its list and its graph
       $C.@SmallSecondaryTextButton #ViewToggle {
         @Anchor = (MinWidth: 100, Left: 8);

@@ -56,6 +56,10 @@ public class ChapterQuest {
         return position;
     }
 
+    void setPosition(@Nonnull Vector2i position) {
+        this.position = position;
+    }
+
     /**
      * @return the icon this chapter draws the quest with in place of the quest's own, or
      * {@code null} to keep the quest's.

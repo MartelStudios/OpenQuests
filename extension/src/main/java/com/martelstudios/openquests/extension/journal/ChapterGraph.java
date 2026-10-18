@@ -79,9 +79,11 @@ final class ChapterGraph {
 
     /**
      * @param runOf the player's run of a quest asset, or {@code null} for one they were never handed.
+     * @param everyQuest whether to draw the quests the player is not shown too, for an editor
+     *                   laying the chapter out.
      */
     @Nonnull
-    static ChapterGraph of(@Nonnull OpenQuestChapter chapter, @Nonnull Function<String, AbstractQuestProgression<?>> runOf, @Nonnull UUID viewer) {
+    static ChapterGraph of(@Nonnull OpenQuestChapter chapter, @Nonnull Function<String, AbstractQuestProgression<?>> runOf, @Nonnull UUID viewer, boolean everyQuest) {
         Map<String, OpenQuestAsset> shown = new LinkedHashMap<>();
         Map<String, ChapterQuest> entries = new HashMap<>();
         Map<String, QuestMark> marks = new HashMap<>();
@@ -90,7 +92,7 @@ final class ChapterGraph {
             String assetId = entry.getQuest();
             AbstractQuestProgression<?> run = runOf.apply(assetId);
             OpenQuestAsset asset = OpenQuestAsset.getAsset(assetId);
-            if (asset == null || shown.containsKey(assetId) || !OpenQuestChapter.isShown(assetId, run)) continue;
+            if (asset == null || shown.containsKey(assetId) || (!everyQuest && !OpenQuestChapter.isShown(assetId, run))) continue;
 
             shown.put(assetId, asset);
             entries.put(assetId, entry);

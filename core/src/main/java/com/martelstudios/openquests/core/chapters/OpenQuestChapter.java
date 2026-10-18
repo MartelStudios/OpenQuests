@@ -12,11 +12,13 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import org.joml.Vector2i;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -63,6 +65,19 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
     @Nonnull
     public ChapterQuest[] getQuests() {
         return quests;
+    }
+
+    /**
+     * Gives quests of this chapter a cell of its graph, for the journal's editor. Changes this loaded
+     * asset only: the caller writes it to its file, which loads it again.
+     *
+     * @param positions the new cell by quest asset id, X the column and Y the row.
+     */
+    public void place(@Nonnull Map<String, Vector2i> positions) {
+        for (ChapterQuest quest : quests) {
+            Vector2i position = positions.get(quest.getQuest());
+            if (position != null) quest.setPosition(position);
+        }
     }
 
     /**

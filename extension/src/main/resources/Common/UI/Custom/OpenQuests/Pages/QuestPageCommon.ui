@@ -143,3 +143,15 @@ $C = "../../Common.ui";
 @GraphTintNone = PatchStyle(Color: #000000(0));
 @GraphTintNext = PatchStyle(Color: #f2d14b(0.22));
 @GraphTintPrevious = PatchStyle(Color: #4b9cf2(0.22));
+
+// The picked-up quest in edit mode, and the grid it is put down on
+@GraphTintSelected = PatchStyle(Color: #ffffff(0.3));
+
+@GraphCellStyle = ButtonStyle(
+  Default: (Background: #ffffff(0.03)),
+  Hovered: (Background: #ffffff(0.09)),
+  Pressed: (Background: #ffffff(0.14)),
+  Sounds: $C.@ButtonSounds
+);
+
+@GraphCellLabelStyle = (FontSize: 10, TextColor: @ColorMuted);
