@@ -22,12 +22,6 @@ $C.@DecoratedContainer {
 
     $C.@ContentSeparator { Anchor: (Top: 4, Bottom: 8); }
 
-    // The trail back to the journal, filled by the page: it is as long as the player went deep
-    Group #Breadcrumb {
-      LayoutMode: Left;
-      Anchor: (Height: 20);
-    }
-
     Group #Toolbar {
       LayoutMode: Left;
       Anchor: (Height: 32);
@@ -38,11 +32,17 @@ $C.@DecoratedContainer {
         FlexWeight: 1;
       }
 
-      // Which quests the quests tab lists, shown on that tab only
+      // Which quest states the open list shows, hidden where there is no such list
       $C.@DropdownBox #QuestFilter {
         Anchor: (Width: 200, Height: 32);
         Visible: false;
       }
+    }
+
+    // The trail back to the tab's list, filled by the page: it is as long as the player went deep
+    Group #Breadcrumb {
+      LayoutMode: Left;
+      Anchor: (Height: 20, Top: 8);
     }
 
     $C.@ContentSeparator { Anchor: (Top: 8, Bottom: 8); }
