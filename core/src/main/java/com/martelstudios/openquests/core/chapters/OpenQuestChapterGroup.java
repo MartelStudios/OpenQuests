@@ -11,8 +11,10 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.validation.ValidatorCache;
 import com.hypixel.hytale.codec.validation.Validators;
+import com.hypixel.hytale.server.core.asset.common.CommonAssetValidator;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
 
@@ -24,11 +26,20 @@ public class OpenQuestChapterGroup implements JsonAssetWithMap<String, DefaultAs
 
     public static final ValidatorCache<String> VALIDATOR_CACHE = new ValidatorCache<>(new AssetKeyValidator<>(OpenQuestChapterGroup::getAssetStore));
 
+    /**
+     * Any icon any pack ships under {@code Common/Icons}, which is also what the asset editor's
+     * file picker offers. A UI asset, so an icon shipped only as {@code @2x} passes too.
+     */
+    public static final CommonAssetValidator ICON_VALIDATOR = new CommonAssetValidator("png", true, "Icons");
+
     public static final AssetBuilderCodec<String, OpenQuestChapterGroup> CODEC = AssetBuilderCodec.builder(OpenQuestChapterGroup.class, OpenQuestChapterGroup::new, Codec.STRING, (group, id) -> group.id = id, group -> group.id, (group, data) -> group.data = data, group -> group.data)
                                                                                                   .append(new KeyedCodec<>("NameKey", Codec.STRING), (group, key) -> group.nameKey = key, group -> group.nameKey)
                                                                                                   .addValidator(Validators.nonNull())
                                                                                                   .add()
                                                                                                   .append(new KeyedCodec<>("Order", Codec.INTEGER), (group, order) -> group.order = order, group -> group.order)
+                                                                                                  .add()
+                                                                                                  .append(new KeyedCodec<>("Icon", Codec.STRING), (group, icon) -> group.icon = icon, group -> group.icon)
+                                                                                                  .addValidator(ICON_VALIDATOR)
                                                                                                   .add()
                                                                                                   .build();
 
@@ -37,7 +48,18 @@ public class OpenQuestChapterGroup implements JsonAssetWithMap<String, DefaultAs
     protected String nameKey;
     protected int order;
 
+    @Nullable
+    protected String icon;
+
     protected OpenQuestChapterGroup() {}
+
+    /**
+     * @return the icon drawn before the name, as a path under {@code Common/}, or {@code null}.
+     */
+    @Nullable
+    public String getIcon() {
+        return icon;
+    }
 
     @Override
     public String getId() {

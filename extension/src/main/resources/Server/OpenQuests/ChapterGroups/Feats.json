@@ -1,4 +1,5 @@
 {
   "NameKey": "quest.chapter-group.feats",
-  "Order": 2
+  "Order": 2,
+  "Icon": "Icons/ItemCategories/Items-Armor.png"
 }

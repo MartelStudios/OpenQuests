@@ -2,5 +2,6 @@
   "NameKey": "quest.chapter.woodcutting",
   "Group": "Survival",
   "Order": 1,
+  "Icon": "Icons/ItemsGenerated/Tool_Hatchet_Iron.png",
   "QuestAssetIds": ["Lumberjack", "GreatFelling"]
 }

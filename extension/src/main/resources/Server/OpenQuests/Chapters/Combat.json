@@ -2,5 +2,6 @@
   "NameKey": "quest.chapter.combat",
   "Group": "Feats",
   "Order": 1,
+  "Icon": "Icons/ItemsGenerated/Weapon_Club_Crude.png",
   "QuestAssetIds": ["FirstBlood"]
 }

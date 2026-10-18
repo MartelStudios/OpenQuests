@@ -2,5 +2,6 @@
   "NameKey": "quest.chapter.hunting",
   "Group": "Survival",
   "Order": 0,
+  "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Raw.png",
   "QuestAssetIds": ["GatherMeat", "CraftCampfire", "CookMeat", "EatMeat"]
 }

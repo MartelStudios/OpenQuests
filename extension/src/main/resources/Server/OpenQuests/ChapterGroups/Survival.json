@@ -1,4 +1,5 @@
 {
   "NameKey": "quest.chapter-group.survival",
-  "Order": 1
+  "Order": 1,
+  "Icon": "Icons/ItemCategories/Natural-Vegetal.png"
 }

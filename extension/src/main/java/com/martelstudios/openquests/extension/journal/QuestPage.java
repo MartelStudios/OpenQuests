@@ -69,6 +69,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private static final String CHAPTERS_CONTAINER = "#ChapterList";
     private static final String FILTER_DROPDOWN = "#QuestFilter";
 
+    private static final Value<String> CHAPTER_OPEN_STYLE = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ChapterOpenStyle");
+    private static final Value<String> CHAPTER_OPEN_LABEL_STYLE = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ChapterOpenLabelStyle");
+
     /**
      * How many steps of the trail are named past the root. The root always shows, since going back
      * to the list is the one jump a player always wants; the rest is folded into a single mark,
@@ -572,6 +575,13 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                                                                                                       .append(QuestPageEventData.KEY_VALUE, FILTER_DROPDOWN + ".Value"), false);
     }
 
+    private static void setIcon(@Nonnull UICommandBuilder commandBuilder, @Nonnull String selector, @Nullable String icon) {
+        if (icon == null) return;
+
+        commandBuilder.set(selector + " #Icon.AssetPath", icon)
+                      .set(selector + " #Icon.Visible", true);
+    }
+
     /**
      * The chapters tab's table of contents, groups and chapters appended flat into one list. A
      * group without chapters is left out, having nothing to unfold onto.
@@ -595,6 +605,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             commandBuilder.append(CHAPTERS_CONTAINER, CHAPTER_GROUP_DOCUMENT)
                           .set(groupSelector + " #Fold.Text", unfoldedGroup ? "-" : "+")
                           .set(groupSelector + " #Name.TextSpans", Message.translation(group.getNameKey()));
+            setIcon(commandBuilder, groupSelector, group.getIcon());
 
             eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, groupSelector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_GROUP)
                                                                                                       .append(QuestPageEventData.KEY_TARGET, group.getId()), false);
@@ -605,8 +616,13 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                 String chapterSelector = CHAPTERS_CONTAINER + "[" + index++ + "]";
 
                 commandBuilder.append(CHAPTERS_CONTAINER, CHAPTER_DOCUMENT)
-                              .set(chapterSelector + ".Text", Message.translation(chapter.getNameKey()))
-                              .set(chapterSelector + ".Disabled", chapter == open);
+                              .set(chapterSelector + " #Name.TextSpans", Message.translation(chapter.getNameKey()));
+                setIcon(commandBuilder, chapterSelector, chapter.getIcon());
+
+                if (chapter == open) {
+                    commandBuilder.set(chapterSelector + ".Style", CHAPTER_OPEN_STYLE)
+                                  .set(chapterSelector + " #Name.Style", CHAPTER_OPEN_LABEL_STYLE);
+                }
 
                 eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, chapterSelector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_CHAPTER)
                                                                                                             .append(QuestPageEventData.KEY_TARGET, chapter.getId()), false);

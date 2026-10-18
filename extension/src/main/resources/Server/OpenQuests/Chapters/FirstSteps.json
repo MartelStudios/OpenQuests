@@ -2,5 +2,6 @@
   "NameKey": "quest.chapter.first-steps",
   "Group": "Adventure",
   "Order": 0,
+  "Icon": "Icons/ItemsGenerated/Tool_Hatchet_Crude.png",
   "QuestAssetIds": ["Intro", "CraftTools", "CraftWorkbench", "ChooseYourWeapon"]
 }

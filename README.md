@@ -574,13 +574,14 @@ category answers to fails the asset at load.
 
 Chapters are the journal's table of contents, and sit beside categories: a category labels a
 quest, a chapter is a place to read it. A chapter group, under `Server/OpenQuests/ChapterGroups/`,
-is a translated name and an `Order`:
+is a translated name, an `Order` and an optional `Icon`, the path of any picture under
+`Common/Icons/` in any pack (the asset editor offers them as a file picker):
 
 ```json
-{ "NameKey": "quest.chapter-group.adventure", "Order": 0 }
+{ "NameKey": "quest.chapter-group.adventure", "Order": 0, "Icon": "Icons/ItemCategories/Items-Weapons.png" }
 ```
 
-A chapter, under `Server/OpenQuests/Chapters/`, names its group, its `Order` within it and its
+A chapter, under `Server/OpenQuests/Chapters/`, names its group, its `Order` within it, an `Icon` and its
 quests, drawn in the order listed. Groups and chapters sort by `Order`, then by id. A quest may sit
 in several chapters, or in none. A quest the player was never given shows as locked, unless its
 `Visibility` keeps it hidden until then.

@@ -36,6 +36,9 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
                                                                                              .add()
                                                                                              .append(new KeyedCodec<>("Order", Codec.INTEGER), (chapter, order) -> chapter.order = order, chapter -> chapter.order)
                                                                                              .add()
+                                                                                             .append(new KeyedCodec<>("Icon", Codec.STRING), (chapter, icon) -> chapter.icon = icon, chapter -> chapter.icon)
+                                                                                             .addValidator(OpenQuestChapterGroup.ICON_VALIDATOR)
+                                                                                             .add()
                                                                                              .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(Codec.STRING, String[]::new)), (chapter, ids) -> chapter.questAssetIds = ids, chapter -> chapter.questAssetIds)
                                                                                              .addValidator(OpenQuestAsset.VALIDATOR_CACHE.getArrayValidator())
                                                                                              .add()
@@ -47,10 +50,21 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
     protected String group;
     protected int order;
 
+    @Nullable
+    protected String icon;
+
     @Nonnull
     protected String[] questAssetIds = NO_QUESTS;
 
     protected OpenQuestChapter() {}
+
+    /**
+     * @return the icon drawn before the name, as a path under {@code Common/}, or {@code null}.
+     */
+    @Nullable
+    public String getIcon() {
+        return icon;
+    }
 
     @Override
     public String getId() {

@@ -86,7 +86,7 @@ $C = "../../Common.ui";
 );
 
 // The chapters tab's table of contents. A group header reads as a heading that folds; a chapter as
-// a line under it, the open one drawn disabled the way the open tab is.
+// a line under it. The open chapter wears the Open styles, swapped in by QuestPage.
 @ChapterGroupLabelStyle = (FontSize: 13, RenderBold: true, TextColor: @ColorTitle, HorizontalAlignment: Start, VerticalAlignment: Center);
 
 @ChapterGroupStyle = ButtonStyle(
@@ -97,11 +97,18 @@ $C = "../../Common.ui";
 );
 
 @ChapterLabelStyle = (FontSize: 12, TextColor: @ColorMuted, HorizontalAlignment: Start, VerticalAlignment: Center, Wrap: true, WrapMaxLines: 1);
+@ChapterOpenLabelStyle = (...@ChapterLabelStyle, RenderBold: true, TextColor: @ColorAccent);
 
-@ChapterStyle = TextButtonStyle(
-  Default: (Background: (Color: #000000(0)), LabelStyle: @ChapterLabelStyle),
-  Hovered: (Background: #2a3a4e, LabelStyle: (...@ChapterLabelStyle, TextColor: @ColorTitle)),
-  Pressed: (Background: #142030, LabelStyle: (...@ChapterLabelStyle, TextColor: @ColorAccent)),
-  Disabled: (Background: #2c3a52, LabelStyle: (...@ChapterLabelStyle, RenderBold: true, TextColor: @ColorAccent)),
+@ChapterStyle = ButtonStyle(
+  Default: (Background: #000000(0)),
+  Hovered: (Background: #2a3a4e),
+  Pressed: (Background: #142030),
+  Sounds: $C.@ButtonSounds
+);
+
+@ChapterOpenStyle = ButtonStyle(
+  Default: (Background: #2c3a52),
+  Hovered: (Background: #2c3a52),
+  Pressed: (Background: #2c3a52),
   Sounds: $C.@ButtonSounds
 );

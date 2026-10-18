@@ -1,9 +1,15 @@
-// One chapter under its group in #ChapterList. The page disables the open one, which marks it.
+// One chapter under its group in #ChapterList. The page disables the open one, which marks it, and
+// writes the accent over its name.
 $P = "QuestPageCommon.ui";
 
-TextButton #Chapter {
-  Text: "";
-  Anchor: (Height: 24, Top: 2);
+Button #Chapter {
+  LayoutMode: Left;
+  Anchor: (Height: 26, Top: 2);
   Padding: (Left: 22, Right: 8);
   Style: $P.@ChapterStyle;
+
+  // Hidden by the page for a chapter naming no icon
+  AssetImage #Icon { Anchor: (Width: 18, Height: 18, Right: 6); Visible: false; }
+
+  Label #Name { Text: ""; FlexWeight: 1; Style: $P.@ChapterLabelStyle; }
 }
