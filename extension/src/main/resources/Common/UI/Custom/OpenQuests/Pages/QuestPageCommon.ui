@@ -50,10 +50,13 @@ $C = "../../Common.ui";
 // The client's own dropdown caret, borrowed to say that finishing a quest opens onto another
 @QuestIconNext = PatchStyle(TexturePath: "../../Common/DropdownPressedCaret.png");
 
-@ToggleStyle = TextButtonStyle(
-  Default: (Background: #1e2a38, LabelStyle: (FontSize: 14, RenderBold: true, TextColor: @ColorMuted, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #2a3a4e, LabelStyle: (FontSize: 14, RenderBold: true, TextColor: @ColorTitle, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #142030, LabelStyle: (FontSize: 14, RenderBold: true, TextColor: @ColorAccent, HorizontalAlignment: Center, VerticalAlignment: Center)),
+// The fold mark at the head of a row, and the row's header, which is what a click folds on
+@ToggleLabelStyle = (FontSize: 14, RenderBold: true, TextColor: @ColorMuted, HorizontalAlignment: Center, VerticalAlignment: Center);
+
+@HeaderStyle = ButtonStyle(
+  Default: (Background: #000000(0)),
+  Hovered: (Background: #ffffff(0.03)),
+  Pressed: (Background: #000000(0.1)),
   Sounds: $C.@ButtonSounds
 );
 
@@ -83,4 +86,40 @@ $C = "../../Common.ui";
   // news left to give, so it drops the gold with everything else.
   Disabled: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Disabled.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallButtonDisabledLabelStyle),
   Sounds: $C.@ButtonSounds
+);
+
+// The chapters tab's table of contents. A group header reads as a heading that folds; a chapter as
+// a line under it. The open chapter wears the Open styles, swapped in by QuestPage.
+@ChapterGroupLabelStyle = (FontSize: 13, RenderBold: true, TextColor: @ColorTitle, HorizontalAlignment: Start, VerticalAlignment: Center);
+
+@ChapterGroupStyle = ButtonStyle(
+  Default: (Background: #1e2a38),
+  Hovered: (Background: #2a3a4e),
+  Pressed: (Background: #142030),
+  Sounds: $C.@ButtonSounds
+);
+
+@ChapterLabelStyle = (FontSize: 12, TextColor: @ColorMuted, HorizontalAlignment: Start, VerticalAlignment: Center, Wrap: true, WrapMaxLines: 1);
+@ChapterOpenLabelStyle = (...@ChapterLabelStyle, RenderBold: true, TextColor: @ColorAccent);
+
+@ChapterStyle = ButtonStyle(
+  Default: (Background: #000000(0)),
+  Hovered: (Background: #2a3a4e),
+  Pressed: (Background: #142030),
+  Sounds: $C.@ButtonSounds
+);
+
+@ChapterOpenStyle = ButtonStyle(
+  Default: (Background: #2c3a52),
+  Hovered: (Background: #2c3a52),
+  Pressed: (Background: #2c3a52),
+  Sounds: $C.@ButtonSounds
+);
+
+// The client's own red for a button that cannot be taken back, at the small button's size
+@DestructiveButtonStyle = TextButtonStyle(
+  Default: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
+  Hovered: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive_Hovered.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
+  Pressed: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive_Pressed.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
+  Sounds: $C.@ButtonsCancel
 );

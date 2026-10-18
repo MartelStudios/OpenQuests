@@ -4,5 +4,5 @@ $C = "../../Common.ui";
 
 $C.@SmallSecondaryTextButton #Tab {
   @Text = "";
-  Anchor: (Width: 104, Height: 30, Right: 4);
+  Anchor: (MinWidth: 104, Height: 30, Right: 4);
 }

@@ -1,0 +1,7 @@
+{
+  "NameKey": "quest.chapter.daily-life",
+  "Group": "Survival",
+  "Order": 2,
+  "Icon": "Icons/ItemCategories/Furniture.png",
+  "QuestAssetIds": ["DailyChores"]
+}

@@ -1,0 +1,7 @@
+{
+  "NameKey": "quest.chapter.goblin-lair",
+  "Group": "Adventure",
+  "Order": 2,
+  "Icon": "Icons/ModelsGenerated/Goblin_Duke.png",
+  "QuestAssetIds": ["GoblinLairRats", "GoblinLairTunnels", "GoblinLairSpiders", "GoblinLairTorches", "GoblinLairLookout", "GoblinLairOgre", "GoblinLairDuke", "GoblinLairDailyHunt"]
+}

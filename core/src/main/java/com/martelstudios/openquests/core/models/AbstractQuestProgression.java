@@ -264,12 +264,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * drawing quests asks before drawing one. What it owes the player is untouched by the answer.
      */
     public boolean isVisible() {
-        return switch (getVisibility()) {
-            case ALWAYS -> true;
-            case WHEN_PROGRESSED -> hasProgressed();
-            case WHEN_COMPLETED -> isCompleted();
-            case NEVER -> false;
-        };
+        return getVisibility().isReachedBy(this);
     }
 
     /**

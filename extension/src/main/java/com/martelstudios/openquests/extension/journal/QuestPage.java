@@ -7,10 +7,14 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
+import com.hypixel.hytale.protocol.FormattedMessage;
 import com.hypixel.hytale.protocol.packets.interface_.Page;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
+import com.hypixel.hytale.server.core.modules.i18n.I18nModule;
+import com.hypixel.hytale.server.core.ui.DropdownEntryInfo;
+import com.hypixel.hytale.server.core.ui.LocalizableString;
 import com.hypixel.hytale.server.core.ui.PatchStyle;
 import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
@@ -18,9 +22,12 @@ import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.util.MessageUtil;
 import com.martelstudios.opennavigation.routes.Route;
 import com.martelstudios.opennavigation.routes.TabRoute;
 import com.martelstudios.opennavigation.services.NavigationService;
+import com.martelstudios.openquests.core.chapters.OpenQuestChapter;
+import com.martelstudios.openquests.core.chapters.OpenQuestChapterGroup;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
@@ -41,6 +48,7 @@ import com.martelstudios.openquests.extension.track.QuestTrackService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.text.Normalizer;
 import java.time.Instant;
 import java.util.*;
 
@@ -56,9 +64,17 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private static final String CRUMB_DOCUMENT = "OpenQuests/Pages/QuestPageCrumb.ui";
     private static final String CRUMB_MORE_DOCUMENT = "OpenQuests/Pages/QuestPageCrumbMore.ui";
     private static final String CATEGORY_DOCUMENT = "OpenQuests/Pages/QuestPageCategory.ui";
+    private static final String CHAPTER_GROUP_DOCUMENT = "OpenQuests/Pages/QuestPageChapterGroup.ui";
+    private static final String CHAPTER_DOCUMENT = "OpenQuests/Pages/QuestPageChapter.ui";
 
     private static final String TABS_CONTAINER = "#Tabs";
     private static final String BREADCRUMB_CONTAINER = "#Breadcrumb";
+    private static final String CHAPTERS_CONTAINER = "#ChapterList";
+    private static final String FILTER_DROPDOWN = "#QuestFilter";
+    private static final String SEARCH_FIELD = "#Search";
+
+    private static final Value<String> CHAPTER_OPEN_STYLE = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ChapterOpenStyle");
+    private static final Value<String> CHAPTER_OPEN_LABEL_STYLE = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ChapterOpenLabelStyle");
 
     /**
      * How many steps of the trail are named past the root. The root always shows, since going back
@@ -82,6 +98,37 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * quest they were never given. Kept here, since folding is a redraw rather than a client toggle.
      */
     private final Set<String> unfolded = new HashSet<>();
+
+    /**
+     * Chapter groups the player unfolded in the chapters tab, by id.
+     */
+    private final Set<String> unfoldedGroups = new HashSet<>();
+
+    /**
+     * The chapter whose quests the chapters tab shows, {@code null} until one is picked or defaulted.
+     */
+    @Nullable
+    private String openChapter;
+
+    @Nonnull
+    private Filter questsFilter = Filter.ACTIVE;
+
+    /**
+     * Every state by default: a chapter is read as a whole, locked quests included.
+     */
+    @Nonnull
+    private Filter chaptersFilter = Filter.ALL;
+
+    /**
+     * What the player typed in each tab's search field, as typed.
+     */
+    private final Map<Tab, String> searches = new EnumMap<>(Tab.class);
+
+    /**
+     * The tab the search field last showed, so its text is written back only on switching tab.
+     */
+    @Nullable
+    private Tab searchShown;
 
     @Nonnull
     private Route route;
@@ -159,12 +206,11 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private void render(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder) {
         var playerComponents = EntityComponents.of(ref);
 
-        JournalRoute journal = journal();
-        Filter filter = Filter.ofTab(journal == null ? JournalRoutes.TAB_ACTIVE : journal.getOpenTabName());
+        Tab tab = openTab();
 
         // Standing on a quest is reading that one quest; standing on the journal is reading a list
         boolean alone = route instanceof QuestRoute;
-        List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : list(playerComponents, filter);
+        List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : search(list(playerComponents, tab), tab);
 
         QuestShape shape = alone ? QuestShape.PAGE : QuestShape.CARD;
 
@@ -172,7 +218,10 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#CloseButton", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_CLOSE), false);
 
         renderBreadcrumb(commandBuilder, eventBuilder);
-        renderTabs(commandBuilder, eventBuilder, filter, isOwedAnything(playerComponents));
+        renderTabs(commandBuilder, eventBuilder, tab, isOwedAnything(playerComponents));
+        renderSearch(commandBuilder, eventBuilder, alone ? null : tab);
+        renderFilter(commandBuilder, eventBuilder, alone || tab == Tab.PENDING ? null : filterOf(tab));
+        renderChapters(commandBuilder, eventBuilder, playerComponents, !alone && tab == Tab.CHAPTERS);
         commandBuilder.clear(QuestPageContext.ROOT_CONTAINER);
 
         var context = new QuestPageContext(commandBuilder, eventBuilder, lookup(playerComponents), playerRef.getUuid());
@@ -195,6 +244,31 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     @Nullable
     private JournalRoute journal() {
         return route.getRoot() instanceof JournalRoute journal ? journal : null;
+    }
+
+    @Nonnull
+    private Tab openTab() {
+        JournalRoute journal = journal();
+        return Tab.ofTab(journal == null ? JournalRoutes.TAB_QUESTS : journal.getOpenTabName());
+    }
+
+    /**
+     * @return the state filter of that tab. Each list keeps its own, since they default differently.
+     */
+    @Nonnull
+    private Filter filterOf(@Nonnull Tab tab) {
+        return tab == Tab.CHAPTERS ? chaptersFilter : questsFilter;
+    }
+
+    private void setFilter(@Nullable String value) {
+        Tab tab = openTab();
+        Filter filter = Filter.parse(value, filterOf(tab));
+
+        if (tab == Tab.CHAPTERS) {
+            chaptersFilter = filter;
+        } else {
+            questsFilter = filter;
+        }
     }
 
     /**
@@ -265,13 +339,68 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
-     * What the open tab lists. Every tab but one reads the quests the player holds; that one reads
-     * what they are still owed, which is not the same list: a quest told to keep no trace of
-     * itself is gone from the journal with its debt still standing.
+     * What the open tab lists. The rewards tab reads what the player is still owed rather than the
+     * quests they hold: a quest told to keep no trace of itself is gone with its debt still standing.
      */
     @Nonnull
-    private List<Entry> list(@Nonnull EntityComponents playerComponents, @Nonnull Filter filter) {
-        return filter == Filter.PENDING ? collectOwed(playerComponents) : collect(playerComponents, filter);
+    private List<Entry> list(@Nonnull EntityComponents playerComponents, @Nonnull Tab tab) {
+        return switch (tab) {
+            case CHAPTERS -> collectChapter(playerComponents);
+            case QUESTS -> collect(playerComponents, questsFilter);
+            case PENDING -> collectOwed(playerComponents);
+        };
+    }
+
+    /**
+     * The open chapter's quests in the order it lists them, each as the player's own run where they
+     * hold one and as its asset otherwise. A quest hidden until reached stays hidden here too.
+     */
+    @Nonnull
+    private List<Entry> collectChapter(@Nonnull EntityComponents playerComponents) {
+        OpenQuestChapter chapter = openChapter(playerComponents);
+        if (chapter == null) return List.of();
+
+        List<Entry> entries = new ArrayList<>();
+        for (String assetId : chapter.getQuestAssetIds()) {
+            Entry entry = resolve(playerComponents, assetId, null);
+            if (entry == null) continue;
+
+            boolean listed = OpenQuestChapter.isShown(assetId, entry.quest());
+            if (listed && chaptersFilter.accepts(entry.mark())) entries.add(entry);
+        }
+        return entries;
+    }
+
+    /**
+     * @return the chapters of that group the player is shown, in reading order. A group none of
+     * whose chapters shows is not shown either.
+     */
+    @Nonnull
+    private static List<OpenQuestChapter> visibleChapters(@Nonnull EntityComponents playerComponents, @Nonnull OpenQuestChapterGroup group) {
+        return OpenQuestChapter.getChaptersOf(group.getId())
+                               .stream()
+                               .filter(chapter -> chapter.isVisible(assetId -> held(playerComponents, assetId)))
+                               .toList();
+    }
+
+    /**
+     * @return the chapter the player picked while it still shows, or else the first one shown,
+     * whose group is then unfolded so the list shows where the quests on the right come from.
+     */
+    @Nullable
+    private OpenQuestChapter openChapter(@Nonnull EntityComponents playerComponents) {
+        OpenQuestChapter chapter = openChapter == null ? null : OpenQuestChapter.getChapter(openChapter);
+        if (chapter != null && chapter.isVisible(assetId -> held(playerComponents, assetId))) return chapter;
+
+        for (OpenQuestChapterGroup group : OpenQuestChapterGroup.getSorted()) {
+            List<OpenQuestChapter> chapters = visibleChapters(playerComponents, group);
+            if (chapters.isEmpty()) continue;
+
+            openChapter = chapters.getFirst().getId();
+            unfoldedGroups.add(group.getId());
+            return chapters.getFirst();
+        }
+        return null;
     }
 
     /**
@@ -467,21 +596,159 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * <p>The rewards tab goes gold while something is waiting on it, so a debt is visible from
      * whichever tab the player is standing on.
      */
-    private void renderTabs(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull Filter open, boolean owed) {
+    private void renderTabs(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull Tab open, boolean owed) {
         commandBuilder.clear(TABS_CONTAINER);
 
         int index = 0;
-        for (Filter tab : Filter.values()) {
+        for (Tab tab : Tab.values()) {
             String tabSelector = TABS_CONTAINER + "[" + index++ + "]";
 
-            boolean gold = tab == Filter.PENDING && owed;
+            boolean gold = tab == Tab.PENDING && owed;
 
             commandBuilder.append(TABS_CONTAINER, gold ? TAB_OWED_DOCUMENT : TAB_DOCUMENT)
                           .set(tabSelector + ".Text", tab.label())
                           .set(tabSelector + ".Disabled", open == tab);
 
-            eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, tabSelector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_FILTER)
+            eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, tabSelector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_TAB)
                                                                                                     .append(QuestPageEventData.KEY_TARGET, tab.tabName()), false);
+        }
+    }
+
+    /**
+     * The open list's choice of quest states. A dropdown rather than a second row of tabs, which
+     * the page has no room left for.
+     *
+     * @param filter the open list's filter, or {@code null} where the page shows no such list.
+     */
+    private void renderFilter(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nullable Filter filter) {
+        commandBuilder.set(FILTER_DROPDOWN + ".Visible", filter != null);
+        if (filter == null) return;
+
+        List<DropdownEntryInfo> entries = Arrays.stream(Filter.values())
+                                                .map(choice -> new DropdownEntryInfo(LocalizableString.fromMessageId(choice.labelKey), choice.name()))
+                                                .toList();
+
+        commandBuilder.set(FILTER_DROPDOWN + ".Entries", entries)
+                      .set(FILTER_DROPDOWN + ".Value", filter.name());
+
+        eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, FILTER_DROPDOWN, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_FILTER)
+                                                                                                      .append(QuestPageEventData.KEY_VALUE, FILTER_DROPDOWN + ".Value"), false);
+    }
+
+    /**
+     * The search field of the open list. Its text is written only when the tab changed: written on
+     * every redraw, it would fight the player typing in it.
+     *
+     * @param tab the open tab, or {@code null} where the page shows a single quest.
+     */
+    private void renderSearch(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nullable Tab tab) {
+        commandBuilder.set("#ListTools.Visible", tab != null);
+        if (tab == null) return;
+
+        if (tab != searchShown) {
+            commandBuilder.set(SEARCH_FIELD + ".Value", searches.getOrDefault(tab, ""));
+            searchShown = tab;
+        }
+
+        eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, SEARCH_FIELD, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_SEARCH)
+                                                                                                   .append(QuestPageEventData.KEY_VALUE, SEARCH_FIELD + ".Value"), false);
+    }
+
+    private void setSearch(@Nullable String value) {
+        Tab tab = openTab();
+        String raw = value == null ? "" : value;
+
+        searches.put(tab, raw);
+    }
+
+    /**
+     * @return the entries whose title holds what the player searched in that tab, all of them
+     * when they searched nothing.
+     */
+    @Nonnull
+    private List<Entry> search(@Nonnull List<Entry> entries, @Nonnull Tab tab) {
+        String query = normalise(searches.getOrDefault(tab, ""));
+        if (query.isEmpty()) return entries;
+
+        String language = playerRef.getLanguage();
+        return entries.stream().filter(entry -> normalise(plainText(entry.title(), language)).contains(query)).toList();
+    }
+
+    /**
+     * Lower case and without accents, so "eclair" finds "Éclair".
+     */
+    @Nonnull
+    private static String normalise(@Nonnull String text) {
+        return Normalizer.normalize(text.trim(), Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * @return the message as the player reads it, translated into their language where it can be.
+     */
+    @Nonnull
+    private static String plainText(@Nonnull Message message, @Nullable String language) {
+        String messageId = message.getMessageId();
+        if (messageId == null || language == null) return message.getAnsiMessage();
+
+        String translated = I18nModule.get().getMessage(language, messageId);
+        if (translated == null) return message.getAnsiMessage();
+
+        FormattedMessage formatted = message.getFormattedMessage();
+        return MessageUtil.formatText(translated, formatted.params, formatted.messageParams);
+    }
+
+    private static void setIcon(@Nonnull UICommandBuilder commandBuilder, @Nonnull String selector, @Nullable String icon) {
+        if (icon == null) return;
+
+        commandBuilder.set(selector + " #Icon.AssetPath", icon)
+                      .set(selector + " #Icon.Visible", true);
+    }
+
+    /**
+     * The chapters tab's table of contents, groups and chapters appended flat into one list. A
+     * group without a chapter shown is left out, having nothing to unfold onto.
+     */
+    private void renderChapters(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull EntityComponents playerComponents, boolean shown) {
+        commandBuilder.clear(CHAPTERS_CONTAINER)
+                      .set(CHAPTERS_CONTAINER + ".Visible", shown);
+        if (!shown) return;
+
+        // Settled before drawing, so a chapter picked by default is drawn as the open one
+        OpenQuestChapter open = openChapter(playerComponents);
+        int index = 0;
+
+        for (OpenQuestChapterGroup group : OpenQuestChapterGroup.getSorted()) {
+            List<OpenQuestChapter> chapters = visibleChapters(playerComponents, group);
+            if (chapters.isEmpty()) continue;
+
+            boolean unfoldedGroup = unfoldedGroups.contains(group.getId());
+            String groupSelector = CHAPTERS_CONTAINER + "[" + index++ + "]";
+
+            commandBuilder.append(CHAPTERS_CONTAINER, CHAPTER_GROUP_DOCUMENT)
+                          .set(groupSelector + " #Fold.Text", unfoldedGroup ? "-" : "+")
+                          .set(groupSelector + " #Name.TextSpans", Message.translation(group.getNameKey()));
+            setIcon(commandBuilder, groupSelector, group.getIcon());
+
+            eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, groupSelector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_GROUP)
+                                                                                                      .append(QuestPageEventData.KEY_TARGET, group.getId()), false);
+
+            if (!unfoldedGroup) continue;
+
+            for (OpenQuestChapter chapter : chapters) {
+                String chapterSelector = CHAPTERS_CONTAINER + "[" + index++ + "]";
+
+                commandBuilder.append(CHAPTERS_CONTAINER, CHAPTER_DOCUMENT)
+                              .set(chapterSelector + " #Name.TextSpans", Message.translation(chapter.getNameKey()));
+                setIcon(commandBuilder, chapterSelector, chapter.getIcon());
+
+                if (chapter == open) {
+                    commandBuilder.set(chapterSelector + ".Style", CHAPTER_OPEN_STYLE)
+                                  .set(chapterSelector + " #Name.Style", CHAPTER_OPEN_LABEL_STYLE);
+                }
+
+                eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, chapterSelector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_CHAPTER)
+                                                                                                            .append(QuestPageEventData.KEY_TARGET, chapter.getId()), false);
+            }
         }
     }
 
@@ -518,13 +785,13 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         List<Entry> entries = new ArrayList<>();
 
         List<AbstractQuestProgression<?>> held = topLevel(questStore.getQuestIds());
-        held.sort(filter == Filter.DONE ? BY_RECENTLY_COMPLETED : byTrackedThenRecent(viewer));
+        held.sort(filter.isEnded() ? BY_RECENTLY_COMPLETED : byTrackedThenRecent(viewer));
 
         // One pass over everything the player holds: a quest that ended is set aside rather than
         // deleted, so the finished half of the journal is read the same way as the running half
         for (AbstractQuestProgression<?> quest : held) {
             if (!quest.isVisible()) continue;
-            if (!filter.accepts(quest.getStateFor(viewer))) continue;
+            if (!filter.accepts(QuestMark.of(quest.getStateFor(viewer)))) continue;
 
             entries.add(Entry.held(quest, viewer, isOwed(playerComponents, quest.getId())));
         }
@@ -583,7 +850,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         int objectives = renderObjectives(context, rowSelector, entry, shape);
 
         context.getEventBuilder()
-               .addEventBinding(CustomUIEventBindingType.Activating, rowSelector + "#Toggle", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_TOGGLE)
+               .addEventBinding(CustomUIEventBindingType.Activating, rowSelector + "#Header", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_TOGGLE)
                                                                                                        .append(QuestPageEventData.KEY_TARGET, entry.id()), false);
 
         if (!open) return;
@@ -752,6 +1019,12 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             case QuestPageEventData.ACTION_CLAIM -> claim(ref, data.getTarget());
             case QuestPageEventData.ACTION_ABANDON -> abandon(ref, data.getTarget());
             case QuestPageEventData.ACTION_TRACK -> track(ref, data.getTarget());
+            case QuestPageEventData.ACTION_FILTER -> setFilter(data.getValue());
+            case QuestPageEventData.ACTION_SEARCH -> setSearch(data.getValue());
+            case QuestPageEventData.ACTION_GROUP -> toggleGroup(data.getTarget());
+            case QuestPageEventData.ACTION_CHAPTER -> {
+                if (data.getTarget() != null) openChapter = data.getTarget();
+            }
 
             // These three move the player, and the redraw comes back through RouteChangedEvent.
             // Redrawing here as well would draw the page they are leaving.
@@ -759,7 +1032,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                 open(ref, data.getTarget(), data.getMark());
                 return;
             }
-            case QuestPageEventData.ACTION_FILTER -> {
+            case QuestPageEventData.ACTION_TAB -> {
                 select(data.getTarget());
                 return;
             }
@@ -847,6 +1120,12 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         if (target == null) return;
 
         if (!unfolded.remove(target)) unfolded.add(target);
+    }
+
+    private void toggleGroup(String target) {
+        if (target == null) return;
+
+        if (!unfoldedGroups.remove(target)) unfoldedGroups.add(target);
     }
 
     private void claim(@Nonnull Ref<EntityStore> ref, String target) {
@@ -992,17 +1271,17 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     }
 
     /**
-     * Which half of the journal is on screen. The page holds it, so a click redraws rather than
+     * Which tab of the journal is on screen. The page holds it, so a click redraws rather than
      * hiding rows the client already has.
      */
-    private enum Filter {
-        ACTIVE(JournalRoutes.TAB_ACTIVE, "openquests.page.filter.active"), DONE(JournalRoutes.TAB_DONE, "openquests.page.filter.done"), ALL(JournalRoutes.TAB_ALL, "openquests.page.filter.all"), PENDING(JournalRoutes.TAB_PENDING, "openquests.page.filter.pending");
+    private enum Tab {
+        CHAPTERS(JournalRoutes.TAB_CHAPTERS, "openquests.page.tab.chapters"), QUESTS(JournalRoutes.TAB_QUESTS, "openquests.page.tab.quests"), PENDING(JournalRoutes.TAB_PENDING, "openquests.page.tab.rewards");
 
         private final String tabName;
 
         private final String labelKey;
 
-        Filter(String tabName, String labelKey) {
+        Tab(String tabName, String labelKey) {
             this.tabName = tabName;
             this.labelKey = labelKey;
         }
@@ -1016,31 +1295,15 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         }
 
         /**
-         * @return whether a quest in that state belongs on this tab. Read off the quest itself
-         * rather than off which store it came from, now that both halves live in the same one.
-         */
-        boolean accepts(@Nonnull QuestState state) {
-            return switch (this) {
-                case ACTIVE -> state == QuestState.IN_PROGRESS;
-                case DONE -> state != QuestState.IN_PROGRESS;
-                case ALL -> true;
-
-                // Never asked: what is owed is read off the debts rather than off the quests, which
-                // is the whole reason this tab exists
-                case PENDING -> false;
-            };
-        }
-
-        /**
-         * @return the tab of that route, falling back to the first one for a name this page no
+         * @return the tab of that route, falling back to the quests for a name this page no
          * longer offers: a history written by an older version rather than something to refuse.
          */
         @Nonnull
-        static Filter ofTab(@Nonnull String tabName) {
-            for (Filter filter : values()) {
-                if (filter.tabName.equals(tabName)) return filter;
+        static Tab ofTab(@Nonnull String tabName) {
+            for (Tab tab : values()) {
+                if (tab.tabName.equals(tabName)) return tab;
             }
-            return ACTIVE;
+            return QUESTS;
         }
 
         @Nonnull
@@ -1049,17 +1312,77 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         }
     }
 
+    /**
+     * Which quests a list shows, by what became of them. Declaration order is the dropdown's.
+     */
+    private enum Filter {
+        ALL("openquests.page.filter.all"),
+        ACTIVE("openquests.page.filter.active"),
+        DONE("openquests.page.filter.done"),
+        SUCCESSFUL("openquests.page.filter.successful"),
+        FAILED("openquests.page.filter.failed"),
+        ABANDONED("openquests.page.filter.abandoned"),
+        LOCKED("openquests.page.filter.locked");
+
+        private final String labelKey;
+
+        Filter(String labelKey) {
+            this.labelKey = labelKey;
+        }
+
+        /**
+         * @return whether a quest marked so belongs on this list. A quest whose record was lost
+         * still ended, so it counts as done without matching any one outcome.
+         */
+        boolean accepts(@Nonnull QuestMark mark) {
+            return switch (this) {
+                case ALL -> true;
+                case ACTIVE -> mark == QuestMark.IN_PROGRESS;
+                case DONE -> mark != QuestMark.IN_PROGRESS && mark != QuestMark.LOCKED;
+                case SUCCESSFUL -> mark == QuestMark.SUCCESSFUL;
+                case FAILED -> mark == QuestMark.FAILED;
+                case ABANDONED -> mark == QuestMark.ABANDONED;
+                case LOCKED -> mark == QuestMark.LOCKED;
+            };
+        }
+
+        /**
+         * @return whether this list only holds quests that ended, which are read latest first.
+         */
+        boolean isEnded() {
+            return this == DONE || this == SUCCESSFUL || this == FAILED || this == ABANDONED;
+        }
+
+        /**
+         * @return the filter the dropdown sent, or {@code fallback} for a value it never offered.
+         */
+        @Nonnull
+        static Filter parse(@Nullable String value, @Nonnull Filter fallback) {
+            for (Filter filter : values()) {
+                if (filter.name().equals(value)) return filter;
+            }
+            return fallback;
+        }
+    }
+
     public static class QuestPageEventData {
         static final String KEY_ACTION = "Action";
         static final String KEY_TARGET = "Target";
         static final String KEY_MARK = "Mark";
+
+        /** Read off the element on the client: the {@code @} asks for its value rather than a constant. */
+        static final String KEY_VALUE = "@Value";
 
         static final String ACTION_TOGGLE = "toggle";
         static final String ACTION_OPEN = "open";
         static final String ACTION_CLAIM = "claim";
         static final String ACTION_ABANDON = "abandon";
         static final String ACTION_TRACK = "track";
+        static final String ACTION_TAB = "tab";
         static final String ACTION_FILTER = "filter";
+        static final String ACTION_SEARCH = "search";
+        static final String ACTION_GROUP = "group";
+        static final String ACTION_CHAPTER = "chapter";
         static final String ACTION_CRUMB = "crumb";
         static final String ACTION_CLOSE = "close";
 
@@ -1070,10 +1393,13 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>(KEY_MARK, Codec.STRING), (data, value) -> data.mark = value, data -> data.mark)
                                                                                  .add()
+                                                                                 .append(new KeyedCodec<>(KEY_VALUE, Codec.STRING), (data, value) -> data.value = value, data -> data.value)
+                                                                                 .add()
                                                                                  .build();
 
         private String action;
         private String target;
+        private String value;
 
         /**
          * What the line that was clicked said the quest was worth, for one nothing else can tell.
@@ -1088,6 +1414,13 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         public String getTarget() {
             return target;
+        }
+
+        /**
+         * @return what the element that sent the event held, such as the entry a dropdown now shows.
+         */
+        public String getValue() {
+            return value;
         }
 
         /**

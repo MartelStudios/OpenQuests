@@ -30,6 +30,6 @@ public class JournalCommand extends AbstractPlayerCommand {
 
     @Override
     protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
-        NavigationService.get().root(playerRef, JournalRoutes.journal(JournalRoutes.TAB_ACTIVE));
+        NavigationService.get().root(playerRef, JournalRoutes.journal(JournalRoutes.TAB_QUESTS));
     }
 }

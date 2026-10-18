@@ -174,3 +174,15 @@ category.achievement=Haut fait
 category.timed=Chronométré
 category.dungeon=Donjon
 category.side-quest=Quête secondaire
+
+chapter-group.adventure=Aventure
+chapter-group.survival=Survie
+chapter-group.feats=Exploits
+chapter.first-steps=Premiers pas
+chapter.forgotten-temple=Le Temple oublié
+chapter.goblin-lair=Le Repaire gobelin
+chapter.hunting=La chasse
+chapter.woodcutting=Le bûcheronnage
+chapter.daily-life=La vie quotidienne
+chapter.athletics=Athlétisme
+chapter.combat=Combat

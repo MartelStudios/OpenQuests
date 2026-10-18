@@ -25,6 +25,8 @@ import com.martelstudios.openquests.core.assignments.trigger.AssignmentTrigger;
 import com.martelstudios.openquests.core.assignments.trigger.PlayerConnectTrigger;
 import com.martelstudios.openquests.core.assignments.trigger.PlayerEnterWorldTrigger;
 import com.martelstudios.openquests.core.assignments.trigger.ScheduleTrigger;
+import com.martelstudios.openquests.core.chapters.OpenQuestChapter;
+import com.martelstudios.openquests.core.chapters.OpenQuestChapterGroup;
 import com.martelstudios.openquests.core.commands.QuestCommand;
 import com.martelstudios.openquests.core.config.OpenQuestsConfig;
 import com.martelstudios.openquests.core.constraints.QuestConstraintValidator;
@@ -208,6 +210,20 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
                                                     .setCodec(OpenQuestAssignment.CODEC)
                                                     .setKeyFunction(OpenQuestAssignment::getId)
                                                     .loadsAfter(OpenQuestAsset.class)
+                                                    .build());
+
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestChapterGroup.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenQuests/ChapterGroups/")
+                                                    .setCodec(OpenQuestChapterGroup.CODEC)
+                                                    .setKeyFunction(OpenQuestChapterGroup::getId)
+                                                    .build());
+
+        // After the quests and the groups, which the chapters name and are checked against
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestChapter.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenQuests/Chapters/")
+                                                    .setCodec(OpenQuestChapter.CODEC)
+                                                    .setKeyFunction(OpenQuestChapter::getId)
+                                                    .loadsAfter(OpenQuestAsset.class, OpenQuestChapterGroup.class)
                                                     .build());
 
         getEventRegistry().registerGlobal(LoadAssetEvent.PRIORITY_LOAD_LATE, LoadAssetEvent.class, QuestConstraintValidator::handleLoadAsset);

@@ -22,27 +22,68 @@ $C.@DecoratedContainer {
 
     $C.@ContentSeparator { Anchor: (Top: 4, Bottom: 8); }
 
-    // The trail back to the journal, filled by the page: it is as long as the player went deep
-    Group #Breadcrumb {
-      LayoutMode: Left;
-      Anchor: (Height: 20);
-    }
-
     // Filled by the page rather than declared here, so the tab standing open follows the state
     Group #Tabs {
       LayoutMode: Left;
-      Anchor: (Height: 30);
+      Anchor: (Height: 32);
+    }
+
+    // Tools of the open list, on a line of their own so the tabs keep the whole width. Hidden by
+    // the page where it shows a single quest.
+    Group #ListTools {
+      LayoutMode: Left;
+      Anchor: (Height: 32, Top: 8);
+      Visible: false;
+
+      // Narrows the open list by title. Each tab keeps its own text, which the page writes back
+      // on switching tab and otherwise leaves to the player typing in it
+      $C.@TextField #Search {
+        FlexWeight: 1;
+        Anchor: (Height: 32);
+        PlaceholderText: %server.customUI.searchPlaceholder;
+      }
+
+      // Which quest states the open list shows, hidden where there is no such list
+      $C.@DropdownBox #QuestFilter {
+        Anchor: (Width: 200, Height: 32, Left: 8);
+        Visible: false;
+      }
+    }
+
+    // The trail back to the tab's list, filled by the page: it is as long as the player went deep
+    Group #Breadcrumb {
+      LayoutMode: Left;
+      Anchor: (Height: 20, Top: 8);
     }
 
     $C.@ContentSeparator { Anchor: (Top: 8, Bottom: 8); }
 
-    Label #Empty { Text: ""; Anchor: (Height: 30); Visible: false; Style: (...$C.@DefaultLabelStyle, FontSize: 13, HorizontalAlignment: Center, VerticalAlignment: Center); }
-
-    Group #QuestList {
+    Group #Body {
       FlexWeight: 1;
-      LayoutMode: TopScrolling;
-      ScrollbarStyle: $C.@DefaultScrollbarStyle;
-      Padding: (Right: 8);
+      LayoutMode: Left;
+
+      // The chapters tab's table of contents: group headers and their chapters, appended flat
+      Group #ChapterList {
+        Anchor: (Width: 230, Right: 10);
+        LayoutMode: TopScrolling;
+        ScrollbarStyle: $C.@DefaultScrollbarStyle;
+        Padding: (Right: 8);
+        Visible: false;
+      }
+
+      Group #Main {
+        FlexWeight: 1;
+        LayoutMode: Top;
+
+        Label #Empty { Text: ""; Anchor: (Height: 30); Visible: false; Style: (...$C.@DefaultLabelStyle, FontSize: 13, HorizontalAlignment: Center, VerticalAlignment: Center); }
+
+        Group #QuestList {
+          FlexWeight: 1;
+          LayoutMode: TopScrolling;
+          ScrollbarStyle: $C.@DefaultScrollbarStyle;
+          Padding: (Right: 8);
+        }
+      }
     }
   }
 }

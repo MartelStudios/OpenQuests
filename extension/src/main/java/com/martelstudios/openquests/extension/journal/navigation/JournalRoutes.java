@@ -20,20 +20,22 @@ public final class JournalRoutes {
     public static final String JOURNAL = "journal";
     public static final String QUEST = "quest";
 
-    public static final String TAB_ACTIVE = "journal/active";
-    public static final String TAB_DONE = "journal/done";
-    public static final String TAB_ALL = "journal/all";
+    /** The table of contents: chapter groups, their chapters and the quests of the open one. */
+    public static final String TAB_CHAPTERS = "journal/chapters";
+
+    /** Every quest the player holds, narrowed by the page's own filter. */
+    public static final String TAB_QUESTS = "journal/quests";
 
     /** What the player is still owed, whether or not the quest that owes it is still listed. */
     public static final String TAB_PENDING = "journal/pending";
 
     /** Declaration order, which is the order the tab buttons are drawn in. */
-    private static final List<String> TABS = List.of(TAB_ACTIVE, TAB_DONE, TAB_ALL, TAB_PENDING);
+    private static final List<String> TABS = List.of(TAB_CHAPTERS, TAB_QUESTS, TAB_PENDING);
 
     private JournalRoutes() {}
 
     /**
-     * @param openTab which list stands open, {@link #TAB_ACTIVE} for a journal being opened afresh.
+     * @param openTab which list stands open, {@link #TAB_QUESTS} for a journal being opened afresh.
      */
     @Nonnull
     public static JournalRoute journal(@Nonnull String openTab) {
