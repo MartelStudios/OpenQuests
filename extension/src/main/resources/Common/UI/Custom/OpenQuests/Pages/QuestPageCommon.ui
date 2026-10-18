@@ -121,5 +121,5 @@ $C = "../../Common.ui";
   Default: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
   Hovered: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive_Hovered.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
   Pressed: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive_Pressed.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
-  Sounds: $C.@ButtonDestructiveSounds
+  Sounds: $C.@ButtonsCancel
 );

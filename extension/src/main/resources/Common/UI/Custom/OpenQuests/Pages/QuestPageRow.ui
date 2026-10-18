@@ -16,11 +16,11 @@ Group #QuestPageRow {
     LayoutMode: Left;
     Style: $P.@HeaderStyle;
 
-    Label #Toggle {
-      Text: "+";
+    Group #ToggleBox {
       Anchor: (Width: 28, Height: 24, Top: 0);
       Background: #1e2a38;
-      Style: $P.@ToggleLabelStyle;
+
+      Label #Toggle { Text: "+"; Style: $P.@ToggleLabelStyle; }
     }
 
     Group { Anchor: (Width: 8); }
