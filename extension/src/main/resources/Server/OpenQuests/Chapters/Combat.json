@@ -2,6 +2,7 @@
   "NameKey": "quest.chapter.combat",
   "Group": "Feats",
   "Order": 1,
+  "Visibility": "WhenSuccessful",
   "Icon": "Icons/ItemsGenerated/Weapon_Club_Crude.png",
   "QuestAssetIds": ["FirstBlood"]
 }

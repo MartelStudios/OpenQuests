@@ -33,7 +33,6 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.OpenQuestCategory;
 import com.martelstudios.openquests.core.models.QuestState;
-import com.martelstudios.openquests.core.models.QuestVisibility;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
@@ -222,7 +221,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         renderTabs(commandBuilder, eventBuilder, tab, isOwedAnything(playerComponents));
         renderSearch(commandBuilder, eventBuilder, alone ? null : tab);
         renderFilter(commandBuilder, eventBuilder, alone || tab == Tab.PENDING ? null : filterOf(tab));
-        renderChapters(commandBuilder, eventBuilder, !alone && tab == Tab.CHAPTERS);
+        renderChapters(commandBuilder, eventBuilder, playerComponents, !alone && tab == Tab.CHAPTERS);
         commandBuilder.clear(QuestPageContext.ROOT_CONTAINER);
 
         var context = new QuestPageContext(commandBuilder, eventBuilder, lookup(playerComponents), playerRef.getUuid());
@@ -358,7 +357,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      */
     @Nonnull
     private List<Entry> collectChapter(@Nonnull EntityComponents playerComponents) {
-        OpenQuestChapter chapter = openChapter();
+        OpenQuestChapter chapter = openChapter(playerComponents);
         if (chapter == null) return List.of();
 
         List<Entry> entries = new ArrayList<>();
@@ -366,23 +365,35 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             Entry entry = resolve(playerComponents, assetId, null);
             if (entry == null) continue;
 
-            boolean listed = entry.quest() != null ? entry.quest().isVisible() : entry.asset().getVisibility() == QuestVisibility.ALWAYS;
+            boolean listed = entry.quest() != null ? entry.quest().isVisible() : entry.asset().getVisibility().isReachedBy(null);
             if (listed && chaptersFilter.accepts(entry.mark())) entries.add(entry);
         }
         return entries;
     }
 
     /**
-     * @return the chapter the player picked, or else the first one there is, whose group is then
-     * unfolded so the list shows where the quests on the right come from.
+     * @return the chapters of that group the player is shown, in reading order. A group none of
+     * whose chapters shows is not shown either.
+     */
+    @Nonnull
+    private static List<OpenQuestChapter> visibleChapters(@Nonnull EntityComponents playerComponents, @Nonnull OpenQuestChapterGroup group) {
+        return OpenQuestChapter.getChaptersOf(group.getId())
+                               .stream()
+                               .filter(chapter -> chapter.isVisible(assetId -> held(playerComponents, assetId)))
+                               .toList();
+    }
+
+    /**
+     * @return the chapter the player picked while it still shows, or else the first one shown,
+     * whose group is then unfolded so the list shows where the quests on the right come from.
      */
     @Nullable
-    private OpenQuestChapter openChapter() {
+    private OpenQuestChapter openChapter(@Nonnull EntityComponents playerComponents) {
         OpenQuestChapter chapter = openChapter == null ? null : OpenQuestChapter.getChapter(openChapter);
-        if (chapter != null) return chapter;
+        if (chapter != null && chapter.isVisible(assetId -> held(playerComponents, assetId))) return chapter;
 
         for (OpenQuestChapterGroup group : OpenQuestChapterGroup.getSorted()) {
-            List<OpenQuestChapter> chapters = OpenQuestChapter.getChaptersOf(group.getId());
+            List<OpenQuestChapter> chapters = visibleChapters(playerComponents, group);
             if (chapters.isEmpty()) continue;
 
             openChapter = chapters.getFirst().getId();
@@ -695,19 +706,19 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     /**
      * The chapters tab's table of contents, groups and chapters appended flat into one list. A
-     * group without chapters is left out, having nothing to unfold onto.
+     * group without a chapter shown is left out, having nothing to unfold onto.
      */
-    private void renderChapters(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, boolean shown) {
+    private void renderChapters(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull EntityComponents playerComponents, boolean shown) {
         commandBuilder.clear(CHAPTERS_CONTAINER)
                       .set(CHAPTERS_CONTAINER + ".Visible", shown);
         if (!shown) return;
 
         // Settled before drawing, so a chapter picked by default is drawn as the open one
-        OpenQuestChapter open = openChapter();
+        OpenQuestChapter open = openChapter(playerComponents);
         int index = 0;
 
         for (OpenQuestChapterGroup group : OpenQuestChapterGroup.getSorted()) {
-            List<OpenQuestChapter> chapters = OpenQuestChapter.getChaptersOf(group.getId());
+            List<OpenQuestChapter> chapters = visibleChapters(playerComponents, group);
             if (chapters.isEmpty()) continue;
 
             boolean unfoldedGroup = unfoldedGroups.contains(group.getId());

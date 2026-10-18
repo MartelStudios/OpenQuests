@@ -506,9 +506,11 @@ once it declares one, so a quest can be written over at runtime rather than only
 
 | Value | Listed |
 | --- | --- |
-| `Always` | From the moment it is handed out. The default. |
+| `Always` | From the moment it is handed out, and before that as locked in its chapters. The default. |
+| `WhenStarted` | From the moment it is handed out, and kept out of its chapters until then. |
 | `WhenProgressed` | Once the player has got somewhere with it. |
-| `WhenCompleted` | Only once it is over: an achievement, earned before it is named. |
+| `WhenCompleted` | Only once it is over, however it ended: an achievement, earned before it is named. |
+| `WhenSuccessful` | Only once it succeeded. |
 | `Never` | Not at all, whatever becomes of it. |
 
 Written in camel case in the asset, as every enum is: `QuestVisibility.WHEN_COMPLETED` in Java is
@@ -585,6 +587,10 @@ A chapter, under `Server/OpenQuests/Chapters/`, names its group, its `Order` wit
 quests, drawn in the order listed. Groups and chapters sort by `Order`, then by id. A quest may sit
 in several chapters, or in none. A quest the player was never given shows as locked, unless its
 `Visibility` keeps it hidden until then.
+
+A chapter takes a `Visibility` too, with the same values read against its quests: it shows once
+one of them reaches it (`WhenSuccessful`: once one succeeded), and from the start with `Always`,
+the default. A group shows while one of its chapters does.
 
 ```json
 { "NameKey": "quest.chapter.goblin-lair", "Group": "Adventure", "Order": 2, "QuestAssetIds": ["GoblinLairRats", "GoblinLairTunnels"] }
