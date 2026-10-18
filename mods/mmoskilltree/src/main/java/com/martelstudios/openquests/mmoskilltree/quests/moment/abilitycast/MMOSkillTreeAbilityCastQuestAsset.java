@@ -19,21 +19,21 @@ public class MMOSkillTreeAbilityCastQuestAsset extends MMOSkillTreeMomentQuestAs
     public static final BuilderCodec<MMOSkillTreeAbilityCastQuestAsset> CODEC =
         BuilderCodec.builder(MMOSkillTreeAbilityCastQuestAsset.class, MMOSkillTreeAbilityCastQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("Ability", Codec.STRING), (asset, ability) -> asset.ability = ability, asset -> asset.ability)
-                    .metadata(DataSets.ABILITY_DROPDOWN)
+                    .metadata(DataSets.ABILITY_OR_ALL_DROPDOWN)
                     .add()
                     .append(new KeyedCodec<>("Skill", Codec.STRING), (asset, skill) -> asset.skill = skill, asset -> asset.skill)
-                    .metadata(DataSets.SKILL_DROPDOWN)
+                    .metadata(DataSets.SKILL_OR_ALL_DROPDOWN)
                     .add()
                     .build();
 
     @Nullable
-    protected String ability;
+    protected String ability = ANY;
 
     /**
      * The skill whose tree holds the ability, MMO Skill Tree's own qualifier of a cast.
      */
     @Nullable
-    protected String skill;
+    protected String skill = ANY;
 
     private MMOSkillTreeAbilityCastQuestAsset() {}
 
@@ -45,18 +45,18 @@ public class MMOSkillTreeAbilityCastQuestAsset extends MMOSkillTreeMomentQuestAs
     @Nullable
     @Override
     public String getTarget() {
-        return ability;
+        return openOrNull(ability);
     }
 
     @Nullable
     @Override
     public String getQualifier() {
-        return skill;
+        return openOrNull(skill);
     }
 
     @Nullable
     @Override
     public String getSkill() {
-        return skill;
+        return openOrNull(skill);
     }
 }

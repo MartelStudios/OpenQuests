@@ -19,14 +19,14 @@ public class MMOSkillTreeCompleteBountyQuestAsset extends MMOSkillTreeMomentQues
     public static final BuilderCodec<MMOSkillTreeCompleteBountyQuestAsset> CODEC =
         BuilderCodec.builder(MMOSkillTreeCompleteBountyQuestAsset.class, MMOSkillTreeCompleteBountyQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("Board", Codec.STRING), (asset, board) -> asset.board = board, asset -> asset.board)
-                    .metadata(DataSets.BOARD_DROPDOWN)
+                    .metadata(DataSets.BOARD_OR_ALL_DROPDOWN)
                     .add()
                     .append(new KeyedCodec<>("Difficulty", Codec.STRING), (asset, difficulty) -> asset.difficulty = difficulty, asset -> asset.difficulty)
                     .add()
                     .build();
 
     @Nullable
-    protected String board;
+    protected String board = ANY;
 
     /**
      * The band the board files the bounty under, such as {@code easy} or {@code elite}.
@@ -44,7 +44,7 @@ public class MMOSkillTreeCompleteBountyQuestAsset extends MMOSkillTreeMomentQues
     @Nullable
     @Override
     public String getTarget() {
-        return board;
+        return openOrNull(board);
     }
 
     @Nullable

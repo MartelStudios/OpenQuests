@@ -25,6 +25,7 @@ public final class KindRewardRenderer implements QuestRewardRenderer {
         var chip = RewardChips.chipFor(((KindReward) reward).toSpec());
         if (chip == null) return;
 
-        QuestPageRows.appendItemLine(context, chip.iconItemId(), chip.label(), null);
+        if (chip.hasIcon()) QuestPageRows.appendItemLine(context, chip.iconItemId(), chip.label(), null);
+        else QuestPageRows.appendLine(context, chip.label());
     }
 }

@@ -11,6 +11,19 @@ import javax.annotation.Nullable;
 public abstract class MMOSkillTreeMomentQuestAsset extends QuantityQuestAsset {
 
     /**
+     * Written in a field left open, so the asset editor shows what it means rather than nothing.
+     */
+    public static final String ANY = "ALL";
+
+    /**
+     * @return the value, or {@code null} for one left open.
+     */
+    @Nullable
+    public static String openOrNull(@Nullable String value) {
+        return value == null || ANY.equalsIgnoreCase(value) ? null : value;
+    }
+
+    /**
      * @return what a moment must be about to count, {@code null} for any.
      */
     @Nullable

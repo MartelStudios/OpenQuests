@@ -20,12 +20,12 @@ public class MMOSkillTreeGainXpQuestAsset extends MMOSkillTreeMomentQuestAsset i
     public static final BuilderCodec<MMOSkillTreeGainXpQuestAsset> CODEC =
         BuilderCodec.builder(MMOSkillTreeGainXpQuestAsset.class, MMOSkillTreeGainXpQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("Skill", Codec.STRING), (asset, skill) -> asset.skill = skill, asset -> asset.skill)
-                    .metadata(DataSets.SKILL_DROPDOWN)
+                    .metadata(DataSets.SKILL_OR_ALL_DROPDOWN)
                     .add()
                     .build();
 
     @Nullable
-    protected String skill;
+    protected String skill = ANY;
 
     private MMOSkillTreeGainXpQuestAsset() {}
 
@@ -37,12 +37,12 @@ public class MMOSkillTreeGainXpQuestAsset extends MMOSkillTreeMomentQuestAsset i
     @Nullable
     @Override
     public String getTarget() {
-        return skill;
+        return openOrNull(skill);
     }
 
     @Nullable
     @Override
     public String getSkill() {
-        return skill;
+        return openOrNull(skill);
     }
 }

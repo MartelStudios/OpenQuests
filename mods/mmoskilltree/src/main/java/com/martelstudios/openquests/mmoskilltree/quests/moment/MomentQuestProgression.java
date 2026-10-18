@@ -42,7 +42,7 @@ public abstract class MomentQuestProgression<Q extends MomentQuestProgression<Q>
      */
     @Nullable
     public String getTarget() {
-        return target != null ? target : getAsset().getTarget();
+        return target != null ? MMOSkillTreeMomentQuestAsset.openOrNull(target) : getAsset().getTarget();
     }
 
     /**
@@ -50,7 +50,7 @@ public abstract class MomentQuestProgression<Q extends MomentQuestProgression<Q>
      */
     @Nullable
     public String getQualifier() {
-        return qualifier != null ? qualifier : getAsset().getQualifier();
+        return qualifier != null ? MMOSkillTreeMomentQuestAsset.openOrNull(qualifier) : getAsset().getQualifier();
     }
 
     /**

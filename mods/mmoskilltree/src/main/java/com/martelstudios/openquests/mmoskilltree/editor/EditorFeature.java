@@ -18,6 +18,8 @@ public final class EditorFeature {
     public static void register(@Nonnull JavaPlugin plugin) {
         plugin.getEventRegistry().register(AssetEditorRequestDataSetEvent.class, DataSets.SKILLS, DataSetEvents::handleSkills);
         plugin.getEventRegistry().register(AssetEditorRequestDataSetEvent.class, DataSets.SKILL_POOLS, DataSetEvents::handleSkillPools);
-        plugin.getEventRegistry().register(AssetEditorRequestDataSetEvent.class, DataSets.ABILITIES, DataSetEvents::handleAbilities);
+        plugin.getEventRegistry().register(AssetEditorRequestDataSetEvent.class, DataSets.SKILLS_OR_ALL, DataSetEvents::handleSkillsOrAll);
+        plugin.getEventRegistry().register(AssetEditorRequestDataSetEvent.class, DataSets.ABILITIES_OR_ALL, DataSetEvents::handleAbilitiesOrAll);
+        plugin.getEventRegistry().register(AssetEditorRequestDataSetEvent.class, DataSets.BOARDS_OR_ALL, DataSetEvents::handleBoardsOrAll);
     }
 }
