@@ -1,0 +1,32 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Void_Anomaly_Crystal.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-anomalies.title",
+  "DescriptionKey": "quest.goblin-breach-anomalies.description",
+  "TargetQuantity": 3,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Void_Anomaly_Crystal*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachVoidCrystals",
+        "GoblinBreachVoidSpawn"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

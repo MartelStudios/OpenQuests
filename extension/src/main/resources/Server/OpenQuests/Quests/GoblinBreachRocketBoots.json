@@ -1,0 +1,22 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Rocket_Boots.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-rocket-boots.title",
+  "DescriptionKey": "quest.goblin-breach-rocket-boots.description",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Rocket_Boots"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachSurvivor"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

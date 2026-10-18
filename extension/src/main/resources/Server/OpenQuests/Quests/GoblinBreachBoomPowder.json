@@ -1,0 +1,22 @@
+{
+  "Type": "Gather",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Powder_Boom.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-boom-powder.title",
+  "DescriptionKey": "quest.goblin-breach-boom-powder.description",
+  "TargetQuantity": 16,
+  "ItemToGather": {
+    "ItemId": "Ingredient_Powder_Boom"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachBangstick"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Glider_Scrap.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-glider.title",
+  "DescriptionKey": "quest.goblin-breach-glider.description",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Glider_Scrap"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachSurvivor"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

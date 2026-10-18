@@ -1,0 +1,13 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/PortalKey_Goblin_Breach.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-fragment.title",
+  "DescriptionKey": "quest.goblin-breach-fragment.description",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "PortalKey_Goblin_Breach"
+  }
+}

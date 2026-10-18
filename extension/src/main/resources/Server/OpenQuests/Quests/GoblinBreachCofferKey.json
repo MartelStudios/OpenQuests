@@ -1,0 +1,22 @@
+{
+  "Type": "Gather",
+  "Icon": "Icons/ItemsGenerated/Coffer_Key.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-coffer-key.title",
+  "DescriptionKey": "quest.goblin-breach-coffer-key.description",
+  "TargetQuantity": 1,
+  "ItemToGather": {
+    "ItemId": "Coffer_Key"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachCoffer"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

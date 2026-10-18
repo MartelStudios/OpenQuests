@@ -1,0 +1,23 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Goblin_Turret.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-turrets.title",
+  "DescriptionKey": "quest.goblin-breach-turrets.description",
+  "TargetQuantity": 6,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "*Goblin_Turret*",
+      "*Goblin_Lobber_Turret*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ]
+}

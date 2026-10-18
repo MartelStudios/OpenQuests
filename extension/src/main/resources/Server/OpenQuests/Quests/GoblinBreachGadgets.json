@@ -1,0 +1,22 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Gadget_Assembly.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-gadgets.title",
+  "DescriptionKey": "quest.goblin-breach-gadgets.description",
+  "TargetQuantity": 3,
+  "ItemToCraft": {
+    "ItemId": "Ingredient_Gadget_Assembly"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachVoidtaken"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}
