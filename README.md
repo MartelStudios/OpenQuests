@@ -656,6 +656,36 @@ same words for everyone's defaults, granted to `hytale:WorldEditor`.
   `"Command": "give {player} Ingredient_Stick --quantity=5"` works; the optional arguments of a
   server command are named, never positional. A leading slash is optional. Runs as the console
   unless `"AsPlayer": true`, which runs it with the permissions of the player instead.
+- `Random`: grants one of its `Rewards`, each a `Reward` and a `Weight` (1 by default) drawn
+  against the others: weights 6, 3 and 1 are 60, 30 and 10 percent. A draw that cannot be granted
+  (a full inventory) grants nothing and is drawn again on the next attempt.
+
+```json
+{
+  "Type": "Random",
+  "Rewards": [
+    { "Weight": 3, "Reward": { "Type": "Item", "ItemId": "Ingredient_Bar_Gold", "Quantity": 2 } },
+    { "Weight": 1, "Reward": { "Type": "Item", "ItemId": "Potion_Health_Greater" } }
+  ]
+}
+```
+
+- `Choice`: opens a popup where the player picks `Choices` (1 by default) of its `Rewards`, each a
+  `Reward` that can be picked up to `Count` times (1 by default). The popup closes once the picks
+  are spent or nothing is left to pick. Each pick is kept as it is made, so a popup closed early
+  reopens with what is left on the next claim. With `AutoClaim` it opens as the quest ends; a
+  player who is not in a world then claims it from the journal.
+
+```json
+{
+  "Type": "Choice",
+  "Choices": 2,
+  "Rewards": [
+    { "Reward": { "Type": "Item", "ItemId": "Ingredient_Bar_Gold", "Quantity": 5 } },
+    { "Count": 2, "Reward": { "Type": "Item", "ItemId": "Potion_Health_Greater", "Quantity": 2 } }
+  ]
+}
+```
 
 ## Constraints
 

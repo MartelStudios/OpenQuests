@@ -67,7 +67,33 @@ public final class QuestPageContext {
      */
     private final List<LiveValue> countdowns = new ArrayList<>();
 
-    QuestPageContext(@Nonnull UICommandBuilder builder, @Nonnull UIEventBuilder eventBuilder, @Nonnull QuestLookup lookup, @Nonnull UUID viewer) {
+    /**
+     * Knows no quest at all, for drawing rewards outside the journal: nothing links, nothing is marked.
+     */
+    public static final QuestLookup NO_LOOKUP = new QuestLookup() {
+        @Override
+        public boolean canOpen(@Nonnull String target) {
+            return false;
+        }
+
+        @Nullable
+        @Override
+        public QuestMark markOf(@Nonnull String target) {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public String grantedFrom(@Nonnull String sourceQuestId, @Nonnull String assetId) {
+            return null;
+        }
+    };
+
+    /**
+     * Draws into {@link #ROOT_CONTAINER} until {@link #into} says otherwise, which is how a page
+     * other than the journal places the lines.
+     */
+    public QuestPageContext(@Nonnull UICommandBuilder builder, @Nonnull UIEventBuilder eventBuilder, @Nonnull QuestLookup lookup, @Nonnull UUID viewer) {
         this.builder = builder;
         this.eventBuilder = eventBuilder;
         this.lookup = lookup;

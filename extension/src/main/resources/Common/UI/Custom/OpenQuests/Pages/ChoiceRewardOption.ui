@@ -1,0 +1,26 @@
+// One reward of a choice: its preview as the journal draws it, how many times it can still be
+// picked, and the button picking it. Appended into #Options of ChoiceRewardPage.ui.
+$P = "QuestPageCommon.ui";
+$C = "../../Common.ui";
+
+Group #ChoiceRewardOption {
+  LayoutMode: Left;
+  Background: #1a2233;
+  Padding: (Full: 12);
+  Anchor: (Bottom: 4);
+
+  // Filled by the reward renderer, as many lines as the reward takes
+  Group #Preview {
+    LayoutMode: Top;
+    FlexWeight: 1;
+  }
+
+  Label #Count { Text: ""; Anchor: (Width: 70, Height: $C.@SmallButtonHeight, Left: 8, Right: 8); Style: $P.@ProgressStyle; }
+
+  TextButton #Choose {
+    Text: "";
+    Anchor: (MinWidth: 110, Height: $C.@SmallButtonHeight);
+    Padding: (Horizontal: 16);
+    Style: $P.@OwedButtonStyle;
+  }
+}

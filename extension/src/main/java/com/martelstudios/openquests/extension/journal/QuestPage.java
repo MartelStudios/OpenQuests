@@ -1173,6 +1173,10 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             }
         }
 
+        // A claim can open a page of its own (a choice of rewards): the journal is gone from the screen
+        var player = EntityComponents.of(ref).getComponent(Player.getComponentType());
+        if (player == null || player.getPageManager().getCustomPage() != this) return;
+
         var commandBuilder = new UICommandBuilder();
         var eventBuilder = new UIEventBuilder();
 
