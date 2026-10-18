@@ -12,11 +12,13 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import org.joml.Vector2i;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -25,8 +27,6 @@ import java.util.function.Function;
  * read in. The chapter lists its quests, so quest assets know nothing of where they are shown.
  */
 public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenQuestChapter>> {
-
-    private static final String[] NO_QUESTS = new String[0];
 
     public static final AssetBuilderCodec<String, OpenQuestChapter> CODEC = AssetBuilderCodec.builder(OpenQuestChapter.class, OpenQuestChapter::new, Codec.STRING, (chapter, id) -> chapter.id = id, chapter -> chapter.id, (chapter, data) -> chapter.data = data, chapter -> chapter.data)
                                                                                              .append(new KeyedCodec<>("NameKey", Codec.STRING), (chapter, key) -> chapter.nameKey = key, chapter -> chapter.nameKey)
@@ -39,10 +39,9 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
                                                                                              .append(new KeyedCodec<>("Order", Codec.INTEGER), (chapter, order) -> chapter.order = order, chapter -> chapter.order)
                                                                                              .add()
                                                                                              .append(new KeyedCodec<>("Icon", Codec.STRING), (chapter, icon) -> chapter.icon = icon, chapter -> chapter.icon)
-                                                                                             .addValidator(OpenQuestChapterGroup.ICON_VALIDATOR)
+                                                                                             .addValidator(OpenQuestAsset.ICON_VALIDATOR)
                                                                                              .add()
-                                                                                             .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(Codec.STRING, String[]::new)), (chapter, ids) -> chapter.questAssetIds = ids, chapter -> chapter.questAssetIds)
-                                                                                             .addValidator(OpenQuestAsset.VALIDATOR_CACHE.getArrayValidator())
+                                                                                             .append(new KeyedCodec<>("Quests", new ArrayCodec<>(ChapterQuest.CODEC, ChapterQuest[]::new)), (chapter, quests) -> chapter.quests = quests, chapter -> chapter.quests)
                                                                                              .add()
                                                                                              .build();
 
@@ -56,9 +55,30 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
     protected String icon;
 
     @Nonnull
-    protected String[] questAssetIds = NO_QUESTS;
+    protected ChapterQuest[] quests = new ChapterQuest[0];
 
     protected OpenQuestChapter() {}
+
+    /**
+     * @return the quests of this chapter as it shows them, in the order they are read.
+     */
+    @Nonnull
+    public ChapterQuest[] getQuests() {
+        return quests;
+    }
+
+    /**
+     * Gives quests of this chapter a cell of its graph, for the journal's editor. Changes this loaded
+     * asset only: the caller writes it to its file, which loads it again.
+     *
+     * @param positions the new cell by quest asset id, X the column and Y the row.
+     */
+    public void place(@Nonnull Map<String, Vector2i> positions) {
+        for (ChapterQuest quest : quests) {
+            Vector2i position = positions.get(quest.getQuest());
+            if (position != null) quest.setPosition(position);
+        }
+    }
 
     /**
      * @param runOf the player's run of a quest asset, or {@code null} for one they were never handed.
@@ -66,8 +86,8 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
      * no visibility of its own, so a quest kept out of sight cannot be glimpsed through it.
      */
     public boolean isVisible(@Nonnull Function<String, AbstractQuestProgression<?>> runOf) {
-        for (String questAssetId : questAssetIds) {
-            if (isShown(questAssetId, runOf.apply(questAssetId))) return true;
+        for (ChapterQuest quest : quests) {
+            if (isShown(quest.getQuest(), runOf.apply(quest.getQuest()))) return true;
         }
         return false;
     }
@@ -118,14 +138,6 @@ public class OpenQuestChapter implements JsonAssetWithMap<String, DefaultAssetMa
      */
     public int getOrder() {
         return order;
-    }
-
-    /**
-     * @return the quests of this chapter, in the order they are read.
-     */
-    @Nonnull
-    public String[] getQuestAssetIds() {
-        return questAssetIds;
     }
 
     /**

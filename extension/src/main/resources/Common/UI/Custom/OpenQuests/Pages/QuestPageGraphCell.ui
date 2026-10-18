@@ -1,0 +1,9 @@
+// One cell of a chapter's grid in edit mode, under the links and tiles, with its coordinates in a
+// corner. A click puts the quest picked up into it.
+$P = "QuestPageCommon.ui";
+
+Button #Cell {
+  Style: $P.@GraphCellStyle;
+
+  Label #Coordinates { Text: ""; Anchor: (Left: 4, Top: 2, Width: 60, Height: 14); Style: $P.@GraphCellLabelStyle; }
+}

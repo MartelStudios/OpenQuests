@@ -123,3 +123,35 @@ $C = "../../Common.ui";
   Pressed: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive_Pressed.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
   Sounds: $C.@ButtonsCancel
 );
+
+// A quest in a chapter's graph: a tile the eye reads as something to click
+@GraphNodeStyle = ButtonStyle(
+  Default: (Background: #22304a),
+  Hovered: (Background: #2f4466),
+  Pressed: (Background: #1a2538),
+  Sounds: $C.@ButtonSounds
+);
+
+// The chevrons laid along a link of the graph, pointing from the quest handing out to the one
+// handed. Dark and half transparent, so they read over every colour a link takes.
+@GraphArrowRight = PatchStyle(TexturePath: "Graph/ArrowRight.png");
+@GraphArrowLeft = PatchStyle(TexturePath: "Graph/ArrowLeft.png");
+@GraphArrowUp = PatchStyle(TexturePath: "Graph/ArrowUp.png");
+@GraphArrowDown = PatchStyle(TexturePath: "Graph/ArrowDown.png");
+
+// Laid over the tiles of the quests linked to the hovered one, in the colours of their links
+@GraphTintNone = PatchStyle(Color: #000000(0));
+@GraphTintNext = PatchStyle(Color: #f2d14b(0.22));
+@GraphTintPrevious = PatchStyle(Color: #4b9cf2(0.22));
+
+// The picked-up quest in edit mode, and the grid it is put down on
+@GraphTintSelected = PatchStyle(Color: #ffffff(0.3));
+
+@GraphCellStyle = ButtonStyle(
+  Default: (Background: #ffffff(0.03)),
+  Hovered: (Background: #ffffff(0.09)),
+  Pressed: (Background: #ffffff(0.14)),
+  Sounds: $C.@ButtonSounds
+);
+
+@GraphCellLabelStyle = (FontSize: 10, TextColor: @ColorMuted);

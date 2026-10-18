@@ -593,8 +593,26 @@ one of its chapters does. A quest kept out of sight cannot be glimpsed through i
 chapter of quests set to `WhenStarted` or later stays hidden until the player reaches one.
 
 ```json
-{ "NameKey": "quest.chapter.goblin-lair", "Group": "Adventure", "Order": 2, "QuestAssetIds": ["GoblinLairRats", "GoblinLairTunnels"] }
+{
+  "NameKey": "quest.chapter.goblin-lair", "Group": "Adventure", "Order": 2,
+  "Quests": [
+    { "Quest": "GoblinLairRats", "Position": { "X": 0, "Y": 1 } },
+    { "Quest": "GoblinLairSpiders", "Position": { "X": 1, "Y": 0 }, "Icon": "Icons/ModelsGenerated/Spider_Cave.png" }
+  ]
+}
 ```
+
+Each entry of `Quests` names a quest and may give it a `Position` in the chapter's graph, `X` the
+column and `Y` the row of an invisible grid counted from the top left. A quest given none is put one
+column right of the quest handing it out, in the first free row. Its `Icon` overrides the quest's
+own `Icon` in this chapter; a quest with neither is drawn as a book. Links between quests come from
+their `GrantQuest` rewards, nothing more to write.
+
+A player holding `martelstudios.openquests.journal.edit`, granted to `hytale:WorldEditor`, gets an
+Edit button over the graph. Edit mode draws the grid with each cell's coordinates and every quest of
+the chapter, hidden ones included: click a quest, then a cell, to move it there, swapping with any
+quest already in it. The chapter's file is rewritten at once, every quest pinned where it was seen;
+a chapter that cannot be written, inside an archive, keeps the change until the server restarts.
 
 ### Quest tracker
 

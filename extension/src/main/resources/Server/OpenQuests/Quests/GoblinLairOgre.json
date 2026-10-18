@@ -1,5 +1,6 @@
 {
   "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Trork_Mauler.png",
   "Categories": ["Dungeon"],
   "TitleKey": "quest.goblin-lair-ogre.title",
   "DescriptionKey": "quest.goblin-lair-ogre.description",

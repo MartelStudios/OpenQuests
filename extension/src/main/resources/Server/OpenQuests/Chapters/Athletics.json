@@ -3,5 +3,16 @@
   "Group": "Feats",
   "Order": 0,
   "Icon": "Icons/ItemCategories/Items-Clothes.png",
-  "QuestAssetIds": ["RunNovice", "RunAdept", "RunMaster", "SprintNovice", "SprintAdept", "SprintMaster", "JumpNovice", "JumpAdept", "JumpMaster", "SilentStep"]
+  "Quests": [
+    { "Quest": "RunNovice" },
+    { "Quest": "RunAdept" },
+    { "Quest": "RunMaster" },
+    { "Quest": "SprintNovice" },
+    { "Quest": "SprintAdept" },
+    { "Quest": "SprintMaster" },
+    { "Quest": "JumpNovice" },
+    { "Quest": "JumpAdept" },
+    { "Quest": "JumpMaster" },
+    { "Quest": "SilentStep" }
+  ]
 }

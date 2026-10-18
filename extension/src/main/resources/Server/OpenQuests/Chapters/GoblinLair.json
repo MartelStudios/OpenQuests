@@ -3,5 +3,14 @@
   "Group": "Adventure",
   "Order": 2,
   "Icon": "Icons/ModelsGenerated/Goblin_Duke.png",
-  "QuestAssetIds": ["GoblinLairRats", "GoblinLairTunnels", "GoblinLairSpiders", "GoblinLairTorches", "GoblinLairLookout", "GoblinLairOgre", "GoblinLairDuke", "GoblinLairDailyHunt"]
+  "Quests": [
+    { "Quest": "GoblinLairRats", "Position": { "X": 0, "Y": 1 } },
+    { "Quest": "GoblinLairTunnels", "Position": { "X": 1, "Y": 1 } },
+    { "Quest": "GoblinLairSpiders", "Position": { "X": 1, "Y": 0 } },
+    { "Quest": "GoblinLairTorches", "Position": { "X": 1, "Y": 2 } },
+    { "Quest": "GoblinLairLookout", "Position": { "X": 2, "Y": 1 } },
+    { "Quest": "GoblinLairOgre", "Position": { "X": 3, "Y": 1 } },
+    { "Quest": "GoblinLairDuke", "Position": { "X": 4, "Y": 1 } },
+    { "Quest": "GoblinLairDailyHunt", "Position": { "X": 0, "Y": 3 } }
+  ]
 }

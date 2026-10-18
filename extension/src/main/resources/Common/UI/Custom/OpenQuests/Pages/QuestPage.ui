@@ -43,9 +43,24 @@ $C.@DecoratedContainer {
         PlaceholderText: %server.customUI.searchPlaceholder;
       }
 
+      // Holds the search field's place where the page hides it
+      Group #ToolsSpacer { FlexWeight: 1; Visible: false; }
+
       // Which quest states the open list shows, hidden where there is no such list
       $C.@DropdownBox #QuestFilter {
         Anchor: (Width: 200, Height: 32, Left: 8);
+        Visible: false;
+      }
+
+      // Lays the open chapter out on its grid, for players allowed to; shown in the graph only
+      $C.@SmallSecondaryTextButton #EditToggle {
+        @Anchor = (MinWidth: 100, Left: 8);
+        Visible: false;
+      }
+
+      // Switches the chapters tab between its list and its graph
+      $C.@SmallSecondaryTextButton #ViewToggle {
+        @Anchor = (MinWidth: 100, Left: 8);
         Visible: false;
       }
     }
@@ -82,6 +97,26 @@ $C.@DecoratedContainer {
           LayoutMode: TopScrolling;
           ScrollbarStyle: $C.@DefaultScrollbarStyle;
           Padding: (Right: 8);
+        }
+
+        // The open chapter as a graph, scrolling both ways though a container scrolls one way only:
+        // rows in #GraphScroll, columns in #GraphRow inside it (shift and the wheel). The vertical one
+        // is outermost, so its scrollbar stays at the edge of the area. #Graph has no layout mode: the
+        // page places every node and line by its anchor, and sizes it and #GraphRow to the chapter.
+        Group #GraphScroll {
+          FlexWeight: 1;
+          LayoutMode: TopScrolling;
+          ScrollbarStyle: $C.@DefaultScrollbarStyle;
+          Background: #0d141f(0.5);
+          Visible: false;
+
+          Group #GraphRow {
+            Anchor: (Height: 380);
+            LayoutMode: LeftScrolling;
+            ScrollbarStyle: $C.@DefaultScrollbarStyle;
+
+            Group #Graph { Anchor: (Width: 552, Height: 368); }
+          }
         }
       }
     }

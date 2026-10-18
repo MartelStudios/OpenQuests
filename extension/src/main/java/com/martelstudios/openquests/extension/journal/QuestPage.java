@@ -1,6 +1,8 @@
 package com.martelstudios.openquests.extension.journal;
 
 import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
@@ -26,6 +28,7 @@ import com.hypixel.hytale.server.core.util.MessageUtil;
 import com.martelstudios.opennavigation.routes.Route;
 import com.martelstudios.opennavigation.routes.TabRoute;
 import com.martelstudios.opennavigation.services.NavigationService;
+import com.martelstudios.openquests.core.chapters.ChapterQuest;
 import com.martelstudios.openquests.core.chapters.OpenQuestChapter;
 import com.martelstudios.openquests.core.chapters.OpenQuestChapterGroup;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
@@ -45,11 +48,13 @@ import com.martelstudios.openquests.extension.journal.navigation.routes.Labelled
 import com.martelstudios.openquests.extension.journal.navigation.routes.QuestRoute;
 import com.martelstudios.openquests.extension.journal.navigation.JournalRoutes;
 import com.martelstudios.openquests.extension.track.QuestTrackService;
+import org.joml.Vector2i;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.text.Normalizer;
 import java.time.Instant;
+import java.util.logging.Level;
 import java.util.*;
 
 /**
@@ -58,6 +63,8 @@ import java.util.*;
  * reward own {@link QuestRewardRenderer}.
  */
 public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventData> {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
     private static final String PAGE_DOCUMENT = "OpenQuests/Pages/QuestPage.ui";
     private static final String TAB_DOCUMENT = "OpenQuests/Pages/QuestPageTab.ui";
     private static final String TAB_OWED_DOCUMENT = "OpenQuests/Pages/QuestPageTabOwed.ui";
@@ -118,6 +125,18 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      */
     @Nonnull
     private Filter chaptersFilter = Filter.ALL;
+
+    /**
+     * Whether the chapters tab shows the open chapter as a graph rather than as a list.
+     */
+    private boolean graphMode;
+
+    /**
+     * Whether the graph shows its grid to lay the chapter out, for a player allowed to.
+     */
+    private boolean editMode;
+
+    private final ChapterGraphView graph = new ChapterGraphView();
 
     /**
      * What the player typed in each tab's search field, as typed.
@@ -210,7 +229,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         // Standing on a quest is reading that one quest; standing on the journal is reading a list
         boolean alone = route instanceof QuestRoute;
-        List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : search(list(playerComponents, tab), tab);
+        boolean chapters = !alone && tab == Tab.CHAPTERS;
+        boolean graphShown = chapters && graphMode;
+        List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : graphShown ? List.of() : search(list(playerComponents, tab), tab);
 
         QuestShape shape = alone ? QuestShape.PAGE : QuestShape.CARD;
 
@@ -220,8 +241,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         renderBreadcrumb(commandBuilder, eventBuilder);
         renderTabs(commandBuilder, eventBuilder, tab, isOwedAnything(playerComponents));
         renderSearch(commandBuilder, eventBuilder, alone ? null : tab);
-        renderFilter(commandBuilder, eventBuilder, alone || tab == Tab.PENDING ? null : filterOf(tab));
-        renderChapters(commandBuilder, eventBuilder, playerComponents, !alone && tab == Tab.CHAPTERS);
+        renderFilter(commandBuilder, eventBuilder, alone || graphShown || tab == Tab.PENDING ? null : filterOf(tab));
+        renderViewTools(commandBuilder, eventBuilder, chapters, graphShown);
+        renderChapters(commandBuilder, eventBuilder, playerComponents, chapters);
         commandBuilder.clear(QuestPageContext.ROOT_CONTAINER);
 
         var context = new QuestPageContext(commandBuilder, eventBuilder, lookup(playerComponents), playerRef.getUuid());
@@ -231,10 +253,84 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         countdowns = List.copyOf(context.getCountdowns());
 
-        commandBuilder.set("#Empty.Visible", entries.isEmpty())
+        int count = graphShown ? renderGraph(commandBuilder, eventBuilder, playerComponents) : entries.size();
+
+        commandBuilder.set("#Empty.Visible", count == 0)
                       .set("#Empty.TextSpans", Message.translation("openquests.page.empty"))
                       .set("#Counts.TextSpans", Message.translation("openquests.page.counts")
-                                                       .param("count", entries.size()));
+                                                       .param("count", count));
+    }
+
+    /**
+     * The chapters tab's switch between list and graph. The graph shows every quest of the
+     * chapter, so the search field gives way to an empty stretch there.
+     */
+    private void renderViewTools(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, boolean chapters, boolean graphShown) {
+        commandBuilder.set(SEARCH_FIELD + ".Visible", !graphShown)
+                      .set("#ToolsSpacer.Visible", graphShown)
+                      .set(QuestPageContext.ROOT_CONTAINER + ".Visible", !graphShown)
+                      .set("#GraphScroll.Visible", graphShown)
+                      .set("#ViewToggle.Visible", chapters);
+
+        boolean editable = graphShown && canEdit();
+        commandBuilder.set("#EditToggle.Visible", editable);
+        if (!editable) editMode = false;
+
+        if (!chapters) return;
+
+        commandBuilder.set("#ViewToggle.Text", Message.translation(graphShown ? "openquests.page.view.list" : "openquests.page.view.graph"));
+        eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ViewToggle", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_VIEW), false);
+
+        if (!editable) return;
+
+        commandBuilder.set("#EditToggle.Text", Message.translation(editMode ? "openquests.page.edit.stop" : "openquests.page.edit.start"));
+        eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#EditToggle", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_EDIT), false);
+    }
+
+    /**
+     * @return whether this player may lay chapters out. Asked again on every edit rather than
+     * trusted from the button being shown: a click is whatever the client chose to send.
+     */
+    private boolean canEdit() {
+        return playerRef.hasPermission(JournalFeature.EDIT_PERMISSION);
+    }
+
+    /**
+     * @return how many quests the open chapter's graph holds, drawn or out of its window.
+     */
+    private int renderGraph(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull EntityComponents playerComponents) {
+        OpenQuestChapter chapter = openChapter(playerComponents);
+        if (chapter == null) {
+            commandBuilder.clear(ChapterGraphView.CONTAINER);
+            return 0;
+        }
+
+        ChapterGraph chapterGraph = ChapterGraph.of(chapter, assetId -> held(playerComponents, assetId), playerRef.getUuid(), editMode);
+        graph.render(commandBuilder, eventBuilder, chapterGraph, editMode);
+        return chapterGraph.nodes().size();
+    }
+
+    /**
+     * Puts the quest picked up in edit mode into the cell clicked, on screen at once, then writes the
+     * chapter's file off the world thread: saving reloads the asset, which takes the asset lock.
+     */
+    private void moveQuest(@Nonnull Ref<EntityStore> ref, @Nullable String target) {
+        if (!editMode || !canEdit()) return;
+
+        OpenQuestChapter chapter = openChapter(EntityComponents.of(ref));
+        Map<String, Vector2i> positions = graph.move(target);
+        if (chapter == null || positions == null) return;
+
+        chapter.place(positions);
+
+        HytaleServer.SCHEDULED_EXECUTOR.execute(() -> {
+            try {
+                ChapterLayoutWriter.save(chapter);
+            } catch (Exception e) {
+                LOGGER.at(Level.WARNING).withCause(e).log("Could not save the layout of chapter %s", chapter.getId());
+                playerRef.sendMessage(Message.translation("openquests.page.edit.unsaved"));
+            }
+        });
     }
 
     /**
@@ -361,7 +457,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         if (chapter == null) return List.of();
 
         List<Entry> entries = new ArrayList<>();
-        for (String assetId : chapter.getQuestAssetIds()) {
+        for (ChapterQuest chapterQuest : chapter.getQuests()) {
+            String assetId = chapterQuest.getQuest();
             Entry entry = resolve(playerComponents, assetId, null);
             if (entry == null) continue;
 
@@ -1025,6 +1122,31 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             case QuestPageEventData.ACTION_CHAPTER -> {
                 if (data.getTarget() != null) openChapter = data.getTarget();
             }
+            case QuestPageEventData.ACTION_VIEW -> graphMode = !graphMode;
+            case QuestPageEventData.ACTION_EDIT -> editMode = !editMode && canEdit();
+            case QuestPageEventData.ACTION_MOVE -> moveQuest(ref, data.getTarget());
+
+            // Tints the tile picked up in place, like a hover
+            case QuestPageEventData.ACTION_SELECT -> {
+                if (!editMode) return;
+
+                var commandBuilder = new UICommandBuilder();
+                graph.select(commandBuilder, data.getTarget());
+                sendUpdate(commandBuilder, false);
+                return;
+            }
+
+            // Both recolour the lines in place: a redraw would replace the node under the mouse
+            case QuestPageEventData.ACTION_HOVER, QuestPageEventData.ACTION_UNHOVER -> {
+                var commandBuilder = new UICommandBuilder();
+                if (action.equals(QuestPageEventData.ACTION_HOVER)) {
+                    graph.hover(commandBuilder, data.getTarget());
+                } else {
+                    graph.unhover(commandBuilder, data.getTarget());
+                }
+                sendUpdate(commandBuilder, false);
+                return;
+            }
 
             // These three move the player, and the redraw comes back through RouteChangedEvent.
             // Redrawing here as well would draw the page they are leaving.
@@ -1383,6 +1505,12 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         static final String ACTION_SEARCH = "search";
         static final String ACTION_GROUP = "group";
         static final String ACTION_CHAPTER = "chapter";
+        static final String ACTION_VIEW = "view";
+        static final String ACTION_UNHOVER = "unhover";
+        static final String ACTION_EDIT = "edit";
+        static final String ACTION_SELECT = "select";
+        static final String ACTION_MOVE = "move";
+        static final String ACTION_HOVER = "hover";
         static final String ACTION_CRUMB = "crumb";
         static final String ACTION_CLOSE = "close";
 

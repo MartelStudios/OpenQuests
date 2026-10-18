@@ -1,5 +1,6 @@
 {
   "Type": "ReachLocation",
+  "Icon": "Icons/ModelsGenerated/Goblin_Lobber.png",
   "Categories": ["Dungeon"],
   "TitleKey": "quest.goblin-lair-lookout.title",
   "DescriptionKey": "quest.goblin-lair-lookout.description",

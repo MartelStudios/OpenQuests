@@ -162,7 +162,7 @@ public final class QuestPageRows {
      * step of a chain as a defeat says something about the player that is not true.
      */
     @Nonnull
-    private static Value<String> iconOf(@Nonnull QuestMark mark) {
+    static Value<String> iconOf(@Nonnull QuestMark mark) {
         return switch (mark) {
             case SUCCESSFUL -> ICON_COMPLETED;
             case FAILED -> ICON_FAILED;

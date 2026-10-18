@@ -1,0 +1,17 @@
+// One quest in a chapter's graph, placed in #Graph by the page through its anchor. Its icon is the
+// quest's own when it names one, and the mark in the corner says where the player stands.
+$C = "../../Common.ui";
+$P = "QuestPageCommon.ui";
+
+Button #Node {
+  Style: $P.@GraphNodeStyle;
+  TextTooltipStyle: $C.@DefaultTextTooltipStyle;
+
+  // Laid under the icon and recoloured by the page while a linked quest is hovered
+  Group #Tint { Background: #000000(0); }
+
+  // The icon the chapter gives the quest, else its own, else a book
+  AssetImage #Icon { Anchor: (Left: 8, Top: 8, Width: 36, Height: 36); }
+
+  Group #Mark { Anchor: (Right: 3, Top: 3, Width: 12, Height: 12); }
+}

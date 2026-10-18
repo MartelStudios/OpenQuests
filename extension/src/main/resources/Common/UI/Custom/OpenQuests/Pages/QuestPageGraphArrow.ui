@@ -1,0 +1,4 @@
+// One chevron on a link of the graph, placed inside its line and given its direction by the page.
+Group #Arrow {
+  Anchor: (Width: 8, Height: 8);
+}
