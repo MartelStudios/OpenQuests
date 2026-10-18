@@ -1,32 +1,31 @@
 package com.martelstudios.openquests.extension.journal;
 
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.ui.Anchor;
 import com.hypixel.hytale.server.core.ui.PatchStyle;
 import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
-import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.extension.journal.QuestPage.QuestPageEventData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- * Draws a {@link ChapterGraph} into the journal's graph area. Rows scroll natively, as the area sits
- * in a scrolling container; a container scrolls one way only, so columns go through a slider
- * and only the ones in its window are drawn, which also keeps lines from spilling sideways.
+ * Draws a whole {@link ChapterGraph} into the journal's graph area, which scrolls both ways
+ * natively: a vertical scroll inside a horizontal one, since a container scrolls one way only.
+ *
+ * <p>Links are cut into pieces one cell long, each drawn once whatever number of links runs along
+ * it, with a dot where pieces meet away from a quest. Links sharing a stretch then share its piece
+ * rather than being stacked, where only the top one would show.
  */
 final class ChapterGraphView {
     static final String CONTAINER = "#Graph";
-    static final String SLIDER = "#GraphSlider";
 
     private static final String COMMON_DOCUMENT = "OpenQuests/Pages/QuestPageCommon.ui";
     private static final String NODE_DOCUMENT = "OpenQuests/Pages/QuestPageGraphNode.ui";
@@ -34,22 +33,23 @@ final class ChapterGraphView {
     private static final String ARROW_DOCUMENT = "OpenQuests/Pages/QuestPageGraphArrow.ui";
 
     /**
-     * One cell of the grid, in UI pixels; the area in QuestPage.ui is {@link #COLUMNS} of them wide.
+     * One cell of the grid, in UI pixels.
      */
     private static final int CELL = 92;
     private static final int NODE = 52;
     private static final int LINE = 8;
-    private static final int COLUMNS = 6;
+
+    /**
+     * The size of the visible area in QuestPage.ui, which the graph fills at least so that a
+     * small chapter is not drawn in a corner of an empty frame.
+     */
+    private static final int VIEW_WIDTH = 552;
+    private static final int VIEW_HEIGHT = 424;
 
     /**
      * From the start of one chevron to the next along a line.
      */
     private static final int ARROW_STEP = 16;
-
-    /**
-     * The slider's maximum in QuestPage.ui.
-     */
-    private static final int SLIDER_RANGE = 100;
 
     private static final Value<String> TINT_NONE = Value.ref(COMMON_DOCUMENT, "GraphTintNone");
     private static final Value<String> TINT_NEXT = Value.ref(COMMON_DOCUMENT, "GraphTintNext");
@@ -73,18 +73,30 @@ final class ChapterGraphView {
     }
 
     /**
-     * A drawn piece of an edge, kept so hovering recolours it in place: redrawing the nodes under
-     * the mouse would fire their enter and exit events again.
+     * The stretch between the centre of cell ({@code column}, {@code row}) and the next cell to the
+     * right, or below when not {@code horizontal}.
      */
-    private record Segment(int index, @Nonnull ChapterGraph.Edge edge) {}
+    private record Piece(int column, int row, boolean horizontal) {}
 
-    private int originColumn;
+    /**
+     * What runs along a piece: the links sharing it, and the way the first of them runs.
+     */
+    private static final class Run {
+        final List<ChapterGraph.Edge> edges = new ArrayList<>();
+        Direction direction;
+        int index;
+    }
 
-    @Nullable
-    private ChapterGraph graph;
+    /**
+     * A dot drawn where pieces meet away from a quest, and the pieces meeting there.
+     */
+    private record Junction(int index, @Nonnull List<Run> runs) {}
 
     @Nonnull
-    private List<Segment> segments = List.of();
+    private List<Run> runs = List.of();
+
+    @Nonnull
+    private List<Junction> junctions = List.of();
 
     /**
      * The tiles drawn last, by asset id, so hovering tints them in place.
@@ -93,111 +105,82 @@ final class ChapterGraphView {
     private Map<String, Integer> tiles = Map.of();
 
     /**
-     * Whether the slider's handle has to be put back, which only a chapter opened afresh asks for:
-     * written on every redraw, it would fight the player dragging it.
+     * The quest under the mouse, so the exit of the one left behind is told apart from the exit
+     * of the one hovered now: the client may report entering the next tile before leaving the last.
      */
-    private boolean sliderStale = true;
+    @Nullable
+    private String hovered;
 
     /**
-     * Back to the first column, for a chapter opened afresh.
-     */
-    void reset() {
-        originColumn = 0;
-        sliderStale = true;
-    }
-
-    /**
-     * Moves the window to where the slider points. The slider runs over a fixed range, so a chapter
-     * of any width is drawn over the same stretch of it.
-     *
-     * @param position the slider's position, from 0 to {@link #SLIDER_RANGE}.
-     * @return whether the window moved, which is what a redraw is needed for.
-     */
-    boolean scrollTo(float position) {
-        int before = originColumn;
-
-        originColumn = Math.round(position * lastOrigin() / SLIDER_RANGE);
-        clamp();
-        return originColumn != before;
-    }
-
-    private int lastOrigin() {
-        int lastColumn = 0;
-        if (graph != null) {
-            for (ChapterGraph.Node node : graph.nodes()) lastColumn = Math.max(lastColumn, node.column());
-        }
-        return Math.max(0, lastColumn - COLUMNS + 1);
-    }
-
-    private void clamp() {
-        originColumn = Math.clamp(originColumn, 0, lastOrigin());
-    }
-
-    /**
-     * Draws the window: the lines first, so the nodes cover their ends.
+     * Draws the graph: the lines first, then the dots joining them, then the tiles over their ends.
      */
     void render(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull ChapterGraph graph) {
-        this.graph = graph;
-        clamp();
+        hovered = null;
 
+        int columns = 1;
         int rows = 1;
-        for (ChapterGraph.Node node : graph.nodes()) rows = Math.max(rows, node.row() + 1);
+        for (ChapterGraph.Node node : graph.nodes()) {
+            columns = Math.max(columns, node.column() + 1);
+            rows = Math.max(rows, node.row() + 1);
+        }
 
         commandBuilder.clear(CONTAINER)
-                      .setObject(CONTAINER + ".Anchor", anchor(0, 0, COLUMNS * CELL, rows * CELL));
+                      .setObject(CONTAINER + ".Anchor", anchor(0, 0, Math.max(VIEW_WIDTH, columns * CELL), Math.max(VIEW_HEIGHT, rows * CELL)))
+                      .setObject("#GraphColumn.Anchor", size(Math.max(VIEW_WIDTH, columns * CELL), VIEW_HEIGHT));
 
-        commandBuilder.set(SLIDER + ".Visible", lastOrigin() > 0);
-        if (sliderStale) {
-            commandBuilder.set(SLIDER + ".Value", 0);
-            sliderStale = false;
-        }
+        Map<Piece, Run> pieces = pieces(graph);
+        Set<Long> occupied = new HashSet<>();
+        for (ChapterGraph.Node node : graph.nodes()) occupied.add(key(node.column(), node.row()));
 
-        Map<String, Boolean> sideways = sideways(graph);
-        List<Segment> drawn = new ArrayList<>();
         int index = 0;
+        Map<Long, List<Run>> ends = new LinkedHashMap<>();
 
-        for (ChapterGraph.Edge edge : graph.edges()) {
-            int fromX = centre(edge.from().column() - originColumn);
-            int fromY = centre(edge.from().row());
-            int toX = centre(edge.to().column() - originColumn);
-            int toY = centre(edge.to().row());
+        for (var entry : pieces.entrySet()) {
+            Piece piece = entry.getKey();
+            Run run = entry.getValue();
+            run.index = index;
 
-            // Children beside the quest are reached by leaving it from the top or bottom and
-            // turning towards them; children above or below, by leaving from a side
-            boolean verticalFirst = sideways.get(edge.from().assetId());
-            int[][] rects = verticalFirst
-                ? new int[][]{vertical(fromY, toY, fromX), horizontal(fromX, toX, toY)}
-                : new int[][]{horizontal(fromX, toX, fromY), vertical(fromY, toY, toX)};
-            Direction[] directions = verticalFirst
-                ? new Direction[]{toY > fromY ? Direction.DOWN : Direction.UP, toX > fromX ? Direction.RIGHT : Direction.LEFT}
-                : new Direction[]{toX > fromX ? Direction.RIGHT : Direction.LEFT, toY > fromY ? Direction.DOWN : Direction.UP};
+            int left = centre(piece.column()) - (piece.horizontal() ? 0 : LINE / 2);
+            int top = centre(piece.row()) - (piece.horizontal() ? LINE / 2 : 0);
+            int[] rect = piece.horizontal() ? new int[]{left, top, CELL, LINE} : new int[]{left, top, LINE, CELL};
 
-            for (int part = 0; part < 2; part++) {
-                int[] rect = rects[part];
-                if (rect == null) continue;
+            String selector = CONTAINER + "[" + index++ + "]";
+            commandBuilder.append(CONTAINER, LINE_DOCUMENT)
+                          .setObject(selector + ".Anchor", anchor(rect[0], rect[1], rect[2], rect[3]));
+            paint(commandBuilder, selector, color(run));
+            arrows(commandBuilder, selector, rect, run.direction);
 
-                String selector = CONTAINER + "[" + index + "]";
-                commandBuilder.append(CONTAINER, LINE_DOCUMENT)
-                              .setObject(selector + ".Anchor", anchor(rect[0], rect[1], rect[2], rect[3]));
-                paint(commandBuilder, selector, baseColor(edge));
-                arrows(commandBuilder, selector, rect, directions[part]);
-
-                drawn.add(new Segment(index++, edge));
-            }
+            ends.computeIfAbsent(key(piece.column(), piece.row()), k -> new ArrayList<>()).add(run);
+            long far = piece.horizontal() ? key(piece.column() + 1, piece.row()) : key(piece.column(), piece.row() + 1);
+            ends.computeIfAbsent(far, k -> new ArrayList<>()).add(run);
         }
-        segments = List.copyOf(drawn);
+        runs = List.copyOf(pieces.values());
+
+        List<Junction> dots = new ArrayList<>();
+        for (var entry : ends.entrySet()) {
+            if (occupied.contains(entry.getKey())) continue;
+
+            int column = (int) (entry.getKey() >> 32);
+            int row = entry.getKey().intValue();
+
+            String selector = CONTAINER + "[" + index + "]";
+            commandBuilder.append(CONTAINER, LINE_DOCUMENT)
+                          .setObject(selector + ".Anchor", anchor(centre(column) - LINE / 2, centre(row) - LINE / 2, LINE, LINE));
+
+            Junction junction = new Junction(index++, entry.getValue());
+            paint(commandBuilder, selector, color(junction));
+            dots.add(junction);
+        }
+        junctions = List.copyOf(dots);
 
         Map<String, Integer> drawnTiles = new HashMap<>();
         for (ChapterGraph.Node node : graph.nodes()) {
-            int column = node.column() - originColumn;
-            if (column < 0 || column >= COLUMNS) continue;
-
             drawnTiles.put(node.assetId(), index);
             String selector = CONTAINER + "[" + index++ + "]";
             int offset = (CELL - NODE) / 2;
 
             commandBuilder.append(CONTAINER, NODE_DOCUMENT)
-                          .setObject(selector + ".Anchor", anchor(column * CELL + offset, node.row() * CELL + offset, NODE, NODE))
+                          .setObject(selector + ".Anchor", anchor(node.column() * CELL + offset, node.row() * CELL + offset, NODE, NODE))
                           .set(selector + " #Mark.Background", QuestPageRows.iconOf(node.mark()))
                           .set(selector + ".TooltipTextSpans", tooltip(node));
 
@@ -211,18 +194,70 @@ final class ChapterGraphView {
                                                                                                  .append(QuestPageEventData.KEY_TARGET, node.assetId()), false);
             eventBuilder.addEventBinding(CustomUIEventBindingType.MouseEntered, selector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_HOVER)
                                                                                                    .append(QuestPageEventData.KEY_TARGET, node.assetId()), false);
-            eventBuilder.addEventBinding(CustomUIEventBindingType.MouseExited, selector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_HOVER), false);
+            eventBuilder.addEventBinding(CustomUIEventBindingType.MouseExited, selector, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_UNHOVER)
+                                                                                                  .append(QuestPageEventData.KEY_TARGET, node.assetId()), false);
         }
-
         tiles = Map.copyOf(drawnTiles);
-
-        eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, SLIDER, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_SCROLL)
-                                                                                             .append(QuestPageEventData.KEY_NUMBER, SLIDER + ".Value"), false);
     }
 
     /**
-     * The quest's title in bold, then its description and where the player stands. Rich text is all
-     * a native tooltip holds, so the two lines stand in for a titled panel.
+     * Cuts every link into pieces one cell long. A quest whose first child sits in another column
+     * leaves from its top or bottom and turns towards its children; one whose first child is above
+     * or below leaves from a side. Laying the children out to match is the pack's.
+     */
+    @Nonnull
+    private static Map<Piece, Run> pieces(@Nonnull ChapterGraph graph) {
+        Map<String, Boolean> sideways = new HashMap<>();
+        for (ChapterGraph.Edge edge : graph.edges()) {
+            sideways.putIfAbsent(edge.from().assetId(), edge.to().column() != edge.from().column());
+        }
+
+        Map<Piece, Run> pieces = new LinkedHashMap<>();
+        for (ChapterGraph.Edge edge : graph.edges()) {
+            int fromColumn = edge.from().column();
+            int fromRow = edge.from().row();
+            int toColumn = edge.to().column();
+            int toRow = edge.to().row();
+
+            if (sideways.get(edge.from().assetId())) {
+                walk(pieces, edge, fromColumn, fromRow, fromColumn, toRow);
+                walk(pieces, edge, fromColumn, toRow, toColumn, toRow);
+            } else {
+                walk(pieces, edge, fromColumn, fromRow, toColumn, fromRow);
+                walk(pieces, edge, toColumn, fromRow, toColumn, toRow);
+            }
+        }
+        return pieces;
+    }
+
+    /**
+     * Adds the straight stretch between two cell centres, one cell at a time.
+     */
+    private static void walk(@Nonnull Map<Piece, Run> pieces, @Nonnull ChapterGraph.Edge edge, int fromColumn, int fromRow, int toColumn, int toRow) {
+        int stepColumn = Integer.signum(toColumn - fromColumn);
+        int stepRow = Integer.signum(toRow - fromRow);
+        if (stepColumn == 0 && stepRow == 0) return;
+
+        Direction direction = stepColumn > 0 ? Direction.RIGHT : stepColumn < 0 ? Direction.LEFT : stepRow > 0 ? Direction.DOWN : Direction.UP;
+
+        for (int column = fromColumn, row = fromRow; column != toColumn || row != toRow; column += stepColumn, row += stepRow) {
+            Piece piece = stepColumn != 0
+                ? new Piece(Math.min(column, column + stepColumn), row, true)
+                : new Piece(column, Math.min(row, row + stepRow), false);
+
+            Run run = pieces.computeIfAbsent(piece, key -> new Run());
+            if (run.direction == null) run.direction = direction;
+            if (!run.edges.contains(edge)) run.edges.add(edge);
+        }
+    }
+
+    private static long key(int column, int row) {
+        return ((long) column << 32) | (row & 0xffffffffL);
+    }
+
+    /**
+     * The quest's title in bold, then where the player stands and its description. Rich text is all
+     * a native tooltip holds, so the lines stand in for a titled panel.
      */
     @Nonnull
     private static Message tooltip(@Nonnull ChapterGraph.Node node) {
@@ -239,20 +274,7 @@ final class ChapterGraphView {
     }
 
     /**
-     * @return for each quest handing others out, whether its first child sits in another column,
-     * which decides how all of its links leave it. Laying the children out to match is the pack's.
-     */
-    @Nonnull
-    private static Map<String, Boolean> sideways(@Nonnull ChapterGraph graph) {
-        Map<String, Boolean> sideways = new HashMap<>();
-        for (ChapterGraph.Edge edge : graph.edges()) {
-            sideways.putIfAbsent(edge.from().assetId(), edge.to().column() != edge.from().column());
-        }
-        return sideways;
-    }
-
-    /**
-     * Lays chevrons along a line, pointing the way it runs, as far as the line is long enough.
+     * Lays chevrons along a line, pointing the way it runs.
      */
     private static void arrows(@Nonnull UICommandBuilder commandBuilder, @Nonnull String lineSelector, @Nonnull int[] rect, @Nonnull Direction direction) {
         boolean horizontal = direction == Direction.RIGHT || direction == Direction.LEFT;
@@ -269,50 +291,82 @@ final class ChapterGraphView {
     }
 
     /**
-     * Recolours what was drawn last: the links leaving the hovered quest and the tiles they reach
-     * in yellow, the links reaching it and the tiles they leave in blue, and everything back as it
-     * was when the mouse leaves. A tile is tinted too, since a link can pass behind another tile.
-     *
-     * @param hovered the asset id under the mouse, or {@code null} when it left.
+     * The mouse entered a tile: what leaves it turns yellow, what reaches it blue, and the tiles at
+     * the other ends take a tint of the same colour, since a link can pass behind another tile.
      */
-    void hover(@Nonnull UICommandBuilder commandBuilder, @Nullable String hovered) {
-        Map<String, Value<String>> tints = new HashMap<>();
-        for (String assetId : tiles.keySet()) tints.put(assetId, TINT_NONE);
-
-        for (Segment segment : segments) {
-            ChapterGraph.Edge edge = segment.edge();
-            String color = baseColor(edge);
-
-            if (edge.from().assetId().equals(hovered)) {
-                color = COLOR_NEXT;
-                tints.put(edge.to().assetId(), TINT_NEXT);
-            } else if (edge.to().assetId().equals(hovered)) {
-                color = COLOR_PREVIOUS;
-                tints.put(edge.from().assetId(), TINT_PREVIOUS);
-            }
-
-            paint(commandBuilder, CONTAINER + "[" + segment.index() + "]", color);
-        }
-
-        tints.forEach((assetId, tint) -> {
-            Integer tile = tiles.get(assetId);
-            if (tile != null) commandBuilder.set(CONTAINER + "[" + tile + "] #Tint.Background", tint);
-        });
+    void hover(@Nonnull UICommandBuilder commandBuilder, @Nullable String assetId) {
+        hovered = assetId;
+        repaint(commandBuilder);
     }
 
     /**
-     * @return the colour of what became of the quest handing out, once it led here; grey before.
+     * The mouse left a tile. Ignored unless it is the one still hovered: leaving the last tile can
+     * be reported after entering the next, and would otherwise wipe the new highlight.
+     */
+    void unhover(@Nonnull UICommandBuilder commandBuilder, @Nullable String assetId) {
+        if (hovered == null || !hovered.equals(assetId)) return;
+
+        hovered = null;
+        repaint(commandBuilder);
+    }
+
+    private void repaint(@Nonnull UICommandBuilder commandBuilder) {
+        Map<String, Value<String>> tints = new HashMap<>();
+        for (String assetId : tiles.keySet()) tints.put(assetId, TINT_NONE);
+
+        for (Run run : runs) {
+            for (ChapterGraph.Edge edge : run.edges) {
+                if (edge.from().assetId().equals(hovered)) tints.put(edge.to().assetId(), TINT_NEXT);
+                if (edge.to().assetId().equals(hovered)) tints.put(edge.from().assetId(), TINT_PREVIOUS);
+            }
+            paint(commandBuilder, CONTAINER + "[" + run.index + "]", color(run));
+        }
+
+        for (Junction junction : junctions) {
+            paint(commandBuilder, CONTAINER + "[" + junction.index() + "]", color(junction));
+        }
+
+        tints.forEach((assetId, tint) -> commandBuilder.set(CONTAINER + "[" + tiles.get(assetId) + "] #Tint.Background", tint));
+    }
+
+    /**
+     * @return yellow when a link along the piece leaves the hovered quest, blue when one reaches
+     * it, else the colour of the strongest outcome that led along it, else grey.
      */
     @Nonnull
-    private static String baseColor(@Nonnull ChapterGraph.Edge edge) {
-        QuestState taken = edge.taken();
-        if (taken == null) return COLOR_IDLE;
+    private String color(@Nonnull Run run) {
+        return COLORS_BY_RANK.get(rank(run));
+    }
 
-        return switch (taken) {
-            case FAILED -> COLOR_FAILED;
-            case ABANDONED -> COLOR_ABANDONED;
-            default -> COLOR_SUCCESSFUL;
-        };
+    /**
+     * @return the brightest colour among the pieces meeting at the dot, so a highlighted path
+     * stays unbroken through it.
+     */
+    @Nonnull
+    private String color(@Nonnull Junction junction) {
+        int best = 0;
+        for (Run run : junction.runs()) best = Math.max(best, rank(run));
+        return COLORS_BY_RANK.get(best);
+    }
+
+    private static final List<String> COLORS_BY_RANK = List.of(COLOR_IDLE, COLOR_ABANDONED, COLOR_FAILED, COLOR_SUCCESSFUL, COLOR_PREVIOUS, COLOR_NEXT);
+
+    private int rank(@Nonnull Run run) {
+        int rank = 0;
+        for (ChapterGraph.Edge edge : run.edges) {
+            if (edge.from().assetId().equals(hovered)) return 5;
+            if (edge.to().assetId().equals(hovered)) rank = Math.max(rank, 4);
+
+            QuestState taken = edge.taken();
+            if (taken != null) {
+                rank = Math.max(rank, switch (taken) {
+                    case FAILED -> 2;
+                    case ABANDONED -> 1;
+                    default -> 3;
+                });
+            }
+        }
+        return rank;
     }
 
     private static void paint(@Nonnull UICommandBuilder commandBuilder, @Nonnull String selector, @Nonnull String color) {
@@ -323,33 +377,17 @@ final class ChapterGraphView {
         return cell * CELL + CELL / 2;
     }
 
-    /**
-     * @return {left, top, width, height} of the stretch of row {@code y} between the two
-     * columns, clipped to the window's width, or {@code null} when nothing of it is inside.
-     */
-    @Nullable
-    private static int[] horizontal(int fromX, int toX, int y) {
-        if (fromX == toX) return null;
-
-        int left = Math.max(0, Math.min(fromX, toX) - LINE / 2);
-        int right = Math.min(COLUMNS * CELL, Math.max(fromX, toX) + LINE / 2);
-        return right <= left ? null : new int[]{left, y - LINE / 2, right - left, LINE};
-    }
-
-    @Nullable
-    private static int[] vertical(int fromY, int toY, int x) {
-        if (fromY == toY || x < 0 || x > COLUMNS * CELL) return null;
-
-        int top = Math.min(fromY, toY) - LINE / 2;
-        int bottom = Math.max(fromY, toY) + LINE / 2;
-        return new int[]{x - LINE / 2, top, LINE, bottom - top};
+    @Nonnull
+    private static Anchor anchor(int left, int top, int width, int height) {
+        Anchor anchor = size(width, height);
+        anchor.setLeft(Value.of(left));
+        anchor.setTop(Value.of(top));
+        return anchor;
     }
 
     @Nonnull
-    private static Anchor anchor(int left, int top, int width, int height) {
+    private static Anchor size(int width, int height) {
         Anchor anchor = new Anchor();
-        anchor.setLeft(Value.of(left));
-        anchor.setTop(Value.of(top));
         anchor.setWidth(Value.of(width));
         anchor.setHeight(Value.of(height));
         return anchor;
