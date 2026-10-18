@@ -80,6 +80,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private static final String FILTER_DROPDOWN = "#QuestFilter";
     private static final String SEARCH_FIELD = "#SearchInput";
 
+    private static final Value<String> VIEW_LIST_ICON = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ViewListIcon");
+    private static final Value<String> VIEW_GRAPH_ICON = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ViewGraphIcon");
     private static final Value<String> CHAPTER_OPEN_STYLE = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ChapterOpenStyle");
     private static final Value<String> CHAPTER_OPEN_LABEL_STYLE = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ChapterOpenLabelStyle");
 
@@ -277,7 +279,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         if (!chapters) return;
 
-        commandBuilder.set("#ViewToggle.Text", Message.translation(graphShown ? "openquests.page.view.list" : "openquests.page.view.graph"));
+        commandBuilder.set("#ViewIcon.Background", graphShown ? VIEW_LIST_ICON : VIEW_GRAPH_ICON)
+                      .set("#ViewToggle.TooltipTextSpans", Message.translation(graphShown ? "openquests.page.view.list" : "openquests.page.view.graph"));
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ViewToggle", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_VIEW), false);
 
         if (!editable) return;
