@@ -1,13 +1,10 @@
 package com.martelstudios.openquests.mmoskilltree.quests.reachlevel;
 
-import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
-import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.ziggfreed.mmoskilltree.api.events.PlayerGainXpEvent;
-import com.ziggfreed.mmoskilltree.skill.SkillRegistry;
 
 import javax.annotation.Nonnull;
 import java.util.function.Consumer;
@@ -53,16 +50,5 @@ public final class ReachLevelEvents {
             var ref = components.getReference();
             if (ref != null) quest.update(new ReachLevelQuestVisitor(event.getPlayerId(), ref));
         });
-    }
-
-    /**
-     * Fails the load once per asset naming a skill MMO Skill Tree does not know.
-     */
-    public static void handleLoadAsset(@Nonnull LoadAssetEvent event) {
-        for (OpenQuestAsset asset : OpenQuestAsset.getAssetMap().getAssetMap().values()) {
-            if (asset instanceof ReachLevelQuestAsset reachLevel && !SkillRegistry.getInstance().isKnownSkill(reachLevel.getSkill())) {
-                event.failed(true, "Quest asset '" + asset.getId() + "' names an unknown MMO Skill Tree skill '" + reachLevel.getSkill() + "'");
-            }
-        }
     }
 }

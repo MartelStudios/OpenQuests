@@ -1,0 +1,11 @@
+{
+  "Type": "MMOSkillTreeGainXp",
+  "Skill": "MINING",
+  "TargetQuantity": 5000,
+  "SuccessfulRewards": [
+    { "Type": "MMOSkillTreeLevel", "Skill": "MINING", "Levels": 1, "AutoClaim": true },
+    { "Type": "MMOSkillTreeTitle", "Title": "OpenQuestsMMOSkillTree_Prospector", "AutoClaim": true },
+    { "Type": "MMOSkillTreeFlair", "Flair": "openquestsmmoskilltree_prospector", "AutoClaim": true },
+    { "Type": "MMOSkillTreeCostume", "Costume": "Potion_Morph_Mouse", "FallbackLootable": "Mmo_Mastery_Offering", "AutoClaim": true }
+  ]
+}

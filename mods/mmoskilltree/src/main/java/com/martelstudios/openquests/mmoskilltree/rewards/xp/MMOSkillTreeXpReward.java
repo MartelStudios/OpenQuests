@@ -6,6 +6,8 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.mmoskilltree.editor.DataSets;
+import com.martelstudios.openquests.mmoskilltree.skills.SkillReference;
 import com.ziggfreed.mmoskilltree.api.MMOSkillTreeAPI;
 import com.ziggfreed.mmoskilltree.skill.SkillService;
 
@@ -16,10 +18,11 @@ import java.util.UUID;
 /**
  * XP in an MMO Skill Tree skill.
  */
-public class XpReward extends QuestReward {
-    public static final BuilderCodec<XpReward> CODEC = BuilderCodec.builder(XpReward.class, XpReward::new, QuestReward.BASE_CODEC)
+public class MMOSkillTreeXpReward extends QuestReward implements SkillReference {
+    public static final BuilderCodec<MMOSkillTreeXpReward> CODEC = BuilderCodec.builder(MMOSkillTreeXpReward.class, MMOSkillTreeXpReward::new, QuestReward.BASE_CODEC)
                                                                    .append(new KeyedCodec<>("Skill", Codec.STRING, true), (reward, skill) -> reward.skill = skill, reward -> reward.skill)
                                                                    .addValidator(Validators.nonNull())
+                                                                   .metadata(DataSets.SKILL_DROPDOWN)
                                                                    .add()
                                                                    .append(new KeyedCodec<>("Amount", Codec.LONG, true), (reward, amount) -> reward.amount = amount, reward -> Long.valueOf(reward.amount))
                                                                    .addValidator(Validators.greaterThan(0L))
@@ -30,7 +33,7 @@ public class XpReward extends QuestReward {
 
     protected long amount;
 
-    private XpReward() {}
+    private MMOSkillTreeXpReward() {}
 
     /**
      * Awarded the way MMO Skill Tree awards its own quest XP, multipliers, level ups and the XP
@@ -49,6 +52,7 @@ public class XpReward extends QuestReward {
         return true;
     }
 
+    @Override
     public String getSkill() {
         return skill;
     }

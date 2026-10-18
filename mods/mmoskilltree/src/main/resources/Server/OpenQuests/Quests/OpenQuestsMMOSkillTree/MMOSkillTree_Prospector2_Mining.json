@@ -1,0 +1,11 @@
+{
+  "Type": "MMOSkillTreeReachLevel",
+  "Skill": "MINING",
+  "TargetQuantity": 5,
+  "SuccessfulRewards": [
+    { "Type": "MMOSkillTreeXp", "Skill": "MINING", "Amount": 250, "AutoClaim": true },
+    { "Type": "MMOSkillTreeCurrency", "Currency": "Mastery_Point", "Amount": 2, "AutoClaim": true },
+    { "Type": "MMOSkillTreeDroplist", "Droplist": "Portals_Goblin_Chest_Tier1", "AutoClaim": true },
+    { "Type": "GrantQuest", "QuestAssetIds": ["MMOSkillTree_Prospector3_Abilities"], "AutoClaim": true }
+  ]
+}

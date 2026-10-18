@@ -1,0 +1,10 @@
+{
+  "Type": "MMOSkillTreeCompleteBounty",
+  "Board": "Mmo_Mastery_Lessons",
+  "TargetQuantity": 3,
+  "SuccessfulRewards": [
+    { "Type": "MMOSkillTreeReputation", "Reputation": "Mmo_Mastery_Trainer", "Amount": 1000, "AutoClaim": true },
+    { "Type": "MMOSkillTreeLootable", "Lootable": "Mmo_Mastery_Offering", "AutoClaim": true },
+    { "Type": "GrantQuest", "QuestAssetIds": ["MMOSkillTree_Prospector5_Mastery"], "AutoClaim": true }
+  ]
+}

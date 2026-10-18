@@ -1,2 +1,12 @@
 quest.default.reach-level = Atteignez le niveau {quantity, number} en {skill}
-reward.xp = XP de {skill}
+reward.level = {levels, plural, one {Niveau} other {Niveaux}} de {skill}
+quest.default.gain-xp = Gagnez {quantity, number} XP de {skill}
+quest.default.gain-xp-any = Gagnez {quantity, number} XP
+quest.default.ability-cast = Utilisez {ability} {quantity, plural, one {une fois} other {{quantity, number} fois}}
+quest.default.ability-cast-skill = Utilisez des capacités de {skill} {quantity, plural, one {une fois} other {{quantity, number} fois}}
+quest.default.ability-cast-any = Utilisez des capacités {quantity, plural, one {une fois} other {{quantity, number} fois}}
+quest.default.complete-bounty = Terminez {quantity, plural, one {un contrat} other {{quantity, number} contrats}} du tableau « {board} »
+quest.default.complete-bounty-any = Terminez {quantity, plural, one {un contrat} other {{quantity, number} contrats}}
+title.openquestsmmoskilltree_prospector.name = Prospecteur
+title.openquestsmmoskilltree_prospector.flavor = A suivi le chemin du prospecteur jusqu'au bout.
+flair.openquestsmmoskilltree_prospector.name = Prospecteur
