@@ -32,6 +32,14 @@ $C.@DecoratedContainer {
         FlexWeight: 1;
       }
 
+      // Narrows the open list by title. Each tab keeps its own text, which the page writes back
+      // on switching tab and otherwise leaves to the player typing in it
+      $C.@TextField #Search {
+        Anchor: (Width: 180, Height: 32, Right: 8);
+        PlaceholderText: %server.customUI.searchPlaceholder;
+        Visible: false;
+      }
+
       // Which quest states the open list shows, hidden where there is no such list
       $C.@DropdownBox #QuestFilter {
         Anchor: (Width: 200, Height: 32);

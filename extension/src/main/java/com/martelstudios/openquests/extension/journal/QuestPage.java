@@ -7,10 +7,12 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
+import com.hypixel.hytale.protocol.FormattedMessage;
 import com.hypixel.hytale.protocol.packets.interface_.Page;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
+import com.hypixel.hytale.server.core.modules.i18n.I18nModule;
 import com.hypixel.hytale.server.core.ui.DropdownEntryInfo;
 import com.hypixel.hytale.server.core.ui.LocalizableString;
 import com.hypixel.hytale.server.core.ui.PatchStyle;
@@ -20,6 +22,7 @@ import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.util.MessageUtil;
 import com.martelstudios.opennavigation.routes.Route;
 import com.martelstudios.opennavigation.routes.TabRoute;
 import com.martelstudios.opennavigation.services.NavigationService;
@@ -46,6 +49,7 @@ import com.martelstudios.openquests.extension.track.QuestTrackService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.text.Normalizer;
 import java.time.Instant;
 import java.util.*;
 
@@ -68,6 +72,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private static final String BREADCRUMB_CONTAINER = "#Breadcrumb";
     private static final String CHAPTERS_CONTAINER = "#ChapterList";
     private static final String FILTER_DROPDOWN = "#QuestFilter";
+    private static final String SEARCH_FIELD = "#Search";
 
     private static final Value<String> CHAPTER_OPEN_STYLE = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ChapterOpenStyle");
     private static final Value<String> CHAPTER_OPEN_LABEL_STYLE = Value.ref("OpenQuests/Pages/QuestPageCommon.ui", "ChapterOpenLabelStyle");
@@ -114,6 +119,17 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      */
     @Nonnull
     private Filter chaptersFilter = Filter.ALL;
+
+    /**
+     * What the player typed in each tab's search field, as typed.
+     */
+    private final Map<Tab, String> searches = new EnumMap<>(Tab.class);
+
+    /**
+     * The tab the search field last showed, so its text is written back only on switching tab.
+     */
+    @Nullable
+    private Tab searchShown;
 
     @Nonnull
     private Route route;
@@ -195,7 +211,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         // Standing on a quest is reading that one quest; standing on the journal is reading a list
         boolean alone = route instanceof QuestRoute;
-        List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : list(playerComponents, tab);
+        List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : search(list(playerComponents, tab), tab);
 
         QuestShape shape = alone ? QuestShape.PAGE : QuestShape.CARD;
 
@@ -204,6 +220,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         renderBreadcrumb(commandBuilder, eventBuilder);
         renderTabs(commandBuilder, eventBuilder, tab, isOwedAnything(playerComponents));
+        renderSearch(commandBuilder, eventBuilder, alone ? null : tab);
         renderFilter(commandBuilder, eventBuilder, alone || tab == Tab.PENDING ? null : filterOf(tab));
         renderChapters(commandBuilder, eventBuilder, !alone && tab == Tab.CHAPTERS);
         commandBuilder.clear(QuestPageContext.ROOT_CONTAINER);
@@ -607,6 +624,68 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
                                                                                                       .append(QuestPageEventData.KEY_VALUE, FILTER_DROPDOWN + ".Value"), false);
     }
 
+    /**
+     * The search field of the open list. Its text is written only when the tab changed: written on
+     * every redraw, it would fight the player typing in it.
+     *
+     * @param tab the open tab, or {@code null} where the page shows a single quest.
+     */
+    private void renderSearch(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nullable Tab tab) {
+        commandBuilder.set(SEARCH_FIELD + ".Visible", tab != null);
+        if (tab == null) return;
+
+        if (tab != searchShown) {
+            commandBuilder.set(SEARCH_FIELD + ".Value", searches.getOrDefault(tab, ""));
+            searchShown = tab;
+        }
+
+        eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, SEARCH_FIELD, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_SEARCH)
+                                                                                                   .append(QuestPageEventData.KEY_VALUE, SEARCH_FIELD + ".Value"), false);
+    }
+
+    private void setSearch(@Nullable String value) {
+        Tab tab = openTab();
+        String raw = value == null ? "" : value;
+
+        searches.put(tab, raw);
+    }
+
+    /**
+     * @return the entries whose title holds what the player searched in that tab, all of them
+     * when they searched nothing.
+     */
+    @Nonnull
+    private List<Entry> search(@Nonnull List<Entry> entries, @Nonnull Tab tab) {
+        String query = normalise(searches.getOrDefault(tab, ""));
+        if (query.isEmpty()) return entries;
+
+        String language = playerRef.getLanguage();
+        return entries.stream().filter(entry -> normalise(plainText(entry.title(), language)).contains(query)).toList();
+    }
+
+    /**
+     * Lower case and without accents, so "eclair" finds "Éclair".
+     */
+    @Nonnull
+    private static String normalise(@Nonnull String text) {
+        return Normalizer.normalize(text.trim(), Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * @return the message as the player reads it, translated into their language where it can be.
+     */
+    @Nonnull
+    private static String plainText(@Nonnull Message message, @Nullable String language) {
+        String messageId = message.getMessageId();
+        if (messageId == null || language == null) return message.getAnsiMessage();
+
+        String translated = I18nModule.get().getMessage(language, messageId);
+        if (translated == null) return message.getAnsiMessage();
+
+        FormattedMessage formatted = message.getFormattedMessage();
+        return MessageUtil.formatText(translated, formatted.params, formatted.messageParams);
+    }
+
     private static void setIcon(@Nonnull UICommandBuilder commandBuilder, @Nonnull String selector, @Nullable String icon) {
         if (icon == null) return;
 
@@ -930,6 +1009,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             case QuestPageEventData.ACTION_ABANDON -> abandon(ref, data.getTarget());
             case QuestPageEventData.ACTION_TRACK -> track(ref, data.getTarget());
             case QuestPageEventData.ACTION_FILTER -> setFilter(data.getValue());
+            case QuestPageEventData.ACTION_SEARCH -> setSearch(data.getValue());
             case QuestPageEventData.ACTION_GROUP -> toggleGroup(data.getTarget());
             case QuestPageEventData.ACTION_CHAPTER -> {
                 if (data.getTarget() != null) openChapter = data.getTarget();
@@ -1289,6 +1369,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         static final String ACTION_TRACK = "track";
         static final String ACTION_TAB = "tab";
         static final String ACTION_FILTER = "filter";
+        static final String ACTION_SEARCH = "search";
         static final String ACTION_GROUP = "group";
         static final String ACTION_CHAPTER = "chapter";
         static final String ACTION_CRUMB = "crumb";
