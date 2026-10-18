@@ -1,0 +1,13 @@
+// One chapter group in the chapters tab, appended into #ChapterList: a click folds or unfolds it.
+// A Button rather than a TextButton, so the fold mark and the name are labels of their own.
+$P = "QuestPageCommon.ui";
+
+Button #Group {
+  LayoutMode: Left;
+  Anchor: (Height: 28, Top: 4);
+  Padding: (Horizontal: 8);
+  Style: $P.@ChapterGroupStyle;
+
+  Label #Fold { Text: ""; Anchor: (Width: 14); Style: $P.@ChapterGroupLabelStyle; }
+  Label #Name { Text: ""; FlexWeight: 1; Style: $P.@ChapterGroupLabelStyle; }
+}

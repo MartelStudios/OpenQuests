@@ -28,21 +28,51 @@ $C.@DecoratedContainer {
       Anchor: (Height: 20);
     }
 
-    // Filled by the page rather than declared here, so the tab standing open follows the state
-    Group #Tabs {
+    Group #Toolbar {
       LayoutMode: Left;
-      Anchor: (Height: 30);
+      Anchor: (Height: 32);
+
+      // Filled by the page rather than declared here, so the tab standing open follows the state
+      Group #Tabs {
+        LayoutMode: Left;
+        FlexWeight: 1;
+      }
+
+      // Which quests the quests tab lists, shown on that tab only
+      $C.@DropdownBox #QuestFilter {
+        Anchor: (Width: 200, Height: 32);
+        Visible: false;
+      }
     }
 
     $C.@ContentSeparator { Anchor: (Top: 8, Bottom: 8); }
 
-    Label #Empty { Text: ""; Anchor: (Height: 30); Visible: false; Style: (...$C.@DefaultLabelStyle, FontSize: 13, HorizontalAlignment: Center, VerticalAlignment: Center); }
-
-    Group #QuestList {
+    Group #Body {
       FlexWeight: 1;
-      LayoutMode: TopScrolling;
-      ScrollbarStyle: $C.@DefaultScrollbarStyle;
-      Padding: (Right: 8);
+      LayoutMode: Left;
+
+      // The chapters tab's table of contents: group headers and their chapters, appended flat
+      Group #ChapterList {
+        Anchor: (Width: 230, Right: 10);
+        LayoutMode: TopScrolling;
+        ScrollbarStyle: $C.@DefaultScrollbarStyle;
+        Padding: (Right: 8);
+        Visible: false;
+      }
+
+      Group #Main {
+        FlexWeight: 1;
+        LayoutMode: Top;
+
+        Label #Empty { Text: ""; Anchor: (Height: 30); Visible: false; Style: (...$C.@DefaultLabelStyle, FontSize: 13, HorizontalAlignment: Center, VerticalAlignment: Center); }
+
+        Group #QuestList {
+          FlexWeight: 1;
+          LayoutMode: TopScrolling;
+          ScrollbarStyle: $C.@DefaultScrollbarStyle;
+          Padding: (Right: 8);
+        }
+      }
     }
   }
 }
