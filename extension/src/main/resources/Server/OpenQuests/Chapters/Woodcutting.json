@@ -1,0 +1,6 @@
+{
+  "NameKey": "quest.chapter.woodcutting",
+  "Group": "Survival",
+  "Order": 1,
+  "QuestAssetIds": ["Lumberjack", "GreatFelling"]
+}

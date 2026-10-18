@@ -1,0 +1,6 @@
+{
+  "NameKey": "quest.chapter.hunting",
+  "Group": "Survival",
+  "Order": 0,
+  "QuestAssetIds": ["GatherMeat", "CraftCampfire", "CookMeat", "EatMeat"]
+}

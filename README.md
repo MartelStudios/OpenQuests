@@ -570,6 +570,25 @@ category answers to fails the asset at load.
 { "Type": "Composite", "Categories": ["Temple", "Timed"], "TitleKey": "…" }
 ```
 
+### Chapters
+
+Chapters are the journal's table of contents, and sit beside categories: a category labels a
+quest, a chapter is a place to read it. A chapter group, under `Server/OpenQuests/ChapterGroups/`,
+is a translated name and an `Order`:
+
+```json
+{ "NameKey": "quest.chapter-group.adventure", "Order": 0 }
+```
+
+A chapter, under `Server/OpenQuests/Chapters/`, names its group, its `Order` within it and its
+quests, drawn in the order listed. Groups and chapters sort by `Order`, then by id. A quest may sit
+in several chapters, or in none. A quest the player was never given shows as locked, unless its
+`Visibility` keeps it hidden until then.
+
+```json
+{ "NameKey": "quest.chapter.goblin-lair", "Group": "Adventure", "Order": 2, "QuestAssetIds": ["GoblinLairRats", "GoblinLairTunnels"] }
+```
+
 ### Quest tracker
 
 Whether the tracker shows and where it sits is what the player chose with `/ohud`, kept in their

@@ -1,0 +1,6 @@
+{
+  "NameKey": "quest.chapter.daily-life",
+  "Group": "Survival",
+  "Order": 2,
+  "QuestAssetIds": ["DailyChores"]
+}

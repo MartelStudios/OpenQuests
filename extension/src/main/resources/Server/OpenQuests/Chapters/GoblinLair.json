@@ -1,0 +1,6 @@
+{
+  "NameKey": "quest.chapter.goblin-lair",
+  "Group": "Adventure",
+  "Order": 2,
+  "QuestAssetIds": ["GoblinLairRats", "GoblinLairTunnels", "GoblinLairSpiders", "GoblinLairTorches", "GoblinLairLookout", "GoblinLairOgre", "GoblinLairDuke", "GoblinLairDailyHunt"]
+}

@@ -1,0 +1,6 @@
+{
+  "NameKey": "quest.chapter.combat",
+  "Group": "Feats",
+  "Order": 1,
+  "QuestAssetIds": ["FirstBlood"]
+}

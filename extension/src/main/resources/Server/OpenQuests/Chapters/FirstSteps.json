@@ -1,0 +1,6 @@
+{
+  "NameKey": "quest.chapter.first-steps",
+  "Group": "Adventure",
+  "Order": 0,
+  "QuestAssetIds": ["Intro", "CraftTools", "CraftWorkbench", "ChooseYourWeapon"]
+}

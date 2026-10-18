@@ -1,0 +1,6 @@
+{
+  "NameKey": "quest.chapter.forgotten-temple",
+  "Group": "Adventure",
+  "Order": 1,
+  "QuestAssetIds": ["DefeatForgottenTempleGuardian", "EnterForgottenTemple", "TalkToRootlingMerchant", "TempleTrial", "TempleOffering", "Flawless"]
+}

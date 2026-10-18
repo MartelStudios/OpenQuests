@@ -174,3 +174,15 @@ category.achievement=Achievement
 category.timed=Timed
 category.dungeon=Dungeon
 category.side-quest=Side quest
+
+chapter-group.adventure=Adventure
+chapter-group.survival=Survival
+chapter-group.feats=Feats
+chapter.first-steps=First steps
+chapter.forgotten-temple=The Forgotten Temple
+chapter.goblin-lair=The Goblin Lair
+chapter.hunting=Hunting
+chapter.woodcutting=Woodcutting
+chapter.daily-life=Daily life
+chapter.athletics=Athletics
+chapter.combat=Combat

@@ -1,0 +1,6 @@
+{
+  "NameKey": "quest.chapter.athletics",
+  "Group": "Feats",
+  "Order": 0,
+  "QuestAssetIds": ["RunNovice", "RunAdept", "RunMaster", "SprintNovice", "SprintAdept", "SprintMaster", "JumpNovice", "JumpAdept", "JumpMaster", "SilentStep"]
+}
