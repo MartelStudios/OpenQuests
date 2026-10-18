@@ -17,8 +17,8 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 /**
- * Draws a whole {@link ChapterGraph} into the journal's graph area, which scrolls both ways
- * natively: a vertical scroll inside a horizontal one, since a container scrolls one way only.
+ * Draws a whole {@link ChapterGraph} into the journal's graph area. Rows scroll natively; columns
+ * through a slider that shifts the graph, a container scrolling one way only.
  *
  * <p>Links are cut into pieces one cell long, each drawn once whatever number of links runs along
  * it, with a dot where pieces meet away from a quest. Links sharing a stretch then share its piece
@@ -26,6 +26,7 @@ import java.util.*;
  */
 final class ChapterGraphView {
     static final String CONTAINER = "#Graph";
+    static final String SLIDER = "#GraphSlider";
 
     private static final String COMMON_DOCUMENT = "OpenQuests/Pages/QuestPageCommon.ui";
     private static final String NODE_DOCUMENT = "OpenQuests/Pages/QuestPageGraphNode.ui";
@@ -40,11 +41,16 @@ final class ChapterGraphView {
     private static final int LINE = 8;
 
     /**
-     * The size of the visible area in QuestPage.ui, which the graph fills at least so that a
-     * small chapter is not drawn in a corner of an empty frame.
+     * The width the graph area gets in the journal, less its vertical scrollbar: measured rather
+     * than declared, the area taking whatever room the chapter list leaves. Too low leaves a little
+     * blank past the last column, too high hides some of it.
      */
-    private static final int VIEW_WIDTH = 552;
-    private static final int VIEW_HEIGHT = 424;
+    private static final int VIEW_WIDTH = 695;
+
+    /**
+     * The slider's maximum in QuestPage.ui.
+     */
+    private static final int SLIDER_RANGE = 100;
 
     /**
      * From the start of one chevron to the next along a line.
@@ -111,6 +117,50 @@ final class ChapterGraphView {
     @Nullable
     private String hovered;
 
+    private int width;
+    private int height;
+
+    /**
+     * How far the slider shifted the graph left, in UI pixels.
+     */
+    private int offset;
+
+    /**
+     * Whether the slider's handle has to be put back, which only a chapter opened afresh asks for:
+     * written on every redraw, it would fight the player dragging it.
+     */
+    private boolean sliderStale = true;
+
+    /**
+     * Back to the left edge, for a chapter opened afresh.
+     */
+    void reset() {
+        offset = 0;
+        sliderStale = true;
+    }
+
+    /**
+     * Shifts the graph to where the slider points, moving it rather than drawing it again, so the
+     * slider keeps the mouse while dragged.
+     *
+     * @param position the slider's position, from 0 to {@link #SLIDER_RANGE}.
+     */
+    void scroll(@Nonnull UICommandBuilder commandBuilder, float position) {
+        offset = Math.round(position * maxOffset() / SLIDER_RANGE);
+        place(commandBuilder);
+    }
+
+    /**
+     * @return how far the graph can shift before its last column reaches the right edge.
+     */
+    private int maxOffset() {
+        return Math.max(0, width - VIEW_WIDTH);
+    }
+
+    private void place(@Nonnull UICommandBuilder commandBuilder) {
+        commandBuilder.setObject(CONTAINER + ".Anchor", anchor(-offset, 0, Math.max(width, VIEW_WIDTH), height));
+    }
+
     /**
      * Draws the graph: the lines first, then the dots joining them, then the tiles over their ends.
      */
@@ -124,9 +174,18 @@ final class ChapterGraphView {
             rows = Math.max(rows, node.row() + 1);
         }
 
-        commandBuilder.clear(CONTAINER)
-                      .setObject(CONTAINER + ".Anchor", anchor(0, 0, Math.max(VIEW_WIDTH, columns * CELL), Math.max(VIEW_HEIGHT, rows * CELL)))
-                      .setObject("#GraphColumn.Anchor", size(Math.max(VIEW_WIDTH, columns * CELL), VIEW_HEIGHT));
+        width = columns * CELL;
+        height = rows * CELL;
+        offset = Math.min(offset, maxOffset());
+
+        commandBuilder.clear(CONTAINER);
+        place(commandBuilder);
+
+        commandBuilder.set(SLIDER + ".Visible", true);
+        if (sliderStale) {
+            commandBuilder.set(SLIDER + ".Value", 0);
+            sliderStale = false;
+        }
 
         Map<Piece, Run> pieces = pieces(graph);
         Set<Long> occupied = new HashSet<>();
@@ -194,6 +253,9 @@ final class ChapterGraphView {
                                                                                                   .append(QuestPageEventData.KEY_TARGET, node.assetId()), false);
         }
         tiles = Map.copyOf(drawnTiles);
+
+        eventBuilder.addEventBinding(CustomUIEventBindingType.ValueChanged, SLIDER, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_SCROLL)
+                                                                                             .append(QuestPageEventData.KEY_NUMBER, SLIDER + ".Value"), false);
     }
 
     /**

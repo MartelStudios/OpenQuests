@@ -93,23 +93,26 @@ $C.@DecoratedContainer {
           Padding: (Right: 8);
         }
 
-        // The open chapter as a graph, scrolling both ways though a container scrolls one way only:
-        // columns in #GraphScroll, rows in #GraphColumn inside it. #Graph has no layout mode: the page
-        // places every node and line by its anchor, and sizes it and #GraphColumn to the chapter.
+        // The open chapter as a graph. Rows scroll here; columns through the slider under it, which
+        // shifts #Graph sideways: nesting a horizontal scroll would hide one of the two scrollbars
+        // past the content's edge. #Graph has no layout mode: the page places every node and line
+        // by its anchor, and sizes it to the chapter.
         Group #GraphScroll {
-          Anchor: (Width: 564, Height: 440);
-          LayoutMode: LeftScrolling;
+          FlexWeight: 1;
+          LayoutMode: TopScrolling;
           ScrollbarStyle: $C.@DefaultScrollbarStyle;
           Background: #0d141f(0.5);
           Visible: false;
 
-          Group #GraphColumn {
-            Anchor: (Width: 552, Height: 424);
-            LayoutMode: TopScrolling;
-            ScrollbarStyle: $C.@DefaultScrollbarStyle;
+          Group #Graph { Anchor: (Height: 368); }
+        }
 
-            Group #Graph { Anchor: (Width: 552, Height: 424); }
-          }
+        $C.@Slider #GraphSlider {
+          @Anchor = (Top: 14, Bottom: 6);
+          Min: 0;
+          Max: 100;
+          Step: 1;
+          Visible: false;
         }
       }
     }
