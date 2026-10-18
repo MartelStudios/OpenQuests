@@ -56,10 +56,16 @@ $C.@DecoratedContainer {
         Visible: false;
       }
 
-      // Switches the chapters tab between its list and its graph
-      $C.@SmallSecondaryTextButton #ViewToggle {
-        @Anchor = (MinWidth: 100, Left: 8);
+      // Switches the chapters tab between its list and its graph, showing the view it switches to; the
+      // page names it in the tooltip
+      Button #ViewToggle {
+        Anchor: (Width: 32, Height: 32, Left: 8);
+        LayoutMode: CenterMiddle;
+        Style: $C.@SecondaryButtonStyle;
+        TextTooltipStyle: $C.@DefaultTextTooltipStyle;
         Visible: false;
+
+        Group #ViewIcon { Anchor: (Width: 20, Height: 20); }
       }
     }
 

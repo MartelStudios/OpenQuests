@@ -155,3 +155,7 @@ $C = "../../Common.ui";
 );
 
 @GraphCellLabelStyle = (FontSize: 10, TextColor: @ColorMuted);
+
+// The icons of the chapters tab's view switch, each standing for the view it switches to
+@ViewListIcon = PatchStyle(TexturePath: "Graph/ViewList.png");
+@ViewGraphIcon = PatchStyle(TexturePath: "Graph/ViewGraph.png");
