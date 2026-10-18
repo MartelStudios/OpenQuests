@@ -1,5 +1,6 @@
 {
   "Type": "MMOSkillTreeCompleteBounty",
+  "Categories": ["MMOSkillTree"],
   "Board": "Mmo_Mastery_Lessons",
   "TargetQuantity": 3,
   "SuccessfulRewards": [

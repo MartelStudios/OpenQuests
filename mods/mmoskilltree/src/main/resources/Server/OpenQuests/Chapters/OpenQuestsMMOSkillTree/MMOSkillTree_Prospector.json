@@ -1,0 +1,7 @@
+{
+  "NameKey": "openquestsmmoskilltree.chapter.prospector",
+  "Group": "MMOSkillTree",
+  "Order": 0,
+  "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Iron.png",
+  "QuestAssetIds": ["MMOSkillTree_Prospector1_FirstSteps", "MMOSkillTree_Prospector2_Mining", "MMOSkillTree_Prospector3_Abilities", "MMOSkillTree_Prospector4_Lessons", "MMOSkillTree_Prospector5_Mastery"]
+}
