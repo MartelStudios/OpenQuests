@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  # The Run workflow button, for a branch whose pull request was retargeted after its last push
+  workflow_dispatch:
 
 jobs:
   build:
