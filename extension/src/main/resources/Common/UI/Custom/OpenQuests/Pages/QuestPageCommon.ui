@@ -123,3 +123,11 @@ $C = "../../Common.ui";
   Pressed: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Destructive_Pressed.png", Border: $C.@ButtonBorder), LabelStyle: $C.@SmallSecondaryButtonLabelStyle),
   Sounds: $C.@ButtonsCancel
 );
+
+// A quest in a chapter's graph: a tile the eye reads as something to click
+@GraphNodeStyle = ButtonStyle(
+  Default: (Background: #22304a),
+  Hovered: (Background: #2f4466),
+  Pressed: (Background: #1a2538),
+  Sounds: $C.@ButtonSounds
+);

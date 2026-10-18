@@ -1,0 +1,12 @@
+// One quest in a chapter's graph, placed in #Graph by the page through its anchor. Its icon is the
+// quest's own when it names one, and the mark in the corner says where the player stands.
+$P = "QuestPageCommon.ui";
+
+Button #Node {
+  Style: $P.@GraphNodeStyle;
+
+  // Hidden by the page for a quest naming no icon
+  AssetImage #Icon { Anchor: (Left: 8, Top: 8, Width: 36, Height: 36); Visible: false; }
+
+  Group #Mark { Anchor: (Right: 3, Top: 3, Width: 12, Height: 12); }
+}

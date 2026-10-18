@@ -43,9 +43,27 @@ $C.@DecoratedContainer {
         PlaceholderText: %server.customUI.searchPlaceholder;
       }
 
+      // Moves the chapter graph's window a cell at a time, in place of the search in that view
+      Group #GraphPan {
+        LayoutMode: Left;
+        FlexWeight: 1;
+        Visible: false;
+
+        $C.@SmallSecondaryTextButton #PanLeft { @Anchor = (Width: 44, Right: 4); @Text = "<"; }
+        $C.@SmallSecondaryTextButton #PanUp { @Anchor = (Width: 44, Right: 4); @Text = "^"; }
+        $C.@SmallSecondaryTextButton #PanDown { @Anchor = (Width: 44, Right: 4); @Text = "v"; }
+        $C.@SmallSecondaryTextButton #PanRight { @Anchor = (Width: 44); @Text = ">"; }
+      }
+
       // Which quest states the open list shows, hidden where there is no such list
       $C.@DropdownBox #QuestFilter {
         Anchor: (Width: 200, Height: 32, Left: 8);
+        Visible: false;
+      }
+
+      // Switches the chapters tab between its list and its graph
+      $C.@SmallSecondaryTextButton #ViewToggle {
+        @Anchor = (MinWidth: 100, Left: 8);
         Visible: false;
       }
     }
@@ -82,6 +100,14 @@ $C.@DecoratedContainer {
           LayoutMode: TopScrolling;
           ScrollbarStyle: $C.@DefaultScrollbarStyle;
           Padding: (Right: 8);
+        }
+
+        // The open chapter as a graph. No layout mode: the page places every node and line by its
+        // anchor. Exactly 6 by 4 cells of 92, the window ChapterGraphView draws.
+        Group #Graph {
+          Anchor: (Width: 552, Height: 368);
+          Background: #0d141f(0.5);
+          Visible: false;
         }
       }
     }

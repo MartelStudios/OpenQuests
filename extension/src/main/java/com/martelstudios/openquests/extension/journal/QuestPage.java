@@ -120,6 +120,13 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private Filter chaptersFilter = Filter.ALL;
 
     /**
+     * Whether the chapters tab shows the open chapter as a graph rather than as a list.
+     */
+    private boolean graphMode;
+
+    private final ChapterGraphView graph = new ChapterGraphView();
+
+    /**
      * What the player typed in each tab's search field, as typed.
      */
     private final Map<Tab, String> searches = new EnumMap<>(Tab.class);
@@ -210,7 +217,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         // Standing on a quest is reading that one quest; standing on the journal is reading a list
         boolean alone = route instanceof QuestRoute;
-        List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : search(list(playerComponents, tab), tab);
+        boolean chapters = !alone && tab == Tab.CHAPTERS;
+        boolean graphShown = chapters && graphMode;
+        List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : graphShown ? List.of() : search(list(playerComponents, tab), tab);
 
         QuestShape shape = alone ? QuestShape.PAGE : QuestShape.CARD;
 
@@ -220,8 +229,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         renderBreadcrumb(commandBuilder, eventBuilder);
         renderTabs(commandBuilder, eventBuilder, tab, isOwedAnything(playerComponents));
         renderSearch(commandBuilder, eventBuilder, alone ? null : tab);
-        renderFilter(commandBuilder, eventBuilder, alone || tab == Tab.PENDING ? null : filterOf(tab));
-        renderChapters(commandBuilder, eventBuilder, playerComponents, !alone && tab == Tab.CHAPTERS);
+        renderFilter(commandBuilder, eventBuilder, alone || graphShown || tab == Tab.PENDING ? null : filterOf(tab));
+        renderViewTools(commandBuilder, eventBuilder, chapters, graphShown);
+        renderChapters(commandBuilder, eventBuilder, playerComponents, chapters);
         commandBuilder.clear(QuestPageContext.ROOT_CONTAINER);
 
         var context = new QuestPageContext(commandBuilder, eventBuilder, lookup(playerComponents), playerRef.getUuid());
@@ -231,10 +241,50 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         countdowns = List.copyOf(context.getCountdowns());
 
-        commandBuilder.set("#Empty.Visible", entries.isEmpty())
+        int count = graphShown ? renderGraph(commandBuilder, eventBuilder, playerComponents) : entries.size();
+
+        commandBuilder.set("#Empty.Visible", count == 0)
                       .set("#Empty.TextSpans", Message.translation("openquests.page.empty"))
                       .set("#Counts.TextSpans", Message.translation("openquests.page.counts")
-                                                       .param("count", entries.size()));
+                                                       .param("count", count));
+    }
+
+    /**
+     * The chapters tab's switch between list and graph, and in the graph the buttons moving its
+     * window, which take the search field's place: the graph shows every quest of the chapter.
+     */
+    private void renderViewTools(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, boolean chapters, boolean graphShown) {
+        commandBuilder.set(SEARCH_FIELD + ".Visible", !graphShown)
+                      .set("#GraphPan.Visible", graphShown)
+                      .set(QuestPageContext.ROOT_CONTAINER + ".Visible", !graphShown)
+                      .set(ChapterGraphView.CONTAINER + ".Visible", graphShown)
+                      .set("#ViewToggle.Visible", chapters);
+        if (!chapters) return;
+
+        commandBuilder.set("#ViewToggle.Text", Message.translation(graphShown ? "openquests.page.view.list" : "openquests.page.view.graph"));
+        eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ViewToggle", EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_VIEW), false);
+
+        if (!graphShown) return;
+
+        for (String direction : List.of("Left", "Up", "Down", "Right")) {
+            eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#Pan" + direction, EventData.of(QuestPageEventData.KEY_ACTION, QuestPageEventData.ACTION_PAN)
+                                                                                                          .append(QuestPageEventData.KEY_TARGET, direction.toLowerCase(Locale.ROOT)), false);
+        }
+    }
+
+    /**
+     * @return how many quests the open chapter's graph holds, drawn or out of its window.
+     */
+    private int renderGraph(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull EntityComponents playerComponents) {
+        OpenQuestChapter chapter = openChapter(playerComponents);
+        if (chapter == null) {
+            commandBuilder.clear(ChapterGraphView.CONTAINER);
+            return 0;
+        }
+
+        ChapterGraph chapterGraph = ChapterGraph.of(chapter, assetId -> held(playerComponents, assetId), playerRef.getUuid());
+        graph.render(commandBuilder, eventBuilder, chapterGraph);
+        return chapterGraph.nodes().size();
     }
 
     /**
@@ -1024,6 +1074,17 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             case QuestPageEventData.ACTION_GROUP -> toggleGroup(data.getTarget());
             case QuestPageEventData.ACTION_CHAPTER -> {
                 if (data.getTarget() != null) openChapter = data.getTarget();
+                graph.reset();
+            }
+            case QuestPageEventData.ACTION_VIEW -> graphMode = !graphMode;
+            case QuestPageEventData.ACTION_PAN -> graph.pan(data.getTarget());
+
+            // Recolours the lines in place: a redraw would replace the node under the mouse
+            case QuestPageEventData.ACTION_HOVER -> {
+                var commandBuilder = new UICommandBuilder();
+                graph.hover(commandBuilder, data.getTarget());
+                sendUpdate(commandBuilder, false);
+                return;
             }
 
             // These three move the player, and the redraw comes back through RouteChangedEvent.
@@ -1383,6 +1444,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         static final String ACTION_SEARCH = "search";
         static final String ACTION_GROUP = "group";
         static final String ACTION_CHAPTER = "chapter";
+        static final String ACTION_VIEW = "view";
+        static final String ACTION_PAN = "pan";
+        static final String ACTION_HOVER = "hover";
         static final String ACTION_CRUMB = "crumb";
         static final String ACTION_CLOSE = "close";
 
