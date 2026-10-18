@@ -6,7 +6,7 @@ $P = "QuestPageCommon.ui";
 
 TextButton #Tab {
   Text: "";
-  Anchor: (Width: 104, Height: 30, Right: 4);
+  Anchor: (MinWidth: 104, Height: 30, Right: 4);
   Padding: (Horizontal: 16);
   Style: $P.@OwedButtonStyle;
 }
