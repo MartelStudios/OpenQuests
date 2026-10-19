@@ -46,6 +46,13 @@ public class QuestProgressionStore {
     private final Map<Class<?>, Set<UUID>> idsByType = new ConcurrentHashMap<>();
 
     /**
+     * The live quests built from each asset, so a player's standing with one is read off a few
+     * quests rather than the whole store.
+     */
+    @Nonnull
+    private final Map<String, Set<UUID>> liveIdsByAsset = new ConcurrentHashMap<>();
+
+    /**
      * Quests read back whose asset is gone or changed type, never let in: everything holding a
      * quest reads its asset, and would throw on these. Remembered so they are read and reported
      * once, and left as stored, so they come back with their asset.
@@ -83,6 +90,13 @@ public class QuestProgressionStore {
         } else {
             quests.put(quest.getId(), quest);
             idsByType.computeIfAbsent(quest.getClass(), k -> ConcurrentHashMap.newKeySet()).add(quest.getId());
+            if (quest.getAssetId() != null) {
+                liveIdsByAsset.compute(quest.getAssetId(), (assetId, ids) -> {
+                    Set<UUID> assetIds = ids != null ? ids : ConcurrentHashMap.newKeySet();
+                    assetIds.add(quest.getId());
+                    return assetIds;
+                });
+            }
         }
 
         HytaleServer.get()
@@ -135,6 +149,13 @@ public class QuestProgressionStore {
 
         Set<UUID> ids = idsByType.get(quest.getClass());
         if (ids != null) ids.remove(id);
+
+        if (quest.getAssetId() != null) {
+            liveIdsByAsset.computeIfPresent(quest.getAssetId(), (assetId, assetIds) -> {
+                assetIds.remove(id);
+                return assetIds.isEmpty() ? null : assetIds;
+            });
+        }
 
         return quest;
     }
@@ -205,6 +226,22 @@ public class QuestProgressionStore {
             if (quest != null) resolved.add(quest);
         }
         return resolved;
+    }
+
+    /**
+     * @return the live quests built from that asset, as they stand now.
+     */
+    @Nonnull
+    public List<AbstractQuestProgression<?>> getLiveForAsset(@Nonnull String assetId) {
+        Set<UUID> ids = liveIdsByAsset.get(assetId);
+        if (ids == null) return List.of();
+
+        List<AbstractQuestProgression<?>> live = new ArrayList<>(ids.size());
+        for (UUID id : ids) {
+            AbstractQuestProgression<?> quest = quests.get(id);
+            if (quest != null) live.add(quest);
+        }
+        return live;
     }
 
     /**

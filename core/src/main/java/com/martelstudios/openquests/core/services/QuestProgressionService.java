@@ -5,13 +5,13 @@ import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.constraints.AssignmentRequest;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestRegisteredEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
@@ -105,18 +105,24 @@ public class QuestProgressionService {
 
     /**
      * @return whether the constraints of the asset let that player be handed a new quest from it
-     * now. Free for an asset laying none; otherwise reads how its quests ended for the player, from
-     * the storage if they are offline.
+     * now. Free for an asset laying none; otherwise reads where the player stands with it, from the
+     * storage if they are offline.
      */
     public boolean isEligible(@Nonnull OpenQuestAsset asset, @Nonnull UUID playerId) {
+        return isEligible(asset, playerId, null);
+    }
+
+    /**
+     * @param joining the shared quest the player would join, {@code null} for a new one
+     */
+    private boolean isEligible(@Nonnull OpenQuestAsset asset, @Nonnull UUID playerId, @Nullable AbstractQuestProgression<?> joining) {
         QuestConstraint[] constraints = asset.getConstraints();
         if (constraints.length == 0) return true;
 
-        QuestCompletions completions = QuestPlayerStateService.get().getCompletions(playerId, asset.getId());
-        Instant now = Instant.now();
-
+        AssignmentRequest request = new AssignmentRequest(asset, playerId, Instant.now(), joining,
+                                                          assetId -> QuestPlayerStateService.get().getTally(playerId, assetId));
         for (QuestConstraint constraint : constraints) {
-            if (!constraint.allowsAssignment(asset, playerId, completions, now)) return false;
+            if (!constraint.allowsAssignment(request)) return false;
         }
         return true;
     }
@@ -164,7 +170,7 @@ public class QuestProgressionService {
         if (quest.isAbandonedBy(playerId) || dataStore.getLive(quest.getId()) == null) return false;
 
         OpenQuestAsset asset = quest.getAsset();
-        if (asset != null && !isEligible(asset, playerId)) return false;
+        if (asset != null && !isEligible(asset, playerId, quest)) return false;
 
         return quest.addPlayer(playerId);
     }

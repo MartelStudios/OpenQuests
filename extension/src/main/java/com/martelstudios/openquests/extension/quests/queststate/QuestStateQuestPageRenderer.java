@@ -33,28 +33,25 @@ public final class QuestStateQuestPageRenderer implements QuestPageRenderer {
                        @Nullable AbstractQuestProgression<?> quest, @Nullable OpenQuestAsset asset) {
         // The progression may name another quest than its asset does, so it is asked first
         if (quest instanceof QuestStateQuestProgression stateQuest && stateQuest.getAsset() != null) {
-            appendWatched(context, stateQuest.getQuestAssetId(), stateQuest.getQuestStateRequirement(), stateQuest.isNot());
+            appendWatched(context, stateQuest.getQuestAssetId(), stateQuest.getRequirement());
             return;
         }
 
         if (asset instanceof QuestStateQuestAsset stateAsset && stateAsset.getQuestAssetId() != null) {
-            appendWatched(context, stateAsset.getQuestAssetId(), stateAsset.getQuestStateRequirement(), stateAsset.isNot());
+            appendWatched(context, stateAsset.getQuestAssetId(), stateAsset.getRequirement());
         }
     }
 
     /**
      * The watched quest, named and leading to itself: a prerequisite is read by opening whatever is
      * holding it up.
-     *
-     * @param not whether the requirement is a standing obligation rather than something to reach,
-     * so it reads as one rather than as its opposite
      */
     private static void appendWatched(@Nonnull QuestPageContext context, @Nonnull String watchedId,
-                                      @Nonnull QuestStateQuestAsset.QuestStateRequirement requirement, boolean not) {
+                                      @Nonnull QuestRequirement requirement) {
         OpenQuestAsset watched = OpenQuestAsset.getAsset(watchedId);
 
         Message title = watched == null ? Message.raw(watchedId) : AbstractQuestProgression.titleOf(watched);
-        Message label = Message.translation("openquests.page.requirement." + (not ? "not." : "") + requirement.name().toLowerCase());
+        Message label = requirement.describe();
 
         // Marked with what became of the watched quest rather than of the one waiting on it: the
         // line names that quest, and how far along it is is the whole of what is being said here

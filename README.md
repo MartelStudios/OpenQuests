@@ -109,8 +109,8 @@ period that began while the server was down is handed out as it comes back.
 
 Every `Repeat` takes a `Max`, the most times a holder is handed the quest by this assignment. The
 quest's own constraints still decide whether a player takes it, and one refused is offered again
-next time: `Max` counts what this assignment handed out, `MaxCompletions` how the quest ended
-wherever it came from.
+next time: `Max` counts what this assignment handed out, `MaxQuests` how many quests from the
+asset the player has had, wherever they came from.
 
 What was handed out is written down per holder, by assignment and then by quest, as `Count`,
 `LastAt` and `Occasion`. A player's records travel in their own; a world's and the server's live in
@@ -471,7 +471,7 @@ already defines, such as `Flowers` or `Meats`. A block is matched through the it
 | `Sprint` | Covering a distance at the fast pace. |
 | `Jump` | Jumping a number of times. |
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
-| `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
+| `QuestState` | Between `Min` (1 by default) and `Max` (no limit by default) of the player's quests from `QuestAssetId` standing in the listed `States` (every state by default), running ones included: the same four fields as the `RequiresQuest` constraint. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation (`"Min": 0, "Max": 0` for none). |
 | `NoOp` | Nothing on its own: a command, a reward, a constraint or a plugin ends it. |
 
 `Walk`, `Run` and `Sprint` count metres. With `"Measure": "Seconds"` they count the seconds spent moving at
@@ -697,7 +697,7 @@ A constraint speaks to the moments of a quest it is about, and has no objection 
 
 | Moment | Hook | Effect |
 | --- | --- | --- |
-| Handing out | `allowsAssignment(asset, playerId, completions, now)` | A player is handed a new quest from the asset only if every constraint agrees, judging from how its quests ended for them so far. |
+| Handing out | `allowsAssignment(request)` | A player is handed a quest from the asset, a new one or a shared one to join, only if every constraint agrees. The `AssignmentRequest` names the asset, the player, the moment and the quest joined, and tallies where the player stands with any asset: `tally()` for this one, `tally(assetId)` for another, running quests included. |
 | Progress | `allowsProgress(quest, actorId)` | A player's action counts only if every constraint agrees. Refused, it leaves no trace. |
 | Running out | `getDeadline(quest)`, `getExpiredState()` | A quest still running ends on the earliest deadline its constraints set, on the outcome of the constraint that set it. |
 
@@ -737,10 +737,11 @@ malformed one stops the server with the asset named rather than failing the day 
 | `InWorld` | `WorldNamePattern`, `OnLeave` | Counts progress only in a world whose whole name matches, the way `EnterWorld` reads its own. `"OnLeave": "Fail"` fails the quest when its player goes from a matching world to one that is not; logging out is not leaving. |
 | `NearPosition` | `Position`, `Radius`, `WorldNamePattern` | Counts progress only within the radius, its edge included. The pattern, optional, says which world the position is in. |
 | `EntityCondition` | `Conditions` | Counts progress only while the player's entity meets every condition: the game's own, `Sprinting`, `OutOfCombat`, `HasEffect`…, so one another mod registers works too. |
+| `RequiresQuest` | `QuestAssetId`, `States`, `Min`, `Max` | Counts progress only while the acting player has between `Min` (1 by default) and `Max` (no limit by default) quests from `QuestAssetId` standing in the listed `States` (every state by default), running ones included: `["InProgress"]` while an escort runs, `["Successful"]` once a chapter is done, `"States": ["Failed"], "Min": 0, "Max": 0` as long as a trial was never failed. |
 | `MinPlayersOnline` | `Count` | Counts progress only while that many players are on the server, the acting one included. |
 | `FailOnDeath` | none | Fails the quest the moment one of its players dies. A shared quest fails for everyone holding it. |
 | `Cooldown` | `Seconds`, `From` | Hands a quest from the asset out at most once per period: from the end of the last one, whichever way it ended, or from its start with `"From": "Start"`. |
-| `MaxCompletions` | `Count`, `Outcomes` | Stops handing quests from the asset out once that many ended that way for the player. Only `Successful` counts unless `Outcomes` lists more. |
+| `MaxQuests` | `Count`, `States` | Stops handing quests from the asset out once that many of the player's stand in the listed `States`, running ones included. Every state counts unless `States` lists some: `["InProgress"]` for one at a time, `["Successful"]` for a number of wins, `["Failed", "Abandoned"]` for a number of misses. |
 
 The journal lists them under **Conditions** on the quest's page, one line each: the time left, the
 world, the players needed against those online, how often the quest can be taken and how much of
@@ -754,7 +755,7 @@ page:
 { "Type": "InWorld", "WorldNamePattern": "Arena_.*", "DescriptionKey": "quest.arena.only-inside" }
 ```
 
-`Cooldown` and `MaxCompletions` read the counts every player record keeps per asset, so they hold
+`Cooldown` and `MaxQuests` read the counts every player record keeps per asset, so they hold
 for an asset that keeps no history, and across restarts. A daily quest is a quest a player can
 take at most once a day, handed out by whatever hands it out (on connection, as a reward, by a
 command):
@@ -766,7 +767,7 @@ command):
   "TargetQuantity": 20,
   "Constraints": [
     { "Type": "Cooldown", "Seconds": 86400 },
-    { "Type": "MaxCompletions", "Count": 30 }
+    { "Type": "MaxQuests", "Count": 30, "States": ["Successful"] }
   ]
 }
 ```

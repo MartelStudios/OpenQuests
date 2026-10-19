@@ -13,6 +13,7 @@ import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.models.QuestTally;
 import com.martelstudios.openquests.core.persistence.PlayerMessage;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
@@ -26,6 +27,7 @@ import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +64,9 @@ public class QuestPlayerStateService {
         plugin.getEventRegistry().registerGlobal(EventPriority.FIRST, PlayerConnectEvent.class, this::handlePlayerConnectEvent);
         // EventPriority.LAST, so whatever another listener does on the way out is written too
         plugin.getEventRegistry().registerGlobal(EventPriority.LAST, PlayerDisconnectEvent.class, this::handlePlayerDisconnectEvent);
-        plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+        // Ahead of EventPriority.FIRST, where rewards are paid: a quest they hand out, the same one's
+        // retry included, is judged on a record that already counts this end
+        plugin.getEventRegistry().registerGlobal((short) (Short.MIN_VALUE + 1), QuestCompletedEvent.class, this::handleQuestCompletedEvent);
     }
 
     public static QuestPlayerStateService get() {
@@ -235,6 +239,26 @@ public class QuestPlayerStateService {
         if (session != null) return session.questStore().getCompletions(assetId);
 
         return storage.loadPlayer(playerId).getCompletions().getOrDefault(assetId, QuestCompletions.NONE);
+    }
+
+    /**
+     * @return where the player stands with that asset, running quests included. An offline player
+     * is read from the storage, quests and all, which blocks: meant for the rare question asked
+     * about someone away.
+     */
+    @Nonnull
+    public QuestTally getTally(@Nonnull UUID playerId, @Nonnull String assetId) {
+        Session session = sessions.get(playerId);
+        if (session != null) {
+            return QuestTally.of(session.questStore().getCompletions(assetId), playerId, progressionStore.getLiveForAsset(assetId));
+        }
+
+        PlayerQuestRecord record = storage.loadPlayer(playerId);
+        List<AbstractQuestProgression<?>> quests = new ArrayList<>();
+        for (AbstractQuestProgression<?> quest : storage.loadProgressions(record.getQuestIds())) {
+            if (assetId.equals(quest.getAssetId())) quests.add(quest);
+        }
+        return QuestTally.of(record.getCompletions().getOrDefault(assetId, QuestCompletions.NONE), playerId, quests);
     }
 
     /**

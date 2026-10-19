@@ -39,8 +39,9 @@
       "Seconds": 72000
     },
     {
-      "Type": "MaxCompletions",
-      "Count": 7
+      "Type": "MaxQuests",
+      "Count": 7,
+      "States": ["Successful"]
     }
   ],
   "SuccessfulRewards": [

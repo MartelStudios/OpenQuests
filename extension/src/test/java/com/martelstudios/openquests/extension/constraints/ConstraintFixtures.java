@@ -1,13 +1,18 @@
 package com.martelstudios.openquests.extension.constraints;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.martelstudios.openquests.core.constraints.AssignmentRequest;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestCompletions;
+import com.martelstudios.openquests.core.models.QuestTally;
 import com.martelstudios.openquests.core.persistence.CodecJson;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -43,6 +48,27 @@ public final class ConstraintFixtures {
         return new TestAsset();
     }
 
+    /**
+     * @return a player standing only on what their record says, nothing of the asset running.
+     */
+    @Nonnull
+    public static QuestTally tally(@Nonnull QuestCompletions completions) {
+        return QuestTally.of(completions, UUID.randomUUID(), List.of());
+    }
+
+    /**
+     * @return a request for a new quest from {@link #asset()}, every asset tallied the same.
+     */
+    @Nonnull
+    public static AssignmentRequest request(@Nonnull QuestTally tally, @Nonnull Instant now) {
+        return new AssignmentRequest(asset(), UUID.randomUUID(), now, null, assetId -> tally);
+    }
+
+    @Nonnull
+    public static AssignmentRequest request(@Nonnull QuestCompletions completions, @Nonnull Instant now) {
+        return request(tally(completions), now);
+    }
+
     @Nonnull
     public static TestQuest questStartedAt(@Nullable Instant startedAt) {
         return new TestQuest(startedAt);
@@ -64,6 +90,15 @@ public final class ConstraintFixtures {
         @Override
         public Instant getStartedAt() {
             return startedAt;
+        }
+
+        /**
+         * Hands the quest to a player without the event a test has no server for.
+         */
+        @Nonnull
+        public TestQuest join(@Nonnull UUID playerId) {
+            apply(new AbstractQuestProgression.Join(playerId));
+            return this;
         }
     }
 

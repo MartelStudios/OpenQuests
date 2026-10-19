@@ -4,9 +4,9 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
+import com.martelstudios.openquests.core.constraints.AssignmentRequest;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.models.QuestCompletions;
 
 import javax.annotation.Nonnull;
 import java.time.Instant;
@@ -32,8 +32,8 @@ public class DeadlineConstraint extends ExpiringConstraint {
      * Nothing is handed out once the moment has passed: it would only end a few seconds later.
      */
     @Override
-    public boolean allowsAssignment(@Nonnull OpenQuestAsset asset, @Nonnull UUID playerId, @Nonnull QuestCompletions completions, @Nonnull Instant now) {
-        return now.isBefore(at);
+    public boolean allowsAssignment(@Nonnull AssignmentRequest request) {
+        return request.getNow().isBefore(at);
     }
 
     @Nonnull
