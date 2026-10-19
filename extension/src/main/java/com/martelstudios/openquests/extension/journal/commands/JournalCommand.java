@@ -17,8 +17,8 @@ import javax.annotation.Nonnull;
  * Opens the quest journal. Extends {@link AbstractPlayerCommand} because opening a page touches
  * the entity store, which only answers on its world thread.
  * <p>
- * Roots a history rather than opening a page: what the player was looking at before is not somewhere
- * to come back to.
+ * Resumes the journal's own navigation rather than opening a page, so the journal reopens where the
+ * player left it. Only the first opening roots it, on the quests tab.
  */
 public class JournalCommand extends AbstractPlayerCommand {
 
@@ -30,6 +30,6 @@ public class JournalCommand extends AbstractPlayerCommand {
 
     @Override
     protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
-        NavigationService.get().root(playerRef, JournalRoutes.journal(JournalRoutes.TAB_QUESTS));
+        NavigationService.get().resume(playerRef, JournalRoutes.ROUTER, () -> JournalRoutes.journal(JournalRoutes.TAB_QUESTS));
     }
 }

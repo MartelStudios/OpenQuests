@@ -25,6 +25,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.MessageUtil;
+import com.martelstudios.opennavigation.routers.RouterId;
 import com.martelstudios.opennavigation.routes.Route;
 import com.martelstudios.opennavigation.routes.TabRoute;
 import com.martelstudios.opennavigation.services.NavigationService;
@@ -103,37 +104,6 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private static final long COUNTDOWN_INTERVAL_MS = 1_000;
 
     /**
-     * Rows the player unfolded, by the id their row answers to: a quest id, or the asset id of a
-     * quest they were never given. Kept here, since folding is a redraw rather than a client toggle.
-     */
-    private final Set<String> unfolded = new HashSet<>();
-
-    /**
-     * Chapter groups the player unfolded in the chapters tab, by id.
-     */
-    private final Set<String> unfoldedGroups = new HashSet<>();
-
-    /**
-     * The chapter whose quests the chapters tab shows, {@code null} until one is picked or defaulted.
-     */
-    @Nullable
-    private String openChapter;
-
-    @Nonnull
-    private Filter questsFilter = Filter.ACTIVE;
-
-    /**
-     * Every state by default: a chapter is read as a whole, locked quests included.
-     */
-    @Nonnull
-    private Filter chaptersFilter = Filter.ALL;
-
-    /**
-     * Whether the chapters tab shows the open chapter as a graph rather than as a list.
-     */
-    private boolean graphMode = true;
-
-    /**
      * Whether the graph shows its grid to lay the chapter out, for a player allowed to.
      */
     private boolean editMode;
@@ -141,15 +111,21 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private final ChapterGraphView graph = new ChapterGraphView();
 
     /**
-     * What the player typed in each tab's search field, as typed.
-     */
-    private final Map<Tab, String> searches = new EnumMap<>(Tab.class);
-
-    /**
      * The tab the search field last showed, so its text is written back only on switching tab.
      */
     @Nullable
     private Tab searchShown;
+
+    /**
+     * What a route reaching the page without a journal shows, kept as long as the page.
+     */
+    private final ViewState orphanState = new ViewState();
+
+    /**
+     * The navigation this page draws, which every click moves.
+     */
+    @Nonnull
+    private RouterId router;
 
     @Nonnull
     private Route route;
@@ -162,9 +138,10 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     private long lastCountdownMs;
 
-    public QuestPage(@Nonnull PlayerRef playerRef, @Nonnull Route route) {
+    public QuestPage(@Nonnull PlayerRef playerRef, @Nonnull RouterId router, @Nonnull Route route) {
         super(playerRef, CustomPageLifetime.CanDismiss, QuestPageEventData.CODEC);
 
+        this.router = router;
         this.route = route;
     }
 
@@ -172,7 +149,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * Draws where the player now stands. Redraws in place rather than opening again, so the client
      * keeps its scroll and the page manager is left alone.
      */
-    public void navigatedTo(@Nonnull Ref<EntityStore> reference, @Nonnull Route route) {
+    public void navigatedTo(@Nonnull Ref<EntityStore> reference, @Nonnull RouterId router, @Nonnull Route route) {
+        this.router = router;
         this.route = route;
 
         var commandBuilder = new UICommandBuilder();
@@ -232,7 +210,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         // Standing on a quest is reading that one quest; standing on the journal is reading a list
         boolean alone = route instanceof QuestRoute;
         boolean chapters = !alone && tab == Tab.CHAPTERS;
-        boolean graphShown = chapters && graphMode;
+        boolean graphShown = chapters && state().graphMode;
         List<Entry> entries = alone ? opened(playerComponents, (QuestRoute) route) : graphShown ? List.of() : search(list(playerComponents, tab), tab);
 
         QuestShape shape = alone ? QuestShape.PAGE : QuestShape.CARD;
@@ -344,6 +322,23 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         return route.getRoot() instanceof JournalRoute journal ? journal : null;
     }
 
+    /**
+     * @return what the player chose to see, kept on the journal's route so that reopening the
+     * journal finds it again. A route without a journal gets the page's own, as a fresh one would.
+     */
+    @Nonnull
+    private ViewState state() {
+        JournalRoute journal = journal();
+        if (journal == null) return orphanState;
+
+        ViewState state = journal.getContext(ViewState.class);
+        if (state == null) {
+            state = new ViewState();
+            journal.setContext(state);
+        }
+        return state;
+    }
+
     @Nonnull
     private Tab openTab() {
         JournalRoute journal = journal();
@@ -355,7 +350,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      */
     @Nonnull
     private Filter filterOf(@Nonnull Tab tab) {
-        return tab == Tab.CHAPTERS ? chaptersFilter : questsFilter;
+        return tab == Tab.CHAPTERS ? state().chaptersFilter : state().questsFilter;
     }
 
     private void setFilter(@Nullable String value) {
@@ -363,9 +358,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         Filter filter = Filter.parse(value, filterOf(tab));
 
         if (tab == Tab.CHAPTERS) {
-            chaptersFilter = filter;
+            state().chaptersFilter = filter;
         } else {
-            questsFilter = filter;
+            state().questsFilter = filter;
         }
     }
 
@@ -378,7 +373,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         Entry entry = resolve(playerComponents, route.getTarget(), route.getMark());
         if (entry == null) return List.of();
 
-        unfolded.add(entry.id());
+        state().unfolded.add(entry.id());
         return List.of(entry);
     }
 
@@ -444,7 +439,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private List<Entry> list(@Nonnull EntityComponents playerComponents, @Nonnull Tab tab) {
         return switch (tab) {
             case CHAPTERS -> collectChapter(playerComponents);
-            case QUESTS -> collect(playerComponents, questsFilter);
+            case QUESTS -> collect(playerComponents, state().questsFilter);
             case PENDING -> collectOwed(playerComponents);
         };
     }
@@ -465,7 +460,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             if (entry == null) continue;
 
             boolean listed = OpenQuestChapter.isShown(assetId, entry.quest());
-            if (listed && chaptersFilter.accepts(entry.mark())) entries.add(entry);
+            if (listed && state().chaptersFilter.accepts(entry.mark())) entries.add(entry);
         }
         return entries;
     }
@@ -488,15 +483,15 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      */
     @Nullable
     private OpenQuestChapter openChapter(@Nonnull EntityComponents playerComponents) {
-        OpenQuestChapter chapter = openChapter == null ? null : OpenQuestChapter.getChapter(openChapter);
+        OpenQuestChapter chapter = state().openChapter == null ? null : OpenQuestChapter.getChapter(state().openChapter);
         if (chapter != null && chapter.isVisible(assetId -> held(playerComponents, assetId))) return chapter;
 
         for (OpenQuestChapterGroup group : OpenQuestChapterGroup.getSorted()) {
             List<OpenQuestChapter> chapters = visibleChapters(playerComponents, group);
             if (chapters.isEmpty()) continue;
 
-            openChapter = chapters.getFirst().getId();
-            unfoldedGroups.add(group.getId());
+            state().openChapter = chapters.getFirst().getId();
+            state().unfoldedGroups.add(group.getId());
             return chapters.getFirst();
         }
         return null;
@@ -745,7 +740,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         if (tab == null) return;
 
         if (tab != searchShown) {
-            commandBuilder.set(SEARCH_FIELD + ".Value", searches.getOrDefault(tab, ""));
+            commandBuilder.set(SEARCH_FIELD + ".Value", state().searches.getOrDefault(tab, ""));
             searchShown = tab;
         }
 
@@ -757,7 +752,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         Tab tab = openTab();
         String raw = value == null ? "" : value;
 
-        searches.put(tab, raw);
+        state().searches.put(tab, raw);
     }
 
     /**
@@ -766,7 +761,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      */
     @Nonnull
     private List<Entry> search(@Nonnull List<Entry> entries, @Nonnull Tab tab) {
-        String query = normalise(searches.getOrDefault(tab, ""));
+        String query = normalise(state().searches.getOrDefault(tab, ""));
         if (query.isEmpty()) return entries;
 
         String language = playerRef.getLanguage();
@@ -820,7 +815,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             List<OpenQuestChapter> chapters = visibleChapters(playerComponents, group);
             if (chapters.isEmpty()) continue;
 
-            boolean unfoldedGroup = unfoldedGroups.contains(group.getId());
+            boolean unfoldedGroup = state().unfoldedGroups.contains(group.getId());
             String groupSelector = CHAPTERS_CONTAINER + "[" + index++ + "]";
 
             commandBuilder.append(CHAPTERS_CONTAINER, CHAPTER_GROUP_DOCUMENT)
@@ -928,7 +923,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         String document = QuestPageRows.documentFor(shape, entry.quest(), entry.asset(), QuestPageRows.ROW_DOCUMENT);
 
         String rowSelector = context.appendRow(document);
-        boolean open = unfolded.contains(entry.id());
+        boolean open = state().unfolded.contains(entry.id());
 
         boolean described = !isBlank(entry.description());
 
@@ -1122,9 +1117,9 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             case QuestPageEventData.ACTION_SEARCH -> setSearch(data.getValue());
             case QuestPageEventData.ACTION_GROUP -> toggleGroup(data.getTarget());
             case QuestPageEventData.ACTION_CHAPTER -> {
-                if (data.getTarget() != null) openChapter = data.getTarget();
+                if (data.getTarget() != null) state().openChapter = data.getTarget();
             }
-            case QuestPageEventData.ACTION_VIEW -> graphMode = !graphMode;
+            case QuestPageEventData.ACTION_VIEW -> state().graphMode = !state().graphMode;
             case QuestPageEventData.ACTION_EDIT -> editMode = !editMode && canEdit();
             case QuestPageEventData.ACTION_MOVE -> moveQuest(ref, data.getTarget());
 
@@ -1206,7 +1201,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         for (Route tab : journal.getTabs()) {
             if (!tab.getName().equals(target)) continue;
 
-            NavigationService.get().setActiveTab(playerRef, journal, tab);
+            NavigationService.get().setActiveTab(playerRef, router, journal, tab);
             return;
         }
     }
@@ -1221,7 +1216,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         for (Route step = route; step != null; step = step.getPrevious()) {
             if (!step.getName().equals(target)) continue;
 
-            NavigationService.get().navigate(playerRef, step);
+            NavigationService.get().navigate(playerRef, router, step);
             return;
         }
     }
@@ -1241,19 +1236,19 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         Entry entry = resolve(EntityComponents.of(ref), target, inherited);
         if (entry == null) return;
 
-        NavigationService.get().push(playerRef, new QuestRoute(target, entry.title(), inherited));
+        NavigationService.get().push(playerRef, router, new QuestRoute(target, entry.title(), inherited));
     }
 
     private void toggle(String target) {
         if (target == null) return;
 
-        if (!unfolded.remove(target)) unfolded.add(target);
+        if (!state().unfolded.remove(target)) state().unfolded.add(target);
     }
 
     private void toggleGroup(String target) {
         if (target == null) return;
 
-        if (!unfoldedGroups.remove(target)) unfoldedGroups.add(target);
+        if (!state().unfoldedGroups.remove(target)) state().unfoldedGroups.add(target);
     }
 
     private void claim(@Nonnull Ref<EntityStore> ref, String target) {
@@ -1396,6 +1391,49 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         private static Entry of(@Nonnull String id, String assetId, OpenQuestAsset asset, @Nonnull Message title, @Nonnull Message description, @Nonnull QuestMark mark, AbstractQuestProgression<?> quest, QuestReward[] rewards, boolean claimable) {
             return new Entry(id, assetId, asset, title, description, Message.translation(mark.getStatusKey()), mark, quest, rewards, claimable);
         }
+    }
+
+    /**
+     * What the player chose to see in the journal, as opposed to where they stand in it. Held by the
+     * journal's route rather than the page, so it outlives the page closing.
+     */
+    private static final class ViewState {
+
+        /**
+         * Rows the player unfolded, by the id their row answers to: a quest id, or the asset id of a
+         * quest they were never given. Kept here, since folding is a redraw rather than a client toggle.
+         */
+        private final Set<String> unfolded = new HashSet<>();
+
+        /**
+         * Chapter groups the player unfolded in the chapters tab, by id.
+         */
+        private final Set<String> unfoldedGroups = new HashSet<>();
+
+        /**
+         * The chapter whose quests the chapters tab shows, {@code null} until one is picked or defaulted.
+         */
+        @Nullable
+        private String openChapter;
+
+        @Nonnull
+        private Filter questsFilter = Filter.ACTIVE;
+
+        /**
+         * Every state by default: a chapter is read as a whole, locked quests included.
+         */
+        @Nonnull
+        private Filter chaptersFilter = Filter.ALL;
+
+        /**
+         * Whether the chapters tab shows the open chapter as a graph rather than as a list.
+         */
+        private boolean graphMode = true;
+
+        /**
+         * What the player typed in each tab's search field, as typed.
+         */
+        private final Map<Tab, String> searches = new EnumMap<>(Tab.class);
     }
 
     /**

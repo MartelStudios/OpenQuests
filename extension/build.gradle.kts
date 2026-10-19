@@ -34,7 +34,7 @@ dependencies {
     // Loaded as a separate plugin at runtime, so it is never bundled in
     compileOnly(project(":core"))
 
-    vineImplementation("curse.maven:opennavigation-1692713:9183645")
+    vineImplementation("curse.maven:opennavigation-1692713:9260487")
 
     // What a constraint decides from its own fields is exercised off a running server, the way the
     // core tests its backends. The server jar and the core are compileOnly, so the tests ask for both.

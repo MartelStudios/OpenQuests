@@ -52,10 +52,10 @@ public final class JournalFeature {
         var pageManager = player.getPageManager();
 
         if (pageManager.getCustomPage() instanceof QuestPage page) {
-            page.navigatedTo(reference, event.getRoute());
+            page.navigatedTo(reference, event.getRouter(), event.getRoute());
             return;
         }
 
-        pageManager.openCustomPage(reference, store, new QuestPage(event.getPlayer(), event.getRoute()));
+        pageManager.openCustomPage(reference, store, new QuestPage(event.getPlayer(), event.getRouter(), event.getRoute()));
     }
 }
