@@ -19,7 +19,8 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "GoblinBreachRevenant"
+        "GoblinBreachKnights",
+        "GoblinBreachCryptTowerFloors"
       ],
       "AutoClaim": true
     }

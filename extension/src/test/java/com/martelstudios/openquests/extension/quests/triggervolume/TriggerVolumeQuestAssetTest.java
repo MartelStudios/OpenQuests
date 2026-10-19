@@ -19,18 +19,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TriggerVolumeQuestAssetTest {
 
     @Test
-    void theWatchtowerQuestMatchesEveryTowerTopVolume() throws IOException {
-        TriggerVolumeQuestAsset asset = decodeShipped("GoblinBreachWatchtower");
+    void eachTowerTopQuestMatchesOnlyItsOwnTopVolumes() throws IOException {
+        // Volume names as the breach watchtower prefabs ship them; enkindled_trigger_d2 is a middle floor
+        assertMatches("GoblinBreachMineTowerTop", new String[] {"trash_pile_trigger", "trash_pile_trigger_b", "trash_pile_trigger4", "trash_pile_trigger (2)"},
+                      new String[] {"my_trash_pile_trigger", "enkindled_trigger_3"});
+        assertMatches("GoblinBreachCryptTowerTop", new String[] {"enkindled_trigger_1", "enkindled_trigger_5"},
+                      new String[] {"enkindled_trigger_d2", "enkindled_trigger", "void_tower_trigger1"});
+        assertMatches("GoblinBreachVoidTowerTop", new String[] {"void_tower_trigger1", "void_tower_trigger4"},
+                      new String[] {"void_tower_trigger", "trash_pile_trigger"});
+    }
+
+    private static void assertMatches(String questId, String[] matching, String[] other) throws IOException {
+        TriggerVolumeQuestAsset asset = decodeShipped(questId);
 
         assertNull(asset.findError());
         assertEquals(TriggerEventType.ENTER, asset.getTriggerEventType());
-
-        // Volume names as the breach watchtower prefabs ship them
-        for (String name : new String[] {"trash_pile_trigger", "trash_pile_trigger_b", "trash_pile_trigger4", "enkindled_trigger_3", "enkindled_trigger_d2", "void_tower_trigger"}) {
-            assertTrue(asset.getVolumeNamePattern().matches(name), name);
-        }
-        assertFalse(asset.getVolumeNamePattern().matches("enkindled_trigger"));
-        assertFalse(asset.getVolumeNamePattern().matches("my_trash_pile_trigger"));
+        for (String name : matching) assertTrue(asset.getVolumeNamePattern().matches(name), name);
+        for (String name : other) assertFalse(asset.getVolumeNamePattern().matches(name), name);
     }
 
     @Test

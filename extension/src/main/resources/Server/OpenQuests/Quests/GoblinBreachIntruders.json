@@ -19,17 +19,18 @@
       "Count": 1
     }
   ],
+  "AutoTrack": true,
   "SuccessfulRewards": [
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "GoblinBreachScrap",
+        "GoblinBreachFragment",
         "GoblinBreachSkeletons",
+        "GoblinBreachMiners",
         "GoblinBreachSpiders",
-        "GoblinBreachAnomalies"
+        "GoblinBreachVoidSpawn"
       ],
       "AutoClaim": true
     }
-  ],
-  "AutoTrack": true
+  ]
 }

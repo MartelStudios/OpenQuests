@@ -9,14 +9,5 @@
   "TargetQuantity": 3,
   "ItemToCraft": {
     "ItemId": "Ingredient_Gadget_Assembly"
-  },
-  "SuccessfulRewards": [
-    {
-      "Type": "GrantQuest",
-      "QuestAssetIds": [
-        "GoblinBreachVoidtaken"
-      ],
-      "AutoClaim": true
-    }
-  ]
+  }
 }

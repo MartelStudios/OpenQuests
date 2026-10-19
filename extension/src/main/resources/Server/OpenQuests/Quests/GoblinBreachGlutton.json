@@ -21,11 +21,10 @@
   ],
   "SuccessfulRewards": [
     {
-      "Type": "GrantQuest",
-      "QuestAssetIds": [
-        "GoblinBreachSurvivor"
-      ],
-      "AutoClaim": true
+      "Type": "Item",
+      "ItemId": "Ingredient_Gadget_Assembly",
+      "Quantity": 2,
+      "AutoClaim": false
     }
   ]
 }

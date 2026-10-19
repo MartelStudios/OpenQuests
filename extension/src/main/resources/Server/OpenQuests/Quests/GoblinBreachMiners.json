@@ -6,7 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-miners.title",
   "DescriptionKey": "quest.goblin-breach-miners.description",
-  "TargetQuantity": 4,
+  "TargetQuantity": 5,
   "NpcGroupId": {
     "IncludeRoles": [
       "*Goblin_Miner*"
@@ -23,8 +23,9 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "GoblinBreachTurrets",
-        "GoblinBreachLobbers"
+        "GoblinBreachGuardians",
+        "GoblinBreachLobbers",
+        "GoblinBreachMineTowerFloors"
       ],
       "AutoClaim": true
     }

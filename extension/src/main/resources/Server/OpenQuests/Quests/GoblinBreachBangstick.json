@@ -14,7 +14,7 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "GoblinBreachRocketBoots"
+        "GoblinBreachVoidtaken"
       ],
       "AutoClaim": true
     }

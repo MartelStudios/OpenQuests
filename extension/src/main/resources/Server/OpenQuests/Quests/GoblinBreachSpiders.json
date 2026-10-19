@@ -23,6 +23,7 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
+        "GoblinBreachBurners",
         "GoblinBreachSilk"
       ],
       "AutoClaim": true

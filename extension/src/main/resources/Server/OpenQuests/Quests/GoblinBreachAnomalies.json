@@ -23,8 +23,8 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "GoblinBreachVoidCrystals",
-        "GoblinBreachVoidSpawn"
+        "GoblinBreachHeart",
+        "GoblinBreachVoidCrystals"
       ],
       "AutoClaim": true
     }

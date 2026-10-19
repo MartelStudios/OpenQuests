@@ -6,7 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-void-spawn.title",
   "DescriptionKey": "quest.goblin-breach-void-spawn.description",
-  "TargetQuantity": 15,
+  "TargetQuantity": 12,
   "NpcGroupId": "Void",
   "Constraints": [
     {
@@ -19,7 +19,9 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "GoblinBreachCofferKey"
+        "GoblinBreachAnomalies",
+        "GoblinBreachVoidTowerTop",
+        "GoblinBreachEntombed"
       ],
       "AutoClaim": true
     }

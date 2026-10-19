@@ -33,15 +33,9 @@
   ],
   "SuccessfulRewards": [
     {
-      "Type": "Item",
-      "ItemId": "Ingredient_Rune_Shard",
-      "Quantity": 2,
-      "AutoClaim": false
-    },
-    {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "GoblinBreachGlutton"
+        "GoblinBreachRune"
       ],
       "AutoClaim": true
     }

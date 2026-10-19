@@ -1,0 +1,31 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Spawn_Void.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-entombed.title",
+  "DescriptionKey": "quest.goblin-breach-entombed.description",
+  "TargetQuantity": 1,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Void_Spawn_Entombed*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachCofferKey"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

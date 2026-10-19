@@ -1,16 +1,15 @@
 {
   "Type": "KillNpc",
-  "Icon": "Icons/ModelsGenerated/Goblin_Turret.png",
+  "Icon": "Icons/ModelsGenerated/Goblin_Guardian.png",
   "Categories": [
     "Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-turrets.title",
-  "DescriptionKey": "quest.goblin-breach-turrets.description",
-  "TargetQuantity": 6,
+  "TitleKey": "quest.goblin-breach-guardians.title",
+  "DescriptionKey": "quest.goblin-breach-guardians.description",
+  "TargetQuantity": 3,
   "NpcGroupId": {
     "IncludeRoles": [
-      "*Goblin_Turret*",
-      "*Goblin_Lobber_Turret*"
+      "*Goblin_Guardian*"
     ]
   },
   "Constraints": [
@@ -24,7 +23,7 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "GoblinBreachWatchtower"
+        "GoblinBreachGlutton"
       ],
       "AutoClaim": true
     }

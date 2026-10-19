@@ -18,5 +18,15 @@
       "DescriptionKey": "quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachRocketBoots",
+        "GoblinBreachGlider"
+      ],
+      "AutoClaim": true
+    }
   ]
 }

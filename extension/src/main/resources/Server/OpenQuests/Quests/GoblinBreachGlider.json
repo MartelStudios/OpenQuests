@@ -9,14 +9,5 @@
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Glider_Scrap"
-  },
-  "SuccessfulRewards": [
-    {
-      "Type": "GrantQuest",
-      "QuestAssetIds": [
-        "GoblinBreachSurvivor"
-      ],
-      "AutoClaim": true
-    }
-  ]
+  }
 }

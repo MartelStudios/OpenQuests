@@ -14,7 +14,7 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "GoblinBreachGlider"
+        "GoblinBreachVoidtaken"
       ],
       "AutoClaim": true
     }
