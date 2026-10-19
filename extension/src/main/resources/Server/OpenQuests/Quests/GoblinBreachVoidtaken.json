@@ -17,6 +17,10 @@
       "Type": "InWorld",
       "DescriptionKey": "quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    },
+    {
+      "Type": "MaxCompletions",
+      "Count": 1
     }
   ],
   "SuccessfulRewards": [

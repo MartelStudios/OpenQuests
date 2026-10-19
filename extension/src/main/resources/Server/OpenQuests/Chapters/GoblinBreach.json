@@ -12,9 +12,16 @@
       }
     },
     {
-      "Quest": "GoblinBreachFragment",
+      "Quest": "GoblinBreachScrap",
       "Position": {
         "X": 1,
+        "Y": 5
+      }
+    },
+    {
+      "Quest": "GoblinBreachFragment",
+      "Position": {
+        "X": 2,
         "Y": 5
       }
     },
@@ -119,21 +126,21 @@
     {
       "Quest": "GoblinBreachVoidtaken",
       "Position": {
-        "X": 5,
+        "X": 6,
         "Y": 5
       }
     },
     {
       "Quest": "GoblinBreachRocketBoots",
       "Position": {
-        "X": 6,
+        "X": 7,
         "Y": 4
       }
     },
     {
       "Quest": "GoblinBreachGlider",
       "Position": {
-        "X": 6,
+        "X": 7,
         "Y": 6
       }
     },
@@ -189,28 +196,28 @@
     {
       "Quest": "GoblinBreachAnomalies",
       "Position": {
-        "X": 2,
+        "X": 3,
         "Y": 8
       }
     },
     {
       "Quest": "GoblinBreachHeart",
       "Position": {
-        "X": 3,
+        "X": 4,
         "Y": 8
       }
     },
     {
       "Quest": "GoblinBreachVoidCrystals",
       "Position": {
-        "X": 3,
+        "X": 4,
         "Y": 9
       }
     },
     {
       "Quest": "GoblinBreachGadgets",
       "Position": {
-        "X": 4,
+        "X": 5,
         "Y": 9
       }
     },

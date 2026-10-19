@@ -9,5 +9,11 @@
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Glider_Scrap"
-  }
+  },
+  "Constraints": [
+    {
+      "Type": "MaxCompletions",
+      "Count": 1
+    }
+  ]
 }

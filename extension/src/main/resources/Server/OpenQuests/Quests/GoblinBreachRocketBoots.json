@@ -9,5 +9,11 @@
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Rocket_Boots"
-  }
+  },
+  "Constraints": [
+    {
+      "Type": "MaxCompletions",
+      "Count": 1
+    }
+  ]
 }

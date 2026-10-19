@@ -24,7 +24,7 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "GoblinBreachFragment",
+        "GoblinBreachScrap",
         "GoblinBreachSkeletons",
         "GoblinBreachMiners",
         "GoblinBreachSpiders",
