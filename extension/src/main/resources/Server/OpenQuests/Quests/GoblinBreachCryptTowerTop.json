@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-crypt-tower-top.title",
   "DescriptionKey": "quest.goblin-breach-crypt-tower-top.description",
+  "ShortDescriptionKey": "quest.goblin-breach-crypt-tower-top.short",
   "TargetQuantity": 1,
   "VolumeNamePattern": "(enkindled_trigger_\\d)( \\(\\d+\\))?",
   "TriggerEventType": "ENTER",
@@ -23,5 +24,8 @@
       "Quantity": 2,
       "AutoClaim": false
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

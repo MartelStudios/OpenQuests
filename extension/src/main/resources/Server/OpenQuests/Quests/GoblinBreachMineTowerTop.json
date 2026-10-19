@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-mine-tower-top.title",
   "DescriptionKey": "quest.goblin-breach-mine-tower-top.description",
+  "ShortDescriptionKey": "quest.goblin-breach-mine-tower-top.short",
   "TargetQuantity": 1,
   "VolumeNamePattern": "(trash_pile_trigger.*)( \\(\\d+\\))?",
   "TriggerEventType": "ENTER",
@@ -23,5 +24,8 @@
       "Quantity": 5,
       "AutoClaim": false
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

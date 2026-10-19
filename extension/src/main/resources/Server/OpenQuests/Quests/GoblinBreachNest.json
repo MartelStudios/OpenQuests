@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-nest.title",
   "DescriptionKey": "quest.goblin-breach-nest.description",
+  "ShortDescriptionKey": "quest.goblin-breach-nest.short",
   "TargetQuantity": 25,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -36,5 +37,8 @@
       "Quantity": 10,
       "AutoClaim": false
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

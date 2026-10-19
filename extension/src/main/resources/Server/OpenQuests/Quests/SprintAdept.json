@@ -4,6 +4,7 @@
   "Visibility": "WhenStarted",
   "TitleKey": "quest.sprint-adept.title",
   "DescriptionKey": "quest.sprint-adept.description",
+  "ShortDescriptionKey": "quest.sprint-adept.short",
   "TargetQuantity": 500,
   "SuccessfulRewards": [
     {

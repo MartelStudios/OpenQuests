@@ -3,6 +3,7 @@
   "Categories": ["Achievement"],
   "TitleKey": "quest.silent-step.title",
   "DescriptionKey": "quest.silent-step.description",
+  "ShortDescriptionKey": "quest.silent-step.short",
   "TargetQuantity": 500,
   "Visibility": "WhenProgressed"
 }

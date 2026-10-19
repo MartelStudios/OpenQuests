@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-burners.title",
   "DescriptionKey": "quest.goblin-breach-burners.description",
+  "ShortDescriptionKey": "quest.goblin-breach-burners.short",
   "TargetQuantity": 2,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -27,5 +28,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

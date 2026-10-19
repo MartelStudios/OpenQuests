@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-knights.title",
   "DescriptionKey": "quest.goblin-breach-knights.description",
+  "ShortDescriptionKey": "quest.goblin-breach-knights.short",
   "TargetQuantity": 3,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -27,5 +28,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

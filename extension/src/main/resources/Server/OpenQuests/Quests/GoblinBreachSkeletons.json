@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-skeletons.title",
   "DescriptionKey": "quest.goblin-breach-skeletons.description",
+  "ShortDescriptionKey": "quest.goblin-breach-skeletons.short",
   "TargetQuantity": 8,
   "NpcGroupId": "Skeleton",
   "Constraints": [
@@ -24,5 +25,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

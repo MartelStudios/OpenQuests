@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-void-spawn.title",
   "DescriptionKey": "quest.goblin-breach-void-spawn.description",
+  "ShortDescriptionKey": "quest.goblin-breach-void-spawn.short",
   "TargetQuantity": 12,
   "NpcGroupId": "Void",
   "Constraints": [
@@ -25,5 +26,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-scrap.title",
   "DescriptionKey": "quest.goblin-breach-scrap.description",
+  "ShortDescriptionKey": "quest.goblin-breach-scrap.short",
   "TargetQuantity": 30,
   "ItemToGather": {
     "ItemId": "Ingredient_Scraps"
@@ -18,5 +19,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

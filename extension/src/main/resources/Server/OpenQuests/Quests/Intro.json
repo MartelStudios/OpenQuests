@@ -4,6 +4,7 @@
   "PersistChildrenHistory": true,
   "TitleKey": "quest.intro.title",
   "DescriptionKey": "quest.intro.description",
+  "ShortDescriptionKey": "quest.intro.short",
   "QuestAssetIds": [
     {
       "Type": "Gather",

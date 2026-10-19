@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-miners.title",
   "DescriptionKey": "quest.goblin-breach-miners.description",
+  "ShortDescriptionKey": "quest.goblin-breach-miners.short",
   "TargetQuantity": 5,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -29,5 +30,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

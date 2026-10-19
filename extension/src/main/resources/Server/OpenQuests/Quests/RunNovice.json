@@ -3,6 +3,7 @@
   "Categories": ["Achievement"],
   "TitleKey": "quest.run-novice.title",
   "DescriptionKey": "quest.run-novice.description",
+  "ShortDescriptionKey": "quest.run-novice.short",
   "TargetQuantity": 100,
   "Visibility": "WhenCompleted",
   "SuccessfulRewards": [

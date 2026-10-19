@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-mine-tower-floors.title",
   "DescriptionKey": "quest.goblin-breach-mine-tower-floors.description",
+  "ShortDescriptionKey": "quest.goblin-breach-mine-tower-floors.short",
   "QuestAssetIds": [
     {
       "Type": "TriggerVolume",
@@ -71,5 +72,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

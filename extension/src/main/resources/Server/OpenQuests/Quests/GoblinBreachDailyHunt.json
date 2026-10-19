@@ -7,6 +7,7 @@
   ],
   "TitleKey": "quest.goblin-breach-daily-hunt.title",
   "DescriptionKey": "quest.goblin-breach-daily-hunt.description",
+  "ShortDescriptionKey": "quest.goblin-breach-daily-hunt.short",
   "TargetQuantity": 50,
   "NpcGroupId": "Goblin",
   "SuccessfulRewards": [
@@ -40,5 +41,8 @@
         }
       ]
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

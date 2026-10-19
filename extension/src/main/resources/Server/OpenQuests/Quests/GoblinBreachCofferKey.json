@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-coffer-key.title",
   "DescriptionKey": "quest.goblin-breach-coffer-key.description",
+  "ShortDescriptionKey": "quest.goblin-breach-coffer-key.short",
   "TargetQuantity": 1,
   "ItemToGather": {
     "ItemId": "Coffer_Key"
@@ -18,5 +19,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-glutton.title",
   "DescriptionKey": "quest.goblin-breach-glutton.description",
+  "ShortDescriptionKey": "quest.goblin-breach-glutton.short",
   "TargetQuantity": 1,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -26,5 +27,8 @@
       "Quantity": 2,
       "AutoClaim": false
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-void-tower-top.title",
   "DescriptionKey": "quest.goblin-breach-void-tower-top.description",
+  "ShortDescriptionKey": "quest.goblin-breach-void-tower-top.short",
   "TargetQuantity": 1,
   "VolumeNamePattern": "(void_tower_trigger\\d)( \\(\\d+\\))?",
   "TriggerEventType": "ENTER",
@@ -23,5 +24,8 @@
       "Quantity": 10,
       "AutoClaim": false
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

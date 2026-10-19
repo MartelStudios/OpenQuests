@@ -3,6 +3,7 @@
   "Categories": ["Temple"],
   "TitleKey": "quest.talk-merchant.title",
   "DescriptionKey": "quest.talk-merchant.description",
+  "ShortDescriptionKey": "quest.talk-merchant.short",
   "TargetQuantity": 1,
   "Constraints": [
     {

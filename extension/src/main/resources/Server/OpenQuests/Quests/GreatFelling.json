@@ -5,6 +5,7 @@
   ],
   "TitleKey": "quest.great-felling.title",
   "DescriptionKey": "quest.great-felling.description",
+  "ShortDescriptionKey": "quest.great-felling.short",
   "TargetQuantity": 500,
   "AntiAbuse": true,
   "AutoTrack": true,

@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-silk.title",
   "DescriptionKey": "quest.goblin-breach-silk.description",
+  "ShortDescriptionKey": "quest.goblin-breach-silk.short",
   "TargetQuantity": 12,
   "ItemToGather": {
     "ItemId": "Ingredient_Spider_Silk"
@@ -18,5 +19,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

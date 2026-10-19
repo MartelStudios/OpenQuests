@@ -4,6 +4,7 @@
   "Visibility": "WhenStarted",
   "TitleKey": "quest.sprint-master.title",
   "DescriptionKey": "quest.sprint-master.description",
+  "ShortDescriptionKey": "quest.sprint-master.short",
   "TargetQuantity": 5000,
   "Tags": {
     "OQ_HUD_DESC": []

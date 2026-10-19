@@ -4,6 +4,7 @@
   "Visibility": "WhenStarted",
   "TitleKey": "quest.jump-master.title",
   "DescriptionKey": "quest.jump-master.description",
+  "ShortDescriptionKey": "quest.jump-master.short",
   "TargetQuantity": 2500,
   "Tags": {
     "OQ_HUD_DESC": []

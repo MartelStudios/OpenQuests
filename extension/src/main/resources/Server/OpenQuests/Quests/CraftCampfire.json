@@ -3,6 +3,7 @@
   "Categories": ["Survival"],
   "TitleKey": "quest.craft-campfire.title",
   "DescriptionKey": "quest.craft-campfire.description",
+  "ShortDescriptionKey": "quest.craft-campfire.short",
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Bench_Campfire"

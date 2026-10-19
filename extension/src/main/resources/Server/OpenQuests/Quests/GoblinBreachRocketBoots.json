@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-rocket-boots.title",
   "DescriptionKey": "quest.goblin-breach-rocket-boots.description",
+  "ShortDescriptionKey": "quest.goblin-breach-rocket-boots.short",
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Rocket_Boots"
@@ -19,5 +20,8 @@
         "Successful"
       ]
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

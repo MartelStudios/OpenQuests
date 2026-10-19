@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-boom-powder.title",
   "DescriptionKey": "quest.goblin-breach-boom-powder.description",
+  "ShortDescriptionKey": "quest.goblin-breach-boom-powder.short",
   "TargetQuantity": 4,
   "ItemToCraft": {
     "ItemId": "Ingredient_Powder_Boom"
@@ -18,5 +19,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }
