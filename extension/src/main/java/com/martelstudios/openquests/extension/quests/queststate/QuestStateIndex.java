@@ -10,8 +10,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Which quests read an asset's outcome, and which quests a player holds from it. A cache of the
- * quest store rather than an authority: everything here is put back by the store's own events.
+ * Which quest-state quests a player holds that read an asset, so a change to that asset reaches
+ * them. A cache of the quest store rather than an authority: everything here is put back by the
+ * store's own events.
  */
 public class QuestStateIndex {
 
@@ -20,23 +21,15 @@ public class QuestStateIndex {
      */
     private final Map<String, Map<UUID, Set<UUID>>> watchers = new ConcurrentHashMap<>();
 
-    /**
-     * Asset id, then player, then the quests they hold from it. Several runs of one asset can be
-     * held at once and any of them may satisfy, so an answer is read off the whole set.
-     */
-    private final Map<String, Map<UUID, Set<UUID>>> candidates = new ConcurrentHashMap<>();
-
     public static QuestStateIndex get() {
         return QuestStateFeature.getIndex();
     }
 
     public void track(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        add(candidates, quest.getAssetId(), playerId, quest.getId());
         add(watchers, watchedAssetOf(quest), playerId, quest.getId());
     }
 
     public void forget(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        remove(candidates, quest.getAssetId(), playerId, quest.getId());
         remove(watchers, watchedAssetOf(quest), playerId, quest.getId());
     }
 
@@ -46,14 +39,6 @@ public class QuestStateIndex {
     @Nonnull
     public Set<UUID> watchersOf(@Nullable String assetId, @Nonnull UUID playerId) {
         return get(watchers, assetId, playerId);
-    }
-
-    /**
-     * @return what could answer for the asset: the quests this player holds that were built from it.
-     */
-    @Nonnull
-    public Set<UUID> candidatesOf(@Nullable String assetId, @Nonnull UUID playerId) {
-        return get(candidates, assetId, playerId);
     }
 
     /**

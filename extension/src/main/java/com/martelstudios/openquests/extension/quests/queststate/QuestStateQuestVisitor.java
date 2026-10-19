@@ -2,7 +2,7 @@ package com.martelstudios.openquests.extension.quests.queststate;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -16,38 +16,16 @@ public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgr
         this.playerId = playerId;
     }
 
+    /**
+     * Read off the player's tally, which counts what ended from their record: a watched quest
+     * answers the same way once it is gone from memory, or was never kept at all.
+     */
     @Override
     public void progress(QuestStateQuestProgression quest) {
         if (quest.isOver()) return;
 
-        QuestState answer = quest.isNot() != matches(quest) ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS;
-
-        quest.apply(new AbstractQuestProgression.SetState(answer));
-    }
-
-    /**
-     * Any of them, running or finished alike: a quest that ended is set aside rather than deleted,
-     * so it answers here the same way it did while it was running. Read as this player sees it,
-     * since one who left a shared quest has abandoned it while it runs on for the others.
-     */
-    private boolean matches(@Nonnull QuestStateQuestProgression quest) {
-        for (UUID questId : QuestStateIndex.get().candidatesOf(quest.getQuestAssetId(), playerId)) {
-            var watched = QuestProgressionService.get().getQuest(questId);
-
-            if (watched != null && matchesState(quest, watched.getStateFor(playerId))) return true;
-        }
-        return false;
-    }
-
-    private boolean matchesState(@Nonnull QuestStateQuestProgression quest, @Nonnull QuestState state) {
-        return switch (quest.getQuestStateRequirement()) {
-            case STARTED -> true;
-            case IN_PROGRESS -> state == QuestState.IN_PROGRESS;
-            case COMPLETED -> state != QuestState.IN_PROGRESS;
-            case SUCCESSFULLY -> state == QuestState.SUCCESSFUL;
-            case FAILED -> state == QuestState.FAILED;
-            case ABANDONED -> state == QuestState.ABANDONED;
-        };
+        boolean met = quest.getRequirement().isMetBy(QuestPlayerStateService.get().getTally(playerId, quest.getQuestAssetId()));
+        quest.apply(new AbstractQuestProgression.SetState(met ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS));
     }
 
     @Override

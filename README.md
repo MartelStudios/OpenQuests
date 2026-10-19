@@ -471,7 +471,7 @@ already defines, such as `Flowers` or `Meats`. A block is matched through the it
 | `Sprint` | Covering a distance at the fast pace. |
 | `Jump` | Jumping a number of times. |
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
-| `QuestState` | Another quest reaching a state, optionally negated with `Not`. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation. |
+| `QuestState` | Between `Min` (1 by default) and `Max` (no limit by default) of the player's quests from `QuestAssetId` standing in the listed `States` (every state by default), running ones included: the same four fields as the `RequiresQuest` constraint. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation (`"Min": 0, "Max": 0` for none). |
 | `NoOp` | Nothing on its own: a command, a reward, a constraint or a plugin ends it. |
 
 `Walk`, `Run` and `Sprint` count metres. With `"Measure": "Seconds"` they count the seconds spent moving at

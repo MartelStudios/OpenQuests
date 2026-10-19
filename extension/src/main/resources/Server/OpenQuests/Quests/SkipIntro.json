@@ -4,7 +4,7 @@
   "TitleKey": "quest.skip-intro.title",
   "DescriptionKey": "quest.skip-intro.description",
   "QuestAssetId": "Intro",
-  "QuestStateRequirement": "Abandoned",
+  "States": ["Abandoned"],
   "AnnounceOutcome": false,
   "AutoTrack": true,
   "Tags": {
