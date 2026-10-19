@@ -12,23 +12,22 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * The cap beside how much of it the player has used, finished quests included.
+ * The cap beside how much of it the player has used, quests still running included.
  */
-public final class MaxCompletionsRenderer implements QuestConstraintRenderer {
+public final class MaxQuestsRenderer implements QuestConstraintRenderer {
 
     @Nonnull
     @Override
     public Class<?> getConstraintType() {
-        return MaxCompletionsConstraint.class;
+        return MaxQuestsConstraint.class;
     }
 
     @Nullable
     @Override
     public Line describe(@Nonnull QuestPageContext context, @Nonnull QuestConstraint constraint, @Nonnull OpenQuestAsset asset, @Nullable AbstractQuestProgression<?> quest) {
-        MaxCompletionsConstraint max = (MaxCompletionsConstraint) constraint;
+        MaxQuestsConstraint max = (MaxQuestsConstraint) constraint;
         int used = max.getCount() - max.getRemaining(QuestPlayerStateService.get().getTally(context.getViewer(), asset.getId()));
-
-        return new Line(Message.translation("openquests.page.constraint.max-completions").param("count", max.getCount()),
-                        Message.raw(used + "/" + max.getCount()));
+        String key = max.isAtOnce() ? "openquests.page.constraint.max-quests-at-once" : "openquests.page.constraint.max-quests";
+        return new Line(Message.translation(key).param("count", max.getCount()), Message.raw(used + "/" + max.getCount()));
     }
 }

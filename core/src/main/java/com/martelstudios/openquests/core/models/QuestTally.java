@@ -85,7 +85,7 @@ public final class QuestTally {
     /**
      * @return how many of the player's quests from the asset stand in any of those states.
      */
-    public int count(@Nonnull Collection<QuestState> states) {
+    public int count(@Nonnull QuestState... states) {
         int total = 0;
         for (QuestState state : states) total += count(state);
         return total;

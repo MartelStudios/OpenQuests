@@ -91,6 +91,15 @@ public final class ConstraintFixtures {
         public Instant getStartedAt() {
             return startedAt;
         }
+
+        /**
+         * Hands the quest to a player without the event a test has no server for.
+         */
+        @Nonnull
+        public TestQuest join(@Nonnull UUID playerId) {
+            apply(new AbstractQuestProgression.Join(playerId));
+            return this;
+        }
     }
 
     private static final class TestAsset extends OpenQuestAsset {

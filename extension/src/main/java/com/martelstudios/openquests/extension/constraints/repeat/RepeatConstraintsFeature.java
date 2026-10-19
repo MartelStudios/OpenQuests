@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
  */
 public final class RepeatConstraintsFeature {
     public static final String COOLDOWN_TYPE_ID = "Cooldown";
-    public static final String MAX_COMPLETIONS_TYPE_ID = "MaxCompletions";
+    public static final String MAX_QUESTS_TYPE_ID = "MaxQuests";
 
     private RepeatConstraintsFeature() {}
 
@@ -21,9 +21,9 @@ public final class RepeatConstraintsFeature {
      */
     public static void register(@Nonnull JavaPlugin plugin) {
         QuestConstraint.CODEC.register(COOLDOWN_TYPE_ID, CooldownConstraint.class, CooldownConstraint.CODEC);
-        QuestConstraint.CODEC.register(MAX_COMPLETIONS_TYPE_ID, MaxCompletionsConstraint.class, MaxCompletionsConstraint.CODEC);
+        QuestConstraint.CODEC.register(MAX_QUESTS_TYPE_ID, MaxQuestsConstraint.class, MaxQuestsConstraint.CODEC);
 
         QuestPageService.register(new CooldownRenderer());
-        QuestPageService.register(new MaxCompletionsRenderer());
+        QuestPageService.register(new MaxQuestsRenderer());
     }
 }

@@ -109,7 +109,7 @@ that cannot be delivered, full inventory or player offline, waits for them. Noth
 | <code>MinPlayersOnline</code> | Only counts while enough players are online                    |
 | <code>FailOnDeath</code>      | Dying fails the quest                                          |
 | <code>Cooldown</code>         | At most once per period, a day for a daily quest               |
-| <code>MaxCompletions</code>   | A set number of times, and no more                             |
+| <code>MaxQuests</code>        | A set number of times, or one at a time                        |
 
 ```
 "Constraints": [

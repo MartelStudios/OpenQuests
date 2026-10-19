@@ -2,16 +2,21 @@ package com.martelstudios.openquests.extension.constraints.repeat;
 
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.models.QuestTally;
+import com.martelstudios.openquests.extension.constraints.ConstraintFixtures.TestQuest;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.asset;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.request;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.tally;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.decode;
+import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.questStartedAt;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.tryDecode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -66,42 +71,59 @@ class RepeatConstraintsTest {
     }
 
     @Test
-    void onlySuccessesUseUpATryByDefault() {
-        MaxCompletionsConstraint max = decode(MaxCompletionsConstraint.CODEC, "{\"Count\": 2}");
+    void everyStateCountsByDefault() {
+        MaxQuestsConstraint max = decode(MaxQuestsConstraint.CODEC, "{\"Count\": 3}");
+        QuestTally tally = withRunning(QuestCompletions.NONE.record(QuestState.FAILED, null, null).record(QuestState.ABANDONED, null, null), 1);
+
+        assertEquals(0, max.getRemaining(tally));
+        assertFalse(max.allowsAssignment(request(tally, ENDED)));
+    }
+
+    @Test
+    void successesAloneMakeANumberOfWins() {
+        MaxQuestsConstraint max = decode(MaxQuestsConstraint.CODEC, "{\"Count\": 2, \"States\": [\"Successful\"]}");
         QuestCompletions completions = QuestCompletions.NONE
             .record(QuestState.SUCCESSFUL, null, null)
             .record(QuestState.FAILED, null, null)
             .record(QuestState.ABANDONED, null, null);
 
-        assertEquals(1, max.getRemaining(tally(completions)));
-        assertTrue(max.allowsAssignment(request(completions, ENDED)));
-
-        QuestCompletions twice = completions.record(QuestState.SUCCESSFUL, null, null);
-        assertEquals(0, max.getRemaining(tally(twice)));
-        assertFalse(max.allowsAssignment(request(twice, ENDED)));
+        assertEquals(1, max.getRemaining(withRunning(completions, 1)));
+        assertFalse(max.allowsAssignment(request(completions.record(QuestState.SUCCESSFUL, null, null), ENDED)));
     }
 
     @Test
-    void theAssetCanCountOtherOutcomesToo() {
-        MaxCompletionsConstraint max = decode(MaxCompletionsConstraint.CODEC, "{\"Count\": 2, \"Outcomes\": [\"Successful\", \"Failed\", \"Abandoned\"]}");
-        QuestCompletions completions = QuestCompletions.NONE
-            .record(QuestState.FAILED, null, null)
-            .record(QuestState.ABANDONED, null, null);
+    void runningQuestsAloneMakeOneAtATime() {
+        MaxQuestsConstraint max = decode(MaxQuestsConstraint.CODEC, "{\"Count\": 1, \"States\": [\"InProgress\"]}");
+        QuestCompletions done = QuestCompletions.NONE.record(QuestState.SUCCESSFUL, null, null);
 
-        assertEquals(0, max.getRemaining(tally(completions)));
-        assertFalse(max.allowsAssignment(request(completions, ENDED)));
+        assertTrue(max.isAtOnce());
+        assertTrue(max.allowsAssignment(request(withRunning(done, 0), ENDED)));
+        assertFalse(max.allowsAssignment(request(withRunning(done, 1), ENDED)));
     }
 
     @Test
-    void countingQuestsStillRunningIsRefusedAtBoot() {
-        MaxCompletionsConstraint max = decode(MaxCompletionsConstraint.CODEC, "{\"Count\": 1, \"Outcomes\": [\"InProgress\"]}");
+    void runningOrWonKeepsAQuestFromRunningTwiceOrComingBack() {
+        MaxQuestsConstraint max = decode(MaxQuestsConstraint.CODEC, "{\"Count\": 1, \"States\": [\"InProgress\", \"Successful\"]}");
+        QuestCompletions failed = QuestCompletions.NONE.record(QuestState.FAILED, null, null);
 
-        assertNotNull(max.validate(asset()));
-        assertNull(decode(MaxCompletionsConstraint.CODEC, "{\"Count\": 1}").validate(asset()));
+        assertTrue(max.allowsAssignment(request(withRunning(failed, 0), ENDED)));
+        assertFalse(max.allowsAssignment(request(withRunning(failed, 1), ENDED)));
+        assertFalse(max.allowsAssignment(request(failed.record(QuestState.SUCCESSFUL, null, null), ENDED)));
     }
 
     @Test
-    void allowingNothingDoesNotDecode() {
-        assertNull(tryDecode(MaxCompletionsConstraint.CODEC, "{\"Count\": 0}"));
+    void allowingNothingOrCountingNothingDoesNotDecode() {
+        assertNull(tryDecode(MaxQuestsConstraint.CODEC, "{\"Count\": 0}"));
+        assertNull(tryDecode(MaxQuestsConstraint.CODEC, "{\"Count\": 1, \"States\": []}"));
+    }
+
+    /**
+     * @return the record standing, with that many quests from the asset running for the player.
+     */
+    private static QuestTally withRunning(QuestCompletions completions, int running) {
+        UUID player = UUID.randomUUID();
+        List<TestQuest> quests = new ArrayList<>();
+        for (int i = 0; i < running; i++) quests.add(questStartedAt(null).join(player));
+        return QuestTally.of(completions, player, quests);
     }
 }

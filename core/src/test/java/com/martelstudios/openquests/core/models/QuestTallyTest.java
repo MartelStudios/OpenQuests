@@ -4,7 +4,6 @@ import com.martelstudios.openquests.core.persistence.TestQuestProgression;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +23,7 @@ class QuestTallyTest {
 
         assertEquals(2, tally.count(QuestState.IN_PROGRESS));
         assertEquals(1, tally.count(QuestState.SUCCESSFUL));
-        assertEquals(3, tally.count(EnumSet.of(QuestState.IN_PROGRESS, QuestState.SUCCESSFUL)));
+        assertEquals(3, tally.count(QuestState.IN_PROGRESS, QuestState.SUCCESSFUL));
     }
 
     @Test
