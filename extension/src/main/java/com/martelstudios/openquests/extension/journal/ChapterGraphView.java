@@ -304,7 +304,7 @@ final class ChapterGraphView {
     }
 
     /**
-     * The quest's title in bold, then where the player stands and its description. Rich text is all
+     * The quest's title in bold, then where the player stands and what to do there. Rich text is all
      * a native tooltip holds, so the lines stand in for a titled panel.
      */
     @Nonnull
@@ -314,9 +314,9 @@ final class ChapterGraphView {
                                  .insert("\n")
                                  .insert(Message.translation(node.mark().getStatusKey()).color(COLOR_NEXT));
 
-        Message description = AbstractQuestProgression.descriptionOf(node.asset());
-        if (description.getMessageId() != null || (description.getRawText() != null && !description.getRawText().isEmpty())) {
-            tooltip.insert("\n").insert(description);
+        Message summary = AbstractQuestProgression.shortDescriptionOf(node.asset());
+        if (summary.getMessageId() != null || (summary.getRawText() != null && !summary.getRawText().isEmpty())) {
+            tooltip.insert("\n").insert(summary);
         }
         return tooltip;
     }

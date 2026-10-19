@@ -19,7 +19,11 @@ $C = "../../Common.ui";
 // A category's name; the page writes the colour each category asks for over this one
 @CategoryStyle = (FontSize: 11, RenderBold: true, TextColor: #d9e1ee, VerticalAlignment: Center);
 @RowStatusStyle = (FontSize: 12, RenderBold: true, TextColor: @ColorAccent, VerticalAlignment: Center, HorizontalAlignment: End);
-@RowTextStyle = (FontSize: 12, TextColor: @ColorMuted, Wrap: true);
+// What to do, brighter than the story under it: it is what the eye looks for in a list
+@RowSummaryStyle = (FontSize: 12, TextColor: #c9d4e5, Wrap: true);
+
+// The story, in italics like the lore of vanilla item descriptions
+@LoreStyle = (FontSize: 12, RenderItalics: true, TextColor: @ColorMuted, Wrap: true);
 
 // Held to one line, since a detail line is a fixed height. A long title that wrapped would spill
 // out of its row rather than push it taller.

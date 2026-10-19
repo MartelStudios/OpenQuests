@@ -95,15 +95,18 @@ public final class QuestHudRows {
     }
 
     /**
-     * Adds the description under the title, for an asset that asked for it. Left to the caller
-     * rather than folded into {@code appendRow}, since a type drawing its own document decides
-     * where the line goes.
+     * Adds the short description under the title, for an asset that asked for it: the HUD says what
+     * to do, the journal tells the story. Left to the caller, since a type drawing its own document
+     * decides where the line goes.
      */
     public static void appendDescription(@Nonnull QuestHudContext context, @Nonnull String rowSelector, @Nonnull AbstractQuestProgression<?> quest) {
         if (!quest.hasTag(DESCRIPTION_TAG)) return;
 
+        Message summary = quest.getShortDescription();
+        if (summary.getMessageId() == null && (summary.getRawText() == null || summary.getRawText().isEmpty())) return;
+
         context.getBuilder()
-               .set(rowSelector + "#Description.TextSpans", quest.getDescription())
+               .set(rowSelector + "#Description.TextSpans", summary)
                .set(rowSelector + "#Description.Visible", true);
     }
 }

@@ -44,6 +44,8 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
                                                                           .add()
                                                                           .append(new KeyedCodec<>("DescriptionKey", Codec.STRING), (asset, key) -> asset.descriptionKey = key, asset -> asset.descriptionKey)
                                                                           .add()
+                                                                          .append(new KeyedCodec<>("ShortDescriptionKey", Codec.STRING), (asset, key) -> asset.shortDescriptionKey = key, asset -> asset.shortDescriptionKey)
+                                                                          .add()
                                                                           .append(new KeyedCodec<>("StopOnComplete", Codec.BOOLEAN), (asset, value) -> asset.stopOnComplete = value, asset -> Boolean.valueOf(asset.stopOnComplete))
                                                                           .add()
                                                                           .append(new KeyedCodec<>("PersistProgression", Codec.BOOLEAN), (asset, value) -> asset.persistProgression = value, asset -> Boolean.valueOf(asset.persistProgression))
@@ -91,6 +93,7 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
     protected AssetExtraInfo.Data data;
     protected String titleKey;
     protected String descriptionKey;
+    protected String shortDescriptionKey;
     protected boolean stopOnComplete = true;
     protected boolean persistProgression = true;
     protected boolean persistHistory = true;
@@ -139,6 +142,15 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
     @Nullable
     public String getDescriptionKey() {
         return descriptionKey;
+    }
+
+    /**
+     * @return the translation key of the line saying concretely what to do, or {@code null} when the
+     * asset leaves it to the type. The description is then free to tell the story.
+     */
+    @Nullable
+    public String getShortDescriptionKey() {
+        return shortDescriptionKey;
     }
 
     /**
