@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.journal.navigation;
 
+import com.martelstudios.opennavigation.routers.RouterId;
 import com.martelstudios.opennavigation.routes.Route;
 import com.martelstudios.openquests.extension.journal.navigation.routes.JournalRoute;
 import com.martelstudios.openquests.extension.journal.navigation.routes.QuestListRoute;
@@ -19,6 +20,9 @@ public final class JournalRoutes {
 
     public static final String JOURNAL = "journal";
     public static final String QUEST = "quest";
+
+    /** The journal's own navigation, kept between two openings so it reopens where it was left. */
+    public static final RouterId ROUTER = new RouterId(NAMESPACE, JOURNAL);
 
     /** The table of contents: chapter groups, their chapters and the quests of the open one. */
     public static final String TAB_CHAPTERS = "journal/chapters";
