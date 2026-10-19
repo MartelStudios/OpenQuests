@@ -6,7 +6,6 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
@@ -52,12 +51,10 @@ public abstract class QuestConstraint {
     }
 
     /**
-     * Whether a player may be handed a new quest from this asset, given how its quests ended for
-     * them so far. Asked wherever a quest is handed out, never as a chain hands out its steps.
-     *
-     * @param now the moment of asking, handed in so every constraint judges the same instant.
+     * Whether a player may be handed a quest from this asset, a new one or a shared one to join.
+     * Asked wherever a quest is handed out, never as a chain hands out its steps.
      */
-    public boolean allowsAssignment(@Nonnull OpenQuestAsset asset, @Nonnull UUID playerId, @Nonnull QuestCompletions completions, @Nonnull Instant now) {
+    public boolean allowsAssignment(@Nonnull AssignmentRequest request) {
         return true;
     }
 

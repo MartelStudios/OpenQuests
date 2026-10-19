@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.asset;
+import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.request;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.decode;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.questStartedAt;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.tryDecode;
@@ -70,7 +71,7 @@ class TimeConstraintsTest {
         DeadlineConstraint constraint = decode(DeadlineConstraint.CODEC, "{\"At\": \"2026-12-31T23:00:00Z\"}");
         UUID playerId = UUID.randomUUID();
 
-        assertTrue(constraint.allowsAssignment(asset(), playerId, QuestCompletions.NONE, Instant.parse("2026-12-31T22:59:59Z")));
-        assertFalse(constraint.allowsAssignment(asset(), playerId, QuestCompletions.NONE, Instant.parse("2026-12-31T23:00:00Z")));
+        assertTrue(constraint.allowsAssignment(request(QuestCompletions.NONE, Instant.parse("2026-12-31T22:59:59Z"))));
+        assertFalse(constraint.allowsAssignment(request(QuestCompletions.NONE, Instant.parse("2026-12-31T23:00:00Z"))));
     }
 }

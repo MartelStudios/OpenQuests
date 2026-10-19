@@ -6,8 +6,9 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
+import com.martelstudios.openquests.core.constraints.AssignmentRequest;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.models.QuestCompletions;
+import com.martelstudios.openquests.core.models.QuestTally;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,18 +40,18 @@ public class CooldownConstraint extends QuestConstraint {
     protected CooldownConstraint() {}
 
     @Override
-    public boolean allowsAssignment(@Nonnull OpenQuestAsset asset, @Nonnull UUID playerId, @Nonnull QuestCompletions completions, @Nonnull Instant now) {
-        Instant availableAt = getAvailableAt(completions);
-        return availableAt == null || !now.isBefore(availableAt);
+    public boolean allowsAssignment(@Nonnull AssignmentRequest request) {
+        Instant availableAt = getAvailableAt(request.tally());
+        return availableAt == null || !request.getNow().isBefore(availableAt);
     }
 
     /**
      * @return when the player may be handed the next one, {@code null} if they may right away
-     * because none ever ended for them.
+     * because none ever ended for them, or none ever started when counted from the start.
      */
     @Nullable
-    public Instant getAvailableAt(@Nonnull QuestCompletions completions) {
-        Instant last = from == From.START ? completions.getLastStartedAt() : completions.getLastCompletedAt();
+    public Instant getAvailableAt(@Nonnull QuestTally tally) {
+        Instant last = from == From.START ? tally.getLastStartedAt() : tally.getLastCompletedAt();
         return last == null ? null : last.plus(duration);
     }
 

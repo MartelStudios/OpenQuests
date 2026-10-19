@@ -9,6 +9,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.asset;
+import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.request;
+import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.tally;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.decode;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.tryDecode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,8 +29,8 @@ class RepeatConstraintsTest {
     void aPlayerWhoNeverEndedOneMayTakeItRightAway() {
         CooldownConstraint cooldown = decode(CooldownConstraint.CODEC, "{\"Seconds\": 86400}");
 
-        assertNull(cooldown.getAvailableAt(QuestCompletions.NONE));
-        assertTrue(cooldown.allowsAssignment(asset(), PLAYER, QuestCompletions.NONE, STARTED));
+        assertNull(cooldown.getAvailableAt(tally(QuestCompletions.NONE)));
+        assertTrue(cooldown.allowsAssignment(request(QuestCompletions.NONE, STARTED)));
     }
 
     @Test
@@ -37,9 +39,9 @@ class RepeatConstraintsTest {
         QuestCompletions once = QuestCompletions.NONE.record(QuestState.SUCCESSFUL, STARTED, ENDED);
 
         assertEquals(Duration.ofDays(1), cooldown.getDuration());
-        assertEquals(ENDED.plus(Duration.ofDays(1)), cooldown.getAvailableAt(once));
-        assertFalse(cooldown.allowsAssignment(asset(), PLAYER, once, ENDED.plus(Duration.ofHours(23))));
-        assertTrue(cooldown.allowsAssignment(asset(), PLAYER, once, ENDED.plus(Duration.ofDays(1))));
+        assertEquals(ENDED.plus(Duration.ofDays(1)), cooldown.getAvailableAt(tally(once)));
+        assertFalse(cooldown.allowsAssignment(request(once, ENDED.plus(Duration.ofHours(23)))));
+        assertTrue(cooldown.allowsAssignment(request(once, ENDED.plus(Duration.ofDays(1)))));
     }
 
     @Test
@@ -47,7 +49,7 @@ class RepeatConstraintsTest {
         CooldownConstraint cooldown = decode(CooldownConstraint.CODEC, "{\"Seconds\": 3600}");
         QuestCompletions abandoned = QuestCompletions.NONE.record(QuestState.ABANDONED, STARTED, ENDED);
 
-        assertFalse(cooldown.allowsAssignment(asset(), PLAYER, abandoned, ENDED.plus(Duration.ofMinutes(30))));
+        assertFalse(cooldown.allowsAssignment(request(abandoned, ENDED.plus(Duration.ofMinutes(30)))));
     }
 
     @Test
@@ -55,7 +57,7 @@ class RepeatConstraintsTest {
         CooldownConstraint cooldown = decode(CooldownConstraint.CODEC, "{\"Seconds\": 86400, \"From\": \"Start\"}");
         QuestCompletions once = QuestCompletions.NONE.record(QuestState.SUCCESSFUL, STARTED, ENDED);
 
-        assertEquals(STARTED.plus(Duration.ofDays(1)), cooldown.getAvailableAt(once));
+        assertEquals(STARTED.plus(Duration.ofDays(1)), cooldown.getAvailableAt(tally(once)));
     }
 
     @Test
@@ -71,12 +73,12 @@ class RepeatConstraintsTest {
             .record(QuestState.FAILED, null, null)
             .record(QuestState.ABANDONED, null, null);
 
-        assertEquals(1, max.getRemaining(completions));
-        assertTrue(max.allowsAssignment(asset(), PLAYER, completions, ENDED));
+        assertEquals(1, max.getRemaining(tally(completions)));
+        assertTrue(max.allowsAssignment(request(completions, ENDED)));
 
         QuestCompletions twice = completions.record(QuestState.SUCCESSFUL, null, null);
-        assertEquals(0, max.getRemaining(twice));
-        assertFalse(max.allowsAssignment(asset(), PLAYER, twice, ENDED));
+        assertEquals(0, max.getRemaining(tally(twice)));
+        assertFalse(max.allowsAssignment(request(twice, ENDED)));
     }
 
     @Test
@@ -86,8 +88,8 @@ class RepeatConstraintsTest {
             .record(QuestState.FAILED, null, null)
             .record(QuestState.ABANDONED, null, null);
 
-        assertEquals(0, max.getRemaining(completions));
-        assertFalse(max.allowsAssignment(asset(), PLAYER, completions, ENDED));
+        assertEquals(0, max.getRemaining(tally(completions)));
+        assertFalse(max.allowsAssignment(request(completions, ENDED)));
     }
 
     @Test

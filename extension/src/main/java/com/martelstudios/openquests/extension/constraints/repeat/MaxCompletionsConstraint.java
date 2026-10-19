@@ -6,9 +6,10 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
+import com.martelstudios.openquests.core.constraints.AssignmentRequest;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.models.QuestCompletions;
+import com.martelstudios.openquests.core.models.QuestTally;
 import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
@@ -42,8 +43,8 @@ public class MaxCompletionsConstraint extends QuestConstraint {
     protected MaxCompletionsConstraint() {}
 
     @Override
-    public boolean allowsAssignment(@Nonnull OpenQuestAsset asset, @Nonnull UUID playerId, @Nonnull QuestCompletions completions, @Nonnull Instant now) {
-        return getRemaining(completions) > 0;
+    public boolean allowsAssignment(@Nonnull AssignmentRequest request) {
+        return getRemaining(request.tally()) > 0;
     }
 
     @Nullable
@@ -58,7 +59,7 @@ public class MaxCompletionsConstraint extends QuestConstraint {
     /**
      * @return how many more the player may still end that way, never below zero.
      */
-    public int getRemaining(@Nonnull QuestCompletions completions) {
+    public int getRemaining(@Nonnull QuestTally completions) {
         int counted = 0;
         for (QuestState outcome : outcomes) {
             counted += completions.count(outcome);

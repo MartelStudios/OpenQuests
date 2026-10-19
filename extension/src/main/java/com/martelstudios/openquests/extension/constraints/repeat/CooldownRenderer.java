@@ -33,7 +33,7 @@ public final class CooldownRenderer implements QuestConstraintRenderer {
         Message label = Message.translation("openquests.page.constraint.cooldown").param("duration", QuestPageRows.formatDuration(cooldown.getDuration()));
 
         Instant now = Instant.now();
-        Instant availableAt = cooldown.getAvailableAt(QuestPlayerStateService.get().getCompletions(context.getViewer(), asset.getId()));
+        Instant availableAt = cooldown.getAvailableAt(QuestPlayerStateService.get().getTally(context.getViewer(), asset.getId()));
         if (availableAt == null || !now.isBefore(availableAt)) return Line.of(label);
 
         return Line.counting(label, new QuestCountdown(availableAt, "openquests.page.constraint.cooldown.wait"));

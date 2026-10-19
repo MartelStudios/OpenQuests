@@ -26,7 +26,7 @@ public final class MaxCompletionsRenderer implements QuestConstraintRenderer {
     @Override
     public Line describe(@Nonnull QuestPageContext context, @Nonnull QuestConstraint constraint, @Nonnull OpenQuestAsset asset, @Nullable AbstractQuestProgression<?> quest) {
         MaxCompletionsConstraint max = (MaxCompletionsConstraint) constraint;
-        int used = max.getCount() - max.getRemaining(QuestPlayerStateService.get().getCompletions(context.getViewer(), asset.getId()));
+        int used = max.getCount() - max.getRemaining(QuestPlayerStateService.get().getTally(context.getViewer(), asset.getId()));
 
         return new Line(Message.translation("openquests.page.constraint.max-completions").param("count", max.getCount()),
                         Message.raw(used + "/" + max.getCount()));

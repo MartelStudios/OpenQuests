@@ -697,7 +697,7 @@ A constraint speaks to the moments of a quest it is about, and has no objection 
 
 | Moment | Hook | Effect |
 | --- | --- | --- |
-| Handing out | `allowsAssignment(asset, playerId, completions, now)` | A player is handed a new quest from the asset only if every constraint agrees, judging from how its quests ended for them so far. |
+| Handing out | `allowsAssignment(request)` | A player is handed a quest from the asset, a new one or a shared one to join, only if every constraint agrees. The `AssignmentRequest` names the asset, the player, the moment and the quest joined, and tallies where the player stands with any asset: `tally()` for this one, `tally(assetId)` for another, running quests included. |
 | Progress | `allowsProgress(quest, actorId)` | A player's action counts only if every constraint agrees. Refused, it leaves no trace. |
 | Running out | `getDeadline(quest)`, `getExpiredState()` | A quest still running ends on the earliest deadline its constraints set, on the outcome of the constraint that set it. |
 
