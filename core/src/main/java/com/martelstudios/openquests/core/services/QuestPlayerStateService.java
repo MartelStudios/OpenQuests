@@ -64,7 +64,9 @@ public class QuestPlayerStateService {
         plugin.getEventRegistry().registerGlobal(EventPriority.FIRST, PlayerConnectEvent.class, this::handlePlayerConnectEvent);
         // EventPriority.LAST, so whatever another listener does on the way out is written too
         plugin.getEventRegistry().registerGlobal(EventPriority.LAST, PlayerDisconnectEvent.class, this::handlePlayerDisconnectEvent);
-        plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+        // Ahead of EventPriority.FIRST, where rewards are paid: a quest they hand out, the same one's
+        // retry included, is judged on a record that already counts this end
+        plugin.getEventRegistry().registerGlobal((short) (Short.MIN_VALUE + 1), QuestCompletedEvent.class, this::handleQuestCompletedEvent);
     }
 
     public static QuestPlayerStateService get() {
