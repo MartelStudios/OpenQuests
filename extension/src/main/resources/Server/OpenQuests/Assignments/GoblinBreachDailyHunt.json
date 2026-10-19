@@ -6,12 +6,12 @@
   },
   "Scope": {
     "Type": "Worlds",
-    "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*"
+    "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
   },
   "Repeat": {
     "Type": "Replace"
   },
   "QuestAssetIds": [
-    "GoblinLairDailyHunt"
+    "GoblinBreachDailyHunt"
   ]
 }

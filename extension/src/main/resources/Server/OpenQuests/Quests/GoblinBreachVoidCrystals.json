@@ -1,0 +1,22 @@
+{
+  "Type": "Gather",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Crystal_Void.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-void-crystals.title",
+  "DescriptionKey": "quest.goblin-breach-void-crystals.description",
+  "TargetQuantity": 6,
+  "ItemToGather": {
+    "ItemId": "Ingredient_Crystal_Void"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachGadgets"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

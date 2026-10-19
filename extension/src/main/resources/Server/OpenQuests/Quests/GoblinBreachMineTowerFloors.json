@@ -1,0 +1,75 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Furniture_Goblin_Ladder.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-mine-tower-floors.title",
+  "DescriptionKey": "quest.goblin-breach-mine-tower-floors.description",
+  "QuestAssetIds": [
+    {
+      "Type": "TriggerVolume",
+      "TargetQuantity": 1,
+      "VolumeNamePattern": "(g_tower_a|g_tower_[b-e]1)( \\(\\d+\\))?",
+      "TriggerEventType": "ENTER",
+      "TitleKey": "quest.goblin-breach-mine-tower-floors-floor-1.title",
+      "AnnounceOutcome": false,
+      "SuccessfulRewards": [
+        {
+          "Type": "Item",
+          "ItemId": "Ingredient_Scraps",
+          "Quantity": 10,
+          "AutoClaim": false
+        }
+      ]
+    },
+    {
+      "Type": "TriggerVolume",
+      "TargetQuantity": 1,
+      "VolumeNamePattern": "(e_tower_a2|g_tower_[b-e]2)( \\(\\d+\\))?",
+      "TriggerEventType": "ENTER",
+      "TitleKey": "quest.goblin-breach-mine-tower-floors-floor-2.title",
+      "AnnounceOutcome": false,
+      "SuccessfulRewards": [
+        {
+          "Type": "Item",
+          "ItemId": "Weapon_Arrow_Crude",
+          "Quantity": 10,
+          "AutoClaim": false
+        }
+      ]
+    },
+    {
+      "Type": "TriggerVolume",
+      "TargetQuantity": 1,
+      "VolumeNamePattern": "(g_tower_[a-e]3)( \\(\\d+\\))?",
+      "TriggerEventType": "ENTER",
+      "TitleKey": "quest.goblin-breach-mine-tower-floors-floor-3.title",
+      "AnnounceOutcome": false,
+      "SuccessfulRewards": [
+        {
+          "Type": "Item",
+          "ItemId": "Ingredient_Powder_Boom",
+          "Quantity": 4,
+          "AutoClaim": false
+        }
+      ]
+    }
+  ],
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachMineTowerTop"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

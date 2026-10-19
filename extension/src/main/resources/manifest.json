@@ -14,6 +14,7 @@
         "Hytale:AssetModule": "*",
         "Hytale:NPC": "*",
         "Hytale:TagSet": "*",
+        "Hytale:TriggerVolumes": "*",
         "MartelStudios:OpenQuestsCore": "*",
         "MartelStudios:OpenNavigation": "*"
     },

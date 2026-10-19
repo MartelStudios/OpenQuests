@@ -1,0 +1,29 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Crawler_Void.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-void-spawn.title",
+  "DescriptionKey": "quest.goblin-breach-void-spawn.description",
+  "TargetQuantity": 12,
+  "NpcGroupId": "Void",
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachAnomalies",
+        "GoblinBreachVoidTowerTop",
+        "GoblinBreachEntombed"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

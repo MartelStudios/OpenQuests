@@ -1,0 +1,32 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Spider_Cave.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-spiders.title",
+  "DescriptionKey": "quest.goblin-breach-spiders.description",
+  "TargetQuantity": 8,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Spider_Cave*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachBurners",
+        "GoblinBreachSilk"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

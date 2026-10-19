@@ -1,0 +1,75 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Furniture_Goblin_Ladder.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-crypt-tower-floors.title",
+  "DescriptionKey": "quest.goblin-breach-crypt-tower-floors.description",
+  "QuestAssetIds": [
+    {
+      "Type": "TriggerVolume",
+      "TargetQuantity": 1,
+      "VolumeNamePattern": "(enkindled_signal_[a-e]1)( \\(\\d+\\))?",
+      "TriggerEventType": "ENTER",
+      "TitleKey": "quest.goblin-breach-crypt-tower-floors-floor-1.title",
+      "AnnounceOutcome": false,
+      "SuccessfulRewards": [
+        {
+          "Type": "Item",
+          "ItemId": "Potion_Health_Lesser",
+          "Quantity": 2,
+          "AutoClaim": false
+        }
+      ]
+    },
+    {
+      "Type": "TriggerVolume",
+      "TargetQuantity": 1,
+      "VolumeNamePattern": "(enkindled_signal_[a-e]2|enkindled_trigger_d2)( \\(\\d+\\))?",
+      "TriggerEventType": "ENTER",
+      "TitleKey": "quest.goblin-breach-crypt-tower-floors-floor-2.title",
+      "AnnounceOutcome": false,
+      "SuccessfulRewards": [
+        {
+          "Type": "Item",
+          "ItemId": "Ingredient_Bar_Iron",
+          "Quantity": 3,
+          "AutoClaim": false
+        }
+      ]
+    },
+    {
+      "Type": "TriggerVolume",
+      "TargetQuantity": 1,
+      "VolumeNamePattern": "(enkindled_signal_[a-e]3)( \\(\\d+\\))?",
+      "TriggerEventType": "ENTER",
+      "TitleKey": "quest.goblin-breach-crypt-tower-floors-floor-3.title",
+      "AnnounceOutcome": false,
+      "SuccessfulRewards": [
+        {
+          "Type": "Item",
+          "ItemId": "Ingredient_Rune_Shard",
+          "Quantity": 1,
+          "AutoClaim": false
+        }
+      ]
+    }
+  ],
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachCryptTowerTop"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

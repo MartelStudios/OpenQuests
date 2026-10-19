@@ -1,0 +1,22 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Tool_Hookshot.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-hookshot.title",
+  "DescriptionKey": "quest.goblin-breach-hookshot.description",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Tool_Hookshot"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachVoidtaken"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

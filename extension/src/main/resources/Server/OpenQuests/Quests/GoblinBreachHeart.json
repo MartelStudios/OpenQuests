@@ -1,0 +1,30 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Void_Anomaly_Crystal.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-heart.title",
+  "DescriptionKey": "quest.goblin-breach-heart.description",
+  "TargetQuantity": 1,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Void_Anomaly_Crystal_Keystone"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Voidheart",
+      "Quantity": 2,
+      "AutoClaim": false
+    }
+  ]
+}

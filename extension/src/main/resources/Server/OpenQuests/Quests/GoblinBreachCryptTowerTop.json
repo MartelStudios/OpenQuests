@@ -1,0 +1,27 @@
+{
+  "Type": "TriggerVolume",
+  "Icon": "Icons/ItemsGenerated/Furniture_Temple_Emerald_Statue_Head.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-crypt-tower-top.title",
+  "DescriptionKey": "quest.goblin-breach-crypt-tower-top.description",
+  "TargetQuantity": 1,
+  "VolumeNamePattern": "(enkindled_trigger_\\d)( \\(\\d+\\))?",
+  "TriggerEventType": "ENTER",
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Enkindled_Resource",
+      "Quantity": 2,
+      "AutoClaim": false
+    }
+  ]
+}

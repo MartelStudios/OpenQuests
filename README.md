@@ -466,6 +466,7 @@ already defines, such as `Flowers` or `Meats`. A block is matched through the it
 | `KillPlayer` | Killing players, optionally a designated one. |
 | `ReachLocation` | Entering a radius around a position. |
 | `EnterWorld` | Entering a world whose name matches a regular expression. |
+| `TriggerVolume` | A `TriggerEventType` on trigger volumes whose whole name matches `VolumeNamePattern`, a number of times. Volumes pasted with a prefab keep their name, sometimes with a suffix, so this finds a spot in a generated world: `"(trash_pile_trigger\|enkindled_trigger_\|void_tower_trigger).*"` is the top of any breach watchtower. |
 | `Walk` | Covering a distance at the slow pace, the one the player holds a key for. |
 | `Run` | Covering a distance at the default pace. |
 | `Sprint` | Covering a distance at the fast pace. |
@@ -473,6 +474,17 @@ already defines, such as `Flowers` or `Meats`. A block is matched through the it
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Between `Min` (1 by default) and `Max` (no limit by default) of the player's quests from `QuestAssetId` standing in the listed `States` (every state by default), running ones included: the same four fields as the `RequiresQuest` constraint. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation (`"Min": 0, "Max": 0` for none). |
 | `NoOp` | Nothing on its own: a command, a reward, a constraint or a plugin ends it. |
+
+`TriggerVolume` counts for the player the event names, and only two event types ever reach it:
+
+| `TriggerEventType` | Counts |
+| --- | --- |
+| `ENTER` (default) | Once the volume accepts the player: its own conditions must pass, and a delayed volume counts when its delay ends. |
+| `EXIT` | When the player leaves, and also when the volume is disabled or its chunk unloads with them inside, whether or not their entry was accepted. |
+
+The other types (`TICK`, `TAG_ADDED`, `TAG_REMOVED`, `BLOCK_PLACED`, `BLOCK_BROKEN`, `BLOCK_USED`,
+`SIGNAL_RECEIVED`, `ENTITY_DIED`, `VOLUME_CREATE`) only drive the volume's own effects and never
+leave the trigger volume plugin, so an asset naming one is refused at boot.
 
 `Walk`, `Run` and `Sprint` count metres. With `"Measure": "Seconds"` they count the seconds spent moving at
 their pace instead, added up across every stretch: `TargetQuantity` is then a duration.

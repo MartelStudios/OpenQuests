@@ -1,0 +1,22 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Weapon_Bangstick.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-bangstick.title",
+  "DescriptionKey": "quest.goblin-breach-bangstick.description",
+  "TargetQuantity": 2,
+  "ItemToCraft": {
+    "ItemId": "Weapon_Bangstick"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachVoidtaken"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

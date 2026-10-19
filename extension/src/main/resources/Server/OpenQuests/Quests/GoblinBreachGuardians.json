@@ -1,0 +1,31 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Goblin_Guardian.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-guardians.title",
+  "DescriptionKey": "quest.goblin-breach-guardians.description",
+  "TargetQuantity": 3,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "*Goblin_Guardian*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachGlutton"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

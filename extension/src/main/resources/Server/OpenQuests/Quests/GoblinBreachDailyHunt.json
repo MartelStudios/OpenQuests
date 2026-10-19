@@ -1,0 +1,44 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Goblin_Scrapper.png",
+  "Categories": [
+    "Dungeon",
+    "Event"
+  ],
+  "TitleKey": "quest.goblin-breach-daily-hunt.title",
+  "DescriptionKey": "quest.goblin-breach-daily-hunt.description",
+  "TargetQuantity": 50,
+  "NpcGroupId": "Goblin",
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 6,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Crystal_Void",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 3,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Gadget_Assembly",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 1,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "PortalKey_Goblin_Breach",
+            "Quantity": 1
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "Trigger": {
+    "Type": "PlayerEnterWorld",
+    "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+  },
+  "Scope": {
+    "Type": "Player"
+  },
+  "QuestAssetIds": [
+    "GoblinBreachIntruders"
+  ]
+}

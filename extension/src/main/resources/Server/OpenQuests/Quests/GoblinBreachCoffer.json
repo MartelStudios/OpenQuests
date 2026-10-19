@@ -1,0 +1,22 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ItemsGenerated/Furniture_Goblin_Coffer.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-coffer.title",
+  "DescriptionKey": "quest.goblin-breach-coffer.description",
+  "TargetQuantity": 12,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Coffer_Goblin_*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ]
+}

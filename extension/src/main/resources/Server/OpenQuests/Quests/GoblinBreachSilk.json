@@ -1,0 +1,22 @@
+{
+  "Type": "Gather",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Spider_Silk.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-silk.title",
+  "DescriptionKey": "quest.goblin-breach-silk.description",
+  "TargetQuantity": 12,
+  "ItemToGather": {
+    "ItemId": "Ingredient_Spider_Silk"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachScrapHook"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

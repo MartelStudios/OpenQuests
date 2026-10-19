@@ -1,0 +1,40 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Bear_Voidtaken.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-voidtaken.title",
+  "DescriptionKey": "quest.goblin-breach-voidtaken.description",
+  "TargetQuantity": 1,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Bear_Voidtaken"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    },
+    {
+      "Type": "MaxQuests",
+      "Count": 1,
+      "States": [
+        "InProgress",
+        "Successful"
+      ]
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachRocketBoots",
+        "GoblinBreachGlider"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

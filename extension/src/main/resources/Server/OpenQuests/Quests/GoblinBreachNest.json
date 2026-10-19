@@ -1,0 +1,40 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Spider_Cave.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-nest.title",
+  "DescriptionKey": "quest.goblin-breach-nest.description",
+  "TargetQuantity": 25,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Spider_Cave*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*",
+      "OnLeave": "Fail"
+    }
+  ],
+  "FailedRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachNest"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Spider_Silk",
+      "Quantity": 10,
+      "AutoClaim": false
+    }
+  ]
+}

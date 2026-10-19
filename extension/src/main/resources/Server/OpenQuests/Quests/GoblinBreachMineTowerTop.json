@@ -1,0 +1,27 @@
+{
+  "Type": "TriggerVolume",
+  "Icon": "Icons/ModelsGenerated/Goblin_Turret.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-mine-tower-top.title",
+  "DescriptionKey": "quest.goblin-breach-mine-tower-top.description",
+  "TargetQuantity": 1,
+  "VolumeNamePattern": "(trash_pile_trigger.*)( \\(\\d+\\))?",
+  "TriggerEventType": "ENTER",
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Iron",
+      "Quantity": 5,
+      "AutoClaim": false
+    }
+  ]
+}

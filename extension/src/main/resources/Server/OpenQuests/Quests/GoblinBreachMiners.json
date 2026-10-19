@@ -1,0 +1,33 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Goblin_Miner.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-miners.title",
+  "DescriptionKey": "quest.goblin-breach-miners.description",
+  "TargetQuantity": 5,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "*Goblin_Miner*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachGuardians",
+        "GoblinBreachLobbers",
+        "GoblinBreachMineTowerFloors"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

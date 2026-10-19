@@ -17,6 +17,7 @@ import com.martelstudios.openquests.extension.quests.consumeitem.ConsumeItemFeat
 import com.martelstudios.openquests.extension.quests.craft.CraftFeature;
 import com.martelstudios.openquests.extension.quests.dropitem.DropItemFeature;
 import com.martelstudios.openquests.extension.quests.enterworld.EnterWorldFeature;
+import com.martelstudios.openquests.extension.quests.triggervolume.TriggerVolumeFeature;
 import com.martelstudios.openquests.extension.quests.gather.GatherFeature;
 import com.martelstudios.openquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
 import com.martelstudios.openquests.extension.quests.kill.KillFeature;
@@ -62,6 +63,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         PickupItemFeature.register(this);
         ReachLocationFeature.register(this);
         EnterWorldFeature.register(this);
+        TriggerVolumeFeature.register(this);
         CompositeFeature.register(this);
         HudFeature.register(this);
         JournalFeature.register(this);

@@ -1,0 +1,22 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Scrap_Hook.png",
+  "Categories": [
+    "Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-scrap-hook.title",
+  "DescriptionKey": "quest.goblin-breach-scrap-hook.description",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Scrap_Hook"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "GoblinBreachHookshot"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}
