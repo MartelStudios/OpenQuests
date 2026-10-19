@@ -12,8 +12,12 @@
   },
   "Constraints": [
     {
-      "Type": "MaxCompletions",
-      "Count": 1
+      "Type": "MaxQuests",
+      "Count": 1,
+      "States": [
+        "InProgress",
+        "Successful"
+      ]
     }
   ]
 }
