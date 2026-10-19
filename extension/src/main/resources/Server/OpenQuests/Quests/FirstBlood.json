@@ -1,5 +1,6 @@
 {
   "Type": "KillPlayer",
+  "Icon": "Icons/ItemsGenerated/Weapon_Sword_Iron.png",
   "Categories": ["Achievement"],
   "TitleKey": "quest.first-blood.title",
   "DescriptionKey": "quest.first-blood.description",

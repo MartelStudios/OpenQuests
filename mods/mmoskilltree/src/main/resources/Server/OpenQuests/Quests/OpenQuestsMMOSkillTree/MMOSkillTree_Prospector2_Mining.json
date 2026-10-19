@@ -1,5 +1,6 @@
 {
   "Type": "MMOSkillTreeReachLevel",
+  "Icon": "Icons/ItemsGenerated/Ore_Copper.png",
   "Categories": ["MMOSkillTree"],
   "Skill": "MINING",
   "TargetQuantity": 5,

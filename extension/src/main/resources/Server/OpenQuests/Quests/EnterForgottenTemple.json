@@ -1,5 +1,6 @@
 {
   "Type": "EnterWorld",
+  "Icon": "Icons/ItemsGenerated/Furniture_Temple_Emerald_Door.png",
   "Categories": ["Temple"],
   "TitleKey": "quest.enter-forgotten-temple.title",
   "DescriptionKey": "quest.enter-forgotten-temple.description",

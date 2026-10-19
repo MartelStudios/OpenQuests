@@ -1,5 +1,6 @@
 {
   "Type": "Jump",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Feathers_Light.png",
   "Categories": ["Achievement"],
   "TitleKey": "quest.jump-novice.title",
   "DescriptionKey": "quest.jump-novice.description",

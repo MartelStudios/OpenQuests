@@ -1,5 +1,6 @@
 {
   "Type": "Walk",
+  "Icon": "Icons/CraftingCategories/Armory/LeatherFeet.png",
   "Categories": ["Achievement"],
   "TitleKey": "quest.silent-step.title",
   "DescriptionKey": "quest.silent-step.description",

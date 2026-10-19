@@ -1,5 +1,6 @@
 {
   "Type": "MMOSkillTreeAbilityCast",
+  "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Iron.png",
   "Categories": ["MMOSkillTree"],
   "Skill": "MINING",
   "TargetQuantity": 5,

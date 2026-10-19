@@ -1,5 +1,6 @@
 {
   "Type": "DropItem",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Life_Essence.png",
   "Categories": ["Temple"],
   "TitleKey": "quest.temple-offering.title",
   "DescriptionKey": "quest.temple-offering.description",

@@ -1,5 +1,6 @@
 {
   "Type": "UseEntity",
+  "Icon": "Icons/ModelsGenerated/Kweebec_Rootling.png",
   "Categories": ["Temple"],
   "TitleKey": "quest.talk-merchant.title",
   "DescriptionKey": "quest.talk-merchant.description",

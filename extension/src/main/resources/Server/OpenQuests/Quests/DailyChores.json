@@ -1,5 +1,6 @@
 {
   "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Plant_Fruit_Berries_Red.png",
   "Categories": ["Chores"],
   "TitleKey": "quest.daily-chores.title",
   "DescriptionKey": "quest.daily-chores.description",

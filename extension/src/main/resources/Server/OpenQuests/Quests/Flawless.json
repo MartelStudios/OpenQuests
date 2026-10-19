@@ -1,5 +1,6 @@
 {
   "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Rock_Gem_Diamond.png",
   "Categories": ["Achievement", "Temple"],
   "TitleKey": "quest.flawless.title",
   "DescriptionKey": "quest.flawless.description",

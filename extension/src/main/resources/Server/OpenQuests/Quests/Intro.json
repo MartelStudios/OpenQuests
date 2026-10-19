@@ -1,5 +1,6 @@
 {
   "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Stick.png",
   "Categories": ["Tutorial"],
   "PersistChildrenHistory": true,
   "TitleKey": "quest.intro.title",

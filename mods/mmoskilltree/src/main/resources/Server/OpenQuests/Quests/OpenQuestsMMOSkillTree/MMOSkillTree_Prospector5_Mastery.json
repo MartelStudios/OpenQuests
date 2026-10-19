@@ -1,5 +1,6 @@
 {
   "Type": "MMOSkillTreeGainXp",
+  "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Mithril.png",
   "Categories": ["MMOSkillTree"],
   "Skill": "MINING",
   "TargetQuantity": 5000,

@@ -1,5 +1,6 @@
 {
   "Type": "Jump",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Feathers_Blue.png",
   "Categories": ["Achievement"],
   "Visibility": "WhenStarted",
   "TitleKey": "quest.jump-adept.title",

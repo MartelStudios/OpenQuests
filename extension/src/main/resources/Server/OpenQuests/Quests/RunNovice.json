@@ -1,5 +1,6 @@
 {
   "Type": "Run",
+  "Icon": "Icons/ItemsGenerated/Armor_Leather_Light_Legs.png",
   "Categories": ["Achievement"],
   "TitleKey": "quest.run-novice.title",
   "DescriptionKey": "quest.run-novice.description",
