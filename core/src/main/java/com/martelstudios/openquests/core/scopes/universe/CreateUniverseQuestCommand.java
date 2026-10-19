@@ -9,12 +9,12 @@ import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
 
-import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes.STRING;
+import static com.martelstudios.openquests.core.commands.OpenQuestArgTypes.QUEST_ASSET;
 
 public class CreateUniverseQuestCommand extends CommandBase {
 
     @Nonnull
-    private final RequiredArg<String> assetIdArg = withRequiredArg("assetId", "server.commands.openquests.quest.create.assetId.desc", STRING);
+    private final RequiredArg<OpenQuestAsset> assetArg = withRequiredArg("assetId", "server.commands.openquests.quest.create.assetId.desc", QUEST_ASSET);
 
     public CreateUniverseQuestCommand() {
         super("universe", "Creates a new quest progression and adds it to the universe's store");
@@ -22,16 +22,10 @@ public class CreateUniverseQuestCommand extends CommandBase {
 
     @Override
     protected void executeSync(@Nonnull CommandContext context) {
-        String assetId = context.get(assetIdArg);
-
-        OpenQuestAsset asset = OpenQuestAsset.getAsset(assetId);
-        if (asset == null) {
-            context.sendMessage(Message.raw("No quest asset found with id '" + assetId + "'."));
-            return;
-        }
+        OpenQuestAsset asset = context.get(assetArg);
 
         var quest = QuestProgressionService.get().registerQuest(asset);
         UniverseQuestService.get().addQuest(quest.getId());
-        context.sendMessage(Message.raw("Created quest " + quest.getId() + " from asset '" + assetId + "'."));
+        context.sendMessage(Message.raw("Created quest " + quest.getId() + " from asset '" + asset.getId() + "'."));
     }
 }

@@ -1,1 +1,3 @@
 quest.default.title = Quête sans titre
+commands.argtype.quest.name = Asset de quête
+commands.argtype.quest.usage = L'identifiant d'un asset de quête OpenQuests

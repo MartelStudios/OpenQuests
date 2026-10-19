@@ -18,6 +18,7 @@ import com.martelstudios.openquests.core.visitors.PlayerSetStateVisitor;
 import javax.annotation.Nonnull;
 
 import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes.STRING;
+import static com.martelstudios.openquests.core.commands.OpenQuestArgTypes.QUEST_ASSET;
 
 /**
  * Writes a terminal state onto the sender's quests. One class for the three outcomes: what
@@ -29,7 +30,8 @@ import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgT
 public class QuestStateCommand extends AbstractPlayerCommand {
 
     @Nonnull
-    private final RequiredArg<String> questArg = withRequiredArg("quest", "server.commands.openquests.quest.state.quest.desc", STRING);
+    private final RequiredArg<String> questArg = withRequiredArg("quest", "server.commands.openquests.quest.state.quest.desc", STRING)
+        .withSuggestionOverride(QUEST_ASSET);
 
     @Nonnull
     private final QuestState state;

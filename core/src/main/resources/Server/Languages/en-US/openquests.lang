@@ -1,1 +1,3 @@
 quest.default.title = Untitled quest
+commands.argtype.quest.name = Quest Asset
+commands.argtype.quest.usage = The id of an OpenQuests quest asset
