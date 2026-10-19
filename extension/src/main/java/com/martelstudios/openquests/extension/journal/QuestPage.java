@@ -131,7 +131,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     /**
      * Whether the chapters tab shows the open chapter as a graph rather than as a list.
      */
-    private boolean graphMode;
+    private boolean graphMode = true;
 
     /**
      * Whether the graph shows its grid to lay the chapter out, for a player allowed to.
