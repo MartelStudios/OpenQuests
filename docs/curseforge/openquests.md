@@ -106,6 +106,7 @@ that cannot be delivered, full inventory or player offline, waits for them. Noth
 | <code>InWorld</code>          | Only counts in some worlds; leaving can fail the quest         |
 | <code>NearPosition</code>     | Only counts within a radius of a position                      |
 | <code>EntityCondition</code>  | Only counts while sprinting, out of combat, under an effect…   |
+| <code>RequiresQuest</code>    | Only counts once, or while, another quest stands as asked      |
 | <code>MinPlayersOnline</code> | Only counts while enough players are online                    |
 | <code>FailOnDeath</code>      | Dying fails the quest                                          |
 | <code>Cooldown</code>         | At most once per period, a day for a daily quest               |

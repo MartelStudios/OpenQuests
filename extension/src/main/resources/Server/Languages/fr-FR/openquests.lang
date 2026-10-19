@@ -95,6 +95,11 @@ page.requirement.not.completed = Non terminée
 page.requirement.not.successfully = Non réussie
 page.requirement.not.failed = Non échouée
 page.requirement.not.abandoned = Non abandonnée
+page.requirement.none = Aucune :
+page.requirement.at-least = (au moins {count, number})
+page.requirement.at-most = (au plus {count, number})
+page.requirement.exactly = (exactement {count, number})
+page.requirement.between = (de {min, number} à {max, number})
 
 feedback.successful = Quête terminée
 feedback.failed = Quête échouée
