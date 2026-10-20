@@ -1,5 +1,6 @@
 {
   "Type": "Sprint",
+  "Icon": "Icons/ItemsGenerated/Potion_Stamina.png",
   "Categories": ["Achievement"],
   "Visibility": "WhenStarted",
   "TitleKey": "quest.sprint-adept.title",

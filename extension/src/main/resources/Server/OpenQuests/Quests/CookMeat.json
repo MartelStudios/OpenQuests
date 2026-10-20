@@ -1,5 +1,6 @@
 {
   "Type": "Gather",
+  "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Cooked.png",
   "Categories": ["Survival"],
   "TitleKey": "quest.cook-meat.title",
   "DescriptionKey": "quest.cook-meat.description",

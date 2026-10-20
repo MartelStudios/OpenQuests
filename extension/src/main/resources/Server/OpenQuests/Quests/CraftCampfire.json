@@ -1,5 +1,6 @@
 {
   "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Bench_Campfire.png",
   "Categories": ["Survival"],
   "TitleKey": "quest.craft-campfire.title",
   "DescriptionKey": "quest.craft-campfire.description",

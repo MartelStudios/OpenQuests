@@ -1,5 +1,6 @@
 {
   "Type": "BreakBlock",
+  "Icon": "Icons/ItemsGenerated/Tool_Hatchet_Iron.png",
   "Categories": [
     "Event"
   ],

@@ -1,5 +1,6 @@
 {
   "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Furniture_Temple_Emerald_Statue.png",
   "Categories": ["Temple", "Timed"],
   "TitleKey": "quest.temple-trial.title",
   "DescriptionKey": "quest.temple-trial.description",

@@ -1,5 +1,6 @@
 {
   "Type": "Gather",
+  "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Raw.png",
   "Categories": ["Survival"],
   "TitleKey": "quest.gather-meat.title",
   "DescriptionKey": "quest.gather-meat.description",

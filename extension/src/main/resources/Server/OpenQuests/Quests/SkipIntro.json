@@ -1,5 +1,6 @@
 {
   "Type": "QuestState",
+  "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
   "Categories": ["Tutorial"],
   "TitleKey": "quest.skip-intro.title",
   "DescriptionKey": "quest.skip-intro.description",

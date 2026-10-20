@@ -1,5 +1,6 @@
 {
   "Type": "MMOSkillTreeCompleteBounty",
+  "Icon": "Icons/ItemsGenerated/Template_Lore_Note_Pages_A.png",
   "Categories": ["MMOSkillTree"],
   "Board": "Mmo_Mastery_Lessons",
   "TargetQuantity": 3,

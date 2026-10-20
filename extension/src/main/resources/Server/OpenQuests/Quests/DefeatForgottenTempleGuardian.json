@@ -1,5 +1,6 @@
 {
   "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Golem_Crystal_Earth.png",
   "Categories": ["Temple"],
   "NpcGroupId": {
     "IncludeRoles": [

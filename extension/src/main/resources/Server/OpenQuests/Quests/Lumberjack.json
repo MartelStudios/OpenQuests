@@ -1,5 +1,6 @@
 {
   "Type": "PickupItem",
+  "Icon": "Icons/ResourceTypes/Wood_Trunk.png",
   "Categories": ["Survival"],
   "TitleKey": "quest.lumberjack.title",
   "DescriptionKey": "quest.lumberjack.description",

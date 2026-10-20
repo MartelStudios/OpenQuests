@@ -1,5 +1,6 @@
 {
   "Type": "Run",
+  "Icon": "Icons/ItemsGenerated/Armor_Mithril_Legs.png",
   "Categories": ["Achievement"],
   "Visibility": "WhenStarted",
   "TitleKey": "quest.run-master.title",

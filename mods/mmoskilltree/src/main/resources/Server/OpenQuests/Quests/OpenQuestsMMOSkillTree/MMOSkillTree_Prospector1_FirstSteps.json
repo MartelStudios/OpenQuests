@@ -1,5 +1,6 @@
 {
   "Type": "MMOSkillTreeGainXp",
+  "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Wood.png",
   "Categories": ["MMOSkillTree"],
   "TargetQuantity": 300,
   "SuccessfulRewards": [
