@@ -4,6 +4,9 @@ plugins {
 
 group = project.property("group").toString()
 
+// Its own key: the release sets OpenQuests' version with -Pversion, which would override a plain `version` here
+version = property("mmoskilltree_version").toString()
+
 hytaleTools {
     javaVersion = property("java_version").toString().toInt()
     hytaleVersion = property("hytale_version").toString()
@@ -41,7 +44,7 @@ dependencies {
 
 tasks.named<Jar>("jar") {
     archiveBaseName.set(project.property("mod_id").toString())
-    archiveVersion.set(project.property("version").toString())
+    archiveVersion.set(project.version.toString())
 }
 
 // The Mastery Pack defines the mastery_point currency, so the currency reward can be tried in the

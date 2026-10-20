@@ -133,25 +133,30 @@ fun archiveEntries(archive: File): Set<String> =
 // Check the shipped content before releasing
 val verifyReleaseArtifacts by tasks.registering {
     group = "verification"
-    description = "Checks the two jars and the quest content pack that the release publishes."
+    description = "Checks the jars and the quest content pack that the release publishes."
 
-    dependsOn(":core:jar", tasks.named("jar"), questExamplesZip)
+    dependsOn(":core:jar", tasks.named("jar"), questExamplesZip, ":mods:mmoskilltree:jar")
 
     val modVersion = project.property("version").toString()
+    // Read late: the pack is configured after this project and carries a version of its own
+    val packVersion = provider { project(":mods:mmoskilltree").version.toString() }
     val coreJars = fileTree(project(":core").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val extensionJars = fileTree(layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val contentPacks = fileTree(layout.buildDirectory.dir("distributions").get().asFile) { include("*.zip") }
+    val packJars = fileTree(project(":mods:mmoskilltree").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val published = mapOf(
-        "core/build/libs/*.jar" to coreJars,
-        "extension/build/libs/*.jar" to extensionJars,
-        "extension/build/distributions/*.zip" to contentPacks
+        "core/build/libs/*.jar" to (coreJars to provider { modVersion }),
+        "extension/build/libs/*.jar" to (extensionJars to provider { modVersion }),
+        "extension/build/distributions/*.zip" to (contentPacks to provider { modVersion }),
+        "mods/mmoskilltree/build/libs/*.jar" to (packJars to packVersion)
     )
 
     val resourcesRoot = file("src/main/resources")
     val questSources = fileTree(resourcesRoot) { include(questExamples) }
 
     doLast {
-        published.forEach { (glob, tree) ->
+        published.forEach { (glob, artifacts) ->
+            val (tree, version) = artifacts
             val matched = tree.files.sortedBy { it.name }
 
             if (matched.isEmpty()) {
@@ -167,9 +172,9 @@ val verifyReleaseArtifacts by tasks.registering {
             }
 
             val artifact = matched.single()
-            if (!artifact.name.contains(modVersion)) {
+            if (!artifact.name.contains(version.get())) {
                 throw GradleException(
-                    "$glob matches ${artifact.name}, not version $modVersion. Run clean."
+                    "$glob matches ${artifact.name}, not version ${version.get()}. Run clean."
                 )
             }
 

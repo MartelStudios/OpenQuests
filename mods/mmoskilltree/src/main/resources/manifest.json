@@ -22,6 +22,6 @@
     "Main": "com.martelstudios.openquests.mmoskilltree.OpenQuestsMMOSkillTreePlugin",
     "IncludesAssetPack": true,
     "UpdateChecker": {
-        "CurseForge": ""
+        "CurseForge": "1752171"
     }
 }
