@@ -29,7 +29,6 @@ import com.martelstudios.opennavigation.routers.RouterId;
 import com.martelstudios.opennavigation.routes.Route;
 import com.martelstudios.opennavigation.routes.TabRoute;
 import com.martelstudios.opennavigation.services.NavigationService;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.chapters.ChapterQuest;
 import com.martelstudios.openquests.core.chapters.OpenQuestChapter;
 import com.martelstudios.openquests.core.chapters.OpenQuestChapterGroup;
@@ -143,11 +142,11 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
     private final QuestRewardService rewards;
     private final QuestTrackService tracks;
 
-    public QuestPage(@Nonnull OpenQuestsServices services, @Nonnull QuestTrackService tracks, @Nonnull PlayerRef playerRef, @Nonnull RouterId router, @Nonnull Route route) {
+    public QuestPage(@Nonnull QuestProgressionService progression, @Nonnull QuestRewardService rewards, @Nonnull QuestTrackService tracks, @Nonnull PlayerRef playerRef, @Nonnull RouterId router, @Nonnull Route route) {
         super(playerRef, CustomPageLifetime.CanDismiss, QuestPageEventData.CODEC);
 
-        this.progression = services.getQuestProgressionService();
-        this.rewards = services.getQuestRewardService();
+        this.progression = progression;
+        this.rewards = rewards;
         this.tracks = tracks;
         this.router = router;
         this.route = route;

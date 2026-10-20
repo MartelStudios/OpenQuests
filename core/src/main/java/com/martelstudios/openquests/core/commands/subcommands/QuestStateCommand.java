@@ -9,7 +9,6 @@ import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayer
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
@@ -46,18 +45,18 @@ public class QuestStateCommand extends AbstractPlayerCommand {
     /**
      * Runs under the permission group of {@code /quest}.
      */
-    public QuestStateCommand(@Nonnull OpenQuestsServices services, @Nonnull String name, @Nonnull String description, @Nonnull QuestState state) {
+    public QuestStateCommand(@Nonnull QuestProgressionService progression, @Nonnull PlayerComponentTypes components, @Nonnull String name, @Nonnull String description, @Nonnull QuestState state) {
         super(name, description);
         this.state = state;
-        this.progression = services.getQuestProgressionService();
-        this.components = services.getPlatform().components();
+        this.progression = progression;
+        this.components = components;
     }
 
     /**
      * Runs under a group of its own, for an outcome a player must not be able to hand themselves.
      */
-    public QuestStateCommand(@Nonnull OpenQuestsServices services, @Nonnull String name, @Nonnull String description, @Nonnull QuestState state, @Nonnull String permissionGroup) {
-        this(services, name, description, state);
+    public QuestStateCommand(@Nonnull QuestProgressionService progression, @Nonnull PlayerComponentTypes components, @Nonnull String name, @Nonnull String description, @Nonnull QuestState state, @Nonnull String permissionGroup) {
+        this(progression, components, name, description, state);
 
         setPermissionGroups(permissionGroup);
     }

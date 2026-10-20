@@ -58,6 +58,6 @@ public final class JournalFeature {
             return;
         }
 
-        pageManager.openCustomPage(reference, store, new QuestPage(services, tracks, event.getPlayer(), event.getRouter(), event.getRoute()));
+        pageManager.openCustomPage(reference, store, new QuestPage(services.getQuestProgressionService(), services.getQuestRewardService(), tracks, event.getPlayer(), event.getRouter(), event.getRoute()));
     }
 }
