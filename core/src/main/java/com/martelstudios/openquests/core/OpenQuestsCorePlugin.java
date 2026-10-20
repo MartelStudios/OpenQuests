@@ -44,6 +44,7 @@ import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.sync.QuestSync;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -106,6 +107,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questStorage.start();
 
         services = new OpenQuestsServices(questStorage, settings.getSyncSeconds());
+        QuestSync.setPolicy(services.getQuestSyncService());
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
         QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);

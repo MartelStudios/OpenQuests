@@ -71,8 +71,6 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
         this.storage = storage;
         this.progressionStore = progressionStore;
         this.intervalSeconds = Math.max(1, intervalSeconds);
-
-        QuestSync.setPolicy(this);
     }
 
     public static QuestSyncService get() {
