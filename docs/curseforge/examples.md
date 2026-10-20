@@ -6,73 +6,97 @@ OpenQuests installs with an empty quest list, on purpose: your server, your ques
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
 
-![The quest tracker showing a composite quest: Introduction, holding Master the basics with its four gathering and crafting steps, an OR rule, and Skip Intro](https://github.com/MartelStudios/OpenQuests/blob/5298250c8df70e71b1956ce65d5b56d24f3eae3f/docs/images/quest-tracker.png?raw=true)
+![The journal's Chapters tab: the Adventure group unfolds, then The Forgotten Temple and The Goblin Breach open one after the other, each drawn as a graph of quest icons](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-chapters.gif?raw=true)
 
 ---
 
 ## ✨ What is inside
 
-Two chains and a daily chore handed out on connection, a trial inside the Forgotten Temple, a goblin dungeon to clear, a server event and a few secrets, in English and French.
+Over sixty quests in eight chapters, in English and French. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, a tutorial, a hunt, a daily chore, a server event and a few secrets.
 
-### ⛏️ The introduction
+🖼️ **Every quest has its icon**, from a crude hatchet to the breach's portal key, so the journal and its chapter graphs read at a glance.
 
-🔀 **Introduction** joins two branches with `OR`, so either one ends it: gather your first sticks, fibre and rubble, or take the other way out.
-
-⏭️ **Skip Intro** is that other way, for players who would rather get on with it. Abandon *Introduction* from the journal or with `/oquest abandon Intro`, and Skip Intro completes on its own: it is a `QuestState` quest watching for exactly that.
-
-⛓️ **Then a chain that hands itself along.** Tools, a workbench, then **Choose your weapon**: four crafts under `OR`, any one of which ends it. From there *Defeat the Guardian*, *Enter the Forgotten Temple* and *Talk to the temple merchant*, which pays 100 Life Essence.
-
-💀 **Defeat the Guardian** fails the moment you die, and hands itself straight back: try again.
-
-### 🏛️ The Temple's trial
-
-🗣️ **Talk to the temple merchant** only counts inside the Forgotten Temple. Completing it hands you the trial below.
-
-⏱️ **The Temple's trial** gives you three minutes to run to the rune altar, jump ten times there while sprinting, run for 20 seconds in all and stay at least a minute exploring the temple. The steps run side by side, and leaving the temple or dying fails the whole trial. These rules are set on the trial, and every step under it follows them.
-
-🏅 **Flawless** is a secret until you pass the trial without ever having failed it.
-
-🕯️ **An offering** follows the trial: throw ten Essence of Life at the foot of the rune altar, counted by `DropItem` as they leave your hand. `AntiAbuse` is on, so picking an offering back up to throw it again does not count twice.
-
-### 🧺 Garden chores
-
-🫐 **Garden chores** asks for wild berries picked by hand, five flowers of any kind and a wooden chest opened. The reward waits in the journal until you claim it. It can be done at most once every twenty hours and seven times in all, and the journal counts down both. Its own assignment, `Assignments/DailyChores.json`, hands it out again at the next connection once the last one has ended, done or given up, with `"Repeat": { "Type": "AfterEnd" }`. The two limits then decide whether it is accepted.
-
-### 🕳️ The goblin lair
-
-A quest line through the goblin lair, the dungeon Hytale ships as an instance. The game keeps it for operators: `/instances spawn Dungeons/Dungeon_Goblin` opens a fresh copy and takes you inside.
-
-👥 **A world quest line.** The whole line belongs to the copy of the lair you are in, so everyone inside shares it: every rat anyone kills counts for the group, whoever joins later finds the line where the group left it, and whoever leaves is taken off it. Rewards go to those still inside when a quest ends. What the group finished stays in each journal, and when the copy closes, what it had not finished fails.
-
-🐀 **Clear out the rats** starts on its own as the first player comes in. The quest itself says nothing of it: an assignment beside it, `Assignments/GoblinLair.json`, hands it out on `PlayerEnterWorld` with the `World` scope, in every copy of the lair named by `instance-Dungeons-Dungeon_Goblin-.*`. It asks for the caves by the entrance to be cleared, and opens the rest of the lair.
-
-⚔️ **The main line** runs through the goblin tunnels, up to a ledge where the Goblin Ogre is in sight (a `ReachLocation` quest), through the ogre itself, and into the duke's hall. There **The Goblin Duke** asks for his guard broken and the duke brought down, in either order, and pays five gold bars waiting in the journal.
-
-🕷️ **Two side quests** open alongside it: squash the spiders haunting the lair, and light its galleries with the torches from the entrance chest, counted by `PlaceBlock`.
-
-Each quest hands the next one over with a `GrantQuest` marked `"Shared": true`, so the quest paying hands it on once, to the lair it belongs to: the chain stays shared from the rats to the duke. Every quest of the line carries the *Dungeon* category, the side quests *Side quest* as well, and the journal shows both beside their titles.
-
-🗓️ **The day's cull** spans every copy at once: fifty goblins, counted across all the lairs run that day. Its assignment, `Assignments/GoblinLairDailyHunt.json`, hands it out each day on a `Schedule` to the `Worlds` scope, so one quest is shared by every copy of the lair, waits between runs, and is replaced the next day with `"Repeat": { "Type": "Replace" }`. It pays two gold bars to whoever is in the lair as it completes.
-
-### 🌲 A server event
-
-🪓 **The Great Felling**, launched by an admin with `/oquest create universe GreatFelling`: five hundred trunks felled by the whole server, counting only while two players are online, before a closing date. `AntiAbuse` is on, so a trunk placed and felled again counts once.
-
-### 🍖 The hunt
-
-🥩 **Gather meat** is handed to every player on connection with `"Visibility": "Never"`, so nobody ever sees it. It waits. The first time a player picks up raw meat of any kind, it completes, through the `Meats` resource type rather than a list of every meat, and the chain appears out of nowhere.
-
-🔥 **Craft a campfire**, then **Cook your meat**, which watches the cooked meat reach your inventory because a processing bench is worked by the block and not by the player.
-
-🍗 **Eat your meat** finishes it with the `Consume` type, and pays an Iron Hand Crossbow and 32 arrows.
+📝 **Two texts per quest.** The HUD shows a short line saying exactly what to do: *Kill 3 skeleton knights in the crypt*. The journal keeps the lore: *Armoured knights bar the way to the deepest tombs. Break through.*
 
 ---
 
-Alongside it run three quiet chains of three: **run**, **sprint** and **jump**, each starting from a secret nobody is told about. Cover the first distance and it reveals itself, earned, while the next rung waits in the journal: a hundred metres, then a thousand, then ten thousand. **Silent step** does the same at a walk, **Lumberjack** counts the trunks you bring back from your fellings with `PickupItem` and leaves out the ones you threw, and **First blood** waits for your first duel.
+## ⚔️ Adventure
+
+### 🪓 First steps
+
+🔀 **Introduction** asks for your first sticks, fibre and rubble, or lets you take the other way out: **Skip Intro** completes the moment you abandon the tutorial, for players who would rather get on with it.
+
+⛓️ **Then a chain that hands itself along.** Tools, a workbench, then **Choose your weapon**: four crude weapons, any one of which ends it.
+
+### 🏛️ The Forgotten Temple
+
+💀 **Defeat the Guardian** fails the moment you die, and hands itself straight back: try again. Then enter the temple and **talk to the merchant**, which only counts inside.
+
+⏱️ **The Temple's trial** gives you three minutes to run to the rune altar, sprint-jump ten times there, run for 20 seconds and explore for a minute. Leaving the temple or dying fails the whole trial.
+
+🏅 **Flawless** stays a secret until you pass the trial without ever having failed it.
+
+🕯️ **An offering** follows: throw ten Essence of Life at the foot of the altar. Picking one back up to throw it again does not count twice.
+
+### 🕳️ The Goblin Breach
+
+Thirty-six quests across the Guttering Hollows, the pocket world a Goblin Breach portal opens on. The chapter graph lays them out by region, and every link shows what leads where.
+
+![Hovering The restless dead shows its tooltip and lights its two branches, then hovering Knights of the crypt shows its own](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-graph-tooltip.gif?raw=true)
+
+🚪 **Through the breach** starts on its own the first time you step through, and opens five branches at once.
+
+⚰️ **The crypt.** Skeletons, then their knights, then the **Revenant Guardian**, who hands the fight straight back if you die. Its rune shards make a fire rune.
+
+⛏️ **The mines.** Goblin miners, shielded guards, the **Glutton** ruling the slums, lobbers raining bombs, and their boom powder turned into bangsticks.
+
+🕸️ **The spider tunnels.** Cave spiders, goblin burners, silk for a scrap hook and a hookshot. **Purge the nest** asks for 25 spiders in a single trip: leave the breach and it starts over.
+
+🟣 **The Void.** Void creatures, anomaly crystals to shatter, the keystone at the heart of a large underground anomaly, and the crystals it leaves behind for gadget assemblies.
+
+🗼 **The watchtowers.** Stone, goblin or overgrown by the Void: climb them floor by floor, with a reward on every landing and another at the top.
+
+🐻 **The Voidtaken Grizzly** gives its hide to the breach's finest gadgets: rocket boots and a scrap glider.
+
+![From the quest list, a reward link opens Bomb throwers, then Boom powder, Bangsticks and The Voidtaken Grizzly, the trail folding its oldest steps; a click on the trail goes back one step](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-quest-links.gif?raw=true)
+
+🗝️ **The veilbound coffer.** Free the Void spawn sealed in crystal, take its key, and open the coffer while every goblin in earshot comes running. Then pick your treasure: gadget assemblies, Void crystals or greater health potions.
+
+![In the Rewards tab, Claim on The veilbound coffer opens a Choose your reward popup, and picking Greater Health Potion closes it](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-reward-choice.gif?raw=true)
+
+🗓️ **The day's cull** is shared by every breach on the server: fifty goblins a day, all players together, renewed every day. It pays a random prize, sometimes a fresh breach fragment.
 
 ---
 
-All twenty-one quest types are in there, along with every constraint (time limits, a closing date, a world, an area, conditions on the player, a minimum of players online, death, cooldowns and caps), the four scopes, all three reward types including rewards for failing, descriptions in the tracker, the three visibility modes, categories, and progressions carried by rewards alone. What starts by itself is handed out by assignments: `Assignments/OnConnection.json` on connection, `Assignments/DailyChores.json` again after each end, `Assignments/GoblinLair.json` in every copy of the lair, `Assignments/GoblinLairDailyHunt.json` once a day across all of them.
+## 🌿 Survival
+
+### 🍖 Hunting
+
+🥩 **Gather meat** is handed to every player and shown to nobody. The first raw meat you pick up, of any kind, completes it, and the chain appears out of nowhere: a campfire, cooked meat, then a meal that pays an Iron Hand Crossbow and 32 arrows.
+
+### 🌲 Woodcutting
+
+🪵 **Lumberjack** counts the trunks you bring back from your fellings, and leaves out the ones you threw.
+
+🪓 **The Great Felling** is a server event launched by an admin: five hundred trunks felled by the whole server, counting only while two players are online, before a closing date. A trunk placed and felled again counts once.
+
+### 🧺 Daily life
+
+🫐 **Garden chores** asks for wild berries, five flowers and a wooden chest opened. It comes back at your next connection once the last one ended, at most once every twenty hours and seven times in all, and the journal counts down both.
+
+---
+
+## 🏆 Feats
+
+🏃 **Athletics:** three quiet chains of three, **run**, **sprint** and **jump**, each a secret until you cover the first distance. Then the next rung waits in the journal, ten times further. **Silent step** does the same at a walk.
+
+🗡️ **Combat:** **First blood** waits for your first duel.
+
+---
+
+All twenty-two quest types are in there, along with every constraint, the four scopes, all five reward types including rewards for failing, the three visibility modes, categories and chapters.
+
+⛏️ Running **MMO Skill Tree**? The **OpenQuests MMOSkillTree** plugin brings a chapter of its own, *The prospector's path*, from a first bit of XP to Mining mastery.
 
 ---
 
