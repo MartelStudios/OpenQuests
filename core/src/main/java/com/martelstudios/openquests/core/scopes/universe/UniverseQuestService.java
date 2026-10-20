@@ -42,7 +42,7 @@ public class UniverseQuestService {
     }
 
     public static UniverseQuestService get() {
-        return OpenQuestsCorePlugin.get().getUniverseQuestService();
+        return OpenQuestsCorePlugin.get().getServices().getUniverseQuestService();
     }
 
     /**

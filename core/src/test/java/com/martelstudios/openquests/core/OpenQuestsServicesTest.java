@@ -1,17 +1,9 @@
-package com.martelstudios.openquests.core.services;
+package com.martelstudios.openquests.core;
 
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.IEventRegistry;
-import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
-import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
-import com.martelstudios.openquests.core.scopes.ScopeIndexes;
-import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
-import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
-import com.martelstudios.openquests.core.scopes.world.WorldClosingService;
-import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
-import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
@@ -27,37 +19,24 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The services are built without a server and only reach the event bus once they are told to
- * listen, so the order their listeners run in is theirs to keep.
+ * The services are built without a server, over a storage they must leave alone until asked, and
+ * only reach the event bus once told to listen, in an order the assembly keeps.
  */
-class ServiceListenersTest {
+class OpenQuestsServicesTest {
 
-    private final QuestStorage storage = untouched(QuestStorage.class);
-    private final QuestProgressionStore progressionStore = new QuestProgressionStore(storage);
-    private final ScopeIndexes indexes = new ScopeIndexes(storage, untouched(ScopeIndexes.Writer.class));
-
-    private final QuestProgressionService progression = new QuestProgressionService(progressionStore);
-    private final QuestPlayerStateService playerState = new QuestPlayerStateService(progressionStore);
-    private final QuestRewardService rewards = new QuestRewardService();
-    private final QuestDeadlineService deadlines = new QuestDeadlineService();
-    private final PlayerQuestService players = new PlayerQuestService();
-    private final UniverseQuestService universe = new UniverseQuestService(indexes);
-    private final WorldQuestService worlds = new WorldQuestService(indexes);
-    private final WorldClosingService closing = new WorldClosingService(storage);
-    private final QuestAssignmentService assignments = new QuestAssignmentService(storage);
+    private final OpenQuestsServices services = new OpenQuestsServices(untouched(QuestStorage.class), 5);
 
     @Test
     void everyServiceSubscribesWhenToldToListen() {
         Map<String, Consumer<IEventRegistry>> listeners = Map.of(
-            "progression", progression::listen,
-            "player state", playerState::listen,
-            "rewards", rewards::listen,
-            "deadlines", deadlines::listen,
-            "players", players::listen,
-            "universe", universe::listen,
-            "worlds", worlds::listen,
-            "world closing", closing::listen,
-            "assignments", assignments::listen
+            "progression", services.getQuestProgressionService()::listen,
+            "player state", services.getQuestPlayerStateService()::listen,
+            "rewards", services.getQuestRewardService()::listen,
+            "deadlines", services.getQuestDeadlineService()::listen,
+            "players", services.getPlayerQuestService()::listen,
+            "universe", services.getUniverseQuestService()::listen,
+            "worlds", services.getWorldQuestService()::listen,
+            "assignments", services.getQuestAssignmentService()::listen
         );
 
         listeners.forEach((name, listen) -> {
@@ -70,18 +49,16 @@ class ServiceListenersTest {
     @Test
     void anEndIsTalliedBeforeItPaysAndUnregisteredLast() {
         RecordingEvents events = new RecordingEvents();
-        progression.listen(events.registry());
-        rewards.listen(events.registry());
-        playerState.listen(events.registry());
+        services.listen(events.registry());
 
         List<Short> priorities = events.priorities(QuestCompletedEvent.class);
         short tally = priorities.stream().min(Short::compare).orElseThrow();
-        short last = priorities.stream().max(Short::compare).orElseThrow();
+        long last = priorities.stream().filter(p -> p == EventPriority.LAST.getValue()).count();
 
-        assertEquals(3, priorities.size());
         assertTrue(tally < EventPriority.FIRST.getValue(), "the record must count the end before rewards are paid");
         assertTrue(priorities.contains(EventPriority.FIRST.getValue()), "rewards are paid at FIRST");
-        assertEquals(EventPriority.LAST.getValue(), last, "the quest is unregistered after everyone else saw it end");
+        assertEquals(1, last, "only the unregistering runs last, after everyone else saw the end");
+        assertEquals(EventPriority.LAST.getValue(), priorities.stream().max(Short::compare).orElseThrow());
     }
 
     /**

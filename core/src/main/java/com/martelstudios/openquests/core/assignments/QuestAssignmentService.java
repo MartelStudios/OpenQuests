@@ -66,7 +66,7 @@ public class QuestAssignmentService {
     }
 
     public static QuestAssignmentService get() {
-        return OpenQuestsCorePlugin.get().getQuestAssignmentService();
+        return OpenQuestsCorePlugin.get().getServices().getQuestAssignmentService();
     }
 
     /**

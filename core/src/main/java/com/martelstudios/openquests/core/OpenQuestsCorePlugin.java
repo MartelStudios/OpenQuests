@@ -11,7 +11,6 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
-import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
 import com.martelstudios.openquests.core.assignments.repeat.AfterEndRepeat;
 import com.martelstudios.openquests.core.assignments.repeat.AssignmentRepeat;
 import com.martelstudios.openquests.core.assignments.repeat.OnceRepeat;
@@ -30,9 +29,6 @@ import com.martelstudios.openquests.core.chapters.OpenQuestChapterGroup;
 import com.martelstudios.openquests.core.commands.QuestCommand;
 import com.martelstudios.openquests.core.config.OpenQuestsConfig;
 import com.martelstudios.openquests.core.constraints.QuestConstraintValidator;
-import com.martelstudios.openquests.core.events.QuestCompletedEvent;
-import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
-import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.OpenQuestCategory;
 import com.martelstudios.openquests.core.models.QuestScope;
@@ -43,23 +39,11 @@ import com.martelstudios.openquests.core.persistence.disk.DiskQuestStorage;
 import com.martelstudios.openquests.core.persistence.disk.DiskQuestStorageProvider;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorageProvider;
-import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
-import com.martelstudios.openquests.core.scopes.ScopeIndexes;
-import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
-import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
-import com.martelstudios.openquests.core.scopes.world.WorldClosingService;
-import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
-import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
-import com.martelstudios.openquests.core.services.QuestDeadlineService;
-import com.martelstudios.openquests.core.services.QuestPlayerStateService;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
-import com.martelstudios.openquests.core.sync.QuestSyncService;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -92,22 +76,9 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
     private OpenQuestsConfig settings;
 
     private QuestStorage questStorage;
-    private QuestProgressionStore questProgressionStore;
+    private OpenQuestsServices services;
     private ComponentType<EntityStore, QuestStoreComponent> questStoreComponentType;
     private ComponentType<EntityStore, PendingRewardStoreComponent> pendingRewardStoreComponentType;
-
-    private QuestProgressionService questProgressionService;
-    private QuestPlayerStateService questPlayerStateService;
-    private QuestAssignmentService questAssignmentService;
-    private QuestSyncService questSyncService;
-    private QuestDeadlineService questDeadlineService;
-    private QuestRewardService questRewardService;
-    private UniverseQuestService universeQuestService;
-    private WorldQuestService worldQuestService;
-
-    private ScopeIndexes scopeIndexes;
-    private WorldGroupIndex worldGroupIndex;
-    private PlayerQuestService playerQuestService;
 
     public OpenQuestsCorePlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -134,49 +105,11 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questStorage = settings.getStorage().create();
         questStorage.start();
 
-        questProgressionStore = new QuestProgressionStore(questStorage);
-        questSyncService = new QuestSyncService(questStorage, questProgressionStore, settings.getSyncSeconds());
-
-        questProgressionService = new QuestProgressionService(questProgressionStore);
-        questProgressionService.listen(getEventRegistry());
-        questPlayerStateService = new QuestPlayerStateService(questProgressionStore);
-        questPlayerStateService.listen(getEventRegistry());
-        questRewardService = new QuestRewardService();
-        questRewardService.listen(getEventRegistry());
-        scopeIndexes = new ScopeIndexes(questStorage, questSyncService);
-        universeQuestService = new UniverseQuestService(scopeIndexes);
-        universeQuestService.listen(getEventRegistry());
-        worldQuestService = new WorldQuestService(scopeIndexes);
-        worldQuestService.listen(getEventRegistry());
-        worldGroupIndex = new WorldGroupIndex(scopeIndexes);
-        new WorldClosingService(questStorage).listen(getEventRegistry());
+        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds());
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
         QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);
         QuestScope.CODEC.register(UniverseQuestScope.TYPE, UniverseQuestScope.class, UniverseQuestScope.CODEC);
-
-        // A quest leaving for good leaves whatever shared it, which only its scope knows how to undo
-        getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, event -> {
-            QuestScope scope = event.getQuest().getScope();
-            if (scope != null) scope.release(event.getQuest());
-        });
-
-        // Indexes hold running quests only: one ending leaves them, its players keeping it in their
-        // journals, and one nobody holds any more is done away with, nothing being left to read it
-        getEventRegistry().registerGlobal(QuestCompletedEvent.class, event -> {
-            AbstractQuestProgression<?> quest = event.getQuest();
-            if (!quest.isStopOnComplete()) return;
-
-            QuestScope scope = quest.getScope();
-            if (scope != null) scope.retire(quest);
-
-            if (quest.getPlayers().isEmpty() && quest.getAbandonedPlayers().isEmpty()) questProgressionService.unregisterQuest(quest);
-        });
-
-        playerQuestService = new PlayerQuestService();
-        playerQuestService.listen(getEventRegistry());
-        questAssignmentService = new QuestAssignmentService(questStorage);
-        questAssignmentService.listen(getEventRegistry());
 
         AssignmentTrigger.CODEC.register(PlayerConnectTrigger.TYPE, PlayerConnectTrigger.class, PlayerConnectTrigger.CODEC);
         AssignmentTrigger.CODEC.register(PlayerEnterWorldTrigger.TYPE, PlayerEnterWorldTrigger.class, PlayerEnterWorldTrigger.CODEC);
@@ -188,8 +121,8 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         AssignmentRepeat.CODEC.register(OnceRepeat.TYPE, OnceRepeat.class, OnceRepeat.CODEC);
         AssignmentRepeat.CODEC.register(AfterEndRepeat.TYPE, AfterEndRepeat.class, AfterEndRepeat.CODEC);
         AssignmentRepeat.CODEC.register(ReplaceRepeat.TYPE, ReplaceRepeat.class, ReplaceRepeat.CODEC);
-        questDeadlineService = new QuestDeadlineService();
-        questDeadlineService.listen(getEventRegistry());
+
+        services.listen(getEventRegistry());
 
         // Both indexes are rebuilt from the storage on connection and on world entry, so neither
         // is written to the entity files the server saves for us
@@ -239,15 +172,15 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     @Override
     protected void start() {
-        universeQuestService.loadQuests();
-        worldGroupIndex.preload(groupsOfAssignments());
-        questAssignmentService.start();
+        services.getUniverseQuestService().loadQuests();
+        services.getWorldGroupIndex().preload(groupsOfAssignments());
+        services.getQuestAssignmentService().start();
 
         long interval = settings.getSaveIntervalMinutes();
 
         HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(() -> saveEverything(false), interval, interval, TimeUnit.MINUTES);
 
-        questSyncService.start();
+        services.getQuestSyncService().start();
     }
 
     /**
@@ -267,7 +200,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         saveEverything(true);
 
         // After the last pass, which hands the shared quests to the storage thread to write
-        if (questSyncService != null) questSyncService.stop();
+        if (services != null) services.getQuestSyncService().stop();
 
         if (questStorage != null) questStorage.close();
     }
@@ -277,9 +210,9 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
      * at would name one that is not there yet if the server stopped in between.
      */
     private void saveEverything(boolean force) {
-        save("quests", questProgressionStore::saveAll);
-        save("player records", () -> questPlayerStateService.saveAllOnline(force));
-        save("the quest indexes", scopeIndexes::flushAll);
+        save("quests", () -> services.getQuestProgressionStore().saveAll());
+        save("player records", () -> services.getQuestPlayerStateService().saveAllOnline(force));
+        save("the quest indexes", () -> services.getScopeIndexes().flushAll());
     }
 
     /**
@@ -331,57 +264,12 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         config.save();
     }
 
+    /**
+     * @return the core services, built in {@link #setup()}.
+     */
     @Nonnull
-    public QuestStorage getQuestStorage() {
-        return questStorage;
-    }
-
-    public QuestProgressionStore getQuestProgressionStore() {
-        return questProgressionStore;
-    }
-
-    public UniverseQuestService getUniverseQuestService() {
-        return universeQuestService;
-    }
-
-    public WorldQuestService getWorldQuestService() {
-        return worldQuestService;
-    }
-
-    public ScopeIndexes getScopeIndexes() {
-        return scopeIndexes;
-    }
-
-    public WorldGroupIndex getWorldGroupIndex() {
-        return worldGroupIndex;
-    }
-
-    public PlayerQuestService getPlayerQuestService() {
-        return playerQuestService;
-    }
-
-    public QuestPlayerStateService getQuestPlayerStateService() {
-        return questPlayerStateService;
-    }
-
-    public QuestAssignmentService getQuestAssignmentService() {
-        return questAssignmentService;
-    }
-
-    public QuestSyncService getQuestSyncService() {
-        return questSyncService;
-    }
-
-    public QuestDeadlineService getQuestDeadlineService() {
-        return questDeadlineService;
-    }
-
-    public QuestProgressionService getQuestProgressionService() {
-        return questProgressionService;
-    }
-
-    public QuestRewardService getQuestRewardService() {
-        return questRewardService;
+    public OpenQuestsServices getServices() {
+        return services;
     }
 
     public ComponentType<EntityStore, QuestStoreComponent> getQuestStoreComponentType() {

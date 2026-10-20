@@ -63,7 +63,7 @@ public class WorldQuestService {
     }
 
     public static WorldQuestService get() {
-        return OpenQuestsCorePlugin.get().getWorldQuestService();
+        return OpenQuestsCorePlugin.get().getServices().getWorldQuestService();
     }
 
     @Nonnull

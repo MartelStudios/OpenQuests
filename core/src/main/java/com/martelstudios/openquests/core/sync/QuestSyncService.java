@@ -76,7 +76,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
     }
 
     public static QuestSyncService get() {
-        return OpenQuestsCorePlugin.get().getQuestSyncService();
+        return OpenQuestsCorePlugin.get().getServices().getQuestSyncService();
     }
 
     /**

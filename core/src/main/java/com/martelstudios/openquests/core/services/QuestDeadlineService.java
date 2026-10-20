@@ -88,7 +88,7 @@ public class QuestDeadlineService {
      * @return the instance the core plugin set up.
      */
     public static QuestDeadlineService get() {
-        return OpenQuestsCorePlugin.get().getQuestDeadlineService();
+        return OpenQuestsCorePlugin.get().getServices().getQuestDeadlineService();
     }
 
     /**

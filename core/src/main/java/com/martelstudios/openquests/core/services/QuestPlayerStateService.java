@@ -75,7 +75,7 @@ public class QuestPlayerStateService {
     }
 
     public static QuestPlayerStateService get() {
-        return OpenQuestsCorePlugin.get().getQuestPlayerStateService();
+        return OpenQuestsCorePlugin.get().getServices().getQuestPlayerStateService();
     }
 
     /**

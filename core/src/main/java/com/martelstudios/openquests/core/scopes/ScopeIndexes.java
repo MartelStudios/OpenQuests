@@ -42,7 +42,7 @@ public class ScopeIndexes {
     }
 
     public static ScopeIndexes get() {
-        return OpenQuestsCorePlugin.get().getScopeIndexes();
+        return OpenQuestsCorePlugin.get().getServices().getScopeIndexes();
     }
 
     /**

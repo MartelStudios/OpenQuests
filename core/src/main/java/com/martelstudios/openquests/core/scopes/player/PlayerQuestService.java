@@ -37,7 +37,7 @@ public class PlayerQuestService {
     }
 
     public static PlayerQuestService get() {
-        return OpenQuestsCorePlugin.get().getPlayerQuestService();
+        return OpenQuestsCorePlugin.get().getServices().getPlayerQuestService();
     }
 
     /**

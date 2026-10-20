@@ -39,7 +39,7 @@ public class WorldGroupIndex {
     }
 
     public static WorldGroupIndex get() {
-        return OpenQuestsCorePlugin.get().getWorldGroupIndex();
+        return OpenQuestsCorePlugin.get().getServices().getWorldGroupIndex();
     }
 
     /**

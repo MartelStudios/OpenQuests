@@ -43,7 +43,7 @@ public class QuestRewardService {
     }
 
     public static QuestRewardService get() {
-        return OpenQuestsCorePlugin.get().getQuestRewardService();
+        return OpenQuestsCorePlugin.get().getServices().getQuestRewardService();
     }
 
     /**

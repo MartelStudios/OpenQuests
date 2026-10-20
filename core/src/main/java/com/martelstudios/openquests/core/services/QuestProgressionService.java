@@ -48,7 +48,7 @@ public class QuestProgressionService {
     }
 
     public static QuestProgressionService get() {
-        return OpenQuestsCorePlugin.get().getQuestProgressionService();
+        return OpenQuestsCorePlugin.get().getServices().getQuestProgressionService();
     }
 
     /**
