@@ -18,19 +18,23 @@ import java.util.UUID;
  */
 public final class Moments {
 
-    private Moments() {}
+    private final QuestProgressionService progression;
+
+    public Moments(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
 
     /**
      * Runs on the player's world thread, which every source of moments is on.
      */
-    public static <Q extends MomentQuestProgression<Q>> void count(@Nonnull Ref<EntityStore> playerRef, @Nonnull UUID playerId, @Nonnull Class<Q> type,
+    public <Q extends MomentQuestProgression<Q>> void count(@Nonnull Ref<EntityStore> playerRef, @Nonnull UUID playerId, @Nonnull Class<Q> type,
                                                                     @Nonnull String target, @Nullable String qualifier, long amount) {
         if (amount <= 0 || !playerRef.isValid()) return;
 
         var questStore = playerRef.getStore().getComponent(playerRef, QuestStoreComponent.getComponentType());
         if (questStore == null) return;
 
-        QuestProgressionService.get().progress(new Visitor<>(playerId, type, target, qualifier, (int) Math.min(amount, Integer.MAX_VALUE)), questStore.getQuestIds());
+        progression.progress(new Visitor<>(playerId, type, target, qualifier, (int) Math.min(amount, Integer.MAX_VALUE)), questStore.getQuestIds());
     }
 
     private record Visitor<Q extends MomentQuestProgression<Q>>(@Nonnull UUID playerId, @Nonnull Class<Q> type, @Nonnull String target,
