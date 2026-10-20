@@ -1,8 +1,8 @@
 package com.martelstudios.openquests.core.scopes.world;
 
 import com.hypixel.hytale.event.EventPriority;
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
@@ -29,11 +29,16 @@ public class WorldClosingService {
     @Nonnull
     private final QuestStorage storage;
 
-    public WorldClosingService(@Nonnull JavaPlugin plugin, @Nonnull QuestStorage storage) {
+    public WorldClosingService(@Nonnull QuestStorage storage) {
         this.storage = storage;
+    }
 
+    /**
+     * Subscribes to world removals.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
         // Last, so a removal another plugin called off is seen as such
-        plugin.getEventRegistry().registerGlobal(EventPriority.LAST, RemoveWorldEvent.class, this::handleRemoveWorldEvent);
+        events.registerGlobal(EventPriority.LAST, RemoveWorldEvent.class, this::handleRemoveWorldEvent);
     }
 
     private void handleRemoveWorldEvent(@Nonnull RemoveWorldEvent removeWorldEvent) {

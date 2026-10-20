@@ -1,8 +1,8 @@
 package com.martelstudios.openquests.core.scopes.universe;
 
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
@@ -30,9 +30,15 @@ public class UniverseQuestService {
     @Nonnull
     private final ScopeIndexes indexes;
 
-    public UniverseQuestService(@Nonnull JavaPlugin javaPlugin, @Nonnull ScopeIndexes indexes) {
+    public UniverseQuestService(@Nonnull ScopeIndexes indexes) {
         this.indexes = indexes;
-        javaPlugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
+    }
+
+    /**
+     * Subscribes to connections, which bring the universe quests to the player.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
     }
 
     public static UniverseQuestService get() {

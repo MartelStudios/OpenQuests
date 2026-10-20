@@ -1,11 +1,11 @@
 package com.martelstudios.openquests.core.assignments;
 
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -50,14 +50,19 @@ public class QuestAssignmentService {
 
     private final SettledOccasions settled = new SettledOccasions();
 
-    public QuestAssignmentService(@Nonnull JavaPlugin plugin, @Nonnull QuestStorage storage) {
+    public QuestAssignmentService(@Nonnull QuestStorage storage) {
         this.records = new SharedAssignmentRecords(storage);
         this.holders = new AssignmentHolders(records);
+    }
 
-        plugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
-        plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
-        plugin.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> settled.forget(AssignmentHolders.playerKey(event.getPlayerRef().getUuid())));
-        plugin.getEventRegistry().registerGlobal(RemoveWorldEvent.class, this::handleRemoveWorldEvent);
+    /**
+     * Subscribes to the occasions assignments are handed out on.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
+        events.registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
+        events.registerGlobal(PlayerDisconnectEvent.class, event -> settled.forget(AssignmentHolders.playerKey(event.getPlayerRef().getUuid())));
+        events.registerGlobal(RemoveWorldEvent.class, this::handleRemoveWorldEvent);
     }
 
     public static QuestAssignmentService get() {

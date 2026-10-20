@@ -2,8 +2,8 @@ package com.martelstudios.openquests.core.services;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.event.EventPriority;
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.constraints.AssignmentRequest;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
@@ -35,12 +35,16 @@ import java.util.UUID;
 public class QuestProgressionService {
     private final QuestProgressionStore dataStore;
 
-    public QuestProgressionService(@Nonnull JavaPlugin plugin, QuestProgressionStore questProgressionStore) {
+    public QuestProgressionService(@Nonnull QuestProgressionStore questProgressionStore) {
         this.dataStore = questProgressionStore;
+    }
 
+    /**
+     * Subscribes to quest ends, after every other listener has seen them.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
         // EventPriority.LAST, to unregister the quest safely
-        plugin.getEventRegistry()
-              .registerGlobal(EventPriority.LAST, QuestCompletedEvent.class, this::handleQuestCompleted);
+        events.registerGlobal(EventPriority.LAST, QuestCompletedEvent.class, this::handleQuestCompleted);
     }
 
     public static QuestProgressionService get() {

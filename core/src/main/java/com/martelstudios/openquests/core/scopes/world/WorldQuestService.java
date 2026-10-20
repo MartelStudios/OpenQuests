@@ -1,9 +1,9 @@
 package com.martelstudios.openquests.core.scopes.world;
 
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.RemovedPlayerFromWorldEvent;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -49,12 +49,17 @@ public class WorldQuestService {
      */
     private final Set<UUID> closing = ConcurrentHashMap.newKeySet();
 
-    public WorldQuestService(@Nonnull JavaPlugin plugin, @Nonnull ScopeIndexes indexes) {
+    public WorldQuestService(@Nonnull ScopeIndexes indexes) {
         this.indexes = indexes;
+    }
 
-        plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
-        plugin.getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, this::handleRemovedPlayerFromWorldEvent);
-        plugin.getEventRegistry().registerGlobal(StartWorldEvent.class, event -> preload(event.getWorld()));
+    /**
+     * Subscribes to the world starts and the player moves that bring world quests in and out.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
+        events.registerGlobal(RemovedPlayerFromWorldEvent.class, this::handleRemovedPlayerFromWorldEvent);
+        events.registerGlobal(StartWorldEvent.class, event -> preload(event.getWorld()));
     }
 
     public static WorldQuestService get() {

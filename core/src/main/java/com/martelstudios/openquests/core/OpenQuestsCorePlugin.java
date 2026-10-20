@@ -137,14 +137,19 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questProgressionStore = new QuestProgressionStore(questStorage);
         questSyncService = new QuestSyncService(questStorage, questProgressionStore, settings.getSyncSeconds());
 
-        questProgressionService = new QuestProgressionService(this, questProgressionStore);
-        questPlayerStateService = new QuestPlayerStateService(this, questProgressionStore);
-        questRewardService = new QuestRewardService(this);
+        questProgressionService = new QuestProgressionService(questProgressionStore);
+        questProgressionService.listen(getEventRegistry());
+        questPlayerStateService = new QuestPlayerStateService(questProgressionStore);
+        questPlayerStateService.listen(getEventRegistry());
+        questRewardService = new QuestRewardService();
+        questRewardService.listen(getEventRegistry());
         scopeIndexes = new ScopeIndexes(questStorage, questSyncService);
-        universeQuestService = new UniverseQuestService(this, scopeIndexes);
-        worldQuestService = new WorldQuestService(this, scopeIndexes);
+        universeQuestService = new UniverseQuestService(scopeIndexes);
+        universeQuestService.listen(getEventRegistry());
+        worldQuestService = new WorldQuestService(scopeIndexes);
+        worldQuestService.listen(getEventRegistry());
         worldGroupIndex = new WorldGroupIndex(scopeIndexes);
-        new WorldClosingService(this, questStorage);
+        new WorldClosingService(questStorage).listen(getEventRegistry());
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
         QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);
@@ -168,8 +173,10 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
             if (quest.getPlayers().isEmpty() && quest.getAbandonedPlayers().isEmpty()) questProgressionService.unregisterQuest(quest);
         });
 
-        playerQuestService = new PlayerQuestService(this);
-        questAssignmentService = new QuestAssignmentService(this, questStorage);
+        playerQuestService = new PlayerQuestService();
+        playerQuestService.listen(getEventRegistry());
+        questAssignmentService = new QuestAssignmentService(questStorage);
+        questAssignmentService.listen(getEventRegistry());
 
         AssignmentTrigger.CODEC.register(PlayerConnectTrigger.TYPE, PlayerConnectTrigger.class, PlayerConnectTrigger.CODEC);
         AssignmentTrigger.CODEC.register(PlayerEnterWorldTrigger.TYPE, PlayerEnterWorldTrigger.class, PlayerEnterWorldTrigger.CODEC);
@@ -181,7 +188,8 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         AssignmentRepeat.CODEC.register(OnceRepeat.TYPE, OnceRepeat.class, OnceRepeat.CODEC);
         AssignmentRepeat.CODEC.register(AfterEndRepeat.TYPE, AfterEndRepeat.class, AfterEndRepeat.CODEC);
         AssignmentRepeat.CODEC.register(ReplaceRepeat.TYPE, ReplaceRepeat.class, ReplaceRepeat.CODEC);
-        questDeadlineService = new QuestDeadlineService(this);
+        questDeadlineService = new QuestDeadlineService();
+        questDeadlineService.listen(getEventRegistry());
 
         // Both indexes are rebuilt from the storage on connection and on world entry, so neither
         // is written to the entity files the server saves for us

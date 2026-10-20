@@ -1,8 +1,8 @@
 package com.martelstudios.openquests.core.services;
 
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -68,15 +68,18 @@ public class QuestDeadlineService {
     @Nullable
     private Instant timerAt;
 
-    public QuestDeadlineService(@Nonnull JavaPlugin plugin) {
-        plugin.getEventRegistry().registerGlobal(QuestRegisteredEvent.class, event -> watch(event.getQuest(), false));
-        plugin.getEventRegistry().registerGlobal(QuestLoadedEvent.class, event -> watch(event.getQuest(), true));
-        plugin.getEventRegistry().registerGlobal(QuestUnloadedEvent.class, event -> forget(event.getQuest().getId()));
-        plugin.getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, event -> forget(event.getQuest().getId()));
-        plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+    /**
+     * Subscribes to the quest lifecycle events that start and stop watching a quest's deadline.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(QuestRegisteredEvent.class, event -> watch(event.getQuest(), false));
+        events.registerGlobal(QuestLoadedEvent.class, event -> watch(event.getQuest(), true));
+        events.registerGlobal(QuestUnloadedEvent.class, event -> forget(event.getQuest().getId()));
+        events.registerGlobal(QuestUnregisteredEvent.class, event -> forget(event.getQuest().getId()));
+        events.registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
         // A quest kept running by StopOnComplete:false going back to running is on the clock again, here or
         // wherever another server moved it
-        plugin.getEventRegistry().registerGlobal(QuestStateChangedEvent.class, event -> {
+        events.registerGlobal(QuestStateChangedEvent.class, event -> {
             if (event.getState() == QuestState.IN_PROGRESS) watch(event.getQuest(), false);
         });
     }

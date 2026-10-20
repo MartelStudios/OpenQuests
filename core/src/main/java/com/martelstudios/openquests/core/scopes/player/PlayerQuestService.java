@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.core.scopes.player;
 
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
@@ -27,10 +27,13 @@ import java.util.UUID;
  */
 public class PlayerQuestService {
 
-    public PlayerQuestService(JavaPlugin plugin) {
-        plugin.getEventRegistry().registerGlobal(QuestPlayerAddedEvent.class, this::handleQuestPlayerAddedEvent);
-        plugin.getEventRegistry().registerGlobal(QuestPlayerRemovedEvent.class, this::handleQuestPlayerRemovedEvent);
-        plugin.getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, this::handleQuestUnregisteredEvent);
+    /**
+     * Subscribes to the quest membership changes mirrored into each player's record.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(QuestPlayerAddedEvent.class, this::handleQuestPlayerAddedEvent);
+        events.registerGlobal(QuestPlayerRemovedEvent.class, this::handleQuestPlayerRemovedEvent);
+        events.registerGlobal(QuestUnregisteredEvent.class, this::handleQuestUnregisteredEvent);
     }
 
     public static PlayerQuestService get() {

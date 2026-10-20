@@ -2,10 +2,10 @@ package com.martelstudios.openquests.core.services;
 
 import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.event.EventPriority;
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
@@ -55,18 +55,23 @@ public class QuestPlayerStateService {
      */
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
 
-    public QuestPlayerStateService(@Nonnull JavaPlugin plugin, @Nonnull QuestProgressionStore progressionStore) {
+    public QuestPlayerStateService(@Nonnull QuestProgressionStore progressionStore) {
         this.progressionStore = progressionStore;
         this.storage = progressionStore.getStorage();
+    }
 
+    /**
+     * Subscribes to connections, disconnections and quest ends, which load, save and tally records.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
         // EventPriority.FIRST, so the quests are back in the store before any scope resolves an id
         // against it and takes a miss for a quest that does exist
-        plugin.getEventRegistry().registerGlobal(EventPriority.FIRST, PlayerConnectEvent.class, this::handlePlayerConnectEvent);
+        events.registerGlobal(EventPriority.FIRST, PlayerConnectEvent.class, this::handlePlayerConnectEvent);
         // EventPriority.LAST, so whatever another listener does on the way out is written too
-        plugin.getEventRegistry().registerGlobal(EventPriority.LAST, PlayerDisconnectEvent.class, this::handlePlayerDisconnectEvent);
+        events.registerGlobal(EventPriority.LAST, PlayerDisconnectEvent.class, this::handlePlayerDisconnectEvent);
         // Ahead of EventPriority.FIRST, where rewards are paid: a quest they hand out, the same one's
         // retry included, is judged on a record that already counts this end
-        plugin.getEventRegistry().registerGlobal((short) (Short.MIN_VALUE + 1), QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+        events.registerGlobal((short) (Short.MIN_VALUE + 1), QuestCompletedEvent.class, this::handleQuestCompletedEvent);
     }
 
     public static QuestPlayerStateService get() {

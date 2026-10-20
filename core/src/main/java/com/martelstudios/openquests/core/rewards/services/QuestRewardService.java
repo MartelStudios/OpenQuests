@@ -1,8 +1,8 @@
 package com.martelstudios.openquests.core.rewards.services;
 
 import com.hypixel.hytale.event.EventPriority;
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
@@ -32,13 +32,14 @@ import java.util.UUID;
  */
 public class QuestRewardService {
 
-    public QuestRewardService(JavaPlugin plugin) {
-        plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
+    /**
+     * Subscribes to the quest ends that pay rewards, and to the arrivals that deliver pending ones.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
         // EventPriority.FIRST, to grant rewards earlier
-        plugin.getEventRegistry()
-              .registerGlobal(EventPriority.FIRST, QuestCompletedEvent.class, this::handleQuestCompletedEvent);
-        plugin.getEventRegistry()
-              .registerGlobal(EventPriority.FIRST, QuestPlayerAbandonedEvent.class, this::handleQuestPlayerAbandonedEvent);
+        events.registerGlobal(EventPriority.FIRST, QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+        events.registerGlobal(EventPriority.FIRST, QuestPlayerAbandonedEvent.class, this::handleQuestPlayerAbandonedEvent);
     }
 
     public static QuestRewardService get() {
