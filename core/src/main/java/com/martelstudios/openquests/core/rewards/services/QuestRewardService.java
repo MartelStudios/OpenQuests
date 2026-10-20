@@ -66,10 +66,6 @@ public class QuestRewardService {
         events.registerGlobal(EventPriority.FIRST, QuestPlayerAbandonedEvent.class, this::handleQuestPlayerAbandonedEvent);
     }
 
-    public static QuestRewardService get() {
-        return OpenQuestsServices.installed().getQuestRewardService();
-    }
-
     /**
      * @return what a player is still owed, created if they are owed nothing yet.
      */

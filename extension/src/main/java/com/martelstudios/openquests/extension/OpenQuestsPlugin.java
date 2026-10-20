@@ -13,7 +13,6 @@ import com.martelstudios.openquests.extension.feedback.FeedbackFeature;
 import com.martelstudios.openquests.extension.hud.HudFeature;
 import com.martelstudios.openquests.extension.journal.JournalFeature;
 import com.martelstudios.openquests.extension.listener.ListenerFeature;
-import com.martelstudios.openquests.extension.listener.QuestListenerService;
 import com.martelstudios.openquests.extension.quests.breakblock.BreakBlockFeature;
 import com.martelstudios.openquests.extension.quests.composite.CompositeFeature;
 import com.martelstudios.openquests.extension.quests.consumeitem.ConsumeItemFeature;
@@ -60,7 +59,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         OpenQuestsServices services = OpenQuestsServices.installed();
 
         // Shared machinery, before the types that declare themselves to it
-        QuestListenerService listeners = ListenerFeature.register(this, services);
+        ListenerFeature.register(this, services);
         QuestTrackService tracks = new QuestTrackService(services.getQuestProgressionService(), services.getQuestPlayerStateService(), services.events());
 
         // Quests
@@ -68,7 +67,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         InteractivelyPickupFeature.register(this, services);
         DropItemFeature.register(this, services);
         PickupItemFeature.register(this, services);
-        ReachLocationFeature.register(this, services, listeners);
+        ReachLocationFeature.register(this, services);
         EnterWorldFeature.register(this, services);
         TriggerVolumeFeature.register(this, services);
         CompositeFeature.register(this, services);
@@ -83,7 +82,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         ConsumeItemFeature.register(this, services);
         UseEntityFeature.register(this, services);
         QuestStateFeature.register(this, services);
-        MovementFeature.register(this, services, listeners);
+        MovementFeature.register(this, services);
         QuantityFeature.register(this, services);
         NoOpFeature.register(this, services);
 

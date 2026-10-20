@@ -7,7 +7,6 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestCompletions;
@@ -78,10 +77,6 @@ public class QuestPlayerStateService {
         // Ahead of EventPriority.FIRST, where rewards are paid: a quest they hand out, the same one's
         // retry included, is judged on a record that already counts this end
         events.registerGlobal((short) (Short.MIN_VALUE + 1), QuestCompletedEvent.class, this::handleQuestCompletedEvent);
-    }
-
-    public static QuestPlayerStateService get() {
-        return OpenQuestsServices.installed().getQuestPlayerStateService();
     }
 
     /**

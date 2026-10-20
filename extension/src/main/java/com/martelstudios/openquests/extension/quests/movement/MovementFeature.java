@@ -36,7 +36,7 @@ public final class MovementFeature {
         return listenerType;
     }
 
-    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services, @Nonnull QuestListenerService listeners) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         QuestProgressionService service = services.getQuestProgressionService();
 
         service.registerQuestType(WALK_TYPE_ID, WalkQuestAsset.class, WalkQuestAsset.CODEC, WalkQuestProgression.class, WalkQuestProgression.CODEC);
@@ -47,7 +47,7 @@ public final class MovementFeature {
         // Registered without a codec, so it stays out of the player's file, and on the base type,
         // so the four of them share one component the way they share one system
         listenerType = plugin.getEntityStoreRegistry().registerComponent(MovementQuestListener.class, MovementQuestListener::new);
-        listeners.register(MovementQuestProgression.class, listenerType);
+        QuestListenerService.register(MovementQuestProgression.class, listenerType);
 
         plugin.getEntityStoreRegistry().registerSystem(new MovementTickingSystem(services.getQuestProgressionService()));
     }

@@ -1,6 +1,5 @@
 package com.martelstudios.openquests.core.scopes;
 
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.persistence.IndexStore;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
@@ -44,10 +43,6 @@ public class ScopeIndexes {
         this.storage = storage;
         this.writer = writer;
         this.progressionStore = progressionStore;
-    }
-
-    public static ScopeIndexes get() {
-        return OpenQuestsServices.installed().getScopeIndexes();
     }
 
     /**

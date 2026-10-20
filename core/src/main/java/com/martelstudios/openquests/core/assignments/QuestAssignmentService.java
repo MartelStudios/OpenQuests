@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
@@ -90,10 +89,6 @@ public class QuestAssignmentService {
         events.registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
         events.registerGlobal(PlayerDisconnectEvent.class, event -> settled.forget(AssignmentHolders.playerKey(event.getPlayerRef().getUuid())));
         events.registerGlobal(RemoveWorldEvent.class, this::handleRemoveWorldEvent);
-    }
-
-    public static QuestAssignmentService get() {
-        return OpenQuestsServices.installed().getQuestAssignmentService();
     }
 
     /**

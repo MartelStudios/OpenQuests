@@ -4,7 +4,6 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.event.IEventRegistry;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.constraints.AssignmentRequest;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
@@ -51,10 +50,6 @@ public class QuestProgressionService {
     public void listen(@Nonnull IEventRegistry events) {
         // EventPriority.LAST, to unregister the quest safely
         events.registerGlobal(EventPriority.LAST, QuestCompletedEvent.class, this::handleQuestCompleted);
-    }
-
-    public static QuestProgressionService get() {
-        return OpenQuestsServices.installed().getQuestProgressionService();
     }
 
     /**

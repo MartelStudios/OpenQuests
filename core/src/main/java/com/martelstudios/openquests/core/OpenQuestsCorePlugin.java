@@ -70,8 +70,6 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     private static final String CONFIG_PATH_ENVIRONMENT = "OPENQUESTS_CONFIG";
 
-    private static OpenQuestsCorePlugin instance;
-
     private final Config<OpenQuestsConfig> config;
 
     private OpenQuestsConfig settings;
@@ -81,17 +79,11 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     public OpenQuestsCorePlugin(@Nonnull JavaPluginInit init) {
         super(init);
-        instance = this;
-
         // Before the config is read, since what it names under "Storage" is resolved through this
         QuestStorageProvider.CODEC.register(DiskQuestStorage.ID, DiskQuestStorageProvider.class, DiskQuestStorageProvider.CODEC);
         QuestStorageProvider.CODEC.register(JdbcQuestStorage.ID, JdbcQuestStorageProvider.class, JdbcQuestStorageProvider.CODEC);
 
         config = withConfig(OpenQuestsConfig.CODEC);
-    }
-
-    public static OpenQuestsCorePlugin get() {
-        return instance;
     }
 
     @Override

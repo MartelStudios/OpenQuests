@@ -1,7 +1,6 @@
 package com.martelstudios.openquests.core.sync;
 
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestOperation;
@@ -82,10 +81,6 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync {
      */
     public void onEachTick(@Nonnull Runnable task) {
         eachTick.add(task);
-    }
-
-    public static QuestSyncService get() {
-        return OpenQuestsServices.installed().getQuestSyncService();
     }
 
     /**

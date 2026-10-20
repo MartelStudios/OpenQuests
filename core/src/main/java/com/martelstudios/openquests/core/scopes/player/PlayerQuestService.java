@@ -2,7 +2,6 @@ package com.martelstudios.openquests.core.scopes.player;
 
 import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.event.IEventRegistry;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
@@ -46,10 +45,6 @@ public class PlayerQuestService {
         events.registerGlobal(QuestPlayerAddedEvent.class, this::handleQuestPlayerAddedEvent);
         events.registerGlobal(QuestPlayerRemovedEvent.class, this::handleQuestPlayerRemovedEvent);
         events.registerGlobal(QuestUnregisteredEvent.class, this::handleQuestUnregisteredEvent);
-    }
-
-    public static PlayerQuestService get() {
-        return OpenQuestsServices.installed().getPlayerQuestService();
     }
 
     /**

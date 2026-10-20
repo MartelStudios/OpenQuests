@@ -18,11 +18,7 @@ public final class ListenerFeature {
 
     private ListenerFeature() {}
 
-    /**
-     * @return the service the quest types keeping a listener on their players register with
-     */
-    @Nonnull
-    public static QuestListenerService register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         QuestListenerService listeners = new QuestListenerService(services.getQuestProgressionService(), services.getPlatform().players());
 
         // EventPriority.LAST, so the player's own quests are in the store and whatever connecting
@@ -32,7 +28,5 @@ public final class ListenerFeature {
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, listeners::handleQuestAddedToPlayerStore);
         plugin.getEventRegistry().registerGlobal(QuestRemovedFromPlayerStoreEvent.class, listeners::handleQuestRemovedFromPlayerStore);
         plugin.getEventRegistry().registerGlobal(QuestStateChangedEvent.class, listeners::handleQuestStateChanged);
-
-        return listeners;
     }
 }

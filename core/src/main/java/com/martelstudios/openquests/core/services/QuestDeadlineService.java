@@ -5,7 +5,6 @@ import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
@@ -101,13 +100,6 @@ public class QuestDeadlineService {
         events.registerGlobal(QuestStateChangedEvent.class, event -> {
             if (event.getState() == QuestState.IN_PROGRESS) watch(event.getQuest(), false);
         });
-    }
-
-    /**
-     * @return the instance the core plugin set up.
-     */
-    public static QuestDeadlineService get() {
-        return OpenQuestsServices.installed().getQuestDeadlineService();
     }
 
     /**

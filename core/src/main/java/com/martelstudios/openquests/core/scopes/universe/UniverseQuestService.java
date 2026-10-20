@@ -4,7 +4,6 @@ import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -43,10 +42,6 @@ public class UniverseQuestService {
      */
     public void listen(@Nonnull IEventRegistry events) {
         events.registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
-    }
-
-    public static UniverseQuestService get() {
-        return OpenQuestsServices.installed().getUniverseQuestService();
     }
 
     /**

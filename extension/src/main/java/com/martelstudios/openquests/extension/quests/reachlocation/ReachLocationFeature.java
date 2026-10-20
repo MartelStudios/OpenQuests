@@ -26,13 +26,13 @@ public final class ReachLocationFeature {
         return listenerType;
     }
 
-    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services, @Nonnull QuestListenerService listeners) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         services.getQuestProgressionService().registerQuestType(TYPE_ID, ReachLocationQuestAsset.class, ReachLocationQuestAsset.CODEC, ReachLocationQuestProgression.class, ReachLocationQuestProgression.CODEC);
 
         // Registered without a codec, which is what keeps it out of the player's file: it says
         // nothing the quest store does not already say, and is built back on connection
         listenerType = plugin.getEntityStoreRegistry().registerComponent(ReachLocationQuestListener.class, ReachLocationQuestListener::new);
-        listeners.register(ReachLocationQuestProgression.class, listenerType);
+        QuestListenerService.register(ReachLocationQuestProgression.class, listenerType);
 
         plugin.getEntityStoreRegistry().registerSystem(new ReachLocationTickingSystem(services.getQuestProgressionService()));
     }

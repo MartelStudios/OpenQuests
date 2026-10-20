@@ -8,7 +8,6 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.StartWorldEvent;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
@@ -68,10 +67,6 @@ public class WorldQuestService {
         events.registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
         events.registerGlobal(RemovedPlayerFromWorldEvent.class, this::handleRemovedPlayerFromWorldEvent);
         events.registerGlobal(StartWorldEvent.class, event -> preload(event.getWorld()));
-    }
-
-    public static WorldQuestService get() {
-        return OpenQuestsServices.installed().getWorldQuestService();
     }
 
     @Nonnull

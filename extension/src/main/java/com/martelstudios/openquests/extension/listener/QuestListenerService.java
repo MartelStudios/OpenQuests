@@ -31,7 +31,8 @@ public final class QuestListenerService {
      */
     private record Kind(@Nonnull Class<?> questType, @Nonnull ComponentType<EntityStore, ? extends QuestListenerComponent> componentType) {}
 
-    private final List<Kind> kinds = new CopyOnWriteArrayList<>();
+    // Open to any plugin adding a type, like the renderers' registries
+    private static final List<Kind> KINDS = new CopyOnWriteArrayList<>();
 
     private final QuestProgressionService progression;
     private final Players players;
@@ -45,8 +46,8 @@ public final class QuestListenerService {
      * @param questType matched on {@code isInstance}, so registering a base type covers every type
      * built on it, which is what lets one ticking system serve a family of quests.
      */
-    public void register(@Nonnull Class<?> questType, @Nonnull ComponentType<EntityStore, ? extends QuestListenerComponent> componentType) {
-        kinds.add(new Kind(questType, componentType));
+    public static void register(@Nonnull Class<?> questType, @Nonnull ComponentType<EntityStore, ? extends QuestListenerComponent> componentType) {
+        KINDS.add(new Kind(questType, componentType));
     }
 
     /**
@@ -125,7 +126,7 @@ public final class QuestListenerService {
 
     @Nullable
     private ComponentType<EntityStore, ? extends QuestListenerComponent> componentTypeFor(@Nonnull AbstractQuestProgression<?> quest) {
-        for (Kind kind : kinds) {
+        for (Kind kind : KINDS) {
             if (kind.questType().isInstance(quest)) return kind.componentType();
         }
         return null;
