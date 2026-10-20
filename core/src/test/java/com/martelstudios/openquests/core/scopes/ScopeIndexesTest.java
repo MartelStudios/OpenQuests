@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.core.scopes;
 
-import com.hypixel.hytale.event.IEventBus;
 import com.martelstudios.openquests.core.Untouched;
+import com.martelstudios.openquests.core.models.QuestEnvironment;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.stores.MemoryIndexStore;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
@@ -23,7 +23,7 @@ class ScopeIndexesTest {
     private static final String GROUP = "worlds:Arena";
 
     private final MemoryIndexStore storage = new MemoryIndexStore();
-    private final ScopeIndexes indexes = new ScopeIndexes(storage, new WritingAtOnce(storage), new QuestProgressionStore(Untouched.of(QuestStorage.class), Untouched.of(IEventBus.class)));
+    private final ScopeIndexes indexes = new ScopeIndexes(storage, new WritingAtOnce(storage), new QuestProgressionStore(Untouched.of(QuestStorage.class), Untouched.of(QuestEnvironment.class)));
 
     private final UUID first = UUID.randomUUID();
     private final UUID second = UUID.randomUUID();

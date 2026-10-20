@@ -3,6 +3,7 @@ package com.martelstudios.openquests.core.scopes.universe;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
+import com.martelstudios.openquests.core.scopes.ScopeServices;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -24,30 +25,30 @@ public class UniverseQuestScope extends QuestScope {
     public static final UniverseQuestScope INSTANCE = new UniverseQuestScope();
 
     @Override
-    public boolean isReachable() {
+    public boolean isReachable(@Nonnull ScopeServices services) {
         return true;
     }
 
     @Nonnull
     @Override
-    public Collection<UUID> getQuestIds() {
-        return List.copyOf(UniverseQuestService.get().getQuestIds());
+    public Collection<UUID> getQuestIds(@Nonnull ScopeServices services) {
+        return List.copyOf(services.universe().getQuestIds());
     }
 
     @Override
-    public void share(@Nonnull AbstractQuestProgression<?> quest) {
+    public void share(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
         quest.apply(new AbstractQuestProgression.SetScope(INSTANCE));
-        UniverseQuestService.get().addQuest(quest.getId());
+        services.universe().addQuest(quest.getId());
     }
 
     @Override
-    public void release(@Nonnull AbstractQuestProgression<?> quest) {
-        UniverseQuestService.get().removeQuest(quest.getId());
+    public void release(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
+        services.universe().removeQuest(quest.getId());
     }
 
     @Override
-    public void retire(@Nonnull AbstractQuestProgression<?> quest) {
-        UniverseQuestService.get().unindex(quest.getId());
+    public void retire(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
+        services.universe().unindex(quest.getId());
     }
 
     /**
@@ -62,7 +63,7 @@ public class UniverseQuestScope extends QuestScope {
      * The server outlives any of its worlds.
      */
     @Override
-    public boolean outlives(@Nonnull UUID closingWorldId) {
+    public boolean outlives(@Nonnull ScopeServices services, @Nonnull UUID closingWorldId) {
         return true;
     }
 }

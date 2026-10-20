@@ -3,6 +3,7 @@ package com.martelstudios.openquests.core.assignments;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.QuestScope;
+import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
@@ -21,6 +22,9 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
 
     @Nonnull
     private final QuestProgressionService progression;
+
+    @Nonnull
+    private final ScopeServices scopes;
 
     @Nonnull
     private final SharedAssignmentRecords records;
@@ -47,8 +51,9 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
      * @param scope the scope a quest handed out here is shared through, which indexes its quests
      * @param joining the player whose arrival this is, not among those the scope reaches yet
      */
-    public SharedAssignmentHolder(@Nonnull QuestProgressionService progression, @Nonnull SharedAssignmentRecords records, @Nonnull String key, @Nonnull QuestScope scope, @Nullable UUID joining) {
+    public SharedAssignmentHolder(@Nonnull QuestProgressionService progression, @Nonnull ScopeServices scopes, @Nonnull SharedAssignmentRecords records, @Nonnull String key, @Nonnull QuestScope scope, @Nullable UUID joining) {
         this.progression = progression;
+        this.scopes = scopes;
         this.records = records;
         this.key = key;
         this.scope = scope;
@@ -73,7 +78,7 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
         if (quests != null) return quests;
 
         List<AbstractQuestProgression<?>> read = new ArrayList<>();
-        for (UUID questId : new ArrayList<>(scope.getQuestIds())) {
+        for (UUID questId : new ArrayList<>(scope.getQuestIds(scopes))) {
             AbstractQuestProgression<?> quest = progression.loadQuest(questId);
             if (quest != null) read.add(quest);
         }
@@ -101,7 +106,7 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
 
         quests = null;
         progression.registerQuest(quest);
-        scope.share(quest);
+        scope.share(scopes, quest);
         if (joining != null) progression.joinQuest(quest, joining);
         return true;
     }

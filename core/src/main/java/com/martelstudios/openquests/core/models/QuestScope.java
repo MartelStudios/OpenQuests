@@ -2,6 +2,7 @@ package com.martelstudios.openquests.core.models;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
+import com.martelstudios.openquests.core.scopes.ScopeServices;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -29,37 +30,37 @@ public abstract class QuestScope {
      * @return whether anything holding the quest is there to share another one with: a world
      * scope whose worlds have all closed is not.
      */
-    public abstract boolean isReachable();
+    public abstract boolean isReachable(@Nonnull ScopeServices services);
 
     /**
      * @return the ids of the quests the holders of this scope index, those that ended included.
      */
     @Nonnull
-    public abstract Collection<UUID> getQuestIds();
+    public abstract Collection<UUID> getQuestIds(@Nonnull ScopeServices services);
 
     /**
      * Shares another quest the way this one is shared, with the same worlds, the same group or the
      * whole server, and writes a scope of this kind on it. The quest is registered already.
      */
-    public abstract void share(@Nonnull AbstractQuestProgression<?> quest);
+    public abstract void share(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest);
 
     /**
      * Takes a quest leaving the store for good out of every index of this scope naming it.
      */
-    public abstract void release(@Nonnull AbstractQuestProgression<?> quest);
+    public abstract void release(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest);
 
     /**
      * Takes an ended quest off the indexes of running quests this scope keeps, which only ever
      * hold what runs. Its players keep it in their journals, and the quest keeps this scope.
      */
-    public abstract void retire(@Nonnull AbstractQuestProgression<?> quest);
+    public abstract void retire(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest);
 
     /**
      * Asked as a world closes for good with the quest in it: one that does not go on fails there.
      *
      * @param closingWorldId the world closing, no longer counted among the open ones
      */
-    public abstract boolean outlives(@Nonnull UUID closingWorldId);
+    public abstract boolean outlives(@Nonnull ScopeServices services, @Nonnull UUID closingWorldId);
 
     /**
      * @return whether several servers may hold a quest of this scope at once, which is what makes

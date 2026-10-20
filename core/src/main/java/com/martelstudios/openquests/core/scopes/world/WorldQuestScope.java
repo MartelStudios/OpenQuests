@@ -7,6 +7,7 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
+import com.martelstudios.openquests.core.scopes.ScopeServices;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -47,16 +48,16 @@ public class WorldQuestScope extends QuestScope {
     }
 
     @Override
-    public boolean isReachable() {
-        return !WorldQuestService.get().openWorlds(worlds).isEmpty();
+    public boolean isReachable(@Nonnull ScopeServices services) {
+        return !services.worlds().openWorlds(worlds).isEmpty();
     }
 
     @Nonnull
     @Override
-    public Collection<UUID> getQuestIds() {
+    public Collection<UUID> getQuestIds(@Nonnull ScopeServices services) {
         Set<UUID> questIds = new HashSet<>();
-        for (World world : WorldQuestService.get().openWorlds(worlds)) {
-            questIds.addAll(WorldQuestService.get().getQuestIds(world));
+        for (World world : services.worlds().openWorlds(worlds)) {
+            questIds.addAll(services.worlds().getQuestIds(world));
         }
         return questIds;
     }
@@ -65,26 +66,26 @@ public class WorldQuestScope extends QuestScope {
      * Into every world of this scope still open, each on its own thread.
      */
     @Override
-    public void share(@Nonnull AbstractQuestProgression<?> quest) {
-        List<World> open = WorldQuestService.get().openWorlds(worlds);
+    public void share(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
+        List<World> open = services.worlds().openWorlds(worlds);
 
         quest.apply(new AbstractQuestProgression.SetScope(new WorldQuestScope(open.stream().map(world -> world.getWorldConfig().getUuid()).toList())));
         for (World world : open) {
-            WorldQuestService.get().addQuest(world, quest.getId());
+            services.worlds().addQuest(world, quest.getId());
         }
     }
 
     @Override
-    public void release(@Nonnull AbstractQuestProgression<?> quest) {
-        for (World world : WorldQuestService.get().openWorlds(worlds)) {
-            WorldQuestService.get().removeQuest(world, quest.getId());
+    public void release(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
+        for (World world : services.worlds().openWorlds(worlds)) {
+            services.worlds().removeQuest(world, quest.getId());
         }
     }
 
     @Override
-    public void retire(@Nonnull AbstractQuestProgression<?> quest) {
-        for (World world : WorldQuestService.get().openWorlds(worlds)) {
-            WorldQuestService.get().unindex(world, quest.getId());
+    public void retire(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
+        for (World world : services.worlds().openWorlds(worlds)) {
+            services.worlds().unindex(world, quest.getId());
         }
     }
 
@@ -92,8 +93,8 @@ public class WorldQuestScope extends QuestScope {
      * A world is its own holder: the quest goes on only while another world holding it is open.
      */
     @Override
-    public boolean outlives(@Nonnull UUID closingWorldId) {
-        for (World world : WorldQuestService.get().openWorlds(worlds)) {
+    public boolean outlives(@Nonnull ScopeServices services, @Nonnull UUID closingWorldId) {
+        for (World world : services.worlds().openWorlds(worlds)) {
             if (!world.getWorldConfig().getUuid().equals(closingWorldId)) return true;
         }
         return false;

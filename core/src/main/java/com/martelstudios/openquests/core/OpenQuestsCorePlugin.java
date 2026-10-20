@@ -43,7 +43,6 @@ import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
-import com.martelstudios.openquests.core.sync.QuestSync;
 import com.martelstudios.openquests.core.utils.ServerPlayers;
 
 import javax.annotation.Nonnull;
@@ -114,7 +113,6 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         Platform platform = new Platform(HytaleServer.get().getEventBus(), Clock.systemUTC(), HytaleServer.SCHEDULED_EXECUTOR, new ServerPlayers(), components);
         services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), platform);
         services.install();
-        QuestSync.setPolicy(services.getQuestSyncService());
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
         QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);

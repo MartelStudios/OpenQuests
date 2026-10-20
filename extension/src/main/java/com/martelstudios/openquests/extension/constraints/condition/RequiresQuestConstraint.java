@@ -4,7 +4,6 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.extension.quests.queststate.QuestRequirement;
 
 import javax.annotation.Nonnull;
@@ -29,7 +28,7 @@ public class RequiresQuestConstraint extends QuestConstraint {
 
     @Override
     public boolean allowsProgress(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID actorId) {
-        return requirement.isMetBy(QuestPlayerStateService.get().getTally(actorId, requirement.getQuestAssetId()));
+        return requirement.isMetBy(quest.environment().services().getQuestPlayerStateService().getTally(actorId, requirement.getQuestAssetId()));
     }
 
     @Nullable

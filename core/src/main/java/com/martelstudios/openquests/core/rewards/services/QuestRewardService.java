@@ -34,6 +34,9 @@ import java.util.UUID;
 public class QuestRewardService {
 
     @Nonnull
+    private final OpenQuestsServices services;
+
+    @Nonnull
     private final QuestStorage storage;
 
     @Nonnull
@@ -43,9 +46,11 @@ public class QuestRewardService {
     private final PlayerComponentTypes components;
 
     /**
+     * @param services handed to each reward granted, which acts through them
      * @param storage where a debt for a player this server does not host is left for their host
      */
-    public QuestRewardService(@Nonnull QuestStorage storage, @Nonnull Players players, @Nonnull PlayerComponentTypes components) {
+    public QuestRewardService(@Nonnull OpenQuestsServices services, @Nonnull QuestStorage storage, @Nonnull Players players, @Nonnull PlayerComponentTypes components) {
+        this.services = services;
         this.storage = storage;
         this.players = players;
         this.components = components;
@@ -193,7 +198,7 @@ public class QuestRewardService {
         for (QuestReward reward : rewards) {
             if (!reward.isAutoClaim()) continue;
 
-            if (!reward.grant(pending.getQuestId(), playerComponents)) continue;
+            if (!reward.grant(services, pending.getQuestId(), playerComponents)) continue;
 
             remaining.remove(reward);
             pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));
@@ -212,7 +217,7 @@ public class QuestRewardService {
         var remaining = new ArrayList<>(Arrays.asList(rewards));
 
         for (QuestReward reward : rewards) {
-            if (!reward.grant(pending.getQuestId(), playerComponents)) continue;
+            if (!reward.grant(services, pending.getQuestId(), playerComponents)) continue;
 
             remaining.remove(reward);
             pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));

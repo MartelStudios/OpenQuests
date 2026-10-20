@@ -4,7 +4,6 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ public abstract class AbstractCompositeQuestProgression<Q extends AbstractCompos
         List<AbstractQuestProgression<?>> children = new ArrayList<>(childIds.length);
 
         for (UUID childId : childIds) {
-            AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(childId);
+            AbstractQuestProgression<?> child = environment().services().getQuestProgressionService().getQuest(childId);
             if (child != null) children.add(child);
         }
         return children;

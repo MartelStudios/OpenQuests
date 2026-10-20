@@ -6,11 +6,13 @@ import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestEnvironment;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
 import com.martelstudios.openquests.core.scopes.ScopeIndexFollower;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
+import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldClosingService;
@@ -24,12 +26,13 @@ import com.martelstudios.openquests.core.sync.QuestSyncService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Clock;
 
 /**
  * The core services, built once over a storage and wired to each other. The plugin builds one
  * against the server, a test one against stand-ins.
  */
-public final class OpenQuestsServices {
+public final class OpenQuestsServices implements QuestEnvironment {
 
     @Nullable
     private static volatile OpenQuestsServices installed;
@@ -46,6 +49,7 @@ public final class OpenQuestsServices {
     private final UniverseQuestService universe;
     private final WorldQuestService worlds;
     private final WorldGroupIndex worldGroups;
+    private final ScopeServices scopes;
     private final WorldClosingService worldClosing;
     private final QuestAssignmentService assignments;
     private final QuestDeadlineService deadlines;
@@ -57,8 +61,8 @@ public final class OpenQuestsServices {
         this.storage = storage;
         this.platform = platform;
 
-        progressionStore = new QuestProgressionStore(storage, platform.events());
-        rewards = new QuestRewardService(storage, platform.players(), platform.components());
+        progressionStore = new QuestProgressionStore(storage, this);
+        rewards = new QuestRewardService(this, storage, platform.players(), platform.components());
         playerState = new QuestPlayerStateService(progressionStore, rewards, platform.players(), platform.components());
         progression = new QuestProgressionService(progressionStore, platform.events(), platform.clock(), playerState);
         sync = new QuestSyncService(storage, progressionStore, progression, syncSeconds);
@@ -67,8 +71,9 @@ public final class OpenQuestsServices {
         universe = new UniverseQuestService(scopeIndexes, progression, platform.players());
         worlds = new WorldQuestService(scopeIndexes, progression, sync, playerQuests, platform.components());
         worldGroups = new WorldGroupIndex(scopeIndexes, progression, worlds);
-        worldClosing = new WorldClosingService(storage, progression, worlds, worldGroups, platform.players());
-        assignments = new QuestAssignmentService(storage, progression, worldGroups, platform.players(), platform.components(), platform.clock(), platform.scheduler());
+        scopes = new ScopeServices(universe, worlds, worldGroups);
+        worldClosing = new WorldClosingService(storage, progression, scopes, platform.players());
+        assignments = new QuestAssignmentService(storage, progression, scopes, platform.players(), platform.components(), platform.clock(), platform.scheduler());
         deadlines = new QuestDeadlineService(progression, platform.clock(), platform.scheduler());
 
         // What other servers write besides the quests themselves, read on each tick of the sync
@@ -93,7 +98,7 @@ public final class OpenQuestsServices {
         // A quest leaving for good leaves whatever shared it, which only its scope knows how to undo
         events.registerGlobal(QuestUnregisteredEvent.class, event -> {
             QuestScope scope = event.getQuest().getScope();
-            if (scope != null) scope.release(event.getQuest());
+            if (scope != null) scope.release(scopes, event.getQuest());
         });
 
         // Indexes hold running quests only: one ending leaves them, its players keeping it in their
@@ -103,7 +108,7 @@ public final class OpenQuestsServices {
             if (!quest.isStopOnComplete()) return;
 
             QuestScope scope = quest.getScope();
-            if (scope != null) scope.retire(quest);
+            if (scope != null) scope.retire(scopes, quest);
 
             if (quest.getPlayers().isEmpty() && quest.getAbandonedPlayers().isEmpty()) progression.unregisterQuest(quest);
         });
@@ -139,8 +144,31 @@ public final class OpenQuestsServices {
     }
 
     @Nonnull
-    public IEventBus getEvents() {
+    @Override
+    public IEventBus events() {
         return platform.events();
+    }
+
+    @Nonnull
+    @Override
+    public Clock clock() {
+        return platform.clock();
+    }
+
+    @Nonnull
+    @Override
+    public OpenQuestsServices services() {
+        return this;
+    }
+
+    @Override
+    public boolean isShared(@Nonnull AbstractQuestProgression<?> quest) {
+        return sync.isShared(quest);
+    }
+
+    @Override
+    public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {
+        sync.writeSoon(quest);
     }
 
     @Nonnull
@@ -191,6 +219,11 @@ public final class OpenQuestsServices {
     @Nonnull
     public WorldGroupIndex getWorldGroupIndex() {
         return worldGroups;
+    }
+
+    @Nonnull
+    public ScopeServices getScopeServices() {
+        return scopes;
     }
 
     @Nonnull

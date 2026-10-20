@@ -45,6 +45,24 @@ class QuestFlowTest {
     }
 
     @Test
+    void aQuestNoStoreHoldsTellsNobody() {
+        harness.hear(QuestCompletedEvent.class);
+        TestQuestProgression quest = new TestQuestProgression();
+
+        quest.addAndEndAt(5, 5);
+
+        assertEquals(QuestState.SUCCESSFUL, quest.getState());
+        assertEquals(List.of(), harness.heard());
+    }
+
+    @Test
+    void aQuestTheStoreHoldsActsThroughItsServices() {
+        TestQuestProgression quest = harness.register();
+
+        assertSame(harness.services(), quest.environment().services());
+    }
+
+    @Test
     void progressShortOfTheEndIsOnlyAnUpdate() {
         TestQuestProgression quest = harness.register();
         harness.hear(QuestUpdatedEvent.class);

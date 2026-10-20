@@ -12,7 +12,7 @@ import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
-import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
+import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
@@ -63,7 +63,7 @@ public class QuestAssignmentService {
     private final ScheduledExecutorService scheduler;
 
     @Nonnull
-    private final WorldGroupIndex worldGroups;
+    private final ScopeServices scopes;
 
     @Nonnull
     private final Players players;
@@ -71,12 +71,12 @@ public class QuestAssignmentService {
     /**
      * @param scheduler where the schedule is checked, shared with the rest of the server
      */
-    public QuestAssignmentService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionService progression, @Nonnull WorldGroupIndex worldGroups,
+    public QuestAssignmentService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionService progression, @Nonnull ScopeServices scopes,
                                   @Nonnull Players players, @Nonnull PlayerComponentTypes components, @Nonnull Clock clock, @Nonnull ScheduledExecutorService scheduler) {
         this.records = new SharedAssignmentRecords(storage);
-        this.holders = new AssignmentHolders(records, progression, components);
+        this.holders = new AssignmentHolders(records, progression, scopes, components);
         this.offer = new AssignmentOffer(ids -> progression.progress(new SetStateVisitor(QuestState.FAILED), ids), clock);
-        this.worldGroups = worldGroups;
+        this.scopes = scopes;
         this.players = players;
         this.clock = clock;
         this.scheduler = scheduler;
@@ -152,7 +152,7 @@ public class QuestAssignmentService {
 
         forEachAssignment("a world entry", assignment -> {
             String group = assignment.getScope().groupOf(assignment, world);
-            if (group != null) worldGroups.enter(group, world, playerRef.getUuid());
+            if (group != null) scopes.worldGroups().enter(group, world, playerRef.getUuid());
 
             Occasion occasion = assignment.getTrigger().onEnterWorld(playerRef.getUuid(), player, world);
             if (occasion != null) evaluate(assignment, occasion);

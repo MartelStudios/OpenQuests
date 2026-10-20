@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.core.assignments;
 
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
@@ -30,11 +31,15 @@ public final class AssignmentHolders {
     private final QuestProgressionService progression;
 
     @Nonnull
+    private final ScopeServices scopes;
+
+    @Nonnull
     private final PlayerComponentTypes components;
 
-    public AssignmentHolders(@Nonnull SharedAssignmentRecords records, @Nonnull QuestProgressionService progression, @Nonnull PlayerComponentTypes components) {
+    public AssignmentHolders(@Nonnull SharedAssignmentRecords records, @Nonnull QuestProgressionService progression, @Nonnull ScopeServices scopes, @Nonnull PlayerComponentTypes components) {
         this.records = records;
         this.progression = progression;
+        this.scopes = scopes;
         this.components = components;
     }
 
@@ -83,7 +88,7 @@ public final class AssignmentHolders {
      */
     @Nonnull
     public AssignmentHolder world(@Nonnull World world, @Nullable UUID joining) {
-        return new SharedAssignmentHolder(progression, records, worldKey(world), new WorldQuestScope(List.of(world.getWorldConfig().getUuid())), joining);
+        return new SharedAssignmentHolder(progression, scopes, records, worldKey(world), new WorldQuestScope(List.of(world.getWorldConfig().getUuid())), joining);
     }
 
     /**
@@ -91,7 +96,7 @@ public final class AssignmentHolders {
      */
     @Nonnull
     public AssignmentHolder group(@Nonnull String group, @Nullable UUID joining) {
-        return new SharedAssignmentHolder(progression, records, groupKey(group), new WorldsQuestScope(group), joining);
+        return new SharedAssignmentHolder(progression, scopes, records, groupKey(group), new WorldsQuestScope(group), joining);
     }
 
     /**
@@ -99,6 +104,6 @@ public final class AssignmentHolders {
      */
     @Nonnull
     public AssignmentHolder universe(@Nullable UUID joining) {
-        return new SharedAssignmentHolder(progression, records, universeKey(), UniverseQuestScope.INSTANCE, joining);
+        return new SharedAssignmentHolder(progression, scopes, records, universeKey(), UniverseQuestScope.INSTANCE, joining);
     }
 }

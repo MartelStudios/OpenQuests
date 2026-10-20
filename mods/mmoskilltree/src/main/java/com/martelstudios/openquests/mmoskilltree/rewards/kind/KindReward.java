@@ -2,6 +2,7 @@ package com.martelstudios.openquests.mmoskilltree.rewards.kind;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.ziggfreed.common.loot.reward.RewardKinds;
@@ -30,7 +31,7 @@ public abstract class KindReward extends QuestReward {
      * pending, to be tried again.
      */
     @Override
-    public boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull OpenQuestsServices services, @Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
         Subject subject = Subject.of(playerComponents.getComponent(Player.getComponentType()));
         if (subject == null) return false;
 

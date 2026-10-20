@@ -1,8 +1,12 @@
 package com.martelstudios.openquests.core.persistence;
 
+import com.hypixel.hytale.event.EventBus;
+import com.hypixel.hytale.event.IEventBus;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.QuestCompletions;
+import com.martelstudios.openquests.core.models.QuestEnvironment;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -12,7 +16,6 @@ import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
-import com.martelstudios.openquests.core.sync.QuestSync;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +25,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -509,14 +513,14 @@ class JdbcQuestStorageTest {
         String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
         QuestStorage onA = open(url);
         QuestStorage onB = open(url);
-        QuestSync.setPolicy(SHARED_ONCE_STORED);
+        SYNC.shared = true;
 
         try {
             UUID alice = UUID.randomUUID();
             UUID bob = UUID.randomUUID();
             TestQuestProgression quest = quest("CommunityHunt");
             onA.writeProgressions(List.of(quest));
-            TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
+            TestQuestProgression copyOnB = attached((TestQuestProgression) onB.loadProgression(quest.getId()));
 
             quest.join(alice).addToCounter(5);
             copyOnB.join(bob).addToCounter(3);
@@ -536,7 +540,7 @@ class JdbcQuestStorageTest {
             assertEquals(8, copyOnB.getCounter());
             assertEquals(3, copyOnB.getReplica().getVersion());
         } finally {
-            QuestSync.setPolicy(ALONE);
+            SYNC.shared = false;
             onA.close();
             onB.close();
         }
@@ -574,12 +578,12 @@ class JdbcQuestStorageTest {
         String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
         QuestStorage onA = open(url);
         QuestStorage onB = open(url);
-        QuestSync.setPolicy(SHARED_ONCE_STORED);
+        SYNC.shared = true;
 
         try {
             TestQuestProgression quest = quest("Race");
             onA.writeProgressions(List.of(quest));
-            TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
+            TestQuestProgression copyOnB = attached((TestQuestProgression) onB.loadProgression(quest.getId()));
 
             quest.addAndEndAt(10, 10);
             copyOnB.addAndEndAt(10, 10);
@@ -601,7 +605,7 @@ class JdbcQuestStorageTest {
             assertEquals(List.of(QuestState.SUCCESSFUL), leftByB);
             assertNotNull(written);
         } finally {
-            QuestSync.setPolicy(ALONE);
+            SYNC.shared = false;
             onA.close();
             onB.close();
         }
@@ -612,13 +616,13 @@ class JdbcQuestStorageTest {
         String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
         QuestStorage onA = open(url);
         QuestStorage onB = open(url);
-        QuestSync.setPolicy(SHARED_ONCE_STORED);
+        SYNC.shared = true;
 
         try {
             UUID alice = UUID.randomUUID();
             TestQuestProgression quest = quest("Joined");
             onA.writeProgressions(List.of(quest));
-            TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
+            TestQuestProgression copyOnB = attached((TestQuestProgression) onB.loadProgression(quest.getId()));
 
             quest.join(alice);
             copyOnB.join(alice);
@@ -630,7 +634,7 @@ class JdbcQuestStorageTest {
             assertEquals(2, copyOnB.getReplica().getVersion());
             assertFalse(copyOnB.hasChanges());
         } finally {
-            QuestSync.setPolicy(ALONE);
+            SYNC.shared = false;
             onA.close();
             onB.close();
         }
@@ -641,12 +645,12 @@ class JdbcQuestStorageTest {
         String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
         QuestStorage onA = open(url);
         QuestStorage onB = open(url);
-        QuestSync.setPolicy(SHARED_ONCE_STORED);
+        SYNC.shared = true;
 
         try {
             TestQuestProgression quest = quest("Holding");
             onA.writeProgressions(List.of(quest));
-            TestQuestProgression copyOnB = (TestQuestProgression) onB.loadProgression(quest.getId());
+            TestQuestProgression copyOnB = attached((TestQuestProgression) onB.loadProgression(quest.getId()));
 
             quest.addToCounter(5);
             write(onA, quest);
@@ -661,7 +665,7 @@ class JdbcQuestStorageTest {
             assertEquals(8, ((TestQuestProgression) onA.loadProgression(quest.getId())).getCounter());
             assertFalse(copyOnB.hasChanges());
         } finally {
-            QuestSync.setPolicy(ALONE);
+            SYNC.shared = false;
             onA.close();
             onB.close();
         }
@@ -669,7 +673,7 @@ class JdbcQuestStorageTest {
 
     @Test
     void aChangeMadePastApplyIsWrittenAsTheWholeQuest() {
-        QuestSync.setPolicy(SHARED_ONCE_STORED);
+        SYNC.shared = true;
 
         try {
             TestQuestProgression quest = quest("Bypassed");
@@ -680,7 +684,7 @@ class JdbcQuestStorageTest {
 
             assertEquals(7, ((TestQuestProgression) storage.loadProgression(quest.getId())).getCounter());
         } finally {
-            QuestSync.setPolicy(ALONE);
+            SYNC.shared = false;
         }
     }
 
@@ -706,22 +710,22 @@ class JdbcQuestStorageTest {
 
     @Test
     void aQuestNoLongerSharedForgetsWhatItKept() {
-        QuestSync.setPolicy(SHARED_ONCE_STORED);
+        SYNC.shared = true;
 
         try {
             TestQuestProgression quest = quest("Unshared");
             storage.writeProgressions(List.of(quest));
             quest.addToCounter(5);
 
-            QuestSync.setPolicy(ALONE);
+            SYNC.shared = false;
             quest.addToCounter(1);
 
-            QuestSync.setPolicy(SHARED_ONCE_STORED);
+            SYNC.shared = true;
             write(storage, quest);
 
             assertEquals(6, ((TestQuestProgression) storage.loadProgression(quest.getId())).getCounter());
         } finally {
-            QuestSync.setPolicy(ALONE);
+            SYNC.shared = false;
         }
     }
 
@@ -926,27 +930,50 @@ class JdbcQuestStorageTest {
     }
 
     /**
-     * Every stored quest shared, as a server on a shared database holding universe quests sees it.
+     * What the quests of these tests act through. Shared, every stored quest is, as a server on a
+     * shared database holding universe quests sees it; otherwise each is written by its server alone.
      */
-    private static final QuestSync.Policy SHARED_ONCE_STORED = new QuestSync.Policy() {
+    private static final SwitchableSync SYNC = new SwitchableSync();
+
+    private static final class SwitchableSync implements QuestEnvironment {
+        private final EventBus events = new EventBus(false);
+        private volatile boolean shared;
+
         @Override
         public boolean isShared(@Nonnull AbstractQuestProgression<?> quest) {
-            return quest.getReplica().getVersion() > 0;
+            return shared && quest.getReplica().getVersion() > 0;
         }
 
         @Override
         public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {}
-    };
 
-    private static final QuestSync.Policy ALONE = new QuestSync.Policy() {
+        @Nonnull
         @Override
-        public boolean isShared(@Nonnull AbstractQuestProgression<?> quest) {
-            return false;
+        public IEventBus events() {
+            return events;
         }
 
+        @Nonnull
         @Override
-        public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {}
-    };
+        public Clock clock() {
+            return Clock.systemUTC();
+        }
+
+        @Nonnull
+        @Override
+        public OpenQuestsServices services() {
+            throw new UnsupportedOperationException("a storage test runs no services");
+        }
+    }
+
+    /**
+     * A copy read back here, acting through what the quests of these tests act through.
+     */
+    @Nonnull
+    private static TestQuestProgression attached(@Nonnull TestQuestProgression quest) {
+        quest.attach(SYNC);
+        return quest;
+    }
 
     @Nonnull
     private static QuestStorage open(@Nonnull String url) {
@@ -988,6 +1015,8 @@ class JdbcQuestStorageTest {
     private static TestQuestProgression quest(@Nonnull String assetId, @Nonnull UUID... playerIds) {
         TestQuestProgression quest = AbstractQuestProgression.Builder.of(new TestQuestProgression(), assetId).build();
         for (UUID playerId : playerIds) quest.join(playerId);
+
+        attached(quest);
 
         // The one field a record cannot invent later
         quest.onRegistered(Instant.now());

@@ -9,6 +9,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.utils.Players;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
@@ -29,15 +30,13 @@ public class WorldClosingService {
     @Nonnull
     private final QuestStorage storage;
     private final QuestProgressionService progression;
-    private final WorldQuestService worldQuests;
-    private final WorldGroupIndex worldGroups;
+    private final ScopeServices scopes;
     private final Players players;
 
-    public WorldClosingService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionService progression, @Nonnull WorldQuestService worldQuests, @Nonnull WorldGroupIndex worldGroups, @Nonnull Players players) {
+    public WorldClosingService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionService progression, @Nonnull ScopeServices scopes, @Nonnull Players players) {
         this.storage = storage;
         this.progression = progression;
-        this.worldQuests = worldQuests;
-        this.worldGroups = worldGroups;
+        this.scopes = scopes;
         this.players = players;
     }
 
@@ -55,20 +54,20 @@ public class WorldClosingService {
 
         World world = removeWorldEvent.getWorld();
 
-        worldQuests.setClosing(world, true);
+        scopes.worlds().setClosing(world, true);
         try {
-            for (UUID questId : new ArrayList<>(worldQuests.getQuestIds(world))) {
+            for (UUID questId : new ArrayList<>(scopes.worlds().getQuestIds(world))) {
                 AbstractQuestProgression<?> quest = progression.loadQuest(questId);
                 if (quest != null) close(world, quest);
             }
 
-            worldQuests.deleteIndex(world);
+            scopes.worlds().deleteIndex(world);
             storage.deleteAssignments(WorldQuestService.indexKey(world));
-            worldGroups.forgetWorld(world.getWorldConfig().getUuid());
+            scopes.worldGroups().forgetWorld(world.getWorldConfig().getUuid());
 
             LOGGER.atInfo().log("Closed the quests of world %s", world.getName());
         } finally {
-            worldQuests.setClosing(world, false);
+            scopes.worlds().setClosing(world, false);
         }
     }
 
@@ -81,8 +80,8 @@ public class WorldClosingService {
         UUID questId = quest.getId();
 
         QuestScope scope = quest.getScope();
-        if (scope != null && scope.outlives(world.getWorldConfig().getUuid())) {
-            worldQuests.removeQuestHere(world, questId);
+        if (scope != null && scope.outlives(scopes, world.getWorldConfig().getUuid())) {
+            scopes.worlds().removeQuestHere(world, questId);
             return;
         }
 

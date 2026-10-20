@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.scopes.ScopeServices;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -45,14 +46,14 @@ public class WorldsQuestScope extends WorldQuestScope {
      * A group is there to share with even while none of its worlds is open.
      */
     @Override
-    public boolean isReachable() {
+    public boolean isReachable(@Nonnull ScopeServices services) {
         return true;
     }
 
     @Nonnull
     @Override
-    public Collection<UUID> getQuestIds() {
-        return List.copyOf(WorldGroupIndex.get().getQuestIds(group));
+    public Collection<UUID> getQuestIds(@Nonnull ScopeServices services) {
+        return List.copyOf(services.worldGroups().getQuestIds(group));
     }
 
     /**
@@ -60,25 +61,25 @@ public class WorldsQuestScope extends WorldQuestScope {
      * take it up as they are entered.
      */
     @Override
-    public void share(@Nonnull AbstractQuestProgression<?> quest) {
+    public void share(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
         quest.apply(new AbstractQuestProgression.SetScope(new WorldsQuestScope(group)));
-        WorldGroupIndex.get().add(group, quest.getId());
+        services.worldGroups().add(group, quest.getId());
 
-        for (World world : WorldGroupIndex.get().getJoinedWorlds(group)) {
-            WorldQuestService.get().addQuest(world, quest.getId());
+        for (World world : services.worldGroups().getJoinedWorlds(group)) {
+            services.worlds().addQuest(world, quest.getId());
         }
     }
 
     @Override
-    public void release(@Nonnull AbstractQuestProgression<?> quest) {
-        WorldGroupIndex.get().remove(group, quest.getId());
-        super.release(quest);
+    public void release(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
+        services.worldGroups().remove(group, quest.getId());
+        super.release(services, quest);
     }
 
     @Override
-    public void retire(@Nonnull AbstractQuestProgression<?> quest) {
-        WorldGroupIndex.get().remove(group, quest.getId());
-        super.retire(quest);
+    public void retire(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
+        services.worldGroups().remove(group, quest.getId());
+        super.retire(services, quest);
     }
 
     /**
@@ -94,7 +95,7 @@ public class WorldsQuestScope extends WorldQuestScope {
      * to be entered, and end on their own terms or as their assignment replaces them.
      */
     @Override
-    public boolean outlives(@Nonnull UUID closingWorldId) {
+    public boolean outlives(@Nonnull ScopeServices services, @Nonnull UUID closingWorldId) {
         return true;
     }
 }

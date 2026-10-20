@@ -14,6 +14,7 @@ import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
@@ -119,7 +120,7 @@ public class ChoiceRewardPage extends InteractiveCustomUIPage<ChoiceRewardPage.E
         ChoiceReward.Entry[] entries = reward.getEntries();
         if (index < 0 || index >= entries.length) return;
 
-        if (!entries[index].getReward().grant(sourceQuestId, components)) return;
+        if (!entries[index].getReward().grant(OpenQuestsServices.installed(), sourceQuestId, components)) return;
 
         ChoiceReward left = reward.afterPicking(index);
         if (left == null) {

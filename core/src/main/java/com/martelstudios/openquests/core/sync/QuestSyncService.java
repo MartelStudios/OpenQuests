@@ -39,7 +39,7 @@ import java.util.function.Predicate;
  * <p>Every write of a shared quest runs on that one thread, so this server never writes one quest
  * twice at once.
  */
-public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
+public class QuestSyncService implements ScopeIndexes.Writer, QuestSync {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     @Nonnull
