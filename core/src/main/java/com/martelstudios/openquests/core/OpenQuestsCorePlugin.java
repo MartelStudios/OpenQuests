@@ -2,13 +2,11 @@ package com.martelstudios.openquests.core;
 
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.codec.util.RawJsonReader;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
 import com.martelstudios.openquests.core.assignments.repeat.AfterEndRepeat;
@@ -43,8 +41,10 @@ import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreCompon
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
+import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.sync.QuestSync;
+import com.martelstudios.openquests.core.utils.ServerPlayers;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -79,8 +79,6 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
     private QuestStorage questStorage;
     private OpenQuestsServices services;
-    private ComponentType<EntityStore, QuestStoreComponent> questStoreComponentType;
-    private ComponentType<EntityStore, PendingRewardStoreComponent> pendingRewardStoreComponentType;
 
     public OpenQuestsCorePlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -107,7 +105,14 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questStorage = settings.getStorage().create();
         questStorage.start();
 
-        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), HytaleServer.get().getEventBus(), Clock.systemUTC(), HytaleServer.SCHEDULED_EXECUTOR);
+        // Both indexes are rebuilt from the storage on connection and on world entry, so neither
+        // is written to the entity files the server saves for us
+        PlayerComponentTypes components = new PlayerComponentTypes(
+            getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, QuestStoreComponent::new),
+            getEntityStoreRegistry().registerComponent(PendingRewardStoreComponent.class, PendingRewardStoreComponent::new));
+
+        Platform platform = new Platform(HytaleServer.get().getEventBus(), Clock.systemUTC(), HytaleServer.SCHEDULED_EXECUTOR, new ServerPlayers(), components);
+        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), platform);
         services.install();
         QuestSync.setPolicy(services.getQuestSyncService());
 
@@ -128,12 +133,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
 
         services.listen(getEventRegistry());
 
-        // Both indexes are rebuilt from the storage on connection and on world entry, so neither
-        // is written to the entity files the server saves for us
-        questStoreComponentType = getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, QuestStoreComponent::new);
-        pendingRewardStoreComponentType = getEntityStoreRegistry().registerComponent(PendingRewardStoreComponent.class, PendingRewardStoreComponent::new);
-
-        getCommandRegistry().registerCommand(new QuestCommand());
+        getCommandRegistry().registerCommand(new QuestCommand(services));
 
         getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestCategory.class, new DefaultAssetMap<>())
                                                     .setPath("OpenQuests/Categories/")
@@ -266,13 +266,5 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         if (Files.exists(getDataDirectory().resolve("config.json"))) return;
 
         config.save();
-    }
-
-    public ComponentType<EntityStore, QuestStoreComponent> getQuestStoreComponentType() {
-        return questStoreComponentType;
-    }
-
-    public ComponentType<EntityStore, PendingRewardStoreComponent> getPendingRewardStoreComponentType() {
-        return pendingRewardStoreComponentType;
     }
 }

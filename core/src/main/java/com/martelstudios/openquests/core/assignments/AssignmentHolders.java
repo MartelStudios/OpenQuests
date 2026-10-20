@@ -7,7 +7,8 @@ import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
-import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
@@ -25,8 +26,16 @@ public final class AssignmentHolders {
     @Nonnull
     private final SharedAssignmentRecords records;
 
-    public AssignmentHolders(@Nonnull SharedAssignmentRecords records) {
+    @Nonnull
+    private final QuestProgressionService progression;
+
+    @Nonnull
+    private final PlayerComponentTypes components;
+
+    public AssignmentHolders(@Nonnull SharedAssignmentRecords records, @Nonnull QuestProgressionService progression, @Nonnull PlayerComponentTypes components) {
         this.records = records;
+        this.progression = progression;
+        this.components = components;
     }
 
     /**
@@ -66,7 +75,7 @@ public final class AssignmentHolders {
      */
     @Nonnull
     public AssignmentHolder player(@Nonnull UUID playerId, @Nonnull EntityComponents player) {
-        return new PlayerAssignmentHolder(playerId, player.ensureAndGetComponent(QuestStoreComponent.getComponentType()));
+        return new PlayerAssignmentHolder(progression, playerId, player.ensureAndGetComponent(components.questStore()));
     }
 
     /**
@@ -74,7 +83,7 @@ public final class AssignmentHolders {
      */
     @Nonnull
     public AssignmentHolder world(@Nonnull World world, @Nullable UUID joining) {
-        return new SharedAssignmentHolder(records, worldKey(world), new WorldQuestScope(List.of(world.getWorldConfig().getUuid())), joining);
+        return new SharedAssignmentHolder(progression, records, worldKey(world), new WorldQuestScope(List.of(world.getWorldConfig().getUuid())), joining);
     }
 
     /**
@@ -82,7 +91,7 @@ public final class AssignmentHolders {
      */
     @Nonnull
     public AssignmentHolder group(@Nonnull String group, @Nullable UUID joining) {
-        return new SharedAssignmentHolder(records, groupKey(group), new WorldsQuestScope(group), joining);
+        return new SharedAssignmentHolder(progression, records, groupKey(group), new WorldsQuestScope(group), joining);
     }
 
     /**
@@ -90,6 +99,6 @@ public final class AssignmentHolders {
      */
     @Nonnull
     public AssignmentHolder universe(@Nullable UUID joining) {
-        return new SharedAssignmentHolder(records, universeKey(), UniverseQuestScope.INSTANCE, joining);
+        return new SharedAssignmentHolder(progression, records, universeKey(), UniverseQuestScope.INSTANCE, joining);
     }
 }

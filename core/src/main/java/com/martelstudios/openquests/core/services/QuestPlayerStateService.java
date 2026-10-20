@@ -6,7 +6,6 @@ import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
@@ -17,13 +16,13 @@ import com.martelstudios.openquests.core.models.QuestTally;
 import com.martelstudios.openquests.core.persistence.PlayerMessage;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
-import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStore;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
+import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
-import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,9 +54,16 @@ public class QuestPlayerStateService {
      */
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
 
-    public QuestPlayerStateService(@Nonnull QuestProgressionStore progressionStore) {
+    private final QuestRewardService rewardService;
+    private final Players players;
+    private final PlayerComponentTypes components;
+
+    public QuestPlayerStateService(@Nonnull QuestProgressionStore progressionStore, @Nonnull QuestRewardService rewardService, @Nonnull Players players, @Nonnull PlayerComponentTypes components) {
         this.progressionStore = progressionStore;
         this.storage = progressionStore.getStorage();
+        this.rewardService = rewardService;
+        this.players = players;
+        this.components = components;
     }
 
     /**
@@ -111,10 +117,10 @@ public class QuestPlayerStateService {
             if (progressionStore.isSetAside(questId)) resolved.add(questId);
         }
 
-        QuestStoreComponent questStore = holder.ensureAndGetComponent(QuestStoreComponent.getComponentType());
+        QuestStoreComponent questStore = holder.ensureAndGetComponent(components.questStore());
         questStore.restore(resolved, record.getAssignments(), record.getCompletions(), record.getTracking(), record.getHud());
 
-        PendingRewardStoreComponent rewards = holder.ensureAndGetComponent(PendingRewardStoreComponent.getComponentType());
+        PendingRewardStoreComponent rewards = holder.ensureAndGetComponent(components.pendingRewards());
         rewards.pending.restore(record.getPendingRewards());
 
         sessions.put(playerId, new Session(questStore, rewards, delivered));
@@ -187,14 +193,6 @@ public class QuestPlayerStateService {
     }
 
     /**
-     * Leaves a debt for a player this server does not host: whichever server hosts them, now or
-     * next, takes it into their record. Their record is never written from here.
-     */
-    public void addPendingRewards(@Nonnull UUID playerId, @Nonnull PendingRewards owed) {
-        storage.postMessage(PlayerMessage.owed(playerId, owed));
-    }
-
-    /**
      * Takes in what other servers left the players this server hosts, each message once: a debt is
      * owed, and paid at once where it claims itself; an ending is counted. The next write of the
      * player's record lets go of them.
@@ -208,7 +206,7 @@ public class QuestPlayerStateService {
             // leaves before it is paid; then paid on their thread where it claims itself
             if (message.getOwed() != null) {
                 session.rewards().pending.add(message.getOwed());
-                EntityComponents.update(message.getPlayerId(), QuestRewardService.get()::claimAuto);
+                players.update(message.getPlayerId(), rewardService::claimAuto);
             }
 
             PlayerMessage.Ending ending = message.getEnding();
@@ -222,6 +220,14 @@ public class QuestPlayerStateService {
     @Nonnull
     public Set<UUID> getHostedPlayers() {
         return Set.copyOf(sessions.keySet());
+    }
+
+    /**
+     * Reads and takes in the messages other servers left the players hosted here.
+     */
+    public void takeInMessages() {
+        Set<UUID> hosted = getHostedPlayers();
+        if (!hosted.isEmpty()) deliverMessages(storage.loadMessages(hosted));
     }
 
     /**
@@ -320,9 +326,9 @@ public class QuestPlayerStateService {
      * @param leavingPlayerId discounted, being still listed among the online while their own
      * departure is announced.
      */
-    private static boolean isAnyOnline(@Nonnull Set<UUID> playerIds, @Nonnull UUID leavingPlayerId) {
+    private boolean isAnyOnline(@Nonnull Set<UUID> playerIds, @Nonnull UUID leavingPlayerId) {
         for (UUID playerId : playerIds) {
-            if (!playerId.equals(leavingPlayerId) && Universe.get().getPlayer(playerId) != null) return true;
+            if (!playerId.equals(leavingPlayerId) && players.isOnline(playerId)) return true;
         }
 
         return false;

@@ -20,8 +20,11 @@ public class CreatePlayerQuestCommand extends CommandBase {
 
     private final RequiredArg<ProfileServiceClient.PublicGameProfile> playerArg = withRequiredArg("player", "server.commands.argtype.player.desc", GAME_PROFILE_LOOKUP);
 
-    public CreatePlayerQuestCommand() {
+    private final QuestProgressionService progression;
+
+    public CreatePlayerQuestCommand(@Nonnull QuestProgressionService progression) {
         super("player", "Creates a new quest progression and adds it to the given player's store");
+        this.progression = progression;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class CreatePlayerQuestCommand extends CommandBase {
         OpenQuestAsset asset = context.get(assetArg);
         ProfileServiceClient.PublicGameProfile profile = context.get(playerArg);
 
-        var quest = QuestProgressionService.get().assignQuest(asset, profile.getUuid());
+        var quest = progression.assignQuest(asset, profile.getUuid());
         if (quest == null) {
             context.sendMessage(Message.raw("The constraints of '" + asset.getId() + "' refuse " + profile.getUsername() + " for now."));
             return;

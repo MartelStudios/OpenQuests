@@ -19,12 +19,16 @@ import java.util.UUID;
 public final class PlayerAssignmentHolder implements AssignmentHolder {
 
     @Nonnull
+    private final QuestProgressionService progression;
+
+    @Nonnull
     private final UUID playerId;
 
     @Nonnull
     private final QuestStoreComponent questStore;
 
-    public PlayerAssignmentHolder(@Nonnull UUID playerId, @Nonnull QuestStoreComponent questStore) {
+    public PlayerAssignmentHolder(@Nonnull QuestProgressionService progression, @Nonnull UUID playerId, @Nonnull QuestStoreComponent questStore) {
+        this.progression = progression;
         this.playerId = playerId;
         this.questStore = questStore;
     }
@@ -54,7 +58,7 @@ public final class PlayerAssignmentHolder implements AssignmentHolder {
     public Collection<AbstractQuestProgression<?>> getQuests() {
         List<AbstractQuestProgression<?>> quests = new ArrayList<>();
         for (UUID questId : new ArrayList<>(questStore.getQuestIds())) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> quest = progression.getQuest(questId);
             if (quest != null) quests.add(quest);
         }
         return quests;
@@ -62,7 +66,7 @@ public final class PlayerAssignmentHolder implements AssignmentHolder {
 
     @Override
     public boolean isRunning(@Nonnull AbstractQuestProgression<?> quest) {
-        return QuestProgressionService.get().getLiveQuest(quest.getId()) != null && quest.getPlayers().contains(playerId);
+        return progression.getLiveQuest(quest.getId()) != null && quest.getPlayers().contains(playerId);
     }
 
     /**
@@ -71,7 +75,7 @@ public final class PlayerAssignmentHolder implements AssignmentHolder {
      */
     @Override
     public boolean handOut(@Nonnull AbstractQuestProgression<?> quest, @Nonnull String assignmentId, @Nonnull String questAssetId, @Nullable AssignmentRecord expected, @Nonnull AssignmentRecord next) {
-        if (!QuestProgressionService.get().assignQuest(quest, playerId)) return false;
+        if (!progression.assignQuest(quest, playerId)) return false;
 
         questStore.getAssignments().put(assignmentId, questAssetId, next);
         questStore.markDirty();

@@ -3,7 +3,6 @@ package com.martelstudios.openquests.core.scopes.world;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -11,6 +10,7 @@ import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.utils.Players;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
@@ -28,9 +28,17 @@ public class WorldClosingService {
 
     @Nonnull
     private final QuestStorage storage;
+    private final QuestProgressionService progression;
+    private final WorldQuestService worldQuests;
+    private final WorldGroupIndex worldGroups;
+    private final Players players;
 
-    public WorldClosingService(@Nonnull QuestStorage storage) {
+    public WorldClosingService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionService progression, @Nonnull WorldQuestService worldQuests, @Nonnull WorldGroupIndex worldGroups, @Nonnull Players players) {
         this.storage = storage;
+        this.progression = progression;
+        this.worldQuests = worldQuests;
+        this.worldGroups = worldGroups;
+        this.players = players;
     }
 
     /**
@@ -47,20 +55,20 @@ public class WorldClosingService {
 
         World world = removeWorldEvent.getWorld();
 
-        WorldQuestService.get().setClosing(world, true);
+        worldQuests.setClosing(world, true);
         try {
-            for (UUID questId : new ArrayList<>(WorldQuestService.get().getQuestIds(world))) {
-                AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+            for (UUID questId : new ArrayList<>(worldQuests.getQuestIds(world))) {
+                AbstractQuestProgression<?> quest = progression.loadQuest(questId);
                 if (quest != null) close(world, quest);
             }
 
-            WorldQuestService.get().deleteIndex(world);
+            worldQuests.deleteIndex(world);
             storage.deleteAssignments(WorldQuestService.indexKey(world));
-            WorldGroupIndex.get().forgetWorld(world.getWorldConfig().getUuid());
+            worldGroups.forgetWorld(world.getWorldConfig().getUuid());
 
             LOGGER.atInfo().log("Closed the quests of world %s", world.getName());
         } finally {
-            WorldQuestService.get().setClosing(world, false);
+            worldQuests.setClosing(world, false);
         }
     }
 
@@ -74,28 +82,28 @@ public class WorldClosingService {
 
         QuestScope scope = quest.getScope();
         if (scope != null && scope.outlives(world.getWorldConfig().getUuid())) {
-            WorldQuestService.get().removeQuestHere(world, questId);
+            worldQuests.removeQuestHere(world, questId);
             return;
         }
 
-        if (QuestProgressionService.get().getLiveQuest(questId) != null) {
-            QuestProgressionService.get().progress(new SetStateVisitor(QuestState.FAILED), List.of(questId));
+        if (progression.getLiveQuest(questId) != null) {
+            progression.progress(new SetStateVisitor(QuestState.FAILED), List.of(questId));
         }
 
         if (quest.getPlayers().isEmpty() && quest.getAbandonedPlayers().isEmpty()) {
-            QuestProgressionService.get().unregisterQuest(quest);
+            progression.unregisterQuest(quest);
         } else if (!isHeldOnline(quest)) {
-            QuestProgressionService.get().unloadQuest(questId);
+            progression.unloadQuest(questId);
         }
     }
 
-    private static boolean isHeldOnline(@Nonnull AbstractQuestProgression<?> quest) {
+    private boolean isHeldOnline(@Nonnull AbstractQuestProgression<?> quest) {
         for (UUID playerId : quest.getPlayers()) {
-            if (Universe.get().getPlayer(playerId) != null) return true;
+            if (players.isOnline(playerId)) return true;
         }
 
         for (UUID playerId : quest.getAbandonedPlayers()) {
-            if (Universe.get().getPlayer(playerId) != null) return true;
+            if (players.isOnline(playerId)) return true;
         }
 
         return false;

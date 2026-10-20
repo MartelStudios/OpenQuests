@@ -3,7 +3,7 @@ package com.martelstudios.openquests.core.rewards.stores;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 
 import javax.annotation.Nullable;
 
@@ -28,6 +28,6 @@ public class PendingRewardStoreComponent implements Component<EntityStore> {
     }
 
     public static ComponentType<EntityStore, PendingRewardStoreComponent> getComponentType() {
-        return OpenQuestsCorePlugin.get().getPendingRewardStoreComponentType();
+        return OpenQuestsServices.installed().getPlatform().components().pendingRewards();
     }
 }

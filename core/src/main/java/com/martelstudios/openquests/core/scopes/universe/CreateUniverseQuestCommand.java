@@ -16,16 +16,21 @@ public class CreateUniverseQuestCommand extends CommandBase {
     @Nonnull
     private final RequiredArg<OpenQuestAsset> assetArg = withRequiredArg("assetId", "server.commands.openquests.quest.create.assetId.desc", QUEST_ASSET);
 
-    public CreateUniverseQuestCommand() {
+    private final QuestProgressionService progression;
+    private final UniverseQuestService universe;
+
+    public CreateUniverseQuestCommand(@Nonnull QuestProgressionService progression, @Nonnull UniverseQuestService universe) {
         super("universe", "Creates a new quest progression and adds it to the universe's store");
+        this.progression = progression;
+        this.universe = universe;
     }
 
     @Override
     protected void executeSync(@Nonnull CommandContext context) {
         OpenQuestAsset asset = context.get(assetArg);
 
-        var quest = QuestProgressionService.get().registerQuest(asset);
-        UniverseQuestService.get().addQuest(quest.getId());
+        var quest = progression.registerQuest(asset);
+        universe.addQuest(quest.getId());
         context.sendMessage(Message.raw("Created quest " + quest.getId() + " from asset '" + asset.getId() + "'."));
     }
 }

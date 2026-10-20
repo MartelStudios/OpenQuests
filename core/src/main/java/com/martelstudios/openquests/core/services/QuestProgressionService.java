@@ -34,13 +34,15 @@ import java.util.UUID;
  */
 public class QuestProgressionService {
     private final QuestProgressionStore dataStore;
-    private final IEventBus events;
+    private final IEventBus eventBus;
     private final Clock clock;
+    private final QuestPlayerStateService playerState;
 
-    public QuestProgressionService(@Nonnull QuestProgressionStore questProgressionStore, @Nonnull IEventBus events, @Nonnull Clock clock) {
+    public QuestProgressionService(@Nonnull QuestProgressionStore questProgressionStore, @Nonnull IEventBus events, @Nonnull Clock clock, @Nonnull QuestPlayerStateService playerState) {
         this.dataStore = questProgressionStore;
-        this.events = events;
+        this.eventBus = events;
         this.clock = clock;
+        this.playerState = playerState;
     }
 
     /**
@@ -128,7 +130,7 @@ public class QuestProgressionService {
         if (constraints.length == 0) return true;
 
         AssignmentRequest request = new AssignmentRequest(asset, playerId, clock.instant(), joining,
-                                                          assetId -> QuestPlayerStateService.get().getTally(playerId, assetId));
+                                                          assetId -> playerState.getTally(playerId, assetId));
         for (QuestConstraint constraint : constraints) {
             if (!constraint.allowsAssignment(request)) return false;
         }
@@ -200,7 +202,7 @@ public class QuestProgressionService {
         dataStore.add(quest);
         quest.onRegistered(clock.instant());
 
-        events.dispatchFor(QuestRegisteredEvent.class, quest.getId()).dispatch(new QuestRegisteredEvent(quest));
+        eventBus.dispatchFor(QuestRegisteredEvent.class, quest.getId()).dispatch(new QuestRegisteredEvent(quest));
     }
 
     /**
@@ -231,7 +233,7 @@ public class QuestProgressionService {
 
         quest.onUnregistered();
 
-        events.dispatchFor(QuestUnregisteredEvent.class, quest.getId()).dispatch(new QuestUnregisteredEvent(quest));
+        eventBus.dispatchFor(QuestUnregisteredEvent.class, quest.getId()).dispatch(new QuestUnregisteredEvent(quest));
 
         return removed;
     }

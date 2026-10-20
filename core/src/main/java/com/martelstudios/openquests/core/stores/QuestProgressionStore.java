@@ -64,11 +64,11 @@ public class QuestProgressionStore {
     private final QuestStorage storage;
 
     @Nonnull
-    private final IEventBus events;
+    private final IEventBus eventBus;
 
     public QuestProgressionStore(@Nonnull QuestStorage storage, @Nonnull IEventBus events) {
         this.storage = storage;
-        this.events = events;
+        this.eventBus = events;
     }
 
     @Nonnull
@@ -103,7 +103,7 @@ public class QuestProgressionStore {
             }
         }
 
-        events.dispatchFor(QuestLoadedEvent.class, quest.getId()).dispatch(new QuestLoadedEvent(quest));
+        eventBus.dispatchFor(QuestLoadedEvent.class, quest.getId()).dispatch(new QuestLoadedEvent(quest));
     }
 
     /**
@@ -121,7 +121,7 @@ public class QuestProgressionStore {
 
         if (remove(id) == null) archived.remove(id);
 
-        events.dispatchFor(QuestUnloadedEvent.class, id).dispatch(new QuestUnloadedEvent(quest));
+        eventBus.dispatchFor(QuestUnloadedEvent.class, id).dispatch(new QuestUnloadedEvent(quest));
 
         return quest;
     }

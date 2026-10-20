@@ -9,6 +9,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
+import com.martelstudios.openquests.core.scopes.ScopeIndexFollower;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
@@ -23,8 +24,6 @@ import com.martelstudios.openquests.core.sync.QuestSyncService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.time.Clock;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * The core services, built once over a storage and wired to each other. The plugin builds one
@@ -36,44 +35,48 @@ public final class OpenQuestsServices {
     private static volatile OpenQuestsServices installed;
 
     private final QuestStorage storage;
-    private final IEventBus events;
+    private final Platform platform;
     private final QuestProgressionStore progressionStore;
-    private final QuestSyncService sync;
-    private final QuestProgressionService progression;
-    private final QuestPlayerStateService playerState;
     private final QuestRewardService rewards;
+    private final QuestPlayerStateService playerState;
+    private final QuestProgressionService progression;
+    private final QuestSyncService sync;
     private final ScopeIndexes scopeIndexes;
+    private final PlayerQuestService playerQuests;
     private final UniverseQuestService universe;
     private final WorldQuestService worlds;
     private final WorldGroupIndex worldGroups;
     private final WorldClosingService worldClosing;
-    private final PlayerQuestService players;
     private final QuestAssignmentService assignments;
     private final QuestDeadlineService deadlines;
 
     /**
      * @param syncSeconds how often quests shared between servers are read back
-     * @param events where the services announce what happens to quests
-     * @param clock what the services read the time from
-     * @param scheduler where they run what waits, shared with the rest of the server
      */
-    public OpenQuestsServices(@Nonnull QuestStorage storage, long syncSeconds, @Nonnull IEventBus events, @Nonnull Clock clock, @Nonnull ScheduledExecutorService scheduler) {
+    public OpenQuestsServices(@Nonnull QuestStorage storage, long syncSeconds, @Nonnull Platform platform) {
         this.storage = storage;
-        this.events = events;
-        progressionStore = new QuestProgressionStore(storage, events);
-        sync = new QuestSyncService(storage, progressionStore, syncSeconds);
-        progression = new QuestProgressionService(progressionStore, events, clock);
-        playerState = new QuestPlayerStateService(progressionStore);
-        rewards = new QuestRewardService();
-        scopeIndexes = new ScopeIndexes(storage, sync);
-        universe = new UniverseQuestService(scopeIndexes);
-        worlds = new WorldQuestService(scopeIndexes);
-        worldGroups = new WorldGroupIndex(scopeIndexes);
-        worldClosing = new WorldClosingService(storage);
-        players = new PlayerQuestService(events);
-        assignments = new QuestAssignmentService(storage, progression, clock, scheduler);
-        deadlines = new QuestDeadlineService(progression, clock, scheduler);
+        this.platform = platform;
+
+        progressionStore = new QuestProgressionStore(storage, platform.events());
+        rewards = new QuestRewardService(storage, platform.players(), platform.components());
+        playerState = new QuestPlayerStateService(progressionStore, rewards, platform.players(), platform.components());
+        progression = new QuestProgressionService(progressionStore, platform.events(), platform.clock(), playerState);
+        sync = new QuestSyncService(storage, progressionStore, progression, syncSeconds);
+        scopeIndexes = new ScopeIndexes(storage, sync, progressionStore);
+        playerQuests = new PlayerQuestService(platform.events(), platform.players(), platform.components());
+        universe = new UniverseQuestService(scopeIndexes, progression, platform.players());
+        worlds = new WorldQuestService(scopeIndexes, progression, sync, playerQuests, platform.components());
+        worldGroups = new WorldGroupIndex(scopeIndexes, progression, worlds);
+        worldClosing = new WorldClosingService(storage, progression, worlds, worldGroups, platform.players());
+        assignments = new QuestAssignmentService(storage, progression, worldGroups, platform.players(), platform.components(), platform.clock(), platform.scheduler());
+        deadlines = new QuestDeadlineService(progression, platform.clock(), platform.scheduler());
+
+        // What other servers write besides the quests themselves, read on each tick of the sync
+        ScopeIndexFollower indexFollower = new ScopeIndexFollower(scopeIndexes, universe, worldGroups);
+        sync.onEachTick(indexFollower::follow);
+        sync.onEachTick(playerState::takeInMessages);
     }
+
 
     /**
      * Subscribes every service to the events it answers. Listeners of equal priority run in the
@@ -105,7 +108,7 @@ public final class OpenQuestsServices {
             if (quest.getPlayers().isEmpty() && quest.getAbandonedPlayers().isEmpty()) progression.unregisterQuest(quest);
         });
 
-        players.listen(events);
+        playerQuests.listen(events);
         assignments.listen(events);
         deadlines.listen(events);
     }
@@ -131,8 +134,13 @@ public final class OpenQuestsServices {
     }
 
     @Nonnull
+    public Platform getPlatform() {
+        return platform;
+    }
+
+    @Nonnull
     public IEventBus getEvents() {
-        return events;
+        return platform.events();
     }
 
     @Nonnull
@@ -187,7 +195,7 @@ public final class OpenQuestsServices {
 
     @Nonnull
     public PlayerQuestService getPlayerQuestService() {
-        return players;
+        return playerQuests;
     }
 
     @Nonnull

@@ -6,7 +6,6 @@ import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsServices;
@@ -16,7 +15,9 @@ import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.core.utils.Players;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
@@ -61,10 +62,22 @@ public class QuestAssignmentService {
     @Nonnull
     private final ScheduledExecutorService scheduler;
 
-    public QuestAssignmentService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionService progression, @Nonnull Clock clock, @Nonnull ScheduledExecutorService scheduler) {
+    @Nonnull
+    private final WorldGroupIndex worldGroups;
+
+    @Nonnull
+    private final Players players;
+
+    /**
+     * @param scheduler where the schedule is checked, shared with the rest of the server
+     */
+    public QuestAssignmentService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionService progression, @Nonnull WorldGroupIndex worldGroups,
+                                  @Nonnull Players players, @Nonnull PlayerComponentTypes components, @Nonnull Clock clock, @Nonnull ScheduledExecutorService scheduler) {
         this.records = new SharedAssignmentRecords(storage);
-        this.holders = new AssignmentHolders(records);
+        this.holders = new AssignmentHolders(records, progression, components);
         this.offer = new AssignmentOffer(ids -> progression.progress(new SetStateVisitor(QuestState.FAILED), ids), clock);
+        this.worldGroups = worldGroups;
+        this.players = players;
         this.clock = clock;
         this.scheduler = scheduler;
     }
@@ -139,7 +152,7 @@ public class QuestAssignmentService {
 
         forEachAssignment("a world entry", assignment -> {
             String group = assignment.getScope().groupOf(assignment, world);
-            if (group != null) WorldGroupIndex.get().enter(group, world, playerRef.getUuid());
+            if (group != null) worldGroups.enter(group, world, playerRef.getUuid());
 
             Occasion occasion = assignment.getTrigger().onEnterWorld(playerRef.getUuid(), player, world);
             if (occasion != null) evaluate(assignment, occasion);
@@ -199,11 +212,10 @@ public class QuestAssignmentService {
         public void onlinePlayers() {
             String key = occasion.placeKey();
 
-            for (PlayerRef playerRef : Universe.get().getPlayers()) {
-                UUID playerId = playerRef.getUuid();
+            for (UUID playerId : players.online()) {
                 if (isSettled(AssignmentHolders.playerKey(playerId), key)) continue;
 
-                EntityComponents.update(playerId, player -> offerAll(holders.player(playerId, player), key));
+                players.update(playerId, player -> offerAll(holders.player(playerId, player), key));
             }
         }
 

@@ -20,6 +20,9 @@ import java.util.UUID;
 public final class SharedAssignmentHolder implements AssignmentHolder {
 
     @Nonnull
+    private final QuestProgressionService progression;
+
+    @Nonnull
     private final SharedAssignmentRecords records;
 
     @Nonnull
@@ -44,7 +47,8 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
      * @param scope the scope a quest handed out here is shared through, which indexes its quests
      * @param joining the player whose arrival this is, not among those the scope reaches yet
      */
-    public SharedAssignmentHolder(@Nonnull SharedAssignmentRecords records, @Nonnull String key, @Nonnull QuestScope scope, @Nullable UUID joining) {
+    public SharedAssignmentHolder(@Nonnull QuestProgressionService progression, @Nonnull SharedAssignmentRecords records, @Nonnull String key, @Nonnull QuestScope scope, @Nullable UUID joining) {
+        this.progression = progression;
         this.records = records;
         this.key = key;
         this.scope = scope;
@@ -70,7 +74,7 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
 
         List<AbstractQuestProgression<?>> read = new ArrayList<>();
         for (UUID questId : new ArrayList<>(scope.getQuestIds())) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+            AbstractQuestProgression<?> quest = progression.loadQuest(questId);
             if (quest != null) read.add(quest);
         }
         quests = read;
@@ -82,7 +86,7 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
      */
     @Override
     public boolean isRunning(@Nonnull AbstractQuestProgression<?> quest) {
-        if (QuestProgressionService.get().getLiveQuest(quest.getId()) == null) return false;
+        if (progression.getLiveQuest(quest.getId()) == null) return false;
 
         return !quest.getPlayers().isEmpty() || quest.getAbandonedPlayers().isEmpty();
     }
@@ -96,9 +100,9 @@ public final class SharedAssignmentHolder implements AssignmentHolder {
         if (!records.claim(key, assignmentId, questAssetId, expected, next)) return false;
 
         quests = null;
-        QuestProgressionService.get().registerQuest(quest);
+        progression.registerQuest(quest);
         scope.share(quest);
-        if (joining != null) QuestProgressionService.get().joinQuest(quest, joining);
+        if (joining != null) progression.joinQuest(quest, joining);
         return true;
     }
 

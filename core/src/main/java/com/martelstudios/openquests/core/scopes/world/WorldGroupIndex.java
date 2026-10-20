@@ -27,6 +27,8 @@ public class WorldGroupIndex {
 
     @Nonnull
     private final ScopeIndexes indexes;
+    private final QuestProgressionService progression;
+    private final WorldQuestService worldQuests;
 
     /**
      * The worlds of each group someone entered since they opened, in memory only: the ones a quest
@@ -34,8 +36,10 @@ public class WorldGroupIndex {
      */
     private final Map<String, Set<UUID>> joinedWorlds = new ConcurrentHashMap<>();
 
-    public WorldGroupIndex(@Nonnull ScopeIndexes indexes) {
+    public WorldGroupIndex(@Nonnull ScopeIndexes indexes, @Nonnull QuestProgressionService progression, @Nonnull WorldQuestService worldQuests) {
         this.indexes = indexes;
+        this.progression = progression;
+        this.worldQuests = worldQuests;
     }
 
     public static WorldGroupIndex get() {
@@ -81,10 +85,10 @@ public class WorldGroupIndex {
         joinedWorlds.computeIfAbsent(group, key -> ConcurrentHashMap.newKeySet()).add(world.getWorldConfig().getUuid());
 
         for (AbstractQuestProgression<?> quest : indexes.resolve(keyOf(group))) {
-            if (QuestProgressionService.get().getLiveQuest(quest.getId()) == null) continue;
+            if (progression.getLiveQuest(quest.getId()) == null) continue;
 
-            WorldQuestService.get().addQuest(world, quest.getId());
-            QuestProgressionService.get().joinQuest(quest, playerId);
+            worldQuests.addQuest(world, quest.getId());
+            progression.joinQuest(quest, playerId);
         }
     }
 
@@ -94,7 +98,7 @@ public class WorldGroupIndex {
     @Nonnull
     public List<World> getJoinedWorlds(@Nonnull String group) {
         Set<UUID> worldIds = joinedWorlds.get(group);
-        return worldIds == null ? List.of() : WorldQuestService.get().openWorlds(worldIds);
+        return worldIds == null ? List.of() : worldQuests.openWorlds(worldIds);
     }
 
     /**
@@ -117,7 +121,7 @@ public class WorldGroupIndex {
 
             List<World> worlds = getJoinedWorlds(key.substring(GROUP_INDEX_PREFIX.length()));
             for (UUID questId : questIds) {
-                for (World world : worlds) WorldQuestService.get().addQuest(world, questId);
+                for (World world : worlds) worldQuests.addQuest(world, questId);
             }
         });
     }
@@ -128,7 +132,7 @@ public class WorldGroupIndex {
      */
     public void preload(@Nonnull Collection<String> groupNames) {
         for (String group : groupNames) {
-            QuestProgressionService.get().loadQuests(getQuestIds(group));
+            progression.loadQuests(getQuestIds(group));
         }
     }
 }

@@ -1,10 +1,13 @@
 package com.martelstudios.openquests.core;
 
+import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.event.IEventRegistry;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
+import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
+import com.martelstudios.openquests.core.utils.Players;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
@@ -27,7 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OpenQuestsServicesTest {
 
-    private final OpenQuestsServices services = new OpenQuestsServices(untouched(QuestStorage.class), 5, untouched(IEventBus.class), Clock.systemUTC(), untouched(ScheduledExecutorService.class));
+    private final Platform platform = new Platform(Untouched.of(IEventBus.class), Clock.systemUTC(), Untouched.of(ScheduledExecutorService.class), Untouched.of(Players.class),
+                                                   new PlayerComponentTypes(new ComponentType<>(), new ComponentType<>()));
+    private final OpenQuestsServices services = new OpenQuestsServices(Untouched.of(QuestStorage.class), 5, platform);
 
     @Test
     void everyServiceSubscribesWhenToldToListen() {
@@ -63,20 +68,6 @@ class OpenQuestsServicesTest {
         assertEquals(1, last, "only the unregistering runs last, after everyone else saw the end");
         assertEquals(EventPriority.LAST.getValue(), priorities.stream().max(Short::compare).orElseThrow());
     }
-
-    /**
-     * @return a stand-in failing on any call, so building a service proves it left it alone.
-     */
-    @Nonnull
-    private static <T> T untouched(@Nonnull Class<T> type) {
-        return type.cast(Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] {type}, (proxy, method, args) -> switch (method.getName()) {
-            case "hashCode" -> System.identityHashCode(proxy);
-            case "equals" -> proxy == args[0];
-            case "toString" -> type.getSimpleName();
-            default -> throw new AssertionError("built with a call to " + type.getSimpleName() + "." + method.getName());
-        }));
-    }
-
     /**
      * Keeps every global subscription with its priority, the default one counted as NORMAL.
      */
