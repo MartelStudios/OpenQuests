@@ -1,8 +1,8 @@
 package com.martelstudios.openquests.core.scopes.player;
 
+import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.event.IEventRegistry;
-import com.hypixel.hytale.server.core.HytaleServer;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
@@ -27,6 +27,12 @@ import java.util.UUID;
  */
 public class PlayerQuestService {
 
+    private final IEventBus events;
+
+    public PlayerQuestService(@Nonnull IEventBus events) {
+        this.events = events;
+    }
+
     /**
      * Subscribes to the quest membership changes mirrored into each player's record.
      */
@@ -37,7 +43,7 @@ public class PlayerQuestService {
     }
 
     public static PlayerQuestService get() {
-        return OpenQuestsCorePlugin.get().getServices().getPlayerQuestService();
+        return OpenQuestsServices.installed().getPlayerQuestService();
     }
 
     /**
@@ -81,10 +87,7 @@ public class PlayerQuestService {
 
         playerStore.markDirty();
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestAddedToPlayerStoreEvent.class, playerId)
-                    .dispatch(new QuestAddedToPlayerStoreEvent(quest, playerId));
+        events.dispatchFor(QuestAddedToPlayerStoreEvent.class, playerId).dispatch(new QuestAddedToPlayerStoreEvent(quest, playerId));
     }
 
     public void removeQuestFromPlayerStore(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
@@ -100,9 +103,6 @@ public class PlayerQuestService {
 
         playerStore.markDirty();
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestRemovedFromPlayerStoreEvent.class, playerId)
-                    .dispatch(new QuestRemovedFromPlayerStoreEvent(quest, playerId));
+        events.dispatchFor(QuestRemovedFromPlayerStoreEvent.class, playerId).dispatch(new QuestRemovedFromPlayerStoreEvent(quest, playerId));
     }
 }

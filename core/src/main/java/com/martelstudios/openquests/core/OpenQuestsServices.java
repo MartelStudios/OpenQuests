@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.core;
 
+import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.event.IEventRegistry;
 import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
@@ -21,6 +22,7 @@ import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.sync.QuestSyncService;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * The core services, built once over a storage and wired to each other. The plugin builds one
@@ -28,7 +30,11 @@ import javax.annotation.Nonnull;
  */
 public final class OpenQuestsServices {
 
+    @Nullable
+    private static volatile OpenQuestsServices installed;
+
     private final QuestStorage storage;
+    private final IEventBus events;
     private final QuestProgressionStore progressionStore;
     private final QuestSyncService sync;
     private final QuestProgressionService progression;
@@ -45,12 +51,14 @@ public final class OpenQuestsServices {
 
     /**
      * @param syncSeconds how often quests shared between servers are read back
+     * @param events where the services announce what happens to quests
      */
-    public OpenQuestsServices(@Nonnull QuestStorage storage, long syncSeconds) {
+    public OpenQuestsServices(@Nonnull QuestStorage storage, long syncSeconds, @Nonnull IEventBus events) {
         this.storage = storage;
-        progressionStore = new QuestProgressionStore(storage);
+        this.events = events;
+        progressionStore = new QuestProgressionStore(storage, events);
         sync = new QuestSyncService(storage, progressionStore, syncSeconds);
-        progression = new QuestProgressionService(progressionStore);
+        progression = new QuestProgressionService(progressionStore, events);
         playerState = new QuestPlayerStateService(progressionStore);
         rewards = new QuestRewardService();
         scopeIndexes = new ScopeIndexes(storage, sync);
@@ -58,7 +66,7 @@ public final class OpenQuestsServices {
         worlds = new WorldQuestService(scopeIndexes);
         worldGroups = new WorldGroupIndex(scopeIndexes);
         worldClosing = new WorldClosingService(storage);
-        players = new PlayerQuestService();
+        players = new PlayerQuestService(events);
         assignments = new QuestAssignmentService(storage);
         deadlines = new QuestDeadlineService();
     }
@@ -96,6 +104,31 @@ public final class OpenQuestsServices {
         players.listen(events);
         assignments.listen(events);
         deadlines.listen(events);
+    }
+
+    /**
+     * Makes these the services that code not handed them yet finds: the static lookups and the
+     * quests built by codecs. The plugin installs its own, a test the one it drives.
+     */
+    public void install() {
+        installed = this;
+    }
+
+    /**
+     * @return the installed services.
+     * @throws IllegalStateException before any were installed, which outside a test means before
+     * the plugin set up
+     */
+    @Nonnull
+    public static OpenQuestsServices installed() {
+        OpenQuestsServices services = installed;
+        if (services == null) throw new IllegalStateException("The OpenQuests services are not set up yet");
+        return services;
+    }
+
+    @Nonnull
+    public IEventBus getEvents() {
+        return events;
     }
 
     @Nonnull

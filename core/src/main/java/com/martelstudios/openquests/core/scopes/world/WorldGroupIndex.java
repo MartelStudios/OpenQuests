@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.core.scopes.world;
 
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -39,7 +39,7 @@ public class WorldGroupIndex {
     }
 
     public static WorldGroupIndex get() {
-        return OpenQuestsCorePlugin.get().getServices().getWorldGroupIndex();
+        return OpenQuestsServices.installed().getWorldGroupIndex();
     }
 
     /**

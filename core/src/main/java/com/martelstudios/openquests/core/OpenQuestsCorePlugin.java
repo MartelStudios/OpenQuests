@@ -106,7 +106,8 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questStorage = settings.getStorage().create();
         questStorage.start();
 
-        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds());
+        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), HytaleServer.get().getEventBus());
+        services.install();
         QuestSync.setPolicy(services.getQuestSyncService());
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
@@ -264,14 +265,6 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         if (Files.exists(getDataDirectory().resolve("config.json"))) return;
 
         config.save();
-    }
-
-    /**
-     * @return the core services, built in {@link #setup()}.
-     */
-    @Nonnull
-    public OpenQuestsServices getServices() {
-        return services;
     }
 
     public ComponentType<EntityStore, QuestStoreComponent> getQuestStoreComponentType() {

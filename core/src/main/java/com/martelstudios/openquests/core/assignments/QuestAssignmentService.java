@@ -10,7 +10,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
@@ -66,7 +66,7 @@ public class QuestAssignmentService {
     }
 
     public static QuestAssignmentService get() {
-        return OpenQuestsCorePlugin.get().getServices().getQuestAssignmentService();
+        return OpenQuestsServices.installed().getQuestAssignmentService();
     }
 
     /**

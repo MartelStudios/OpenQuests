@@ -5,7 +5,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
@@ -42,7 +42,7 @@ public class UniverseQuestService {
     }
 
     public static UniverseQuestService get() {
-        return OpenQuestsCorePlugin.get().getServices().getUniverseQuestService();
+        return OpenQuestsServices.installed().getUniverseQuestService();
     }
 
     /**

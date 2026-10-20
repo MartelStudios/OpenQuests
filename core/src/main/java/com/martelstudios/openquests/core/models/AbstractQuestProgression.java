@@ -8,8 +8,8 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.event.IEvent;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
@@ -374,7 +374,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     private static <E extends IEvent<UUID>> void dispatch(@Nonnull Class<E> type, @Nonnull UUID key, @Nonnull E event) {
-        HytaleServer.get().getEventBus().dispatchFor(type, key).dispatch(event);
+        OpenQuestsServices.installed().getEvents().dispatchFor(type, key).dispatch(event);
     }
 
     /**

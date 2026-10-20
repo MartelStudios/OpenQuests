@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.core.sync;
 
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestOperation;
@@ -74,7 +74,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
     }
 
     public static QuestSyncService get() {
-        return OpenQuestsCorePlugin.get().getServices().getQuestSyncService();
+        return OpenQuestsServices.installed().getQuestSyncService();
     }
 
     /**

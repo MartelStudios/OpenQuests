@@ -2,9 +2,9 @@ package com.martelstudios.openquests.core.services;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.event.EventPriority;
+import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.event.IEventRegistry;
-import com.hypixel.hytale.server.core.HytaleServer;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.constraints.AssignmentRequest;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
@@ -34,9 +34,11 @@ import java.util.UUID;
  */
 public class QuestProgressionService {
     private final QuestProgressionStore dataStore;
+    private final IEventBus events;
 
-    public QuestProgressionService(@Nonnull QuestProgressionStore questProgressionStore) {
+    public QuestProgressionService(@Nonnull QuestProgressionStore questProgressionStore, @Nonnull IEventBus events) {
         this.dataStore = questProgressionStore;
+        this.events = events;
     }
 
     /**
@@ -48,7 +50,7 @@ public class QuestProgressionService {
     }
 
     public static QuestProgressionService get() {
-        return OpenQuestsCorePlugin.get().getServices().getQuestProgressionService();
+        return OpenQuestsServices.installed().getQuestProgressionService();
     }
 
     /**
@@ -196,10 +198,7 @@ public class QuestProgressionService {
         dataStore.add(quest);
         quest.onRegistered();
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestRegisteredEvent.class, quest.getId())
-                    .dispatch(new QuestRegisteredEvent(quest));
+        events.dispatchFor(QuestRegisteredEvent.class, quest.getId()).dispatch(new QuestRegisteredEvent(quest));
     }
 
     /**
@@ -230,10 +229,7 @@ public class QuestProgressionService {
 
         quest.onUnregistered();
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestUnregisteredEvent.class, quest.getId())
-                    .dispatch(new QuestUnregisteredEvent(quest));
+        events.dispatchFor(QuestUnregisteredEvent.class, quest.getId()).dispatch(new QuestUnregisteredEvent(quest));
 
         return removed;
     }

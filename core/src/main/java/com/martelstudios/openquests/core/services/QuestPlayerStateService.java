@@ -8,7 +8,7 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestCompletions;
@@ -75,7 +75,7 @@ public class QuestPlayerStateService {
     }
 
     public static QuestPlayerStateService get() {
-        return OpenQuestsCorePlugin.get().getServices().getQuestPlayerStateService();
+        return OpenQuestsServices.installed().getQuestPlayerStateService();
     }
 
     /**

@@ -4,7 +4,7 @@ import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.universe.Universe;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -43,7 +43,7 @@ public class QuestRewardService {
     }
 
     public static QuestRewardService get() {
-        return OpenQuestsCorePlugin.get().getServices().getQuestRewardService();
+        return OpenQuestsServices.installed().getQuestRewardService();
     }
 
     /**

@@ -6,7 +6,7 @@ import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
@@ -88,7 +88,7 @@ public class QuestDeadlineService {
      * @return the instance the core plugin set up.
      */
     public static QuestDeadlineService get() {
-        return OpenQuestsCorePlugin.get().getServices().getQuestDeadlineService();
+        return OpenQuestsServices.installed().getQuestDeadlineService();
     }
 
     /**

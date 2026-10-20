@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.core.stores;
 
+import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
 import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -63,8 +63,12 @@ public class QuestProgressionStore {
     @Nonnull
     private final QuestStorage storage;
 
-    public QuestProgressionStore(@Nonnull QuestStorage storage) {
+    @Nonnull
+    private final IEventBus events;
+
+    public QuestProgressionStore(@Nonnull QuestStorage storage, @Nonnull IEventBus events) {
         this.storage = storage;
+        this.events = events;
     }
 
     @Nonnull
@@ -99,10 +103,7 @@ public class QuestProgressionStore {
             }
         }
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestLoadedEvent.class, quest.getId())
-                    .dispatch(new QuestLoadedEvent(quest));
+        events.dispatchFor(QuestLoadedEvent.class, quest.getId()).dispatch(new QuestLoadedEvent(quest));
     }
 
     /**
@@ -120,10 +121,7 @@ public class QuestProgressionStore {
 
         if (remove(id) == null) archived.remove(id);
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestUnloadedEvent.class, id)
-                    .dispatch(new QuestUnloadedEvent(quest));
+        events.dispatchFor(QuestUnloadedEvent.class, id).dispatch(new QuestUnloadedEvent(quest));
 
         return quest;
     }

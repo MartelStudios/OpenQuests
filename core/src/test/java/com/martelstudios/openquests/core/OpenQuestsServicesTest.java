@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.core;
 
 import com.hypixel.hytale.event.EventPriority;
+import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.event.IEventRegistry;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OpenQuestsServicesTest {
 
-    private final OpenQuestsServices services = new OpenQuestsServices(untouched(QuestStorage.class), 5);
+    private final OpenQuestsServices services = new OpenQuestsServices(untouched(QuestStorage.class), 5, untouched(IEventBus.class));
 
     @Test
     void everyServiceSubscribesWhenToldToListen() {
