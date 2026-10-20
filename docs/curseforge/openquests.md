@@ -28,9 +28,16 @@ needs.
 
 🔀 **Branching paths.** `OR` lets the player choose their way through a chapter, `AND` asks for everything.
 
-📖 **A quest journal.** `/ojournal` opens a real page: what you are on, what you finished, what you are still owed.
+📖 **A quest journal with chapters.** `/ojournal` sorts your quests into chapters drawn as a map of how they lead into
+one another, and opens again right where you left it.
+
+🖼️ **Quests that read well.** Every quest has an icon, a short line on the HUD saying exactly what to do, and a
+description for the story, with paragraphs, italics and colours.
 
 📊 **A tracker HUD.** Titles, counters, nesting and timers, exactly as the screenshot shows. Players can hide or move it, and the server picks where it starts.
+
+🎁 **Rewards to look forward to.** Items, the next quests, commands, a prize drawn at random, or a popup where the
+player picks their own.
 
 ⏳ **Rules on any quest.** Time limits, worlds, cooldowns, caps: add them to any quest and combine them freely.
 
@@ -48,14 +55,32 @@ of a player hours later.
 
 ***
 
-## 📖 The quest journal
+## 📖 Chapters and the quest journal
 
-![The quest journal opened on Choose your weapon, reached through a trail reading Quest journal, Craft a workbench, Choose your weapon. The quest is marked Locked, and its four crafting objectives are separated by OR rules](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-breadcrumb.png?raw=true)
+![The journal's Chapters tab: the Adventure group unfolds, then The Forgotten Temple and The Goblin Breach open one after the other, each drawn as a graph of quest icons](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-chapters.gif?raw=true)
 
-* **Four tabs:** *Active*, *Finished*, *All*, and *Rewards*, which turns gold when something waits to be collected.
-* **Rows that open** on the description, every objective with its counter, and the rewards on offer.
+Group your quests into **chapters**, and chapters into groups, each with its icon. A chapter is drawn as a map: every
+quest is a tile, and the arrows show which one opens the next.
+
+![Hovering The restless dead shows its tooltip and lights its two branches, then hovering Knights of the crypt shows its own](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-graph-tooltip.gif?raw=true)
+
+* **Hover a quest** to read where it stands and what it asks, with the path leading to it lit up.
+* **A map as big as you need:** scroll it both ways, or switch to a plain list of the chapter in one click.
+* **Three tabs:** *Chapters*, *Quests* with a state filter and a search box, and *Rewards*, which turns gold when
+  something waits to be collected.
+* **Rows that open** on the story, every objective with its counter, and the rewards on offer.
 * **Tracking from the journal:** put a quest, or a single step of a long chain, on the HUD in one click.
-* **Chains you can walk through:** an objective naming another quest is a link, and a trail at the top takes you back.
+
+![From the quest list, a reward link opens Bomb throwers, then Boom powder, Bangsticks and The Voidtaken Grizzly, the trail folding its oldest steps; a click on the trail goes back one step](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-quest-links.gif?raw=true)
+
+* **Chains you can walk through:** a reward or an objective naming another quest is a link, and the trail at the top
+  takes you back.
+* **It remembers:** close the journal, open it again, and you are back on the same tab, chapter and quest.
+
+![In edit mode, the Rune of fire tile is picked up and dropped one cell further right, then the edit is closed](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-graph-edit.gif?raw=true)
+
+**Lay chapters out in game.** Players allowed to edit get an *Edit* button: pick a tile, drop it on another cell, and
+the chapter's file is written for you.
 
 ***
 
@@ -77,6 +102,7 @@ of a player hours later.
 | <code>KillPlayer</code>                                  | Killing players, optionally a designated one                       |
 | <code>ReachLocation</code>                               | Entering a radius around a position                                |
 | <code>EnterWorld</code>                                  | Entering a world whose name matches a pattern                      |
+| <code>TriggerVolume</code>                               | Entering trigger volumes, even in generated worlds                 |
 | <code>Walk</code>, <code>Run</code>, <code>Sprint</code> | Covering a distance, or a time, at that pace                       |
 | <code>Jump</code>                                        | Jumping a number of times                                          |
 | <code>Composite</code>                                   | Its children, combined with <code>AND</code> or <code>OR</code>    |
@@ -93,6 +119,10 @@ the same item thrown and picked up, or the same block placed and broken, from co
 | <code>Item</code>       | Gives items                                               |
 | <code>GrantQuest</code> | Hands the next quests over: this is how a chain continues |
 | <code>Command</code>    | Runs a server command, as the console or as the player    |
+| <code>Random</code>     | Draws one of its rewards, each with its own weight        |
+| <code>Choice</code>     | Opens a popup where the player picks what they get        |
+
+![In the Rewards tab, Claim on The veilbound coffer opens a Choose your reward popup, and picking Greater Health Potion closes it](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-reward-choice.gif?raw=true)
 
 Rewards can be paid on success, on failure or on abandon, handed over at once or collected from the journal. A reward
 that cannot be delivered, full inventory or player offline, waits for them. Nothing is lost.
@@ -133,6 +163,8 @@ The same quest asset can be played four ways:
 
 ## 🎨 Make it yours
 
+* **Icons** on every quest, chapter and group, taken from any item or model of the game or your own pack.
+* **Two texts per quest:** a short line saying what to do, shown on the HUD, and a description that tells the story.
 * **Categories** colour-code quests in the journal: *Dungeon*, *Server event*, *Side quest*…
 * **Secret quests** appear only once earned, with `"Visibility": "WhenCompleted"`.
 * **Sounds** per outcome, from the game or your own asset pack.
@@ -153,7 +185,11 @@ Drop them in `mods/`. Nothing else to configure.
 
 ### Writing a quest
 
-A quest is a JSON asset, steps included:
+Open it in the Asset Editor and change what you like, every field checked as you type:
+
+![The Asset Editor on The veilbound coffer: Auto Track gets ticked and Target Quantity goes from 12 to 20](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/asset-editor-quest.gif?raw=true)
+
+Underneath, a quest is a JSON asset, steps included:
 
 ```
 {
@@ -175,9 +211,9 @@ and again.
 
 ```
 {
-  "Trigger": { "Type": "PlayerEnterWorld", "WorldNamePattern": "instance-Dungeons-Dungeon_Goblin-.*" },
+  "Trigger": { "Type": "PlayerEnterWorld", "WorldNamePattern": "instance-Portals-Portals_Goblins-.*" },
   "Scope": { "Type": "World" },
-  "QuestAssetIds": ["GoblinLairRats"]
+  "QuestAssetIds": ["GoblinBreachIntruders"]
 }
 ```
 
@@ -197,7 +233,8 @@ and again.
 | <code>/ohud reset</code>                              | Puts it back where the server wants it                                       | <code>hytale:Adventurer</code>  |
 | <code>/ohud default show</code> and so on             | The same for everyone who chose nothing, kept in <code>hud.json</code>       | <code>hytale:WorldEditor</code> |
 
-`<quest>` is a quest id or an asset id. `/oquest` also answers to `/quest` and `/q`.
+`<quest>` is a quest id or an asset id, and asset ids are suggested as you type. `/oquest` also answers to `/quest`
+and `/q`.
 
 ### Storage
 
