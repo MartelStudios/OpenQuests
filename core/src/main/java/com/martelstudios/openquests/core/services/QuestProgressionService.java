@@ -18,7 +18,7 @@ import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.time.Instant;
+import java.time.Clock;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -35,10 +35,12 @@ import java.util.UUID;
 public class QuestProgressionService {
     private final QuestProgressionStore dataStore;
     private final IEventBus events;
+    private final Clock clock;
 
-    public QuestProgressionService(@Nonnull QuestProgressionStore questProgressionStore, @Nonnull IEventBus events) {
+    public QuestProgressionService(@Nonnull QuestProgressionStore questProgressionStore, @Nonnull IEventBus events, @Nonnull Clock clock) {
         this.dataStore = questProgressionStore;
         this.events = events;
+        this.clock = clock;
     }
 
     /**
@@ -125,7 +127,7 @@ public class QuestProgressionService {
         QuestConstraint[] constraints = asset.getConstraints();
         if (constraints.length == 0) return true;
 
-        AssignmentRequest request = new AssignmentRequest(asset, playerId, Instant.now(), joining,
+        AssignmentRequest request = new AssignmentRequest(asset, playerId, clock.instant(), joining,
                                                           assetId -> QuestPlayerStateService.get().getTally(playerId, assetId));
         for (QuestConstraint constraint : constraints) {
             if (!constraint.allowsAssignment(request)) return false;
@@ -196,7 +198,7 @@ public class QuestProgressionService {
      */
     public void registerQuest(@Nonnull AbstractQuestProgression<?> quest) {
         dataStore.add(quest);
-        quest.onRegistered();
+        quest.onRegistered(clock.instant());
 
         events.dispatchFor(QuestRegisteredEvent.class, quest.getId()).dispatch(new QuestRegisteredEvent(quest));
     }

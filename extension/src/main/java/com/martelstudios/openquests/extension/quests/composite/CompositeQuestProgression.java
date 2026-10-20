@@ -20,6 +20,7 @@ import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -74,8 +75,8 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * knows whose step it is.
      */
     @Override
-    public void onRegistered() {
-        super.onRegistered();
+    public void onRegistered(@Nonnull Instant startedAt) {
+        super.onRegistered(startedAt);
 
         for (String assetId : getAsset().getAssetIds()) {
             OpenQuestAsset childAsset = OpenQuestAsset.getAsset(assetId);

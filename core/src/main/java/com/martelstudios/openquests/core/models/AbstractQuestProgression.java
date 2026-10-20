@@ -416,9 +416,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      *
      * <p>Runs once, when the quest is first handed out, and not when one is read back from disk,
      * which is what makes it the moment the quest started.
+     *
+     * @param startedAt the moment it was handed out, read off the services' clock
      */
-    public void onRegistered() {
-        startedAt = Instant.now();
+    public void onRegistered(@Nonnull Instant startedAt) {
+        this.startedAt = startedAt;
         markDirty();
     }
 

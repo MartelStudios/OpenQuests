@@ -2,7 +2,6 @@ package com.martelstudios.openquests.core.assignments;
 
 import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
@@ -12,16 +11,21 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
+import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -46,13 +50,23 @@ public class QuestAssignmentService {
     @Nonnull
     private final AssignmentHolders holders;
 
-    private final AssignmentOffer offer = new AssignmentOffer();
+    @Nonnull
+    private final AssignmentOffer offer;
 
     private final SettledOccasions settled = new SettledOccasions();
 
-    public QuestAssignmentService(@Nonnull QuestStorage storage) {
+    @Nonnull
+    private final Clock clock;
+
+    @Nonnull
+    private final ScheduledExecutorService scheduler;
+
+    public QuestAssignmentService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionService progression, @Nonnull Clock clock, @Nonnull ScheduledExecutorService scheduler) {
         this.records = new SharedAssignmentRecords(storage);
         this.holders = new AssignmentHolders(records);
+        this.offer = new AssignmentOffer(ids -> progression.progress(new SetStateVisitor(QuestState.FAILED), ids), clock);
+        this.clock = clock;
+        this.scheduler = scheduler;
     }
 
     /**
@@ -74,7 +88,7 @@ public class QuestAssignmentService {
      * period that began while the server was down is handed out as it comes back.
      */
     public void start() {
-        HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(this::tick, 5, TICK_SECONDS, TimeUnit.SECONDS);
+        scheduler.scheduleWithFixedDelay(this::tick, 5, TICK_SECONDS, TimeUnit.SECONDS);
     }
 
     /**
@@ -86,7 +100,7 @@ public class QuestAssignmentService {
 
     private void tick() {
         try {
-            Instant now = Instant.now();
+            Instant now = clock.instant();
 
             forEachAssignment("the schedule", assignment -> {
                 Occasion occasion = assignment.getTrigger().onTick(now);

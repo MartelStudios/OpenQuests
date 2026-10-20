@@ -2,8 +2,8 @@ package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
-import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestCompletions;
+import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
@@ -990,7 +990,7 @@ class JdbcQuestStorageTest {
         for (UUID playerId : playerIds) quest.join(playerId);
 
         // The one field a record cannot invent later
-        quest.onRegistered();
+        quest.onRegistered(Instant.now());
 
         return quest;
     }

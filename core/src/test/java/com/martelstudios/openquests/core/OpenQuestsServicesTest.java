@@ -9,9 +9,11 @@ import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Proxy;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -25,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class OpenQuestsServicesTest {
 
-    private final OpenQuestsServices services = new OpenQuestsServices(untouched(QuestStorage.class), 5, untouched(IEventBus.class));
+    private final OpenQuestsServices services = new OpenQuestsServices(untouched(QuestStorage.class), 5, untouched(IEventBus.class), Clock.systemUTC(), untouched(ScheduledExecutorService.class));
 
     @Test
     void everyServiceSubscribesWhenToldToListen() {

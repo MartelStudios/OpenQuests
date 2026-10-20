@@ -66,7 +66,7 @@ class QuestTallyTest {
     private static TestQuestProgression quest(UUID... players) {
         TestQuestProgression quest = AbstractQuestProgression.Builder.of(new TestQuestProgression(), "Asset").build();
         for (UUID playerId : players) quest.join(playerId);
-        quest.onRegistered();
+        quest.onRegistered(Instant.now());
         return quest;
     }
 }

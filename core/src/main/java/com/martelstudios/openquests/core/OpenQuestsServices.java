@@ -23,6 +23,8 @@ import com.martelstudios.openquests.core.sync.QuestSyncService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Clock;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * The core services, built once over a storage and wired to each other. The plugin builds one
@@ -52,13 +54,15 @@ public final class OpenQuestsServices {
     /**
      * @param syncSeconds how often quests shared between servers are read back
      * @param events where the services announce what happens to quests
+     * @param clock what the services read the time from
+     * @param scheduler where they run what waits, shared with the rest of the server
      */
-    public OpenQuestsServices(@Nonnull QuestStorage storage, long syncSeconds, @Nonnull IEventBus events) {
+    public OpenQuestsServices(@Nonnull QuestStorage storage, long syncSeconds, @Nonnull IEventBus events, @Nonnull Clock clock, @Nonnull ScheduledExecutorService scheduler) {
         this.storage = storage;
         this.events = events;
         progressionStore = new QuestProgressionStore(storage, events);
         sync = new QuestSyncService(storage, progressionStore, syncSeconds);
-        progression = new QuestProgressionService(progressionStore, events);
+        progression = new QuestProgressionService(progressionStore, events, clock);
         playerState = new QuestPlayerStateService(progressionStore);
         rewards = new QuestRewardService();
         scopeIndexes = new ScopeIndexes(storage, sync);
@@ -67,8 +71,8 @@ public final class OpenQuestsServices {
         worldGroups = new WorldGroupIndex(scopeIndexes);
         worldClosing = new WorldClosingService(storage);
         players = new PlayerQuestService(events);
-        assignments = new QuestAssignmentService(storage);
-        deadlines = new QuestDeadlineService();
+        assignments = new QuestAssignmentService(storage, progression, clock, scheduler);
+        deadlines = new QuestDeadlineService(progression, clock, scheduler);
     }
 
     /**

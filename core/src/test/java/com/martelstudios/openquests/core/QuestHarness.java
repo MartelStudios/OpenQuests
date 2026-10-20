@@ -4,6 +4,7 @@ import com.hypixel.hytale.event.EventBus;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.IEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.TestQuestProgression;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
@@ -11,6 +12,7 @@ import com.martelstudios.openquests.core.persistence.jdbc.SqlDialect;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +27,8 @@ public final class QuestHarness implements AutoCloseable {
 
     private final QuestStorage storage;
     private final EventBus events = new EventBus(false);
+    private final TestClock clock = new TestClock();
+    private final ManualScheduler scheduler = new ManualScheduler(clock);
     private final OpenQuestsServices services;
     private final List<Object> heard = new ArrayList<>();
 
@@ -35,7 +39,7 @@ public final class QuestHarness implements AutoCloseable {
         storage = new JdbcQuestStorage(new JdbcQuestStorage.JdbcSettings(url, null, null, null, null, "oqtest_", 4, 10, true, SqlDialect.fromUrl(url)));
         storage.start();
 
-        services = new OpenQuestsServices(storage, 5, events);
+        services = new OpenQuestsServices(storage, 5, events, clock, scheduler);
         services.listen(events);
         services.install();
     }
@@ -60,6 +64,16 @@ public final class QuestHarness implements AutoCloseable {
         return storage;
     }
 
+    @Nonnull
+    public TestClock clock() {
+        return clock;
+    }
+
+    @Nonnull
+    public ManualScheduler scheduler() {
+        return scheduler;
+    }
+
     /**
      * Keeps every event of that type early in its dispatch, so one a service dispatches while
      * handling it comes after it.
@@ -81,7 +95,15 @@ public final class QuestHarness implements AutoCloseable {
      */
     @Nonnull
     public TestQuestProgression register() {
-        TestQuestProgression quest = new TestQuestProgression();
+        return register(null);
+    }
+
+    /**
+     * @return a quest reading that asset, registered the way the services hand one out.
+     */
+    @Nonnull
+    public TestQuestProgression register(@Nullable OpenQuestAsset asset) {
+        TestQuestProgression quest = new TestQuestProgression().withAsset(asset);
         services.getQuestProgressionService().registerQuest(quest);
         return quest;
     }
@@ -96,6 +118,7 @@ public final class QuestHarness implements AutoCloseable {
     @Override
     public void close() {
         events.shutdown();
+        scheduler.shutdownNow();
         storage.close();
     }
 

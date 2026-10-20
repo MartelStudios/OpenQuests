@@ -6,13 +6,10 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestOrigin;
-import com.martelstudios.openquests.core.models.QuestState;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.time.Instant;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,15 +24,16 @@ public final class AssignmentOffer {
     @Nonnull
     private final Consumer<List<UUID>> failLine;
 
-    public AssignmentOffer() {
-        this(ids -> QuestProgressionService.get().progress(new SetStateVisitor(QuestState.FAILED), ids));
-    }
+    @Nonnull
+    private final Clock clock;
 
     /**
      * @param failLine fails what a replaced hand-out had opened and still runs
+     * @param clock dates each hand-out
      */
-    AssignmentOffer(@Nonnull Consumer<List<UUID>> failLine) {
+    public AssignmentOffer(@Nonnull Consumer<List<UUID>> failLine, @Nonnull Clock clock) {
         this.failLine = failLine;
+        this.clock = clock;
     }
 
     /**
@@ -74,7 +72,7 @@ public final class AssignmentOffer {
 
         AbstractQuestProgression<?> quest = asset.builder().origin(new QuestOrigin(assignmentId, questAssetId, occasion)).build();
 
-        if (!holder.handOut(quest, assignmentId, questAssetId, record, AssignmentRecord.next(record, occasion, Instant.now()))) return null;
+        if (!holder.handOut(quest, assignmentId, questAssetId, record, AssignmentRecord.next(record, occasion, clock.instant()))) return null;
 
         if (!replaced.isEmpty()) failLine.accept(replaced);
         return true;

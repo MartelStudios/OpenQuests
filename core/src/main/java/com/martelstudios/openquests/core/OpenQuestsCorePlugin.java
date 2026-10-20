@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Clock;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -106,7 +107,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         questStorage = settings.getStorage().create();
         questStorage.start();
 
-        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), HytaleServer.get().getEventBus());
+        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), HytaleServer.get().getEventBus(), Clock.systemUTC(), HytaleServer.SCHEDULED_EXECUTOR);
         services.install();
         QuestSync.setPolicy(services.getQuestSyncService());
 

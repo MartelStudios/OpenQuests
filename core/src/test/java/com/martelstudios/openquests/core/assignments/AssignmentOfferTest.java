@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ class AssignmentOfferTest {
     private static final String WEEK_TWO = "period:2026-10-17T18:00:00Z";
 
     private final List<List<UUID>> failed = new ArrayList<>();
-    private final AssignmentOffer offer = new AssignmentOffer(failed::add);
+    private final AssignmentOffer offer = new AssignmentOffer(failed::add, Clock.systemUTC());
     private final StepAsset asset = new StepAsset("Chores");
 
     @Test
