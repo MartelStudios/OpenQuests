@@ -9,6 +9,10 @@ on:
       version:
         description: 'Version to release, without the leading v, as in 1.0.0'
         required: true
+      mmoskilltree_version:
+        description: 'Version of the OpenQuests MMOSkillTree pack to publish with it, or empty to leave the pack out'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -42,7 +46,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Write the version down
-        run: sed -i "s/^version = .*/version = ${{ inputs.version }}/" gradle.properties
+        env:
+          PACK_VERSION: ${{ inputs.mmoskilltree_version }}
+        run: |
+          sed -i "s/^version = .*/version = ${{ inputs.version }}/" gradle.properties
+          if [[ -n "$PACK_VERSION" ]]; then
+            sed -i "s/^mmoskilltree_version = .*/mmoskilltree_version = $PACK_VERSION/" mods/mmoskilltree/gradle.properties
+          fi
 
       # Regenerates every manifest.json from the property, so the tag carries a coherent tree
       - name: Build
@@ -64,6 +74,7 @@ jobs:
             core/build/libs/*.jar
             extension/build/libs/*.jar
             extension/build/distributions/*.zip
+            mods/*/build/libs/*.jar
           generate_release_notes: true
           fail_on_unmatched_files: true
 
@@ -77,6 +88,7 @@ jobs:
             core/build/libs/*.jar
             extension/build/libs/*.jar
             extension/build/distributions/*.zip
+            mods/*/build/libs/*.jar
           if-no-files-found: error
 
   # A job of its own rather than a step of the release: it runs as soon as the release job
@@ -102,6 +114,12 @@ jobs:
             relations: openquests:requiredDependency
             project_id: '1680200'
             file: extension/build/distributions/OpenQuestsExamples-*.zip
+          - name: OpenQuests MMOSkillTree
+            relations: openquests:requiredDependency,mmo-skill-tree:requiredDependency,mmo-skill-tree-mastery-pack:optionalDependency
+            project_id: '1752171'
+            file: mods/mmoskilltree/build/libs/OpenQuestsMMOSkillTree-*.jar
+            # Versioned on its own, and only published when a version is given for it
+            version_input: mmoskilltree_version
 
     steps:
       - name: Fetch the artefacts
@@ -110,10 +128,12 @@ jobs:
           name: release-artifacts
 
       - name: Upload ${{ matrix.name }}
+        if: inputs[matrix.version_input || 'version'] != ''
         env:
           TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           GAME_VERSION: ${{ vars.CURSEFORGE_GAME_VERSION }}
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ inputs[matrix.version_input || 'version'] }}
+          TAG: v${{ inputs.version }}
           NAME: ${{ matrix.name }}
           PROJECT_ID: ${{ matrix.project_id }}
           RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ inputs.version }}
@@ -140,7 +160,7 @@ jobs:
             exit 1
           fi
 
-          jq -n --arg changelog "Released as [v$VERSION]($RELEASE_URL)." \
+          jq -n --arg changelog "Released with [$TAG]($RELEASE_URL)." \
                 --arg displayName "$NAME $VERSION" \
                 --argjson versions "[$GAME_VERSION]" \
                 '{changelog: $changelog, changelogType: "markdown", displayName: $displayName, releaseType: "release", gameVersions: $versions}' \
