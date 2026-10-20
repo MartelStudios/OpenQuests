@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.extension.rewards.grantquest;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.extension.journal.QuestPageService;
 
@@ -14,7 +15,7 @@ public final class GrantQuestRewardFeature {
 
     private GrantQuestRewardFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         QuestReward.CODEC.register(TYPE_ID, GrantQuestReward.class, GrantQuestReward.CODEC);
 
         QuestPageService.register(new GrantQuestRewardRenderer());

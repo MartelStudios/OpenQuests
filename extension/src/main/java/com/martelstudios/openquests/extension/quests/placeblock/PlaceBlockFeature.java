@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.placeblock;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.extension.quests.block.PlacedBlockMarks;
 
 import javax.annotation.Nonnull;
@@ -14,11 +14,10 @@ public final class PlaceBlockFeature {
 
     private PlaceBlockFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, PlaceBlockQuestAsset.class, PlaceBlockQuestAsset.CODEC, PlaceBlockQuestProgression.class, PlaceBlockQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, PlaceBlockQuestAsset.class, PlaceBlockQuestAsset.CODEC, PlaceBlockQuestProgression.class, PlaceBlockQuestProgression.CODEC);
 
-        plugin.getEntityStoreRegistry().registerSystem(new PlaceBlockEventSystem());
+        plugin.getEntityStoreRegistry().registerSystem(new PlaceBlockEventSystem(services.getQuestProgressionService()));
 
         // Registered here, once, though break quests read the marks too: placing is what writes them
         PlacedBlockMarks.register(plugin.getChunkStoreRegistry());

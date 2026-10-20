@@ -1,21 +1,22 @@
 package com.martelstudios.openquests.core.rewards.services;
 
 import com.hypixel.hytale.event.EventPriority;
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.hypixel.hytale.server.core.universe.Universe;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.core.persistence.PlayerMessage;
+import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStore;
-import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
-import com.martelstudios.openquests.core.services.QuestPlayerStateService;
+import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -32,17 +33,37 @@ import java.util.UUID;
  */
 public class QuestRewardService {
 
-    public QuestRewardService(JavaPlugin plugin) {
-        plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
-        // EventPriority.FIRST, to grant rewards earlier
-        plugin.getEventRegistry()
-              .registerGlobal(EventPriority.FIRST, QuestCompletedEvent.class, this::handleQuestCompletedEvent);
-        plugin.getEventRegistry()
-              .registerGlobal(EventPriority.FIRST, QuestPlayerAbandonedEvent.class, this::handleQuestPlayerAbandonedEvent);
+    @Nonnull
+    private final OpenQuestsServices services;
+
+    @Nonnull
+    private final QuestStorage storage;
+
+    @Nonnull
+    private final Players players;
+
+    @Nonnull
+    private final PlayerComponentTypes components;
+
+    /**
+     * @param services handed to each reward granted, which acts through them
+     * @param storage where a debt for a player this server does not host is left for their host
+     */
+    public QuestRewardService(@Nonnull OpenQuestsServices services, @Nonnull QuestStorage storage, @Nonnull Players players, @Nonnull PlayerComponentTypes components) {
+        this.services = services;
+        this.storage = storage;
+        this.players = players;
+        this.components = components;
     }
 
-    public static QuestRewardService get() {
-        return OpenQuestsCorePlugin.get().getQuestRewardService();
+    /**
+     * Subscribes to the quest ends that pay rewards, and to the arrivals that deliver pending ones.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
+        // EventPriority.FIRST, to grant rewards earlier
+        events.registerGlobal(EventPriority.FIRST, QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+        events.registerGlobal(EventPriority.FIRST, QuestPlayerAbandonedEvent.class, this::handleQuestPlayerAbandonedEvent);
     }
 
     /**
@@ -50,7 +71,7 @@ public class QuestRewardService {
      */
     @Nonnull
     public PendingRewardStore getPending(@Nonnull EntityComponents playerComponents) {
-        return playerComponents.ensureAndGetComponent(PendingRewardStoreComponent.getComponentType()).pending;
+        return playerComponents.ensureAndGetComponent(components.pendingRewards()).pending;
     }
 
     /**
@@ -110,8 +131,8 @@ public class QuestRewardService {
      * standing in their record, nothing holding their components to write it into.
      */
     private void owe(@Nonnull UUID playerId, @Nonnull PendingRewards pending) {
-        if (Universe.get().getPlayer(playerId) == null) {
-            QuestPlayerStateService.get().addPendingRewards(playerId, pending);
+        if (!players.isOnline(playerId)) {
+            storage.postMessage(PlayerMessage.owed(playerId, pending));
             return;
         }
 
@@ -123,10 +144,10 @@ public class QuestRewardService {
      * or one another server left them.
      */
     public void deliver(@Nonnull UUID playerId, @Nonnull PendingRewards pending) {
-        EntityComponents.update(playerId, components -> {
-            getPending(components).add(pending);
+        players.update(playerId, player -> {
+            getPending(player).add(pending);
 
-            grantAuto(pending, components);
+            grantAuto(pending, player);
         });
     }
 
@@ -173,7 +194,7 @@ public class QuestRewardService {
         for (QuestReward reward : rewards) {
             if (!reward.isAutoClaim()) continue;
 
-            if (!reward.grant(pending.getQuestId(), playerComponents)) continue;
+            if (!reward.grant(services, pending.getQuestId(), playerComponents)) continue;
 
             remaining.remove(reward);
             pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));
@@ -192,7 +213,7 @@ public class QuestRewardService {
         var remaining = new ArrayList<>(Arrays.asList(rewards));
 
         for (QuestReward reward : rewards) {
-            if (!reward.grant(pending.getQuestId(), playerComponents)) continue;
+            if (!reward.grant(services, pending.getQuestId(), playerComponents)) continue;
 
             remaining.remove(reward);
             pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));

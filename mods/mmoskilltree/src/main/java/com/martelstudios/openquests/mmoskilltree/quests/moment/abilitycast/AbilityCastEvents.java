@@ -11,15 +11,19 @@ import javax.annotation.Nonnull;
  */
 public final class AbilityCastEvents {
 
-    private AbilityCastEvents() {}
+    private final Moments moments;
+
+    public AbilityCastEvents(@Nonnull Moments moments) {
+        this.moments = moments;
+    }
 
     /**
      * Qualified by the skill whose tree holds the ability, the way MMO Skill Tree qualifies its own.
      */
-    public static void handleAbilityCast(@Nonnull PlayerAbilityUsedEvent event) {
+    public void handleAbilityCast(@Nonnull PlayerAbilityUsedEvent event) {
         String abilityId = event.spec.id();
         var placement = SkillTreeService.findAbilityPlacement(abilityId);
 
-        Moments.count(event.playerEntityRef, event.playerRef.getUuid(), AbilityCastQuestProgression.class, abilityId, placement == null ? null : placement.skillId(), 1);
+        moments.count(event.playerEntityRef, event.playerRef.getUuid(), AbilityCastQuestProgression.class, abilityId, placement == null ? null : placement.skillId(), 1);
     }
 }

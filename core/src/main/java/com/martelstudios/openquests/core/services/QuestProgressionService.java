@@ -2,9 +2,8 @@ package com.martelstudios.openquests.core.services;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.event.EventPriority;
-import com.hypixel.hytale.server.core.HytaleServer;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.hypixel.hytale.event.IEventBus;
+import com.hypixel.hytale.event.IEventRegistry;
 import com.martelstudios.openquests.core.constraints.AssignmentRequest;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
@@ -18,7 +17,7 @@ import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.time.Instant;
+import java.time.Clock;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -34,17 +33,23 @@ import java.util.UUID;
  */
 public class QuestProgressionService {
     private final QuestProgressionStore dataStore;
+    private final IEventBus eventBus;
+    private final Clock clock;
+    private final QuestPlayerStateService playerState;
 
-    public QuestProgressionService(@Nonnull JavaPlugin plugin, QuestProgressionStore questProgressionStore) {
+    public QuestProgressionService(@Nonnull QuestProgressionStore questProgressionStore, @Nonnull IEventBus events, @Nonnull Clock clock, @Nonnull QuestPlayerStateService playerState) {
         this.dataStore = questProgressionStore;
-
-        // EventPriority.LAST, to unregister the quest safely
-        plugin.getEventRegistry()
-              .registerGlobal(EventPriority.LAST, QuestCompletedEvent.class, this::handleQuestCompleted);
+        this.eventBus = events;
+        this.clock = clock;
+        this.playerState = playerState;
     }
 
-    public static QuestProgressionService get() {
-        return OpenQuestsCorePlugin.get().getQuestProgressionService();
+    /**
+     * Subscribes to quest ends, after every other listener has seen them.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        // EventPriority.LAST, to unregister the quest safely
+        events.registerGlobal(EventPriority.LAST, QuestCompletedEvent.class, this::handleQuestCompleted);
     }
 
     /**
@@ -119,8 +124,8 @@ public class QuestProgressionService {
         QuestConstraint[] constraints = asset.getConstraints();
         if (constraints.length == 0) return true;
 
-        AssignmentRequest request = new AssignmentRequest(asset, playerId, Instant.now(), joining,
-                                                          assetId -> QuestPlayerStateService.get().getTally(playerId, assetId));
+        AssignmentRequest request = new AssignmentRequest(asset, playerId, clock.instant(), joining,
+                                                          assetId -> playerState.getTally(playerId, assetId));
         for (QuestConstraint constraint : constraints) {
             if (!constraint.allowsAssignment(request)) return false;
         }
@@ -190,12 +195,9 @@ public class QuestProgressionService {
      */
     public void registerQuest(@Nonnull AbstractQuestProgression<?> quest) {
         dataStore.add(quest);
-        quest.onRegistered();
+        quest.onRegistered(clock.instant());
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestRegisteredEvent.class, quest.getId())
-                    .dispatch(new QuestRegisteredEvent(quest));
+        eventBus.dispatchFor(QuestRegisteredEvent.class, quest.getId()).dispatch(new QuestRegisteredEvent(quest));
     }
 
     /**
@@ -226,10 +228,7 @@ public class QuestProgressionService {
 
         quest.onUnregistered();
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestUnregisteredEvent.class, quest.getId())
-                    .dispatch(new QuestUnregisteredEvent(quest));
+        eventBus.dispatchFor(QuestUnregisteredEvent.class, quest.getId()).dispatch(new QuestUnregisteredEvent(quest));
 
         return removed;
     }

@@ -3,6 +3,7 @@ package com.martelstudios.openquests.extension.listener;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.openquests.core.scopes.player.events.QuestRemovedFromPlayerStoreEvent;
@@ -17,13 +18,15 @@ public final class ListenerFeature {
 
     private ListenerFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        QuestListenerService listeners = new QuestListenerService(services.getQuestProgressionService(), services.getPlatform().players());
+
         // EventPriority.LAST, so the player's own quests are in the store and whatever connecting
         // hands out has been handed out: this pass is the one with everything to read
-        plugin.getEventRegistry().registerGlobal(EventPriority.LAST, PlayerConnectEvent.class, QuestListenerService::handlePlayerConnect);
+        plugin.getEventRegistry().registerGlobal(EventPriority.LAST, PlayerConnectEvent.class, listeners::handlePlayerConnect);
 
-        plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, QuestListenerService::handleQuestAddedToPlayerStore);
-        plugin.getEventRegistry().registerGlobal(QuestRemovedFromPlayerStoreEvent.class, QuestListenerService::handleQuestRemovedFromPlayerStore);
-        plugin.getEventRegistry().registerGlobal(QuestStateChangedEvent.class, QuestListenerService::handleQuestStateChanged);
+        plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, listeners::handleQuestAddedToPlayerStore);
+        plugin.getEventRegistry().registerGlobal(QuestRemovedFromPlayerStoreEvent.class, listeners::handleQuestRemovedFromPlayerStore);
+        plugin.getEventRegistry().registerGlobal(QuestStateChangedEvent.class, listeners::handleQuestStateChanged);
     }
 }

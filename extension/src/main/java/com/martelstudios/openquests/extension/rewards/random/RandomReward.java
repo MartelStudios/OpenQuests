@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
@@ -32,8 +33,8 @@ public class RandomReward extends QuestReward {
      * Draws again on every attempt: a reward that failed granted nothing, so nothing was won yet.
      */
     @Override
-    public boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
-        return draw().reward.grant(sourceQuestId, playerComponents);
+    public boolean grant(@Nonnull OpenQuestsServices services, @Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
+        return draw().reward.grant(services, sourceQuestId, playerComponents);
     }
 
     /**

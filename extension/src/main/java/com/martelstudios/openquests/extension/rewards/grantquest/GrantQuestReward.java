@@ -7,6 +7,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestScope;
@@ -51,18 +52,19 @@ public class GrantQuestReward extends QuestReward {
      * quests that did resolve a second time.
      */
     @Override
-    public boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull OpenQuestsServices services, @Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
         var uuidComponent = playerComponents.getComponent(UUIDComponent.getComponentType());
         if (uuidComponent == null) return false;
 
         // Read back if need be: a reward collected by hand can come long after its quest left memory
-        AbstractQuestProgression<?> source = QuestProgressionService.get().loadQuest(sourceQuestId);
-        AbstractQuestProgression<?> head = source == null ? null : headOf(source);
+        QuestProgressionService progression = services.getQuestProgressionService();
+        AbstractQuestProgression<?> source = progression.loadQuest(sourceQuestId);
+        AbstractQuestProgression<?> head = source == null ? null : headOf(progression, source);
 
         for (OpenQuestAsset asset : assets()) {
             // A quest its constraints refuse is dropped rather than retried: the grant is what
             // was owed, and it happened
-            QuestProgressionService.get().assignQuest(createFrom(asset, sourceQuestId, head), uuidComponent.getUuid());
+            progression.assignQuest(createFrom(asset, sourceQuestId, head), uuidComponent.getUuid());
         }
         return true;
     }
@@ -78,19 +80,21 @@ public class GrantQuestReward extends QuestReward {
      */
     @Override
     public void grantOnce(@Nonnull AbstractQuestProgression<?> quest) {
-        AbstractQuestProgression<?> head = headOf(quest);
+        OpenQuestsServices services = quest.environment().services();
+        QuestProgressionService progression = services.getQuestProgressionService();
+        AbstractQuestProgression<?> head = headOf(progression, quest);
         QuestScope scope = head.getScope();
 
         for (OpenQuestAsset asset : assets()) {
-            if (scope != null && scope.isReachable()) {
+            if (scope != null && scope.isReachable(services.getScopeServices())) {
                 AbstractQuestProgression<?> followUp = createFrom(asset, quest.getId(), head);
-                QuestProgressionService.get().registerQuest(followUp);
-                scope.share(followUp);
+                progression.registerQuest(followUp);
+                scope.share(services.getScopeServices(), followUp);
                 continue;
             }
 
             for (UUID playerId : List.copyOf(quest.getPlayers())) {
-                QuestProgressionService.get().assignQuest(createFrom(asset, quest.getId(), head), playerId);
+                progression.assignQuest(createFrom(asset, quest.getId(), head), playerId);
             }
         }
     }
@@ -119,10 +123,10 @@ public class GrantQuestReward extends QuestReward {
      * carries no scope and no origin of its own.
      */
     @Nonnull
-    private static AbstractQuestProgression<?> headOf(@Nonnull AbstractQuestProgression<?> quest) {
+    private static AbstractQuestProgression<?> headOf(@Nonnull QuestProgressionService progression, @Nonnull AbstractQuestProgression<?> quest) {
         AbstractQuestProgression<?> head = quest;
         while (head.getParentId() != null) {
-            AbstractQuestProgression<?> parent = QuestProgressionService.get().loadQuest(head.getParentId());
+            AbstractQuestProgression<?> parent = progression.loadQuest(head.getParentId());
             if (parent == null) break;
 
             head = parent;

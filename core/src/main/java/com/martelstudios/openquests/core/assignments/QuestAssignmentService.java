@@ -1,27 +1,31 @@
 package com.martelstudios.openquests.core.assignments;
 
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
-import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
+import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
+import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.core.utils.Players;
+import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -46,22 +50,45 @@ public class QuestAssignmentService {
     @Nonnull
     private final AssignmentHolders holders;
 
-    private final AssignmentOffer offer = new AssignmentOffer();
+    @Nonnull
+    private final AssignmentOffer offer;
 
     private final SettledOccasions settled = new SettledOccasions();
 
-    public QuestAssignmentService(@Nonnull JavaPlugin plugin, @Nonnull QuestStorage storage) {
-        this.records = new SharedAssignmentRecords(storage);
-        this.holders = new AssignmentHolders(records);
+    @Nonnull
+    private final Clock clock;
 
-        plugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
-        plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
-        plugin.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> settled.forget(AssignmentHolders.playerKey(event.getPlayerRef().getUuid())));
-        plugin.getEventRegistry().registerGlobal(RemoveWorldEvent.class, this::handleRemoveWorldEvent);
+    @Nonnull
+    private final ScheduledExecutorService scheduler;
+
+    @Nonnull
+    private final ScopeServices scopes;
+
+    @Nonnull
+    private final Players players;
+
+    /**
+     * @param scheduler where the schedule is checked, shared with the rest of the server
+     */
+    public QuestAssignmentService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionService progression, @Nonnull ScopeServices scopes,
+                                  @Nonnull Players players, @Nonnull PlayerComponentTypes components, @Nonnull Clock clock, @Nonnull ScheduledExecutorService scheduler) {
+        this.records = new SharedAssignmentRecords(storage);
+        this.holders = new AssignmentHolders(records, progression, scopes, components);
+        this.offer = new AssignmentOffer(ids -> progression.progress(new SetStateVisitor(QuestState.FAILED), ids), clock);
+        this.scopes = scopes;
+        this.players = players;
+        this.clock = clock;
+        this.scheduler = scheduler;
     }
 
-    public static QuestAssignmentService get() {
-        return OpenQuestsCorePlugin.get().getQuestAssignmentService();
+    /**
+     * Subscribes to the occasions assignments are handed out on.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
+        events.registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
+        events.registerGlobal(PlayerDisconnectEvent.class, event -> settled.forget(AssignmentHolders.playerKey(event.getPlayerRef().getUuid())));
+        events.registerGlobal(RemoveWorldEvent.class, this::handleRemoveWorldEvent);
     }
 
     /**
@@ -69,7 +96,7 @@ public class QuestAssignmentService {
      * period that began while the server was down is handed out as it comes back.
      */
     public void start() {
-        HytaleServer.SCHEDULED_EXECUTOR.scheduleWithFixedDelay(this::tick, 5, TICK_SECONDS, TimeUnit.SECONDS);
+        scheduler.scheduleWithFixedDelay(this::tick, 5, TICK_SECONDS, TimeUnit.SECONDS);
     }
 
     /**
@@ -81,7 +108,7 @@ public class QuestAssignmentService {
 
     private void tick() {
         try {
-            Instant now = Instant.now();
+            Instant now = clock.instant();
 
             forEachAssignment("the schedule", assignment -> {
                 Occasion occasion = assignment.getTrigger().onTick(now);
@@ -120,7 +147,7 @@ public class QuestAssignmentService {
 
         forEachAssignment("a world entry", assignment -> {
             String group = assignment.getScope().groupOf(assignment, world);
-            if (group != null) WorldGroupIndex.get().enter(group, world, playerRef.getUuid());
+            if (group != null) scopes.worldGroups().enter(group, world, playerRef.getUuid());
 
             Occasion occasion = assignment.getTrigger().onEnterWorld(playerRef.getUuid(), player, world);
             if (occasion != null) evaluate(assignment, occasion);
@@ -180,11 +207,10 @@ public class QuestAssignmentService {
         public void onlinePlayers() {
             String key = occasion.placeKey();
 
-            for (PlayerRef playerRef : Universe.get().getPlayers()) {
-                UUID playerId = playerRef.getUuid();
+            for (UUID playerId : players.online()) {
                 if (isSettled(AssignmentHolders.playerKey(playerId), key)) continue;
 
-                EntityComponents.update(playerId, player -> offerAll(holders.player(playerId, player), key));
+                players.update(playerId, player -> offerAll(holders.player(playerId, player), key));
             }
         }
 

@@ -20,8 +20,13 @@ public class CreateWorldQuestCommand extends CommandBase {
 
     private final RequiredArg<World> worldArg = withRequiredArg("world", "server.commands.openquests.quest.create.world.desc", WORLD);
 
-    public CreateWorldQuestCommand() {
+    private final QuestProgressionService progression;
+    private final WorldQuestService worlds;
+
+    public CreateWorldQuestCommand(@Nonnull QuestProgressionService progression, @Nonnull WorldQuestService worlds) {
         super("world", "Creates a new quest progression and adds it to the given world's store");
+        this.progression = progression;
+        this.worlds = worlds;
     }
 
     @Override
@@ -29,8 +34,8 @@ public class CreateWorldQuestCommand extends CommandBase {
         OpenQuestAsset asset = context.get(assetArg);
         World world = context.get(worldArg);
 
-        var quest = QuestProgressionService.get().registerQuest(asset);
+        var quest = progression.registerQuest(asset);
         context.sendMessage(Message.raw("Created quest " + quest.getId() + " from asset '" + asset.getId() + "'."));
-        WorldQuestService.get().addQuest(world, quest.getId());
+        worlds.addQuest(world, quest.getId());
     }
 }

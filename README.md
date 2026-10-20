@@ -798,24 +798,52 @@ that is about holding out (survive for five minutes), or `Abandoned`.
 
 ## Extending
 
+The services come from OpenQuestsCore, which sets up before any plugin depending on it. Read them
+once in your plugin's `setup()` and hand each feature what it needs; nothing looks a service up
+afterwards:
+
+```java
+@Override
+protected void setup() {
+    super.setup();
+
+    OpenQuestsServices services = OpenQuestsServices.installed();
+    MyFeature.register(this, services);
+}
+```
+
 Group everything a type needs in one package (asset, progression, visitor, systems) and give it a
-single entry point, the way each package of `OpenQuests` does:
+single entry point, the way each package of `OpenQuests` does. Systems and listeners receive the
+services they use through their constructors:
 
 ```java
 public final class MyFeature {
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get().registerQuestType(
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(
             "MyType",
             MyQuestAsset.class, MyQuestAsset.CODEC,
             MyQuestProgression.class, MyQuestProgression.CODEC
         );
 
-        plugin.getEntityStoreRegistry().registerSystem(new MyEventSystem());
+        plugin.getEntityStoreRegistry().registerSystem(new MyEventSystem(services.getQuestProgressionService()));
     }
 }
 ```
 
 Your plugin's `setup()` then only lists its features, and never grows past that.
+
+What a codec builds (a quest, a reward, a constraint, a scope) cannot take services through a
+constructor, so it is handed them where it acts:
+
+- A quest reaches them through `environment().services()` once a store holds it, along with the
+  event bus and the clock. One no store holds yet announces nothing.
+- A reward's `grant(services, sourceQuestId, playerComponents)` receives them; `grantOnce(quest)`
+  reaches them through the quest.
+- A constraint reads them from the quest it is asked about.
+- A scope's methods receive the `ScopeServices` it shares and indexes quests through.
+
+In a test, `new OpenQuestsServices(storage, syncSeconds, platform)` builds the same services over a
+`Platform` of your own: an event bus, a clock, a scheduler, the players and their component types.
 
 The quest types built on another mod live under `mods/`, one plugin per mod (`mods/mmoskilltree`
 for MMO Skill Tree), each published as a CurseForge project of its own. They use only the public
@@ -829,7 +857,7 @@ plugin makes a quest of its own at runtime, a bounty board picking its target:
 
 ```java
 KillPlayerQuestProgression bounty = bountyAsset.builder().playerToKill(target.getUsername()).targetQuantity(1).build();
-QuestProgressionService.get().registerQuest(bounty);
+services.getQuestProgressionService().registerQuest(bounty);
 ```
 
 A reward type is registered the same way:
@@ -890,7 +918,7 @@ and adopts each step before registering it:
 ```java
 AbstractQuestProgression<?> step = stepAsset.create();
 adopt(step);
-QuestProgressionService.get().registerQuest(step);
+environment().services().getQuestProgressionService().registerQuest(step);
 ```
 
 ## Example assets

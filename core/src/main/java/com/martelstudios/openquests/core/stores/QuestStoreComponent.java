@@ -3,7 +3,7 @@ package com.martelstudios.openquests.core.stores;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.AssignmentRecords;
 import com.martelstudios.openquests.core.models.HudSettings;
@@ -83,7 +83,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
     }
 
     public static ComponentType<EntityStore, QuestStoreComponent> getComponentType() {
-        return OpenQuestsCorePlugin.get().getQuestStoreComponentType();
+        return OpenQuestsServices.installed().getPlatform().components().questStore();
     }
 
     /**

@@ -23,29 +23,35 @@ import java.util.function.BiConsumer;
  */
 public final class QuestStateQuestEvents {
 
-    private QuestStateQuestEvents() {}
+    private final QuestStateIndex index;
+    private final QuestProgressionService progression;
 
-    public static void handleQuestLoaded(@Nonnull QuestLoadedEvent event) {
-        forEachHolder(event.getQuest(), QuestStateQuestEvents::track);
+    public QuestStateQuestEvents(@Nonnull QuestStateIndex index, @Nonnull QuestProgressionService progression) {
+        this.index = index;
+        this.progression = progression;
     }
 
-    public static void handleQuestUnloaded(@Nonnull QuestUnloadedEvent event) {
-        forEachHolder(event.getQuest(), (quest, playerId) -> QuestStateIndex.get().forget(quest, playerId));
+    public void handleQuestLoaded(@Nonnull QuestLoadedEvent event) {
+        forEachHolder(event.getQuest(), this::track);
     }
 
-    public static void handleQuestAddedToPlayerStore(@Nonnull QuestAddedToPlayerStoreEvent event) {
+    public void handleQuestUnloaded(@Nonnull QuestUnloadedEvent event) {
+        forEachHolder(event.getQuest(), (quest, playerId) -> index.forget(quest, playerId));
+    }
+
+    public void handleQuestAddedToPlayerStore(@Nonnull QuestAddedToPlayerStoreEvent event) {
         track(event.getQuest(), event.getPlayerId());
     }
 
-    public static void handleQuestRemovedFromPlayerStore(@Nonnull QuestRemovedFromPlayerStoreEvent event) {
-        QuestStateIndex.get().forget(event.getQuest(), event.getPlayerId());
+    public void handleQuestRemovedFromPlayerStore(@Nonnull QuestRemovedFromPlayerStoreEvent event) {
+        index.forget(event.getQuest(), event.getPlayerId());
     }
 
-    public static void handleQuestStateChanged(@Nonnull QuestStateChangedEvent event) {
+    public void handleQuestStateChanged(@Nonnull QuestStateChangedEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
 
         for (UUID playerId : quest.getPlayers()) {
-            reevaluate(playerId, QuestStateIndex.get().watchersOf(quest.getAssetId(), playerId));
+            reevaluate(playerId, index.watchersOf(quest.getAssetId(), playerId));
         }
     }
 
@@ -53,10 +59,10 @@ public final class QuestStateQuestEvents {
      * Leaving a quest changes what it is worth to that player alone, and a shared quest carries on
      * for the others without any change of state to report it.
      */
-    public static void handleQuestPlayerAbandoned(@Nonnull QuestPlayerAbandonedEvent event) {
+    public void handleQuestPlayerAbandoned(@Nonnull QuestPlayerAbandonedEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
 
-        reevaluate(event.getPlayerId(), QuestStateIndex.get().watchersOf(quest.getAssetId(), event.getPlayerId()));
+        reevaluate(event.getPlayerId(), index.watchersOf(quest.getAssetId(), event.getPlayerId()));
     }
 
     /**
@@ -64,10 +70,10 @@ public final class QuestStateQuestEvents {
      * Order is therefore free: a watcher that arrives before its candidates answers on what is
      * there, and each candidate arriving after puts the answer right.
      */
-    private static void track(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        QuestStateIndex.get().track(quest, playerId);
+    private void track(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        index.track(quest, playerId);
 
-        Set<UUID> watcherIds = new HashSet<>(QuestStateIndex.get().watchersOf(quest.getAssetId(), playerId));
+        Set<UUID> watcherIds = new HashSet<>(index.watchersOf(quest.getAssetId(), playerId));
         if (quest instanceof QuestStateQuestProgression) watcherIds.add(quest.getId());
 
         reevaluate(playerId, watcherIds);
@@ -82,9 +88,9 @@ public final class QuestStateQuestEvents {
         quest.getAbandonedPlayers().forEach(playerId -> action.accept(quest, playerId));
     }
 
-    private static void reevaluate(@Nonnull UUID playerId, @Nonnull Collection<UUID> watcherIds) {
+    private void reevaluate(@Nonnull UUID playerId, @Nonnull Collection<UUID> watcherIds) {
         if (watcherIds.isEmpty()) return;
 
-        QuestProgressionService.get().progress(new QuestStateQuestVisitor(playerId), watcherIds);
+        progression.progress(new QuestStateQuestVisitor(playerId), watcherIds);
     }
 }

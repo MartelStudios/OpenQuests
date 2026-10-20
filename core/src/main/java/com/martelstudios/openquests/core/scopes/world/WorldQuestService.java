@@ -1,20 +1,19 @@
 package com.martelstudios.openquests.core.scopes.world;
 
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.RemovedPlayerFromWorldEvent;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.StartWorldEvent;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.sync.QuestSyncService;
 
@@ -42,6 +41,10 @@ public class WorldQuestService {
 
     @Nonnull
     private final ScopeIndexes indexes;
+    private final QuestProgressionService progression;
+    private final QuestSyncService sync;
+    private final PlayerQuestService playerQuests;
+    private final PlayerComponentTypes components;
 
     /**
      * The worlds closing for good: nothing is shared into them any more, so a quest paying with
@@ -49,16 +52,21 @@ public class WorldQuestService {
      */
     private final Set<UUID> closing = ConcurrentHashMap.newKeySet();
 
-    public WorldQuestService(@Nonnull JavaPlugin plugin, @Nonnull ScopeIndexes indexes) {
+    public WorldQuestService(@Nonnull ScopeIndexes indexes, @Nonnull QuestProgressionService progression, @Nonnull QuestSyncService sync, @Nonnull PlayerQuestService playerQuests, @Nonnull PlayerComponentTypes components) {
         this.indexes = indexes;
-
-        plugin.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
-        plugin.getEventRegistry().registerGlobal(RemovedPlayerFromWorldEvent.class, this::handleRemovedPlayerFromWorldEvent);
-        plugin.getEventRegistry().registerGlobal(StartWorldEvent.class, event -> preload(event.getWorld()));
+        this.progression = progression;
+        this.sync = sync;
+        this.playerQuests = playerQuests;
+        this.components = components;
     }
 
-    public static WorldQuestService get() {
-        return OpenQuestsCorePlugin.get().getWorldQuestService();
+    /**
+     * Subscribes to the world starts and the player moves that bring world quests in and out.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
+        events.registerGlobal(RemovedPlayerFromWorldEvent.class, this::handleRemovedPlayerFromWorldEvent);
+        events.registerGlobal(StartWorldEvent.class, event -> preload(event.getWorld()));
     }
 
     @Nonnull
@@ -95,7 +103,7 @@ public class WorldQuestService {
      * so the first player in finds them in memory. One entering first reads them on the spot.
      */
     public void preload(@Nonnull World world) {
-        QuestSyncService.get().execute("the quests of world " + world.getName(), () -> QuestProgressionService.get().loadQuests(getQuestIds(world)));
+        sync.execute("the quests of world " + world.getName(), () -> progression.loadQuests(getQuestIds(world)));
     }
 
     /**
@@ -153,7 +161,7 @@ public class WorldQuestService {
         indexes.remove(indexKey(world), questId);
 
         // Gone already when it left for good, and nothing then is left to write on
-        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+        AbstractQuestProgression<?> quest = progression.getQuest(questId);
         UUID worldId = world.getWorldConfig().getUuid();
         if (quest != null) quest.apply(new AbstractQuestProgression.RemoveWorld(worldId));
     }
@@ -166,7 +174,7 @@ public class WorldQuestService {
     }
 
     private void addQuestHere(@Nonnull World world, @Nonnull UUID questId) {
-        AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+        AbstractQuestProgression<?> quest = progression.loadQuest(questId);
         if (quest == null) return;
 
         if (!indexes.add(indexKey(world), questId)) return;
@@ -182,7 +190,7 @@ public class WorldQuestService {
         }
 
         for (PlayerRef playerRef : world.getPlayerRefs()) {
-            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
+            progression.joinQuest(quest, playerRef.getUuid());
         }
     }
 
@@ -195,7 +203,7 @@ public class WorldQuestService {
         if (playerRef == null) return;
 
         for (AbstractQuestProgression<?> quest : indexes.resolve(indexKey(addPlayerToWorldEvent.getWorld()))) {
-            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
+            progression.joinQuest(quest, playerRef.getUuid());
         }
     }
 
@@ -210,13 +218,13 @@ public class WorldQuestService {
         var playerRef = removedPlayerFromWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
         if (playerRef == null) return;
 
-        QuestStoreComponent playerStore = removedPlayerFromWorldEvent.getHolder().getComponent(QuestStoreComponent.getComponentType());
+        QuestStoreComponent playerStore = removedPlayerFromWorldEvent.getHolder().getComponent(components.questStore());
 
         for (AbstractQuestProgression<?> quest : indexes.resolve(indexKey(removedPlayerFromWorldEvent.getWorld()))) {
-            if (QuestProgressionService.get().getLiveQuest(quest.getId()) == null) continue;
+            if (progression.getLiveQuest(quest.getId()) == null) continue;
 
             if (quest.removePlayer(playerRef.getUuid()) && playerStore != null) {
-                PlayerQuestService.get().removeQuestFromPlayerStore(playerStore, quest, playerRef.getUuid());
+                playerQuests.removeQuestFromPlayerStore(playerStore, quest, playerRef.getUuid());
             }
         }
     }

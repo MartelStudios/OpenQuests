@@ -1,7 +1,8 @@
 package com.martelstudios.openquests.mmoskilltree.quests.moment.completebounty;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
+import com.martelstudios.openquests.mmoskilltree.quests.moment.Moments;
 import com.ziggfreed.common.quest.event.QuestClaimedEvent;
 
 import javax.annotation.Nonnull;
@@ -17,10 +18,9 @@ public final class CompleteBountyFeature {
     /**
      * Registers the type and the claim listener feeding it.
      */
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, MMOSkillTreeCompleteBountyQuestAsset.class, MMOSkillTreeCompleteBountyQuestAsset.CODEC, CompleteBountyQuestProgression.class, CompleteBountyQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, MMOSkillTreeCompleteBountyQuestAsset.class, MMOSkillTreeCompleteBountyQuestAsset.CODEC, CompleteBountyQuestProgression.class, CompleteBountyQuestProgression.CODEC);
 
-        plugin.getEventRegistry().registerGlobal(QuestClaimedEvent.class, CompleteBountyEvents::handleQuestClaimed);
+        plugin.getEventRegistry().registerGlobal(QuestClaimedEvent.class, new CompleteBountyEvents(new Moments(services.getQuestProgressionService()), services.getPlatform().players())::handleQuestClaimed);
     }
 }

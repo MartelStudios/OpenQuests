@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.interactivelypickup;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 
 import javax.annotation.Nonnull;
 
@@ -14,10 +14,9 @@ public final class InteractivelyPickupFeature {
 
     private InteractivelyPickupFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, InteractivelyPickupQuestAsset.class, InteractivelyPickupQuestAsset.CODEC, InteractivelyPickupQuestProgression.class, InteractivelyPickupQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, InteractivelyPickupQuestAsset.class, InteractivelyPickupQuestAsset.CODEC, InteractivelyPickupQuestProgression.class, InteractivelyPickupQuestProgression.CODEC);
 
-        plugin.getEntityStoreRegistry().registerSystem(new InteractivelyPickupItemEventSystem());
+        plugin.getEntityStoreRegistry().registerSystem(new InteractivelyPickupItemEventSystem(services.getQuestProgressionService()));
     }
 }

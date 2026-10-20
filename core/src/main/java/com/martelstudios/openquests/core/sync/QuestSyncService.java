@@ -1,7 +1,6 @@
 package com.martelstudios.openquests.core.sync;
 
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestOperation;
@@ -10,9 +9,6 @@ import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.models.QuestStateVersion;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
-import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
-import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
-import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
@@ -21,11 +17,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,14 +31,14 @@ import java.util.function.Predicate;
 /**
  * Keeps the quests several servers write in step with the storage, on a thread of its own so no
  * game thread waits on it: writes the changes made here over the latest version, takes in what
- * other servers wrote, follows the shared indexes, holds on to the players hosted here and takes
- * in the messages left for them. It also runs whatever else is read off the game threads, such as a world's quests
- * as it starts.
+ * other servers wrote and holds on to the players hosted here. Each tick then runs the tasks
+ * following the rest, and the thread runs whatever else is read off the game threads, such as a
+ * world's quests as it starts.
  *
  * <p>Every write of a shared quest runs on that one thread, so this server never writes one quest
  * twice at once.
  */
-public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
+public class QuestSyncService implements ScopeIndexes.Writer, QuestSync {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     @Nonnull
@@ -51,7 +47,12 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
     @Nonnull
     private final QuestProgressionStore progressionStore;
 
+    @Nonnull
+    private final QuestProgressionService progression;
+
     private final long intervalSeconds;
+
+    private final List<Runnable> eachTick = new CopyOnWriteArrayList<>();
 
     @Nullable
     private volatile Thread workerThread;
@@ -67,16 +68,19 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
      * @param intervalSeconds how often other servers' writes are looked for, which bounds how
      * late one server sees what another did
      */
-    public QuestSyncService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionStore progressionStore, long intervalSeconds) {
+    public QuestSyncService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionStore progressionStore, @Nonnull QuestProgressionService progression, long intervalSeconds) {
         this.storage = storage;
         this.progressionStore = progressionStore;
+        this.progression = progression;
         this.intervalSeconds = Math.max(1, intervalSeconds);
-
-        QuestSync.setPolicy(this);
     }
 
-    public static QuestSyncService get() {
-        return OpenQuestsCorePlugin.get().getQuestSyncService();
+    /**
+     * Adds a task to every tick, after the shared quests were written and read back. For what else
+     * other servers write and this one follows, such as the shared indexes and the player messages.
+     */
+    public void onEachTick(@Nonnull Runnable task) {
+        eachTick.add(task);
     }
 
     /**
@@ -147,7 +151,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
     private void store(@Nonnull Set<UUID> questIds) {
         List<AbstractQuestProgression<?>> quests = new ArrayList<>();
         for (UUID questId : questIds) {
-            collect(QuestProgressionService.get().getQuest(questId), quests);
+            collect(progressionStore.get(questId), quests);
         }
         progressionStore.save(quests);
     }
@@ -240,13 +244,11 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
             }
 
             follow(following);
-            followIndexes();
 
             // Held three ticks, so a tick running late never lets a player go to another server
             storage.renewHosting(Duration.ofSeconds(Math.max(30, 3 * intervalSeconds)));
 
-            Set<UUID> hosted = QuestPlayerStateService.get().getHostedPlayers();
-            if (!hosted.isEmpty()) QuestPlayerStateService.get().deliverMessages(storage.loadMessages(hosted));
+            for (Runnable task : eachTick) task.run();
         } catch (Throwable e) {
             // Anything thrown out of a scheduled task cancels every tick after it, silently
             LOGGER.atWarning().withCause(e).log("Following the other servers on the quest storage failed");
@@ -309,20 +311,7 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync.Policy {
      */
     private void gone(@Nonnull AbstractQuestProgression<?> quest) {
         LOGGER.atInfo().log("Quest %s was done away with on another server", quest.getId());
-        QuestProgressionService.get().unregisterQuest(quest);
-    }
-
-    /**
-     * The universe and the groups this server follows, read in one go.
-     */
-    private void followIndexes() {
-        Set<String> keys = new HashSet<>(ScopeIndexes.get().getLoadedKeys(WorldGroupIndex.GROUP_INDEX_PREFIX));
-        keys.add(UniverseQuestService.UNIVERSE_INDEX_KEY);
-
-        Map<String, Set<UUID>> added = ScopeIndexes.get().refresh(keys);
-
-        UniverseQuestService.get().joinAdded(added.getOrDefault(UniverseQuestService.UNIVERSE_INDEX_KEY, Set.of()));
-        WorldGroupIndex.get().spreadAdded(added);
+        progression.unregisterQuest(quest);
     }
 
     /**

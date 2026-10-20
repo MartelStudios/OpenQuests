@@ -21,10 +21,6 @@ public class QuestStateIndex {
      */
     private final Map<String, Map<UUID, Set<UUID>>> watchers = new ConcurrentHashMap<>();
 
-    public static QuestStateIndex get() {
-        return QuestStateFeature.getIndex();
-    }
-
     public void track(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         add(watchers, watchedAssetOf(quest), playerId, quest.getId());
     }

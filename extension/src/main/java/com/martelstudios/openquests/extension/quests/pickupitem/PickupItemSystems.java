@@ -34,11 +34,17 @@ import java.util.Set;
  */
 public final class PickupItemSystems {
 
+    private final QuestProgressionService progression;
+
     /**
      * The last stack taken off the ground on this world's thread, waiting for the copy that names its
      * taker. Each world ticks on a thread of its own, which is what keeps two worlds apart.
      */
     private final ThreadLocal<TakenStack> taken = new ThreadLocal<>();
+
+    public PickupItemSystems(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
 
     /**
      * @return the system noting what a player took off the ground.
@@ -71,15 +77,14 @@ public final class PickupItemSystems {
     /**
      * Only the ground can hand back what the player threw, so a harvest by hand is told apart.
      */
-    private static void count(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> player, @Nonnull ItemStack stack, boolean fromGround) {
+    private void count(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> player, @Nonnull ItemStack stack, boolean fromGround) {
         var playerRef = store.getComponent(player, PlayerRef.getComponentType());
         var questStoreComponent = store.getComponent(player, QuestStoreComponent.getComponentType());
         if (playerRef == null || questStoreComponent == null) return;
 
         ItemExchange exchange = fromGround ? ItemExchange.GROUND_PICKUP : ItemExchange.HARVEST;
 
-        QuestProgressionService.get()
-                               .progress(new ItemExchangeVisitor(playerRef.getUuid(), exchange, stack.getItemId(), stack.getQuantity()), questStoreComponent.getQuestIds());
+        progression.progress(new ItemExchangeVisitor(playerRef.getUuid(), exchange, stack.getItemId(), stack.getQuantity()), questStoreComponent.getQuestIds());
     }
 
     private record TakenStack(@Nonnull ItemStack stack, long tick) {}
@@ -148,7 +153,7 @@ public final class PickupItemSystems {
     /**
      * Last, so that any other system had its chance to cancel the harvest or change what it yields.
      */
-    private static final class HandPickupSystem extends EntityEventSystem<EntityStore, InteractivelyPickupItemEvent> {
+    private final class HandPickupSystem extends EntityEventSystem<EntityStore, InteractivelyPickupItemEvent> {
 
         private HandPickupSystem() {
             super(InteractivelyPickupItemEvent.class);

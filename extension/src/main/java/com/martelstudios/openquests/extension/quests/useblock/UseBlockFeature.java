@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.useblock;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 
 import javax.annotation.Nonnull;
 
@@ -13,10 +13,9 @@ public final class UseBlockFeature {
 
     private UseBlockFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, UseBlockQuestAsset.class, UseBlockQuestAsset.CODEC, UseBlockQuestProgression.class, UseBlockQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, UseBlockQuestAsset.class, UseBlockQuestAsset.CODEC, UseBlockQuestProgression.class, UseBlockQuestProgression.CODEC);
 
-        plugin.getEntityStoreRegistry().registerSystem(new UseBlockEventSystem());
+        plugin.getEntityStoreRegistry().registerSystem(new UseBlockEventSystem(services.getQuestProgressionService()));
     }
 }

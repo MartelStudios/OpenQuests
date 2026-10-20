@@ -1,9 +1,8 @@
 package com.martelstudios.openquests.core.scopes;
 
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.persistence.IndexStore;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 
 import javax.annotation.Nonnull;
@@ -31,18 +30,19 @@ public class ScopeIndexes {
     @Nonnull
     private final Writer writer;
 
+    @Nonnull
+    private final QuestProgressionStore progressionStore;
+
     private final Map<String, QuestsRecord> records = new ConcurrentHashMap<>();
 
     /**
      * @param writer where each change goes once made, so the game threads never wait on the storage
+     * @param progressionStore where the quests an index lists are read back from
      */
-    public ScopeIndexes(@Nonnull IndexStore storage, @Nonnull Writer writer) {
+    public ScopeIndexes(@Nonnull IndexStore storage, @Nonnull Writer writer, @Nonnull QuestProgressionStore progressionStore) {
         this.storage = storage;
         this.writer = writer;
-    }
-
-    public static ScopeIndexes get() {
-        return OpenQuestsCorePlugin.get().getScopeIndexes();
+        this.progressionStore = progressionStore;
     }
 
     /**
@@ -83,14 +83,14 @@ public class ScopeIndexes {
     @Nonnull
     public List<AbstractQuestProgression<?>> resolve(@Nonnull String key) {
         List<UUID> questIds = List.copyOf(getIds(key));
-        QuestProgressionService.get().loadQuests(questIds);
+        progressionStore.loadMissing(questIds);
 
         List<AbstractQuestProgression<?>> quests = new ArrayList<>(questIds.size());
         for (UUID questId : questIds) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+            AbstractQuestProgression<?> quest = progressionStore.load(questId);
             if (quest != null) {
                 quests.add(quest);
-            } else if (!QuestProgressionService.get().isSetAside(questId)) {
+            } else if (!progressionStore.isSetAside(questId)) {
                 remove(key, questId);
             }
         }

@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.extension.rewards.item;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.extension.journal.QuestPageService;
 
@@ -14,7 +15,7 @@ public final class ItemRewardFeature {
 
     private ItemRewardFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         QuestReward.CODEC.register(TYPE_ID, ItemReward.class, ItemReward.CODEC);
 
         QuestPageService.register(new ItemRewardRenderer());

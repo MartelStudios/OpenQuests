@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.useentity;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 
 import javax.annotation.Nonnull;
 
@@ -13,10 +13,9 @@ public final class UseEntityFeature {
 
     private UseEntityFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, UseEntityQuestAsset.class, UseEntityQuestAsset.CODEC, UseEntityQuestProgression.class, UseEntityQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, UseEntityQuestAsset.class, UseEntityQuestAsset.CODEC, UseEntityQuestProgression.class, UseEntityQuestProgression.CODEC);
 
-        plugin.getEntityStoreRegistry().registerSystem(new UseEntityEventSystem());
+        plugin.getEntityStoreRegistry().registerSystem(new UseEntityEventSystem(services.getQuestProgressionService()));
     }
 }

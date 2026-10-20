@@ -14,9 +14,9 @@ import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
-import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStore;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.extension.journal.QuestPageContext;
@@ -36,6 +36,9 @@ public class ChoiceRewardPage extends InteractiveCustomUIPage<ChoiceRewardPage.E
     private static final String OPTION_DOCUMENT = "OpenQuests/Pages/ChoiceRewardOption.ui";
     private static final String OPTIONS_CONTAINER = "#Options";
 
+    private final OpenQuestsServices services;
+
+    @Nonnull
     private final UUID sourceQuestId;
 
     /**
@@ -49,9 +52,10 @@ public class ChoiceRewardPage extends InteractiveCustomUIPage<ChoiceRewardPage.E
      * @param sourceQuestId the completion paying the choice
      * @param reward        the choice as it stands in what the player is owed
      */
-    public ChoiceRewardPage(@Nonnull PlayerRef playerRef, @Nonnull UUID sourceQuestId, @Nonnull ChoiceReward reward) {
+    public ChoiceRewardPage(@Nonnull OpenQuestsServices services, @Nonnull PlayerRef playerRef, @Nonnull UUID sourceQuestId, @Nonnull ChoiceReward reward) {
         super(playerRef, CustomPageLifetime.CanDismiss, EventDataModel.CODEC);
 
+        this.services = services;
         this.sourceQuestId = sourceQuestId;
         this.reward = reward;
     }
@@ -105,7 +109,7 @@ public class ChoiceRewardPage extends InteractiveCustomUIPage<ChoiceRewardPage.E
         }
 
         EntityComponents components = EntityComponents.of(ref);
-        PendingRewardStore store = QuestRewardService.get().getPending(components);
+        PendingRewardStore store = services.getQuestRewardService().getPending(components);
         PendingRewards pending = store.get(sourceQuestId);
 
         // Settled meanwhile, from another popup of the same choice
@@ -119,7 +123,7 @@ public class ChoiceRewardPage extends InteractiveCustomUIPage<ChoiceRewardPage.E
         ChoiceReward.Entry[] entries = reward.getEntries();
         if (index < 0 || index >= entries.length) return;
 
-        if (!entries[index].getReward().grant(sourceQuestId, components)) return;
+        if (!entries[index].getReward().grant(services, sourceQuestId, components)) return;
 
         ChoiceReward left = reward.afterPicking(index);
         if (left == null) {

@@ -1,14 +1,13 @@
 package com.martelstudios.openquests.core.scopes.universe;
 
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.Universe;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -29,14 +28,20 @@ public class UniverseQuestService {
 
     @Nonnull
     private final ScopeIndexes indexes;
+    private final QuestProgressionService progression;
+    private final Players players;
 
-    public UniverseQuestService(@Nonnull JavaPlugin javaPlugin, @Nonnull ScopeIndexes indexes) {
+    public UniverseQuestService(@Nonnull ScopeIndexes indexes, @Nonnull QuestProgressionService progression, @Nonnull Players players) {
         this.indexes = indexes;
-        javaPlugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
+        this.progression = progression;
+        this.players = players;
     }
 
-    public static UniverseQuestService get() {
-        return OpenQuestsCorePlugin.get().getUniverseQuestService();
+    /**
+     * Subscribes to connections, which bring the universe quests to the player.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(PlayerConnectEvent.class, this::handlePlayerConnectEvent);
     }
 
     /**
@@ -48,7 +53,7 @@ public class UniverseQuestService {
     }
 
     public void addQuest(@Nonnull UUID questId) {
-        AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+        AbstractQuestProgression<?> quest = progression.loadQuest(questId);
         if (quest == null) return;
 
         // Before the index lists it, which writes the quest: another server reading it finds it shared
@@ -67,7 +72,7 @@ public class UniverseQuestService {
         indexes.remove(UNIVERSE_INDEX_KEY, questId);
 
         // Gone already when it left for good, and nothing then is left to write on
-        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+        AbstractQuestProgression<?> quest = progression.getQuest(questId);
         if (quest != null && quest.getScope() instanceof UniverseQuestScope) quest.apply(new AbstractQuestProgression.SetScope(null));
     }
 
@@ -84,7 +89,7 @@ public class UniverseQuestService {
      */
     public void joinAdded(@Nonnull Collection<UUID> questIds) {
         for (UUID questId : questIds) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().loadQuest(questId);
+            AbstractQuestProgression<?> quest = progression.loadQuest(questId);
             if (quest != null) joinEveryone(quest);
         }
     }
@@ -99,9 +104,9 @@ public class UniverseQuestService {
         }
     }
 
-    private static void joinEveryone(@Nonnull AbstractQuestProgression<?> quest) {
-        for (PlayerRef playerRef : Universe.get().getPlayers()) {
-            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
+    private void joinEveryone(@Nonnull AbstractQuestProgression<?> quest) {
+        for (UUID playerId : players.online()) {
+            progression.joinQuest(quest, playerId);
         }
     }
 
@@ -115,7 +120,7 @@ public class UniverseQuestService {
         if (playerRef == null) return;
 
         for (AbstractQuestProgression<?> quest : indexes.resolve(UNIVERSE_INDEX_KEY)) {
-            QuestProgressionService.get().joinQuest(quest, playerRef.getUuid());
+            progression.joinQuest(quest, playerRef.getUuid());
         }
     }
 }

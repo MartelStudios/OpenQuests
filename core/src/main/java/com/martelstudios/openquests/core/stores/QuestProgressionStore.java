@@ -1,15 +1,14 @@
 package com.martelstudios.openquests.core.stores;
 
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
 import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestEnvironment;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.services.QuestTypeRegistry;
-import com.martelstudios.openquests.core.sync.QuestSync;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -63,8 +62,15 @@ public class QuestProgressionStore {
     @Nonnull
     private final QuestStorage storage;
 
-    public QuestProgressionStore(@Nonnull QuestStorage storage) {
+    @Nonnull
+    private final QuestEnvironment environment;
+
+    /**
+     * @param environment what the quests this store holds act through, attached to each as it enters
+     */
+    public QuestProgressionStore(@Nonnull QuestStorage storage, @Nonnull QuestEnvironment environment) {
         this.storage = storage;
+        this.environment = environment;
     }
 
     @Nonnull
@@ -85,6 +91,8 @@ public class QuestProgressionStore {
             return;
         }
 
+        quest.attach(environment);
+
         if (quest.isOver()) {
             archived.put(quest.getId(), quest);
         } else {
@@ -99,10 +107,7 @@ public class QuestProgressionStore {
             }
         }
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestLoadedEvent.class, quest.getId())
-                    .dispatch(new QuestLoadedEvent(quest));
+        environment.events().dispatchFor(QuestLoadedEvent.class, quest.getId()).dispatch(new QuestLoadedEvent(quest));
     }
 
     /**
@@ -120,10 +125,7 @@ public class QuestProgressionStore {
 
         if (remove(id) == null) archived.remove(id);
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestUnloadedEvent.class, id)
-                    .dispatch(new QuestUnloadedEvent(quest));
+        environment.events().dispatchFor(QuestUnloadedEvent.class, id).dispatch(new QuestUnloadedEvent(quest));
 
         return quest;
     }
@@ -276,8 +278,8 @@ public class QuestProgressionStore {
         for (AbstractQuestProgression<?> quest : candidates) {
             if (!isPersisted(quest)) continue;
 
-            if (QuestSync.isShared(quest)) {
-                if (quest.hasChanges()) QuestSync.writeSoon(quest);
+            if (quest.isShared()) {
+                if (quest.hasChanges()) environment.writeSoon(quest);
                 continue;
             }
 

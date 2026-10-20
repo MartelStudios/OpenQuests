@@ -30,11 +30,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class DropItemSystems {
 
+    private final QuestProgressionService progression;
+
     /**
      * The tick each player last asked to throw something on. Written and read on the world thread
      * the player is in, but players of several worlds share it.
      */
     private final Map<UUID, Long> requests = new ConcurrentHashMap<>();
+
+    public DropItemSystems(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
 
     /**
      * @return the system noting a player's request to throw.
@@ -114,8 +120,7 @@ public final class DropItemSystems {
             ItemStack dropped = event.getItemStack();
             if (dropped == null || dropped.isEmpty()) return;
 
-            QuestProgressionService.get()
-                                   .progress(new ItemExchangeVisitor(playerRef.getUuid(), ItemExchange.THROW, dropped.getItemId(), dropped.getQuantity()), questStoreComponent.getQuestIds());
+            progression.progress(new ItemExchangeVisitor(playerRef.getUuid(), ItemExchange.THROW, dropped.getItemId(), dropped.getQuantity()), questStoreComponent.getQuestIds());
         }
 
         @Override

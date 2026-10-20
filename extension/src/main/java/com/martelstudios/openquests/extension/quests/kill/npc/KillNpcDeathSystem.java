@@ -17,6 +17,12 @@ import java.util.UUID;
  */
 public class KillNpcDeathSystem extends KillDeathSystem {
 
+    private final QuestProgressionService progression;
+
+    public KillNpcDeathSystem(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
+
     @Nonnull
     @Override
     public Query<EntityStore> getQuery() {
@@ -28,7 +34,6 @@ public class KillNpcDeathSystem extends KillDeathSystem {
         var victim = store.getComponent(victimRef, NPCEntity.getComponentType());
         if (victim == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new KillNpcQuestVisitor(killerId, victim), killerQuests.getQuestIds());
+        progression.progress(new KillNpcQuestVisitor(killerId, victim), killerQuests.getQuestIds());
     }
 }

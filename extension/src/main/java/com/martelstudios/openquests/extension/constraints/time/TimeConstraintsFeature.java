@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.extension.constraints.time;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.extension.journal.QuestPageService;
 
@@ -19,7 +20,7 @@ public final class TimeConstraintsFeature {
     /**
      * Registers both constraints under their type ids, and how the journal describes them.
      */
-    public static void register(@Nonnull JavaPlugin plugin) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         QuestConstraint.CODEC.register(TIME_LIMIT_TYPE_ID, TimeLimitConstraint.class, TimeLimitConstraint.CODEC);
         QuestConstraint.CODEC.register(DEADLINE_TYPE_ID, DeadlineConstraint.class, DeadlineConstraint.CODEC);
 

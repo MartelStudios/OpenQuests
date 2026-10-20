@@ -21,8 +21,12 @@ import javax.annotation.Nullable;
  * quests, this isn't tied to a specific harvest/pickup interaction).
  */
 public class GatherItemEventSystem extends EntityEventSystem<EntityStore, InventoryChangeEvent> {
-    public GatherItemEventSystem() {
+
+    private final QuestProgressionService progression;
+
+    public GatherItemEventSystem(@Nonnull QuestProgressionService progression) {
         super(InventoryChangeEvent.class);
+        this.progression = progression;
     }
 
     @Override
@@ -32,8 +36,7 @@ public class GatherItemEventSystem extends EntityEventSystem<EntityStore, Invent
         var playerRef = store.getComponent(ref, PlayerRef.getComponentType());
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
 
-        QuestProgressionService.get()
-                               .progress(new GatherQuestVisitor(EntityComponents.of(playerRef.getReference())), questStoreComponent.getQuestIds());
+        progression.progress(new GatherQuestVisitor(EntityComponents.of(playerRef.getReference())), questStoreComponent.getQuestIds());
     }
 
     @Nullable

@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.extension.quests.quantity;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.extension.hud.QuestHudService;
 import com.martelstudios.openquests.extension.journal.QuestPageService;
 
@@ -14,7 +15,7 @@ public final class QuantityFeature {
 
     private QuantityFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         QuestHudService.register(new QuantityQuestHudRenderer());
         QuestPageService.register(new QuantityQuestPageRenderer());
     }

@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.extension.constraints.death;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.extension.journal.QuestPageService;
 
@@ -18,10 +19,10 @@ public final class DeathConstraintsFeature {
      * Registers the constraint under its type id, how the journal describes it, and the system
      * hearing the deaths.
      */
-    public static void register(@Nonnull JavaPlugin plugin) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         QuestConstraint.CODEC.register(FAIL_ON_DEATH_TYPE_ID, FailOnDeathConstraint.class, FailOnDeathConstraint.CODEC);
         QuestPageService.register(new FailOnDeathRenderer());
 
-        plugin.getEntityStoreRegistry().registerSystem(new FailOnDeathSystem());
+        plugin.getEntityStoreRegistry().registerSystem(new FailOnDeathSystem(services.getQuestProgressionService()));
     }
 }

@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.craft;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 
 import javax.annotation.Nonnull;
 
@@ -13,10 +13,9 @@ public final class CraftFeature {
 
     private CraftFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, CraftQuestAsset.class, CraftQuestAsset.CODEC, CraftQuestProgression.class, CraftQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, CraftQuestAsset.class, CraftQuestAsset.CODEC, CraftQuestProgression.class, CraftQuestProgression.CODEC);
 
-        plugin.getEntityStoreRegistry().registerSystem(new CraftRecipeEventSystem());
+        plugin.getEntityStoreRegistry().registerSystem(new CraftRecipeEventSystem(services.getQuestProgressionService()));
     }
 }

@@ -1,7 +1,8 @@
 package com.martelstudios.openquests.mmoskilltree.quests.moment.abilitycast;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
+import com.martelstudios.openquests.mmoskilltree.quests.moment.Moments;
 import com.ziggfreed.mmoskilltree.ability.cast.AbilityCastObserverRegistry;
 
 import javax.annotation.Nonnull;
@@ -23,10 +24,9 @@ public final class AbilityCastFeature {
     /**
      * Registers the type and the cast observer feeding it.
      */
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, MMOSkillTreeAbilityCastQuestAsset.class, MMOSkillTreeAbilityCastQuestAsset.CODEC, AbilityCastQuestProgression.class, AbilityCastQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, MMOSkillTreeAbilityCastQuestAsset.class, MMOSkillTreeAbilityCastQuestAsset.CODEC, AbilityCastQuestProgression.class, AbilityCastQuestProgression.CODEC);
 
-        if (OBSERVED.compareAndSet(false, true)) AbilityCastObserverRegistry.getInstance().register(AbilityCastEvents::handleAbilityCast);
+        if (OBSERVED.compareAndSet(false, true)) AbilityCastObserverRegistry.getInstance().register(new AbilityCastEvents(new Moments(services.getQuestProgressionService()))::handleAbilityCast);
     }
 }

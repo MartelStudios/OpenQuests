@@ -9,6 +9,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
@@ -50,13 +51,13 @@ public class ChoiceReward extends QuestReward {
      * player out of world, who has no screen to show it on.
      */
     @Override
-    public boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull OpenQuestsServices services, @Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
         Ref<EntityStore> reference = playerComponents.getReference();
         Player player = playerComponents.getComponent(Player.getComponentType());
         PlayerRef playerRef = playerComponents.getComponent(PlayerRef.getComponentType());
         if (reference == null || player == null || playerRef == null) return false;
 
-        player.getPageManager().openCustomPage(reference, reference.getStore(), new ChoiceRewardPage(playerRef, sourceQuestId, this));
+        player.getPageManager().openCustomPage(reference, reference.getStore(), new ChoiceRewardPage(services, playerRef, sourceQuestId, this));
         return false;
     }
 

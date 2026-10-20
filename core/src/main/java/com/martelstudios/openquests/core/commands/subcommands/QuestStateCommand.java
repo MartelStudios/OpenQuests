@@ -11,7 +11,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.visitors.PlayerSetStateVisitor;
 
@@ -36,19 +36,27 @@ public class QuestStateCommand extends AbstractPlayerCommand {
     @Nonnull
     private final QuestState state;
 
+    @Nonnull
+    private final QuestProgressionService progression;
+
+    @Nonnull
+    private final PlayerComponentTypes components;
+
     /**
      * Runs under the permission group of {@code /quest}.
      */
-    public QuestStateCommand(@Nonnull String name, @Nonnull String description, @Nonnull QuestState state) {
+    public QuestStateCommand(@Nonnull QuestProgressionService progression, @Nonnull PlayerComponentTypes components, @Nonnull String name, @Nonnull String description, @Nonnull QuestState state) {
         super(name, description);
         this.state = state;
+        this.progression = progression;
+        this.components = components;
     }
 
     /**
      * Runs under a group of its own, for an outcome a player must not be able to hand themselves.
      */
-    public QuestStateCommand(@Nonnull String name, @Nonnull String description, @Nonnull QuestState state, @Nonnull String permissionGroup) {
-        this(name, description, state);
+    public QuestStateCommand(@Nonnull QuestProgressionService progression, @Nonnull PlayerComponentTypes components, @Nonnull String name, @Nonnull String description, @Nonnull QuestState state, @Nonnull String permissionGroup) {
+        this(progression, components, name, description, state);
 
         setPermissionGroups(permissionGroup);
     }
@@ -62,14 +70,14 @@ public class QuestStateCommand extends AbstractPlayerCommand {
     protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
         String questRef = context.get(questArg);
 
-        var questStore = EntityComponents.of(ref).getComponent(QuestStoreComponent.getComponentType());
+        var questStore = EntityComponents.of(ref).getComponent(components.questStore());
         if (questStore == null) {
             context.sendMessage(Message.raw("You hold no quest."));
             return;
         }
 
         var visitor = new PlayerSetStateVisitor(playerRef.getUuid(), questRef, state);
-        QuestProgressionService.get().progress(visitor, questStore.getQuestIds());
+        progression.progress(visitor, questStore.getQuestIds());
 
         if (visitor.getMatched() == 0 && visitor.getRefused() > 0) {
             context.sendMessage(Message.raw(String.format("'%s' cannot be set to %s.", questRef, state)));

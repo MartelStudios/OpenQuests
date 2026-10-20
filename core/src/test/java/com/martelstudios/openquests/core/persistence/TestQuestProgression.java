@@ -4,9 +4,11 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestState;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
@@ -25,6 +27,22 @@ public class TestQuestProgression extends AbstractQuestProgression<TestQuestProg
                     .build();
 
     private int counter;
+
+    @Nullable
+    private transient OpenQuestAsset asset;
+
+    /**
+     * Gives the quest the asset it reads, there being no asset store behind a test.
+     */
+    public TestQuestProgression withAsset(@Nullable OpenQuestAsset asset) {
+        this.asset = asset;
+        return this;
+    }
+
+    @Override
+    public OpenQuestAsset getAsset() {
+        return asset;
+    }
 
     /**
      * Hands the quest to a player the way the quest would, without the event a test has no server for.

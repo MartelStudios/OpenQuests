@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
@@ -37,12 +38,13 @@ public abstract class QuestReward {
      * Grants this reward to one player. Must be all-or-nothing: a partial grant would be handed
      * out twice, since a reward that fails stays pending and is retried.
      *
+     * @param services what the reward acts through, for one handing out more than items
      * @param sourceQuestId the completion being paid for. Most rewards have no use for it (an
      *                      item is an item), but one that hands a quest over is creating something
      *                      whose provenance nothing else could reconstruct afterwards.
      * @return {@code false} if it could not be granted right now, e.g. a full inventory
      */
-    public abstract boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents);
+    public abstract boolean grant(@Nonnull OpenQuestsServices services, @Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents);
 
     /**
      * @return whether this reward is handed over the moment it is owed, rather than waiting for the

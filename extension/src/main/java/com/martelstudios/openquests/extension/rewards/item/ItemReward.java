@@ -8,13 +8,14 @@ import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
-import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Gives items to the player, hotbar first then storage. The item id is validated at asset load,
@@ -36,7 +37,7 @@ public class ItemReward extends QuestReward {
     private ItemReward() {}
 
     @Override
-    public boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull OpenQuestsServices services, @Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
         List<ItemContainer> containers = new ArrayList<>(InventoryComponent.HOTBAR_FIRST.length);
 
         for (var inventoryType : InventoryComponent.HOTBAR_FIRST) {

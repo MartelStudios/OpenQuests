@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.pickupitem;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 
 import javax.annotation.Nonnull;
 
@@ -17,11 +17,10 @@ public final class PickupItemFeature {
     /**
      * Registers the type and the systems that tell a pickup apart, which share what they saw.
      */
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, PickupItemQuestAsset.class, PickupItemQuestAsset.CODEC, PickupItemQuestProgression.class, PickupItemQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, PickupItemQuestAsset.class, PickupItemQuestAsset.CODEC, PickupItemQuestProgression.class, PickupItemQuestProgression.CODEC);
 
-        PickupItemSystems systems = new PickupItemSystems();
+        PickupItemSystems systems = new PickupItemSystems(services.getQuestProgressionService());
         plugin.getEntityStoreRegistry().registerSystem(systems.leftGroundSystem());
         plugin.getEntityStoreRegistry().registerSystem(systems.flyingItemSystem());
         plugin.getEntityStoreRegistry().registerSystem(systems.handPickupSystem());

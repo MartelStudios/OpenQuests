@@ -8,8 +8,10 @@ import com.hypixel.hytale.server.core.permissions.provider.HytalePermissionsProv
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opennavigation.events.RouteChangedEvent;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.extension.journal.commands.JournalCommand;
 import com.martelstudios.openquests.extension.journal.navigation.JournalRoutes;
+import com.martelstudios.openquests.extension.track.QuestTrackService;
 
 import javax.annotation.Nonnull;
 
@@ -27,7 +29,7 @@ public final class JournalFeature {
 
     private JournalFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services, @Nonnull QuestTrackService tracks) {
         // Granted the way world editing commands are; the groups are rebuilt once already at boot
         PermissionsModule.registerPermission(EDIT_PERMISSION, HytalePermissionsProvider.GROUP_WORLD_EDITOR);
         PermissionsModule.get().refreshVirtualGroups();
@@ -35,14 +37,14 @@ public final class JournalFeature {
         plugin.getCommandRegistry().registerCommand(new JournalCommand());
         plugin.getEntityStoreRegistry().registerSystem(new QuestPageTickingSystem());
         plugin.getEventRegistry()
-              .register(RouteChangedEvent.class, JournalRoutes.NAMESPACE, JournalFeature::handleRouteChanged);
+              .register(RouteChangedEvent.class, JournalRoutes.NAMESPACE, event -> handleRouteChanged(event, services, tracks));
     }
 
     /**
      * Redraws the page the player already has open rather than sending a new one: opening a custom
      * page dismisses whatever stood there, and the client would lose the scroll with it.
      */
-    private static void handleRouteChanged(@Nonnull RouteChangedEvent event) {
+    private static void handleRouteChanged(@Nonnull RouteChangedEvent event, @Nonnull OpenQuestsServices services, @Nonnull QuestTrackService tracks) {
         Ref<EntityStore> reference = event.getReference();
         Store<EntityStore> store = reference.getStore();
 
@@ -56,6 +58,6 @@ public final class JournalFeature {
             return;
         }
 
-        pageManager.openCustomPage(reference, store, new QuestPage(event.getPlayer(), event.getRouter(), event.getRoute()));
+        pageManager.openCustomPage(reference, store, new QuestPage(services.getQuestProgressionService(), services.getQuestRewardService(), tracks, event.getPlayer(), event.getRouter(), event.getRoute()));
     }
 }

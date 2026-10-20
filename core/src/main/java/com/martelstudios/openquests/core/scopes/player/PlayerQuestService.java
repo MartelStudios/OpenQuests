@@ -1,17 +1,18 @@
 package com.martelstudios.openquests.core.scopes.player;
 
-import com.hypixel.hytale.server.core.HytaleServer;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
+import com.hypixel.hytale.event.IEventBus;
+import com.hypixel.hytale.event.IEventRegistry;
 import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.openquests.core.scopes.player.events.QuestRemovedFromPlayerStoreEvent;
+import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.stores.QuestsRecord;
 import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -27,14 +28,23 @@ import java.util.UUID;
  */
 public class PlayerQuestService {
 
-    public PlayerQuestService(JavaPlugin plugin) {
-        plugin.getEventRegistry().registerGlobal(QuestPlayerAddedEvent.class, this::handleQuestPlayerAddedEvent);
-        plugin.getEventRegistry().registerGlobal(QuestPlayerRemovedEvent.class, this::handleQuestPlayerRemovedEvent);
-        plugin.getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, this::handleQuestUnregisteredEvent);
+    private final IEventBus eventBus;
+    private final Players players;
+    private final PlayerComponentTypes components;
+
+    public PlayerQuestService(@Nonnull IEventBus events, @Nonnull Players players, @Nonnull PlayerComponentTypes components) {
+        this.eventBus = events;
+        this.players = players;
+        this.components = components;
     }
 
-    public static PlayerQuestService get() {
-        return OpenQuestsCorePlugin.get().getPlayerQuestService();
+    /**
+     * Subscribes to the quest membership changes mirrored into each player's record.
+     */
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(QuestPlayerAddedEvent.class, this::handleQuestPlayerAddedEvent);
+        events.registerGlobal(QuestPlayerRemovedEvent.class, this::handleQuestPlayerRemovedEvent);
+        events.registerGlobal(QuestUnregisteredEvent.class, this::handleQuestUnregisteredEvent);
     }
 
     /**
@@ -42,7 +52,7 @@ public class PlayerQuestService {
      */
     @Nonnull
     public QuestsRecord getQuests(@Nonnull EntityComponents playerComponents) {
-        return playerComponents.ensureAndGetComponent(QuestStoreComponent.getComponentType()).getQuests();
+        return playerComponents.ensureAndGetComponent(components.questStore()).getQuests();
     }
 
     private void handleQuestPlayerAddedEvent(@Nonnull QuestPlayerAddedEvent questPlayerAddedEvent) {
@@ -70,7 +80,7 @@ public class PlayerQuestService {
     }
 
     public void addQuestToPlayerStore(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        EntityComponents.update(playerId, components -> addQuestToPlayerStore(components.ensureAndGetComponent(QuestStoreComponent.getComponentType()), quest, playerId));
+        players.update(playerId, player -> addQuestToPlayerStore(player.ensureAndGetComponent(components.questStore()), quest, playerId));
     }
 
     public void addQuestToPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
@@ -78,14 +88,11 @@ public class PlayerQuestService {
 
         playerStore.markDirty();
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestAddedToPlayerStoreEvent.class, playerId)
-                    .dispatch(new QuestAddedToPlayerStoreEvent(quest, playerId));
+        eventBus.dispatchFor(QuestAddedToPlayerStoreEvent.class, playerId).dispatch(new QuestAddedToPlayerStoreEvent(quest, playerId));
     }
 
     public void removeQuestFromPlayerStore(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        EntityComponents.update(playerId, components -> removeQuestFromPlayerStore(components.ensureAndGetComponent(QuestStoreComponent.getComponentType()), quest, playerId));
+        players.update(playerId, player -> removeQuestFromPlayerStore(player.ensureAndGetComponent(components.questStore()), quest, playerId));
     }
 
     /**
@@ -97,9 +104,6 @@ public class PlayerQuestService {
 
         playerStore.markDirty();
 
-        HytaleServer.get()
-                    .getEventBus()
-                    .dispatchFor(QuestRemovedFromPlayerStoreEvent.class, playerId)
-                    .dispatch(new QuestRemovedFromPlayerStoreEvent(quest, playerId));
+        eventBus.dispatchFor(QuestRemovedFromPlayerStoreEvent.class, playerId).dispatch(new QuestRemovedFromPlayerStoreEvent(quest, playerId));
     }
 }

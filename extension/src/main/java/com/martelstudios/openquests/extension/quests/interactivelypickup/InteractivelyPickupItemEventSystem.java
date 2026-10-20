@@ -15,8 +15,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class InteractivelyPickupItemEventSystem extends EntityEventSystem<EntityStore, InteractivelyPickupItemEvent> {
-    public InteractivelyPickupItemEventSystem() {
+
+    private final QuestProgressionService progression;
+
+    public InteractivelyPickupItemEventSystem(@Nonnull QuestProgressionService progression) {
         super(InteractivelyPickupItemEvent.class);
+        this.progression = progression;
     }
 
     @Override
@@ -27,8 +31,7 @@ public class InteractivelyPickupItemEventSystem extends EntityEventSystem<Entity
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
         if (playerRef == null || questStoreComponent == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new InteractivelyPickupQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
+        progression.progress(new InteractivelyPickupQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.mmoskilltree.editor.DataSets;
@@ -40,7 +41,7 @@ public class MMOSkillTreeXpReward extends QuestReward implements SkillReference 
      * event included: {@link MMOSkillTreeAPI#addXp} skips all three.
      */
     @Override
-    public boolean grant(@Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
+    public boolean grant(@Nonnull OpenQuestsServices services, @Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
         var ref = playerComponents.getReference();
         if (ref == null) return false;
 

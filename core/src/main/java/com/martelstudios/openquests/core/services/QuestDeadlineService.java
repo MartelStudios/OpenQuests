@@ -1,12 +1,10 @@
 package com.martelstudios.openquests.core.services;
 
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.server.core.HytaleServer;
-import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.openquests.core.OpenQuestsCorePlugin;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
@@ -21,6 +19,7 @@ import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -68,24 +68,38 @@ public class QuestDeadlineService {
     @Nullable
     private Instant timerAt;
 
-    public QuestDeadlineService(@Nonnull JavaPlugin plugin) {
-        plugin.getEventRegistry().registerGlobal(QuestRegisteredEvent.class, event -> watch(event.getQuest(), false));
-        plugin.getEventRegistry().registerGlobal(QuestLoadedEvent.class, event -> watch(event.getQuest(), true));
-        plugin.getEventRegistry().registerGlobal(QuestUnloadedEvent.class, event -> forget(event.getQuest().getId()));
-        plugin.getEventRegistry().registerGlobal(QuestUnregisteredEvent.class, event -> forget(event.getQuest().getId()));
-        plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
-        // A quest kept running by StopOnComplete:false going back to running is on the clock again, here or
-        // wherever another server moved it
-        plugin.getEventRegistry().registerGlobal(QuestStateChangedEvent.class, event -> {
-            if (event.getState() == QuestState.IN_PROGRESS) watch(event.getQuest(), false);
-        });
+    @Nonnull
+    private final QuestProgressionService progression;
+
+    @Nonnull
+    private final Clock clock;
+
+    @Nonnull
+    private final ScheduledExecutorService scheduler;
+
+    /**
+     * @param scheduler where the timer runs, shared with the rest of the server
+     */
+    public QuestDeadlineService(@Nonnull QuestProgressionService progression, @Nonnull Clock clock, @Nonnull ScheduledExecutorService scheduler) {
+        this.progression = progression;
+        this.clock = clock;
+        this.scheduler = scheduler;
     }
 
     /**
-     * @return the instance the core plugin set up.
+     * Subscribes to the quest lifecycle events that start and stop watching a quest's deadline.
      */
-    public static QuestDeadlineService get() {
-        return OpenQuestsCorePlugin.get().getQuestDeadlineService();
+    public void listen(@Nonnull IEventRegistry events) {
+        events.registerGlobal(QuestRegisteredEvent.class, event -> watch(event.getQuest(), false));
+        events.registerGlobal(QuestLoadedEvent.class, event -> watch(event.getQuest(), true));
+        events.registerGlobal(QuestUnloadedEvent.class, event -> forget(event.getQuest().getId()));
+        events.registerGlobal(QuestUnregisteredEvent.class, event -> forget(event.getQuest().getId()));
+        events.registerGlobal(QuestCompletedEvent.class, this::handleQuestCompletedEvent);
+        // A quest kept running by StopOnComplete:false going back to running is on the clock again, here or
+        // wherever another server moved it
+        events.registerGlobal(QuestStateChangedEvent.class, event -> {
+            if (event.getState() == QuestState.IN_PROGRESS) watch(event.getQuest(), false);
+        });
     }
 
     /**
@@ -112,7 +126,7 @@ public class QuestDeadlineService {
 
         Instant at = expiry.at();
         if (arriving) {
-            Instant earliest = Instant.now().plus(ARRIVAL_GRACE);
+            Instant earliest = clock.instant().plus(ARRIVAL_GRACE);
             if (at.isBefore(earliest)) at = earliest;
         }
 
@@ -152,9 +166,9 @@ public class QuestDeadlineService {
 
         if (timer != null) timer.cancel(false);
 
-        long delay = Math.max(0, Duration.between(Instant.now(), next.at()).toMillis());
+        long delay = Math.max(0, Duration.between(clock.instant(), next.at()).toMillis());
         timerAt = next.at();
-        timer = HytaleServer.SCHEDULED_EXECUTOR.schedule(this::expireDue, delay, TimeUnit.MILLISECONDS);
+        timer = scheduler.schedule(this::expireDue, delay, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -167,7 +181,7 @@ public class QuestDeadlineService {
             timer = null;
             timerAt = null;
 
-            Instant now = Instant.now();
+            Instant now = clock.instant();
             while (!queue.isEmpty() && !queue.peek().at().isAfter(now)) {
                 Scheduled entry = queue.poll();
                 scheduled.remove(entry.questId());
@@ -187,14 +201,14 @@ public class QuestDeadlineService {
      * online there is no such thread, and no session either for the outcome to race.
      */
     private void expire(@Nonnull UUID questId) {
-        AbstractQuestProgression<?> quest = QuestProgressionService.get().getLiveQuest(questId);
+        AbstractQuestProgression<?> quest = progression.getLiveQuest(questId);
         if (quest == null || quest.isCompleted()) return;
 
         Expiry expiry = expiryOf(quest);
         if (expiry == null) return;
 
         // Moved since it was scheduled, by an asset reloaded under it
-        if (expiry.at().isAfter(Instant.now())) {
+        if (expiry.at().isAfter(clock.instant())) {
             schedule(questId, expiry.at());
             return;
         }
@@ -207,17 +221,17 @@ public class QuestDeadlineService {
 
         Ref<EntityStore> reference = holder.getReference();
         if (reference == null) {
-            schedule(questId, Instant.now().plus(HOLDER_RETRY));
+            schedule(questId, clock.instant().plus(HOLDER_RETRY));
             return;
         }
 
         reference.getStore().getExternalData().getWorld().execute(() -> end(quest, expiry.state()));
     }
 
-    private static void end(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state) {
+    private void end(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state) {
         if (quest.isCompleted()) return;
 
-        QuestProgressionService.get().progress(new SetStateVisitor(state), List.of(quest.getId()));
+        progression.progress(new SetStateVisitor(state), List.of(quest.getId()));
     }
 
     @Nullable

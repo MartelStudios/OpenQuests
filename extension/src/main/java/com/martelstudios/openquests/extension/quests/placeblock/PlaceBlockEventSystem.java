@@ -28,8 +28,12 @@ import java.util.Set;
  * quests that asked for it.
  */
 public class PlaceBlockEventSystem extends EntityEventSystem<EntityStore, PlaceBlockEvent> {
-    public PlaceBlockEventSystem() {
+
+    private final QuestProgressionService progression;
+
+    public PlaceBlockEventSystem(@Nonnull QuestProgressionService progression) {
         super(PlaceBlockEvent.class);
+        this.progression = progression;
     }
 
     @Override
@@ -51,8 +55,7 @@ public class PlaceBlockEventSystem extends EntityEventSystem<EntityStore, PlaceB
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
         if (playerRef == null || questStoreComponent == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new BlockActionVisitor(playerRef.getUuid(), BlockAction.PLACE, itemInHand.getItemId(), false), questStoreComponent.getQuestIds());
+        progression.progress(new BlockActionVisitor(playerRef.getUuid(), BlockAction.PLACE, itemInHand.getItemId(), false), questStoreComponent.getQuestIds());
     }
 
     /**

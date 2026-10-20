@@ -21,7 +21,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class InWorldLeaveTracker {
 
+    private final QuestProgressionService progression;
+
     private final Map<UUID, String> lastWorlds = new ConcurrentHashMap<>();
+
+    public InWorldLeaveTracker(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
 
     /**
      * Only a move from a matching world to one that is not counts, so a quest handed out before
@@ -39,8 +45,7 @@ public final class InWorldLeaveTracker {
         var questStore = holder.getComponent(QuestStoreComponent.getComponentType());
         if (questStore == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new ConstraintEndVisitor(playerRef.getUuid(), constraint -> ConstraintEndVisitor.failIf(
+        progression.progress(new ConstraintEndVisitor(playerRef.getUuid(), constraint -> ConstraintEndVisitor.failIf(
                                    constraint instanceof InWorldConstraint inWorld && inWorld.failsOnLeave() && inWorld.matches(left) && !inWorld.matches(entered))), questStore.getQuestIds());
     }
 

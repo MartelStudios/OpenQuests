@@ -24,6 +24,12 @@ import javax.annotation.Nonnull;
  */
 public class MovementTickingSystem extends EntityTickingSystem<EntityStore> {
 
+    private final QuestProgressionService progression;
+
+    public MovementTickingSystem(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
+
     @Nonnull
     @Override
     public Query<EntityStore> getQuery() {
@@ -48,7 +54,6 @@ public class MovementTickingSystem extends EntityTickingSystem<EntityStore> {
         // where they were rather than from wherever they last happened to be counted
         double metres = listener.sampleTravel(position.x(), position.z());
 
-        QuestProgressionService.get()
-                               .progress(new MovementQuestVisitor(playerRef.getUuid(), states, metres, dt), listener.getQuestIds());
+        progression.progress(new MovementQuestVisitor(playerRef.getUuid(), states, metres, dt), listener.getQuestIds());
     }
 }

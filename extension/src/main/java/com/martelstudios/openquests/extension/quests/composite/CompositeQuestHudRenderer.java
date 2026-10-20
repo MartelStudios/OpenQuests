@@ -17,6 +17,12 @@ import java.util.UUID;
  */
 public final class CompositeQuestHudRenderer implements QuestHudRenderer {
 
+    private final QuestProgressionService progression;
+
+    public CompositeQuestHudRenderer(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
+
     /** Carries the composite line and, under it, the container its children draw into. */
     private static final String GROUP_DOCUMENT = "OpenQuests/Hud/QuestTrackerGroup.ui";
 
@@ -44,7 +50,7 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
      * Walks the children by index, since {@code questIds} and the asset ids are built together and
      * a child archived on completion is only nameable through its asset.
      */
-    private static void renderChildren(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite) {
+    private void renderChildren(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite) {
         CompositeQuestAsset asset = composite.getAsset();
         if (asset == null) return;
 
@@ -56,7 +62,7 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
         for (int i = 0; i < questIds.length; i++) {
             if (separated && i > 0) context.appendRow(SEPARATOR_DOCUMENT);
 
-            AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(questIds[i]);
+            AbstractQuestProgression<?> child = progression.getQuest(questIds[i]);
 
             if (child == null) {
                 renderArchivedChild(context, composite, questIds[i], i < assetIds.length ? assetIds[i] : null);
@@ -72,7 +78,7 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
      * was would read as if it had never been asked for. The group remembers which way it went;
      * read as a success when even it cannot say, which is what a child gone from the store means.
      */
-    private static void renderArchivedChild(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite, @Nonnull UUID questId, String assetId) {
+    private void renderArchivedChild(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite, @Nonnull UUID questId, String assetId) {
         if (assetId == null) return;
 
         OpenQuestAsset asset = OpenQuestAsset.getAsset(assetId);

@@ -7,7 +7,6 @@ import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.event.EventRegistration;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -15,11 +14,11 @@ import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.models.QuestStateVersion;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -74,8 +73,8 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
      * knows whose step it is.
      */
     @Override
-    public void onRegistered() {
-        super.onRegistered();
+    public void onRegistered(@Nonnull Instant startedAt) {
+        super.onRegistered(startedAt);
 
         for (String assetId : getAsset().getAssetIds()) {
             OpenQuestAsset childAsset = OpenQuestAsset.getAsset(assetId);
@@ -83,7 +82,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
             AbstractQuestProgression<?> child = childAsset.builder().persistHistory(getAsset().isPersistChildrenHistory() ? null : false).build();
             adopt(child);
 
-            QuestProgressionService.get().registerQuest(child);
+            environment().services().getQuestProgressionService().registerQuest(child);
         }
 
         listenToChildren();
@@ -127,15 +126,15 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
         releaseChildListeners();
 
         for (UUID questId : getChildIds()) {
-            AbstractQuestProgression<?> child = QuestProgressionService.get().loadQuest(questId);
+            AbstractQuestProgression<?> child = environment().services().getQuestProgressionService().loadQuest(questId);
             if (child == null) continue;
 
             if (child.isCompleted()) {
-                if (QuestProgressionService.get().getLiveQuest(questId) != null) QuestProgressionService.get().archiveQuest(child);
+                if (environment().services().getQuestProgressionService().getLiveQuest(questId) != null) environment().services().getQuestProgressionService().archiveQuest(child);
                 continue;
             }
 
-            QuestProgressionService.get().progress(new SetStateVisitor(QuestState.ABANDONED), List.of(questId));
+            environment().services().getQuestProgressionService().progress(new SetStateVisitor(QuestState.ABANDONED), List.of(questId));
 
             hear(List.of(new Heard(questId, child.getStateVersion())));
         }
@@ -308,8 +307,7 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
         releaseChildListeners();
 
         for (UUID questId : getChildIds()) {
-            var registration = HytaleServer.get()
-                                           .getEventBus()
+            var registration = environment().events()
                                            .register(QuestStateChangedEvent.class, questId, this::handleStepStateChanged);
             if (registration != null) childListeners.add(registration);
         }

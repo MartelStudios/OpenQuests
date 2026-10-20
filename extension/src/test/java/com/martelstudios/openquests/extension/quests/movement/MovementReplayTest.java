@@ -1,18 +1,21 @@
 package com.martelstudios.openquests.extension.quests.movement;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.event.EventBus;
+import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.protocol.MovementStates;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestEnvironment;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestReplica;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.CodecJson;
-import com.martelstudios.openquests.core.sync.QuestSync;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
+import java.time.Clock;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -25,16 +28,10 @@ class MovementReplayTest {
 
     private static final UUID PLAYER = UUID.randomUUID();
 
-    @AfterEach
-    void alone() {
-        QuestSync.setPolicy(shared(false));
-    }
-
     @Test
     void aSampleCountsOnAStoredCopyWhatItCountedHere() {
-        QuestSync.setPolicy(shared(true));
-
         PaceQuest here = new PaceQuest.Builder().targetQuantity(10).build();
+        here.attach(ON_SHARED_STORAGE);
         here.join(PLAYER);
         // Written as it stands, so what follows is kept operation by operation
         here.getReplica().markStored(new QuestReplica.Stored(1, QuestState.IN_PROGRESS, Set.of(PLAYER), Set.of()));
@@ -53,9 +50,8 @@ class MovementReplayTest {
 
     @Test
     void countsKeptBetweenTwoWritesGoAsOne() {
-        QuestSync.setPolicy(shared(true));
-
         PaceQuest quest = new PaceQuest.Builder().targetQuantity(10).build();
+        quest.attach(ON_SHARED_STORAGE);
         quest.getReplica().markStored(new QuestReplica.Stored(1, QuestState.IN_PROGRESS, Set.of(), Set.of()));
 
         quest.apply(new QuantityQuestProgression.Add(1));
@@ -76,20 +72,37 @@ class MovementReplayTest {
     }
 
     /**
-     * @param stored whether a quest written once is shared, as on a database several servers write
+     * A quest written once is shared, as on a database several servers write.
      */
-    @Nonnull
-    private static QuestSync.Policy shared(boolean stored) {
-        return new QuestSync.Policy() {
-            @Override
-            public boolean isShared(@Nonnull AbstractQuestProgression<?> quest) {
-                return stored && quest.getReplica().getVersion() > 0;
-            }
+    private static final QuestEnvironment ON_SHARED_STORAGE = new QuestEnvironment() {
+        private final EventBus events = new EventBus(false);
 
-            @Override
-            public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {}
-        };
-    }
+        @Override
+        public boolean isShared(@Nonnull AbstractQuestProgression<?> quest) {
+            return quest.getReplica().getVersion() > 0;
+        }
+
+        @Override
+        public void writeSoon(@Nonnull AbstractQuestProgression<?> quest) {}
+
+        @Nonnull
+        @Override
+        public IEventBus events() {
+            return events;
+        }
+
+        @Nonnull
+        @Override
+        public Clock clock() {
+            return Clock.systemUTC();
+        }
+
+        @Nonnull
+        @Override
+        public OpenQuestsServices services() {
+            throw new UnsupportedOperationException("a replay test runs no services");
+        }
+    };
 
     /**
      * Counts metres, standing in for the shipped paces without an asset store.

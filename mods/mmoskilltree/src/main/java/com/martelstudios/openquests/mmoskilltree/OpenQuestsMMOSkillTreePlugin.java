@@ -2,6 +2,7 @@ package com.martelstudios.openquests.mmoskilltree;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.mmoskilltree.editor.EditorFeature;
 import com.martelstudios.openquests.mmoskilltree.quests.moment.abilitycast.AbilityCastFeature;
 import com.martelstudios.openquests.mmoskilltree.quests.moment.completebounty.CompleteBountyFeature;
@@ -39,16 +40,19 @@ public class OpenQuestsMMOSkillTreePlugin extends JavaPlugin {
     protected void setup() {
         super.setup();
 
+        // Set up by OpenQuestsCore, which this plugin depends on and which sets up first
+        OpenQuestsServices services = OpenQuestsServices.installed();
+
         // Shared machinery
         EditorFeature.register(this);
         SkillsFeature.register(this);
         KindRewardFeature.register(this);
 
         // Quests
-        ReachLevelFeature.register(this);
-        GainXpFeature.register(this);
-        AbilityCastFeature.register(this);
-        CompleteBountyFeature.register(this);
+        ReachLevelFeature.register(this, services);
+        GainXpFeature.register(this, services);
+        AbilityCastFeature.register(this, services);
+        CompleteBountyFeature.register(this, services);
 
         // Rewards
         XpRewardFeature.register(this);

@@ -8,7 +8,6 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.hypixel.hytale.event.IEvent;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
@@ -18,7 +17,6 @@ import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.sync.QuestSync;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -210,6 +208,13 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     transient boolean dirty;
 
     /**
+     * What the quest acts through, attached by the store holding it. A quest no store holds yet
+     * tells nobody of its changes and is written by this server alone.
+     */
+    @Nullable
+    private transient QuestEnvironment environment;
+
+    /**
      * @return whether reaching a terminal state ends this quest. One that says {@code false} keeps
      * running and being re-evaluated, so its state can still change.
      */
@@ -323,7 +328,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         if (now.state() == previousState) return true;
 
         if (kept) {
-            QuestSync.writeSoon(this);
+            environment().writeSoon(this);
         } else {
             announce(previousState, now, true);
         }
@@ -340,7 +345,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         try {
             if (!operation.applyTo(self())) return false;
 
-            if (getState() != previousState) completedAt = isCompleted() ? Instant.now() : null;
+            if (getState() != previousState) completedAt = isCompleted() ? now() : null;
             markDirty();
             return true;
         } finally {
@@ -373,8 +378,41 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         dispatch(QuestUpdatedEvent.class, getId(), new QuestUpdatedEvent(this));
     }
 
-    private static <E extends IEvent<UUID>> void dispatch(@Nonnull Class<E> type, @Nonnull UUID key, @Nonnull E event) {
-        HytaleServer.get().getEventBus().dispatchFor(type, key).dispatch(event);
+    private <E extends IEvent<UUID>> void dispatch(@Nonnull Class<E> type, @Nonnull UUID key, @Nonnull E event) {
+        if (environment != null) environment.events().dispatchFor(type, key).dispatch(event);
+    }
+
+    /**
+     * Gives the quest what it acts through. Called by the store as the quest enters it or is read
+     * back into it.
+     */
+    public void attach(@Nonnull QuestEnvironment environment) {
+        this.environment = environment;
+    }
+
+    /**
+     * @return what the quest acts through.
+     * @throws IllegalStateException for a quest no store holds yet
+     */
+    @Nonnull
+    public QuestEnvironment environment() {
+        if (environment == null) throw new IllegalStateException("Quest " + id + " is not held by any store yet");
+        return environment;
+    }
+
+    /**
+     * The environment's time, the system's for a quest no store holds yet.
+     */
+    @Nonnull
+    private Instant now() {
+        return environment != null ? environment.clock().instant() : Instant.now();
+    }
+
+    /**
+     * @return whether other servers may write this quest too, which only a stored quest can be.
+     */
+    public boolean isShared() {
+        return environment != null && environment.isShared(this);
     }
 
     /**
@@ -416,9 +454,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      *
      * <p>Runs once, when the quest is first handed out, and not when one is read back from disk,
      * which is what makes it the moment the quest started.
+     *
+     * @param startedAt the moment it was handed out, read off the services' clock
      */
-    public void onRegistered() {
-        startedAt = Instant.now();
+    public void onRegistered(@Nonnull Instant startedAt) {
+        this.startedAt = startedAt;
         markDirty();
     }
 
@@ -602,7 +642,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public AbstractCompositeQuestProgression<?> getParent() {
         if (parentId == null) return null;
 
-        return QuestProgressionService.get().getQuest(parentId) instanceof AbstractCompositeQuestProgression<?> parent ? parent : null;
+        if (environment == null) return null;
+
+        return environment.services().getQuestProgressionService().getQuest(parentId) instanceof AbstractCompositeQuestProgression<?> parent ? parent : null;
     }
 
     /**

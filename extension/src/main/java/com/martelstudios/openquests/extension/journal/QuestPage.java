@@ -1,16 +1,16 @@
 package com.martelstudios.openquests.extension.journal;
 
 import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.protocol.FormattedMessage;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
-import com.hypixel.hytale.protocol.FormattedMessage;
 import com.hypixel.hytale.protocol.packets.interface_.Page;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
@@ -44,10 +44,10 @@ import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.visitors.PlayerSetStateVisitor;
+import com.martelstudios.openquests.extension.journal.navigation.JournalRoutes;
 import com.martelstudios.openquests.extension.journal.navigation.routes.JournalRoute;
 import com.martelstudios.openquests.extension.journal.navigation.routes.LabelledRoute;
 import com.martelstudios.openquests.extension.journal.navigation.routes.QuestRoute;
-import com.martelstudios.openquests.extension.journal.navigation.JournalRoutes;
 import com.martelstudios.openquests.extension.track.QuestTrackService;
 import org.joml.Vector2i;
 
@@ -55,8 +55,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.text.Normalizer;
 import java.time.Instant;
-import java.util.logging.Level;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * The quest journal: what the player is running, what they finished, and what each one is worth.
@@ -138,9 +138,16 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
     private long lastCountdownMs;
 
-    public QuestPage(@Nonnull PlayerRef playerRef, @Nonnull RouterId router, @Nonnull Route route) {
+    private final QuestProgressionService progression;
+    private final QuestRewardService rewards;
+    private final QuestTrackService tracks;
+
+    public QuestPage(@Nonnull QuestProgressionService progression, @Nonnull QuestRewardService rewards, @Nonnull QuestTrackService tracks, @Nonnull PlayerRef playerRef, @Nonnull RouterId router, @Nonnull Route route) {
         super(playerRef, CustomPageLifetime.CanDismiss, QuestPageEventData.CODEC);
 
+        this.progression = progression;
+        this.rewards = rewards;
+        this.tracks = tracks;
         this.router = router;
         this.route = route;
     }
@@ -424,7 +431,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
             @Override
             public String grantedFrom(@Nonnull String sourceQuestId, @Nonnull String assetId) {
-                AbstractQuestProgression<?> quest = QuestPage.grantedFrom(playerComponents, sourceQuestId, assetId);
+                AbstractQuestProgression<?> quest = QuestPage.this.grantedFrom(playerComponents, sourceQuestId, assetId);
 
                 return quest == null ? null : quest.getId().toString();
             }
@@ -470,7 +477,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * whose chapters shows is not shown either.
      */
     @Nonnull
-    private static List<OpenQuestChapter> visibleChapters(@Nonnull EntityComponents playerComponents, @Nonnull OpenQuestChapterGroup group) {
+    private List<OpenQuestChapter> visibleChapters(@Nonnull EntityComponents playerComponents, @Nonnull OpenQuestChapterGroup group) {
         return OpenQuestChapter.getChaptersOf(group.getId())
                                .stream()
                                .filter(chapter -> chapter.isVisible(assetId -> held(playerComponents, assetId)))
@@ -507,8 +514,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         UUID viewer = playerRef.getUuid();
         List<Entry> entries = new ArrayList<>();
 
-        for (PendingRewards owed : QuestRewardService.get().getPending(playerComponents).getAll()) {
-            entries.add(Entry.owed(owed, QuestProgressionService.get().getQuest(owed.getQuestId()), viewer));
+        for (PendingRewards owed : rewards.getPending(playerComponents).getAll()) {
+            entries.add(Entry.owed(owed, progression.getQuest(owed.getQuestId()), viewer));
         }
         return entries;
     }
@@ -522,14 +529,14 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * that ended last: a name cannot say which run it meant, and that is the one the player means.
      */
     @Nullable
-    private static AbstractQuestProgression<?> held(@Nonnull EntityComponents playerComponents, @Nonnull String target) {
+    private AbstractQuestProgression<?> held(@Nonnull EntityComponents playerComponents, @Nonnull String target) {
         var questStore = playerComponents.getComponent(QuestStoreComponent.getComponentType());
         if (questStore == null) return null;
 
         AbstractQuestProgression<?> best = null;
 
         for (UUID questId : questStore.getQuestIds()) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> quest = progression.getQuest(questId);
             if (quest == null) continue;
 
             // A quest id names one run, and there is nothing to choose between
@@ -551,12 +558,12 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * the outcome paying for it, or one whose grant is still owed.
      */
     @Nullable
-    private static AbstractQuestProgression<?> grantedFrom(@Nonnull EntityComponents playerComponents, @Nonnull String sourceQuestId, @Nonnull String assetId) {
+    private AbstractQuestProgression<?> grantedFrom(@Nonnull EntityComponents playerComponents, @Nonnull String sourceQuestId, @Nonnull String assetId) {
         var questStore = playerComponents.getComponent(QuestStoreComponent.getComponentType());
         if (questStore == null) return null;
 
         for (UUID questId : questStore.getQuestIds()) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> quest = progression.getQuest(questId);
             if (quest == null || !assetId.equals(quest.getAssetId())) continue;
 
             UUID grantedBy = quest.getGrantedBy();
@@ -569,8 +576,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * @return whether that completion still has something waiting for this player to collect,
      * which is what puts a claim button on its row.
      */
-    private static boolean isOwed(@Nonnull EntityComponents playerComponents, @Nonnull UUID questId) {
-        return QuestRewardService.get().isOwed(questId, playerComponents);
+    private boolean isOwed(@Nonnull EntityComponents playerComponents, @Nonnull UUID questId) {
+        return rewards.isOwed(questId, playerComponents);
     }
 
     /**
@@ -578,8 +585,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * tab in gold. Read off the debts rather than off the quests: one that kept no trace of itself
      * still owes, and that is the case the tab exists for.
      */
-    private static boolean isOwedAnything(@Nonnull EntityComponents playerComponents) {
-        return !QuestRewardService.get().getPending(playerComponents).getAll().isEmpty();
+    private boolean isOwedAnything(@Nonnull EntityComponents playerComponents) {
+        return !rewards.getPending(playerComponents).getAll().isEmpty();
     }
 
     /**
@@ -852,8 +859,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * list. A quest with no start recorded sorts last rather than first: an unknown date is no
      * claim to being recent.
      */
-    private static Comparator<AbstractQuestProgression<?>> byTrackedThenRecent(@Nonnull UUID viewer) {
-        return Comparator.comparing((AbstractQuestProgression<?> quest) -> QuestTrackService.isTracked(quest, viewer), Comparator.reverseOrder())
+    private Comparator<AbstractQuestProgression<?>> byTrackedThenRecent(@Nonnull UUID viewer) {
+        return Comparator.comparing((AbstractQuestProgression<?> quest) -> tracks.isTracked(quest, viewer), Comparator.reverseOrder())
                          .thenComparing(AbstractQuestProgression::getStartedAt, Comparator.nullsLast(Comparator.reverseOrder()));
     }
 
@@ -897,11 +904,11 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      * it here too would put the same quest on the page twice under two different names.
      */
     @Nonnull
-    private static List<AbstractQuestProgression<?>> topLevel(@Nonnull Set<UUID> questIds) {
+    private List<AbstractQuestProgression<?>> topLevel(@Nonnull Set<UUID> questIds) {
         List<AbstractQuestProgression<?>> topLevel = new ArrayList<>();
 
         for (UUID questId : questIds) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> quest = progression.getQuest(questId);
             if (quest == null || drawnByItsGroup(quest)) continue;
 
             topLevel.add(quest);
@@ -941,7 +948,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         renderCategories(context, rowSelector, entry.asset());
 
         // A frame round the whole row, so a tracked quest is picked out while folded and in a list
-        if (entry.quest() != null && QuestTrackService.isTracked(entry.quest(), playerRef.getUuid())) QuestPageRows.setTracked(context, rowSelector);
+        if (entry.quest() != null && tracks.isTracked(entry.quest(), playerRef.getUuid())) QuestPageRows.setTracked(context, rowSelector);
 
         // Drawn whether the row is open or not: a counter beside the title is most of what a folded
         // row is worth. What it appends lands inside #Details, which is what the fold hides.
@@ -1084,7 +1091,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         // Offered on every running quest, abandonable or not: what the tracker shows is the
         // player's to decide even where staying on the quest is not
-        boolean tracked = QuestTrackService.isTracked(entry.quest(), playerRef.getUuid());
+        boolean tracked = tracks.isTracked(entry.quest(), playerRef.getUuid());
 
         context.getBuilder()
                .set(rowSelector + "#Track.Visible", true)
@@ -1259,7 +1266,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         UUID id = parse(target);
         if (id == null) return;
 
-        QuestRewardService.get().claim(id, EntityComponents.of(ref));
+        rewards.claim(id, EntityComponents.of(ref));
     }
 
     private void abandon(@Nonnull Ref<EntityStore> ref, String target) {
@@ -1269,8 +1276,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         var questStore = EntityComponents.of(ref).getComponent(QuestStoreComponent.getComponentType());
         if (questStore == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new PlayerSetStateVisitor(playerRef.getUuid(), id.toString(), QuestState.ABANDONED), questStore.getQuestIds());
+        progression.progress(new PlayerSetStateVisitor(playerRef.getUuid(), id.toString(), QuestState.ABANDONED), questStore.getQuestIds());
     }
 
     /**
@@ -1283,10 +1289,10 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         var questStore = EntityComponents.of(ref).getComponent(QuestStoreComponent.getComponentType());
         if (questStore == null || !questStore.getQuestIds().contains(id)) return;
 
-        AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(id);
+        AbstractQuestProgression<?> quest = progression.getQuest(id);
         if (quest == null) return;
 
-        QuestTrackService.toggle(quest, playerRef.getUuid());
+        tracks.toggle(quest, playerRef.getUuid());
     }
 
     /**

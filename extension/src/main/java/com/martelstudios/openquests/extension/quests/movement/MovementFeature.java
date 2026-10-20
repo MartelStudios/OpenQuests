@@ -3,6 +3,7 @@ package com.martelstudios.openquests.extension.quests.movement;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.extension.listener.QuestListenerService;
 
@@ -35,8 +36,8 @@ public final class MovementFeature {
         return listenerType;
     }
 
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService service = QuestProgressionService.get();
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        QuestProgressionService service = services.getQuestProgressionService();
 
         service.registerQuestType(WALK_TYPE_ID, WalkQuestAsset.class, WalkQuestAsset.CODEC, WalkQuestProgression.class, WalkQuestProgression.CODEC);
         service.registerQuestType(RUN_TYPE_ID, RunQuestAsset.class, RunQuestAsset.CODEC, RunQuestProgression.class, RunQuestProgression.CODEC);
@@ -48,6 +49,6 @@ public final class MovementFeature {
         listenerType = plugin.getEntityStoreRegistry().registerComponent(MovementQuestListener.class, MovementQuestListener::new);
         QuestListenerService.register(MovementQuestProgression.class, listenerType);
 
-        plugin.getEntityStoreRegistry().registerSystem(new MovementTickingSystem());
+        plugin.getEntityStoreRegistry().registerSystem(new MovementTickingSystem(services.getQuestProgressionService()));
     }
 }

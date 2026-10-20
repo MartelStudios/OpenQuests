@@ -2,7 +2,6 @@ package com.martelstudios.openquests.core.models;
 
 import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.martelstudios.openquests.core.sync.QuestSync;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
@@ -86,7 +85,7 @@ public final class QuestReplica<Q extends AbstractQuestProgression<Q>> {
      * @return whether the operation was kept, the quest being shared
      */
     boolean keep(@Nonnull QuestOperation<? super Q> operation, boolean unsaved) {
-        if (!QuestSync.isShared(quest)) {
+        if (!quest.isShared()) {
             // Written whole from now on: what was kept would be made twice were it shared again
             pending.clear();
             return false;
@@ -100,7 +99,7 @@ public final class QuestReplica<Q extends AbstractQuestProgression<Q>> {
      * Warns, once per quest type, that a shared quest changed past {@link AbstractQuestProgression#apply}.
      */
     void reportUnkept() {
-        if (stored.version() > 0 && QuestSync.isShared(quest) && REPORTED_UNKEPT.add(quest.getClass())) {
+        if (stored.version() > 0 && quest.isShared() && REPORTED_UNKEPT.add(quest.getClass())) {
             LOGGER.atWarning().log("A %s other servers write too was changed past apply(): written as a copy of the whole quest, it may undo what another server wrote", quest.getClass().getSimpleName());
         }
     }
@@ -164,7 +163,7 @@ public final class QuestReplica<Q extends AbstractQuestProgression<Q>> {
     @Nonnull
     public List<QuestOperation<? super Q>> getPendingOperations() {
         synchronized (quest) {
-            if (pending.isEmpty() && quest.hasChanges() && QuestSync.isShared(quest)) pending.add(new Overwrite(copy()));
+            if (pending.isEmpty() && quest.hasChanges() && quest.isShared()) pending.add(new Overwrite(copy()));
 
             // Merged here rather than as they are kept: a write already under way holds the ones before
             List<QuestOperation<? super Q>> merged = new ArrayList<>(pending.size());
