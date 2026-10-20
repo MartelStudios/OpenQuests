@@ -20,6 +20,16 @@
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     }
   ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Choice",
+      "Rewards": [
+        { "Reward": { "Type": "Item", "ItemId": "Ingredient_Gadget_Assembly", "Quantity": 2 } },
+        { "Reward": { "Type": "Item", "ItemId": "Ingredient_Crystal_Void", "Quantity": 6 } },
+        { "Reward": { "Type": "Item", "ItemId": "Potion_Health_Greater", "Quantity": 3 } }
+      ]
+    }
+  ],
   "Tags": {
     "OQ_HUD_DESC": []
   }
