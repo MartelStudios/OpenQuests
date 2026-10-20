@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.noop;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 
 import javax.annotation.Nonnull;
 
@@ -16,8 +16,7 @@ public final class NoOpFeature {
     /**
      * Registers the type alone: no system watches the game on its behalf.
      */
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, NoOpQuestAsset.class, NoOpQuestAsset.CODEC, NoOpQuestProgression.class, NoOpQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, NoOpQuestAsset.class, NoOpQuestAsset.CODEC, NoOpQuestProgression.class, NoOpQuestProgression.CODEC);
     }
 }

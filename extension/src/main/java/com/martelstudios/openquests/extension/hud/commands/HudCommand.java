@@ -21,15 +21,18 @@ import java.util.UUID;
  */
 public class HudCommand extends AbstractCommandCollection {
 
-    public HudCommand() {
+    private final QuestHudSettings settings;
+
+    public HudCommand(@Nonnull QuestHudSettings settings) {
         super("ohud", "Shows, hides or moves your quest tracker");
+        this.settings = settings;
         setPermissionGroups(HytalePermissionsProvider.GROUP_ADVENTURER);
 
         addTargetCommands(this, false, HytalePermissionsProvider.GROUP_ADVENTURER);
         addSubCommand(new DefaultsCommand());
     }
 
-    private static class DefaultsCommand extends AbstractCommandCollection {
+    private class DefaultsCommand extends AbstractCommandCollection {
         DefaultsCommand() {
             super("default", "Changes the quest tracker of everyone who chose nothing");
             setPermissionGroups(HytalePermissionsProvider.GROUP_WORLD_EDITOR);
@@ -37,7 +40,7 @@ public class HudCommand extends AbstractCommandCollection {
         }
     }
 
-    private static void addTargetCommands(@Nonnull AbstractCommandCollection parent, boolean defaults, @Nonnull String permissionGroup) {
+    private void addTargetCommands(@Nonnull AbstractCommandCollection parent, boolean defaults, @Nonnull String permissionGroup) {
         parent.addSubCommand(new VisibilityCommand("show", "Shows the quest tracker", true, defaults, permissionGroup));
         parent.addSubCommand(new VisibilityCommand("hide", "Hides the quest tracker", false, defaults, permissionGroup));
         parent.addSubCommand(new MoveCommand(defaults, permissionGroup));
@@ -50,11 +53,11 @@ public class HudCommand extends AbstractCommandCollection {
      *
      * @param choice {@code null} drops what was chosen rather than adding to it.
      */
-    private static void apply(@Nonnull CommandContext context, boolean defaults, @Nullable HudSettings choice) {
+    private void apply(@Nonnull CommandContext context, boolean defaults, @Nullable HudSettings choice) {
         if (defaults) {
-            if (choice == null) QuestHudSettings.resetDefaults(); else QuestHudSettings.overrideDefaults(choice);
+            if (choice == null) settings.getDefaults().reset(); else settings.getDefaults().override(choice);
 
-            context.sendMessage(describe("openquests.hud.defaults", QuestHudSettings.getDefaults()));
+            context.sendMessage(describe("openquests.hud.defaults", settings.getDefaults().get()));
             return;
         }
 
@@ -64,8 +67,8 @@ public class HudCommand extends AbstractCommandCollection {
         }
 
         UUID playerId = context.sender().getUuid();
-        boolean applied = choice == null ? QuestHudSettings.reset(playerId) : QuestHudSettings.choose(playerId, choice);
-        if (applied) context.sendMessage(describe("openquests.hud.yours", QuestHudSettings.resolve(playerId)));
+        boolean applied = choice == null ? settings.reset(playerId) : settings.choose(playerId, choice);
+        if (applied) context.sendMessage(describe("openquests.hud.yours", settings.resolve(playerId)));
     }
 
     /**
@@ -80,7 +83,7 @@ public class HudCommand extends AbstractCommandCollection {
                       .param("top", settings.getTop());
     }
 
-    private static class VisibilityCommand extends CommandBase {
+    private class VisibilityCommand extends CommandBase {
         private final boolean visible;
         private final boolean defaults;
 
@@ -97,7 +100,7 @@ public class HudCommand extends AbstractCommandCollection {
         }
     }
 
-    private static class MoveCommand extends CommandBase {
+    private class MoveCommand extends CommandBase {
         private final OptionalArg<HudSettings.Side> side = withOptionalArg("side", "The edge of the screen it hangs from: Left or Right", ArgTypes.forEnum("side", HudSettings.Side.class));
         private final OptionalArg<Integer> offset = withOptionalArg("offset", "How far from that edge, in UI pixels", ArgTypes.INTEGER);
         private final OptionalArg<Integer> top = withOptionalArg("top", "How far from the top of the screen, in UI pixels", ArgTypes.INTEGER);
@@ -124,7 +127,7 @@ public class HudCommand extends AbstractCommandCollection {
         }
     }
 
-    private static class ResetCommand extends CommandBase {
+    private class ResetCommand extends CommandBase {
         private final boolean defaults;
 
         ResetCommand(boolean defaults, @Nonnull String permissionGroup) {

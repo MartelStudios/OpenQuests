@@ -57,7 +57,7 @@ public class ChoiceReward extends QuestReward {
         PlayerRef playerRef = playerComponents.getComponent(PlayerRef.getComponentType());
         if (reference == null || player == null || playerRef == null) return false;
 
-        player.getPageManager().openCustomPage(reference, reference.getStore(), new ChoiceRewardPage(playerRef, sourceQuestId, this));
+        player.getPageManager().openCustomPage(reference, reference.getStore(), new ChoiceRewardPage(services, playerRef, sourceQuestId, this));
         return false;
     }
 

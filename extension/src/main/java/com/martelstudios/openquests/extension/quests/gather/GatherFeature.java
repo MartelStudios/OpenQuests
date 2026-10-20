@@ -1,8 +1,8 @@
 package com.martelstudios.openquests.extension.quests.gather;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
 
@@ -15,11 +15,10 @@ public final class GatherFeature {
 
     private GatherFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, GatherQuestAsset.class, GatherQuestAsset.CODEC, GatherQuestProgression.class, GatherQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, GatherQuestAsset.class, GatherQuestAsset.CODEC, GatherQuestProgression.class, GatherQuestProgression.CODEC);
 
-        plugin.getEntityStoreRegistry().registerSystem(new GatherItemEventSystem());
+        plugin.getEntityStoreRegistry().registerSystem(new GatherItemEventSystem(services.getQuestProgressionService()));
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, GatherEvents::handleQuestAssignedToPlayer);
     }
 }

@@ -1,6 +1,6 @@
 package com.martelstudios.openquests.extension.track;
 
-import com.hypixel.hytale.server.core.HytaleServer;
+import com.hypixel.hytale.event.IEventBus;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -23,26 +23,33 @@ import java.util.UUID;
  * drawing a quest as tracked asks here rather than reading either.
  *
  * <p>Tracking is the player's: a quest many players hold is tracked by each of them their own way.
- * Static so a feature can ask whenever it likes, without depending on anything being set up first.
  *
  * <p>Tracking is answered, not stored: a set of its own would have to be kept in step with quests
  * arriving, ending and being done away with.
  */
 public final class QuestTrackService {
 
-    private QuestTrackService() {}
+    private final QuestProgressionService progression;
+    private final QuestPlayerStateService playerState;
+    private final IEventBus eventBus;
+
+    public QuestTrackService(@Nonnull QuestProgressionService progression, @Nonnull QuestPlayerStateService playerState, @Nonnull IEventBus eventBus) {
+        this.progression = progression;
+        this.playerState = playerState;
+        this.eventBus = eventBus;
+    }
 
     /**
      * @return {@code false} if the player already tracked the quest.
      */
-    public static boolean track(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+    public boolean track(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         return apply(quest, playerId, Boolean.TRUE);
     }
 
     /**
      * @return {@code false} if the player had already dropped the quest.
      */
-    public static boolean untrack(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+    public boolean untrack(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         return apply(quest, playerId, Boolean.FALSE);
     }
 
@@ -52,7 +59,7 @@ public final class QuestTrackService {
      *
      * @return {@code false} if the asset was going to say the same thing anyway.
      */
-    public static boolean reset(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+    public boolean reset(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         return apply(quest, playerId, null);
     }
 
@@ -62,8 +69,8 @@ public final class QuestTrackService {
      *
      * @return what the player now says.
      */
-    public static boolean toggle(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        boolean tracked = !wants(quest, QuestPlayerStateService.get().getQuestStore(playerId));
+    public boolean toggle(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        boolean tracked = !wants(quest, playerState.getQuestStore(playerId));
         apply(quest, playerId, tracked);
 
         return tracked;
@@ -76,8 +83,8 @@ public final class QuestTrackService {
      *
      * @return whether the answer changed.
      */
-    private static boolean apply(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId, @Nullable Boolean track) {
-        QuestStoreComponent questStore = QuestPlayerStateService.get().getQuestStore(playerId);
+    private boolean apply(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId, @Nullable Boolean track) {
+        QuestStoreComponent questStore = playerState.getQuestStore(playerId);
         if (questStore == null) return false;
 
         boolean was = wants(quest, questStore);
@@ -90,9 +97,7 @@ public final class QuestTrackService {
         return true;
     }
 
-    private static void announce(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId, boolean tracked) {
-        var eventBus = HytaleServer.get().getEventBus();
-
+    private void announce(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId, boolean tracked) {
         if (tracked) {
             eventBus.dispatchFor(QuestTrackedEvent.class, quest.getId()).dispatch(new QuestTrackedEvent(quest, playerId));
             return;
@@ -106,11 +111,11 @@ public final class QuestTrackService {
      * outlives the work, so a quest the player is done with never is, nor one they are not meant
      * to read about, whatever they or its asset asked for.
      */
-    public static boolean isTracked(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        return isTracked(quest, playerId, QuestPlayerStateService.get().getQuestStore(playerId));
+    public boolean isTracked(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        return isTracked(quest, playerId, playerState.getQuestStore(playerId));
     }
 
-    private static boolean isTracked(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId, @Nullable QuestStoreComponent questStore) {
+    private boolean isTracked(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId, @Nullable QuestStoreComponent questStore) {
         return quest.getStateFor(playerId) == QuestState.IN_PROGRESS && quest.isVisible() && wants(quest, questStore);
     }
 
@@ -118,7 +123,7 @@ public final class QuestTrackService {
      * @return what the player said of tracking the quest, or what its asset says while they said
      * nothing.
      */
-    private static boolean wants(@Nonnull AbstractQuestProgression<?> quest, @Nullable QuestStoreComponent questStore) {
+    private boolean wants(@Nonnull AbstractQuestProgression<?> quest, @Nullable QuestStoreComponent questStore) {
         Boolean said = questStore == null ? null : questStore.getTracking(quest.getId());
         if (said != null) return said;
 
@@ -133,7 +138,7 @@ public final class QuestTrackService {
      * @return the ids of the quests this player is tracking, in no particular order.
      */
     @Nonnull
-    public static List<UUID> getTracked(@Nonnull UUID playerId) {
+    public List<UUID> getTracked(@Nonnull UUID playerId) {
         return getTracked(playerId, EntityComponents.of(playerId));
     }
 
@@ -145,14 +150,14 @@ public final class QuestTrackService {
      * @return the ids of the quests this player is tracking, in no particular order.
      */
     @Nonnull
-    public static List<UUID> getTracked(@Nonnull UUID playerId, @Nonnull EntityComponents playerComponents) {
+    public List<UUID> getTracked(@Nonnull UUID playerId, @Nonnull EntityComponents playerComponents) {
         QuestStoreComponent questStore = playerComponents.getComponent(QuestStoreComponent.getComponentType());
         if (questStore == null) return List.of();
 
         List<UUID> tracked = new ArrayList<>();
 
         for (UUID questId : questStore.getQuestIds()) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> quest = progression.getQuest(questId);
 
             if (quest != null && isTracked(quest, playerId, questStore)) tracked.add(questId);
         }
@@ -168,7 +173,7 @@ public final class QuestTrackService {
      * @return what was being tracked until now, to be handed back to this same method afterwards.
      */
     @Nonnull
-    public static List<UUID> replaceTracked(@Nonnull UUID playerId, @Nullable List<UUID> questIds) {
+    public List<UUID> replaceTracked(@Nonnull UUID playerId, @Nullable List<UUID> questIds) {
         List<UUID> previous = getTracked(playerId);
 
         setTracked(playerId, previous, false);
@@ -183,9 +188,9 @@ public final class QuestTrackService {
      *
      * <p>Skips what is no longer in memory: what its asset says and who hears of it need the quest.
      */
-    private static void setTracked(@Nonnull UUID playerId, @Nonnull List<UUID> questIds, boolean tracked) {
+    private void setTracked(@Nonnull UUID playerId, @Nonnull List<UUID> questIds, boolean tracked) {
         for (UUID questId : questIds) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().getQuest(questId);
+            AbstractQuestProgression<?> quest = progression.getQuest(questId);
             if (quest == null) continue;
 
             if (tracked) track(quest, playerId); else untrack(quest, playerId);

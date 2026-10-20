@@ -15,8 +15,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class UseBlockEventSystem extends EntityEventSystem<EntityStore, UseBlockEvent.Post> {
-    public UseBlockEventSystem() {
+
+    private final QuestProgressionService progression;
+
+    public UseBlockEventSystem(@Nonnull QuestProgressionService progression) {
         super(UseBlockEvent.Post.class);
+        this.progression = progression;
     }
 
     @Override
@@ -27,8 +31,7 @@ public class UseBlockEventSystem extends EntityEventSystem<EntityStore, UseBlock
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
         if (playerRef == null || questStoreComponent == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new UseBlockQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
+        progression.progress(new UseBlockQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
     }
 
     @Override

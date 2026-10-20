@@ -16,6 +16,12 @@ import javax.annotation.Nullable;
  */
 public final class MaxQuestsRenderer implements QuestConstraintRenderer {
 
+    private final QuestPlayerStateService playerState;
+
+    public MaxQuestsRenderer(@Nonnull QuestPlayerStateService playerState) {
+        this.playerState = playerState;
+    }
+
     @Nonnull
     @Override
     public Class<?> getConstraintType() {
@@ -26,7 +32,7 @@ public final class MaxQuestsRenderer implements QuestConstraintRenderer {
     @Override
     public Line describe(@Nonnull QuestPageContext context, @Nonnull QuestConstraint constraint, @Nonnull OpenQuestAsset asset, @Nullable AbstractQuestProgression<?> quest) {
         MaxQuestsConstraint max = (MaxQuestsConstraint) constraint;
-        int used = max.getCount() - max.getRemaining(QuestPlayerStateService.get().getTally(context.getViewer(), asset.getId()));
+        int used = max.getCount() - max.getRemaining(playerState.getTally(context.getViewer(), asset.getId()));
         String key = max.isAtOnce() ? "openquests.page.constraint.max-quests-at-once" : "openquests.page.constraint.max-quests";
         return new Line(Message.translation(key).param("count", max.getCount()), Message.raw(used + "/" + max.getCount()));
     }

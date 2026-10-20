@@ -20,6 +20,12 @@ import javax.annotation.Nonnull;
  */
 public class FailOnDeathSystem extends DeathSystems.OnDeathSystem {
 
+    private final QuestProgressionService progression;
+
+    public FailOnDeathSystem(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
+
     @Nonnull
     @Override
     public Query<EntityStore> getQuery() {
@@ -32,7 +38,6 @@ public class FailOnDeathSystem extends DeathSystems.OnDeathSystem {
         var questStore = store.getComponent(victimRef, QuestStoreComponent.getComponentType());
         if (playerRef == null || questStore == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new ConstraintEndVisitor(playerRef.getUuid(), constraint -> ConstraintEndVisitor.failIf(constraint instanceof FailOnDeathConstraint)), questStore.getQuestIds());
+        progression.progress(new ConstraintEndVisitor(playerRef.getUuid(), constraint -> ConstraintEndVisitor.failIf(constraint instanceof FailOnDeathConstraint)), questStore.getQuestIds());
     }
 }

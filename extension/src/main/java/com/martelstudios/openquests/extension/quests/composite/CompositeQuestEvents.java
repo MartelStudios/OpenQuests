@@ -14,24 +14,28 @@ import java.util.Arrays;
  */
 public final class CompositeQuestEvents {
 
-    private CompositeQuestEvents() {}
+    private final QuestProgressionService progression;
+
+    public CompositeQuestEvents(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
 
     /**
      * A group listens to its children for as long as it is in the store. A running one brings
      * them in with it, so a player joining it, or a server following its index, reaches them too,
      * and writes down where they stand, which may be past what the group was last written with.
      */
-    public static void handleQuestLoaded(@Nonnull QuestLoadedEvent event) {
+    public void handleQuestLoaded(@Nonnull QuestLoadedEvent event) {
         if (!(event.getQuest() instanceof CompositeQuestProgression composite)) return;
 
         if (!composite.isCompleted()) {
-            QuestProgressionService.get().loadQuests(Arrays.asList(composite.getChildIds()));
+            progression.loadQuests(Arrays.asList(composite.getChildIds()));
             composite.reconcileOutcomes();
         }
         composite.listenToChildren();
     }
 
-    public static void handleQuestUnloaded(@Nonnull QuestUnloadedEvent event) {
+    public void handleQuestUnloaded(@Nonnull QuestUnloadedEvent event) {
         if (event.getQuest() instanceof CompositeQuestProgression composite) composite.stopListeningToChildren();
     }
 }

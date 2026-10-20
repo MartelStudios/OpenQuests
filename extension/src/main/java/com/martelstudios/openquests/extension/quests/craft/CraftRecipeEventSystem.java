@@ -15,8 +15,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CraftRecipeEventSystem extends EntityEventSystem<EntityStore, CraftRecipeEvent.Post> {
-    public CraftRecipeEventSystem() {
+
+    private final QuestProgressionService progression;
+
+    public CraftRecipeEventSystem(@Nonnull QuestProgressionService progression) {
         super(CraftRecipeEvent.Post.class);
+        this.progression = progression;
     }
 
     @Override
@@ -27,8 +31,7 @@ public class CraftRecipeEventSystem extends EntityEventSystem<EntityStore, Craft
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
         if (playerRef == null || questStoreComponent == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new CraftQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
+        progression.progress(new CraftQuestVisitor(playerRef.getUuid(), event), questStoreComponent.getQuestIds());
     }
 
     @Override

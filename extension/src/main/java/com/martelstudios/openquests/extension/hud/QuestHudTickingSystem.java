@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.extension.track.QuestTrackService;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -28,6 +29,17 @@ import java.util.UUID;
  * when it said it would go stale.
  */
 public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
+
+    private final QuestProgressionService progression;
+    private final QuestTrackService tracks;
+    private final QuestHudSettings settings;
+
+    public QuestHudTickingSystem(@Nonnull QuestProgressionService progression, @Nonnull QuestTrackService tracks, @Nonnull QuestHudSettings settings) {
+        this.progression = progression;
+        this.tracks = tracks;
+        this.settings = settings;
+    }
+
     @Nonnull
     @Override
     public Query<EntityStore> getQuery() {
@@ -43,7 +55,7 @@ public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
 
         if (!QuestHudRefresh.consume(playerRef.getUuid()) && !QuestTrackerHud.isDue(player)) return;
 
-        QuestTrackerHud hud = QuestTrackerHud.get(player, playerRef);
+        QuestTrackerHud hud = QuestTrackerHud.get(player, playerRef, tracks, settings);
 
         // Gathering is pointless while the HUD would throttle the push away, and the mark is put
         // back so that what happened is drawn once the floor has passed rather than dropped
@@ -54,7 +66,7 @@ public class QuestHudTickingSystem extends EntityTickingSystem<EntityStore> {
 
         List<AbstractQuestProgression<?>> quests = new ArrayList<>();
         for (UUID questId : questStoreComponent.getQuestIds()) {
-            var quest = QuestProgressionService.get().getQuest(questId);
+            var quest = progression.getQuest(questId);
             if (quest != null) quests.add(quest);
         }
 

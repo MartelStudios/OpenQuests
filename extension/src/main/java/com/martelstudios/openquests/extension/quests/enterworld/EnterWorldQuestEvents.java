@@ -13,14 +13,17 @@ import javax.annotation.Nonnull;
  */
 public final class EnterWorldQuestEvents {
 
-    private EnterWorldQuestEvents() {}
+    private final QuestProgressionService progression;
 
-    public static void handleAddPlayerToWorld(@Nonnull AddPlayerToWorldEvent addPlayerToWorldEvent) {
+    public EnterWorldQuestEvents(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
+
+    public void handleAddPlayerToWorld(@Nonnull AddPlayerToWorldEvent addPlayerToWorldEvent) {
         var playerRef = addPlayerToWorldEvent.getHolder().getComponent(PlayerRef.getComponentType());
         var questStore = addPlayerToWorldEvent.getHolder().getComponent(QuestStoreComponent.getComponentType());
         if (playerRef == null || questStore == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new EnterWorldQuestVisitor(playerRef.getUuid(), addPlayerToWorldEvent.getWorld().getName()), questStore.getQuestIds());
+        progression.progress(new EnterWorldQuestVisitor(playerRef.getUuid(), addPlayerToWorldEvent.getWorld().getName()), questStore.getQuestIds());
     }
 }

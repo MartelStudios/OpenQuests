@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.quests.queststate;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
-import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -24,7 +23,7 @@ public class QuestStateQuestVisitor implements QuestVisitor<QuestStateQuestProgr
     public void progress(QuestStateQuestProgression quest) {
         if (quest.isOver()) return;
 
-        boolean met = quest.getRequirement().isMetBy(QuestPlayerStateService.get().getTally(playerId, quest.getQuestAssetId()));
+        boolean met = quest.getRequirement().isMetBy(quest.environment().services().getQuestPlayerStateService().getTally(playerId, quest.getQuestAssetId()));
         quest.apply(new AbstractQuestProgression.SetState(met ? QuestState.SUCCESSFUL : QuestState.IN_PROGRESS));
     }
 

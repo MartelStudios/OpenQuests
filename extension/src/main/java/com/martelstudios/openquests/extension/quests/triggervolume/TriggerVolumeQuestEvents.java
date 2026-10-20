@@ -15,13 +15,17 @@ import javax.annotation.Nonnull;
  */
 public final class TriggerVolumeQuestEvents {
 
-    private TriggerVolumeQuestEvents() {}
+    private final QuestProgressionService progression;
+
+    public TriggerVolumeQuestEvents(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
 
     /**
      * Counts the event for the player it names. Dispatched from the volumes' ticking system, so
      * already on the world thread the entity and the volume manager belong to.
      */
-    public static void handleTriggerVolume(@Nonnull TriggerVolumeEvent event) {
+    public void handleTriggerVolume(@Nonnull TriggerVolumeEvent event) {
         var entityRef = event.getEntityRef();
         if (!entityRef.isValid()) return;
 
@@ -33,8 +37,7 @@ public final class TriggerVolumeQuestEvents {
         var volume = store.getResource(TriggerVolumesPlugin.get().getManagerResourceType()).getVolume(event.getVolumeId());
         if (volume == null || volume.getName() == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new TriggerVolumeQuestVisitor(playerRef.getUuid(), event.getTriggerEventType(), volume.getName()), questStore.getQuestIds());
+        progression.progress(new TriggerVolumeQuestVisitor(playerRef.getUuid(), event.getTriggerEventType(), volume.getName()), questStore.getQuestIds());
     }
 
     /**

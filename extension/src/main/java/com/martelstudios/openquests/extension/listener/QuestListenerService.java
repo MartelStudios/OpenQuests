@@ -2,7 +2,6 @@ package com.martelstudios.openquests.extension.listener;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
-import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -11,6 +10,7 @@ import com.martelstudios.openquests.core.scopes.player.events.QuestRemovedFromPl
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,16 +31,22 @@ public final class QuestListenerService {
      */
     private record Kind(@Nonnull Class<?> questType, @Nonnull ComponentType<EntityStore, ? extends QuestListenerComponent> componentType) {}
 
-    private static final List<Kind> KINDS = new CopyOnWriteArrayList<>();
+    private final List<Kind> kinds = new CopyOnWriteArrayList<>();
 
-    private QuestListenerService() {}
+    private final QuestProgressionService progression;
+    private final Players players;
+
+    public QuestListenerService(@Nonnull QuestProgressionService progression, @Nonnull Players players) {
+        this.progression = progression;
+        this.players = players;
+    }
 
     /**
      * @param questType matched on {@code isInstance}, so registering a base type covers every type
      * built on it, which is what lets one ticking system serve a family of quests.
      */
-    public static void register(@Nonnull Class<?> questType, @Nonnull ComponentType<EntityStore, ? extends QuestListenerComponent> componentType) {
-        KINDS.add(new Kind(questType, componentType));
+    public void register(@Nonnull Class<?> questType, @Nonnull ComponentType<EntityStore, ? extends QuestListenerComponent> componentType) {
+        kinds.add(new Kind(questType, componentType));
     }
 
     /**
@@ -48,14 +54,14 @@ public final class QuestListenerService {
      * (they are not online yet), so this pass goes through their incoming holder, and it runs last
      * so that whatever connecting hands out has been handed out.
      */
-    public static void handlePlayerConnect(@Nonnull PlayerConnectEvent event) {
+    public void handlePlayerConnect(@Nonnull PlayerConnectEvent event) {
         var components = EntityComponents.of(event.getHolder());
 
         QuestStoreComponent questStore = components.getComponent(QuestStoreComponent.getComponentType());
         if (questStore == null) return;
 
         for (UUID questId : questStore.getQuestIds()) {
-            AbstractQuestProgression<?> quest = QuestProgressionService.get().getLiveQuest(questId);
+            AbstractQuestProgression<?> quest = progression.getLiveQuest(questId);
             if (quest == null) continue;
 
             var componentType = componentTypeFor(quest);
@@ -65,11 +71,11 @@ public final class QuestListenerService {
         }
     }
 
-    public static void handleQuestAddedToPlayerStore(@Nonnull QuestAddedToPlayerStoreEvent event) {
+    public void handleQuestAddedToPlayerStore(@Nonnull QuestAddedToPlayerStoreEvent event) {
         follow(event.getQuest(), event.getPlayerId());
     }
 
-    public static void handleQuestRemovedFromPlayerStore(@Nonnull QuestRemovedFromPlayerStoreEvent event) {
+    public void handleQuestRemovedFromPlayerStore(@Nonnull QuestRemovedFromPlayerStoreEvent event) {
         forget(event.getQuest(), event.getPlayerId());
     }
 
@@ -80,22 +86,22 @@ public final class QuestListenerService {
      * <p>Archiving happens before the change is announced, which is what makes "no longer live"
      * the whole test: a quest kept running by {@code StopOnComplete: false} stays listed.
      */
-    public static void handleQuestStateChanged(@Nonnull QuestStateChangedEvent event) {
+    public void handleQuestStateChanged(@Nonnull QuestStateChangedEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
-        if (QuestProgressionService.get().getLiveQuest(quest.getId()) != null) return;
+        if (progression.getLiveQuest(quest.getId()) != null) return;
 
         quest.getPlayers().forEach(playerId -> forget(quest, playerId));
         quest.getAbandonedPlayers().forEach(playerId -> forget(quest, playerId));
     }
 
-    private static void follow(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+    private void follow(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         var componentType = componentTypeFor(quest);
         if (componentType == null || isOffline(playerId)) return;
 
         EntityComponents.update(playerId, components -> components.ensureAndGetComponent(componentType).follow(quest.getId()));
     }
 
-    private static void forget(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+    private void forget(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
         var componentType = componentTypeFor(quest);
         if (componentType == null || isOffline(playerId)) return;
 
@@ -113,13 +119,13 @@ public final class QuestListenerService {
      * Nothing ticks for a player who is not there, and writing to their stored data would be a disk
      * read and a disk write for a component that is never written down.
      */
-    private static boolean isOffline(@Nonnull UUID playerId) {
-        return Universe.get().getPlayer(playerId) == null;
+    private boolean isOffline(@Nonnull UUID playerId) {
+        return !players.isOnline(playerId);
     }
 
     @Nullable
-    private static ComponentType<EntityStore, ? extends QuestListenerComponent> componentTypeFor(@Nonnull AbstractQuestProgression<?> quest) {
-        for (Kind kind : KINDS) {
+    private ComponentType<EntityStore, ? extends QuestListenerComponent> componentTypeFor(@Nonnull AbstractQuestProgression<?> quest) {
+        for (Kind kind : kinds) {
             if (kind.questType().isInstance(quest)) return kind.componentType();
         }
         return null;

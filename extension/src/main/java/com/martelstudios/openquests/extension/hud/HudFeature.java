@@ -2,11 +2,13 @@ package com.martelstudios.openquests.extension.hud;
 
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
 import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.openquests.core.scopes.player.events.QuestRemovedFromPlayerStoreEvent;
 import com.martelstudios.openquests.extension.hud.commands.HudCommand;
+import com.martelstudios.openquests.extension.track.QuestTrackService;
 import com.martelstudios.openquests.extension.track.events.QuestTrackedEvent;
 import com.martelstudios.openquests.extension.track.events.QuestUntrackedEvent;
 
@@ -20,11 +22,13 @@ public final class HudFeature {
 
     private HudFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestHudSettings.load(plugin.getDataDirectory());
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services, @Nonnull QuestTrackService tracks) {
+        QuestHudDefaults defaults = new QuestHudDefaults(services.getPlatform().players());
+        defaults.load(plugin.getDataDirectory());
+        QuestHudSettings settings = new QuestHudSettings(defaults, services.getQuestPlayerStateService());
 
-        plugin.getEntityStoreRegistry().registerSystem(new QuestHudTickingSystem());
-        plugin.getCommandRegistry().registerCommand(new HudCommand());
+        plugin.getEntityStoreRegistry().registerSystem(new QuestHudTickingSystem(services.getQuestProgressionService(), tracks, settings));
+        plugin.getCommandRegistry().registerCommand(new HudCommand(settings));
 
         plugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, QuestHudRefresh::handlePlayerConnect);
         plugin.getEventRegistry().registerGlobal(QuestUpdatedEvent.class, QuestHudRefresh::handleQuestUpdated);

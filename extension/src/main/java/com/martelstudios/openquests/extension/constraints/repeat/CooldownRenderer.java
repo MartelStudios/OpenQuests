@@ -20,6 +20,12 @@ import java.time.Instant;
  */
 public final class CooldownRenderer implements QuestConstraintRenderer {
 
+    private final QuestPlayerStateService playerState;
+
+    public CooldownRenderer(@Nonnull QuestPlayerStateService playerState) {
+        this.playerState = playerState;
+    }
+
     @Nonnull
     @Override
     public Class<?> getConstraintType() {
@@ -33,7 +39,7 @@ public final class CooldownRenderer implements QuestConstraintRenderer {
         Message label = Message.translation("openquests.page.constraint.cooldown").param("duration", QuestPageRows.formatDuration(cooldown.getDuration()));
 
         Instant now = Instant.now();
-        Instant availableAt = cooldown.getAvailableAt(QuestPlayerStateService.get().getTally(context.getViewer(), asset.getId()));
+        Instant availableAt = cooldown.getAvailableAt(playerState.getTally(context.getViewer(), asset.getId()));
         if (availableAt == null || !now.isBefore(availableAt)) return Line.of(label);
 
         return Line.counting(label, new QuestCountdown(availableAt, "openquests.page.constraint.cooldown.wait"));

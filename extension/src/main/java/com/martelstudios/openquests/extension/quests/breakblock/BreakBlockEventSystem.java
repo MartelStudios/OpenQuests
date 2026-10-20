@@ -27,8 +27,12 @@ import java.util.Set;
  * that asked for it.
  */
 public class BreakBlockEventSystem extends EntityEventSystem<EntityStore, BreakBlockEvent> {
-    public BreakBlockEventSystem() {
+
+    private final QuestProgressionService progression;
+
+    public BreakBlockEventSystem(@Nonnull QuestProgressionService progression) {
         super(BreakBlockEvent.class);
+        this.progression = progression;
     }
 
     @Override
@@ -47,8 +51,7 @@ public class BreakBlockEventSystem extends EntityEventSystem<EntityStore, BreakB
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
         if (playerRef == null || questStoreComponent == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new BlockActionVisitor(playerRef.getUuid(), BlockAction.BREAK, event.getBlockType().getId(), placedByPlayer), questStoreComponent.getQuestIds());
+        progression.progress(new BlockActionVisitor(playerRef.getUuid(), BlockAction.BREAK, event.getBlockType().getId(), placedByPlayer), questStoreComponent.getQuestIds());
     }
 
     /**

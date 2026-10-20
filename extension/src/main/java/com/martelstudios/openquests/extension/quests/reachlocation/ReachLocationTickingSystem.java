@@ -18,6 +18,12 @@ import javax.annotation.Nonnull;
  * leaves out every player who has no such quest and each check is a distance comparison.
  */
 public class ReachLocationTickingSystem extends EntityTickingSystem<EntityStore> {
+
+    private final QuestProgressionService progression;
+
+    public ReachLocationTickingSystem(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
     @Nonnull
     @Override
     public Query<EntityStore> getQuery() {
@@ -32,7 +38,6 @@ public class ReachLocationTickingSystem extends EntityTickingSystem<EntityStore>
 
         if (playerRef == null || transform == null || listener == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new ReachLocationQuestVisitor(playerRef.getUuid(), transform.getPosition()), listener.getQuestIds());
+        progression.progress(new ReachLocationQuestVisitor(playerRef.getUuid(), transform.getPosition()), listener.getQuestIds());
     }
 }

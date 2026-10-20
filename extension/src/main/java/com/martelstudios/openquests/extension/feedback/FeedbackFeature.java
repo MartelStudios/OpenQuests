@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension.feedback;
 
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 
@@ -15,7 +16,7 @@ public final class FeedbackFeature {
 
     private FeedbackFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         var service = new QuestFeedbackService();
 
         // EventPriority.FIRST, so the quest is announced before anything it ends takes the stage:

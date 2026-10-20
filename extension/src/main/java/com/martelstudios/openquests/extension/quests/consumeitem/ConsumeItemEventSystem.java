@@ -24,8 +24,12 @@ import javax.annotation.Nullable;
  * {@code AdjustHeldItemQuantity}, which takes the item out of the slot the player is holding.
  */
 public class ConsumeItemEventSystem extends EntityEventSystem<EntityStore, InventoryChangeEvent> {
-    public ConsumeItemEventSystem() {
+
+    private final QuestProgressionService progression;
+
+    public ConsumeItemEventSystem(@Nonnull QuestProgressionService progression) {
         super(InventoryChangeEvent.class);
+        this.progression = progression;
     }
 
     @Override
@@ -56,8 +60,7 @@ public class ConsumeItemEventSystem extends EntityEventSystem<EntityStore, Inven
         var questStoreComponent = store.getComponent(ref, QuestStoreComponent.getComponentType());
         if (playerRef == null || questStoreComponent == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new ConsumeItemQuestVisitor(playerRef.getUuid(), consumed.getItemId(), consumed.getQuantity()), questStoreComponent.getQuestIds());
+        progression.progress(new ConsumeItemQuestVisitor(playerRef.getUuid(), consumed.getItemId(), consumed.getQuantity()), questStoreComponent.getQuestIds());
     }
 
     @Override

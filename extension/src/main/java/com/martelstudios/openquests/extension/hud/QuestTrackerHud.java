@@ -42,20 +42,25 @@ public class QuestTrackerHud extends CustomUIHud {
      */
     private volatile long refreshAtMs;
 
-    public QuestTrackerHud(@Nonnull PlayerRef playerRef) {
+    private final QuestTrackService tracks;
+    private final QuestHudSettings settings;
+
+    public QuestTrackerHud(@Nonnull PlayerRef playerRef, @Nonnull QuestTrackService tracks, @Nonnull QuestHudSettings settings) {
         super(playerRef, KEY);
+        this.tracks = tracks;
+        this.settings = settings;
     }
 
     /**
      * Gets this player's existing tracker HUD, or creates and registers a new one.
      */
     @Nonnull
-    public static QuestTrackerHud get(@Nonnull Player player, @Nonnull PlayerRef playerRef) {
+    public static QuestTrackerHud get(@Nonnull Player player, @Nonnull PlayerRef playerRef, @Nonnull QuestTrackService tracks, @Nonnull QuestHudSettings settings) {
         var hudManager = player.getHudManager();
         var existing = hudManager.getCustomHud(KEY);
         if (existing instanceof QuestTrackerHud hud) return hud;
 
-        var hud = new QuestTrackerHud(playerRef);
+        var hud = new QuestTrackerHud(playerRef, tracks, settings);
         hudManager.addCustomHud(playerRef, hud);
         return hud;
     }
@@ -107,15 +112,15 @@ public class QuestTrackerHud extends CustomUIHud {
 
         for (AbstractQuestProgression<?> quest : quests) {
             if (shown >= MAX_QUESTS) break;
-            if (!QuestTrackService.isTracked(quest, viewer)) continue;
+            if (!tracks.isTracked(quest, viewer)) continue;
 
             QuestHudRows.render(context, quest);
             shown++;
         }
 
-        HudSettings settings = QuestHudSettings.resolve(viewer);
-        builder.set("#QuestTrackerPanel.Visible", settings.getVisible() && context.getRowCount() > 0);
-        builder.setObject("#QuestTrackerPanel.Anchor", anchorOf(settings));
+        HudSettings placement = settings.resolve(viewer);
+        builder.set("#QuestTrackerPanel.Visible", placement.getVisible() && context.getRowCount() > 0);
+        builder.setObject("#QuestTrackerPanel.Anchor", anchorOf(placement));
         update(true, builder);
 
         long refreshMillis = context.getRefreshMillis();

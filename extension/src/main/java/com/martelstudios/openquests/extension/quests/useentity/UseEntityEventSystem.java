@@ -19,8 +19,12 @@ import javax.annotation.Nullable;
  * The event is published on the interacting entity, so the used one is read from the event.
  */
 public class UseEntityEventSystem extends EntityEventSystem<EntityStore, UseEntityEvent.Post> {
-    public UseEntityEventSystem() {
+
+    private final QuestProgressionService progression;
+
+    public UseEntityEventSystem(@Nonnull QuestProgressionService progression) {
         super(UseEntityEvent.Post.class);
+        this.progression = progression;
     }
 
     @Override
@@ -37,8 +41,7 @@ public class UseEntityEventSystem extends EntityEventSystem<EntityStore, UseEnti
         var target = store.getComponent(targetRef, NPCEntity.getComponentType());
         if (target == null) return;
 
-        QuestProgressionService.get()
-                               .progress(new UseEntityQuestVisitor(playerRef.getUuid(), target), questStoreComponent.getQuestIds());
+        progression.progress(new UseEntityQuestVisitor(playerRef.getUuid(), target), questStoreComponent.getQuestIds());
     }
 
     @Override

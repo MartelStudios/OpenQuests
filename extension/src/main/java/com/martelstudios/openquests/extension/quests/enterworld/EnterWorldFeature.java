@@ -3,7 +3,7 @@ package com.martelstudios.openquests.extension.quests.enterworld;
 import com.hypixel.hytale.server.core.asset.LoadAssetEvent;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 
 import javax.annotation.Nonnull;
 
@@ -15,12 +15,12 @@ public final class EnterWorldFeature {
 
     private EnterWorldFeature() {}
 
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, EnterWorldQuestAsset.class, EnterWorldQuestAsset.CODEC, EnterWorldQuestProgression.class, EnterWorldQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, EnterWorldQuestAsset.class, EnterWorldQuestAsset.CODEC, EnterWorldQuestProgression.class, EnterWorldQuestProgression.CODEC);
 
+        EnterWorldQuestEvents events = new EnterWorldQuestEvents(services.getQuestProgressionService());
         plugin.getEventRegistry()
-              .registerGlobal(AddPlayerToWorldEvent.class, EnterWorldQuestEvents::handleAddPlayerToWorld);
+              .registerGlobal(AddPlayerToWorldEvent.class, events::handleAddPlayerToWorld);
 
         plugin.getEventRegistry()
               .registerGlobal(LoadAssetEvent.PRIORITY_LOAD_LATE, LoadAssetEvent.class, EnterWorldQuestAssetValidator::handleLoadAsset);

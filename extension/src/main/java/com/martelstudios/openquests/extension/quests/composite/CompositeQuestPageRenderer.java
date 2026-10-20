@@ -27,6 +27,12 @@ import java.util.UUID;
  */
 public final class CompositeQuestPageRenderer implements QuestPageRenderer {
 
+    private final QuestProgressionService progression;
+
+    public CompositeQuestPageRenderer(@Nonnull QuestProgressionService progression) {
+        this.progression = progression;
+    }
+
     /** Between the children of an OR composite: only one of them has to succeed. */
     private static final String SEPARATOR_DOCUMENT = "OpenQuests/Pages/QuestPageSeparator.ui";
 
@@ -62,7 +68,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
         if (asset instanceof CompositeQuestAsset compositeAsset) renderPreview(context, compositeAsset);
     }
 
-    private static void renderRow(@Nonnull QuestPageContext context, @Nullable CompositeQuestProgression composite, @Nullable OpenQuestAsset asset) {
+    private void renderRow(@Nonnull QuestPageContext context, @Nullable CompositeQuestProgression composite, @Nullable OpenQuestAsset asset) {
         if (composite != null) {
             QuestPageRows.appendLine(context, composite.getTitle(), tallyOf(context, composite));
             return;
@@ -75,7 +81,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * The children, one line each. A row appends its own line, so the selector it is handed is one
      * it never writes onto.
      */
-    private static void renderSteps(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite, @Nonnull CompositeQuestAsset asset) {
+    private void renderSteps(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite, @Nonnull CompositeQuestAsset asset) {
         List<Step> steps = stepsOf(context, composite, asset);
         boolean separated = asset.getOperator() == CompositeQuestAsset.Operator.OR;
 
@@ -104,14 +110,14 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * that kept no trace of itself is only nameable through its asset.
      */
     @Nonnull
-    private static List<Step> stepsOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite, @Nonnull CompositeQuestAsset asset) {
+    private List<Step> stepsOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite, @Nonnull CompositeQuestAsset asset) {
         UUID[] questIds = composite.getChildIds();
         String[] assetIds = asset.getAssetIds();
 
         List<Step> steps = new ArrayList<>(questIds.length);
 
         for (int i = 0; i < questIds.length; i++) {
-            steps.add(new Step(QuestProgressionService.get().getQuest(questIds[i]),
+            steps.add(new Step(progression.getQuest(questIds[i]),
                 i < assetIds.length ? assetIds[i] : null, markOf(context, composite, questIds[i])));
         }
 
@@ -131,8 +137,8 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * something it does not know is worse than one admitting it lost the thread.
      */
     @Nonnull
-    private static QuestMark markOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite, @Nonnull UUID childId) {
-        AbstractQuestProgression<?> child = QuestProgressionService.get().getQuest(childId);
+    private QuestMark markOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite, @Nonnull UUID childId) {
+        AbstractQuestProgression<?> child = progression.getQuest(childId);
 
         // What it came to for whoever is reading, not for everyone else still on it
         if (child != null) return QuestMark.of(child.getStateFor(context.getViewer()));
@@ -146,7 +152,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * hole where it was would read as if it had never been asked for, and the line is what lets
      * the player open a step the store no longer holds.
      */
-    private static void renderChild(@Nonnull QuestPageContext context, @Nullable String assetId) {
+    private void renderChild(@Nonnull QuestPageContext context, @Nullable String assetId) {
         if (assetId == null) return;
 
         OpenQuestAsset childAsset = OpenQuestAsset.getAsset(assetId);
@@ -155,7 +161,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
         context.listing(assetId, () -> QuestPageRows.appendLine(context, AbstractQuestProgression.titleOf(childAsset)));
     }
 
-    private static void renderPreview(@Nonnull QuestPageContext context, @Nonnull CompositeQuestAsset composite) {
+    private void renderPreview(@Nonnull QuestPageContext context, @Nonnull CompositeQuestAsset composite) {
         String[] assetIds = composite.getAssetIds();
         boolean separated = composite.getOperator() == CompositeQuestAsset.Operator.OR;
 
@@ -184,7 +190,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * succeeded: a tally is read as a fact.
      */
     @Nonnull
-    private static String tallyOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite) {
+    private String tallyOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite) {
         UUID[] questIds = composite.getChildIds();
         int successful = 0;
 
@@ -199,7 +205,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * the same shade. Continuing the alternation across the rule would shade one side and not the
      * other, which reads as a difference between them rather than as a break.
      */
-    private static void openBranch(@Nonnull QuestPageContext context, boolean first) {
+    private void openBranch(@Nonnull QuestPageContext context, boolean first) {
         if (!first) context.appendRow(SEPARATOR_DOCUMENT);
 
         context.restartStripes();

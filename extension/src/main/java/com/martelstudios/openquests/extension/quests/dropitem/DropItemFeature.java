@@ -1,7 +1,7 @@
 package com.martelstudios.openquests.extension.quests.dropitem;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 
 import javax.annotation.Nonnull;
 
@@ -17,11 +17,10 @@ public final class DropItemFeature {
     /**
      * Registers the type and the two systems a throw goes through, which share what was asked.
      */
-    public static void register(@Nonnull JavaPlugin plugin) {
-        QuestProgressionService.get()
-                               .registerQuestType(TYPE_ID, DropItemQuestAsset.class, DropItemQuestAsset.CODEC, DropItemQuestProgression.class, DropItemQuestProgression.CODEC);
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, DropItemQuestAsset.class, DropItemQuestAsset.CODEC, DropItemQuestProgression.class, DropItemQuestProgression.CODEC);
 
-        DropItemSystems systems = new DropItemSystems();
+        DropItemSystems systems = new DropItemSystems(services.getQuestProgressionService());
         plugin.getEntityStoreRegistry().registerSystem(systems.requestSystem());
         plugin.getEntityStoreRegistry().registerSystem(systems.dropSystem());
     }
