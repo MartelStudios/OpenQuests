@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-voidtaken.title",
   "DescriptionKey": "quest.goblin-breach-voidtaken.description",
+  "ShortDescriptionKey": "quest.goblin-breach-voidtaken.short",
   "TargetQuantity": 1,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -36,5 +37,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

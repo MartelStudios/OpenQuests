@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-lobbers.title",
   "DescriptionKey": "quest.goblin-breach-lobbers.description",
+  "ShortDescriptionKey": "quest.goblin-breach-lobbers.short",
   "TargetQuantity": 4,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -27,5 +28,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

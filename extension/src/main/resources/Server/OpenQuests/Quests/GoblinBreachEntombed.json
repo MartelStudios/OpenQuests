@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-entombed.title",
   "DescriptionKey": "quest.goblin-breach-entombed.description",
+  "ShortDescriptionKey": "quest.goblin-breach-entombed.short",
   "TargetQuantity": 1,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -27,5 +28,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

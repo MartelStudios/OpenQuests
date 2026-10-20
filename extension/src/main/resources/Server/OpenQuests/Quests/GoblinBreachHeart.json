@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-heart.title",
   "DescriptionKey": "quest.goblin-breach-heart.description",
+  "ShortDescriptionKey": "quest.goblin-breach-heart.short",
   "TargetQuantity": 1,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -26,5 +27,8 @@
       "Quantity": 2,
       "AutoClaim": false
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

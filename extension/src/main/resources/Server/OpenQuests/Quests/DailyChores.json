@@ -3,6 +3,7 @@
   "Categories": ["Chores"],
   "TitleKey": "quest.daily-chores.title",
   "DescriptionKey": "quest.daily-chores.description",
+  "ShortDescriptionKey": "quest.daily-chores.short",
   "AbandonedSound": "",
   "QuestAssetIds": [
     {

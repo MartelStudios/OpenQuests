@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-guardians.title",
   "DescriptionKey": "quest.goblin-breach-guardians.description",
+  "ShortDescriptionKey": "quest.goblin-breach-guardians.short",
   "TargetQuantity": 3,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -27,5 +28,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

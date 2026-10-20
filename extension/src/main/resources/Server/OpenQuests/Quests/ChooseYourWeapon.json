@@ -4,6 +4,7 @@
   "Operator": "Or",
   "TitleKey": "quest.choose-weapon.title",
   "DescriptionKey": "quest.choose-weapon.description",
+  "ShortDescriptionKey": "quest.choose-weapon.short",
   "QuestAssetIds": [
     {
       "Type": "Craft",

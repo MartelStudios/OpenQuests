@@ -6,8 +6,12 @@
   ],
   "TitleKey": "quest.goblin-breach-gadgets.title",
   "DescriptionKey": "quest.goblin-breach-gadgets.description",
+  "ShortDescriptionKey": "quest.goblin-breach-gadgets.short",
   "TargetQuantity": 3,
   "ItemToCraft": {
     "ItemId": "Ingredient_Gadget_Assembly"
+  },
+  "Tags": {
+    "OQ_HUD_DESC": []
   }
 }

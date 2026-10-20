@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-hookshot.title",
   "DescriptionKey": "quest.goblin-breach-hookshot.description",
+  "ShortDescriptionKey": "quest.goblin-breach-hookshot.short",
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Tool_Hookshot"
@@ -18,5 +19,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

@@ -43,7 +43,19 @@ Group #QuestPageRow {
     Label #Status { Text: ""; Anchor: (Width: 140, Height: 24, Top: 0); Style: $P.@RowStatusStyle; }
   }
 
-  Label #Description { Text: ""; Anchor: (Top: 4); Style: $P.@RowTextStyle; Visible: false; }
+  // Under the title, folded or not: what to do is what a list is scanned for
+  Label #Summary { Text: ""; Anchor: (Top: 4, Left: 56); Style: $P.@RowSummaryStyle; Visible: false; }
+
+  // The story, set apart from the action on a panel of its own, as a quote would be
+  Group #Lore {
+    LayoutMode: Top;
+    Anchor: (Top: 8);
+    Padding: (Full: 10);
+    Background: #141b29;
+    Visible: false;
+
+    Label #Description { Text: ""; Style: $P.@LoreStyle; }
+  }
 
   // Every gap is the top margin of what follows it rather than a spacer after what precedes it, so
   // a hidden section takes its gap along and nothing is left trailing under the last one shown

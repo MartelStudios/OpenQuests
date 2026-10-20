@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-bangstick.title",
   "DescriptionKey": "quest.goblin-breach-bangstick.description",
+  "ShortDescriptionKey": "quest.goblin-breach-bangstick.short",
   "TargetQuantity": 2,
   "ItemToCraft": {
     "ItemId": "Weapon_Bangstick"
@@ -18,5 +19,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

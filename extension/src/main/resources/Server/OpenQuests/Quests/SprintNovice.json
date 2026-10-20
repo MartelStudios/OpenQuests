@@ -3,6 +3,7 @@
   "Categories": ["Achievement"],
   "TitleKey": "quest.sprint-novice.title",
   "DescriptionKey": "quest.sprint-novice.description",
+  "ShortDescriptionKey": "quest.sprint-novice.short",
   "TargetQuantity": 50,
   "Visibility": "WhenCompleted",
   "SuccessfulRewards": [

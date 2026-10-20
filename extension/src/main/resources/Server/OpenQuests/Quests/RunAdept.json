@@ -4,6 +4,7 @@
   "Visibility": "WhenStarted",
   "TitleKey": "quest.run-adept.title",
   "DescriptionKey": "quest.run-adept.description",
+  "ShortDescriptionKey": "quest.run-adept.short",
   "TargetQuantity": 1000,
   "SuccessfulRewards": [
     {

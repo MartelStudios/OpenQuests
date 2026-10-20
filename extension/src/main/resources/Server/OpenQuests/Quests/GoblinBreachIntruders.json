@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-intruders.title",
   "DescriptionKey": "quest.goblin-breach-intruders.description",
+  "ShortDescriptionKey": "quest.goblin-breach-intruders.short",
   "TargetQuantity": 10,
   "NpcGroupId": "Goblin",
   "Constraints": [
@@ -36,5 +37,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

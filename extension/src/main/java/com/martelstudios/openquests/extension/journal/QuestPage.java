@@ -925,13 +925,17 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         String rowSelector = context.appendRow(document);
         boolean open = state().unfolded.contains(entry.id());
 
+        boolean summarised = !isBlank(entry.summary());
         boolean described = !isBlank(entry.description());
 
         context.getBuilder()
                .set(rowSelector + "#Title.TextSpans", entry.title())
                .set(rowSelector + "#Status.TextSpans", entry.status())
                .set(rowSelector + "#Toggle.Text", open ? "-" : "+")
-               .set(rowSelector + "#Description.Visible", open && described);
+               .set(rowSelector + "#Summary.Visible", summarised)
+               .set(rowSelector + "#Lore.Visible", open && described);
+
+        if (summarised) context.getBuilder().set(rowSelector + "#Summary.TextSpans", entry.summary());
 
         QuestPageRows.setIcon(context, rowSelector + "#Icon", entry.mark());
         renderCategories(context, rowSelector, entry.asset());
@@ -949,7 +953,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         if (!open) return;
 
-        if (described) context.getBuilder().set(rowSelector + "#Description.TextSpans", entry.description());
+        if (described) context.getBuilder().set(rowSelector + "#Description.TextSpans", withMarkup(entry.description()));
 
         int lines = objectives + renderConditions(context, rowSelector, entry) + renderRewards(context, rowSelector, entry);
         boolean acted = renderActions(context, rowSelector, entry);
@@ -1296,6 +1300,16 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         return raw == null || raw.isEmpty();
     }
 
+    /**
+     * Lets a description lay itself out the way vanilla item descriptions do: line breaks, <i>, <b>
+     * and <color is="#rrggbb">. Written on the message itself, since {@code Message} has no setter.
+     */
+    @Nonnull
+    private static Message withMarkup(@Nonnull Message message) {
+        message.getFormattedMessage().markupEnabled = true;
+        return message;
+    }
+
     private static UUID parse(String value) {
         try {
             return value == null ? null : UUID.fromString(value);
@@ -1315,7 +1329,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
      *             place at all is one the player was never given, and saying so is the point of showing it.
      */
     private record Entry(@Nonnull String id, String assetId, OpenQuestAsset asset, @Nonnull Message title,
-                         @Nonnull Message description, @Nonnull Message status, @Nonnull QuestMark mark,
+                         @Nonnull Message summary, @Nonnull Message description, @Nonnull Message status, @Nonnull QuestMark mark,
                          AbstractQuestProgression<?> quest, QuestReward[] rewards, boolean claimable) {
 
         /**
@@ -1332,7 +1346,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
             QuestMark mark = QuestMark.of(quest.getStateFor(viewer));
 
             return of(quest.getId()
-                           .toString(), quest.getAssetId(), asset, quest.getTitle(), quest.getDescription(), mark, quest, rewardsOf(asset, mark), owed);
+                           .toString(), quest.getAssetId(), asset, quest.getTitle(), quest.getShortDescription(), quest.getDescription(), mark, quest, rewardsOf(asset, mark), owed);
         }
 
         /**
@@ -1343,10 +1357,10 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         @Nonnull
         static Entry owed(@Nonnull PendingRewards owed, @Nullable AbstractQuestProgression<?> quest, @Nonnull UUID viewer) {
             if (quest == null) {
-                return of(owed.getQuestId().toString(), null, null, Message.translation("openquests.page.reward.unknown"), Message.raw(""), QuestMark.LOST, null, owed.getRewards(), true);
+                return of(owed.getQuestId().toString(), null, null, Message.translation("openquests.page.reward.unknown"), Message.raw(""), Message.raw(""), QuestMark.LOST, null, owed.getRewards(), true);
             }
 
-            return of(quest.getId().toString(), quest.getAssetId(), quest.getAsset(), quest.getTitle(), quest.getDescription(), QuestMark.of(quest.getStateFor(viewer)), quest, owed.getRewards(), true);
+            return of(quest.getId().toString(), quest.getAssetId(), quest.getAsset(), quest.getTitle(), quest.getShortDescription(), quest.getDescription(), QuestMark.of(quest.getStateFor(viewer)), quest, owed.getRewards(), true);
         }
 
         /**
@@ -1362,7 +1376,7 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
         static Entry preview(@Nonnull OpenQuestAsset asset, @Nullable QuestMark inherited) {
             QuestMark mark = inherited == null ? QuestMark.LOCKED : inherited;
 
-            return of(asset.getId(), asset.getId(), asset, AbstractQuestProgression.titleOf(asset), AbstractQuestProgression.descriptionOf(asset), mark, null, rewardsOf(asset, mark), false);
+            return of(asset.getId(), asset.getId(), asset, AbstractQuestProgression.titleOf(asset), AbstractQuestProgression.shortDescriptionOf(asset), AbstractQuestProgression.descriptionOf(asset), mark, null, rewardsOf(asset, mark), false);
         }
 
         /**
@@ -1388,8 +1402,8 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
          * The status word follows the mark rather than being chosen beside it, so the two agree.
          */
         @Nonnull
-        private static Entry of(@Nonnull String id, String assetId, OpenQuestAsset asset, @Nonnull Message title, @Nonnull Message description, @Nonnull QuestMark mark, AbstractQuestProgression<?> quest, QuestReward[] rewards, boolean claimable) {
-            return new Entry(id, assetId, asset, title, description, Message.translation(mark.getStatusKey()), mark, quest, rewards, claimable);
+        private static Entry of(@Nonnull String id, String assetId, OpenQuestAsset asset, @Nonnull Message title, @Nonnull Message summary, @Nonnull Message description, @Nonnull QuestMark mark, AbstractQuestProgression<?> quest, QuestReward[] rewards, boolean claimable) {
+            return new Entry(id, assetId, asset, title, summary, description, Message.translation(mark.getStatusKey()), mark, quest, rewards, claimable);
         }
     }
 

@@ -3,6 +3,7 @@
   "Categories": ["Survival"],
   "TitleKey": "quest.lumberjack.title",
   "DescriptionKey": "quest.lumberjack.description",
+  "ShortDescriptionKey": "quest.lumberjack.short",
   "TargetQuantity": 20,
   "AntiAbuse": true,
   "ItemToPickup": {

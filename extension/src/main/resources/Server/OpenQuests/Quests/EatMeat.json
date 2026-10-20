@@ -3,6 +3,7 @@
   "Categories": ["Survival"],
   "TitleKey": "quest.eat-meat.title",
   "DescriptionKey": "quest.eat-meat.description",
+  "ShortDescriptionKey": "quest.eat-meat.short",
   "TargetQuantity": 1,
   "ItemToConsume": {
     "ItemId": "Food_Wildmeat_Cooked"

@@ -3,6 +3,7 @@
   "Categories": ["Achievement", "Temple"],
   "TitleKey": "quest.flawless.title",
   "DescriptionKey": "quest.flawless.description",
+  "ShortDescriptionKey": "quest.flawless.short",
   "Visibility": "WhenCompleted",
   "QuestAssetIds": [
     {

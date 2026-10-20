@@ -804,6 +804,16 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
+     * @return the line saying concretely what to do, what the HUD shows. Empty when the asset names
+     * none: a title saying it already would only be repeated.
+     */
+    @Nonnull
+    public Message getShortDescription() {
+        OpenQuestAsset asset = getAsset();
+        return asset == null ? Message.raw("") : shortDescriptionOf(asset);
+    }
+
+    /**
      * Stands in when the asset names no title. A type that can describe itself from its own
      * parameters overrides this, so an unnamed quest still reads as something.
      */
@@ -984,5 +994,15 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         String descriptionKey = asset.getDescriptionKey();
 
         return descriptionKey != null ? Message.translation(descriptionKey) : asset.create().getDefaultDescription();
+    }
+
+    /**
+     * The short description of a quest asset, for a quest that no longer has a progression to ask.
+     */
+    @Nonnull
+    public static Message shortDescriptionOf(@Nonnull OpenQuestAsset asset) {
+        String key = asset.getShortDescriptionKey();
+
+        return key != null ? Message.translation(key) : Message.raw("");
     }
 }

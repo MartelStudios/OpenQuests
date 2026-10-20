@@ -6,6 +6,7 @@
   ],
   "TitleKey": "quest.goblin-breach-revenant.title",
   "DescriptionKey": "quest.goblin-breach-revenant.description",
+  "ShortDescriptionKey": "quest.goblin-breach-revenant.short",
   "TargetQuantity": 1,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -39,5 +40,8 @@
       ],
       "AutoClaim": true
     }
-  ]
+  ],
+  "Tags": {
+    "OQ_HUD_DESC": []
+  }
 }

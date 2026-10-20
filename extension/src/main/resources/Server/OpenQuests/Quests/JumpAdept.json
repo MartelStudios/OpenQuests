@@ -4,6 +4,7 @@
   "Visibility": "WhenStarted",
   "TitleKey": "quest.jump-adept.title",
   "DescriptionKey": "quest.jump-adept.description",
+  "ShortDescriptionKey": "quest.jump-adept.short",
   "TargetQuantity": 250,
   "SuccessfulRewards": [
     {

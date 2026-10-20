@@ -3,6 +3,7 @@
   "Categories": ["Tutorial"],
   "TitleKey": "quest.skip-intro.title",
   "DescriptionKey": "quest.skip-intro.description",
+  "ShortDescriptionKey": "quest.skip-intro.short",
   "QuestAssetId": "Intro",
   "States": ["Abandoned"],
   "AnnounceOutcome": false,

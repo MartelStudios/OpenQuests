@@ -3,6 +3,7 @@
   "Categories": ["Temple"],
   "TitleKey": "quest.temple-offering.title",
   "DescriptionKey": "quest.temple-offering.description",
+  "ShortDescriptionKey": "quest.temple-offering.short",
   "TargetQuantity": 10,
   "AutoTrack": true,
   "AntiAbuse": true,

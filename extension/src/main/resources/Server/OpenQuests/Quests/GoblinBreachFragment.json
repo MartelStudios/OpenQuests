@@ -6,8 +6,12 @@
   ],
   "TitleKey": "quest.goblin-breach-fragment.title",
   "DescriptionKey": "quest.goblin-breach-fragment.description",
+  "ShortDescriptionKey": "quest.goblin-breach-fragment.short",
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "PortalKey_Goblin_Breach"
+  },
+  "Tags": {
+    "OQ_HUD_DESC": []
   }
 }

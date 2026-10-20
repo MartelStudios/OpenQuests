@@ -3,6 +3,7 @@
   "Categories": ["Survival"],
   "TitleKey": "quest.gather-meat.title",
   "DescriptionKey": "quest.gather-meat.description",
+  "ShortDescriptionKey": "quest.gather-meat.short",
   "TargetQuantity": 1,
   "ItemToGather": {
     "ResourceTypeId": "Meats"

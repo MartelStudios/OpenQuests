@@ -12,7 +12,7 @@ definition never touches saved progression.
 One quest, as the tracker draws it. *Introduction* combines its two children with `OR`, so either
 branch ends it, hence the rule between them. *Master the basics* combines its own four with `AND`,
 and nests one level further. *Gather fibre* is done: complete icon, greyed, counter dropped. The two
-grey lines are descriptions, shown because their assets carry the `OQ_HUD_DESC` tag.
+grey lines are short descriptions, shown because their assets carry the `OQ_HUD_DESC` tag.
 
 ## Modules
 
@@ -490,7 +490,7 @@ leave the trigger volume plugin, so an asset naming one is refused at boot.
 their pace instead, added up across every stretch: `TargetQuantity` is then a duration.
 
 The tracker only lists quests that asked for it. `AutoTrack` puts every quest made from the asset on
-the panel; `OQ_HUD_DESC` shows its description under its title, greyed and smaller:
+the panel; `OQ_HUD_DESC` shows its short description under its title, greyed and smaller:
 
 ```json
 { "Type": "Composite", "TitleKey": "…", "AutoTrack": true, "Tags": { "OQ_HUD_DESC": [] } }
@@ -902,6 +902,7 @@ A quest, in `OpenQuests/Quests/CollectStick.json`:
   "Type": "Gather",
   "TitleKey": "quest.collect-stick.title",
   "DescriptionKey": "quest.collect-stick.description",
+  "ShortDescriptionKey": "quest.collect-stick.short",
   "AutoClaim": true,
   "ItemToGather": { "ItemId": "Ingredient_Stick" },
   "TargetQuantity": 20,
@@ -953,7 +954,12 @@ it holds: `hud.or` in `openquests.lang` answers to `openquests.hud.or`. The serv
 pushes them to clients, so they resolve from markup as `%openquests.hud.or` and from code as
 `Message.translation(...)` alike. `en-US` and `fr-FR` ship.
 
-`TitleKey` and `DescriptionKey` are optional. Without them a quest falls back to
+A quest says what it is in three texts. `ShortDescriptionKey` states the concrete action (what the
+HUD shows and the journal puts under the title), and `DescriptionKey` tells the story, drawn in
+italics once the row is unfolded. A description can span paragraphs and use the markup vanilla item
+descriptions use: `\n` for a line break, `<i>`, `<b>` and `<color is="#e0b25a">`.
+
+All three are optional. Without a title a quest falls back to
 `getDefaultTitle()`, which a type overrides to describe itself from its own parameters: a `Gather`
 quest reads "Gather 2 Sticks" on its own, the item naming itself through Hytale's own
 `Item.getTranslationMessage()`. The templates live in the same files and use ICU, so a locale

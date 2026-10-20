@@ -3,6 +3,7 @@
   "Categories": ["Temple"],
   "TitleKey": "quest.enter-forgotten-temple.title",
   "DescriptionKey": "quest.enter-forgotten-temple.description",
+  "ShortDescriptionKey": "quest.enter-forgotten-temple.short",
   "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)",
   "SuccessfulRewards": [
     {
