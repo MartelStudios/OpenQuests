@@ -7,8 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release, without the leading v, as in 1.0.0'
-        required: true
+        description: 'Version to release, without the leading v, as in 1.0.0, or empty to release the MMOSkillTree pack alone'
+        required: false
+        default: ''
       mmoskilltree_version:
         description: 'Version of the OpenQuests MMOSkillTree pack to publish with it, or empty to leave the pack out'
         required: false
@@ -16,6 +17,10 @@ on:
 
 permissions:
   contents: write
+
+# A pack released alone gets a tag of its own, so it never takes an OpenQuests version
+env:
+  TAG: ${{ inputs.version != '' && format('v{0}', inputs.version) || format('mmoskilltree-v{0}', inputs.mmoskilltree_version) }}
 
 jobs:
   release:
@@ -47,34 +52,40 @@ jobs:
 
       - name: Write the version down
         env:
+          VERSION: ${{ inputs.version }}
           PACK_VERSION: ${{ inputs.mmoskilltree_version }}
         run: |
-          sed -i "s/^version = .*/version = ${{ inputs.version }}/" gradle.properties
+          if [[ -z "$VERSION" && -z "$PACK_VERSION" ]]; then
+            echo "::error::Give a version, a pack version, or both."
+            exit 1
+          fi
+          if [[ -n "$VERSION" ]]; then
+            sed -i "s/^version = .*/version = $VERSION/" gradle.properties
+          fi
           if [[ -n "$PACK_VERSION" ]]; then
             sed -i "s/^mmoskilltree_version = .*/mmoskilltree_version = $PACK_VERSION/" mods/mmoskilltree/gradle.properties
           fi
 
       # Regenerates every manifest.json from the property, so the tag carries a coherent tree
       - name: Build
-        run: ./gradlew build -Pversion=${{ inputs.version }}
+        env:
+          VERSION: ${{ inputs.version }}
+        run: ./gradlew build ${VERSION:+-Pversion=$VERSION}
 
       - name: Commit and tag
         run: |
           git config user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
           git config user.email "${{ steps.app-token.outputs.installation-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
-          git commit -am "chore: release ${{ inputs.version }}"
-          git tag "v${{ inputs.version }}"
-          git push origin HEAD "v${{ inputs.version }}"
+          git commit -am "chore: release ${TAG#v}"
+          git tag "$TAG"
+          git push origin HEAD "$TAG"
 
       - name: Publish the release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ inputs.version }}
-          files: |
-            core/build/libs/*.jar
-            extension/build/libs/*.jar
-            extension/build/distributions/*.zip
-            mods/*/build/libs/*.jar
+          tag_name: ${{ env.TAG }}
+          # Only the pack's jar when it is released alone: the rest would pass for a new OpenQuests
+          files: ${{ inputs.version != '' && 'core/build/libs/*.jar,extension/build/libs/*.jar,extension/build/distributions/*.zip,mods/*/build/libs/*.jar' || 'mods/mmoskilltree/build/libs/*.jar' }}
           generate_release_notes: true
           fail_on_unmatched_files: true
 
@@ -133,10 +144,9 @@ jobs:
           TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
           GAME_VERSION: ${{ vars.CURSEFORGE_GAME_VERSION }}
           VERSION: ${{ inputs[matrix.version_input || 'version'] }}
-          TAG: v${{ inputs.version }}
           NAME: ${{ matrix.name }}
           PROJECT_ID: ${{ matrix.project_id }}
-          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ inputs.version }}
+          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ env.TAG }}
           RELATIONS: ${{ matrix.relations }}
         run: |
           set -euo pipefail
