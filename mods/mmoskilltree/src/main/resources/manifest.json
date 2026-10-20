@@ -1,7 +1,7 @@
 {
     "Group": "MartelStudios",
     "Name": "OpenQuestsMMOSkillTree",
-    "Version": "0.1.0",
+    "Version": "1.0.0",
     "Description": "OpenQuests quest and reward types for MMO Skill Tree",
     "Authors": [
         {
