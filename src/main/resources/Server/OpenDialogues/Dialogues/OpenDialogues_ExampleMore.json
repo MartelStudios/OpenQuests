@@ -6,7 +6,12 @@
   "Responses": [
     {
       "Text": "Thank you, I will be careful.",
-      "Actions": [ { "Type": "OpenDialoguesCommand", "Command": "help" }, { "Type": "OpenDialoguesClose" } ]
+      "Actions": [ { "Type": "OpenDialoguesClose" } ]
+    },
+    {
+      "Text": "Where is the river?",
+      "Actions": [ { "Type": "OpenDialoguesCommand", "Command": "help" } ]
     }
-  ]
+  ],
+  "$NodeEditorMetadata": { "$WorkspaceID": "OpenDialogues - Dialogue" }
 }

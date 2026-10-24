@@ -13,5 +13,6 @@
       "Text": "Goodbye.",
       "Actions": [ { "Type": "OpenDialoguesClose" } ]
     }
-  ]
+  ],
+  "$NodeEditorMetadata": { "$WorkspaceID": "OpenDialogues - Dialogue" }
 }
