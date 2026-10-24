@@ -1,7 +1,7 @@
-package com.martelstudios.opendialogues.actions;
+package com.martelstudios.opendialogues.actions.impl.close;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
-import com.martelstudios.opendialogues.api.DialogueAction;
+import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.api.DialogueContext;
 
 import javax.annotation.Nonnull;

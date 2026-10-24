@@ -1,4 +1,4 @@
-package com.martelstudios.opendialogues.presenters;
+package com.martelstudios.opendialogues.presenters.impl.page;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;

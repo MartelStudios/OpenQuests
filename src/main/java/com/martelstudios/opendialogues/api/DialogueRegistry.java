@@ -1,7 +1,9 @@
 package com.martelstudios.opendialogues.api;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.nodeeditor.NodeDefinition;
+import com.martelstudios.opendialogues.presenters.DialoguePresenter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

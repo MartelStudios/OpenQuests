@@ -1,8 +1,8 @@
-package com.martelstudios.opendialogues.presenters;
+package com.martelstudios.opendialogues.presenters.impl.chat;
 
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.opendialogues.api.DialoguePresenter;
+import com.martelstudios.opendialogues.presenters.DialoguePresenter;
 import com.martelstudios.opendialogues.dialogues.DialoguePage;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 

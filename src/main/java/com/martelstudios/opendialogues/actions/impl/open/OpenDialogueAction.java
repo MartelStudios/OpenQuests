@@ -1,11 +1,11 @@
-package com.martelstudios.opendialogues.actions;
+package com.martelstudios.opendialogues.actions.impl.open;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.hypixel.hytale.server.core.Message;
-import com.martelstudios.opendialogues.api.DialogueAction;
+import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.api.DialogueContext;
 
 import javax.annotation.Nonnull;

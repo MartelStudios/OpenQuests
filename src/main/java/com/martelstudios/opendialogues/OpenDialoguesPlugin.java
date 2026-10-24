@@ -8,9 +8,9 @@ import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
-import com.martelstudios.opendialogues.actions.CloseDialogueAction;
-import com.martelstudios.opendialogues.actions.CommandDialogueAction;
-import com.martelstudios.opendialogues.actions.OpenDialogueAction;
+import com.martelstudios.opendialogues.actions.impl.close.CloseDialogueAction;
+import com.martelstudios.opendialogues.actions.impl.command.CommandDialogueAction;
+import com.martelstudios.opendialogues.actions.impl.open.OpenDialogueAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
@@ -18,11 +18,11 @@ import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.nodeeditor.NodeDefinition;
 import com.martelstudios.opendialogues.nodeeditor.WorkspaceBuilder;
 import com.martelstudios.opendialogues.nodeeditor.WorkspaceExporter;
-import com.martelstudios.opendialogues.presenters.ChatPresenter;
-import com.martelstudios.opendialogues.presenters.PagePresenter;
+import com.martelstudios.opendialogues.presenters.impl.chat.ChatPresenter;
+import com.martelstudios.opendialogues.presenters.impl.page.PagePresenter;
 import com.martelstudios.opendialogues.services.DialogueService;
 
-import com.martelstudios.opendialogues.api.DialogueAction;
+import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.dialogues.DialogueResponse;
 
 import javax.annotation.Nonnull;
@@ -125,7 +125,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     /**
      * Every dialogue loaded, and every id an answer names, loaded or not: see
-     * {@link com.martelstudios.opendialogues.api.DialogueAction#getReferencedDialogues}.
+     * {@link DialogueAction#getReferencedDialogues}.
      */
     @Nonnull
     private static Set<String> dialogueIds() {

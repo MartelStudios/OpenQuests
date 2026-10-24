@@ -2,9 +2,9 @@ package com.martelstudios.opendialogues.services;
 
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.opendialogues.api.DialogueAction;
+import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.api.DialogueContext;
-import com.martelstudios.opendialogues.api.DialoguePresenter;
+import com.martelstudios.opendialogues.presenters.DialoguePresenter;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.events.DialogueEvent;

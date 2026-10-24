@@ -11,7 +11,7 @@ import com.hypixel.hytale.server.core.permissions.provider.HytalePermissionsProv
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.opendialogues.presenters.ChatPresenter;
+import com.martelstudios.opendialogues.presenters.impl.chat.ChatPresenter;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 import javax.annotation.Nonnull;

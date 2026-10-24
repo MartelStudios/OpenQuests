@@ -1,6 +1,6 @@
 package com.martelstudios.opendialogues.sessions;
 
-import com.martelstudios.opendialogues.api.DialoguePresenter;
+import com.martelstudios.opendialogues.presenters.DialoguePresenter;
 import com.martelstudios.opendialogues.dialogues.DialogueResponse;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 

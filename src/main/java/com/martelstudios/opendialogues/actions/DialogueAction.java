@@ -1,7 +1,9 @@
-package com.martelstudios.opendialogues.api;
+package com.martelstudios.opendialogues.actions;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
+import com.martelstudios.opendialogues.api.DialogueContext;
+import com.martelstudios.opendialogues.api.DialogueRegistry;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;

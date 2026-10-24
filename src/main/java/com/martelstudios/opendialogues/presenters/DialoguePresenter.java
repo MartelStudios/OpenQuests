@@ -1,4 +1,4 @@
-package com.martelstudios.opendialogues.api;
+package com.martelstudios.opendialogues.presenters;
 
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
