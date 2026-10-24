@@ -1,5 +1,9 @@
 {
   "Title": "Old Kweebec",
+  "Speaker": {
+    "Name": "opendialogues.example.elder.name",
+    "Epithet": "opendialogues.example.elder.epithet"
+  },
   "Pages": [
     { "Text": "Trorks gather by the river. Keep away from the water after dusk." }
   ],

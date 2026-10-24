@@ -1,5 +1,10 @@
 {
   "Title": "Old Kweebec",
+  "Speaker": {
+    "Name": "opendialogues.example.elder.name",
+    "Epithet": "opendialogues.example.elder.epithet",
+    "Portrait": "Icons/ModelsGenerated/Kweebec_Sapling.png"
+  },
   "Pages": [
     { "Text": "Ah, a traveller. The woods are restless tonight." },
     { "Text": "Will you hear what I have seen?" }

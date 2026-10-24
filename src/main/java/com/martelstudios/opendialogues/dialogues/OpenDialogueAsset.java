@@ -24,6 +24,8 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
                                                                                               .add()
                                                                                               .append(new KeyedCodec<>("Presenter", Codec.STRING), (dialogue, presenter) -> dialogue.presenter = presenter, dialogue -> dialogue.presenter)
                                                                                               .add()
+                                                                                              .append(new KeyedCodec<>("Speaker", DialogueSpeaker.CODEC), (dialogue, speaker) -> dialogue.speaker = speaker, dialogue -> dialogue.speaker)
+                                                                                              .add()
                                                                                               .append(new KeyedCodec<>("Pages", new ArrayCodec<>(DialoguePage.CODEC, DialoguePage[]::new)), (dialogue, pages) -> dialogue.pages = pages, dialogue -> dialogue.pages)
                                                                                               .add()
                                                                                               .append(new KeyedCodec<>("Responses", new ArrayCodec<>(DialogueResponse.CODEC, DialogueResponse[]::new)), (dialogue, responses) -> dialogue.responses = responses, dialogue -> dialogue.responses)
@@ -38,6 +40,9 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
 
     @Nullable
     protected String presenter;
+
+    @Nullable
+    protected DialogueSpeaker speaker;
 
     protected DialoguePage[] pages = new DialoguePage[0];
     protected DialogueResponse[] responses = new DialogueResponse[0];
@@ -63,6 +68,14 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     @Nullable
     public String getPresenter() {
         return presenter;
+    }
+
+    /**
+     * @return who speaks, or {@code null} for a dialogue nobody voices.
+     */
+    @Nullable
+    public DialogueSpeaker getSpeaker() {
+        return speaker;
     }
 
     /**

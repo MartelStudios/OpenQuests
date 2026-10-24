@@ -1,0 +1,50 @@
+{
+  "Id": "OpenDialogues.Speaker",
+  "Title": "Speaker",
+  "Color": "Purple",
+  "Description": "Who speaks the dialogue, for presenters that show it.",
+  "Content": [
+    {
+      "Id": "Name",
+      "Type": "SmallString",
+      "Options": {
+        "Label": "Name",
+        "Default": "",
+        "Width": 300,
+        "Description": "Translation key of the name."
+      }
+    },
+    {
+      "Id": "Epithet",
+      "Type": "SmallString",
+      "Options": {
+        "Label": "Epithet",
+        "Default": "",
+        "Width": 300,
+        "Description": "Translation key of what the speaker is known as."
+      }
+    },
+    {
+      "Id": "Portrait",
+      "Type": "SmallString",
+      "Options": {
+        "Label": "Portrait",
+        "Default": "",
+        "Width": 300,
+        "Description": "Image path under Common/, like Icons/ModelsGenerated/Kweebec_Sapling.png. Empty to show the name's initial."
+      }
+    }
+  ],
+  "Inputs": [
+    {
+      "Id": "Speaker",
+      "Type": "OpenDialogues.Speaker.Connection",
+      "Color": "Purple"
+    }
+  ],
+  "Schema": {
+    "Name": "Name",
+    "Epithet": "Epithet",
+    "Portrait": "Portrait"
+  }
+}

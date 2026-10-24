@@ -63,6 +63,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerAction(CloseDialogueAction.TYPE, CloseDialogueAction.class, CloseDialogueAction.CODEC, node("OpenDialogues.CloseAction", "Actions", "CloseAction.json"));
         registry.registerAction(OpenDialogueAction.TYPE, OpenDialogueAction.class, OpenDialogueAction.CODEC, node("OpenDialogues.OpenAction", "Actions", "OpenAction.json"));
         registry.registerAction(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC, node("OpenDialogues.CommandAction", "Actions", "CommandAction.json"));
+        registry.registerNode(node("OpenDialogues.Speaker", "Dialogue", "Speaker.json"));
         registry.registerPresenter(ChatPresenter.ID, new ChatPresenter());
 
         // shortcut: the chat is the only presenter, make the default a server setting once the page presenter lands.
