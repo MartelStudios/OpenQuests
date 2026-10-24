@@ -1,0 +1,28 @@
+{
+  "Id": "OpenDialogs.OpenAction",
+  "Title": "Open Dialog",
+  "Color": "Pink",
+  "Content": [
+    {
+      "Id": "Dialog",
+      "Type": "AssetId",
+      "Options": {
+        "AssetType": "OpenDialogsDialog",
+        "Label": "Dialog",
+        "Default": "",
+        "Width": 250
+      }
+    }
+  ],
+  "Inputs": [
+    {
+      "Id": "Action",
+      "Type": "OpenDialogs.Action.Connection",
+      "Color": "Pink"
+    }
+  ],
+  "Schema": {
+    "Type": "OpenDialogsOpen",
+    "Dialog": "Dialog"
+  }
+}

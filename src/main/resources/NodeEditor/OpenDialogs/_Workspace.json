@@ -1,0 +1,31 @@
+{
+  "WorkspaceName": "OpenDialogs",
+  "Roots": {
+    "Dialog": {
+      "RootNodeType": "OpenDialogs.Dialog",
+      "MenuName": "OpenDialogs - Dialog"
+    }
+  },
+  "NodeCategories": {
+    "Dialog": [
+      "OpenDialogs.Dialog",
+      "OpenDialogs.Page",
+      "OpenDialogs.Response"
+    ],
+    "Actions": [
+      "OpenDialogs.CloseAction",
+      "OpenDialogs.OpenAction",
+      "OpenDialogs.CommandAction"
+    ]
+  },
+  "Variants": {
+    "OpenDialogs.Action.Variants": {
+      "VariantFieldName": "Type",
+      "Variants": {
+        "OpenDialogsClose": "OpenDialogs.CloseAction",
+        "OpenDialogsOpen": "OpenDialogs.OpenAction",
+        "OpenDialogsCommand": "OpenDialogs.CommandAction"
+      }
+    }
+  }
+}

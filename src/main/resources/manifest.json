@@ -1,0 +1,25 @@
+{
+    "Group": "MartelStudios",
+    "Name": "OpenDialogs",
+    "Version": "0.1.0",
+    "Description": "Dialogue trees for Hytale: pages, answers and actions, written as assets and linked in the Node Editor",
+    "Authors": [
+        {
+            "Name": "Hazard4U"
+        }
+    ],
+    "Website": "https://github.com/MartelStudios/OpenDialogs",
+    "ServerVersion": "^0.7.0",
+    "Dependencies": {
+        "Hytale:AssetModule": "*"
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "com.martelstudios.opendialogs.OpenDialogsPlugin",
+    "IncludesAssetPack": true,
+    "UpdateChecker": {
+        "CurseForge": ""
+    }
+}

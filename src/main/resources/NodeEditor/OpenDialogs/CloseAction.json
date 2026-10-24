@@ -1,0 +1,16 @@
+{
+  "Id": "OpenDialogs.CloseAction",
+  "Title": "Close",
+  "Color": "Pink",
+  "Content": [],
+  "Inputs": [
+    {
+      "Id": "Action",
+      "Type": "OpenDialogs.Action.Connection",
+      "Color": "Pink"
+    }
+  ],
+  "Schema": {
+    "Type": "OpenDialogsClose"
+  }
+}

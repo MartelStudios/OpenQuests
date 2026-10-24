@@ -1,0 +1,12 @@
+{
+  "Title": "Old Kweebec",
+  "Pages": [
+    { "Text": "Trorks gather by the river. Keep away from the water after dusk." }
+  ],
+  "Responses": [
+    {
+      "Text": "Thank you, I will be careful.",
+      "Actions": [ { "Type": "OpenDialogsCommand", "Command": "help" }, { "Type": "OpenDialogsClose" } ]
+    }
+  ]
+}
