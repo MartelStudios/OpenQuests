@@ -14,11 +14,11 @@ import javax.annotation.Nonnull;
 public class DialogueResponse {
 
     public static final BuilderCodec<DialogueResponse> CODEC = BuilderCodec.builder(DialogueResponse.class, DialogueResponse::new)
-                                                                         .append(new KeyedCodec<>("Text", Codec.STRING), (response, text) -> response.text = text, response -> response.text)
-                                                                         .add()
-                                                                         .append(new KeyedCodec<>("Actions", new ArrayCodec<>(DialogueAction.CODEC, DialogueAction[]::new)), (response, actions) -> response.actions = actions, response -> response.actions)
-                                                                         .add()
-                                                                         .build();
+                                                                           .append(new KeyedCodec<>("Text", Codec.STRING), (response, text) -> response.text = text, response -> response.text)
+                                                                           .add()
+                                                                           .append(new KeyedCodec<>("Actions", new ArrayCodec<>(DialogueAction.CODEC, DialogueAction[]::new)), (response, actions) -> response.actions = actions, response -> response.actions)
+                                                                           .add()
+                                                                           .build();
 
     private String text = "";
     private DialogueAction[] actions = new DialogueAction[0];

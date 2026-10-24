@@ -5,17 +5,20 @@ import com.hypixel.hytale.assetstore.event.RemovedAssetsEvent;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.server.core.asset.AssetModule;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
+import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.opendialogues.actions.CloseDialogueAction;
 import com.martelstudios.opendialogues.actions.CommandDialogueAction;
 import com.martelstudios.opendialogues.actions.OpenDialogueAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
+import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.nodeeditor.NodeDefinition;
 import com.martelstudios.opendialogues.nodeeditor.WorkspaceBuilder;
 import com.martelstudios.opendialogues.nodeeditor.WorkspaceExporter;
+import com.martelstudios.opendialogues.presenters.ChatPresenter;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 import com.martelstudios.opendialogues.api.DialogueAction;
@@ -28,7 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Dialogues as assets: written in the Asset Editor or linked in the Node Editor, opened by id.
+ * Dialogues as assets: written in the Asset Editor or linked in the Node Editor, opened by id and
+ * drawn by whichever presenter they name.
  */
 public class OpenDialoguesPlugin extends JavaPlugin {
 
@@ -53,14 +57,16 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     protected void setup() {
         super.setup();
 
-        dialogueService = new DialogueService();
-
         registry.registerNode(node(WorkspaceBuilder.ROOT_NODE, "Dialogue", "Dialogue.json"));
         registry.registerNode(node("OpenDialogues.Page", "Dialogue", "Page.json"));
         registry.registerNode(node("OpenDialogues.Response", "Dialogue", "Response.json"));
         registry.registerAction(CloseDialogueAction.TYPE, CloseDialogueAction.class, CloseDialogueAction.CODEC, node("OpenDialogues.CloseAction", "Actions", "CloseAction.json"));
         registry.registerAction(OpenDialogueAction.TYPE, OpenDialogueAction.class, OpenDialogueAction.CODEC, node("OpenDialogues.OpenAction", "Actions", "OpenAction.json"));
         registry.registerAction(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC, node("OpenDialogues.CommandAction", "Actions", "CommandAction.json"));
+        registry.registerPresenter(ChatPresenter.ID, new ChatPresenter());
+
+        // shortcut: the chat is the only presenter, make the default a server setting once the page presenter lands.
+        dialogueService = new DialogueService(registry, ChatPresenter.ID);
 
         getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenDialogues/Dialogues/")
@@ -71,8 +77,10 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         // The workspace lists the dialogue ids, so it follows every change to them
         getEventRegistry().register(LoadedAssetsEvent.class, OpenDialogueAsset.class, this::onDialoguesLoaded);
         getEventRegistry().register(RemovedAssetsEvent.class, OpenDialogueAsset.class, this::onDialoguesRemoved);
+        getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
 
         getCommandRegistry().registerCommand(new DialogueCommand(dialogueService));
+        getCommandRegistry().registerCommand(new AnswerCommand("oda", dialogueService));
     }
 
     @Override
@@ -81,13 +89,14 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     }
 
     /**
-     * @return where actions and their Node Editor nodes are registered.
+     * @return where actions, Node Editor nodes and presenters are registered.
      */
     @Nonnull
     public DialogueRegistry getRegistry() {
         return registry;
     }
 
+    @Nonnull
     public DialogueService getDialogueService() {
         return dialogueService;
     }

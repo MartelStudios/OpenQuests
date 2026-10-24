@@ -2,6 +2,7 @@
   "Id": "OpenDialogues.CloseAction",
   "Title": "Close",
   "Color": "Pink",
+  "Description": "Ends the dialogue answered.",
   "Content": [],
   "Inputs": [
     {

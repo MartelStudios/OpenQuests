@@ -2,8 +2,6 @@ package com.martelstudios.opendialogues.api;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.opendialogues.services.DialogueService;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -28,7 +26,7 @@ public abstract class DialogueAction {
     /**
      * Runs the action for the player who picked the answer.
      */
-    public abstract void execute(@Nonnull DialogueService dialogues, @Nonnull PlayerRef player);
+    public abstract void execute(@Nonnull DialogueContext context);
 
     /**
      * The Node Editor crashes on a dialogue field holding an id missing from its list, so every id

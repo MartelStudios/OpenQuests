@@ -1,77 +1,123 @@
 package com.martelstudios.opendialogues.services;
 
-import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.api.DialogueAction;
-import com.martelstudios.opendialogues.dialogues.DialoguePage;
-import com.martelstudios.opendialogues.dialogues.DialogueResponse;
+import com.martelstudios.opendialogues.api.DialogueContext;
+import com.martelstudios.opendialogues.api.DialoguePresenter;
+import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import com.martelstudios.opendialogues.sessions.DialogueSession;
+import com.martelstudios.opendialogues.sessions.SessionStore;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Opens dialogues for players and runs the answers they pick. Remembers only which dialogue each player
- * stands in, for this session.
+ * Opens dialogues, runs the answers players pick and closes them, whatever draws them and however
+ * the player answered. Open dialogues last for the session only.
  */
 public class DialogueService {
 
-    private final Map<UUID, String> openDialogues = new ConcurrentHashMap<>();
+    /**
+     * What came of an answer.
+     */
+    public enum AnswerResult {
+        ANSWERED,
+        /** No dialogue open, or the one named is not open. */
+        NO_DIALOGUE,
+        /** Several dialogues open and none named. */
+        AMBIGUOUS,
+        NO_SUCH_ANSWER
+    }
+
+    private final SessionStore<DialogueSession> sessions = new SessionStore<>();
+
+    @Nonnull
+    private final DialogueRegistry registry;
+
+    @Nonnull
+    private final String defaultPresenter;
+
+    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull String defaultPresenter) {
+        this.registry = registry;
+        this.defaultPresenter = defaultPresenter;
+    }
 
     /**
-     * Shows a dialogue to a player, replacing any dialogue they stood in.
+     * Shows a dialogue to a player, replacing the same dialogue if it was open.
      *
      * @return whether a dialogue exists under that id.
      */
     public boolean open(@Nonnull PlayerRef player, @Nonnull String dialogueId) {
         OpenDialogueAsset dialogue = OpenDialogueAsset.getDialogue(dialogueId);
         if (dialogue == null) {
-            player.sendMessage(Message.raw("No dialogue '" + dialogueId + "'."));
             return false;
         }
 
-        openDialogues.put(player.getUuid(), dialogueId);
-
-        // shortcut: chat output stands in for the dialogue interface, replace once the UI task lands.
-        if (dialogue.getTitle() != null) {
-            player.sendMessage(Message.raw("[" + dialogue.getTitle() + "]"));
-        }
-        for (DialoguePage page : dialogue.getPages()) {
-            player.sendMessage(Message.raw(page.getText()));
-        }
-        DialogueResponse[] responses = dialogue.getResponses();
-        for (int i = 0; i < responses.length; i++) {
-            player.sendMessage(Message.raw((i + 1) + ". " + responses[i].getText()));
-        }
+        // shortcut: every answer is shown, filter here once answers carry conditions.
+        DialogueSession session = new DialogueSession(dialogue, List.of(dialogue.getResponses()), presenterFor(dialogue));
+        sessions.put(player.getUuid(), dialogueId, session);
+        session.presenter().show(player, session);
         return true;
     }
 
     /**
-     * Runs the actions of the answer at that position, counted from 1, in the player's dialogue.
+     * Runs the actions of an answer the player was shown.
      *
-     * @return whether the player stood in a dialogue offering that answer.
+     * @param dialogueId the dialogue answered, or {@code null} when the player has a single one open.
+     * @param position   the answer's position among those shown, from 1.
      */
-    public boolean answer(@Nonnull PlayerRef player, int position) {
-        String dialogueId = openDialogues.get(player.getUuid());
-        OpenDialogueAsset dialogue = dialogueId == null ? null : OpenDialogueAsset.getDialogue(dialogueId);
-        if (dialogue == null || position < 1 || position > dialogue.getResponses().length) {
-            return false;
+    @Nonnull
+    public AnswerResult answer(@Nonnull PlayerRef player, @Nullable String dialogueId, int position) {
+        DialogueSession session = sessions.resolve(player.getUuid(), dialogueId);
+        if (session == null) {
+            return dialogueId == null && sessions.openIds(player.getUuid()).size() > 1 ? AnswerResult.AMBIGUOUS : AnswerResult.NO_DIALOGUE;
+        }
+        if (position < 1 || position > session.responses().size()) {
+            return AnswerResult.NO_SUCH_ANSWER;
         }
 
-        for (DialogueAction action : dialogue.getResponses()[position - 1].getActions()) {
-            action.execute(this, player);
+        DialogueContext context = new DialogueContext(this, player, session);
+        for (DialogueAction action : session.responses().get(position - 1).getActions()) {
+            action.execute(context);
         }
+        return AnswerResult.ANSWERED;
+    }
+
+    /**
+     * Ends one of the player's dialogues.
+     *
+     * @return whether it was open.
+     */
+    public boolean close(@Nonnull PlayerRef player, @Nonnull String dialogueId) {
+        DialogueSession session = sessions.remove(player.getUuid(), dialogueId);
+        if (session == null) {
+            return false;
+        }
+        session.presenter().close(player, session);
         return true;
     }
 
     /**
-     * Ends the player's dialogue, if any.
+     * Forgets every dialogue of a player leaving, without drawing anything: there is no one to draw for.
      */
-    public void close(@Nonnull PlayerRef player) {
-        if (openDialogues.remove(player.getUuid()) != null) {
-            player.sendMessage(Message.raw("[Dialogue closed]"));
-        }
+    public void forget(@Nonnull PlayerRef player) {
+        sessions.removeAll(player.getUuid());
+    }
+
+    /**
+     * @return the ids of the player's open dialogues, in opening order.
+     */
+    @Nonnull
+    public List<String> openDialogues(@Nonnull UUID player) {
+        return sessions.openIds(player);
+    }
+
+    @Nonnull
+    private DialoguePresenter presenterFor(@Nonnull OpenDialogueAsset dialogue) {
+        DialoguePresenter presenter = dialogue.getPresenter() == null ? null : registry.getPresenter(dialogue.getPresenter());
+        return presenter != null ? presenter : registry.getPresenter(defaultPresenter);
     }
 }

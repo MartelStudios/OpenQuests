@@ -2,6 +2,7 @@
   "Id": "OpenDialogues.CommandAction",
   "Title": "Run Command",
   "Color": "Pink",
+  "Description": "Runs a command as the player, without the slash. The dialogue stays open.",
   "Content": [
     {
       "Id": "Command",

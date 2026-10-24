@@ -12,6 +12,16 @@
         "Default": "",
         "Width": 300
       }
+    },
+    {
+      "Id": "Presenter",
+      "Type": "SmallString",
+      "Options": {
+        "Label": "Presenter",
+        "Default": "",
+        "Width": 200,
+        "Description": "What draws this dialogue. Empty for the server default."
+      }
     }
   ],
   "Outputs": [
@@ -32,6 +42,7 @@
   ],
   "Schema": {
     "Title": "Title",
+    "Presenter": "Presenter",
     "Pages": {
       "Node": "OpenDialogues.Page",
       "Pin": "Pages"

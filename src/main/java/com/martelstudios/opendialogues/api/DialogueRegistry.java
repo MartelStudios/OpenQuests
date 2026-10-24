@@ -9,16 +9,18 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Where OpenDialogues and other mods plug in: answer actions with the node drawing them in the
- * Node Editor. Register during {@code setup}, so the codecs exist before dialogues load and the
- * nodes reach the first export.
+ * Node Editor, and presenters drawing dialogues. Register during {@code setup}, so the codecs exist
+ * before dialogues load and the nodes reach the first export.
  */
 public class DialogueRegistry {
 
     private final List<NodeDefinition> nodes = new ArrayList<>();
     private final Map<String, String> actionNodes = new LinkedHashMap<>();
+    private final Map<String, DialoguePresenter> presenters = new ConcurrentHashMap<>();
 
     /**
      * Adds an action kind under its {@code Type}, which carries the registering mod's prefix.
@@ -38,6 +40,21 @@ public class DialogueRegistry {
      */
     public synchronized void registerNode(@Nonnull NodeDefinition node) {
         nodes.add(node);
+    }
+
+    /**
+     * Adds a presenter, named by dialogues in their {@code Presenter} field.
+     */
+    public void registerPresenter(@Nonnull String id, @Nonnull DialoguePresenter presenter) {
+        presenters.put(id, presenter);
+    }
+
+    /**
+     * @return the presenter under that id, or {@code null} for one nobody registered.
+     */
+    @Nullable
+    public DialoguePresenter getPresenter(@Nonnull String id) {
+        return presenters.get(id);
     }
 
     /**

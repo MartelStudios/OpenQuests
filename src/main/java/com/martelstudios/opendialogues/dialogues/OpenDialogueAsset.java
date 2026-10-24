@@ -22,6 +22,8 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     public static final AssetBuilderCodec<String, OpenDialogueAsset> CODEC = AssetBuilderCodec.builder(OpenDialogueAsset.class, OpenDialogueAsset::new, Codec.STRING, (dialogue, id) -> dialogue.id = id, dialogue -> dialogue.id, (dialogue, data) -> dialogue.data = data, dialogue -> dialogue.data)
                                                                                               .append(new KeyedCodec<>("Title", Codec.STRING), (dialogue, title) -> dialogue.title = title, dialogue -> dialogue.title)
                                                                                               .add()
+                                                                                              .append(new KeyedCodec<>("Presenter", Codec.STRING), (dialogue, presenter) -> dialogue.presenter = presenter, dialogue -> dialogue.presenter)
+                                                                                              .add()
                                                                                               .append(new KeyedCodec<>("Pages", new ArrayCodec<>(DialoguePage.CODEC, DialoguePage[]::new)), (dialogue, pages) -> dialogue.pages = pages, dialogue -> dialogue.pages)
                                                                                               .add()
                                                                                               .append(new KeyedCodec<>("Responses", new ArrayCodec<>(DialogueResponse.CODEC, DialogueResponse[]::new)), (dialogue, responses) -> dialogue.responses = responses, dialogue -> dialogue.responses)
@@ -33,6 +35,9 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
 
     @Nullable
     protected String title;
+
+    @Nullable
+    protected String presenter;
 
     protected DialoguePage[] pages = new DialoguePage[0];
     protected DialogueResponse[] responses = new DialogueResponse[0];
@@ -53,6 +58,14 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     }
 
     /**
+     * @return the id of the presenter drawing this dialogue, or {@code null} for the default one.
+     */
+    @Nullable
+    public String getPresenter() {
+        return presenter;
+    }
+
+    /**
      * @return the pages, in reading order.
      */
     @Nonnull
@@ -61,7 +74,7 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     }
 
     /**
-     * @return the answers offered after the last page.
+     * @return every answer the file declares, shown or not.
      */
     @Nonnull
     public DialogueResponse[] getResponses() {
