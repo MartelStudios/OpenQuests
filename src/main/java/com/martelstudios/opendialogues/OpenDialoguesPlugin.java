@@ -7,21 +7,29 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.opendialogues.actions.CloseDialogueAction;
 import com.martelstudios.opendialogues.actions.CommandDialogueAction;
-import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.actions.OpenDialogueAction;
+import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import com.martelstudios.opendialogues.nodeeditor.NodeDefinition;
+import com.martelstudios.opendialogues.nodeeditor.WorkspaceBuilder;
 import com.martelstudios.opendialogues.nodeeditor.WorkspaceExporter;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * Dialogues as assets: written in the Asset Editor or linked in the Node Editor, opened by id.
  */
 public class OpenDialoguesPlugin extends JavaPlugin {
 
+    private static final String NODES = "/NodeEditor/OpenDialogues/";
+
     private static OpenDialoguesPlugin instance;
+
+    private final DialogueRegistry registry = new DialogueRegistry();
 
     private DialogueService dialogueService;
 
@@ -40,9 +48,12 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         dialogueService = new DialogueService();
 
-        DialogueAction.CODEC.register(CloseDialogueAction.TYPE, CloseDialogueAction.class, CloseDialogueAction.CODEC);
-        DialogueAction.CODEC.register(OpenDialogueAction.TYPE, OpenDialogueAction.class, OpenDialogueAction.CODEC);
-        DialogueAction.CODEC.register(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC);
+        registry.registerNode(node(WorkspaceBuilder.ROOT_NODE, "Dialogue", "Dialogue.json"));
+        registry.registerNode(node("OpenDialogues.Page", "Dialogue", "Page.json"));
+        registry.registerNode(node("OpenDialogues.Response", "Dialogue", "Response.json"));
+        registry.registerAction(CloseDialogueAction.TYPE, CloseDialogueAction.class, CloseDialogueAction.CODEC, node("OpenDialogues.CloseAction", "Actions", "CloseAction.json"));
+        registry.registerAction(OpenDialogueAction.TYPE, OpenDialogueAction.class, OpenDialogueAction.CODEC, node("OpenDialogues.OpenAction", "Actions", "OpenAction.json"));
+        registry.registerAction(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC, node("OpenDialogues.CommandAction", "Actions", "CommandAction.json"));
 
         getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenDialogues/Dialogues/")
@@ -55,12 +66,34 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     @Override
     protected void start() {
-        var result = WorkspaceExporter.export(WorkspaceExporter.findWorkspacesFolders(AssetModule.get().getBaseAssetPack().getPackLocation()));
-        result.written().forEach(folder -> getLogger().atInfo().log("Node Editor workspace written to %s", folder));
-        result.failed().forEach((folder, error) -> getLogger().atWarning().withCause(error).log("Could not write the Node Editor workspace into %s", folder));
+        exportWorkspace();
+    }
+
+    /**
+     * @return where actions and their Node Editor nodes are registered.
+     */
+    @Nonnull
+    public DialogueRegistry getRegistry() {
+        return registry;
     }
 
     public DialogueService getDialogueService() {
         return dialogueService;
+    }
+
+    private void exportWorkspace() {
+        try {
+            var files = WorkspaceBuilder.build(registry.getNodes(), registry.getActionNodes(), Set.of());
+            var result = WorkspaceExporter.export(WorkspaceExporter.findWorkspacesFolders(AssetModule.get().getBaseAssetPack().getPackLocation()), files);
+            result.written().forEach(folder -> getLogger().atInfo().log("Node Editor workspace written to %s", folder));
+            result.failed().forEach((folder, error) -> getLogger().atWarning().withCause(error).log("Could not write the Node Editor workspace into %s", folder));
+        } catch (IOException e) {
+            getLogger().atWarning().withCause(e).log("Could not build the Node Editor workspace");
+        }
+    }
+
+    @Nonnull
+    private static NodeDefinition node(@Nonnull String id, @Nonnull String category, @Nonnull String file) {
+        return new NodeDefinition(id, category, OpenDialoguesPlugin.class.getResource(NODES + file));
     }
 }

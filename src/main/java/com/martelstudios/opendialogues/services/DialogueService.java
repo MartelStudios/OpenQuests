@@ -2,7 +2,7 @@ package com.martelstudios.opendialogues.services;
 
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.opendialogues.actions.DialogueAction;
+import com.martelstudios.opendialogues.api.DialogueAction;
 import com.martelstudios.opendialogues.dialogues.DialoguePage;
 import com.martelstudios.opendialogues.dialogues.DialogueResponse;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;

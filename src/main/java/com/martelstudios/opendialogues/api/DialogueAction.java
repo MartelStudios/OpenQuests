@@ -1,4 +1,4 @@
-package com.martelstudios.opendialogues.actions;
+package com.martelstudios.opendialogues.api;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
@@ -8,8 +8,8 @@ import com.martelstudios.opendialogues.services.DialogueService;
 import javax.annotation.Nonnull;
 
 /**
- * What an answer does once picked. Each kind registers under a {@code "Type"} tag, so another mod
- * can add its own, completing a quest for instance.
+ * What an answer does once picked. Each kind registers under a {@code "Type"} tag through
+ * {@link DialogueRegistry#registerAction}, so another mod can add its own.
  */
 public abstract class DialogueAction {
 

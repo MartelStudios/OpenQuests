@@ -2,6 +2,7 @@ package com.martelstudios.opendialogues.actions;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.martelstudios.opendialogues.api.DialogueAction;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 import javax.annotation.Nonnull;

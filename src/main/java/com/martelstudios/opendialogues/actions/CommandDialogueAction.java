@@ -6,6 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.hypixel.hytale.server.core.command.system.CommandManager;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.martelstudios.opendialogues.api.DialogueAction;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 import javax.annotation.Nonnull;

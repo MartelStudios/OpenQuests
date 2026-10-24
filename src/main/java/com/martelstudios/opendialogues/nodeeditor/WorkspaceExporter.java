@@ -2,10 +2,9 @@ package com.martelstudios.opendialogues.nodeeditor;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,35 +12,22 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Installs the OpenDialogues workspace into every Node Editor found on this machine. The editor reads
- * workspaces from its own install folder only, never from a mod, so a server run by a dialogue author
- * puts it there. Written over on each start and never removed, so a crash leaves nothing stale.
+ * Installs the workspace into every Node Editor found on this machine. The editor reads workspaces
+ * from its own install folder only, never from a mod, so a server run by a dialogue author puts it
+ * there. Written over on each export and never removed, so a crash leaves nothing stale.
  */
-public class WorkspaceExporter {
-
-    public static final String WORKSPACE = "OpenDialogues";
-
-    /**
-     * Every file of the workspace, as shipped under {@code NodeEditor/OpenDialogues/} in the jar.
-     */
-    public static final List<String> FILES = List.of(
-        "_Workspace.json",
-        "Dialogue.json",
-        "Page.json",
-        "Response.json",
-        "CloseAction.json",
-        "OpenAction.json",
-        "CommandAction.json");
+public final class WorkspaceExporter {
 
     private WorkspaceExporter() {}
 
     /**
-     * Writes the workspace into each folder, skipping those that do not exist.
+     * Writes the files into a {@value WorkspaceBuilder#WORKSPACE} folder of each workspaces folder,
+     * skipping those that do not exist.
      *
      * @return the workspace folders written, and for each folder that failed, why.
      */
     @Nonnull
-    public static Result export(@Nonnull List<Path> workspacesFolders) {
+    public static Result export(@Nonnull List<Path> workspacesFolders, @Nonnull Map<String, String> files) {
         List<Path> written = new ArrayList<>();
         Map<Path, IOException> failed = new LinkedHashMap<>();
         for (Path folder : workspacesFolders) {
@@ -49,16 +35,11 @@ public class WorkspaceExporter {
                 continue;
             }
 
-            Path target = folder.resolve(WORKSPACE);
+            Path target = folder.resolve(WorkspaceBuilder.WORKSPACE);
             try {
                 Files.createDirectories(target);
-                for (String file : FILES) {
-                    try (InputStream in = WorkspaceExporter.class.getResourceAsStream("/NodeEditor/" + WORKSPACE + "/" + file)) {
-                        if (in == null) {
-                            throw new IOException("Missing resource " + file);
-                        }
-                        Files.copy(in, target.resolve(file), StandardCopyOption.REPLACE_EXISTING);
-                    }
+                for (Map.Entry<String, String> file : files.entrySet()) {
+                    Files.writeString(target.resolve(file.getKey()), file.getValue(), StandardCharsets.UTF_8);
                 }
                 written.add(target);
             } catch (IOException e) {
