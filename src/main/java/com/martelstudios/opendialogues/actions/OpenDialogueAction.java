@@ -9,6 +9,8 @@ import com.martelstudios.opendialogues.api.DialogueAction;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Moves on to another dialogue, the way {@code /odialogues open} would.
@@ -28,5 +30,11 @@ public class OpenDialogueAction extends DialogueAction {
     @Override
     public void execute(@Nonnull DialogueService dialogues, @Nonnull PlayerRef player) {
         dialogues.open(player, dialogue);
+    }
+
+    @Nonnull
+    @Override
+    public Collection<String> getReferencedDialogues() {
+        return List.of(dialogue);
     }
 }

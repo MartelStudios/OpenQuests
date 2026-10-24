@@ -2,15 +2,15 @@
   "Id": "OpenDialogues.OpenAction",
   "Title": "Open Dialogue",
   "Color": "Pink",
+  "Description": "Closes the dialogue answered and opens this one in its place.",
   "Content": [
     {
       "Id": "Dialogue",
-      "Type": "AssetId",
+      "Type": "EnumFilterable",
       "Options": {
-        "AssetType": "OpenDialogueAsset",
         "Label": "Dialogue",
-        "Default": "",
-        "Width": 250
+        "Width": 250,
+        "Values": "$OpenDialogues.DialogueIds"
       }
     }
   ],
