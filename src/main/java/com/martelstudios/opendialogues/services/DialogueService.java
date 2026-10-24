@@ -1,11 +1,13 @@
 package com.martelstudios.opendialogues.services;
 
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.api.DialogueAction;
 import com.martelstudios.opendialogues.api.DialogueContext;
 import com.martelstudios.opendialogues.api.DialoguePresenter;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 import com.martelstudios.opendialogues.sessions.SessionStore;
 
@@ -60,6 +62,7 @@ public class DialogueService {
         DialogueSession session = new DialogueSession(dialogue, List.of(dialogue.getResponses()), presenterFor(dialogue));
         sessions.put(player.getUuid(), dialogueId, session);
         session.presenter().show(player, session);
+        dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
         return true;
     }
 
@@ -79,6 +82,7 @@ public class DialogueService {
             return AnswerResult.NO_SUCH_ANSWER;
         }
 
+        dispatch(new DialogueEvent.Answered(player, session, position), DialogueEvent.Answered.class);
         DialogueContext context = new DialogueContext(this, player, session);
         for (DialogueAction action : session.responses().get(position - 1).getActions()) {
             action.execute(context);
@@ -96,15 +100,17 @@ public class DialogueService {
         if (session == null) {
             return false;
         }
-        session.presenter().close(player, session);
+        closed(player, session);
         return true;
     }
 
     /**
-     * Forgets every dialogue of a player leaving, without drawing anything: there is no one to draw for.
+     * Ends every dialogue of a player leaving, without drawing anything: there is no one to draw for.
      */
     public void forget(@Nonnull PlayerRef player) {
-        sessions.removeAll(player.getUuid());
+        for (DialogueSession session : sessions.removeAll(player.getUuid())) {
+            dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
+        }
     }
 
     /**
@@ -115,9 +121,18 @@ public class DialogueService {
         return sessions.openIds(player);
     }
 
+    private void closed(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
+        session.presenter().close(player, session);
+        dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
+    }
+
     @Nonnull
     private DialoguePresenter presenterFor(@Nonnull OpenDialogueAsset dialogue) {
         DialoguePresenter presenter = dialogue.getPresenter() == null ? null : registry.getPresenter(dialogue.getPresenter());
         return presenter != null ? presenter : registry.getPresenter(defaultPresenter);
+    }
+
+    private static <E extends DialogueEvent> void dispatch(@Nonnull E event, @Nonnull Class<E> type) {
+        HytaleServer.get().getEventBus().dispatchFor(type, event.getSession().dialogueId()).dispatch(event);
     }
 }
