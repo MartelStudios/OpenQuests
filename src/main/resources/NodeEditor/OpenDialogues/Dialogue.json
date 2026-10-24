@@ -1,0 +1,44 @@
+{
+  "Id": "OpenDialogues.Dialogue",
+  "Title": "Dialogue",
+  "Color": "Blue",
+  "Description": "What a player reads when this dialogue opens: a title, pages in order, then the answers.",
+  "Content": [
+    {
+      "Id": "Title",
+      "Type": "SmallString",
+      "Options": {
+        "Label": "Title",
+        "Default": "",
+        "Width": 300
+      }
+    }
+  ],
+  "Outputs": [
+    {
+      "Id": "Pages",
+      "Type": "OpenDialogues.Page.Connection",
+      "Color": "Green",
+      "Multiple": true,
+      "Label": "Pages"
+    },
+    {
+      "Id": "Responses",
+      "Type": "OpenDialogues.Response.Connection",
+      "Color": "Olive",
+      "Multiple": true,
+      "Label": "Responses"
+    }
+  ],
+  "Schema": {
+    "Title": "Title",
+    "Pages": {
+      "Node": "OpenDialogues.Page",
+      "Pin": "Pages"
+    },
+    "Responses": {
+      "Node": "OpenDialogues.Response",
+      "Pin": "Responses"
+    }
+  }
+}

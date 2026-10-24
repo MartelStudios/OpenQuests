@@ -1,0 +1,17 @@
+{
+  "Title": "Old Kweebec",
+  "Pages": [
+    { "Text": "Ah, a traveller. The woods are restless tonight." },
+    { "Text": "Will you hear what I have seen?" }
+  ],
+  "Responses": [
+    {
+      "Text": "Tell me more.",
+      "Actions": [ { "Type": "OpenDialoguesOpen", "Dialogue": "OpenDialogues_ExampleMore" } ]
+    },
+    {
+      "Text": "Goodbye.",
+      "Actions": [ { "Type": "OpenDialoguesClose" } ]
+    }
+  ]
+}

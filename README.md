@@ -1,24 +1,24 @@
-# OpenDialogs
+# OpenDialogues
 
-Dialogue trees for Hytale. A dialog is an asset: a title, pages read in order, and answers that run
-actions. Open one with `/odialogs open <id>`.
+Dialogue trees for Hytale. A dialogue is an asset: a title, pages read in order, and answers that run
+actions. Open one with `/odialogues open <id>`.
 
-Prototype stage: answers are listed in chat and picked with `/odialogs answer <n>` until the dialog
+Prototype stage: answers are listed in chat and picked with `/odialogues answer <n>` until the dialogue
 interface exists.
 
-## Writing dialogs
+## Writing dialogues
 
-Dialogs live under `Server/OpenDialogs/Dialogs/` of an asset pack, one file per dialog, the file name
+Dialogues live under `Server/OpenDialogues/Dialogues/` of an asset pack, one file per dialogue, the file name
 being its id. They can be edited in the Asset Editor, or in the Node Editor.
 
 | Action type | Does |
 | --- | --- |
-| `OpenDialogsClose` | Ends the dialog. |
-| `OpenDialogsOpen` | Opens the dialog named in `Dialog`. |
-| `OpenDialogsCommand` | Runs `Command` as the player. |
+| `OpenDialoguesClose` | Ends the dialogue. |
+| `OpenDialoguesOpen` | Opens the dialogue named in `Dialogue`. |
+| `OpenDialoguesCommand` | Runs `Command` as the player. |
 
 ## Node Editor
 
 The Node Editor reads its workspaces from the client install only, never from a mod. On start the
-plugin writes the `OpenDialogs` workspace into every launcher install it finds, so a server run on
-the author's machine is enough. Pick **OpenDialogs - Dialog** when opening a dialog file.
+plugin writes the `OpenDialogues` workspace into every launcher install it finds, so a server run on
+the author's machine is enough. Pick **OpenDialogues - Dialogue** when opening a dialogue file.

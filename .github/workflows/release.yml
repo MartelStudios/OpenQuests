@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      NAME: OpenDialogs
+      NAME: OpenDialogues
       PROJECT_ID: ''
 
     steps:

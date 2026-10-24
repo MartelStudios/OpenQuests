@@ -1,0 +1,26 @@
+{
+  "Id": "OpenDialogues.Page",
+  "Title": "Page",
+  "Color": "Green",
+  "Content": [
+    {
+      "Id": "Text",
+      "Type": "String",
+      "Options": {
+        "Label": "Text",
+        "Default": "",
+        "Width": 350
+      }
+    }
+  ],
+  "Inputs": [
+    {
+      "Id": "Page",
+      "Type": "OpenDialogues.Page.Connection",
+      "Color": "Green"
+    }
+  ],
+  "Schema": {
+    "Text": "Text"
+  }
+}

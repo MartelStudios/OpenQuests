@@ -1,0 +1,27 @@
+{
+  "Id": "OpenDialogues.CommandAction",
+  "Title": "Run Command",
+  "Color": "Pink",
+  "Content": [
+    {
+      "Id": "Command",
+      "Type": "SmallString",
+      "Options": {
+        "Label": "Command",
+        "Default": "",
+        "Width": 250
+      }
+    }
+  ],
+  "Inputs": [
+    {
+      "Id": "Action",
+      "Type": "OpenDialogues.Action.Connection",
+      "Color": "Pink"
+    }
+  ],
+  "Schema": {
+    "Type": "OpenDialoguesCommand",
+    "Command": "Command"
+  }
+}
