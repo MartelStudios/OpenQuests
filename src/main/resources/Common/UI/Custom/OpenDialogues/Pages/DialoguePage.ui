@@ -1,0 +1,68 @@
+// A dialogue as a bar along the bottom of the screen: the speaker's portrait, their name over the
+// page being read, and the answers on the right. PagePresenter appends one DialogueAnswer.ui per
+// answer into #Answers.
+$C = "../../Common.ui";
+
+@SpeakerNameStyle = LabelStyle(FontSize: 22, TextColor: #e8a93b, RenderBold: true, VerticalAlignment: Center);
+@EpithetStyle = LabelStyle(FontSize: 14, TextColor: #96a9be, VerticalAlignment: Center);
+@PageTextStyle = LabelStyle(FontSize: 18, TextColor: #d8dee6, Wrap: true);
+@PageCountStyle = LabelStyle(FontSize: 13, TextColor: #878e9c, VerticalAlignment: Center);
+@InitialStyle = LabelStyle(FontSize: 72, TextColor: #e8a93b, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+
+Group {
+  LayoutMode: Bottom;
+  Padding: (Bottom: 32);
+
+  Group #Row {
+    LayoutMode: Center;
+    Anchor: (Height: 250);
+
+    // No layout mode: the body fills the bar and the close button sits on its corner
+    Group #Bar {
+      Anchor: (Width: 1180);
+
+      Group #Body {
+        LayoutMode: Left;
+        Padding: (Full: 22);
+        Background: (TexturePath: "../../Common/ContainerPatch.png", Border: 23);
+
+        Group #Portrait {
+          Anchor: (Width: 160, Height: 160, Top: 0);
+          Background: #000000(0.35);
+
+          Label #Initial { Text: ""; Style: @InitialStyle; }
+          AssetImage #PortraitImage { Anchor: (Full: 6); Visible: false; }
+        }
+
+        Group #Speech {
+          LayoutMode: Top;
+          FlexWeight: 1;
+          Padding: (Horizontal: 22);
+
+          Label #SpeakerName { Text: ""; Anchor: (Height: 28); Style: @SpeakerNameStyle; }
+          Label #Epithet { Text: ""; Anchor: (Height: 18); Style: @EpithetStyle; }
+          $C.@ContentSeparator { @Anchor = Anchor(Top: 6, Bottom: 10); }
+
+          Label #PageText { Text: ""; FlexWeight: 1; Style: @PageTextStyle; }
+
+          Group #Footer {
+            LayoutMode: Left;
+            Anchor: (Height: $C.@SmallButtonHeight);
+
+            Label #PageCount { Text: ""; FlexWeight: 1; Style: @PageCountStyle; }
+            $C.@SmallSecondaryTextButton #NextButton { @Anchor = Anchor(MinWidth: 120); }
+          }
+        }
+
+        Group #Answers {
+          Anchor: (Width: 360);
+          LayoutMode: TopScrolling;
+          ScrollbarStyle: $C.@DefaultScrollbarStyle;
+          Padding: (Right: 8);
+        }
+      }
+
+      $C.@CloseButton #CloseButton {}
+    }
+  }
+}

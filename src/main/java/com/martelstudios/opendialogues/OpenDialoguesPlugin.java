@@ -19,6 +19,7 @@ import com.martelstudios.opendialogues.nodeeditor.NodeDefinition;
 import com.martelstudios.opendialogues.nodeeditor.WorkspaceBuilder;
 import com.martelstudios.opendialogues.nodeeditor.WorkspaceExporter;
 import com.martelstudios.opendialogues.presenters.ChatPresenter;
+import com.martelstudios.opendialogues.presenters.PagePresenter;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 import com.martelstudios.opendialogues.api.DialogueAction;
@@ -64,10 +65,11 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerAction(OpenDialogueAction.TYPE, OpenDialogueAction.class, OpenDialogueAction.CODEC, node("OpenDialogues.OpenAction", "Actions", "OpenAction.json"));
         registry.registerAction(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC, node("OpenDialogues.CommandAction", "Actions", "CommandAction.json"));
         registry.registerNode(node("OpenDialogues.Speaker", "Dialogue", "Speaker.json"));
-        registry.registerPresenter(ChatPresenter.ID, new ChatPresenter());
 
-        // shortcut: the chat is the only presenter, make the default a server setting once the page presenter lands.
+        // shortcut: the chat is the default presenter for every dialogue naming none, make it a server setting when servers ask.
         dialogueService = new DialogueService(registry, ChatPresenter.ID);
+        registry.registerPresenter(ChatPresenter.ID, new ChatPresenter());
+        registry.registerPresenter(PagePresenter.ID, new PagePresenter(dialogueService));
 
         getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenDialogues/Dialogues/")
