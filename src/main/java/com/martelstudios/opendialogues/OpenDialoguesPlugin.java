@@ -37,7 +37,7 @@ import java.util.Set;
  */
 public class OpenDialoguesPlugin extends JavaPlugin {
 
-    private static final String NODES = "/NodeEditor/OpenDialogues/";
+    public static final String NODES = "/NodeEditor/OpenDialogues/";
 
     private static OpenDialoguesPlugin instance;
 
