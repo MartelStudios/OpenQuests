@@ -4,11 +4,8 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.martelstudios.opendialogues.api.DialogueContext;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
-import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * What an answer does once picked. Each kind registers under a {@code "Type"} tag through
@@ -30,12 +27,4 @@ public abstract class DialogueAction {
      * Runs the action for the player who picked the answer.
      */
     public abstract void execute(@Nonnull DialogueContext context);
-
-    /**
-     * @return the dialogues written inline in this action, which their parent names on load.
-     */
-    @Nonnull
-    public Collection<OpenDialogueAsset> getInlineDialogues() {
-        return List.of();
-    }
 }

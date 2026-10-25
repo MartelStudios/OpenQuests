@@ -1,16 +1,18 @@
 package com.martelstudios.opendialogues.dialogues;
 
 import com.hypixel.hytale.assetstore.AssetExtraInfo;
+import com.hypixel.hytale.assetstore.AssetKeyValidator;
 import com.hypixel.hytale.assetstore.AssetRegistry;
 import com.hypixel.hytale.assetstore.AssetStore;
 import com.hypixel.hytale.assetstore.codec.AssetBuilderCodec;
+import com.hypixel.hytale.assetstore.codec.ContainedAssetCodec;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.assetstore.map.JsonAssetWithMap;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
-import com.martelstudios.opendialogues.actions.DialogueAction;
+import com.hypixel.hytale.codec.validation.ValidatorCache;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,14 +24,14 @@ import javax.annotation.Nullable;
 public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenDialogueAsset>> {
 
     /**
-     * The dialogue without its id, for one written inline in another dialogue's answer.
+     * The dialogue without its id, which the asset store and inline dialogues each wrap with theirs.
      */
     public static final BuilderCodec<OpenDialogueAsset> BODY_CODEC = BuilderCodec.builder(OpenDialogueAsset.class, OpenDialogueAsset::new)
                                                                                  .append(new KeyedCodec<>("Title", Codec.STRING), (dialogue, title) -> dialogue.title = title, dialogue -> dialogue.title)
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Presenter", Codec.STRING), (dialogue, presenter) -> dialogue.presenter = presenter, dialogue -> dialogue.presenter)
                                                                                  .add()
-                                                                                 .append(new KeyedCodec<>("Speaker", DialogueSpeaker.CODEC), (dialogue, speaker) -> dialogue.speaker = speaker, dialogue -> dialogue.speaker)
+                                                                                 .append(new KeyedCodec<>("Speaker", OpenDialogueSpeakerAsset.CONTAINED_CODEC), (dialogue, speaker) -> dialogue.speaker = speaker, dialogue -> dialogue.speaker)
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Pages", new ArrayCodec<>(DialoguePage.CODEC, DialoguePage[]::new)), (dialogue, pages) -> dialogue.pages = pages, dialogue -> dialogue.pages)
                                                                                  .add()
@@ -38,6 +40,13 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
                                                                                  .build();
 
     public static final AssetBuilderCodec<String, OpenDialogueAsset> CODEC = AssetBuilderCodec.wrap(BODY_CODEC, Codec.STRING, (dialogue, id) -> dialogue.id = id, dialogue -> dialogue.id, (dialogue, data) -> dialogue.data = data, dialogue -> dialogue.data);
+
+    /**
+     * A field naming a dialogue by id, or writing one inline.
+     */
+    public static final Codec<String> CONTAINED_CODEC = new ContainedAssetCodec<>(OpenDialogueAsset.class, CODEC);
+
+    public static final ValidatorCache<String> VALIDATOR_CACHE = new ValidatorCache<>(new AssetKeyValidator<>(OpenDialogueAsset::getAssetStore));
 
     protected String id;
     protected AssetExtraInfo.Data data;
@@ -49,7 +58,7 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     protected String presenter;
 
     @Nullable
-    protected DialogueSpeaker speaker;
+    protected String speaker;
 
     protected DialoguePage[] pages = new DialoguePage[0];
     protected DialogueResponse[] responses = new DialogueResponse[0];
@@ -78,11 +87,11 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     }
 
     /**
-     * @return who speaks, or {@code null} for a dialogue nobody voices.
+     * @return who speaks, or {@code null} for a dialogue nobody voices or naming a speaker no pack declares.
      */
     @Nullable
-    public DialogueSpeaker getSpeaker() {
-        return speaker;
+    public OpenDialogueSpeakerAsset getSpeaker() {
+        return speaker == null ? null : OpenDialogueSpeakerAsset.getSpeaker(speaker);
     }
 
     /**
@@ -99,22 +108,6 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     @Nonnull
     public DialogueResponse[] getResponses() {
         return responses;
-    }
-
-    /**
-     * Gives every dialogue written inline in this one an id under its own, like {@code Elder/2.1} for the
-     * first action of the second answer, so sessions and commands can name it.
-     */
-    public void nameInlineDialogues() {
-        for (int response = 0; response < responses.length; response++) {
-            DialogueAction[] actions = responses[response].getActions();
-            for (int action = 0; action < actions.length; action++) {
-                for (OpenDialogueAsset inline : actions[action].getInlineDialogues()) {
-                    inline.id = id + "/" + (response + 1) + "." + (action + 1);
-                    inline.nameInlineDialogues();
-                }
-            }
-        }
     }
 
     /**

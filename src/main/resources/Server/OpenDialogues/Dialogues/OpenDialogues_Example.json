@@ -16,7 +16,7 @@
       "Actions": [
         {
           "Type": "OpenDialoguesOpen",
-          "Inline": {
+          "Dialogue": {
             "Title": "New Kweebec",
             "Presenter": "OpenDialoguesPage",
             "Speaker": {

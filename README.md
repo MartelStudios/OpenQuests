@@ -21,10 +21,16 @@ file name being its id. Prefix it with your pack's name.
 | `Pages` | Objects with a `Text`, read in order. |
 | `Responses` | Objects with a `Text` and `Actions` run in order when picked. |
 
+Everything is edited in the Asset Editor, under the **OpenDialogueAsset** and
+**OpenDialogueSpeakerAsset** types. Fields naming another asset (`Speaker`, and `Dialogue` in an
+`OpenDialoguesOpen` action) take either its id or a whole asset written inline, which becomes an
+asset of its own with a generated id. A speaker starts from another with `Parent`, then each field
+it sets overrides the parent's. Speakers live under `Server/OpenDialogues/Speakers/`.
+
 | Action type | Does |
 | --- | --- |
 | `OpenDialoguesClose` | Ends the dialogue answered. |
-| `OpenDialoguesOpen` | Closes the dialogue answered and opens the one named in `Dialogue`. |
+| `OpenDialoguesOpen` | Closes the dialogue answered and opens `Dialogue`, an id or an inline dialogue. |
 | `OpenDialoguesCommand` | Runs `Command` as the player. The dialogue stays open. |
 
 ## Extending

@@ -1,6 +1,5 @@
 package com.martelstudios.opendialogues;
 
-import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
@@ -66,8 +65,6 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .setKeyFunction(OpenDialogueSpeakerAsset::getId)
                                                     .build());
 
-        // Inline dialogues take their id from the dialogue holding them, so they are named on every load
-        getEventRegistry().register(LoadedAssetsEvent.class, OpenDialogueAsset.class, this::onDialoguesLoaded);
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
 
         getCommandRegistry().registerCommand(new DialogueCommand(dialogueService));
@@ -85,9 +82,5 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     @Nonnull
     public DialogueService getDialogueService() {
         return dialogueService;
-    }
-
-    private void onDialoguesLoaded(@Nonnull LoadedAssetsEvent<String, OpenDialogueAsset, DefaultAssetMap<String, OpenDialogueAsset>> event) {
-        event.getLoadedAssets().values().forEach(OpenDialogueAsset::nameInlineDialogues);
     }
 }

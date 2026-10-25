@@ -15,7 +15,7 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.dialogues.DialoguePage;
-import com.martelstudios.opendialogues.dialogues.DialogueSpeaker;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.services.DialogueService;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 
@@ -101,7 +101,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
      */
     @Nonnull
     private String speaker(@Nonnull UICommandBuilder commandBuilder) {
-        DialogueSpeaker speaker = session.dialogue().getSpeaker();
+        OpenDialogueSpeakerAsset speaker = session.dialogue().getSpeaker();
 
         String portrait = speaker == null ? null : speaker.getPortrait();
         boolean hasPortrait = portrait != null && !portrait.isEmpty();
