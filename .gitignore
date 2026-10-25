@@ -11,3 +11,5 @@ run/*
 .project
 .settings/
 .vscode
+# Local helper scripts
+tools/
