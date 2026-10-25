@@ -2,6 +2,7 @@ package com.martelstudios.opendialogues.api;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.opendialogues.actions.DialogueAction;
+import com.martelstudios.opendialogues.conditions.DialogueCondition;
 import com.martelstudios.opendialogues.displays.DialogueDisplay;
 
 import javax.annotation.Nonnull;
@@ -21,6 +22,11 @@ public class DialogueRegistry {
      */
     public static final String DISPLAYS_DATA_SET = "opendialogues:displays";
 
+    /**
+     * The Asset Editor data set suggesting every dialogue id, inline dialogues included.
+     */
+    public static final String DIALOGUES_DATA_SET = "opendialogues:dialogues";
+
     private final Map<String, DialogueDisplay> displays = new ConcurrentHashMap<>();
 
     /**
@@ -28,6 +34,13 @@ public class DialogueRegistry {
      */
     public synchronized <T extends DialogueAction> void registerAction(@Nonnull String type, @Nonnull Class<T> actionClass, @Nonnull BuilderCodec<T> codec) {
         DialogueAction.CODEC.register(type, actionClass, codec);
+    }
+
+    /**
+     * Adds a condition kind under its {@code Type}, which carries the registering mod's prefix.
+     */
+    public synchronized <T extends DialogueCondition> void registerCondition(@Nonnull String type, @Nonnull Class<T> conditionClass, @Nonnull BuilderCodec<T> codec) {
+        DialogueCondition.CODEC.register(type, conditionClass, codec);
     }
 
     /**

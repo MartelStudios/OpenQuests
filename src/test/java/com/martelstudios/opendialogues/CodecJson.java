@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues;
 
+import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.util.RawJsonReader;
@@ -23,7 +24,7 @@ public final class CodecJson {
      * @return the value, or {@code null} when decoding or a validator failed.
      */
     @Nullable
-    public static <T> T decode(@Nonnull BuilderCodec<T> codec, @Nonnull String json) {
+    public static <T> T decode(@Nonnull Codec<T> codec, @Nonnull String json) {
         try (RawJsonReader reader = RawJsonReader.fromBuffer(json.toCharArray())) {
             ExtraInfo extraInfo = ExtraInfo.THREAD_LOCAL.get();
             T value = codec.decodeJson(reader, extraInfo);
