@@ -49,6 +49,7 @@ dependencies {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+    systemProperty("java.util.logging.manager", "com.hypixel.hytale.logger.backend.HytaleLogManager")
 
     testLogging {
         events("failed")

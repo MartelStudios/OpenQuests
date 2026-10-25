@@ -42,6 +42,10 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Responses", new ArrayCodec<>(DialogueResponse.CODEC, DialogueResponse[]::new)), (dialogue, responses) -> dialogue.responses = responses, dialogue -> dialogue.responses)
                                                                                  .add()
+                                                                                 .validator((dialogue, results) -> {
+                                                                                     String error = dialogue.findAnswerKeyError();
+                                                                                     if (error != null) results.fail(error);
+                                                                                 })
                                                                                  .build();
 
     public static final AssetBuilderCodec<String, OpenDialogueAsset> CODEC = AssetBuilderCodec.wrap(BODY_CODEC, Codec.STRING, (dialogue, id) -> dialogue.id = id, dialogue -> dialogue.id, (dialogue, data) -> dialogue.data = data, dialogue -> dialogue.data);
@@ -134,6 +138,48 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     @Nonnull
     public DialogueResponse[] getResponses() {
         return responses;
+    }
+
+    /**
+     * @return the name history records an answer of this dialogue under: its {@code Id}, else its
+     * position in the file from 1.
+     */
+    @Nonnull
+    public String answerKey(@Nonnull DialogueResponse response) {
+        if (response.getId() != null) return response.getId();
+        for (int i = 0; i < responses.length; i++) {
+            if (responses[i] == response) return Integer.toString(i + 1);
+        }
+        throw new IllegalArgumentException("Answer not in dialogue '" + id + "'");
+    }
+
+    /**
+     * @return the answer recorded under that key, or {@code null} for none.
+     */
+    @Nullable
+    public DialogueResponse findAnswer(@Nonnull String key) {
+        for (DialogueResponse response : responses) {
+            if (answerKey(response).equals(key)) return response;
+        }
+        return null;
+    }
+
+    /**
+     * A numeric id would read as another answer's position, so it is refused like a duplicate.
+     */
+    @Nullable
+    private String findAnswerKeyError() {
+        Set<String> keys = new HashSet<>();
+        for (DialogueResponse response : responses) {
+            String responseId = response.getId();
+            if (responseId != null && responseId.chars().allMatch(Character::isDigit)) {
+                return "Answer id '" + responseId + "' is a number, which positions already use";
+            }
+            if (!keys.add(answerKey(response))) {
+                return "Two answers share the key '" + answerKey(response) + "'";
+            }
+        }
+        return null;
     }
 
     /**

@@ -7,6 +7,7 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.martelstudios.opendialogues.actions.DialogueAction;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * An answer the player can pick, and what picking it does, in order.
@@ -14,16 +15,29 @@ import javax.annotation.Nonnull;
 public class DialogueResponse {
 
     public static final BuilderCodec<DialogueResponse> CODEC = BuilderCodec.builder(DialogueResponse.class, DialogueResponse::new)
+                                                                           .append(new KeyedCodec<>("Id", Codec.STRING), (response, id) -> response.id = id, response -> response.id)
+                                                                           .add()
                                                                            .append(new KeyedCodec<>("Text", Codec.STRING), (response, text) -> response.text = text, response -> response.text)
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Actions", new ArrayCodec<>(DialogueAction.CODEC, DialogueAction[]::new)), (response, actions) -> response.actions = actions, response -> response.actions)
                                                                            .add()
                                                                            .build();
 
+    @Nullable
+    private String id;
+
     private String text = "";
     private DialogueAction[] actions = new DialogueAction[0];
 
     protected DialogueResponse() {}
+
+    /**
+     * @return the name history records the answer under, or {@code null} to record it by position.
+     */
+    @Nullable
+    public String getId() {
+        return id;
+    }
 
     /**
      * @return the text of the answer, or its translation key.
