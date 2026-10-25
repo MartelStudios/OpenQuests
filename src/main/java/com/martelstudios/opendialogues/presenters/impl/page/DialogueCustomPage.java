@@ -9,7 +9,6 @@ import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
-import com.hypixel.hytale.server.core.modules.i18n.I18nModule;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -22,7 +21,6 @@ import com.martelstudios.opendialogues.sessions.DialogueSession;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Locale;
 
 /**
  * One dialogue on screen for {@link PagePresenter}: the pages read one at a time, then the answers.
@@ -72,10 +70,10 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
         commandBuilder.append(PAGE_DOCUMENT);
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#CloseButton", EventData.of(EventDataModel.KEY_ACTION, EventDataModel.ACTION_CLOSE), false);
 
-        speaker(commandBuilder);
+        String layout = speaker(commandBuilder);
 
         DialoguePage[] pages = session.dialogue().getPages();
-        if (pages.length > 0) commandBuilder.set("#PageText.Text", pages[page].getText());
+        if (pages.length > 0) commandBuilder.set(layout + "Text.Text", pages[page].getText());
         if (pages.length > 1) commandBuilder.set("#PageCount.Text", (page + 1) + " / " + pages.length);
 
         boolean lastPage = page >= pages.length - 1;
@@ -97,41 +95,36 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
     }
 
     /**
-     * Without a speaker, the title stands in for the name.
+     * Without a speaker, the title stands in for the name. Without a portrait, the text moves to the middle.
+     *
+     * @return the prefix of the name, epithet and text elements of the layout in use.
      */
-    private void speaker(@Nonnull UICommandBuilder commandBuilder) {
+    @Nonnull
+    private String speaker(@Nonnull UICommandBuilder commandBuilder) {
         DialogueSpeaker speaker = session.dialogue().getSpeaker();
-        String nameKey = speaker == null ? null : speaker.getName();
-        String name = nameKey == null ? session.dialogue().getTitle() : I18nModule.get().getMessage(playerRef.getLanguage(), nameKey);
 
+        String portrait = speaker == null ? null : speaker.getPortrait();
+        boolean hasPortrait = portrait != null && !portrait.isEmpty();
+        String layout = hasPortrait ? "#Side" : "#Centered";
+        commandBuilder.set("#Portrait.Visible", hasPortrait);
+        commandBuilder.set("#Side.Visible", hasPortrait);
+        commandBuilder.set("#Centered.Visible", !hasPortrait);
+        if (hasPortrait) commandBuilder.set("#PortraitImage.AssetPath", portrait);
+
+        String nameKey = speaker == null ? null : speaker.getName();
         if (nameKey != null) {
-            commandBuilder.set("#SpeakerName.TextSpans", Message.translation(nameKey));
-        } else if (name != null) {
-            commandBuilder.set("#SpeakerName.Text", name);
+            commandBuilder.set(layout + "Name.TextSpans", Message.translation(nameKey));
+        } else if (session.dialogue().getTitle() != null) {
+            commandBuilder.set(layout + "Name.Text", session.dialogue().getTitle());
         }
 
         String epithet = speaker == null ? null : speaker.getEpithet();
         if (epithet != null) {
-            commandBuilder.set("#Epithet.TextSpans", Message.translation(epithet));
+            commandBuilder.set(layout + "Epithet.TextSpans", Message.translation(epithet));
         } else {
-            commandBuilder.set("#Epithet.Visible", false);
+            commandBuilder.set(layout + "Epithet.Visible", false);
         }
-
-        String portrait = speaker == null ? null : speaker.getPortrait();
-        if (portrait != null && !portrait.isEmpty()) {
-            commandBuilder.set("#PortraitImage.AssetPath", portrait);
-            commandBuilder.set("#PortraitImage.Visible", true);
-            commandBuilder.set("#Initial.Visible", false);
-        } else {
-            commandBuilder.set("#Initial.Text", initial(name));
-        }
-    }
-
-    @Nonnull
-    private static String initial(@Nullable String name) {
-        if (name == null || name.isBlank()) return "";
-        String trimmed = name.strip();
-        return new String(Character.toChars(trimmed.codePointAt(0))).toUpperCase(Locale.ROOT);
+        return layout;
     }
 
     @Override

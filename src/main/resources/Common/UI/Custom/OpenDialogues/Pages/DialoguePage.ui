@@ -11,7 +11,9 @@ $C = "../../Common.ui";
   Hovered: (Background: PatchStyle(Color: #7896be(0.07))),
   Pressed: (Background: PatchStyle(Color: #000000(0.18)))
 );
-@InitialStyle = LabelStyle(FontSize: 72, TextColor: #e8a93b, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+@CenteredSpeakerNameStyle = LabelStyle(...@SpeakerNameStyle, HorizontalAlignment: Center);
+@CenteredEpithetStyle = LabelStyle(...@EpithetStyle, HorizontalAlignment: Center);
+@CenteredPageTextStyle = LabelStyle(...@PageTextStyle, HorizontalAlignment: Center);
 
 Group {
   LayoutMode: Bottom;
@@ -31,23 +33,55 @@ Group {
         Background: (TexturePath: "../../Common/ContainerFullPatch.png", Border: 20);
 
         Group #Portrait {
-          Anchor: (Width: 160, Height: 160, Top: 0);
-          Background: #000000(0.35);
+          Anchor: (Width: 160, Height: 160);
+          Background: (TexturePath: "../../Common/ContainerPanelPatch.png", Border: 6);
+          Visible: false;
 
-          Label #Initial { Text: ""; Style: @InitialStyle; }
-          AssetImage #PortraitImage { Anchor: (Full: 6); Visible: false; }
+          AssetImage #PortraitImage { Anchor: (Full: 6); }
         }
 
+        // #Side sits beside a portrait; without one, #Centered puts the text in the middle of the bar
         Group #Speech {
           LayoutMode: Top;
           FlexWeight: 1;
           Padding: (Horizontal: 22);
 
-          Label #SpeakerName { Text: ""; Anchor: (Height: 28); Style: @SpeakerNameStyle; }
-          Label #Epithet { Text: ""; Anchor: (Height: 18); Style: @EpithetStyle; }
-          $C.@ContentSeparator { @Anchor = Anchor(Top: 6, Bottom: 10); }
+          Group #Side {
+            LayoutMode: Top;
+            FlexWeight: 1;
 
-          Label #PageText { Text: ""; FlexWeight: 1; Style: @PageTextStyle; }
+            Label #SideName { Text: ""; Anchor: (Height: 28); Style: @SpeakerNameStyle; }
+            Label #SideEpithet { Text: ""; Anchor: (Height: 18); Style: @EpithetStyle; }
+            $C.@ContentSeparator { @Anchor = Anchor(Top: 6, Bottom: 10); }
+
+            Label #SideText { Text: ""; FlexWeight: 1; Style: @PageTextStyle; }
+          }
+
+          Group #Centered {
+            LayoutMode: Top;
+            FlexWeight: 1;
+            Padding: (Horizontal: 40);
+            Visible: false;
+
+            Label #CenteredName { Text: ""; Anchor: (Height: 28); Style: @CenteredSpeakerNameStyle; }
+            Label #CenteredEpithet { Text: ""; Anchor: (Height: 18); Style: @CenteredEpithetStyle; }
+
+            Group #FancySeparator {
+              LayoutMode: Center;
+              Anchor: (Height: 8, Top: 8, Bottom: 12);
+
+              Group {
+                LayoutMode: Left;
+                Anchor: (Width: 420);
+
+                Group { FlexWeight: 1; Anchor: (Height: 1); Background: (Color: #2b3542); }
+                Group { Anchor: (Width: 11, Height: 8, Horizontal: 8); Background: "../../Common/ContainerPanelSeparatorFancyDecoration.png"; }
+                Group { FlexWeight: 1; Anchor: (Height: 1); Background: (Color: #2b3542); }
+              }
+            }
+
+            Label #CenteredText { Text: ""; FlexWeight: 1; Style: @CenteredPageTextStyle; }
+          }
 
           Label #PageCount { Text: ""; Anchor: (Height: 18); Style: @PageCountStyle; }
         }
