@@ -7,6 +7,7 @@ import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -37,5 +38,13 @@ public class DialogueRegistry {
     @Nullable
     public DialogueDisplay getDisplay(@Nonnull String id) {
         return displays.get(id);
+    }
+
+    /**
+     * @return the ids of every display registered so far.
+     */
+    @Nonnull
+    public Set<String> getDisplayIds() {
+        return Set.copyOf(displays.keySet());
     }
 }

@@ -17,7 +17,7 @@ file name being its id. Prefix it with your pack's name.
 | Field | Meaning |
 | --- | --- |
 | `Title` | Shown above the pages. |
-| `Display` | What draws the dialogue. Empty for the default, `OpenDialoguesChat`. |
+| `Display` | What draws the dialogue, unless the server owner decides otherwise. Empty for the server's default. |
 | `Tags` | Hytale's asset tags, which server owners target to pick a display. A dialogue written inline also carries the tags of the one holding it. |
 | `Pages` | Objects with a `Text`, read in order. |
 | `Responses` | Objects with a `Text` and `Actions` run in order when picked. |
@@ -33,6 +33,22 @@ it sets overrides the parent's. Speakers live under `Server/OpenDialogues/Speake
 | `OpenDialoguesClose` | Ends the dialogue answered. |
 | `OpenDialoguesOpen` | Closes the dialogue answered and opens `Dialogue`, an id or an inline dialogue. |
 | `OpenDialoguesCommand` | Runs `Command` as the player. The dialogue stays open. |
+
+## Choosing displays
+
+Server owners pick displays with `/odialogues display`, saved in the plugin's `Displays.json`:
+
+| Command | Does |
+| --- | --- |
+| `default <display>` | Display for dialogues naming none. `OpenDialoguesChat` at first. |
+| `set <target> <display> [--position=<n>]` | Display for dialogues matching `*`, `dialogue:<id>`, `tag:<tag>` or `pack:<pack>`, over their own `Display`. |
+| `unset <target>` | Removes that rule. |
+| `list` | Shows the default and the rules in order. |
+| `which <dialogue>` | Tells which display a dialogue opens in, what picked it, and its pack and tags. |
+
+A dialogue opens in the first registered display among: rules on its id, rules on its tags or pack
+in list order, the `*` rule, its own `Display`, the default. A rule naming a display no mod
+registered is skipped.
 
 ## Extending
 

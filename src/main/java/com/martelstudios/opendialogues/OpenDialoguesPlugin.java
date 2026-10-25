@@ -71,7 +71,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
 
-        getCommandRegistry().registerCommand(new DialogueCommand(dialogueService));
+        getCommandRegistry().registerCommand(new DialogueCommand(dialogueService, registry, displayRules));
         getCommandRegistry().registerCommand(new AnswerCommand("oda", dialogueService));
     }
 

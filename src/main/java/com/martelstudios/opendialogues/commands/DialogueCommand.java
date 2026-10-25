@@ -13,7 +13,10 @@ import com.hypixel.hytale.server.core.permissions.provider.HytalePermissionsProv
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.util.Config;
+import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 import javax.annotation.Nonnull;
@@ -21,23 +24,24 @@ import javax.annotation.Nonnull;
 import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes.STRING;
 
 /**
- * {@code /odialogues}, alias {@code /od}: opens a dialogue by id and picks its answers.
+ * {@code /odialogues}, alias {@code /od}: opens a dialogue by id, picks its answers and sets which display draws it.
  */
 public class DialogueCommand extends AbstractCommandCollection {
 
     /**
      * Suggests every loaded dialogue, read from the store on each request so a reload is seen.
      */
-    private static final AssetArgumentType<OpenDialogueAsset, DefaultAssetMap<String, OpenDialogueAsset>> DIALOGUE_ASSET = new AssetArgumentType<>(
+    static final AssetArgumentType<OpenDialogueAsset, DefaultAssetMap<String, OpenDialogueAsset>> DIALOGUE_ASSET = new AssetArgumentType<>(
         "Dialogue", OpenDialogueAsset.class, "Id of a dialogue");
 
-    public DialogueCommand(@Nonnull DialogueService dialogues) {
+    public DialogueCommand(@Nonnull DialogueService dialogues, @Nonnull DialogueRegistry registry, @Nonnull Config<DisplayRules> displayRules) {
         super("odialogues", "Opens and answers dialogues");
         addAliases("od");
 
         setPermissionGroups(HytalePermissionsProvider.GROUP_ADVENTURER);
         addSubCommand(new OpenCommand(dialogues));
         addSubCommand(new AnswerCommand("answer", dialogues));
+        addSubCommand(new DisplayCommand(dialogues, registry, displayRules));
     }
 
     private static class OpenCommand extends AbstractPlayerCommand {
