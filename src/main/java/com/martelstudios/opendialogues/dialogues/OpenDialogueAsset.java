@@ -8,7 +8,9 @@ import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.assetstore.map.JsonAssetWithMap;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
+import com.martelstudios.opendialogues.actions.DialogueAction;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,18 +21,23 @@ import javax.annotation.Nullable;
  */
 public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenDialogueAsset>> {
 
-    public static final AssetBuilderCodec<String, OpenDialogueAsset> CODEC = AssetBuilderCodec.builder(OpenDialogueAsset.class, OpenDialogueAsset::new, Codec.STRING, (dialogue, id) -> dialogue.id = id, dialogue -> dialogue.id, (dialogue, data) -> dialogue.data = data, dialogue -> dialogue.data)
-                                                                                              .append(new KeyedCodec<>("Title", Codec.STRING), (dialogue, title) -> dialogue.title = title, dialogue -> dialogue.title)
-                                                                                              .add()
-                                                                                              .append(new KeyedCodec<>("Presenter", Codec.STRING), (dialogue, presenter) -> dialogue.presenter = presenter, dialogue -> dialogue.presenter)
-                                                                                              .add()
-                                                                                              .append(new KeyedCodec<>("Speaker", DialogueSpeaker.CODEC), (dialogue, speaker) -> dialogue.speaker = speaker, dialogue -> dialogue.speaker)
-                                                                                              .add()
-                                                                                              .append(new KeyedCodec<>("Pages", new ArrayCodec<>(DialoguePage.CODEC, DialoguePage[]::new)), (dialogue, pages) -> dialogue.pages = pages, dialogue -> dialogue.pages)
-                                                                                              .add()
-                                                                                              .append(new KeyedCodec<>("Responses", new ArrayCodec<>(DialogueResponse.CODEC, DialogueResponse[]::new)), (dialogue, responses) -> dialogue.responses = responses, dialogue -> dialogue.responses)
-                                                                                              .add()
-                                                                                              .build();
+    /**
+     * The dialogue without its id, for one written inline in another dialogue's answer.
+     */
+    public static final BuilderCodec<OpenDialogueAsset> BODY_CODEC = BuilderCodec.builder(OpenDialogueAsset.class, OpenDialogueAsset::new)
+                                                                                 .append(new KeyedCodec<>("Title", Codec.STRING), (dialogue, title) -> dialogue.title = title, dialogue -> dialogue.title)
+                                                                                 .add()
+                                                                                 .append(new KeyedCodec<>("Presenter", Codec.STRING), (dialogue, presenter) -> dialogue.presenter = presenter, dialogue -> dialogue.presenter)
+                                                                                 .add()
+                                                                                 .append(new KeyedCodec<>("Speaker", DialogueSpeaker.CODEC), (dialogue, speaker) -> dialogue.speaker = speaker, dialogue -> dialogue.speaker)
+                                                                                 .add()
+                                                                                 .append(new KeyedCodec<>("Pages", new ArrayCodec<>(DialoguePage.CODEC, DialoguePage[]::new)), (dialogue, pages) -> dialogue.pages = pages, dialogue -> dialogue.pages)
+                                                                                 .add()
+                                                                                 .append(new KeyedCodec<>("Responses", new ArrayCodec<>(DialogueResponse.CODEC, DialogueResponse[]::new)), (dialogue, responses) -> dialogue.responses = responses, dialogue -> dialogue.responses)
+                                                                                 .add()
+                                                                                 .build();
+
+    public static final AssetBuilderCodec<String, OpenDialogueAsset> CODEC = AssetBuilderCodec.wrap(BODY_CODEC, Codec.STRING, (dialogue, id) -> dialogue.id = id, dialogue -> dialogue.id, (dialogue, data) -> dialogue.data = data, dialogue -> dialogue.data);
 
     protected String id;
     protected AssetExtraInfo.Data data;
@@ -92,6 +99,22 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     @Nonnull
     public DialogueResponse[] getResponses() {
         return responses;
+    }
+
+    /**
+     * Gives every dialogue written inline in this one an id under its own, like {@code Elder/2.1} for the
+     * first action of the second answer, so sessions and commands can name it.
+     */
+    public void nameInlineDialogues() {
+        for (int response = 0; response < responses.length; response++) {
+            DialogueAction[] actions = responses[response].getActions();
+            for (int action = 0; action < actions.length; action++) {
+                for (OpenDialogueAsset inline : actions[action].getInlineDialogues()) {
+                    inline.id = id + "/" + (response + 1) + "." + (action + 1);
+                    inline.nameInlineDialogues();
+                }
+            }
+        }
     }
 
     /**

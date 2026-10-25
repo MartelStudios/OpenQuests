@@ -2,7 +2,7 @@
   "Id": "OpenDialogues.OpenAction",
   "Title": "Open Dialogue",
   "Color": "Pink",
-  "Description": "Closes the dialogue answered and opens this one in its place.",
+  "Description": "Closes the dialogue answered and opens the next one in its place: the one linked, or else the one named.",
   "Content": [
     {
       "Id": "Dialogue",
@@ -10,6 +10,7 @@
       "Options": {
         "Label": "Dialogue",
         "Width": 250,
+        "Description": "A dialogue of its own file, used when none is linked.",
         "Values": "$OpenDialogues.DialogueIds"
       }
     }
@@ -21,8 +22,21 @@
       "Color": "Pink"
     }
   ],
+  "Outputs": [
+    {
+      "Id": "Inline",
+      "Type": "OpenDialogues.Dialogue.Connection",
+      "Color": "Blue",
+      "Multiple": false,
+      "Label": "Dialogue"
+    }
+  ],
   "Schema": {
     "Type": "OpenDialoguesOpen",
-    "Dialogue": "Dialogue"
+    "Dialogue": "Dialogue",
+    "Inline": {
+      "Node": "OpenDialogues.Dialogue",
+      "Pin": "Inline"
+    }
   }
 }

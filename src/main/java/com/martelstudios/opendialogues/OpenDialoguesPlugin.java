@@ -105,6 +105,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     }
 
     private void onDialoguesLoaded(@Nonnull LoadedAssetsEvent<String, OpenDialogueAsset, DefaultAssetMap<String, OpenDialogueAsset>> event) {
+        event.getLoadedAssets().values().forEach(OpenDialogueAsset::nameInlineDialogues);
         exportWorkspace();
     }
 
@@ -131,14 +132,17 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     private static Set<String> dialogueIds() {
         Map<String, OpenDialogueAsset> loaded = OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap();
         Set<String> ids = new HashSet<>(loaded.keySet());
-        for (OpenDialogueAsset dialogue : loaded.values()) {
-            for (DialogueResponse response : dialogue.getResponses()) {
-                for (DialogueAction action : response.getActions()) {
-                    ids.addAll(action.getReferencedDialogues());
-                }
+        loaded.values().forEach(dialogue -> collectReferences(dialogue, ids));
+        return ids;
+    }
+
+    private static void collectReferences(@Nonnull OpenDialogueAsset dialogue, @Nonnull Set<String> ids) {
+        for (DialogueResponse response : dialogue.getResponses()) {
+            for (DialogueAction action : response.getActions()) {
+                ids.addAll(action.getReferencedDialogues());
+                action.getInlineDialogues().forEach(inline -> collectReferences(inline, ids));
             }
         }
-        return ids;
     }
 
     @Nonnull

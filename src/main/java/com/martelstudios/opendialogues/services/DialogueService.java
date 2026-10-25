@@ -57,13 +57,20 @@ public class DialogueService {
         if (dialogue == null) {
             return false;
         }
+        open(player, dialogue);
+        return true;
+    }
 
+    /**
+     * Shows a dialogue to a player, one from the store or one written inline, replacing the same
+     * dialogue if it was open.
+     */
+    public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue) {
         // shortcut: every answer is shown, filter here once answers carry conditions.
         DialogueSession session = new DialogueSession(dialogue, List.of(dialogue.getResponses()), presenterFor(dialogue));
-        sessions.put(player.getUuid(), dialogueId, session);
+        sessions.put(player.getUuid(), dialogue.getId(), session);
         session.presenter().show(player, session);
         dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
-        return true;
     }
 
     /**
