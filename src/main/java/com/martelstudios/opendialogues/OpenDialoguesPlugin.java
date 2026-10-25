@@ -17,6 +17,9 @@ import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.events.DialogueEvent;
+import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
+import com.martelstudios.opendialogues.routers.impl.sequence.SequenceSelector;
+import com.martelstudios.opendialogues.routers.impl.weighted.WeightedSelector;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 import com.martelstudios.opendialogues.history.DialogueHistoryRecorder;
 import com.martelstudios.opendialogues.displays.impl.chat.ChatDisplay;
@@ -78,6 +81,9 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerCondition(HoldingCondition.TYPE, HoldingCondition.class, HoldingCondition.CODEC);
         registry.registerCondition(InventoryCondition.TYPE, InventoryCondition.class, InventoryCondition.CODEC);
 
+        registry.registerSelector(SequenceSelector.TYPE, SequenceSelector.class, SequenceSelector.CODEC);
+        registry.registerSelector(WeightedSelector.TYPE, WeightedSelector.class, WeightedSelector.CODEC);
+
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID);
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
         registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService));
@@ -86,6 +92,11 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .setPath("OpenDialogues/Dialogues/")
                                                     .setCodec(OpenDialogueAsset.CODEC)
                                                     .setKeyFunction(OpenDialogueAsset::getId)
+                                                    .build());
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueRouterAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenDialogues/Routers/")
+                                                    .setCodec(OpenDialogueRouterAsset.CODEC)
+                                                    .setKeyFunction(OpenDialogueRouterAsset::getId)
                                                     .build());
         getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueSpeakerAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenDialogues/Speakers/")

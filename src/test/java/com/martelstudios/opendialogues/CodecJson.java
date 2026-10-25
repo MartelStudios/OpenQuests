@@ -1,10 +1,12 @@
 package com.martelstudios.opendialogues;
 
+import com.hypixel.hytale.assetstore.AssetExtraInfo;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.util.RawJsonReader;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import org.bson.BsonValue;
 
 import javax.annotation.Nonnull;
@@ -21,16 +23,19 @@ public final class CodecJson {
     private CodecJson() {}
 
     /**
+     * Decodes as an asset file would be, so fields naming other assets by id read too.
+     *
      * @return the value, or {@code null} when decoding or a validator failed.
      */
     @Nullable
     public static <T> T decode(@Nonnull Codec<T> codec, @Nonnull String json) {
         try (RawJsonReader reader = RawJsonReader.fromBuffer(json.toCharArray())) {
-            ExtraInfo extraInfo = ExtraInfo.THREAD_LOCAL.get();
+            ExtraInfo extraInfo = new AssetExtraInfo<>(new AssetExtraInfo.Data(OpenDialogueAsset.class, "Test", null));
             T value = codec.decodeJson(reader, extraInfo);
             extraInfo.getValidationResults().logOrThrowValidatorExceptions(LOGGER);
             return value;
         } catch (IOException | RuntimeException e) {
+            for (Throwable cause = e; cause != null; cause = cause.getCause()) System.err.println("Unreadable JSON " + json + ": " + cause);
             return null;
         }
     }

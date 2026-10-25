@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
 import com.martelstudios.opendialogues.displays.DialogueDisplay;
+import com.martelstudios.opendialogues.routers.DialogueSelector;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,6 +42,13 @@ public class DialogueRegistry {
      */
     public synchronized <T extends DialogueCondition> void registerCondition(@Nonnull String type, @Nonnull Class<T> conditionClass, @Nonnull BuilderCodec<T> codec) {
         DialogueCondition.CODEC.register(type, conditionClass, codec);
+    }
+
+    /**
+     * Adds a router selector kind under its {@code Type}, which carries the registering mod's prefix.
+     */
+    public synchronized <T extends DialogueSelector> void registerSelector(@Nonnull String type, @Nonnull Class<T> selectorClass, @Nonnull BuilderCodec<T> codec) {
+        DialogueSelector.CODEC.register(type, selectorClass, codec);
     }
 
     /**
