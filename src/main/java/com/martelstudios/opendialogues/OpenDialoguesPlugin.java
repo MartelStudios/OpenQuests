@@ -5,6 +5,7 @@ import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.opendialogues.actions.impl.close.CloseDialogueAction;
 import com.martelstudios.opendialogues.actions.impl.command.CommandDialogueAction;
 import com.martelstudios.opendialogues.actions.impl.open.OpenDialogueAction;
@@ -13,6 +14,7 @@ import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
+import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.displays.impl.chat.ChatDisplay;
 import com.martelstudios.opendialogues.displays.impl.page.PageDisplay;
 import com.martelstudios.opendialogues.services.DialogueService;
@@ -30,11 +32,14 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     private final DialogueRegistry registry = new DialogueRegistry();
 
+    private final Config<DisplayRules> displayRules;
+
     private DialogueService dialogueService;
 
     public OpenDialoguesPlugin(@Nonnull JavaPluginInit init) {
         super(init);
         instance = this;
+        displayRules = withConfig("Displays", DisplayRules.CODEC);
     }
 
     public static OpenDialoguesPlugin get() {
@@ -49,8 +54,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerAction(OpenDialogueAction.TYPE, OpenDialogueAction.class, OpenDialogueAction.CODEC);
         registry.registerAction(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC);
 
-        // shortcut: the chat is the default display for every dialogue naming none, make it a server setting when servers ask.
-        dialogueService = new DialogueService(registry, ChatDisplay.ID);
+        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID);
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
         registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService));
 

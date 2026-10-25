@@ -1,10 +1,12 @@
 package com.martelstudios.opendialogues.services;
 
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.api.DialogueContext;
 import com.martelstudios.opendialogues.displays.DialogueDisplay;
+import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.events.DialogueEvent;
@@ -15,6 +17,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * Opens dialogues, runs the answers players pick and closes them, whatever draws them and however
@@ -34,17 +37,41 @@ public class DialogueService {
         NO_SUCH_ANSWER
     }
 
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
+
     private final SessionStore<DialogueSession> sessions = new SessionStore<>();
 
     @Nonnull
     private final DialogueRegistry registry;
 
     @Nonnull
-    private final String defaultDisplay;
+    private final Supplier<DisplayRules> rules;
 
-    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull String defaultDisplay) {
+    @Nonnull
+    private final String fallbackDisplay;
+
+    /**
+     * @param rules           read on each opening, since the config behind them can be reloaded.
+     * @param fallbackDisplay drawing a dialogue when every display the rules name is missing.
+     */
+    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay) {
         this.registry = registry;
-        this.defaultDisplay = defaultDisplay;
+        this.rules = rules;
+        this.fallbackDisplay = fallbackDisplay;
+    }
+
+    /**
+     * @return the display a dialogue would open in and what picked it, skipping displays nobody registered.
+     */
+    @Nonnull
+    public DisplayRules.Choice chooseDisplay(@Nonnull OpenDialogueAsset dialogue) {
+        for (DisplayRules.Choice choice : rules.get().choices(dialogue)) {
+            if (registry.getDisplay(choice.display()) != null) {
+                return choice;
+            }
+            LOGGER.atWarning().log("Display '%s' from %s is not registered, skipped for dialogue '%s'.", choice.display(), choice.source(), dialogue.getId());
+        }
+        return new DisplayRules.Choice("fallback", fallbackDisplay);
     }
 
     /**
@@ -135,8 +162,8 @@ public class DialogueService {
 
     @Nonnull
     private DialogueDisplay displayFor(@Nonnull OpenDialogueAsset dialogue) {
-        DialogueDisplay display = dialogue.getDisplay() == null ? null : registry.getDisplay(dialogue.getDisplay());
-        return display != null ? display : registry.getDisplay(defaultDisplay);
+        DialogueDisplay display = registry.getDisplay(chooseDisplay(dialogue).display());
+        return display != null ? display : registry.getDisplay(fallbackDisplay);
     }
 
     private static <E extends DialogueEvent> void dispatch(@Nonnull E event, @Nonnull Class<E> type) {
