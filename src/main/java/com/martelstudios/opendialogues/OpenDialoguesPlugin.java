@@ -1,6 +1,7 @@
 package com.martelstudios.opendialogues;
 
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
+import com.hypixel.hytale.builtin.asseteditor.event.AssetEditorFetchAutoCompleteDataEvent;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -21,6 +22,7 @@ import com.martelstudios.opendialogues.services.DialogueService;
 
 
 import javax.annotation.Nonnull;
+import java.util.Locale;
 
 /**
  * Dialogues and their speakers as assets: written in the Asset Editor, opened by id and drawn by
@@ -70,6 +72,10 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .build());
 
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
+        getEventRegistry().register(AssetEditorFetchAutoCompleteDataEvent.class, DialogueRegistry.DISPLAYS_DATA_SET, event -> {
+            String query = event.getQuery().toLowerCase(Locale.ROOT);
+            event.setResults(registry.getDisplayIds().stream().filter(id -> id.toLowerCase(Locale.ROOT).contains(query)).sorted().toArray(String[]::new));
+        });
 
         getCommandRegistry().registerCommand(new DialogueCommand(dialogueService, registry, displayRules));
         getCommandRegistry().registerCommand(new AnswerCommand("oda", dialogueService));

@@ -2,7 +2,9 @@
   "Title": "Old Kweebec",
   "Display": "OpenDialoguesPage",
   "Tags": {
-    "Series": ["OpenDialogues_Example"]
+    "Series": [
+      "OpenDialogues_Example"
+    ]
   },
   "Pages": [
     {
