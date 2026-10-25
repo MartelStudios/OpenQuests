@@ -13,3 +13,5 @@ run/*
 .vscode
 # Local helper scripts
 tools/
+# Local design documents
+docs/superpowers/
