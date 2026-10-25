@@ -9,8 +9,7 @@ import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.assetstore.map.JsonAssetWithMap;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
-import com.hypixel.hytale.codec.validation.ValidatorCache;
-import com.hypixel.hytale.assetstore.AssetKeyValidator;
+import com.hypixel.hytale.server.core.asset.common.CommonAssetValidator;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,6 +20,7 @@ import javax.annotation.Nullable;
  * inline in a dialogue, and starts from another with {@code Parent}.
  */
 public class OpenDialogueSpeakerAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenDialogueSpeakerAsset>> {
+    public static final CommonAssetValidator ICON_VALIDATOR = new CommonAssetValidator("png", true, "Icons");
 
     public static final AssetBuilderCodec<String, OpenDialogueSpeakerAsset> CODEC = AssetBuilderCodec.builder(OpenDialogueSpeakerAsset.class, OpenDialogueSpeakerAsset::new, Codec.STRING, (speaker, id) -> speaker.id = id, speaker -> speaker.id, (speaker, data) -> speaker.data = data, speaker -> speaker.data)
                                                                                                      .appendInherited(new KeyedCodec<>("Name", Codec.STRING), (speaker, name) -> speaker.name = name, speaker -> speaker.name, (speaker, parent) -> speaker.name = parent.name)
@@ -28,7 +28,7 @@ public class OpenDialogueSpeakerAsset implements JsonAssetWithMap<String, Defaul
                                                                                                      .appendInherited(new KeyedCodec<>("Epithet", Codec.STRING), (speaker, epithet) -> speaker.epithet = epithet, speaker -> speaker.epithet, (speaker, parent) -> speaker.epithet = parent.epithet)
                                                                                                      .add()
                                                                                                      .appendInherited(new KeyedCodec<>("Portrait", Codec.STRING), (speaker, portrait) -> speaker.portrait = portrait, speaker -> speaker.portrait, (speaker, parent) -> speaker.portrait = parent.portrait)
-                                                                                                     .addValidator(DialoguePortraits.VALIDATOR)
+                                                                                                     .addValidator(ICON_VALIDATOR)
                                                                                                      .add()
                                                                                                      .build();
 
@@ -36,8 +36,6 @@ public class OpenDialogueSpeakerAsset implements JsonAssetWithMap<String, Defaul
      * A field naming a speaker by id, or writing one inline.
      */
     public static final Codec<String> CONTAINED_CODEC = new ContainedAssetCodec<>(OpenDialogueSpeakerAsset.class, CODEC);
-
-    public static final ValidatorCache<String> VALIDATOR_CACHE = new ValidatorCache<>(new AssetKeyValidator<>(OpenDialogueSpeakerAsset::getAssetStore));
 
     protected String id;
     protected AssetExtraInfo.Data data;
@@ -52,6 +50,21 @@ public class OpenDialogueSpeakerAsset implements JsonAssetWithMap<String, Defaul
     private String portrait;
 
     protected OpenDialogueSpeakerAsset() {}
+
+    /**
+     * @return the store every pack's speakers are loaded into.
+     */
+    public static AssetStore<String, OpenDialogueSpeakerAsset, DefaultAssetMap<String, OpenDialogueSpeakerAsset>> getAssetStore() {
+        return AssetRegistry.getAssetStore(OpenDialogueSpeakerAsset.class);
+    }
+
+    /**
+     * @return the speaker under that id, or {@code null} for one no pack declares.
+     */
+    @Nullable
+    public static OpenDialogueSpeakerAsset getSpeaker(@Nonnull String speakerId) {
+        return getAssetStore().getAssetMap().getAsset(speakerId);
+    }
 
     @Override
     public String getId() {
@@ -79,21 +92,6 @@ public class OpenDialogueSpeakerAsset implements JsonAssetWithMap<String, Defaul
      */
     @Nullable
     public String getPortrait() {
-        return portrait == null || portrait.isEmpty() ? portrait : DialoguePortraits.resolve(portrait);
-    }
-
-    /**
-     * @return the store every pack's speakers are loaded into.
-     */
-    public static AssetStore<String, OpenDialogueSpeakerAsset, DefaultAssetMap<String, OpenDialogueSpeakerAsset>> getAssetStore() {
-        return AssetRegistry.getAssetStore(OpenDialogueSpeakerAsset.class);
-    }
-
-    /**
-     * @return the speaker under that id, or {@code null} for one no pack declares.
-     */
-    @Nullable
-    public static OpenDialogueSpeakerAsset getSpeaker(@Nonnull String speakerId) {
-        return getAssetStore().getAssetMap().getAsset(speakerId);
+        return portrait;
     }
 }

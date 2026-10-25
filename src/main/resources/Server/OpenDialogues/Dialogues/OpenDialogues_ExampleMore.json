@@ -1,21 +1,29 @@
 {
   "Title": "Old Kweebec",
   "Presenter": "OpenDialoguesPage",
-  "Speaker": {
-    "Name": "opendialogues.example.elder.name",
-    "Epithet": "opendialogues.example.elder.epithet"
-  },
   "Pages": [
-    { "Text": "Trorks gather by the river. Keep away from the water after dusk." }
-  ]
+    {
+      "Text": "Trorks gather by the river. Keep away from the water after dusk."
+    }
+  ],
   "Responses": [
     {
       "Text": "Thank you, I will be careful.",
-      "Actions": [ { "Type": "OpenDialoguesClose" } ]
+      "Actions": [
+        {
+          "Type": "OpenDialoguesClose"
+        }
+      ]
     },
     {
       "Text": "Where is the river?",
-      "Actions": [ { "Type": "OpenDialoguesCommand", "Command": "help" } ]
+      "Actions": [
+        {
+          "Type": "OpenDialoguesCommand",
+          "Command": "help"
+        }
+      ]
     }
-  ]
+  ],
+  "Speaker": "LittleKweebec"
 }
