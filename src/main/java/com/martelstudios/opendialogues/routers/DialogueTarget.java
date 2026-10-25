@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -30,6 +31,17 @@ public class DialogueTarget {
     protected String router;
 
     protected DialogueTarget() {}
+
+    /**
+     * @return a target leading to the dialogue when one is named, else to the router.
+     */
+    @Nonnull
+    public static DialogueTarget of(@Nullable String dialogue, @Nullable String router) {
+        DialogueTarget target = new DialogueTarget();
+        target.dialogue = dialogue;
+        target.router = dialogue == null ? router : null;
+        return target;
+    }
 
     /**
      * @return the id of the dialogue led to, {@code null} when the target is a router.

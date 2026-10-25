@@ -17,9 +17,15 @@ import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
+import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
 import com.martelstudios.opendialogues.services.DialogueService;
+import com.hypixel.hytale.server.core.command.system.CommandSender;
+import com.hypixel.hytale.server.core.command.system.suggestion.SuggestionResult;
 
 import javax.annotation.Nonnull;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes.STRING;
 
@@ -47,8 +53,8 @@ public class DialogueCommand extends AbstractCommandCollection {
     private static class OpenCommand extends AbstractPlayerCommand {
 
         @Nonnull
-        private final RequiredArg<String> dialogueArg = withRequiredArg("dialogue", "Id of the dialogue to open", STRING)
-            .withSuggestionOverride(DIALOGUE_ASSET);
+        private final RequiredArg<String> dialogueArg = withRequiredArg("dialogue", "Id of the dialogue or router to open", STRING)
+            .suggest(OpenCommand::suggestIds);
 
         @Nonnull
         private final DialogueService dialogues;
@@ -59,11 +65,24 @@ public class DialogueCommand extends AbstractCommandCollection {
             this.dialogues = dialogues;
         }
 
+        /**
+         * Dialogues first, then routers no dialogue shadows, each read from its store so a reload is seen.
+         */
+        private static void suggestIds(@Nonnull CommandSender sender, @Nonnull String input, int index, @Nonnull SuggestionResult result) {
+            String query = input.toLowerCase(Locale.ROOT);
+            Set<String> dialogueIds = OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap().keySet();
+            Stream.concat(dialogueIds.stream().sorted(),
+                          OpenDialogueRouterAsset.getAssetStore().getAssetMap().getAssetMap().keySet().stream().filter(id -> !dialogueIds.contains(id)).sorted())
+                  .filter(id -> id.toLowerCase(Locale.ROOT).contains(query))
+                  .takeWhile(id -> !result.isFull())
+                  .forEach(result::suggest);
+        }
+
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
             String dialogueId = context.get(dialogueArg);
             if (!dialogues.open(playerRef, dialogueId)) {
-                context.sendMessage(Message.raw("No dialogue '" + dialogueId + "'."));
+                context.sendMessage(Message.raw("No dialogue from '" + dialogueId + "'."));
             }
         }
     }

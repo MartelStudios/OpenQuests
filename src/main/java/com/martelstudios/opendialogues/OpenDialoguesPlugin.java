@@ -35,9 +35,14 @@ import com.martelstudios.opendialogues.conditions.impl.logic.AllCondition;
 import com.martelstudios.opendialogues.conditions.impl.logic.AnyCondition;
 import com.martelstudios.opendialogues.conditions.impl.logic.NotCondition;
 
+import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
+import com.martelstudios.opendialogues.services.DialogueResolver;
+
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
+import java.util.SplittableRandom;
 
 /**
  * Dialogues and their speakers as assets: written in the Asset Editor, opened by id and drawn by
@@ -54,6 +59,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     private DialogueService dialogueService;
 
     private DialogueHistoryRecorder historyRecorder;
+
+    private DialogueResolver resolver;
 
     public OpenDialoguesPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -84,7 +91,9 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerSelector(SequenceSelector.TYPE, SequenceSelector.class, SequenceSelector.CODEC);
         registry.registerSelector(WeightedSelector.TYPE, WeightedSelector.class, WeightedSelector.CODEC);
 
-        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID);
+        historyRecorder = new DialogueHistoryRecorder(getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC));
+        resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
+        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, historyRecorder::history);
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
         registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService));
 
@@ -104,7 +113,9 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .setKeyFunction(OpenDialogueSpeakerAsset::getId)
                                                     .build());
 
-        historyRecorder = new DialogueHistoryRecorder(getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC));
+        onLoaded(OpenDialogueAsset.class, this::validateRouters);
+        onLoaded(OpenDialogueRouterAsset.class, this::validateRouters);
+
         getEventRegistry().registerGlobal(DialogueEvent.Opened.class, historyRecorder::onOpened);
         getEventRegistry().registerGlobal(DialogueEvent.Answered.class, historyRecorder::onAnswered);
 
@@ -114,6 +125,23 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         getCommandRegistry().registerCommand(new DialogueCommand(dialogueService, registry, displayRules));
         getCommandRegistry().registerCommand(new AnswerCommand("oda", dialogueService));
+    }
+
+    /**
+     * The event is keyed by asset class, which its generic signature cannot express to the registry.
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void onLoaded(@Nonnull Class<?> assetClass, @Nonnull Runnable action) {
+        getEventRegistry().register((Class) LoadedAssetsEvent.class, assetClass, event -> action.run());
+    }
+
+    /**
+     * Either store may load or reload first, so every router is checked again against both.
+     */
+    private void validateRouters() {
+        Map<String, String> errors = resolver.validate(OpenDialogueRouterAsset.getAssetStore().getAssetMap().getAssetMap().keySet());
+        errors.forEach((routerId, error) -> getLogger().atSevere().log("Router '%s' leads nowhere: %s", routerId, error));
+        resolver.setInvalidRouters(errors.keySet());
     }
 
     private static void suggest(@Nonnull AssetEditorFetchAutoCompleteDataEvent event, @Nonnull Collection<String> ids) {

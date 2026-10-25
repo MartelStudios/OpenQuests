@@ -1,6 +1,12 @@
 package com.martelstudios.opendialogues.services;
 
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.opendialogues.conditions.ConditionContext;
+import com.martelstudios.opendialogues.history.DialogueHistory;
+import com.martelstudios.opendialogues.routers.DialogueTarget;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.DialogueAction;
@@ -17,6 +23,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -50,14 +57,23 @@ public class DialogueService {
     @Nonnull
     private final String fallbackDisplay;
 
+    @Nonnull
+    private final DialogueResolver resolver;
+
+    @Nonnull
+    private final Function<PlayerRef, DialogueHistory> histories;
+
     /**
      * @param rules           read on each opening, since the config behind them can be reloaded.
      * @param fallbackDisplay drawing a dialogue when every display the rules name is missing.
+     * @param histories       a player's history, {@code null} when it cannot be read from this thread.
      */
-    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay) {
+    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, DialogueHistory> histories) {
         this.registry = registry;
         this.rules = rules;
         this.fallbackDisplay = fallbackDisplay;
+        this.resolver = resolver;
+        this.histories = histories;
     }
 
     /**
@@ -75,17 +91,42 @@ public class DialogueService {
     }
 
     /**
-     * Shows a dialogue to a player, replacing the same dialogue if it was open.
+     * Shows the dialogue an id leads to, a dialogue under it first, else what the router under it
+     * picks for that player, replacing the same dialogue if it was open.
      *
-     * @return whether a dialogue exists under that id.
+     * @return whether the id led to a dialogue.
      */
-    public boolean open(@Nonnull PlayerRef player, @Nonnull String dialogueId) {
-        OpenDialogueAsset dialogue = OpenDialogueAsset.getDialogue(dialogueId);
+    public boolean open(@Nonnull PlayerRef player, @Nonnull String id) {
+        return show(player, resolver.resolve(id, contextFor(player)));
+    }
+
+    /**
+     * Shows the dialogue a target leads to for that player.
+     *
+     * @return whether the target led to a dialogue.
+     */
+    public boolean open(@Nonnull PlayerRef player, @Nonnull DialogueTarget target) {
+        return show(player, resolver.resolve(target, contextFor(player)));
+    }
+
+    private boolean show(@Nonnull PlayerRef player, @Nullable OpenDialogueAsset dialogue) {
         if (dialogue == null) {
             return false;
         }
         open(player, dialogue);
         return true;
+    }
+
+    /**
+     * Off the player's world thread only the history could be read, and it cannot, so conditions
+     * judge an empty one.
+     */
+    @Nonnull
+    private ConditionContext contextFor(@Nonnull PlayerRef player) {
+        DialogueHistory history = histories.apply(player);
+        Ref<EntityStore> entity = player.getReference();
+        Store<EntityStore> store = entity == null ? null : entity.getStore();
+        return new ConditionContext(player, entity, store, history != null ? history : new DialogueHistory());
     }
 
     /**
