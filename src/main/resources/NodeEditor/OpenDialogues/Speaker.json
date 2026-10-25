@@ -2,8 +2,18 @@
   "Id": "OpenDialogues.Speaker",
   "Title": "Speaker",
   "Color": "Purple",
-  "Description": "Who speaks the dialogue, for presenters that show it.",
+  "Description": "Who speaks the dialogue, for presenters that show it: a speaker asset, its fields overridden by those set here.",
   "Content": [
+    {
+      "Id": "Id",
+      "Type": "EnumFilterable",
+      "Options": {
+        "Label": "Speaker",
+        "Width": 250,
+        "Description": "A speaker of its own file. Empty to describe one here only.",
+        "Values": "$OpenDialogues.SpeakerIds"
+      }
+    },
     {
       "Id": "Name",
       "Type": "SmallString",
@@ -43,6 +53,7 @@
     }
   ],
   "Schema": {
+    "Id": "Id",
     "Name": "Name",
     "Epithet": "Epithet",
     "Portrait": "Portrait"

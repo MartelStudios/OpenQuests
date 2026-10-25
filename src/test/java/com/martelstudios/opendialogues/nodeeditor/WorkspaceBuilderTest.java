@@ -23,7 +23,7 @@ class WorkspaceBuilderTest {
         Map<String, String> types = new LinkedHashMap<>();
         types.put("ModClose", "Mod.Close");
 
-        Map<String, String> files = WorkspaceBuilder.build(List.of(dialogue, close), types, Set.of());
+        Map<String, String> files = WorkspaceBuilder.build(List.of(dialogue, close), types, Map.of());
 
         assertEquals(Set.of("_Workspace.json", "Mod.Dialogue.json", "Mod.Close.json"), files.keySet());
         String workspace = files.get("_Workspace.json");
@@ -31,20 +31,21 @@ class WorkspaceBuilderTest {
         assertTrue(workspace.contains("\"Actions\": [\"Mod.Close\"]"), workspace);
         assertTrue(workspace.contains("\"ModClose\": \"Mod.Close\""), workspace);
         assertTrue(workspace.contains("\"MenuName\": \"" + WorkspaceBuilder.ROOT_MENU + "\""), workspace);
+        assertTrue(workspace.contains("\"MenuName\": \"" + WorkspaceBuilder.SPEAKER_ROOT_MENU + "\""), workspace);
     }
 
     @Test
     void writesTheDialogueIdsSortedAndEscaped(@TempDir Path root) throws Exception {
         NodeDefinition open = node(root, "Mod.Open", "Actions", "{\"Values\": " + WorkspaceBuilder.DIALOGUE_IDS + "}");
 
-        Map<String, String> files = WorkspaceBuilder.build(List.of(open), Map.of(), Set.of("b", "a\"q"));
+        Map<String, String> files = WorkspaceBuilder.build(List.of(open), Map.of(), Map.of(WorkspaceBuilder.DIALOGUE_IDS, Set.of("b", "a\"q")));
 
         assertEquals("{\"Values\": [\"a\\\"q\", \"b\"]}", files.get("Mod.Open.json"));
     }
 
     @Test
     void shipsEveryNodeTheModRegisters() throws Exception {
-        for (String file : List.of("Dialogue", "Page", "Response", "CloseAction", "OpenAction", "CommandAction")) {
+        for (String file : List.of("Dialogue", "Page", "Response", "CloseAction", "OpenAction", "CommandAction", "Speaker", "SpeakerAsset")) {
             assertTrue(WorkspaceBuilder.class.getResource("/NodeEditor/OpenDialogues/" + file + ".json") != null, file);
         }
     }

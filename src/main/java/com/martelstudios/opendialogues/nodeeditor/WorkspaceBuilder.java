@@ -25,27 +25,35 @@ public final class WorkspaceBuilder {
 
     public static final String ROOT_NODE = "OpenDialogues.Dialogue";
 
+    public static final String SPEAKER_ROOT_MENU = "OpenDialogues - Speaker";
+
+    public static final String SPEAKER_ROOT_NODE = "OpenDialogues.SpeakerAsset";
+
     public static final String ACTION_VARIANTS = "OpenDialogues.Action.Variants";
 
     public static final String DIALOGUE_IDS = "\"$OpenDialogues.DialogueIds\"";
+
+    public static final String SPEAKER_IDS = "\"$OpenDialogues.SpeakerIds\"";
 
     private WorkspaceBuilder() {}
 
     /**
      * @param nodes       every node, in menu order.
      * @param actionTypes the node drawing each action, by its {@code Type}.
-     * @param dialogueIds the loaded dialogues, offered by the fields that name one.
+     * @param lists       the values written in place of each placeholder, like {@link #DIALOGUE_IDS}.
      * @return the content of each workspace file, by file name.
      */
     @Nonnull
-    public static Map<String, String> build(@Nonnull List<NodeDefinition> nodes, @Nonnull Map<String, String> actionTypes, @Nonnull Collection<String> dialogueIds) throws IOException {
-        String ids = dialogueIds.stream().sorted().map(WorkspaceBuilder::quote).collect(Collectors.joining(", ", "[", "]"));
-
+    public static Map<String, String> build(@Nonnull List<NodeDefinition> nodes, @Nonnull Map<String, String> actionTypes, @Nonnull Map<String, ? extends Collection<String>> lists) throws IOException {
         Map<String, String> files = new LinkedHashMap<>();
         files.put("_Workspace.json", workspace(nodes, actionTypes));
         for (NodeDefinition node : nodes) {
             try (InputStream in = node.resource().openStream()) {
-                files.put(node.id() + ".json", new String(in.readAllBytes(), StandardCharsets.UTF_8).replace(DIALOGUE_IDS, ids));
+                String content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+                for (Map.Entry<String, ? extends Collection<String>> list : lists.entrySet()) {
+                    content = content.replace(list.getKey(), list.getValue().stream().sorted().map(WorkspaceBuilder::quote).collect(Collectors.joining(", ", "[", "]")));
+                }
+                files.put(node.id() + ".json", content);
             }
         }
         return files;
@@ -65,7 +73,8 @@ public final class WorkspaceBuilder {
         return "{\n"
             + "  \"WorkspaceName\": " + quote(WORKSPACE) + ",\n"
             + "  \"Roots\": {\n"
-            + "    \"Dialogue\": { \"RootNodeType\": " + quote(ROOT_NODE) + ", \"MenuName\": " + quote(ROOT_MENU) + " }\n"
+            + "    \"Dialogue\": { \"RootNodeType\": " + quote(ROOT_NODE) + ", \"MenuName\": " + quote(ROOT_MENU) + " },\n"
+            + "    \"Speaker\": { \"RootNodeType\": " + quote(SPEAKER_ROOT_NODE) + ", \"MenuName\": " + quote(SPEAKER_ROOT_MENU) + " }\n"
             + "  },\n"
             + "  \"NodeCategories\": {\n" + categoryEntries + "\n  },\n"
             + "  \"Variants\": {\n"

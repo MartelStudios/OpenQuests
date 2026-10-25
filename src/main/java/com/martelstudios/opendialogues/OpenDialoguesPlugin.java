@@ -15,6 +15,7 @@ import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.nodeeditor.NodeDefinition;
 import com.martelstudios.opendialogues.nodeeditor.WorkspaceBuilder;
 import com.martelstudios.opendialogues.nodeeditor.WorkspaceExporter;
@@ -32,8 +33,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Dialogues as assets: written in the Asset Editor or linked in the Node Editor, opened by id and
- * drawn by whichever presenter they name.
+ * Dialogues and their speakers as assets: written in the Asset Editor or linked in the Node Editor,
+ * opened by id and drawn by whichever presenter they name.
  */
 public class OpenDialoguesPlugin extends JavaPlugin {
 
@@ -65,6 +66,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerAction(OpenDialogueAction.TYPE, OpenDialogueAction.class, OpenDialogueAction.CODEC, node("OpenDialogues.OpenAction", "Actions", "OpenAction.json"));
         registry.registerAction(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC, node("OpenDialogues.CommandAction", "Actions", "CommandAction.json"));
         registry.registerNode(node("OpenDialogues.Speaker", "Dialogue", "Speaker.json"));
+        registry.registerNode(node(WorkspaceBuilder.SPEAKER_ROOT_NODE, "Speaker", "SpeakerAsset.json"));
 
         // shortcut: the chat is the default presenter for every dialogue naming none, make it a server setting when servers ask.
         dialogueService = new DialogueService(registry, ChatPresenter.ID);
@@ -76,10 +78,17 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .setCodec(OpenDialogueAsset.CODEC)
                                                     .setKeyFunction(OpenDialogueAsset::getId)
                                                     .build());
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueSpeakerAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenDialogues/Speakers/")
+                                                    .setCodec(OpenDialogueSpeakerAsset.CODEC)
+                                                    .setKeyFunction(OpenDialogueSpeakerAsset::getId)
+                                                    .build());
 
-        // The workspace lists the dialogue ids, so it follows every change to them
+        // The workspace lists the dialogue and speaker ids, so it follows every change to them
         getEventRegistry().register(LoadedAssetsEvent.class, OpenDialogueAsset.class, this::onDialoguesLoaded);
         getEventRegistry().register(RemovedAssetsEvent.class, OpenDialogueAsset.class, this::onDialoguesRemoved);
+        getEventRegistry().register(LoadedAssetsEvent.class, OpenDialogueSpeakerAsset.class, this::onSpeakersLoaded);
+        getEventRegistry().register(RemovedAssetsEvent.class, OpenDialogueSpeakerAsset.class, this::onSpeakersRemoved);
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
 
         getCommandRegistry().registerCommand(new DialogueCommand(dialogueService));
@@ -113,9 +122,23 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         exportWorkspace();
     }
 
+    private void onSpeakersLoaded(@Nonnull LoadedAssetsEvent<String, OpenDialogueSpeakerAsset, DefaultAssetMap<String, OpenDialogueSpeakerAsset>> event) {
+        exportWorkspace();
+    }
+
+    private void onSpeakersRemoved(@Nonnull RemovedAssetsEvent<String, OpenDialogueSpeakerAsset, DefaultAssetMap<String, OpenDialogueSpeakerAsset>> event) {
+        exportWorkspace();
+    }
+
     private void exportWorkspace() {
         try {
-            var files = WorkspaceBuilder.build(registry.getNodes(), registry.getActionNodes(), dialogueIds());
+            Set<String> dialogueIds = new HashSet<>();
+            Set<String> speakerIds = new HashSet<>(OpenDialogueSpeakerAsset.getAssetStore().getAssetMap().getAssetMap().keySet());
+            for (OpenDialogueAsset dialogue : OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap().values()) {
+                dialogueIds.add(dialogue.getId());
+                collectReferences(dialogue, dialogueIds, speakerIds);
+            }
+            var files = WorkspaceBuilder.build(registry.getNodes(), registry.getActionNodes(), Map.of(WorkspaceBuilder.DIALOGUE_IDS, dialogueIds, WorkspaceBuilder.SPEAKER_IDS, speakerIds));
             var result = WorkspaceExporter.export(WorkspaceExporter.findWorkspacesFolders(AssetModule.get().getBaseAssetPack().getPackLocation()), files);
             result.written().forEach(folder -> getLogger().atInfo().log("Node Editor workspace written to %s", folder));
             result.failed().forEach((folder, error) -> getLogger().atWarning().withCause(error).log("Could not write the Node Editor workspace into %s", folder));
@@ -125,22 +148,17 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     }
 
     /**
-     * Every dialogue loaded, and every id an answer names, loaded or not: see
-     * {@link DialogueAction#getReferencedDialogues}.
+     * Adds every dialogue and speaker id the dialogue names, loaded or not, since the Node Editor
+     * crashes on an id missing from its list: see {@link DialogueAction#getReferencedDialogues}.
      */
-    @Nonnull
-    private static Set<String> dialogueIds() {
-        Map<String, OpenDialogueAsset> loaded = OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap();
-        Set<String> ids = new HashSet<>(loaded.keySet());
-        loaded.values().forEach(dialogue -> collectReferences(dialogue, ids));
-        return ids;
-    }
-
-    private static void collectReferences(@Nonnull OpenDialogueAsset dialogue, @Nonnull Set<String> ids) {
+    private static void collectReferences(@Nonnull OpenDialogueAsset dialogue, @Nonnull Set<String> dialogueIds, @Nonnull Set<String> speakerIds) {
+        if (dialogue.getSpeaker() != null && dialogue.getSpeaker().getReference() != null) {
+            speakerIds.add(dialogue.getSpeaker().getReference());
+        }
         for (DialogueResponse response : dialogue.getResponses()) {
             for (DialogueAction action : response.getActions()) {
-                ids.addAll(action.getReferencedDialogues());
-                action.getInlineDialogues().forEach(inline -> collectReferences(inline, ids));
+                dialogueIds.addAll(action.getReferencedDialogues());
+                action.getInlineDialogues().forEach(inline -> collectReferences(inline, dialogueIds, speakerIds));
             }
         }
     }
