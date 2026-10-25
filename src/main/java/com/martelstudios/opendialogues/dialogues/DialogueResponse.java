@@ -26,7 +26,7 @@ public class DialogueResponse {
     protected DialogueResponse() {}
 
     /**
-     * @return the text of the answer.
+     * @return the text of the answer, or its translation key.
      */
     @Nonnull
     public String getText() {

@@ -73,7 +73,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
         String layout = speaker(commandBuilder);
 
         DialoguePage[] pages = session.dialogue().getPages();
-        if (pages.length > 0) commandBuilder.set(layout + "Text.Text", pages[page].getText());
+        if (pages.length > 0) commandBuilder.set(layout + "Text.TextSpans", Message.translation(pages[page].getText()));
         if (pages.length > 1) commandBuilder.set("#PageCount.Text", (page + 1) + " / " + pages.length);
 
         boolean lastPage = page >= pages.length - 1;
@@ -88,7 +88,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
         for (int index = 0; index < responses.size(); index++) {
             String answer = ANSWERS_CONTAINER + "[" + index + "]";
             commandBuilder.append(ANSWERS_CONTAINER, ANSWER_DOCUMENT);
-            commandBuilder.set(answer + ".Text", responses.get(index).getText());
+            commandBuilder.set(answer + ".TextSpans", Message.translation(responses.get(index).getText()));
             eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, answer, EventData.of(EventDataModel.KEY_ACTION, EventDataModel.ACTION_ANSWER)
                                                                                                .append(EventDataModel.KEY_INDEX, String.valueOf(index)), false);
         }
@@ -115,7 +115,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
         if (nameKey != null) {
             commandBuilder.set(layout + "Name.TextSpans", Message.translation(nameKey));
         } else if (session.dialogue().getTitle() != null) {
-            commandBuilder.set(layout + "Name.Text", session.dialogue().getTitle());
+            commandBuilder.set(layout + "Name.TextSpans", Message.translation(session.dialogue().getTitle()));
         }
 
         String epithet = speaker == null ? null : speaker.getEpithet();

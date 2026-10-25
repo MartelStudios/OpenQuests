@@ -55,7 +55,7 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     }
 
     /**
-     * @return the title shown above the pages, or {@code null} for a dialogue without one.
+     * @return the title or its translation key, or {@code null} for a dialogue without one.
      */
     @Nullable
     public String getTitle() {

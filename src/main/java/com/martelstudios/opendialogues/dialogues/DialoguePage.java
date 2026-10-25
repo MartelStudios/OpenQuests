@@ -22,7 +22,7 @@ public class DialoguePage {
     protected DialoguePage() {}
 
     /**
-     * @return the text of the page.
+     * @return the text of the page, or its translation key.
      */
     @Nonnull
     public String getText() {

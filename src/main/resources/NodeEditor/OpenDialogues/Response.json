@@ -10,7 +10,8 @@
       "Options": {
         "Label": "Text",
         "Default": "",
-        "Width": 300
+        "Width": 300,
+        "Description": "The text, or a translation key."
       }
     }
   ],

@@ -20,15 +20,15 @@ public class ChatPresenter implements DialoguePresenter {
     @Override
     public void show(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
         if (session.dialogue().getTitle() != null) {
-            player.sendMessage(Message.raw("[" + session.dialogue().getTitle() + "]").bold(true));
+            player.sendMessage(Message.join(Message.raw("["), Message.translation(session.dialogue().getTitle()), Message.raw("]")).bold(true));
         }
         for (DialoguePage page : session.dialogue().getPages()) {
-            player.sendMessage(Message.raw(page.getText()));
+            player.sendMessage(Message.translation(page.getText()));
         }
 
         var responses = session.responses();
         for (int i = 0; i < responses.size(); i++) {
-            player.sendMessage(Message.raw("  " + (i + 1) + ". " + responses.get(i).getText()));
+            player.sendMessage(Message.join(Message.raw("  " + (i + 1) + ". "), Message.translation(responses.get(i).getText())));
         }
         if (!responses.isEmpty()) {
             player.sendMessage(Message.raw("/oda <n> " + session.dialogueId()).italic(true));
