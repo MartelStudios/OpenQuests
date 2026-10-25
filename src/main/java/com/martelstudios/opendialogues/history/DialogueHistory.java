@@ -4,6 +4,8 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
+import com.hypixel.hytale.component.Component;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -13,7 +15,7 @@ import java.util.Map;
  * What a player did with each dialogue: how often it opened and how often each answer was picked.
  * Conditions read it to tell a first meeting from the next ones.
  */
-public class DialogueHistory {
+public class DialogueHistory implements Component<EntityStore> {
 
     /**
      * Counts for one dialogue.
@@ -29,6 +31,13 @@ public class DialogueHistory {
 
         private int opened;
         private final Map<String, Integer> answers = new HashMap<>();
+
+        private Entry() {}
+
+        private Entry(@Nonnull Entry other) {
+            opened = other.opened;
+            answers.putAll(other.answers);
+        }
     }
 
     public static final BuilderCodec<DialogueHistory> CODEC = BuilderCodec.builder(DialogueHistory.class, DialogueHistory::new)
@@ -37,6 +46,17 @@ public class DialogueHistory {
                                                                           .build();
 
     private final Map<String, Entry> dialogues = new HashMap<>();
+
+    public DialogueHistory() {}
+
+    private DialogueHistory(@Nonnull DialogueHistory other) {
+        other.dialogues.forEach((id, entry) -> dialogues.put(id, new Entry(entry)));
+    }
+
+    @Override
+    public Component<EntityStore> clone() {
+        return new DialogueHistory(this);
+    }
 
     /**
      * Counts one more opening of a dialogue.

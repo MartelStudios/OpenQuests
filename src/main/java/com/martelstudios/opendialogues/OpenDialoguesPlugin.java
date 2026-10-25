@@ -16,6 +16,9 @@ import com.martelstudios.opendialogues.commands.DialogueCommand;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
+import com.martelstudios.opendialogues.events.DialogueEvent;
+import com.martelstudios.opendialogues.history.DialogueHistory;
+import com.martelstudios.opendialogues.history.DialogueHistoryRecorder;
 import com.martelstudios.opendialogues.displays.impl.chat.ChatDisplay;
 import com.martelstudios.opendialogues.displays.impl.page.PageDisplay;
 import com.martelstudios.opendialogues.services.DialogueService;
@@ -46,6 +49,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     private final Config<DisplayRules> displayRules;
 
     private DialogueService dialogueService;
+
+    private DialogueHistoryRecorder historyRecorder;
 
     public OpenDialoguesPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -87,6 +92,10 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .setCodec(OpenDialogueSpeakerAsset.CODEC)
                                                     .setKeyFunction(OpenDialogueSpeakerAsset::getId)
                                                     .build());
+
+        historyRecorder = new DialogueHistoryRecorder(getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC));
+        getEventRegistry().registerGlobal(DialogueEvent.Opened.class, historyRecorder::onOpened);
+        getEventRegistry().registerGlobal(DialogueEvent.Answered.class, historyRecorder::onAnswered);
 
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
         getEventRegistry().register(AssetEditorFetchAutoCompleteDataEvent.class, DialogueRegistry.DISPLAYS_DATA_SET, event -> suggest(event, registry.getDisplayIds()));

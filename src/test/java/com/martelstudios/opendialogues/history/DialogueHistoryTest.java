@@ -21,6 +21,20 @@ class DialogueHistoryTest {
     }
 
     @Test
+    void aCloneCountsOnItsOwn() {
+        DialogueHistory history = new DialogueHistory();
+        history.recordAnswer("Elder_Welcome", "Accept");
+
+        DialogueHistory copy = (DialogueHistory) history.clone();
+        copy.recordAnswer("Elder_Welcome", "Accept");
+        copy.recordOpened("Elder_Welcome");
+
+        assertEquals(1, history.answered("Elder_Welcome", "Accept"));
+        assertEquals(0, history.opened("Elder_Welcome"));
+        assertEquals(2, copy.answered("Elder_Welcome", "Accept"));
+    }
+
+    @Test
     void unknownDialogueCountsZero() {
         DialogueHistory history = new DialogueHistory();
 
