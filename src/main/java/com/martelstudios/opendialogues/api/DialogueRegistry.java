@@ -19,7 +19,7 @@ public class DialogueRegistry {
     /**
      * The Asset Editor data set suggesting registered display ids.
      */
-    public static final String DISPLAYS_DATA_SET = "OpenDialoguesDisplays";
+    public static final String DISPLAYS_DATA_SET = "opendialogues:displays";
 
     private final Map<String, DialogueDisplay> displays = new ConcurrentHashMap<>();
 
