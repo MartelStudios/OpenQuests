@@ -18,6 +18,7 @@ file name being its id. Prefix it with your pack's name.
 | --- | --- |
 | `Title` | Shown above the pages. |
 | `Display` | What draws the dialogue. Empty for the default, `OpenDialoguesChat`. |
+| `Tags` | Hytale's asset tags, which server owners target to pick a display. A dialogue written inline also carries the tags of the one holding it. |
 | `Pages` | Objects with a `Text`, read in order. |
 | `Responses` | Objects with a `Text` and `Actions` run in order when picked. |
 

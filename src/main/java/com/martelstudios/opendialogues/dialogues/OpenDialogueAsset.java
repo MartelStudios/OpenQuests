@@ -16,6 +16,8 @@ import com.hypixel.hytale.codec.validation.ValidatorCache;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * One exchange shown to a player: a title, pages read in order, and the answers offered once they
@@ -84,6 +86,27 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     @Nullable
     public String getDisplay() {
         return display;
+    }
+
+    /**
+     * @return its {@code Tags} with values expanded, plus those of every dialogue writing it inline,
+     * so one tag on the first dialogue of a series reaches all of it.
+     */
+    @Nonnull
+    public Set<String> getTags() {
+        Set<String> tags = new HashSet<>();
+        for (AssetExtraInfo.Data each = data; each != null; each = each.getContainerData()) {
+            tags.addAll(each.getRawTags().keySet());
+        }
+        return tags;
+    }
+
+    /**
+     * @return the asset pack declaring it, or {@code null} for a dialogue the store does not hold.
+     */
+    @Nullable
+    public String getPack() {
+        return getAssetStore().getAssetMap().getAssetPack(id);
     }
 
     /**

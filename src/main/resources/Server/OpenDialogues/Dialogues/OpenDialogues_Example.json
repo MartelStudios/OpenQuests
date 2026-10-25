@@ -1,6 +1,9 @@
 {
   "Title": "Old Kweebec",
   "Display": "OpenDialoguesPage",
+  "Tags": {
+    "Series": ["OpenDialogues_Example"]
+  },
   "Pages": [
     {
       "Text": "Ah, a traveller. The woods are restless tonight."
