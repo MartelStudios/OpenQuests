@@ -80,8 +80,8 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
 
         boolean lastPage = page >= pages.length - 1;
         commandBuilder.set("#NextButton.Visible", !lastPage);
+        commandBuilder.set("#AnswersColumn.Visible", lastPage);
         if (!lastPage) {
-            commandBuilder.set("#NextButton.Text", Message.translation("opendialogues.page.next"));
             eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#NextButton", EventData.of(EventDataModel.KEY_ACTION, EventDataModel.ACTION_NEXT), false);
             return;
         }

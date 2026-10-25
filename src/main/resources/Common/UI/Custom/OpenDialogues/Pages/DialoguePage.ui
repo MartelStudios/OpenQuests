@@ -1,12 +1,16 @@
 // A dialogue as a bar along the bottom of the screen: the speaker's portrait, their name over the
-// page being read, and the answers on the right. PagePresenter appends one DialogueAnswer.ui per
-// answer into #Answers.
+// page being read, and on the right the next page arrow, or the answers once on the last page.
+// PagePresenter appends one DialogueAnswer.ui per answer into #Answers.
 $C = "../../Common.ui";
 
 @SpeakerNameStyle = LabelStyle(FontSize: 22, TextColor: #e8a93b, RenderBold: true, VerticalAlignment: Center);
 @EpithetStyle = LabelStyle(FontSize: 14, TextColor: #96a9be, VerticalAlignment: Center);
 @PageTextStyle = LabelStyle(FontSize: 18, TextColor: #d8dee6, Wrap: true);
-@PageCountStyle = LabelStyle(FontSize: 13, TextColor: #878e9c, VerticalAlignment: Center);
+@PageCountStyle = LabelStyle(FontSize: 13, TextColor: #878e9c, HorizontalAlignment: End, VerticalAlignment: Center);
+@NextButtonStyle = (
+  Hovered: (Background: PatchStyle(Color: #7896be(0.07))),
+  Pressed: (Background: PatchStyle(Color: #000000(0.18)))
+);
 @InitialStyle = LabelStyle(FontSize: 72, TextColor: #e8a93b, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
 
 Group {
@@ -45,20 +49,35 @@ Group {
 
           Label #PageText { Text: ""; FlexWeight: 1; Style: @PageTextStyle; }
 
-          Group #Footer {
-            LayoutMode: Left;
-            Anchor: (Height: $C.@SmallButtonHeight);
+          Label #PageCount { Text: ""; Anchor: (Height: 18); Style: @PageCountStyle; }
+        }
 
-            Label #PageCount { Text: ""; FlexWeight: 1; Style: @PageCountStyle; }
-            $C.@SmallSecondaryTextButton #NextButton { @Anchor = Anchor(MinWidth: 120); }
+        // The whole column turns the page, so the arrow is hard to miss and easy to hit
+        Button #NextButton {
+          Anchor: (Width: 132);
+          LayoutMode: Center;
+          Style: @NextButtonStyle;
+
+          Sprite #NextArrow {
+            Anchor: (Width: 48, Height: 48);
+            TexturePath: "NextArrow.png";
+            Frame: (Width: 48, Height: 48, PerRow: 8, Count: 48);
+            FramesPerSecond: 20;
           }
         }
 
-        Group #Answers {
-          Anchor: (Width: 360);
-          LayoutMode: TopScrolling;
-          ScrollbarStyle: $C.@DefaultScrollbarStyle;
-          Padding: (Right: 8);
+        Group #AnswersColumn {
+          LayoutMode: Left;
+          Visible: false;
+
+          Group #AnswersSeparator { Anchor: (Width: 1, Right: 18); Background: (Color: #2b3542); }
+
+          Group #Answers {
+            Anchor: (Width: 360);
+            LayoutMode: TopScrolling;
+            ScrollbarStyle: $C.@DefaultScrollbarStyle;
+            Padding: (Right: 8);
+          }
         }
       }
 
