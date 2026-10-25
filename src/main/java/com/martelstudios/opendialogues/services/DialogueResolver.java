@@ -27,7 +27,7 @@ import java.util.random.RandomGenerator;
 public class DialogueResolver {
 
     /**
-     * How many routers deep a resolution may go before it is taken for a loop and leads nowhere.
+     * How many routers deep a resolution may go before it leads nowhere.
      */
     public static final int MAX_DEPTH = 16;
 
@@ -60,7 +60,7 @@ public class DialogueResolver {
     @Nullable
     public OpenDialogueAsset resolve(@Nonnull String id, @Nonnull ConditionContext context) {
         OpenDialogueAsset dialogue = dialogues.apply(id);
-        return dialogue != null ? dialogue : resolveRouter(id, context, 0);
+        return dialogue != null ? dialogue : resolveRouter(id, context, new ArrayDeque<>());
     }
 
     /**
@@ -68,7 +68,7 @@ public class DialogueResolver {
      */
     @Nullable
     public OpenDialogueAsset resolve(@Nonnull DialogueTarget target, @Nonnull ConditionContext context) {
-        return resolve(target, context, 0);
+        return resolve(target, context, new ArrayDeque<>());
     }
 
     /**
@@ -95,18 +95,25 @@ public class DialogueResolver {
     }
 
     @Nullable
-    private OpenDialogueAsset resolve(@Nonnull DialogueTarget target, @Nonnull ConditionContext context, int depth) {
+    private OpenDialogueAsset resolve(@Nonnull DialogueTarget target, @Nonnull ConditionContext context, @Nonnull Deque<String> path) {
         String dialogueId = target.getDialogue();
         if (dialogueId != null) return dialogues.apply(dialogueId);
 
         String routerId = target.getRouter();
-        return routerId == null ? null : resolveRouter(routerId, context, depth);
+        return routerId == null ? null : resolveRouter(routerId, context, path);
     }
 
+    /**
+     * A router already on the path leads nowhere at once, so a loop the validation missed costs
+     * one step per route instead of branching until the depth limit.
+     *
+     * @param path the routers being resolved, outermost first.
+     */
     @Nullable
-    private OpenDialogueAsset resolveRouter(@Nonnull String routerId, @Nonnull ConditionContext context, int depth) {
-        if (depth >= MAX_DEPTH) {
-            LOGGER.atWarning().log("Router '%s' is %d routers deep, taken for a loop.", routerId, depth);
+    private OpenDialogueAsset resolveRouter(@Nonnull String routerId, @Nonnull ConditionContext context, @Nonnull Deque<String> path) {
+        if (path.contains(routerId)) return null;
+        if (path.size() >= MAX_DEPTH) {
+            LOGGER.atWarning().log("Router '%s' is %d routers deep: %s", routerId, path.size(), path);
             return null;
         }
         if (invalidRouters.contains(routerId)) return null;
@@ -114,11 +121,21 @@ public class DialogueResolver {
         OpenDialogueRouterAsset router = routers.apply(routerId);
         if (router == null) return null;
 
+        path.addLast(routerId);
+        try {
+            return select(router, context, path);
+        } finally {
+            path.removeLast();
+        }
+    }
+
+    @Nullable
+    private OpenDialogueAsset select(@Nonnull OpenDialogueRouterAsset router, @Nonnull ConditionContext context, @Nonnull Deque<String> path) {
         return router.getSelector().select(context, new TargetResolver() {
             @Nullable
             @Override
             public OpenDialogueAsset resolve(@Nonnull DialogueTarget target) {
-                return DialogueResolver.this.resolve(target, context, depth + 1);
+                return DialogueResolver.this.resolve(target, context, path);
             }
 
             @Nonnull

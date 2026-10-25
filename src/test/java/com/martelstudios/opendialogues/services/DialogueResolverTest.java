@@ -10,6 +10,7 @@ import com.martelstudios.opendialogues.routers.impl.sequence.SequenceSelector;
 import com.martelstudios.opendialogues.routers.impl.weighted.WeightedSelector;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DialogueResolverTest {
@@ -141,6 +143,13 @@ class DialogueResolverTest {
         router("Loop", "{ \"Type\": \"OpenDialoguesSequence\", \"Default\": { \"Router\": \"Loop\" } }");
 
         assertNull(resolve("Loop"));
+    }
+
+    @Test
+    void aBranchingCycleLeadingNowhereEndsAtOnce() {
+        router("Loop", "{ \"Type\": \"OpenDialoguesSequence\", \"Routes\": [ " + "{ \"Then\": { \"Router\": \"Loop\" } }, ".repeat(3) + "{ \"Then\": { \"Router\": \"Loop\" } } ] }");
+
+        assertNull(assertTimeoutPreemptively(Duration.ofSeconds(1), () -> resolve("Loop")));
     }
 
     @Test
