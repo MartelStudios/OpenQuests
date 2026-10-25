@@ -13,8 +13,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 /**
- * A portrait is a PNG path under {@code Common/}, or only its file name without extension: the
- * Node Editor's file picker writes bare names, the Asset Editor's image picker full paths.
+ * A portrait is a PNG path under {@code Common/}, or only its file name without extension, which
+ * is looked up among every pack's images.
  */
 public final class DialoguePortraits {
 

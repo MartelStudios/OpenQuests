@@ -2,7 +2,7 @@
     "Group": "MartelStudios",
     "Name": "OpenDialogues",
     "Version": "0.1.0",
-    "Description": "Dialogue trees for Hytale: pages, answers and actions, written as assets and linked in the Node Editor",
+    "Description": "Dialogue trees for Hytale: pages, answers and actions",
     "Authors": [
         {
             "Name": "Hazard4U"

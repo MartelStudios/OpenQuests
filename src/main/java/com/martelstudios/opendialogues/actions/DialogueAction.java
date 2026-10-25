@@ -32,17 +32,6 @@ public abstract class DialogueAction {
     public abstract void execute(@Nonnull DialogueContext context);
 
     /**
-     * The Node Editor crashes on a dialogue field holding an id missing from its list, so every id
-     * an action names is listed, even one no pack declares.
-     *
-     * @return the ids of the dialogues this action names.
-     */
-    @Nonnull
-    public Collection<String> getReferencedDialogues() {
-        return List.of();
-    }
-
-    /**
      * @return the dialogues written inline in this action, which their parent names on load.
      */
     @Nonnull

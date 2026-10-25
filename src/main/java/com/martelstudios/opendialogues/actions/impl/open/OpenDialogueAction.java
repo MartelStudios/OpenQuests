@@ -49,12 +49,6 @@ public class OpenDialogueAction extends DialogueAction {
 
     @Nonnull
     @Override
-    public Collection<String> getReferencedDialogues() {
-        return dialogue == null ? List.of() : List.of(dialogue);
-    }
-
-    @Nonnull
-    @Override
     public Collection<OpenDialogueAsset> getInlineDialogues() {
         return inline == null ? List.of() : List.of(inline);
     }

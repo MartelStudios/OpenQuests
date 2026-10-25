@@ -13,12 +13,31 @@
   "Responses": [
     {
       "Text": "Tell me more.",
-      "Actions": [ { "Type": "OpenDialoguesOpen", "Dialogue": "OpenDialogues_ExampleMore" } ]
+      "Actions": [
+        {
+          "Type": "OpenDialoguesOpen",
+          "Inline": {
+            "Title": "New Kweebec",
+            "Presenter": "OpenDialoguesPage",
+            "Speaker": {
+              "Name": "opendialogues.example.elder.name",
+              "Epithet": "opendialogues.example.elder.epithet",
+              "Portrait": "Icons/ModelsGenerated/Kweebec_Sapling.png"
+            },
+            "Pages": [ { "Text": "Will you hear what I have seen?" } ],
+            "Responses": [
+              {
+                "Text": "Goodbye.",
+                "Actions": [ { "Type": "OpenDialoguesClose" } ]
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "Text": "Goodbye.",
       "Actions": [ { "Type": "OpenDialoguesClose" } ]
     }
-  ],
-  "$NodeEditorMetadata": { "$WorkspaceID": "OpenDialogues - Dialogue" }
+  ]
 }
