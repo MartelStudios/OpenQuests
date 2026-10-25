@@ -1,0 +1,54 @@
+{
+  "Selector": {
+    "Type": "OpenDialoguesSequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "OpenDialoguesAny",
+          "Conditions": [
+            { "Type": "OpenDialoguesInventory", "Item": { "ItemId": "Weapon_Sword_Iron" } },
+            { "Type": "OpenDialoguesInventory", "Item": { "ItemId": "Weapon_Axe_Iron" } }
+          ]
+        },
+        "Then": { "Dialogue": "OpenDialogues_ExampleElderArmed" }
+      },
+      {
+        "When": { "Type": "OpenDialoguesAnswered", "Dialogue": "OpenDialogues_ExampleElderWelcome", "Answer": "Thanks" },
+        "Then": {
+          "Router": {
+            "Selector": {
+              "Type": "OpenDialoguesWeighted",
+              "Entries": [
+                {
+                  "Weight": 3,
+                  "Then": {
+                    "Dialogue": {
+                      "Title": "Old Kweebec",
+                      "Display": "OpenDialoguesPage",
+                      "Speaker": "LittleKweebec",
+                      "Pages": [ { "Text": "Back again? The grove remembers you." } ],
+                      "Responses": [ { "Text": "Hello again.", "Actions": [ { "Type": "OpenDialoguesClose" } ] } ]
+                    }
+                  }
+                },
+                {
+                  "Weight": 1,
+                  "Then": {
+                    "Dialogue": {
+                      "Title": "Old Kweebec",
+                      "Display": "OpenDialoguesPage",
+                      "Speaker": "LittleKweebec",
+                      "Pages": [ { "Text": "The wind speaks of you, traveller. It says you walk lightly." } ],
+                      "Responses": [ { "Text": "Does it?", "Actions": [ { "Type": "OpenDialoguesClose" } ] } ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "Default": { "Dialogue": "OpenDialogues_ExampleElderWelcome" }
+  }
+}

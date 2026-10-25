@@ -1,7 +1,8 @@
 # OpenDialogues
 
 Dialogue trees for Hytale. A dialogue is an asset: a title, pages read in order, and answers that
-run actions. Open one with `/odialogues open <id>` (alias `/od open`).
+run actions. Open one with `/odialogues open <id>` (alias `/od open`), where the id names a
+dialogue or a router picking one. A dialogue wins when both share the id.
 
 ## Answering
 
@@ -20,7 +21,7 @@ file name being its id. Prefix it with your pack's name.
 | `Display` | What draws the dialogue, unless the server owner decides otherwise. Empty for the server's default. |
 | `Tags` | Hytale's asset tags, which server owners target to pick a display. A dialogue written inline also carries the tags of the one holding it. |
 | `Pages` | Objects with a `Text`, read in order. |
-| `Responses` | Objects with a `Text` and `Actions` run in order when picked. |
+| `Responses` | Objects with a `Text`, `Actions` run in order when picked, and an optional `Id` naming the answer for conditions. |
 
 Everything is edited in the Asset Editor, under the **OpenDialogueAsset** and
 **OpenDialogueSpeakerAsset** types. Fields naming another asset (`Speaker`, and `Dialogue` in an
@@ -31,8 +32,38 @@ it sets overrides the parent's. Speakers live under `Server/OpenDialogues/Speake
 | Action type | Does |
 | --- | --- |
 | `OpenDialoguesClose` | Ends the dialogue answered. |
-| `OpenDialoguesOpen` | Closes the dialogue answered and opens `Dialogue`, an id or an inline dialogue. |
+| `OpenDialoguesOpen` | Closes the dialogue answered and opens `Dialogue`, or what `Router` picks, each an id or written inline. |
 | `OpenDialoguesCommand` | Runs `Command` as the player. The dialogue stays open. |
+
+## Routers
+
+A router picks a dialogue from what the player did: a welcome the first time, something else once
+it was read. Routers live under `Server/OpenDialogues/Routers/` (type **OpenDialogueRouterAsset**)
+and hold a `Selector`. A target (`Then`, `Default`) is `{ "Dialogue": … }` or `{ "Router": … }`,
+each an id or written inline, so routers nest. A target leading to no dialogue counts as a route
+that does not hold, and the selector moves on. See `OpenDialogues_ExampleElder`.
+
+| Selector type | Picks |
+| --- | --- |
+| `OpenDialoguesSequence` | The first of `Routes` (`When`, `Then`) whose condition holds, else `Default`. |
+| `OpenDialoguesWeighted` | One of `Entries` (`Weight`, optional `When`, `Then`) drawn by weight among those whose condition holds. |
+
+| Condition type | Holds when |
+| --- | --- |
+| `OpenDialoguesSeen` | `Dialogue` was opened at least `Min` times (default 1). |
+| `OpenDialoguesAnswered` | `Answer` of `Dialogue` was picked at least `Min` times. |
+| `OpenDialoguesHolding` | The item in hand matches `Item`. |
+| `OpenDialoguesInventory` | The inventory holds at least `Min` items matching `Item`. |
+| `OpenDialoguesAll`, `OpenDialoguesAny` | Every, or one, of `Conditions` holds. |
+| `OpenDialoguesNot` | `Condition` does not hold. |
+
+`Item` takes an `ItemId`, a `ResourceTypeId` or a `BlockTag`. An answer is named by its `Id`, or by
+its position in the file from 1 when it has none. Dialogues written inline count too: their
+generated id, suggested in the Asset Editor, follows where they sit in their file, so moving one
+forgets what players did with it. Each player's history is saved with them.
+
+Routers are checked once dialogues and routers load: a missing target, a wrong condition or a router
+leading back to itself is logged and makes that router lead nowhere.
 
 ## Choosing displays
 
@@ -55,6 +86,8 @@ registered is skipped.
 Other mods register through `OpenDialoguesPlugin.get().getRegistry()` during their `setup`:
 
 - `registerAction(type, class, codec)`: an answer action, its `Type` carrying the mod's prefix.
+- `registerCondition(type, class, codec)`: a condition routes can read, extending `DialogueCondition`.
+- `registerSelector(type, class, codec)`: a way for routers to pick, extending `DialogueSelector`.
 - `registerDisplay(id, display)`: something drawing dialogues, named by their `Display` field.
 
 `DialogueEvent.Opened`, `Answered` and `Closed` are dispatched keyed on the dialogue id.

@@ -1,0 +1,20 @@
+{
+  "Title": "Old Kweebec",
+  "Display": "OpenDialoguesPage",
+  "Speaker": "LittleKweebec",
+  "Pages": [
+    {
+      "Text": "Put that blade away, the grove does not like steel. Come back when your hands are empty."
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "As you wish.",
+      "Actions": [
+        {
+          "Type": "OpenDialoguesClose"
+        }
+      ]
+    }
+  ]
+}
