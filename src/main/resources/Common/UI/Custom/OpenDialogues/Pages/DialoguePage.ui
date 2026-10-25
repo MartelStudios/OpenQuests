@@ -1,6 +1,6 @@
 // A dialogue as a bar along the bottom of the screen: the speaker's portrait, their name over the
 // page being read, and on the right the next page arrow, or the answers once on the last page.
-// PagePresenter appends one DialogueAnswer.ui per answer into #Answers.
+// PageDisplay appends one DialogueAnswer.ui per answer into #Answers.
 $C = "../../Common.ui";
 
 @SpeakerNameStyle = LabelStyle(FontSize: 22, TextColor: #e8a93b, RenderBold: true, VerticalAlignment: Center);

@@ -1,6 +1,6 @@
 package com.martelstudios.opendialogues.sessions;
 
-import com.martelstudios.opendialogues.presenters.DialoguePresenter;
+import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import com.martelstudios.opendialogues.dialogues.DialogueResponse;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 
@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @param responses the answers shown, in the order shown.
  */
-public record DialogueSession(@Nonnull OpenDialogueAsset dialogue, @Nonnull List<DialogueResponse> responses, @Nonnull DialoguePresenter presenter) {
+public record DialogueSession(@Nonnull OpenDialogueAsset dialogue, @Nonnull List<DialogueResponse> responses, @Nonnull DialogueDisplay display) {
 
     /**
      * @return the id of the open dialogue.

@@ -1,8 +1,8 @@
-package com.martelstudios.opendialogues.presenters.impl.chat;
+package com.martelstudios.opendialogues.displays.impl.chat;
 
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.opendialogues.presenters.DialoguePresenter;
+import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import com.martelstudios.opendialogues.dialogues.DialoguePage;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * Draws a dialogue in the chat: its pages, then its answers numbered for {@code /oda}. Several
  * dialogues can share the chat, so the answers end with the command naming their dialogue.
  */
-public class ChatPresenter implements DialoguePresenter {
+public class ChatDisplay implements DialogueDisplay {
 
     public static final String ID = "OpenDialoguesChat";
 

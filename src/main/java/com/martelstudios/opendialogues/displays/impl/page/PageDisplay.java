@@ -1,4 +1,4 @@
-package com.martelstudios.opendialogues.presenters.impl.page;
+package com.martelstudios.opendialogues.displays.impl.page;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -8,7 +8,7 @@ import com.hypixel.hytale.server.core.entity.entities.player.pages.PageManager;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.opendialogues.presenters.DialoguePresenter;
+import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import com.martelstudios.opendialogues.services.DialogueService;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 
@@ -19,14 +19,14 @@ import java.util.function.BiConsumer;
  * Draws a dialogue as a custom page along the bottom of the screen. The server shows one custom
  * page at a time, so each dialogue shown replaces whatever page was open, another dialogue included.
  */
-public class PagePresenter implements DialoguePresenter {
+public class PageDisplay implements DialogueDisplay {
 
     public static final String ID = "OpenDialoguesPage";
 
     @Nonnull
     private final DialogueService dialogues;
 
-    public PagePresenter(@Nonnull DialogueService dialogues) {
+    public PageDisplay(@Nonnull DialogueService dialogues) {
         this.dialogues = dialogues;
     }
 

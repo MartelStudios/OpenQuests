@@ -13,8 +13,8 @@ import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
-import com.martelstudios.opendialogues.presenters.impl.chat.ChatPresenter;
-import com.martelstudios.opendialogues.presenters.impl.page.PagePresenter;
+import com.martelstudios.opendialogues.displays.impl.chat.ChatDisplay;
+import com.martelstudios.opendialogues.displays.impl.page.PageDisplay;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 
@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
 
 /**
  * Dialogues and their speakers as assets: written in the Asset Editor, opened by id and drawn by
- * whichever presenter they name.
+ * whichever display they name.
  */
 public class OpenDialoguesPlugin extends JavaPlugin {
 
@@ -49,10 +49,10 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerAction(OpenDialogueAction.TYPE, OpenDialogueAction.class, OpenDialogueAction.CODEC);
         registry.registerAction(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC);
 
-        // shortcut: the chat is the default presenter for every dialogue naming none, make it a server setting when servers ask.
-        dialogueService = new DialogueService(registry, ChatPresenter.ID);
-        registry.registerPresenter(ChatPresenter.ID, new ChatPresenter());
-        registry.registerPresenter(PagePresenter.ID, new PagePresenter(dialogueService));
+        // shortcut: the chat is the default display for every dialogue naming none, make it a server setting when servers ask.
+        dialogueService = new DialogueService(registry, ChatDisplay.ID);
+        registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
+        registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService));
 
         getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenDialogues/Dialogues/")
@@ -72,7 +72,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     }
 
     /**
-     * @return where actions and presenters are registered.
+     * @return where actions and displays are registered.
      */
     @Nonnull
     public DialogueRegistry getRegistry() {

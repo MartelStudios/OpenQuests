@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Who speaks a dialogue: a name and an epithet as translation keys, and a portrait. Presenters
+ * Who speaks a dialogue: a name and an epithet as translation keys, and a portrait. Displays
  * that have no room for it, like the chat, leave it out. A speaker is a file of its own or written
  * inline in a dialogue, and starts from another with {@code Parent}.
  */

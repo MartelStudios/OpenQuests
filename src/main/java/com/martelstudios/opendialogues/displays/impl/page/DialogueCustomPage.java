@@ -1,4 +1,4 @@
-package com.martelstudios.opendialogues.presenters.impl.page;
+package com.martelstudios.opendialogues.displays.impl.page;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * One dialogue on screen for {@link PagePresenter}: the pages read one at a time, then the answers.
+ * One dialogue on screen for {@link PageDisplay}: the pages read one at a time, then the answers.
  * Leaving the page by Esc or its close button ends the dialogue, being replaced does not.
  */
 public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPage.EventDataModel> {
@@ -167,7 +167,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
     private void leaveDialogue() {
         if (left) return;
         left = true;
-        // Closing the session takes the page down through the presenter; if it was gone already, do it here
+        // Closing the session takes the page down through the display; if it was gone already, do it here
         if (!dialogues.close(playerRef, session.dialogueId())) close();
     }
 

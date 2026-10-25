@@ -4,7 +4,7 @@ import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.api.DialogueContext;
-import com.martelstudios.opendialogues.presenters.DialoguePresenter;
+import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.events.DialogueEvent;
@@ -40,11 +40,11 @@ public class DialogueService {
     private final DialogueRegistry registry;
 
     @Nonnull
-    private final String defaultPresenter;
+    private final String defaultDisplay;
 
-    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull String defaultPresenter) {
+    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull String defaultDisplay) {
         this.registry = registry;
-        this.defaultPresenter = defaultPresenter;
+        this.defaultDisplay = defaultDisplay;
     }
 
     /**
@@ -67,9 +67,9 @@ public class DialogueService {
      */
     public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue) {
         // shortcut: every answer is shown, filter here once answers carry conditions.
-        DialogueSession session = new DialogueSession(dialogue, List.of(dialogue.getResponses()), presenterFor(dialogue));
+        DialogueSession session = new DialogueSession(dialogue, List.of(dialogue.getResponses()), displayFor(dialogue));
         sessions.put(player.getUuid(), dialogue.getId(), session);
-        session.presenter().show(player, session);
+        session.display().show(player, session);
         dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
     }
 
@@ -129,14 +129,14 @@ public class DialogueService {
     }
 
     private void closed(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
-        session.presenter().close(player, session);
+        session.display().close(player, session);
         dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
     }
 
     @Nonnull
-    private DialoguePresenter presenterFor(@Nonnull OpenDialogueAsset dialogue) {
-        DialoguePresenter presenter = dialogue.getPresenter() == null ? null : registry.getPresenter(dialogue.getPresenter());
-        return presenter != null ? presenter : registry.getPresenter(defaultPresenter);
+    private DialogueDisplay displayFor(@Nonnull OpenDialogueAsset dialogue) {
+        DialogueDisplay display = dialogue.getDisplay() == null ? null : registry.getDisplay(dialogue.getDisplay());
+        return display != null ? display : registry.getDisplay(defaultDisplay);
     }
 
     private static <E extends DialogueEvent> void dispatch(@Nonnull E event, @Nonnull Class<E> type) {

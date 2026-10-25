@@ -1,4 +1,4 @@
-package com.martelstudios.opendialogues.presenters;
+package com.martelstudios.opendialogues.displays;
 
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
  * Draws dialogues for players: the chat, a custom page, anything a mod registers. It only draws;
  * every answer comes back through {@code DialogueService.answer}, whatever the player clicked or typed.
  */
-public interface DialoguePresenter {
+public interface DialogueDisplay {
 
     /**
      * Shows a dialogue just opened, or opened again.

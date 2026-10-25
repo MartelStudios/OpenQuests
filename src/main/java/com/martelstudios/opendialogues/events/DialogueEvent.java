@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
  * Something that happened to a player's dialogue. Keyed on the dialogue id, so a listener can hear
  * one dialogue only, a quest objective "have this discussion" for instance.
  * <p>
- * For reactions, not for drawing: drawing is the presenter's.
+ * For reactions, not for drawing: drawing is the display's.
  */
 public abstract class DialogueEvent implements IEvent<String> {
 

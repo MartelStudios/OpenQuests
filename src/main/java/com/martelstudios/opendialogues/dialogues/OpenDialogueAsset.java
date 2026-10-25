@@ -29,7 +29,7 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     public static final BuilderCodec<OpenDialogueAsset> BODY_CODEC = BuilderCodec.builder(OpenDialogueAsset.class, OpenDialogueAsset::new)
                                                                                  .append(new KeyedCodec<>("Title", Codec.STRING), (dialogue, title) -> dialogue.title = title, dialogue -> dialogue.title)
                                                                                  .add()
-                                                                                 .append(new KeyedCodec<>("Presenter", Codec.STRING), (dialogue, presenter) -> dialogue.presenter = presenter, dialogue -> dialogue.presenter)
+                                                                                 .append(new KeyedCodec<>("Display", Codec.STRING), (dialogue, display) -> dialogue.display = display, dialogue -> dialogue.display)
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Speaker", OpenDialogueSpeakerAsset.CONTAINED_CODEC), (dialogue, speaker) -> dialogue.speaker = speaker, dialogue -> dialogue.speaker)
                                                                                  .add()
@@ -55,7 +55,7 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     protected String title;
 
     @Nullable
-    protected String presenter;
+    protected String display;
 
     @Nullable
     protected String speaker;
@@ -79,11 +79,11 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     }
 
     /**
-     * @return the id of the presenter drawing this dialogue, or {@code null} for the default one.
+     * @return the id of the display drawing this dialogue, or {@code null} for the default one.
      */
     @Nullable
-    public String getPresenter() {
-        return presenter;
+    public String getDisplay() {
+        return display;
     }
 
     /**

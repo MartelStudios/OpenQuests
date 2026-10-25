@@ -5,7 +5,7 @@ run actions. Open one with `/odialogues open <id>` (alias `/od open`).
 
 ## Answering
 
-Answers are drawn by a **presenter**. The chat presenter lists them numbered; pick one with
+Answers are drawn by a **display**. The chat display lists them numbered; pick one with
 `/oda <n>`, or `/oda <n> <dialogue>` when several dialogues are open at once. The dialogue argument
 only suggests the dialogues you have open.
 
@@ -17,7 +17,7 @@ file name being its id. Prefix it with your pack's name.
 | Field | Meaning |
 | --- | --- |
 | `Title` | Shown above the pages. |
-| `Presenter` | What draws the dialogue. Empty for the default, `OpenDialoguesChat`. |
+| `Display` | What draws the dialogue. Empty for the default, `OpenDialoguesChat`. |
 | `Pages` | Objects with a `Text`, read in order. |
 | `Responses` | Objects with a `Text` and `Actions` run in order when picked. |
 
@@ -38,6 +38,6 @@ it sets overrides the parent's. Speakers live under `Server/OpenDialogues/Speake
 Other mods register through `OpenDialoguesPlugin.get().getRegistry()` during their `setup`:
 
 - `registerAction(type, class, codec)`: an answer action, its `Type` carrying the mod's prefix.
-- `registerPresenter(id, presenter)`: something drawing dialogues, named by their `Presenter` field.
+- `registerDisplay(id, display)`: something drawing dialogues, named by their `Display` field.
 
 `DialogueEvent.Opened`, `Answered` and `Closed` are dispatched keyed on the dialogue id.

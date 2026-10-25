@@ -11,7 +11,7 @@ import com.hypixel.hytale.server.core.permissions.provider.HytalePermissionsProv
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.opendialogues.presenters.impl.chat.ChatPresenter;
+import com.martelstudios.opendialogues.displays.impl.chat.ChatDisplay;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 import javax.annotation.Nonnull;
@@ -46,7 +46,7 @@ public class AnswerCommand extends AbstractPlayerCommand {
         switch (dialogues.answer(playerRef, dialogueId, context.get(answerArg))) {
             case ANSWERED -> {}
             case NO_DIALOGUE -> context.sendMessage(Message.raw(dialogueId == null ? "No dialogue open." : "Dialogue '" + dialogueId + "' is not open."));
-            case AMBIGUOUS -> context.sendMessage(ChatPresenter.ambiguous(dialogues.openDialogues(playerRef.getUuid())));
+            case AMBIGUOUS -> context.sendMessage(ChatDisplay.ambiguous(dialogues.openDialogues(playerRef.getUuid())));
             case NO_SUCH_ANSWER -> context.sendMessage(Message.raw("No such answer."));
         }
     }
