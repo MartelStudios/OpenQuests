@@ -75,7 +75,7 @@ Group {
                 Anchor: (Width: 420);
 
                 Group { FlexWeight: 1; Anchor: (Height: 1); Background: (Color: #2b3542); }
-                Group { Anchor: (Width: 11, Height: 8, Horizontal: 8); Background: "../../Common/ContainerPanelSeparatorFancyDecoration.png"; }
+                Group { Anchor: (Width: 11, Height: 8, Left: 8, Right: 8); Background: "../../Common/ContainerPanelSeparatorFancyDecoration.png"; }
                 Group { FlexWeight: 1; Anchor: (Height: 1); Background: (Color: #2b3542); }
               }
             }
