@@ -23,8 +23,8 @@ Group {
 
       Group #Body {
         LayoutMode: Left;
-        Padding: (Full: 22);
-        Background: (TexturePath: "../../Common/ContainerPatch.png", Border: 23);
+        Padding: (Full: 26);
+        Background: (TexturePath: "../../Common/ContainerFullPatch.png", Border: 20);
 
         Group #Portrait {
           Anchor: (Width: 160, Height: 160, Top: 0);
@@ -60,6 +60,16 @@ Group {
           ScrollbarStyle: $C.@DefaultScrollbarStyle;
           Padding: (Right: 8);
         }
+      }
+
+      Group #DecorationTop {
+        Anchor: (Width: 236, Height: 11, Top: -5);
+        Background: "../../Common/ContainerDecorationTop.png";
+      }
+
+      Group #DecorationBottom {
+        Anchor: (Width: 236, Height: 11, Bottom: -6);
+        Background: "../../Common/ContainerDecorationBottom.png";
       }
 
       $C.@CloseButton #CloseButton {}
