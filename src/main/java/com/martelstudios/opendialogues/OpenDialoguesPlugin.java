@@ -23,6 +23,8 @@ import com.martelstudios.opendialogues.services.DialogueService;
 
 import com.martelstudios.opendialogues.conditions.impl.history.AnsweredCondition;
 import com.martelstudios.opendialogues.conditions.impl.history.SeenCondition;
+import com.martelstudios.opendialogues.conditions.impl.items.HoldingCondition;
+import com.martelstudios.opendialogues.conditions.impl.items.InventoryCondition;
 import com.martelstudios.opendialogues.conditions.impl.logic.AllCondition;
 import com.martelstudios.opendialogues.conditions.impl.logic.AnyCondition;
 import com.martelstudios.opendialogues.conditions.impl.logic.NotCondition;
@@ -68,6 +70,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerCondition(NotCondition.TYPE, NotCondition.class, NotCondition.CODEC);
         registry.registerCondition(SeenCondition.TYPE, SeenCondition.class, SeenCondition.CODEC);
         registry.registerCondition(AnsweredCondition.TYPE, AnsweredCondition.class, AnsweredCondition.CODEC);
+        registry.registerCondition(HoldingCondition.TYPE, HoldingCondition.class, HoldingCondition.CODEC);
+        registry.registerCondition(InventoryCondition.TYPE, InventoryCondition.class, InventoryCondition.CODEC);
 
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID);
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
