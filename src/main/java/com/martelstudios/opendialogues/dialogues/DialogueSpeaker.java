@@ -22,6 +22,7 @@ public class DialogueSpeaker {
                                                                                .append(new KeyedCodec<>("Epithet", Codec.STRING), (speaker, epithet) -> speaker.epithet = epithet, speaker -> speaker.epithet)
                                                                                .add()
                                                                                .append(new KeyedCodec<>("Portrait", Codec.STRING), (speaker, portrait) -> speaker.portrait = portrait, speaker -> speaker.portrait)
+                                                                               .addValidator(DialoguePortraits.VALIDATOR)
                                                                                .add()
                                                                                .build();
 
@@ -73,7 +74,8 @@ public class DialogueSpeaker {
      */
     @Nullable
     public String getPortrait() {
-        return portrait != null || referenced() == null ? portrait : referenced().getPortrait();
+        String image = portrait != null || referenced() == null ? portrait : referenced().getPortrait();
+        return image == null || image.isEmpty() ? image : DialoguePortraits.resolve(image);
     }
 
     /**

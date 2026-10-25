@@ -1,6 +1,6 @@
 {
   "Id": "OpenDialogues.SpeakerAsset",
-  "Title": "Speaker",
+  "Title": "Speaker Asset",
   "Color": "Purple",
   "Description": "A speaker described once, for every dialogue naming it to share.",
   "Content": [
@@ -26,12 +26,10 @@
     },
     {
       "Id": "Portrait",
-      "Type": "SmallString",
+      "Type": "FilePath",
       "Options": {
         "Label": "Portrait",
-        "Default": "",
-        "Width": 300,
-        "Description": "Image path under Common/, like Icons/ModelsGenerated/Kweebec_Sapling.png. Empty to show the name's initial."
+        "Description": "A PNG of any pack's Common/ folder, like Icons/ModelsGenerated/Kweebec_Sapling.png. Empty to show the name's initial."
       }
     }
   ],
