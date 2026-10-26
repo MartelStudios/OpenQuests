@@ -137,10 +137,18 @@ public class DialogueService {
      * dialogue if it was open. With no answer for the player to see, it ends as soon as shown.
      */
     public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue) {
+        present(player, dialogue, true);
+    }
+
+    /**
+     * @param opening whether the player opened it, rather than it being redrawn after a stale
+     *                answer, which history must not count as another opening.
+     */
+    private void present(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, boolean opening) {
         DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contextFor(player)), displayFor(dialogue));
         sessions.put(player.getUuid(), dialogue.getId(), session);
         session.display().show(player, session);
-        dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
+        if (opening) dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
         if (session.responses().isEmpty()) {
             sessions.remove(player.getUuid(), dialogue.getId());
             dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
@@ -164,7 +172,7 @@ public class DialogueService {
         }
         OpenDialoguesResponse response = session.responses().get(position - 1);
         if (!response.isShownTo(contextFor(player))) {
-            open(player, session.dialogue());
+            present(player, session.dialogue(), false);
             return AnswerResult.REFRESHED;
         }
 
