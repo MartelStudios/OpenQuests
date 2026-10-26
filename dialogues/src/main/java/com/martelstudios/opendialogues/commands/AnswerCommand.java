@@ -48,6 +48,7 @@ public class AnswerCommand extends AbstractPlayerCommand {
             case NO_DIALOGUE -> context.sendMessage(Message.raw(dialogueId == null ? "No dialogue open." : "Dialogue '" + dialogueId + "' is not open."));
             case AMBIGUOUS -> context.sendMessage(ChatDisplay.ambiguous(dialogues.openDialogues(playerRef.getUuid())));
             case NO_SUCH_ANSWER -> context.sendMessage(Message.raw("No such answer."));
+            case REFRESHED -> {}
         }
     }
 }

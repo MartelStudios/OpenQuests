@@ -15,6 +15,7 @@ import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 import com.martelstudios.opendialogues.sessions.SessionStore;
@@ -41,7 +42,9 @@ public class DialogueService {
         NO_DIALOGUE,
         /** Several dialogues open and none named. */
         AMBIGUOUS,
-        NO_SUCH_ANSWER
+        NO_SUCH_ANSWER,
+        /** The answer no longer applied: nothing ran and the dialogue was shown again. */
+        REFRESHED
     }
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -131,14 +134,17 @@ public class DialogueService {
 
     /**
      * Shows a dialogue to a player, one from the store or one written inline, replacing the same
-     * dialogue if it was open.
+     * dialogue if it was open. With no answer for the player to see, it ends as soon as shown.
      */
     public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue) {
-        // shortcut: every answer is shown, filter here once answers carry conditions.
-        DialogueSession session = new DialogueSession(dialogue, List.of(dialogue.getResponses()), displayFor(dialogue));
+        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contextFor(player)), displayFor(dialogue));
         sessions.put(player.getUuid(), dialogue.getId(), session);
         session.display().show(player, session);
         dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
+        if (session.responses().isEmpty()) {
+            sessions.remove(player.getUuid(), dialogue.getId());
+            dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
+        }
     }
 
     /**
@@ -156,10 +162,15 @@ public class DialogueService {
         if (position < 1 || position > session.responses().size()) {
             return AnswerResult.NO_SUCH_ANSWER;
         }
+        OpenDialoguesResponse response = session.responses().get(position - 1);
+        if (!response.isShownTo(contextFor(player))) {
+            open(player, session.dialogue());
+            return AnswerResult.REFRESHED;
+        }
 
         dispatch(new DialogueEvent.Answered(player, session, position), DialogueEvent.Answered.class);
         DialogueContext context = new DialogueContext(this, player, session);
-        for (DialogueAction action : session.responses().get(position - 1).getActions()) {
+        for (DialogueAction action : response.getActions()) {
             action.execute(context);
         }
         return AnswerResult.ANSWERED;
