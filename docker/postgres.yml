@@ -1,7 +1,7 @@
 # A PostgreSQL to point the JDBC backend at while developing, and a browser to read it with.
 #
 #   docker compose -f docker/postgres.yml up -d
-#   ./gradlew :core:test -Popenquests.jdbc.url=jdbc:postgresql://localhost:5433/openquests \
+#   ./gradlew :quests:core:test -Popenquests.jdbc.url=jdbc:postgresql://localhost:5433/openquests \
 #                        -Popenquests.jdbc.user=openquests \
 #                        -Popenquests.jdbc.password=openquests
 #

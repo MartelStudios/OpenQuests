@@ -32,7 +32,7 @@ repositories {
 
 dependencies {
     // Loaded as a separate plugin at runtime, so it is never bundled in
-    compileOnly(project(":core"))
+    compileOnly(project(":quests:core"))
 
     vineImplementation("curse.maven:opennavigation-1692713:9260487")
 
@@ -42,7 +42,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    testImplementation(project(":core"))
+    testImplementation(project(":quests:core"))
     testImplementation(files(configurations.named("vineServerJar")))
 }
 
@@ -135,19 +135,19 @@ val verifyReleaseArtifacts by tasks.registering {
     group = "verification"
     description = "Checks the jars and the quest content pack that the release publishes."
 
-    dependsOn(":core:jar", tasks.named("jar"), questExamplesZip, ":mods:mmoskilltree:jar")
+    dependsOn(":quests:core:jar", tasks.named("jar"), questExamplesZip, ":mods:mmoskilltree:jar")
 
     val modVersion = project.property("version").toString()
     // Read late: the pack is configured after this project and carries a version of its own
     val packVersion = provider { project(":mods:mmoskilltree").version.toString() }
-    val coreJars = fileTree(project(":core").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
+    val coreJars = fileTree(project(":quests:core").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val extensionJars = fileTree(layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val contentPacks = fileTree(layout.buildDirectory.dir("distributions").get().asFile) { include("*.zip") }
     val packJars = fileTree(project(":mods:mmoskilltree").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val published = mapOf(
-        "core/build/libs/*.jar" to (coreJars to provider { modVersion }),
-        "extension/build/libs/*.jar" to (extensionJars to provider { modVersion }),
-        "extension/build/distributions/*.zip" to (contentPacks to provider { modVersion }),
+        "quests/core/build/libs/*.jar" to (coreJars to provider { modVersion }),
+        "quests/extension/build/libs/*.jar" to (extensionJars to provider { modVersion }),
+        "quests/extension/build/distributions/*.zip" to (contentPacks to provider { modVersion }),
         "mods/mmoskilltree/build/libs/*.jar" to (packJars to packVersion)
     )
 

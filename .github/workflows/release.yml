@@ -85,7 +85,7 @@ jobs:
         with:
           tag_name: ${{ env.TAG }}
           # Only the pack's jar when it is released alone: the rest would pass for a new OpenQuests
-          files: ${{ inputs.version != '' && 'core/build/libs/*.jar,extension/build/libs/*.jar,extension/build/distributions/*.zip,mods/*/build/libs/*.jar' || 'mods/mmoskilltree/build/libs/*.jar' }}
+          files: ${{ inputs.version != '' && 'quests/core/build/libs/*.jar,quests/extension/build/libs/*.jar,quests/extension/build/distributions/*.zip,mods/*/build/libs/*.jar' || 'mods/mmoskilltree/build/libs/*.jar' }}
           generate_release_notes: true
           fail_on_unmatched_files: true
 
@@ -96,9 +96,9 @@ jobs:
         with:
           name: release-artifacts
           path: |
-            core/build/libs/*.jar
-            extension/build/libs/*.jar
-            extension/build/distributions/*.zip
+            quests/core/build/libs/*.jar
+            quests/extension/build/libs/*.jar
+            quests/extension/build/distributions/*.zip
             mods/*/build/libs/*.jar
           if-no-files-found: error
 
@@ -116,15 +116,15 @@ jobs:
           - name: OpenQuests
             relations: openquests-core:requiredDependency,opennavigation:requiredDependency,openquests-examples:optionalDependency
             project_id: '1678106'
-            file: extension/build/libs/OpenQuests-*.jar
+            file: quests/extension/build/libs/OpenQuests-*.jar
           - name: OpenQuests Core
             relations: ''
             project_id: '1678101'
-            file: core/build/libs/OpenQuestsCore-*.jar
+            file: quests/core/build/libs/OpenQuestsCore-*.jar
           - name: OpenQuests Examples
             relations: openquests:requiredDependency
             project_id: '1680200'
-            file: extension/build/distributions/OpenQuestsExamples-*.zip
+            file: quests/extension/build/distributions/OpenQuestsExamples-*.zip
           - name: OpenQuests MMOSkillTree
             relations: openquests:requiredDependency,mmo-skill-tree:requiredDependency,mmo-skill-tree-mastery-pack:optionalDependency
             project_id: '1752171'

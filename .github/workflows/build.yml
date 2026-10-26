@@ -34,6 +34,6 @@ jobs:
         with:
           name: plugins
           path: |
-            core/build/libs/*.jar
-            extension/build/libs/*.jar
+            quests/core/build/libs/*.jar
+            quests/extension/build/libs/*.jar
           if-no-files-found: error
