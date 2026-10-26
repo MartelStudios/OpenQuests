@@ -39,7 +39,7 @@ public abstract class DialogueSelector {
      * @return every target the selector may pick, so loading can check where they lead.
      */
     @Nonnull
-    public abstract List<DialogueTarget> targets();
+    public abstract List<OpenDialoguesTarget> targets();
 
     /**
      * @return every condition the selector reads, so loading can validate them.

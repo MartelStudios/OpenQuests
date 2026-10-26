@@ -4,7 +4,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
-import com.martelstudios.opendialogues.routers.DialogueTarget;
+import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
 import com.martelstudios.opendialogues.routers.TargetResolver;
 
@@ -67,7 +67,7 @@ public class DialogueResolver {
      * @return the dialogue the target leads to for that player, or {@code null} when it leads nowhere.
      */
     @Nullable
-    public OpenDialogueAsset resolve(@Nonnull DialogueTarget target, @Nonnull ConditionContext context) {
+    public OpenDialogueAsset resolve(@Nonnull OpenDialoguesTarget target, @Nonnull ConditionContext context) {
         return resolve(target, context, new ArrayDeque<>());
     }
 
@@ -95,7 +95,7 @@ public class DialogueResolver {
     }
 
     @Nullable
-    private OpenDialogueAsset resolve(@Nonnull DialogueTarget target, @Nonnull ConditionContext context, @Nonnull Deque<String> path) {
+    private OpenDialogueAsset resolve(@Nonnull OpenDialoguesTarget target, @Nonnull ConditionContext context, @Nonnull Deque<String> path) {
         String dialogueId = target.getDialogue();
         if (dialogueId != null) return dialogues.apply(dialogueId);
 
@@ -134,7 +134,7 @@ public class DialogueResolver {
         return router.getSelector().select(context, new TargetResolver() {
             @Nullable
             @Override
-            public OpenDialogueAsset resolve(@Nonnull DialogueTarget target) {
+            public OpenDialogueAsset resolve(@Nonnull OpenDialoguesTarget target) {
                 return DialogueResolver.this.resolve(target, context, path);
             }
 
@@ -151,7 +151,7 @@ public class DialogueResolver {
         OpenDialogueRouterAsset router = routers.apply(routerId);
         if (router == null) return "No router '" + routerId + "'";
 
-        for (DialogueTarget target : router.getSelector().targets()) {
+        for (OpenDialoguesTarget target : router.getSelector().targets()) {
             if (target.getDialogue() != null && dialogues.apply(target.getDialogue()) == null) return "No dialogue '" + target.getDialogue() + "'";
             if (target.getRouter() != null && routers.apply(target.getRouter()) == null) return "No router '" + target.getRouter() + "'";
         }
@@ -179,7 +179,7 @@ public class DialogueResolver {
         if (router == null) return Set.of();
 
         Set<String> targets = new HashSet<>();
-        for (DialogueTarget target : router.getSelector().targets()) {
+        for (OpenDialoguesTarget target : router.getSelector().targets()) {
             if (target.getRouter() != null) targets.add(target.getRouter());
         }
         return targets;

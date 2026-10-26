@@ -12,18 +12,18 @@ import javax.annotation.Nonnull;
 /**
  * Holds while the item in the player's hand is one the filter accepts.
  */
-public class HoldingCondition extends DialogueCondition {
+public class OpenDialoguesHoldingCondition extends DialogueCondition {
 
     public static final String TYPE = "Holding";
 
-    public static final BuilderCodec<HoldingCondition> CODEC = BuilderCodec.builder(HoldingCondition.class, HoldingCondition::new, DialogueCondition.BASE_CODEC)
-                                                                           .append(new KeyedCodec<>("Item", DialogueItemFilter.CODEC, true), (condition, item) -> condition.item = item, condition -> condition.item)
+    public static final BuilderCodec<OpenDialoguesHoldingCondition> CODEC = BuilderCodec.builder(OpenDialoguesHoldingCondition.class, OpenDialoguesHoldingCondition::new, DialogueCondition.BASE_CODEC)
+                                                                           .append(new KeyedCodec<>("Item", OpenDialoguesItemFilter.CODEC, true), (condition, item) -> condition.item = item, condition -> condition.item)
                                                                            .add()
                                                                            .build();
 
-    protected DialogueItemFilter item;
+    protected OpenDialoguesItemFilter item;
 
-    protected HoldingCondition() {}
+    protected OpenDialoguesHoldingCondition() {}
 
     /**
      * Fails off the player's world thread, where the hand cannot be read.

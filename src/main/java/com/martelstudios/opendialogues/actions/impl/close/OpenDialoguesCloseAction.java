@@ -9,11 +9,11 @@ import javax.annotation.Nonnull;
 /**
  * Ends the dialogue answered.
  */
-public class CloseDialogueAction extends DialogueAction {
+public class OpenDialoguesCloseAction extends DialogueAction {
 
     public static final String TYPE = "Close";
 
-    public static final BuilderCodec<CloseDialogueAction> CODEC = BuilderCodec.builder(CloseDialogueAction.class, CloseDialogueAction::new, DialogueAction.BASE_CODEC).build();
+    public static final BuilderCodec<OpenDialoguesCloseAction> CODEC = BuilderCodec.builder(OpenDialoguesCloseAction.class, OpenDialoguesCloseAction::new, DialogueAction.BASE_CODEC).build();
 
     @Override
     public void execute(@Nonnull DialogueContext context) {

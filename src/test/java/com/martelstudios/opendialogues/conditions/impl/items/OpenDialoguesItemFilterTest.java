@@ -7,21 +7,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class DialogueItemFilterTest {
+class OpenDialoguesItemFilterTest {
 
     @Test
     void aFilterNamingNothingIsRefused() {
-        assertNull(CodecJson.decode(DialogueItemFilter.CODEC, "{}"));
+        assertNull(CodecJson.decode(OpenDialoguesItemFilter.CODEC, "{}"));
     }
 
     @Test
     void aTagAloneIsEnough() {
-        assertNotNull(CodecJson.decode(DialogueItemFilter.CODEC, "{ \"BlockTag\": \"Wood\" }"));
+        assertNotNull(CodecJson.decode(OpenDialoguesItemFilter.CODEC, "{ \"BlockTag\": \"Wood\" }"));
     }
 
     @Test
     void nothingMatchesAMissingId() {
-        DialogueItemFilter filter = CodecJson.decode(DialogueItemFilter.CODEC, "{ \"BlockTag\": \"Wood\" }");
+        OpenDialoguesItemFilter filter = CodecJson.decode(OpenDialoguesItemFilter.CODEC, "{ \"BlockTag\": \"Wood\" }");
 
         assertNotNull(filter);
         assertFalse(filter.matches(null));

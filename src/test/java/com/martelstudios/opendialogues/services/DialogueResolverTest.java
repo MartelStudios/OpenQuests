@@ -6,8 +6,8 @@ import com.martelstudios.opendialogues.conditions.ConditionFixtures;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
-import com.martelstudios.opendialogues.routers.impl.sequence.SequenceSelector;
-import com.martelstudios.opendialogues.routers.impl.weighted.WeightedSelector;
+import com.martelstudios.opendialogues.routers.impl.sequence.OpenDialoguesSequenceSelector;
+import com.martelstudios.opendialogues.routers.impl.weighted.OpenDialoguesWeightedSelector;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -29,8 +29,8 @@ class DialogueResolverTest {
         // Loads the condition fixtures, which register the conditions routes read
         ConditionFixtures.context(new DialogueHistory());
         DialogueRegistry registry = new DialogueRegistry();
-        registry.registerSelector(SequenceSelector.TYPE, SequenceSelector.class, SequenceSelector.CODEC);
-        registry.registerSelector(WeightedSelector.TYPE, WeightedSelector.class, WeightedSelector.CODEC);
+        registry.registerSelector(OpenDialoguesSequenceSelector.TYPE, OpenDialoguesSequenceSelector.class, OpenDialoguesSequenceSelector.CODEC);
+        registry.registerSelector(OpenDialoguesWeightedSelector.TYPE, OpenDialoguesWeightedSelector.class, OpenDialoguesWeightedSelector.CODEC);
     }
 
     private final Map<String, OpenDialogueAsset> dialogues = new HashMap<>();

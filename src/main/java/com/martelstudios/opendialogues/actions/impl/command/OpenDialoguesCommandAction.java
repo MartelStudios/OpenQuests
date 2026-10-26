@@ -13,11 +13,11 @@ import javax.annotation.Nonnull;
 /**
  * Runs a command as the player, with the player's own permissions. The dialogue stays open.
  */
-public class CommandDialogueAction extends DialogueAction {
+public class OpenDialoguesCommandAction extends DialogueAction {
 
     public static final String TYPE = "Command";
 
-    public static final BuilderCodec<CommandDialogueAction> CODEC = BuilderCodec.builder(CommandDialogueAction.class, CommandDialogueAction::new, DialogueAction.BASE_CODEC)
+    public static final BuilderCodec<OpenDialoguesCommandAction> CODEC = BuilderCodec.builder(OpenDialoguesCommandAction.class, OpenDialoguesCommandAction::new, DialogueAction.BASE_CODEC)
                                                                                 .append(new KeyedCodec<>("Command", Codec.STRING), (action, command) -> action.command = command, action -> action.command)
                                                                                 .addValidator(Validators.nonNull())
                                                                                 .add()

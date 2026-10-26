@@ -18,11 +18,11 @@ import java.util.function.Function;
  * Holds while the player opened a dialogue between {@code Min} and {@code Max} times, inline
  * dialogues included.
  */
-public class OpenedCondition extends DialogueCondition {
+public class OpenDialoguesOpenedCondition extends DialogueCondition {
 
     public static final String TYPE = "Opened";
 
-    public static final BuilderCodec<OpenedCondition> CODEC = BuilderCodec.builder(OpenedCondition.class, OpenedCondition::new, DialogueCondition.BASE_CODEC)
+    public static final BuilderCodec<OpenDialoguesOpenedCondition> CODEC = BuilderCodec.builder(OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition::new, DialogueCondition.BASE_CODEC)
                                                                         .append(new KeyedCodec<>("Dialogue", Codec.STRING, true), (condition, dialogue) -> condition.dialogue = dialogue, condition -> condition.dialogue)
                                                                         .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
                                                                         .add()
@@ -37,7 +37,7 @@ public class OpenedCondition extends DialogueCondition {
     @Nullable
     protected Integer max;
 
-    protected OpenedCondition() {}
+    protected OpenDialoguesOpenedCondition() {}
 
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {

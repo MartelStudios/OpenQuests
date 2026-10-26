@@ -14,11 +14,11 @@ import javax.annotation.Nullable;
  * Which items a condition accepts: one item, every item under a tag, or every item of a resource
  * type, the families recipes accept such as any sword or any flower. Same keys as OpenQuests.
  */
-public class DialogueItemFilter {
+public class OpenDialoguesItemFilter {
 
     private static final int NO_TAG = Integer.MIN_VALUE;
 
-    public static final BuilderCodec<DialogueItemFilter> CODEC = BuilderCodec.builder(DialogueItemFilter.class, DialogueItemFilter::new)
+    public static final BuilderCodec<OpenDialoguesItemFilter> CODEC = BuilderCodec.builder(OpenDialoguesItemFilter.class, OpenDialoguesItemFilter::new)
                                                                              .append(new KeyedCodec<>("BlockTag", Codec.STRING), (filter, tag) -> filter.blockTag = tag, filter -> filter.blockTag)
                                                                              .add()
                                                                              .append(new KeyedCodec<>("ItemId", Codec.STRING), (filter, id) -> filter.itemId = id, filter -> filter.itemId)
@@ -48,7 +48,7 @@ public class DialogueItemFilter {
     @Nullable
     protected String resourceTypeId;
 
-    protected DialogueItemFilter() {}
+    protected OpenDialoguesItemFilter() {}
 
     /**
      * @param id an item id, {@code null} for an empty slot.

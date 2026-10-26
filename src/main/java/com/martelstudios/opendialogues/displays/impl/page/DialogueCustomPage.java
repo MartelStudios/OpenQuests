@@ -14,7 +14,7 @@ import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.opendialogues.dialogues.DialoguePage;
+import com.martelstudios.opendialogues.dialogues.OpenDialoguesPage;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.services.DialogueService;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
@@ -72,7 +72,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
 
         String layout = speaker(commandBuilder);
 
-        DialoguePage[] pages = session.dialogue().getPages();
+        OpenDialoguesPage[] pages = session.dialogue().getPages();
         if (pages.length > 0) commandBuilder.set(layout + "Text.TextSpans", Message.translation(pages[page].getText()));
         if (pages.length > 1) commandBuilder.set("#PageCount.Text", (page + 1) + " / " + pages.length);
 

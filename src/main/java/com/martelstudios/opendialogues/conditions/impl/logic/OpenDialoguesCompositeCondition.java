@@ -16,11 +16,11 @@ import java.util.function.Function;
  * Combines {@code Conditions} with {@code Operator}: {@code And} holds for an empty list, {@code Or}
  * never does. With {@code Not}, the pair gives "not all" and "none".
  */
-public class CompositeCondition extends DialogueCondition {
+public class OpenDialoguesCompositeCondition extends DialogueCondition {
 
     public static final String TYPE = "Composite";
 
-    public static final BuilderCodec<CompositeCondition> CODEC = BuilderCodec.builder(CompositeCondition.class, CompositeCondition::new, DialogueCondition.BASE_CODEC)
+    public static final BuilderCodec<OpenDialoguesCompositeCondition> CODEC = BuilderCodec.builder(OpenDialoguesCompositeCondition.class, OpenDialoguesCompositeCondition::new, DialogueCondition.BASE_CODEC)
                                                                              .append(new KeyedCodec<>("Operator", new EnumCodec<>(Operator.class)), (condition, operator) -> condition.operator = operator, condition -> condition.operator)
                                                                              .add()
                                                                              .append(new KeyedCodec<>("Conditions", new ArrayCodec<>(DialogueCondition.CODEC, DialogueCondition[]::new)), (condition, conditions) -> condition.conditions = conditions, condition -> condition.conditions)
@@ -30,7 +30,7 @@ public class CompositeCondition extends DialogueCondition {
     protected Operator operator = Operator.AND;
     protected DialogueCondition[] conditions = new DialogueCondition[0];
 
-    protected CompositeCondition() {}
+    protected OpenDialoguesCompositeCondition() {}
 
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {

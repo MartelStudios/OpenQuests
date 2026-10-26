@@ -38,9 +38,9 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Speaker", OpenDialogueSpeakerAsset.CONTAINED_CODEC), (dialogue, speaker) -> dialogue.speaker = speaker, dialogue -> dialogue.speaker)
                                                                                  .add()
-                                                                                 .append(new KeyedCodec<>("Pages", new ArrayCodec<>(DialoguePage.CODEC, DialoguePage[]::new)), (dialogue, pages) -> dialogue.pages = pages, dialogue -> dialogue.pages)
+                                                                                 .append(new KeyedCodec<>("Pages", new ArrayCodec<>(OpenDialoguesPage.CODEC, OpenDialoguesPage[]::new)), (dialogue, pages) -> dialogue.pages = pages, dialogue -> dialogue.pages)
                                                                                  .add()
-                                                                                 .append(new KeyedCodec<>("Responses", new ArrayCodec<>(DialogueResponse.CODEC, DialogueResponse[]::new)), (dialogue, responses) -> dialogue.responses = responses, dialogue -> dialogue.responses)
+                                                                                 .append(new KeyedCodec<>("Responses", new ArrayCodec<>(OpenDialoguesResponse.CODEC, OpenDialoguesResponse[]::new)), (dialogue, responses) -> dialogue.responses = responses, dialogue -> dialogue.responses)
                                                                                  .add()
                                                                                  .validator((dialogue, results) -> {
                                                                                      String error = dialogue.findAnswerKeyError();
@@ -69,8 +69,8 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     @Nullable
     protected String speaker;
 
-    protected DialoguePage[] pages = new DialoguePage[0];
-    protected DialogueResponse[] responses = new DialogueResponse[0];
+    protected OpenDialoguesPage[] pages = new OpenDialoguesPage[0];
+    protected OpenDialoguesResponse[] responses = new OpenDialoguesResponse[0];
 
     protected OpenDialogueAsset() {}
 
@@ -128,7 +128,7 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
      * @return the pages, in reading order.
      */
     @Nonnull
-    public DialoguePage[] getPages() {
+    public OpenDialoguesPage[] getPages() {
         return pages;
     }
 
@@ -136,7 +136,7 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
      * @return every answer the file declares, shown or not.
      */
     @Nonnull
-    public DialogueResponse[] getResponses() {
+    public OpenDialoguesResponse[] getResponses() {
         return responses;
     }
 
@@ -145,7 +145,7 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
      * position in the file from 1.
      */
     @Nonnull
-    public String answerKey(@Nonnull DialogueResponse response) {
+    public String answerKey(@Nonnull OpenDialoguesResponse response) {
         if (response.getId() != null) return response.getId();
         for (int i = 0; i < responses.length; i++) {
             if (responses[i] == response) return Integer.toString(i + 1);
@@ -157,8 +157,8 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
      * @return the answer recorded under that key, or {@code null} for none.
      */
     @Nullable
-    public DialogueResponse findAnswer(@Nonnull String key) {
-        for (DialogueResponse response : responses) {
+    public OpenDialoguesResponse findAnswer(@Nonnull String key) {
+        for (OpenDialoguesResponse response : responses) {
             if (answerKey(response).equals(key)) return response;
         }
         return null;
@@ -170,7 +170,7 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     @Nullable
     private String findAnswerKeyError() {
         Set<String> keys = new HashSet<>();
-        for (DialogueResponse response : responses) {
+        for (OpenDialoguesResponse response : responses) {
             String responseId = response.getId();
             if (responseId != null && responseId.chars().allMatch(Character::isDigit)) {
                 return "Answer id '" + responseId + "' is a number, which positions already use";

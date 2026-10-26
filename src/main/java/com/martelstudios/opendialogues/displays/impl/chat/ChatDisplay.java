@@ -3,7 +3,7 @@ package com.martelstudios.opendialogues.displays.impl.chat;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.displays.DialogueDisplay;
-import com.martelstudios.opendialogues.dialogues.DialoguePage;
+import com.martelstudios.opendialogues.dialogues.OpenDialoguesPage;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 
 import javax.annotation.Nonnull;
@@ -22,7 +22,7 @@ public class ChatDisplay implements DialogueDisplay {
         if (session.dialogue().getTitle() != null) {
             player.sendMessage(Message.join(Message.raw("["), Message.translation(session.dialogue().getTitle()), Message.raw("]")).bold(true));
         }
-        for (DialoguePage page : session.dialogue().getPages()) {
+        for (OpenDialoguesPage page : session.dialogue().getPages()) {
             player.sendMessage(Message.translation(page.getText()));
         }
 

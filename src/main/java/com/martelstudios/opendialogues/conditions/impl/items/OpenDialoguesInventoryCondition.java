@@ -17,12 +17,12 @@ import java.util.function.Function;
  * Holds while the player carries between {@code Min} and {@code Max} items the filter accepts,
  * anywhere in their inventory.
  */
-public class InventoryCondition extends DialogueCondition {
+public class OpenDialoguesInventoryCondition extends DialogueCondition {
 
     public static final String TYPE = "Inventory";
 
-    public static final BuilderCodec<InventoryCondition> CODEC = BuilderCodec.builder(InventoryCondition.class, InventoryCondition::new, DialogueCondition.BASE_CODEC)
-                                                                             .append(new KeyedCodec<>("Item", DialogueItemFilter.CODEC, true), (condition, item) -> condition.item = item, condition -> condition.item)
+    public static final BuilderCodec<OpenDialoguesInventoryCondition> CODEC = BuilderCodec.builder(OpenDialoguesInventoryCondition.class, OpenDialoguesInventoryCondition::new, DialogueCondition.BASE_CODEC)
+                                                                             .append(new KeyedCodec<>("Item", OpenDialoguesItemFilter.CODEC, true), (condition, item) -> condition.item = item, condition -> condition.item)
                                                                              .add()
                                                                              .append(new KeyedCodec<>("Min", Codec.INTEGER), (condition, min) -> condition.min = min, condition -> condition.min)
                                                                              .add()
@@ -30,12 +30,12 @@ public class InventoryCondition extends DialogueCondition {
                                                                              .add()
                                                                              .build();
 
-    protected DialogueItemFilter item;
+    protected OpenDialoguesItemFilter item;
     protected int min = 1;
     @Nullable
     protected Integer max;
 
-    protected InventoryCondition() {}
+    protected OpenDialoguesInventoryCondition() {}
 
     /**
      * Fails off the player's world thread, where the inventory cannot be read.

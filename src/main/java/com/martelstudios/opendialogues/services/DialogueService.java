@@ -6,7 +6,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.history.DialogueHistory;
-import com.martelstudios.opendialogues.routers.DialogueTarget;
+import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.DialogueAction;
@@ -105,7 +105,7 @@ public class DialogueService {
      *
      * @return whether the target led to a dialogue.
      */
-    public boolean open(@Nonnull PlayerRef player, @Nonnull DialogueTarget target) {
+    public boolean open(@Nonnull PlayerRef player, @Nonnull OpenDialoguesTarget target) {
         return show(player, resolver.resolve(target, contextFor(player)));
     }
 

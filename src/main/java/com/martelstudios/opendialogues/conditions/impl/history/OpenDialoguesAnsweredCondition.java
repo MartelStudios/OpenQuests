@@ -18,11 +18,11 @@ import java.util.function.Function;
  * Holds while the player picked an answer between {@code Min} and {@code Max} times. The answer is
  * named by its {@code Id}, or by its position in the file from 1 when it has none.
  */
-public class AnsweredCondition extends DialogueCondition {
+public class OpenDialoguesAnsweredCondition extends DialogueCondition {
 
     public static final String TYPE = "Answered";
 
-    public static final BuilderCodec<AnsweredCondition> CODEC = BuilderCodec.builder(AnsweredCondition.class, AnsweredCondition::new, DialogueCondition.BASE_CODEC)
+    public static final BuilderCodec<OpenDialoguesAnsweredCondition> CODEC = BuilderCodec.builder(OpenDialoguesAnsweredCondition.class, OpenDialoguesAnsweredCondition::new, DialogueCondition.BASE_CODEC)
                                                                             .append(new KeyedCodec<>("Dialogue", Codec.STRING, true), (condition, dialogue) -> condition.dialogue = dialogue, condition -> condition.dialogue)
                                                                             .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
                                                                             .add()
@@ -40,7 +40,7 @@ public class AnsweredCondition extends DialogueCondition {
     @Nullable
     protected Integer max;
 
-    protected AnsweredCondition() {}
+    protected OpenDialoguesAnsweredCondition() {}
 
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {

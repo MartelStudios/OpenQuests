@@ -2,9 +2,9 @@ package com.martelstudios.opendialogues.conditions;
 
 import com.martelstudios.opendialogues.CodecJson;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
-import com.martelstudios.opendialogues.conditions.impl.history.AnsweredCondition;
-import com.martelstudios.opendialogues.conditions.impl.history.OpenedCondition;
-import com.martelstudios.opendialogues.conditions.impl.logic.CompositeCondition;
+import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesAnsweredCondition;
+import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesOpenedCondition;
+import com.martelstudios.opendialogues.conditions.impl.logic.OpenDialoguesCompositeCondition;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 
 import javax.annotation.Nonnull;
@@ -16,9 +16,9 @@ public final class ConditionFixtures {
 
     static {
         DialogueRegistry registry = new DialogueRegistry();
-        registry.registerCondition(CompositeCondition.TYPE, CompositeCondition.class, CompositeCondition.CODEC);
-        registry.registerCondition(OpenedCondition.TYPE, OpenedCondition.class, OpenedCondition.CODEC);
-        registry.registerCondition(AnsweredCondition.TYPE, AnsweredCondition.class, AnsweredCondition.CODEC);
+        registry.registerCondition(OpenDialoguesCompositeCondition.TYPE, OpenDialoguesCompositeCondition.class, OpenDialoguesCompositeCondition.CODEC);
+        registry.registerCondition(OpenDialoguesOpenedCondition.TYPE, OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition.CODEC);
+        registry.registerCondition(OpenDialoguesAnsweredCondition.TYPE, OpenDialoguesAnsweredCondition.class, OpenDialoguesAnsweredCondition.CODEC);
     }
 
     private ConditionFixtures() {}

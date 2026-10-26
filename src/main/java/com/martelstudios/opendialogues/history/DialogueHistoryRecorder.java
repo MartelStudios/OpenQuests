@@ -7,7 +7,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.opendialogues.dialogues.DialogueResponse;
+import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 
@@ -41,7 +41,7 @@ public class DialogueHistoryRecorder {
      */
     public void onAnswered(@Nonnull DialogueEvent.Answered event) {
         DialogueSession session = event.getSession();
-        DialogueResponse response = session.responses().get(event.getPosition() - 1);
+        OpenDialoguesResponse response = session.responses().get(event.getPosition() - 1);
         String answerKey = session.dialogue().answerKey(response);
         write(event.getPlayer(), history -> history.recordAnswer(session.dialogueId(), answerKey));
     }

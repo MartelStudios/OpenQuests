@@ -7,9 +7,9 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.util.Config;
-import com.martelstudios.opendialogues.actions.impl.close.CloseDialogueAction;
-import com.martelstudios.opendialogues.actions.impl.command.CommandDialogueAction;
-import com.martelstudios.opendialogues.actions.impl.open.OpenDialogueAction;
+import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
+import com.martelstudios.opendialogues.actions.impl.command.OpenDialoguesCommandAction;
+import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
@@ -18,8 +18,8 @@ import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
-import com.martelstudios.opendialogues.routers.impl.sequence.SequenceSelector;
-import com.martelstudios.opendialogues.routers.impl.weighted.WeightedSelector;
+import com.martelstudios.opendialogues.routers.impl.sequence.OpenDialoguesSequenceSelector;
+import com.martelstudios.opendialogues.routers.impl.weighted.OpenDialoguesWeightedSelector;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 import com.martelstudios.opendialogues.history.DialogueHistoryRecorder;
 import com.martelstudios.opendialogues.displays.impl.chat.ChatDisplay;
@@ -27,11 +27,11 @@ import com.martelstudios.opendialogues.displays.impl.page.PageDisplay;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 
-import com.martelstudios.opendialogues.conditions.impl.history.AnsweredCondition;
-import com.martelstudios.opendialogues.conditions.impl.history.OpenedCondition;
-import com.martelstudios.opendialogues.conditions.impl.items.HoldingCondition;
-import com.martelstudios.opendialogues.conditions.impl.items.InventoryCondition;
-import com.martelstudios.opendialogues.conditions.impl.logic.CompositeCondition;
+import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesAnsweredCondition;
+import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesOpenedCondition;
+import com.martelstudios.opendialogues.conditions.impl.items.OpenDialoguesHoldingCondition;
+import com.martelstudios.opendialogues.conditions.impl.items.OpenDialoguesInventoryCondition;
+import com.martelstudios.opendialogues.conditions.impl.logic.OpenDialoguesCompositeCondition;
 
 import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.martelstudios.opendialogues.services.DialogueResolver;
@@ -74,18 +74,18 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     protected void setup() {
         super.setup();
 
-        registry.registerAction(CloseDialogueAction.TYPE, CloseDialogueAction.class, CloseDialogueAction.CODEC);
-        registry.registerAction(OpenDialogueAction.TYPE, OpenDialogueAction.class, OpenDialogueAction.CODEC);
-        registry.registerAction(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC);
+        registry.registerAction(OpenDialoguesCloseAction.TYPE, OpenDialoguesCloseAction.class, OpenDialoguesCloseAction.CODEC);
+        registry.registerAction(OpenDialoguesOpenAction.TYPE, OpenDialoguesOpenAction.class, OpenDialoguesOpenAction.CODEC);
+        registry.registerAction(OpenDialoguesCommandAction.TYPE, OpenDialoguesCommandAction.class, OpenDialoguesCommandAction.CODEC);
 
-        registry.registerCondition(CompositeCondition.TYPE, CompositeCondition.class, CompositeCondition.CODEC);
-        registry.registerCondition(OpenedCondition.TYPE, OpenedCondition.class, OpenedCondition.CODEC);
-        registry.registerCondition(AnsweredCondition.TYPE, AnsweredCondition.class, AnsweredCondition.CODEC);
-        registry.registerCondition(HoldingCondition.TYPE, HoldingCondition.class, HoldingCondition.CODEC);
-        registry.registerCondition(InventoryCondition.TYPE, InventoryCondition.class, InventoryCondition.CODEC);
+        registry.registerCondition(OpenDialoguesCompositeCondition.TYPE, OpenDialoguesCompositeCondition.class, OpenDialoguesCompositeCondition.CODEC);
+        registry.registerCondition(OpenDialoguesOpenedCondition.TYPE, OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition.CODEC);
+        registry.registerCondition(OpenDialoguesAnsweredCondition.TYPE, OpenDialoguesAnsweredCondition.class, OpenDialoguesAnsweredCondition.CODEC);
+        registry.registerCondition(OpenDialoguesHoldingCondition.TYPE, OpenDialoguesHoldingCondition.class, OpenDialoguesHoldingCondition.CODEC);
+        registry.registerCondition(OpenDialoguesInventoryCondition.TYPE, OpenDialoguesInventoryCondition.class, OpenDialoguesInventoryCondition.CODEC);
 
-        registry.registerSelector(SequenceSelector.TYPE, SequenceSelector.class, SequenceSelector.CODEC);
-        registry.registerSelector(WeightedSelector.TYPE, WeightedSelector.class, WeightedSelector.CODEC);
+        registry.registerSelector(OpenDialoguesSequenceSelector.TYPE, OpenDialoguesSequenceSelector.class, OpenDialoguesSequenceSelector.CODEC);
+        registry.registerSelector(OpenDialoguesWeightedSelector.TYPE, OpenDialoguesWeightedSelector.class, OpenDialoguesWeightedSelector.CODEC);
 
         historyRecorder = new DialogueHistoryRecorder(getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC));
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());

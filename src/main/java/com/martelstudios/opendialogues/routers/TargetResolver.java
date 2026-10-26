@@ -15,7 +15,7 @@ public interface TargetResolver {
      * @return the dialogue the target leads to, or {@code null} when it leads nowhere.
      */
     @Nullable
-    OpenDialogueAsset resolve(@Nonnull DialogueTarget target);
+    OpenDialogueAsset resolve(@Nonnull OpenDialoguesTarget target);
 
     /**
      * @return the source of random draws, seeded in tests.

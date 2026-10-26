@@ -8,7 +8,7 @@ import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.routers.DialogueSelector;
-import com.martelstudios.opendialogues.routers.DialogueTarget;
+import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.martelstudios.opendialogues.routers.TargetResolver;
 
 import javax.annotation.Nonnull;
@@ -20,26 +20,26 @@ import java.util.List;
  * Draws one of the entries whose condition holds, the heavier the likelier, anew each time. An
  * entry leading nowhere is set aside and the draw runs again among the rest.
  */
-public class WeightedSelector extends DialogueSelector {
+public class OpenDialoguesWeightedSelector extends DialogueSelector {
 
     public static final String TYPE = "Weighted";
 
-    public static final BuilderCodec<WeightedSelector> CODEC = BuilderCodec.builder(WeightedSelector.class, WeightedSelector::new, DialogueSelector.BASE_CODEC)
-                                                                           .append(new KeyedCodec<>("Entries", new ArrayCodec<>(Entry.CODEC, Entry[]::new)), (selector, entries) -> selector.entries = entries, selector -> selector.entries)
+    public static final BuilderCodec<OpenDialoguesWeightedSelector> CODEC = BuilderCodec.builder(OpenDialoguesWeightedSelector.class, OpenDialoguesWeightedSelector::new, DialogueSelector.BASE_CODEC)
+                                                                           .append(new KeyedCodec<>("Entries", new ArrayCodec<>(OpenDialoguesWeightedEntry.CODEC, OpenDialoguesWeightedEntry[]::new)), (selector, entries) -> selector.entries = entries, selector -> selector.entries)
                                                                            .add()
                                                                            .build();
 
     /**
      * A target with its weight, eligible when its condition holds or when it has none.
      */
-    public static class Entry {
+    public static class OpenDialoguesWeightedEntry {
 
-        public static final BuilderCodec<Entry> CODEC = BuilderCodec.builder(Entry.class, Entry::new)
+        public static final BuilderCodec<OpenDialoguesWeightedEntry> CODEC = BuilderCodec.builder(OpenDialoguesWeightedEntry.class, OpenDialoguesWeightedEntry::new)
                                                                     .append(new KeyedCodec<>("Weight", Codec.INTEGER), (entry, weight) -> entry.weight = weight, entry -> entry.weight)
                                                                     .add()
                                                                     .append(new KeyedCodec<>("When", DialogueCondition.CODEC), (entry, when) -> entry.when = when, entry -> entry.when)
                                                                     .add()
-                                                                    .append(new KeyedCodec<>("Then", DialogueTarget.CODEC, true), (entry, then) -> entry.then = then, entry -> entry.then)
+                                                                    .append(new KeyedCodec<>("Then", OpenDialoguesTarget.CODEC, true), (entry, then) -> entry.then = then, entry -> entry.then)
                                                                     .add()
                                                                     .validator((entry, results) -> {
                                                                         if (entry.weight <= 0) results.fail("Weight must be above 0");
@@ -51,21 +51,21 @@ public class WeightedSelector extends DialogueSelector {
         @Nullable
         protected DialogueCondition when;
 
-        protected DialogueTarget then;
+        protected OpenDialoguesTarget then;
 
-        protected Entry() {}
+        protected OpenDialoguesWeightedEntry() {}
     }
 
-    protected Entry[] entries = new Entry[0];
+    protected OpenDialoguesWeightedEntry[] entries = new OpenDialoguesWeightedEntry[0];
 
-    protected WeightedSelector() {}
+    protected OpenDialoguesWeightedSelector() {}
 
     @Nullable
     @Override
     public OpenDialogueAsset select(@Nonnull ConditionContext context, @Nonnull TargetResolver resolver) {
-        List<Entry> eligible = new ArrayList<>(entries.length);
+        List<OpenDialoguesWeightedEntry> eligible = new ArrayList<>(entries.length);
         int total = 0;
-        for (Entry entry : entries) {
+        for (OpenDialoguesWeightedEntry entry : entries) {
             if (entry.when == null || entry.when.test(context)) {
                 eligible.add(entry);
                 total += entry.weight;
@@ -73,7 +73,7 @@ public class WeightedSelector extends DialogueSelector {
         }
 
         while (!eligible.isEmpty()) {
-            Entry drawn = draw(eligible, resolver.random().nextInt(total));
+            OpenDialoguesWeightedEntry drawn = draw(eligible, resolver.random().nextInt(total));
             OpenDialogueAsset dialogue = resolver.resolve(drawn.then);
             if (dialogue != null) return dialogue;
 
@@ -84,8 +84,8 @@ public class WeightedSelector extends DialogueSelector {
     }
 
     @Nonnull
-    private static Entry draw(@Nonnull List<Entry> eligible, int roll) {
-        for (Entry entry : eligible) {
+    private static OpenDialoguesWeightedEntry draw(@Nonnull List<OpenDialoguesWeightedEntry> eligible, int roll) {
+        for (OpenDialoguesWeightedEntry entry : eligible) {
             roll -= entry.weight;
             if (roll < 0) return entry;
         }
@@ -94,9 +94,9 @@ public class WeightedSelector extends DialogueSelector {
 
     @Nonnull
     @Override
-    public List<DialogueTarget> targets() {
-        List<DialogueTarget> targets = new ArrayList<>(entries.length);
-        for (Entry entry : entries) targets.add(entry.then);
+    public List<OpenDialoguesTarget> targets() {
+        List<OpenDialoguesTarget> targets = new ArrayList<>(entries.length);
+        for (OpenDialoguesWeightedEntry entry : entries) targets.add(entry.then);
         return targets;
     }
 
@@ -104,7 +104,7 @@ public class WeightedSelector extends DialogueSelector {
     @Override
     public List<DialogueCondition> conditions() {
         List<DialogueCondition> conditions = new ArrayList<>(entries.length);
-        for (Entry entry : entries) {
+        for (OpenDialoguesWeightedEntry entry : entries) {
             if (entry.when != null) conditions.add(entry.when);
         }
         return conditions;

@@ -12,9 +12,9 @@ import javax.annotation.Nullable;
 /**
  * An answer the player can pick, and what picking it does, in order.
  */
-public class DialogueResponse {
+public class OpenDialoguesResponse {
 
-    public static final BuilderCodec<DialogueResponse> CODEC = BuilderCodec.builder(DialogueResponse.class, DialogueResponse::new)
+    public static final BuilderCodec<OpenDialoguesResponse> CODEC = BuilderCodec.builder(OpenDialoguesResponse.class, OpenDialoguesResponse::new)
                                                                            .append(new KeyedCodec<>("Id", Codec.STRING), (response, id) -> response.id = id, response -> response.id)
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Text", Codec.STRING), (response, text) -> response.text = text, response -> response.text)
@@ -29,7 +29,7 @@ public class DialogueResponse {
     private String text = "";
     private DialogueAction[] actions = new DialogueAction[0];
 
-    protected DialogueResponse() {}
+    protected OpenDialoguesResponse() {}
 
     /**
      * @return the name history records the answer under, or {@code null} to record it by position.
