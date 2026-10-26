@@ -9,6 +9,32 @@
   ],
   "Responses": [
     {
+      "Id": "Potion",
+      "Text": "I brought you a healing potion.",
+      "When": {
+        "Type": "Inventory",
+        "Item": {
+          "ItemId": "Potion_Health_Lesser"
+        },
+        "Min": 1
+      },
+      "Actions": [
+        {
+          "Type": "Open",
+          "Dialogue": {
+            "Title": "Old Kweebec",
+            "Display": "Page",
+            "Speaker": "LittleKweebec",
+            "Pages": [
+              {
+                "Text": "For my old roots? You are kind, traveller. The grove will remember it."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
       "Id": "Thanks",
       "Text": "Thank you, elder.",
       "Actions": [
