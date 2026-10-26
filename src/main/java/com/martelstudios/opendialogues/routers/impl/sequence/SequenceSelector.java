@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class SequenceSelector extends DialogueSelector {
 
-    public static final String TYPE = "OpenDialoguesSequence";
+    public static final String TYPE = "Sequence";
 
     public static final BuilderCodec<SequenceSelector> CODEC = BuilderCodec.builder(SequenceSelector.class, SequenceSelector::new, DialogueSelector.BASE_CODEC)
                                                                            .append(new KeyedCodec<>("Routes", new ArrayCodec<>(Route.CODEC, Route[]::new)), (selector, routes) -> selector.routes = routes, selector -> selector.routes)

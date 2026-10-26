@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
  */
 public class CloseDialogueAction extends DialogueAction {
 
-    public static final String TYPE = "OpenDialoguesClose";
+    public static final String TYPE = "Close";
 
     public static final BuilderCodec<CloseDialogueAction> CODEC = BuilderCodec.builder(CloseDialogueAction.class, CloseDialogueAction::new, DialogueAction.BASE_CODEC).build();
 

@@ -15,7 +15,7 @@ import java.util.function.Function;
  */
 public class NotCondition extends DialogueCondition {
 
-    public static final String TYPE = "OpenDialoguesNot";
+    public static final String TYPE = "Not";
 
     public static final BuilderCodec<NotCondition> CODEC = BuilderCodec.builder(NotCondition.class, NotCondition::new, DialogueCondition.BASE_CODEC)
                                                                        .append(new KeyedCodec<>("Condition", DialogueCondition.CODEC, true), (condition, inner) -> condition.condition = inner, condition -> condition.condition)

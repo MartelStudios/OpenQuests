@@ -18,7 +18,7 @@ import java.util.function.Function;
  */
 public class SeenCondition extends DialogueCondition {
 
-    public static final String TYPE = "OpenDialoguesSeen";
+    public static final String TYPE = "Seen";
 
     public static final BuilderCodec<SeenCondition> CODEC = BuilderCodec.builder(SeenCondition.class, SeenCondition::new, DialogueCondition.BASE_CODEC)
                                                                         .append(new KeyedCodec<>("Dialogue", Codec.STRING, true), (condition, dialogue) -> condition.dialogue = dialogue, condition -> condition.dialogue)

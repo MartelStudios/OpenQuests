@@ -18,7 +18,7 @@ class HistoryConditionsTest {
 
     @Test
     void seenHoldsFromMinOpenings() {
-        DialogueCondition seen = condition("{ \"Type\": \"OpenDialoguesSeen\", \"Dialogue\": \"Elder_Welcome\", \"Min\": 2 }");
+        DialogueCondition seen = condition("{ \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\", \"Min\": 2 }");
         DialogueHistory history = new DialogueHistory();
 
         history.recordOpened("Elder_Welcome");
@@ -30,7 +30,7 @@ class HistoryConditionsTest {
 
     @Test
     void answeredReadsTheAnswerKey() {
-        DialogueCondition answered = condition("{ \"Type\": \"OpenDialoguesAnswered\", \"Dialogue\": \"Elder_Flowers\", \"Answer\": \"Accept\" }");
+        DialogueCondition answered = condition("{ \"Type\": \"Answered\", \"Dialogue\": \"Elder_Flowers\", \"Answer\": \"Accept\" }");
         DialogueHistory history = new DialogueHistory();
 
         history.recordAnswer("Elder_Flowers", "Refuse");
@@ -42,7 +42,7 @@ class HistoryConditionsTest {
 
     @Test
     void seenValidationNamesAMissingDialogue() {
-        DialogueCondition seen = condition("{ \"Type\": \"OpenDialoguesSeen\", \"Dialogue\": \"Elder_Welcome\" }");
+        DialogueCondition seen = condition("{ \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\" }");
 
         assertNotNull(seen.validate(id -> null));
     }
@@ -52,13 +52,13 @@ class HistoryConditionsTest {
         OpenDialogueAsset flowers = CodecJson.decode(OpenDialogueAsset.BODY_CODEC, "{ \"Responses\": [ { \"Text\": \"a\", \"Id\": \"Accept\" } ] }");
         Map<String, OpenDialogueAsset> dialogues = Map.of("Elder_Flowers", flowers);
 
-        assertNull(condition("{ \"Type\": \"OpenDialoguesAnswered\", \"Dialogue\": \"Elder_Flowers\", \"Answer\": \"Accept\" }").validate(dialogues::get));
-        assertNotNull(condition("{ \"Type\": \"OpenDialoguesAnswered\", \"Dialogue\": \"Elder_Flowers\", \"Answer\": \"Refuse\" }").validate(dialogues::get));
+        assertNull(condition("{ \"Type\": \"Answered\", \"Dialogue\": \"Elder_Flowers\", \"Answer\": \"Accept\" }").validate(dialogues::get));
+        assertNotNull(condition("{ \"Type\": \"Answered\", \"Dialogue\": \"Elder_Flowers\", \"Answer\": \"Refuse\" }").validate(dialogues::get));
     }
 
     @Test
     void validationReachesNestedConditions() {
-        DialogueCondition not = condition("{ \"Type\": \"OpenDialoguesNot\", \"Condition\": { \"Type\": \"OpenDialoguesSeen\", \"Dialogue\": \"Elder_Welcome\" } }");
+        DialogueCondition not = condition("{ \"Type\": \"Not\", \"Condition\": { \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\" } }");
 
         assertNotNull(not.validate(id -> null));
     }

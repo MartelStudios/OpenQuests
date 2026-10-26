@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class WeightedSelector extends DialogueSelector {
 
-    public static final String TYPE = "OpenDialoguesWeighted";
+    public static final String TYPE = "Weighted";
 
     public static final BuilderCodec<WeightedSelector> CODEC = BuilderCodec.builder(WeightedSelector.class, WeightedSelector::new, DialogueSelector.BASE_CODEC)
                                                                            .append(new KeyedCodec<>("Entries", new ArrayCodec<>(Entry.CODEC, Entry[]::new)), (selector, entries) -> selector.entries = entries, selector -> selector.entries)

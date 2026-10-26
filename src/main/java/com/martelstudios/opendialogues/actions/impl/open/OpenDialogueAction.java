@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
  */
 public class OpenDialogueAction extends DialogueAction {
 
-    public static final String TYPE = "OpenDialoguesOpen";
+    public static final String TYPE = "Open";
 
     public static final BuilderCodec<OpenDialogueAction> CODEC = BuilderCodec.builder(OpenDialogueAction.class, OpenDialogueAction::new, DialogueAction.BASE_CODEC)
                                                                              .append(new KeyedCodec<>("Dialogue", OpenDialogueAsset.CONTAINED_CODEC), (action, dialogue) -> action.dialogue = dialogue, action -> action.dialogue)

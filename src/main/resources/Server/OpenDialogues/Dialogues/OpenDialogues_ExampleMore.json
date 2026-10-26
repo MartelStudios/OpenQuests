@@ -1,6 +1,6 @@
 {
   "Title": "Old Kweebec",
-  "Display": "OpenDialoguesPage",
+  "Display": "Page",
   "Pages": [
     {
       "Text": "Trorks gather by the river. Keep away from the water after dusk."
@@ -11,7 +11,7 @@
       "Text": "Thank you, I will be careful.",
       "Actions": [
         {
-          "Type": "OpenDialoguesClose"
+          "Type": "Close"
         }
       ]
     },
@@ -19,7 +19,7 @@
       "Text": "Where is the river?",
       "Actions": [
         {
-          "Type": "OpenDialoguesCommand",
+          "Type": "Command",
           "Command": "help"
         }
       ]

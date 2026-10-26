@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
  */
 public class InventoryCondition extends DialogueCondition {
 
-    public static final String TYPE = "OpenDialoguesInventory";
+    public static final String TYPE = "Inventory";
 
     public static final BuilderCodec<InventoryCondition> CODEC = BuilderCodec.builder(InventoryCondition.class, InventoryCondition::new, DialogueCondition.BASE_CODEC)
                                                                              .append(new KeyedCodec<>("Item", DialogueItemFilter.CODEC, true), (condition, item) -> condition.item = item, condition -> condition.item)

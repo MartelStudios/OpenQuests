@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class ChatDisplay implements DialogueDisplay {
 
-    public static final String ID = "OpenDialoguesChat";
+    public static final String ID = "Chat";
 
     @Override
     public void show(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {

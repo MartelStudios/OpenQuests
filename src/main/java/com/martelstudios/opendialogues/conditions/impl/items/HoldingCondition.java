@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
  */
 public class HoldingCondition extends DialogueCondition {
 
-    public static final String TYPE = "OpenDialoguesHolding";
+    public static final String TYPE = "Holding";
 
     public static final BuilderCodec<HoldingCondition> CODEC = BuilderCodec.builder(HoldingCondition.class, HoldingCondition::new, DialogueCondition.BASE_CODEC)
                                                                            .append(new KeyedCodec<>("Item", DialogueItemFilter.CODEC, true), (condition, item) -> condition.item = item, condition -> condition.item)

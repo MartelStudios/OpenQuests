@@ -21,7 +21,7 @@ import java.util.function.BiConsumer;
  */
 public class PageDisplay implements DialogueDisplay {
 
-    public static final String ID = "OpenDialoguesPage";
+    public static final String ID = "Page";
 
     @Nonnull
     private final DialogueService dialogues;

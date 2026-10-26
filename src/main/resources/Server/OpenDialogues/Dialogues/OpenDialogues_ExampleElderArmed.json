@@ -1,6 +1,6 @@
 {
   "Title": "Old Kweebec",
-  "Display": "OpenDialoguesPage",
+  "Display": "Page",
   "Speaker": "LittleKweebec",
   "Pages": [
     {
@@ -12,7 +12,7 @@
       "Text": "As you wish.",
       "Actions": [
         {
-          "Type": "OpenDialoguesClose"
+          "Type": "Close"
         }
       ]
     }

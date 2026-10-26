@@ -1,6 +1,6 @@
 {
   "Title": "Old Kweebec",
-  "Display": "OpenDialoguesPage",
+  "Display": "Page",
   "Tags": {
     "Series": [
       "OpenDialogues_Example"
@@ -19,7 +19,7 @@
       "Text": "Tell me more.",
       "Actions": [
         {
-          "Type": "OpenDialoguesOpen",
+          "Type": "Open",
           "Dialogue": "OpenDialogues_ExampleMore"
         }
       ]
@@ -28,7 +28,7 @@
       "Text": "Goodbye.",
       "Actions": [
         {
-          "Type": "OpenDialoguesClose"
+          "Type": "Close"
         }
       ]
     }

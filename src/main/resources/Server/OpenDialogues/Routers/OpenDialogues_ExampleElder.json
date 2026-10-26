@@ -1,33 +1,33 @@
 {
   "Selector": {
-    "Type": "OpenDialoguesSequence",
+    "Type": "Sequence",
     "Routes": [
       {
         "When": {
-          "Type": "OpenDialoguesAny",
+          "Type": "Any",
           "Conditions": [
-            { "Type": "OpenDialoguesInventory", "Item": { "ItemId": "Weapon_Sword_Iron" } },
-            { "Type": "OpenDialoguesInventory", "Item": { "ItemId": "Weapon_Axe_Iron" } }
+            { "Type": "Inventory", "Item": { "ItemId": "Weapon_Sword_Iron" } },
+            { "Type": "Inventory", "Item": { "ItemId": "Weapon_Axe_Iron" } }
           ]
         },
         "Then": { "Dialogue": "OpenDialogues_ExampleElderArmed" }
       },
       {
-        "When": { "Type": "OpenDialoguesAnswered", "Dialogue": "OpenDialogues_ExampleElderWelcome", "Answer": "Thanks" },
+        "When": { "Type": "Answered", "Dialogue": "OpenDialogues_ExampleElderWelcome", "Answer": "Thanks" },
         "Then": {
           "Router": {
             "Selector": {
-              "Type": "OpenDialoguesWeighted",
+              "Type": "Weighted",
               "Entries": [
                 {
                   "Weight": 3,
                   "Then": {
                     "Dialogue": {
                       "Title": "Old Kweebec",
-                      "Display": "OpenDialoguesPage",
+                      "Display": "Page",
                       "Speaker": "LittleKweebec",
                       "Pages": [ { "Text": "Back again? The grove remembers you." } ],
-                      "Responses": [ { "Text": "Hello again.", "Actions": [ { "Type": "OpenDialoguesClose" } ] } ]
+                      "Responses": [ { "Text": "Hello again.", "Actions": [ { "Type": "Close" } ] } ]
                     }
                   }
                 },
@@ -36,10 +36,10 @@
                   "Then": {
                     "Dialogue": {
                       "Title": "Old Kweebec",
-                      "Display": "OpenDialoguesPage",
+                      "Display": "Page",
                       "Speaker": "LittleKweebec",
                       "Pages": [ { "Text": "The wind speaks of you, traveller. It says you walk lightly." } ],
-                      "Responses": [ { "Text": "Does it?", "Actions": [ { "Type": "OpenDialoguesClose" } ] } ]
+                      "Responses": [ { "Text": "Does it?", "Actions": [ { "Type": "Close" } ] } ]
                     }
                   }
                 }

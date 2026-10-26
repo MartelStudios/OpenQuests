@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
  */
 public class CommandDialogueAction extends DialogueAction {
 
-    public static final String TYPE = "OpenDialoguesCommand";
+    public static final String TYPE = "Command";
 
     public static final BuilderCodec<CommandDialogueAction> CODEC = BuilderCodec.builder(CommandDialogueAction.class, CommandDialogueAction::new, DialogueAction.BASE_CODEC)
                                                                                 .append(new KeyedCodec<>("Command", Codec.STRING), (action, command) -> action.command = command, action -> action.command)

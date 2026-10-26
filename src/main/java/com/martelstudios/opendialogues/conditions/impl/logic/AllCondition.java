@@ -16,7 +16,7 @@ import java.util.function.Function;
  */
 public class AllCondition extends DialogueCondition {
 
-    public static final String TYPE = "OpenDialoguesAll";
+    public static final String TYPE = "All";
 
     public static final BuilderCodec<AllCondition> CODEC = BuilderCodec.builder(AllCondition.class, AllCondition::new, DialogueCondition.BASE_CODEC)
                                                                        .append(new KeyedCodec<>("Conditions", new ArrayCodec<>(DialogueCondition.CODEC, DialogueCondition[]::new)), (condition, conditions) -> condition.conditions = conditions, condition -> condition.conditions)

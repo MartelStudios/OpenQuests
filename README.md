@@ -25,15 +25,15 @@ file name being its id. Prefix it with your pack's name.
 
 Everything is edited in the Asset Editor, under the **OpenDialogueAsset** and
 **OpenDialogueSpeakerAsset** types. Fields naming another asset (`Speaker`, and `Dialogue` in an
-`OpenDialoguesOpen` action) take either its id or a whole asset written inline, which becomes an
+`Open` action) take either its id or a whole asset written inline, which becomes an
 asset of its own with a generated id. A speaker starts from another with `Parent`, then each field
 it sets overrides the parent's. Speakers live under `Server/OpenDialogues/Speakers/`.
 
 | Action type | Does |
 | --- | --- |
-| `OpenDialoguesClose` | Ends the dialogue answered. |
-| `OpenDialoguesOpen` | Closes the dialogue answered and opens `Dialogue`, or what `Router` picks, each an id or written inline. |
-| `OpenDialoguesCommand` | Runs `Command` as the player. The dialogue stays open. |
+| `Close` | Ends the dialogue answered. |
+| `Open` | Closes the dialogue answered and opens `Dialogue`, or what `Router` picks, each an id or written inline. |
+| `Command` | Runs `Command` as the player. The dialogue stays open. |
 
 ## Routers
 
@@ -45,17 +45,17 @@ that does not hold, and the selector moves on. See `OpenDialogues_ExampleElder`.
 
 | Selector type | Picks |
 | --- | --- |
-| `OpenDialoguesSequence` | The first of `Routes` (`When`, `Then`) whose condition holds, else `Default`. |
-| `OpenDialoguesWeighted` | One of `Entries` (`Weight`, optional `When`, `Then`) drawn by weight among those whose condition holds. |
+| `Sequence` | The first of `Routes` (`When`, `Then`) whose condition holds, else `Default`. |
+| `Weighted` | One of `Entries` (`Weight`, optional `When`, `Then`) drawn by weight among those whose condition holds. |
 
 | Condition type | Holds when |
 | --- | --- |
-| `OpenDialoguesSeen` | `Dialogue` was opened at least `Min` times (default 1). |
-| `OpenDialoguesAnswered` | `Answer` of `Dialogue` was picked at least `Min` times. |
-| `OpenDialoguesHolding` | The item in hand matches `Item`. |
-| `OpenDialoguesInventory` | The inventory holds at least `Min` items matching `Item`. |
-| `OpenDialoguesAll`, `OpenDialoguesAny` | Every, or one, of `Conditions` holds. |
-| `OpenDialoguesNot` | `Condition` does not hold. |
+| `Seen` | `Dialogue` was opened at least `Min` times (default 1). |
+| `Answered` | `Answer` of `Dialogue` was picked at least `Min` times. |
+| `Holding` | The item in hand matches `Item`. |
+| `Inventory` | The inventory holds at least `Min` items matching `Item`. |
+| `All`, `Any` | Every, or one, of `Conditions` holds. |
+| `Not` | `Condition` does not hold. |
 
 `Item` takes an `ItemId`, a `ResourceTypeId` or a `BlockTag`. An answer is named by its `Id`, or by
 its position in the file from 1 when it has none. Dialogues written inline count too: their
@@ -71,7 +71,7 @@ Server owners pick displays with `/odialogues display`, saved in the plugin's `D
 
 | Command | Does |
 | --- | --- |
-| `default <display>` | Display for dialogues naming none. `OpenDialoguesChat` at first. |
+| `default <display>` | Display for dialogues naming none. `Chat` at first. |
 | `set <target> <display> [--position=<n>]` | Display for dialogues matching `*`, `dialogue:<id>`, `tag:<tag>` or `pack:<pack>`, over their own `Display`. |
 | `unset <target>` | Removes that rule. |
 | `list` | Shows the default and the rules in order. |

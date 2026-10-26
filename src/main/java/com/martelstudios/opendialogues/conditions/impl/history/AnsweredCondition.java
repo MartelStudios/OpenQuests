@@ -19,7 +19,7 @@ import java.util.function.Function;
  */
 public class AnsweredCondition extends DialogueCondition {
 
-    public static final String TYPE = "OpenDialoguesAnswered";
+    public static final String TYPE = "Answered";
 
     public static final BuilderCodec<AnsweredCondition> CODEC = BuilderCodec.builder(AnsweredCondition.class, AnsweredCondition::new, DialogueCondition.BASE_CODEC)
                                                                             .append(new KeyedCodec<>("Dialogue", Codec.STRING, true), (condition, dialogue) -> condition.dialogue = dialogue, condition -> condition.dialogue)
