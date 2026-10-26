@@ -28,7 +28,7 @@ jobs:
       - name: Build
         run: ./gradlew build
 
-      # Both plugins, so a pull request can be tried without building it locally
+      # The plugins, so a pull request can be tried without building it locally
       - name: Upload plugins
         uses: actions/upload-artifact@v4
         with:
@@ -36,4 +36,5 @@ jobs:
           path: |
             quests/core/build/libs/*.jar
             quests/extension/build/libs/*.jar
+            dialogues/build/libs/*.jar
           if-no-files-found: error

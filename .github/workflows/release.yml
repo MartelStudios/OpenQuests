@@ -7,7 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to release, without the leading v, as in 1.0.0, or empty to release the MMOSkillTree pack alone'
+        description: 'Version to release, without the leading v, as in 1.0.0, or empty to release one mod below alone'
+        required: false
+        default: ''
+      dialogues_version:
+        description: 'Version of OpenDialogues to publish, or empty to leave it out'
         required: false
         default: ''
       mmoskilltree_version:
@@ -18,15 +22,47 @@ on:
 permissions:
   contents: write
 
-# A pack released alone gets a tag of its own, so it never takes an OpenQuests version
-env:
-  TAG: ${{ inputs.version != '' && format('v{0}', inputs.version) || format('mmoskilltree-v{0}', inputs.mmoskilltree_version) }}
-
 jobs:
   release:
     runs-on: ubuntu-latest
 
+    outputs:
+      tag: ${{ steps.pick.outputs.tag }}
+
     steps:
+      # A mod released alone gets a tag of its own, so it never takes an OpenQuests version, and a
+      # release carries only the files of what it releases
+      - name: Pick the tag and the files
+        id: pick
+        env:
+          VERSION: ${{ inputs.version }}
+          DIALOGUES_VERSION: ${{ inputs.dialogues_version }}
+          PACK_VERSION: ${{ inputs.mmoskilltree_version }}
+        run: |
+          FILES=""
+          ALONE=()
+          if [[ -n "$VERSION" ]]; then
+            FILES+=$'quests/core/build/libs/*.jar\nquests/extension/build/libs/*.jar\nquests/extension/build/distributions/*.zip\n'
+          fi
+          if [[ -n "$DIALOGUES_VERSION" ]]; then
+            ALONE+=("dialogues-v$DIALOGUES_VERSION")
+            FILES+=$'dialogues/build/libs/*.jar\n'
+          fi
+          if [[ -n "$PACK_VERSION" ]]; then
+            ALONE+=("mmoskilltree-v$PACK_VERSION")
+            FILES+=$'mods/mmoskilltree/build/libs/*.jar\n'
+          fi
+          if [[ -n "$VERSION" ]]; then
+            TAG="v$VERSION"
+          elif [[ ${#ALONE[@]} -eq 1 ]]; then
+            TAG="${ALONE[0]}"
+          else
+            echo "::error::Give an OpenQuests version, or exactly one mod version to release it alone."
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          { echo "TAG=$TAG"; echo "FILES<<EOF"; printf '%s' "$FILES"; echo "EOF"; } >> "$GITHUB_ENV"
+
       # An app installed on the repository is an actor the ruleset can name, which GITHUB_TOKEN
       # is not, and the version commit lands on main, so it needs that exception.
       - name: Mint a token for the release app
@@ -53,14 +89,14 @@ jobs:
       - name: Write the version down
         env:
           VERSION: ${{ inputs.version }}
+          DIALOGUES_VERSION: ${{ inputs.dialogues_version }}
           PACK_VERSION: ${{ inputs.mmoskilltree_version }}
         run: |
-          if [[ -z "$VERSION" && -z "$PACK_VERSION" ]]; then
-            echo "::error::Give a version, a pack version, or both."
-            exit 1
-          fi
           if [[ -n "$VERSION" ]]; then
             sed -i "s/^version = .*/version = $VERSION/" gradle.properties
+          fi
+          if [[ -n "$DIALOGUES_VERSION" ]]; then
+            sed -i "s/^dialogues_version = .*/dialogues_version = $DIALOGUES_VERSION/" dialogues/gradle.properties
           fi
           if [[ -n "$PACK_VERSION" ]]; then
             sed -i "s/^mmoskilltree_version = .*/mmoskilltree_version = $PACK_VERSION/" mods/mmoskilltree/gradle.properties
@@ -84,8 +120,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
-          # Only the pack's jar when it is released alone: the rest would pass for a new OpenQuests
-          files: ${{ inputs.version != '' && 'quests/core/build/libs/*.jar,quests/extension/build/libs/*.jar,quests/extension/build/distributions/*.zip,mods/*/build/libs/*.jar' || 'mods/mmoskilltree/build/libs/*.jar' }}
+          files: ${{ env.FILES }}
           generate_release_notes: true
           fail_on_unmatched_files: true
 
@@ -95,11 +130,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-artifacts
-          path: |
-            quests/core/build/libs/*.jar
-            quests/extension/build/libs/*.jar
-            quests/extension/build/distributions/*.zip
-            mods/*/build/libs/*.jar
+          path: ${{ env.FILES }}
           if-no-files-found: error
 
   # A job of its own rather than a step of the release: it runs as soon as the release job
@@ -108,6 +139,9 @@ jobs:
   curseforge:
     needs: release
     runs-on: ubuntu-latest
+
+    env:
+      TAG: ${{ needs.release.outputs.tag }}
 
     strategy:
       fail-fast: false
