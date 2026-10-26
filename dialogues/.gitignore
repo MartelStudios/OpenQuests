@@ -1,0 +1,17 @@
+.gradle/
+build/
+out/
+run/*
+.idea/
+*.iml
+*.ipr
+*.iws
+*.bak
+.classpath
+.project
+.settings/
+.vscode
+# Local helper scripts
+tools/
+# Local design documents
+docs/superpowers/

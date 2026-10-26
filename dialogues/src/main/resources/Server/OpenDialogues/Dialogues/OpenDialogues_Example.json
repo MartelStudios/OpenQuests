@@ -1,0 +1,37 @@
+{
+  "Title": "Old Kweebec",
+  "Display": "Page",
+  "Tags": {
+    "Series": [
+      "OpenDialogues_Example"
+    ]
+  },
+  "Pages": [
+    {
+      "Text": "Ah, a traveller. The woods are restless tonight."
+    },
+    {
+      "Text": "Will you hear what I have seen?"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "Tell me more.",
+      "Actions": [
+        {
+          "Type": "Open",
+          "Dialogue": "OpenDialogues_ExampleMore"
+        }
+      ]
+    },
+    {
+      "Text": "Goodbye.",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ],
+  "Speaker": "LittleKweebec"
+}

@@ -1,0 +1,143 @@
+name: Release
+
+# Run this from the Actions tab: it writes the version down, commits, tags and publishes.
+# There is no tag trigger on purpose — the push below is made with a token that does start
+# workflows, so a tag pushed here would fire a second, duplicate run.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, without the leading v — 1.0.0'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # An app installed on the repository is an actor the ruleset can name, which GITHUB_TOKEN
+      # is not — and the version commit lands on main, so it needs that exception.
+      - name: Mint a token for the release app
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Write the version down
+        run: sed -i "s/^version = .*/version = ${{ inputs.version }}/" gradle.properties
+
+      # Regenerates manifest.json from the property, so the tag carries a coherent tree
+      - name: Build
+        run: ./gradlew build -Pversion=${{ inputs.version }}
+
+      - name: Commit and tag
+        run: |
+          git config user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
+          git config user.email "${{ steps.app-token.outputs.installation-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+          git commit -am "chore: release ${{ inputs.version }}"
+          git tag "v${{ inputs.version }}"
+          git push origin HEAD "v${{ inputs.version }}"
+
+      - name: Publish the release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          files: build/libs/*.jar
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+
+      # Handed to the CurseForge job rather than rebuilt there: what is published has to be the very
+      # same file the release carries, not one built again from the same sources.
+      - name: Keep the artefact for CurseForge
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: build/libs/*.jar
+          if-no-files-found: error
+
+  # A job of its own rather than a step of the release: it runs as soon as the release job succeeds,
+  # so both land together, but a refusal from CurseForge leaves a complete GitHub release behind and
+  # a job to re-run instead of a half-published version.
+  curseforge:
+    needs: release
+    runs-on: ubuntu-latest
+
+    env:
+      NAME: OpenDialogues
+      PROJECT_ID: ''
+
+    steps:
+      - name: Fetch the artefact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+
+      - name: Upload to CurseForge
+        env:
+          TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          GAME_VERSION: ${{ vars.CURSEFORGE_GAME_VERSION }}
+          VERSION: ${{ inputs.version }}
+          RELEASE_URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$TOKEN" ]]; then
+            echo "::error::CURSEFORGE_TOKEN is not set."
+            exit 1
+          fi
+
+          if [[ -z "$GAME_VERSION" ]]; then
+            echo "::error::Set the CURSEFORGE_GAME_VERSION variable to the Hytale version id this release targets."
+            exit 1
+          fi
+
+          # Matched by name, so it does not matter how the download laid the tree out
+          FILE=$(find . -type f -name "$NAME-*.jar" -print -quit)
+
+          if [[ -z "$FILE" ]]; then
+            echo "::error::No artefact matching $NAME-*.jar"
+            find . -type f -name '*.jar' -print
+            exit 1
+          fi
+
+          jq -n --arg changelog "Released as [v$VERSION]($RELEASE_URL)." \
+                --arg displayName "$NAME $VERSION" \
+                --argjson versions "[$GAME_VERSION]" \
+                '{changelog: $changelog, changelogType: "markdown", displayName: $displayName, releaseType: "release", gameVersions: $versions}' \
+            > metadata.json
+
+          echo "Uploading $FILE to project $PROJECT_ID"
+          cat metadata.json
+
+          # A project is addressed by id on www, the host CurseForge documents for the auto-packager.
+          # There is no per-game subdomain to pick: Hytale is not on the old Curse network.
+          STATUS=$(curl -sS -o response.json -w '%{http_code}' -X POST \
+            "https://www.curseforge.com/api/projects/$PROJECT_ID/upload-file" \
+            -H "X-Api-Token: $TOKEN" \
+            -F "metadata=<metadata.json" \
+            -F "file=@$FILE")
+
+          cat response.json
+
+          if [[ "$STATUS" -lt 200 || "$STATUS" -ge 300 ]]; then
+            echo "::error::CurseForge refused $NAME (HTTP $STATUS)"
+            exit 1
+          fi

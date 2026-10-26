@@ -1,0 +1,131 @@
+// A dialogue as a bar along the bottom of the screen: the speaker's portrait, their name over the
+// page being read, and on the right the next page arrow, or the answers once on the last page.
+// PageDisplay appends one DialogueAnswer.ui per answer into #Answers.
+$C = "../../Common.ui";
+
+@SpeakerNameStyle = LabelStyle(FontSize: 22, TextColor: #e8a93b, RenderBold: true, VerticalAlignment: Center);
+@EpithetStyle = LabelStyle(FontSize: 14, TextColor: #96a9be, VerticalAlignment: Center);
+@PageTextStyle = LabelStyle(FontSize: 18, TextColor: #d8dee6, Wrap: true);
+@PageCountStyle = LabelStyle(FontSize: 13, TextColor: #878e9c, HorizontalAlignment: End, VerticalAlignment: Center);
+@NextButtonStyle = (
+  Hovered: (Background: PatchStyle(Color: #7896be(0.07))),
+  Pressed: (Background: PatchStyle(Color: #000000(0.18)))
+);
+@CenteredSpeakerNameStyle = LabelStyle(...@SpeakerNameStyle, HorizontalAlignment: Center);
+@CenteredEpithetStyle = LabelStyle(...@EpithetStyle, HorizontalAlignment: Center);
+@CenteredPageTextStyle = LabelStyle(...@PageTextStyle, HorizontalAlignment: Center);
+
+Group {
+  LayoutMode: Bottom;
+  Padding: (Bottom: 32);
+
+  Group #Row {
+    LayoutMode: Center;
+    Anchor: (Height: 250);
+
+    // No layout mode: the body fills the bar and the close button sits on its corner
+    Group #Bar {
+      Anchor: (Width: 1180);
+
+      Group #Body {
+        LayoutMode: Left;
+        Padding: (Full: 26);
+        Background: (TexturePath: "../../Common/ContainerFullPatch.png", Border: 20);
+
+        Group #Portrait {
+          Anchor: (Width: 160, Height: 160);
+          Background: (TexturePath: "../../Common/ContainerPanelPatch.png", Border: 6);
+          Visible: false;
+
+          AssetImage #PortraitImage { Anchor: (Full: 6); }
+        }
+
+        // #Side sits beside a portrait; without one, #Centered puts the text in the middle of the bar
+        Group #Speech {
+          LayoutMode: Top;
+          FlexWeight: 1;
+          Padding: (Horizontal: 22);
+
+          Group #Side {
+            LayoutMode: Top;
+            FlexWeight: 1;
+
+            Label #SideName { Text: ""; Anchor: (Height: 28); Style: @SpeakerNameStyle; }
+            Label #SideEpithet { Text: ""; Anchor: (Height: 18); Style: @EpithetStyle; }
+            $C.@ContentSeparator { @Anchor = Anchor(Top: 6, Bottom: 10); }
+
+            Label #SideText { Text: ""; FlexWeight: 1; Style: @PageTextStyle; }
+          }
+
+          Group #Centered {
+            LayoutMode: Top;
+            FlexWeight: 1;
+            Padding: (Horizontal: 40);
+            Visible: false;
+
+            Label #CenteredName { Text: ""; Anchor: (Height: 28); Style: @CenteredSpeakerNameStyle; }
+            Label #CenteredEpithet { Text: ""; Anchor: (Height: 18); Style: @CenteredEpithetStyle; }
+
+            Group #FancySeparator {
+              LayoutMode: Center;
+              Anchor: (Height: 8, Top: 8, Bottom: 12);
+
+              Group {
+                LayoutMode: Left;
+                Anchor: (Width: 420);
+
+                Group { FlexWeight: 1; Anchor: (Height: 1); Background: (Color: #2b3542); }
+                Group { Anchor: (Width: 11, Height: 8, Left: 8, Right: 8); Background: "../../Common/ContainerPanelSeparatorFancyDecoration.png"; }
+                Group { FlexWeight: 1; Anchor: (Height: 1); Background: (Color: #2b3542); }
+              }
+            }
+
+            Label #CenteredText { Text: ""; FlexWeight: 1; Style: @CenteredPageTextStyle; }
+          }
+
+          Label #PageCount { Text: ""; Anchor: (Height: 18); Style: @PageCountStyle; }
+        }
+
+        // The whole column turns the page, so the arrow is hard to miss and easy to hit
+        Button #NextButton {
+          Anchor: (Width: 132);
+          LayoutMode: Center;
+          Style: @NextButtonStyle;
+
+          Sprite #NextArrow {
+            Anchor: (Width: 48, Height: 48);
+            TexturePath: "NextArrow.png";
+            Frame: (Width: 48, Height: 48, PerRow: 8, Count: 48);
+            FramesPerSecond: 20;
+          }
+        }
+
+        Group #AnswersColumn {
+          LayoutMode: Left;
+          Visible: false;
+
+          Group #AnswersSeparator { Anchor: (Width: 1, Right: 18); Background: (Color: #2b3542); }
+
+          Group #Answers {
+            Anchor: (Width: 360);
+            LayoutMode: TopScrolling;
+            ScrollbarStyle: $C.@DefaultScrollbarStyle;
+            Padding: (Right: 8);
+          }
+        }
+      }
+
+      Group #DecorationTop {
+        Anchor: (Width: 236, Height: 11, Top: -5);
+        Background: "../../Common/ContainerDecorationTop.png";
+      }
+
+      Group #DecorationBottom {
+        Anchor: (Width: 236, Height: 11, Bottom: -6);
+        Background: "../../Common/ContainerDecorationBottom.png";
+      }
+
+      $C.@CloseButton #CloseButton {}
+    }
+  }
+}

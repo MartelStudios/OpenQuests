@@ -1,0 +1,21 @@
+{
+  "Title": "Old Kweebec",
+  "Display": "Page",
+  "Speaker": "LittleKweebec",
+  "Pages": [
+    {
+      "Text": "A traveller! Few find their way to this grove. Rest here, the trees keep watch over us."
+    }
+  ],
+  "Responses": [
+    {
+      "Id": "Thanks",
+      "Text": "Thank you, elder.",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

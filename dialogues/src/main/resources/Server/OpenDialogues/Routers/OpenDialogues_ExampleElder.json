@@ -1,0 +1,99 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "Or",
+          "Conditions": [
+            {
+              "Type": "Holding",
+              "Item": {
+                "ItemId": "Weapon_Sword_Iron"
+              }
+            },
+            {
+              "Type": "Holding",
+              "Item": {
+                "ItemId": "Weapon_Axe_Iron"
+              }
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenDialogues_ExampleElderArmed"
+        }
+      },
+      {
+        "When": {
+          "Type": "Answered",
+          "Dialogue": "OpenDialogues_ExampleElderWelcome",
+          "Answer": "Thanks"
+        },
+        "Then": {
+          "Router": {
+            "Selector": {
+              "Type": "Weighted",
+              "Entries": [
+                {
+                  "Weight": 3,
+                  "Then": {
+                    "Dialogue": {
+                      "Title": "Old Kweebec",
+                      "Display": "Page",
+                      "Speaker": "LittleKweebec",
+                      "Pages": [
+                        {
+                          "Text": "Back again? The grove remembers you."
+                        }
+                      ],
+                      "Responses": [
+                        {
+                          "Text": "Hello again.",
+                          "Actions": [
+                            {
+                              "Type": "Close"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "Weight": 1,
+                  "Then": {
+                    "Dialogue": {
+                      "Title": "Old Kweebec",
+                      "Display": "Page",
+                      "Speaker": "LittleKweebec",
+                      "Pages": [
+                        {
+                          "Text": "The wind speaks of you, traveller. It says you walk lightly."
+                        }
+                      ],
+                      "Responses": [
+                        {
+                          "Text": "Does it?",
+                          "Actions": [
+                            {
+                              "Type": "Close"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "Default": {
+      "Dialogue": "OpenDialogues_ExampleElderWelcome"
+    }
+  }
+}
