@@ -17,17 +17,9 @@ import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
-import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
 import com.martelstudios.opendialogues.services.DialogueService;
-import com.hypixel.hytale.server.core.command.system.CommandSender;
-import com.hypixel.hytale.server.core.command.system.suggestion.SuggestionResult;
 
 import javax.annotation.Nonnull;
-import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes.STRING;
 
 /**
  * {@code /odialogues}, alias {@code /od}: opens a dialogue by id, picks its answers and sets which display draws it.
@@ -53,8 +45,7 @@ public class DialogueCommand extends AbstractCommandCollection {
     private static class OpenCommand extends AbstractPlayerCommand {
 
         @Nonnull
-        private final RequiredArg<String> dialogueArg = withRequiredArg("dialogue", "Id of the dialogue or router to open", STRING)
-            .suggest(OpenCommand::suggestIds);
+        private final RequiredArg<String> dialogueArg = withRequiredArg("dialogue", "Id of the dialogue or router to open", new DialogueIdArgType());
 
         @Nonnull
         private final DialogueService dialogues;
@@ -63,19 +54,6 @@ public class DialogueCommand extends AbstractCommandCollection {
             super("open", "Opens a dialogue by id");
             setPermissionGroups(HytalePermissionsProvider.GROUP_WORLD_EDITOR);
             this.dialogues = dialogues;
-        }
-
-        /**
-         * Dialogues first, then routers no dialogue shadows, each read from its store so a reload is seen.
-         */
-        private static void suggestIds(@Nonnull CommandSender sender, @Nonnull String input, int index, @Nonnull SuggestionResult result) {
-            String query = input.toLowerCase(Locale.ROOT);
-            Set<String> dialogueIds = OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap().keySet();
-            Stream.concat(dialogueIds.stream().sorted(),
-                          OpenDialogueRouterAsset.getAssetStore().getAssetMap().getAssetMap().keySet().stream().filter(id -> !dialogueIds.contains(id)).sorted())
-                  .filter(id -> id.toLowerCase(Locale.ROOT).contains(query))
-                  .takeWhile(id -> !result.isFull())
-                  .forEach(result::suggest);
         }
 
         @Override
