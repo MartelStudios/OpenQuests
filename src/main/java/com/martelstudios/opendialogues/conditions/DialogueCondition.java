@@ -1,5 +1,7 @@
 package com.martelstudios.opendialogues.conditions;
 
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.lookup.CodecMapCodec;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
@@ -23,12 +25,24 @@ public abstract class DialogueCondition {
     /**
      * Serializes the fields shared by every kind; concrete codecs chain from this.
      */
-    public static final BuilderCodec<DialogueCondition> BASE_CODEC = BuilderCodec.abstractBuilder(DialogueCondition.class).build();
+    public static final BuilderCodec<DialogueCondition> BASE_CODEC = BuilderCodec.abstractBuilder(DialogueCondition.class)
+                                                                         .append(new KeyedCodec<>("Not", Codec.BOOLEAN), (condition, not) -> condition.not = not, condition -> condition.not)
+                                                                         .add()
+                                                                         .build();
+
+    protected boolean not;
 
     /**
-     * @return whether the condition holds for that player now.
+     * @return whether the condition holds for that player now, {@code Not} applied.
      */
-    public abstract boolean test(@Nonnull ConditionContext context);
+    public final boolean test(@Nonnull ConditionContext context) {
+        return evaluate(context) != not;
+    }
+
+    /**
+     * @return whether the condition holds for that player now, before {@code Not} inverts it.
+     */
+    protected abstract boolean evaluate(@Nonnull ConditionContext context);
 
     /**
      * Asked once every dialogue is loaded, so a wrong id shows at boot rather than in play.

@@ -57,6 +57,8 @@ that does not hold, and the selector moves on. See `OpenDialogues_ExampleElder`.
 | `All`, `Any` | Every, or one, of `Conditions` holds. |
 | `Not` | `Condition` does not hold. |
 
+Every condition also takes `Not`: when true, it holds exactly when it would not.
+
 `Item` takes an `ItemId`, a `ResourceTypeId` or a `BlockTag`. An answer is named by its `Id`, or by
 its position in the file from 1 when it has none. Dialogues written inline count too: their
 generated id, suggested in the Asset Editor, follows where they sit in their file, so moving one

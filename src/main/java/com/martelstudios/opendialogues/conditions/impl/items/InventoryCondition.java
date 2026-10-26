@@ -33,7 +33,7 @@ public class InventoryCondition extends DialogueCondition {
      * Fails off the player's world thread, where the inventory cannot be read.
      */
     @Override
-    public boolean test(@Nonnull ConditionContext context) {
+    protected boolean evaluate(@Nonnull ConditionContext context) {
         if (!context.canReadEntity()) return false;
 
         return InventoryComponent.getCombined(context.store(), context.entity(), InventoryComponent.HOTBAR_FIRST)

@@ -29,7 +29,7 @@ public class HoldingCondition extends DialogueCondition {
      * Fails off the player's world thread, where the hand cannot be read.
      */
     @Override
-    public boolean test(@Nonnull ConditionContext context) {
+    protected boolean evaluate(@Nonnull ConditionContext context) {
         if (!context.canReadEntity()) return false;
 
         ItemStack held = InventoryComponent.getItemInHand(context.store(), context.entity());

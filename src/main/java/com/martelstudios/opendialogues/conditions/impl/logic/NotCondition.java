@@ -27,7 +27,7 @@ public class NotCondition extends DialogueCondition {
     protected NotCondition() {}
 
     @Override
-    public boolean test(@Nonnull ConditionContext context) {
+    protected boolean evaluate(@Nonnull ConditionContext context) {
         return !condition.test(context);
     }
 

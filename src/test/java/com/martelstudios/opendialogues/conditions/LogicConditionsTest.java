@@ -39,4 +39,15 @@ class LogicConditionsTest {
 
         assertTrue(not.test(context(new DialogueHistory())));
     }
+
+    @Test
+    void notFieldInvertsAnyCondition() {
+        DialogueCondition notSeen = condition("{ \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\", \"Not\": true }");
+        DialogueHistory history = new DialogueHistory();
+
+        assertTrue(notSeen.test(context(history)));
+
+        history.recordOpened("Elder_Welcome");
+        assertFalse(notSeen.test(context(history)));
+    }
 }

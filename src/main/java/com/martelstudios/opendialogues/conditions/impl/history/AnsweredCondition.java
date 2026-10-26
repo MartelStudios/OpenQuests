@@ -38,7 +38,7 @@ public class AnsweredCondition extends DialogueCondition {
     protected AnsweredCondition() {}
 
     @Override
-    public boolean test(@Nonnull ConditionContext context) {
+    protected boolean evaluate(@Nonnull ConditionContext context) {
         return context.history().answered(dialogue, answer) >= min;
     }
 

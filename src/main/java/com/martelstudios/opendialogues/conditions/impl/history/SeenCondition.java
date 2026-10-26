@@ -34,7 +34,7 @@ public class SeenCondition extends DialogueCondition {
     protected SeenCondition() {}
 
     @Override
-    public boolean test(@Nonnull ConditionContext context) {
+    protected boolean evaluate(@Nonnull ConditionContext context) {
         return context.history().opened(dialogue) >= min;
     }
 

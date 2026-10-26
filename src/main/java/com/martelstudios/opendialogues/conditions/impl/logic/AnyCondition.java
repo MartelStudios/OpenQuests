@@ -28,7 +28,7 @@ public class AnyCondition extends DialogueCondition {
     protected AnyCondition() {}
 
     @Override
-    public boolean test(@Nonnull ConditionContext context) {
+    protected boolean evaluate(@Nonnull ConditionContext context) {
         for (DialogueCondition condition : conditions) {
             if (condition.test(context)) return true;
         }
