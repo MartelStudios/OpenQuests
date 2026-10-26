@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DialogueResolverTest {
 
-    private static final String SEEN_WELCOME = "{ \"Type\": \"Seen\", \"Dialogue\": \"Welcome\" }";
+    private static final String OPENED_WELCOME = "{ \"Type\": \"Opened\", \"Dialogue\": \"Welcome\" }";
 
     static {
         // Loads the condition fixtures, which register the conditions routes read
@@ -70,7 +70,7 @@ class DialogueResolverTest {
     void sequenceTakesTheFirstHoldingRoute() {
         dialogue("Welcome");
         OpenDialogueAsset again = dialogue("Again");
-        router("Elder", "{ \"Type\": \"Sequence\", \"Routes\": [ { \"When\": " + SEEN_WELCOME + ", \"Then\": { \"Dialogue\": \"Again\" } } ], \"Default\": { \"Dialogue\": \"Welcome\" } }");
+        router("Elder", "{ \"Type\": \"Sequence\", \"Routes\": [ { \"When\": " + OPENED_WELCOME + ", \"Then\": { \"Dialogue\": \"Again\" } } ], \"Default\": { \"Dialogue\": \"Welcome\" } }");
         history.recordOpened("Welcome");
 
         assertSame(again, resolve("Elder"));
@@ -80,7 +80,7 @@ class DialogueResolverTest {
     void sequenceFallsBackToDefault() {
         OpenDialogueAsset welcome = dialogue("Welcome");
         dialogue("Again");
-        router("Elder", "{ \"Type\": \"Sequence\", \"Routes\": [ { \"When\": " + SEEN_WELCOME + ", \"Then\": { \"Dialogue\": \"Again\" } } ], \"Default\": { \"Dialogue\": \"Welcome\" } }");
+        router("Elder", "{ \"Type\": \"Sequence\", \"Routes\": [ { \"When\": " + OPENED_WELCOME + ", \"Then\": { \"Dialogue\": \"Again\" } } ], \"Default\": { \"Dialogue\": \"Welcome\" } }");
 
         assertSame(welcome, resolve("Elder"));
     }
@@ -98,7 +98,7 @@ class DialogueResolverTest {
     void weightedOnlyDrawsEligibleEntries() {
         dialogue("Welcome");
         OpenDialogueAsset plain = dialogue("Plain");
-        router("Elder", "{ \"Type\": \"Weighted\", \"Entries\": [ { \"Weight\": 100, \"When\": " + SEEN_WELCOME + ", \"Then\": { \"Dialogue\": \"Welcome\" } }, { \"Weight\": 1, \"Then\": { \"Dialogue\": \"Plain\" } } ] }");
+        router("Elder", "{ \"Type\": \"Weighted\", \"Entries\": [ { \"Weight\": 100, \"When\": " + OPENED_WELCOME + ", \"Then\": { \"Dialogue\": \"Welcome\" } }, { \"Weight\": 1, \"Then\": { \"Dialogue\": \"Plain\" } } ] }");
 
         for (long seed = 0; seed < 20; seed++) {
             assertSame(plain, resolver(seed).resolve("Elder", ConditionFixtures.context(history)));
@@ -133,7 +133,7 @@ class DialogueResolverTest {
     @Test
     void weightedGivesNothingWhenEveryEntryLeadsNowhere() {
         router("Empty", "{ \"Type\": \"Sequence\", \"Routes\": [] }");
-        router("Elder", "{ \"Type\": \"Weighted\", \"Entries\": [ { \"Weight\": 1, \"Then\": { \"Router\": \"Empty\" } }, { \"Weight\": 1, \"When\": " + SEEN_WELCOME + ", \"Then\": { \"Router\": \"Empty\" } } ] }");
+        router("Elder", "{ \"Type\": \"Weighted\", \"Entries\": [ { \"Weight\": 1, \"Then\": { \"Router\": \"Empty\" } }, { \"Weight\": 1, \"When\": " + OPENED_WELCOME + ", \"Then\": { \"Router\": \"Empty\" } } ] }");
 
         assertNull(resolve("Elder"));
     }
@@ -165,7 +165,7 @@ class DialogueResolverTest {
 
     @Test
     void validationFindsAMissingDialogue() {
-        router("Elder", "{ \"Type\": \"Sequence\", \"Routes\": [ { \"When\": " + SEEN_WELCOME + ", \"Then\": { \"Dialogue\": \"Nowhere\" } } ] }");
+        router("Elder", "{ \"Type\": \"Sequence\", \"Routes\": [ { \"When\": " + OPENED_WELCOME + ", \"Then\": { \"Dialogue\": \"Nowhere\" } } ] }");
 
         Map<String, String> errors = resolver(0).validate(routers.keySet());
 

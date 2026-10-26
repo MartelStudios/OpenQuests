@@ -50,7 +50,7 @@ that does not hold, and the selector moves on. See `OpenDialogues_ExampleElder`.
 
 | Condition type | Holds when |
 | --- | --- |
-| `Seen` | `Dialogue` was opened at least `Min` times (default 1). |
+| `Opened` | `Dialogue` was opened at least `Min` times (default 1). |
 | `Answered` | `Answer` of `Dialogue` was picked at least `Min` times. |
 | `Holding` | The item in hand matches `Item`. |
 | `Inventory` | The inventory holds at least `Min` items matching `Item`. |

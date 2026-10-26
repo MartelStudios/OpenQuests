@@ -10,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LogicConditionsTest {
 
-    private static final String SEEN = "{ \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\" }";
-    private static final String NOT_SEEN = "{ \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\", \"Not\": true }";
+    private static final String OPENED = "{ \"Type\": \"Opened\", \"Dialogue\": \"Elder_Welcome\" }";
+    private static final String NOT_OPENED = "{ \"Type\": \"Opened\", \"Dialogue\": \"Elder_Welcome\", \"Not\": true }";
 
     @Test
     void andOfNothingHolds() {
@@ -25,7 +25,7 @@ class LogicConditionsTest {
 
     @Test
     void andNeedsEveryCondition() {
-        DialogueCondition and = condition("{ \"Type\": \"Composite\", \"Conditions\": [ " + NOT_SEEN + ", " + SEEN + " ] }");
+        DialogueCondition and = condition("{ \"Type\": \"Composite\", \"Conditions\": [ " + NOT_OPENED + ", " + OPENED + " ] }");
 
         assertFalse(and.test(context(new DialogueHistory())));
     }
@@ -35,7 +35,7 @@ class LogicConditionsTest {
         DialogueHistory history = new DialogueHistory();
         history.recordOpened("Elder_Welcome");
 
-        DialogueCondition or = condition("{ \"Type\": \"Composite\", \"Operator\": \"Or\", \"Conditions\": [ " + NOT_SEEN + ", " + SEEN + " ] }");
+        DialogueCondition or = condition("{ \"Type\": \"Composite\", \"Operator\": \"Or\", \"Conditions\": [ " + NOT_OPENED + ", " + OPENED + " ] }");
 
         assertTrue(or.test(context(history)));
         assertTrue(or.test(context(new DialogueHistory())));
@@ -43,7 +43,7 @@ class LogicConditionsTest {
 
     @Test
     void notOrHoldsWhenNoneHolds() {
-        DialogueCondition none = condition("{ \"Type\": \"Composite\", \"Operator\": \"Or\", \"Not\": true, \"Conditions\": [ " + SEEN + " ] }");
+        DialogueCondition none = condition("{ \"Type\": \"Composite\", \"Operator\": \"Or\", \"Not\": true, \"Conditions\": [ " + OPENED + " ] }");
         DialogueHistory history = new DialogueHistory();
 
         assertTrue(none.test(context(history)));
@@ -54,12 +54,12 @@ class LogicConditionsTest {
 
     @Test
     void notFieldInvertsAnyCondition() {
-        DialogueCondition notSeen = condition(NOT_SEEN);
+        DialogueCondition notOpened = condition(NOT_OPENED);
         DialogueHistory history = new DialogueHistory();
 
-        assertTrue(notSeen.test(context(history)));
+        assertTrue(notOpened.test(context(history)));
 
         history.recordOpened("Elder_Welcome");
-        assertFalse(notSeen.test(context(history)));
+        assertFalse(notOpened.test(context(history)));
     }
 }

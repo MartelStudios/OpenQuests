@@ -16,11 +16,11 @@ import java.util.function.Function;
 /**
  * Holds once the player opened a dialogue at least {@code Min} times, inline dialogues included.
  */
-public class SeenCondition extends DialogueCondition {
+public class OpenedCondition extends DialogueCondition {
 
-    public static final String TYPE = "Seen";
+    public static final String TYPE = "Opened";
 
-    public static final BuilderCodec<SeenCondition> CODEC = BuilderCodec.builder(SeenCondition.class, SeenCondition::new, DialogueCondition.BASE_CODEC)
+    public static final BuilderCodec<OpenedCondition> CODEC = BuilderCodec.builder(OpenedCondition.class, OpenedCondition::new, DialogueCondition.BASE_CODEC)
                                                                         .append(new KeyedCodec<>("Dialogue", Codec.STRING, true), (condition, dialogue) -> condition.dialogue = dialogue, condition -> condition.dialogue)
                                                                         .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
                                                                         .add()
@@ -31,7 +31,7 @@ public class SeenCondition extends DialogueCondition {
     protected String dialogue;
     protected int min = 1;
 
-    protected SeenCondition() {}
+    protected OpenedCondition() {}
 
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {

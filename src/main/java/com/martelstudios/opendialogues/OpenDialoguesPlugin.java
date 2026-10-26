@@ -28,7 +28,7 @@ import com.martelstudios.opendialogues.services.DialogueService;
 
 
 import com.martelstudios.opendialogues.conditions.impl.history.AnsweredCondition;
-import com.martelstudios.opendialogues.conditions.impl.history.SeenCondition;
+import com.martelstudios.opendialogues.conditions.impl.history.OpenedCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.HoldingCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.InventoryCondition;
 import com.martelstudios.opendialogues.conditions.impl.logic.CompositeCondition;
@@ -79,7 +79,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerAction(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC);
 
         registry.registerCondition(CompositeCondition.TYPE, CompositeCondition.class, CompositeCondition.CODEC);
-        registry.registerCondition(SeenCondition.TYPE, SeenCondition.class, SeenCondition.CODEC);
+        registry.registerCondition(OpenedCondition.TYPE, OpenedCondition.class, OpenedCondition.CODEC);
         registry.registerCondition(AnsweredCondition.TYPE, AnsweredCondition.class, AnsweredCondition.CODEC);
         registry.registerCondition(HoldingCondition.TYPE, HoldingCondition.class, HoldingCondition.CODEC);
         registry.registerCondition(InventoryCondition.TYPE, InventoryCondition.class, InventoryCondition.CODEC);

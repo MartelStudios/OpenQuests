@@ -3,7 +3,7 @@ package com.martelstudios.opendialogues.conditions;
 import com.martelstudios.opendialogues.CodecJson;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.conditions.impl.history.AnsweredCondition;
-import com.martelstudios.opendialogues.conditions.impl.history.SeenCondition;
+import com.martelstudios.opendialogues.conditions.impl.history.OpenedCondition;
 import com.martelstudios.opendialogues.conditions.impl.logic.CompositeCondition;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 
@@ -17,7 +17,7 @@ public final class ConditionFixtures {
     static {
         DialogueRegistry registry = new DialogueRegistry();
         registry.registerCondition(CompositeCondition.TYPE, CompositeCondition.class, CompositeCondition.CODEC);
-        registry.registerCondition(SeenCondition.TYPE, SeenCondition.class, SeenCondition.CODEC);
+        registry.registerCondition(OpenedCondition.TYPE, OpenedCondition.class, OpenedCondition.CODEC);
         registry.registerCondition(AnsweredCondition.TYPE, AnsweredCondition.class, AnsweredCondition.CODEC);
     }
 

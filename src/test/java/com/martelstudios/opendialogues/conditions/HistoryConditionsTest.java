@@ -17,15 +17,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class HistoryConditionsTest {
 
     @Test
-    void seenHoldsFromMinOpenings() {
-        DialogueCondition seen = condition("{ \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\", \"Min\": 2 }");
+    void openedHoldsFromMinOpenings() {
+        DialogueCondition opened = condition("{ \"Type\": \"Opened\", \"Dialogue\": \"Elder_Welcome\", \"Min\": 2 }");
         DialogueHistory history = new DialogueHistory();
 
         history.recordOpened("Elder_Welcome");
-        assertFalse(seen.test(context(history)));
+        assertFalse(opened.test(context(history)));
 
         history.recordOpened("Elder_Welcome");
-        assertTrue(seen.test(context(history)));
+        assertTrue(opened.test(context(history)));
     }
 
     @Test
@@ -41,10 +41,10 @@ class HistoryConditionsTest {
     }
 
     @Test
-    void seenValidationNamesAMissingDialogue() {
-        DialogueCondition seen = condition("{ \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\" }");
+    void openedValidationNamesAMissingDialogue() {
+        DialogueCondition opened = condition("{ \"Type\": \"Opened\", \"Dialogue\": \"Elder_Welcome\" }");
 
-        assertNotNull(seen.validate(id -> null));
+        assertNotNull(opened.validate(id -> null));
     }
 
     @Test
@@ -58,7 +58,7 @@ class HistoryConditionsTest {
 
     @Test
     void validationReachesNestedConditions() {
-        DialogueCondition composite = condition("{ \"Type\": \"Composite\", \"Conditions\": [ { \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\" } ] }");
+        DialogueCondition composite = condition("{ \"Type\": \"Composite\", \"Conditions\": [ { \"Type\": \"Opened\", \"Dialogue\": \"Elder_Welcome\" } ] }");
 
         assertNotNull(composite.validate(id -> null));
     }
