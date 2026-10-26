@@ -1,9 +1,5 @@
 plugins {
-    idea
-    java
-    // The mod itself, not a workspace of them: hytale-tools builds this project, where
-    // hytale-workspace only ties several mod projects together and has none to tie here.
-    id("com.azuredoom.hytale-tools") version "1.+"
+    id("com.azuredoom.hytale-tools")
 }
 
 tasks.withType<Javadoc>().configureEach {
@@ -12,9 +8,8 @@ tasks.withType<Javadoc>().configureEach {
 
 group = project.property("group").toString()
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(property("java_version").toString().toInt()))
-}
+// Its own key: the release sets OpenQuests' version with -Pversion, which would override a plain `version` here
+version = property("dialogues_version").toString()
 
 hytaleTools {
     javaVersion = property("java_version").toString().toInt()
@@ -59,12 +54,5 @@ tasks.named<Test>("test") {
 
 tasks.named<Jar>("jar") {
     archiveBaseName.set(project.property("mod_name").toString())
-    archiveVersion.set(project.property("version").toString())
-}
-
-idea {
-    module {
-        isDownloadSources = true
-        isDownloadJavadoc = true
-    }
+    archiveVersion.set(project.version.toString())
 }
