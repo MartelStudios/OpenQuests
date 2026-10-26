@@ -4,14 +4,18 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
+import com.martelstudios.opendialogues.conditions.CountBounds;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.function.Function;
 
 /**
- * Holds while the player carries at least {@code Min} items the filter accepts, anywhere in their
- * inventory.
+ * Holds while the player carries between {@code Min} and {@code Max} items the filter accepts,
+ * anywhere in their inventory.
  */
 public class InventoryCondition extends DialogueCondition {
 
@@ -22,10 +26,14 @@ public class InventoryCondition extends DialogueCondition {
                                                                              .add()
                                                                              .append(new KeyedCodec<>("Min", Codec.INTEGER), (condition, min) -> condition.min = min, condition -> condition.min)
                                                                              .add()
+                                                                             .append(new KeyedCodec<>("Max", Codec.INTEGER), (condition, max) -> condition.max = max, condition -> condition.max)
+                                                                             .add()
                                                                              .build();
 
     protected DialogueItemFilter item;
     protected int min = 1;
+    @Nullable
+    protected Integer max;
 
     protected InventoryCondition() {}
 
@@ -36,7 +44,14 @@ public class InventoryCondition extends DialogueCondition {
     protected boolean evaluate(@Nonnull ConditionContext context) {
         if (!context.canReadEntity()) return false;
 
-        return InventoryComponent.getCombined(context.store(), context.entity(), InventoryComponent.HOTBAR_FIRST)
-                                 .countItemStacks(stack -> item.matches(stack.getItemId())) >= min;
+        int count = InventoryComponent.getCombined(context.store(), context.entity(), InventoryComponent.HOTBAR_FIRST)
+                                      .countItemStacks(stack -> item.matches(stack.getItemId()));
+        return CountBounds.within(count, min, max);
+    }
+
+    @Nullable
+    @Override
+    public String validate(@Nonnull Function<String, OpenDialogueAsset> dialogues) {
+        return CountBounds.validate(min, max);
     }
 }

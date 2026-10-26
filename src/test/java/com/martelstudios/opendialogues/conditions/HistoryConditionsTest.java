@@ -29,6 +29,23 @@ class HistoryConditionsTest {
     }
 
     @Test
+    void openedStopsHoldingPastMax() {
+        DialogueCondition opened = condition("{ \"Type\": \"Opened\", \"Dialogue\": \"Elder_Welcome\", \"Max\": 1 }");
+        DialogueHistory history = new DialogueHistory();
+
+        history.recordOpened("Elder_Welcome");
+        assertTrue(opened.test(context(history)));
+
+        history.recordOpened("Elder_Welcome");
+        assertFalse(opened.test(context(history)));
+    }
+
+    @Test
+    void validationRejectsMaxBelowMin() {
+        assertNotNull(condition("{ \"Type\": \"Opened\", \"Dialogue\": \"Elder_Welcome\", \"Min\": 2, \"Max\": 1 }").validate(id -> null));
+    }
+
+    @Test
     void answeredReadsTheAnswerKey() {
         DialogueCondition answered = condition("{ \"Type\": \"Answered\", \"Dialogue\": \"Elder_Flowers\", \"Answer\": \"Accept\" }");
         DialogueHistory history = new DialogueHistory();

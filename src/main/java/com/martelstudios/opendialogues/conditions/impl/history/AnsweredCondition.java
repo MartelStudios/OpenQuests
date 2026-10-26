@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.schema.metadata.ui.UIEditor;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
+import com.martelstudios.opendialogues.conditions.CountBounds;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
@@ -14,8 +15,8 @@ import javax.annotation.Nullable;
 import java.util.function.Function;
 
 /**
- * Holds once the player picked an answer at least {@code Min} times. The answer is named by its
- * {@code Id}, or by its position in the file from 1 when it has none.
+ * Holds while the player picked an answer between {@code Min} and {@code Max} times. The answer is
+ * named by its {@code Id}, or by its position in the file from 1 when it has none.
  */
 public class AnsweredCondition extends DialogueCondition {
 
@@ -29,22 +30,28 @@ public class AnsweredCondition extends DialogueCondition {
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Min", Codec.INTEGER), (condition, min) -> condition.min = min, condition -> condition.min)
                                                                             .add()
+                                                                            .append(new KeyedCodec<>("Max", Codec.INTEGER), (condition, max) -> condition.max = max, condition -> condition.max)
+                                                                            .add()
                                                                             .build();
 
     protected String dialogue;
     protected String answer;
     protected int min = 1;
+    @Nullable
+    protected Integer max;
 
     protected AnsweredCondition() {}
 
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {
-        return context.history().answered(dialogue, answer) >= min;
+        return CountBounds.within(context.history().answered(dialogue, answer), min, max);
     }
 
     @Nullable
     @Override
     public String validate(@Nonnull Function<String, OpenDialogueAsset> dialogues) {
+        String bounds = CountBounds.validate(min, max);
+        if (bounds != null) return bounds;
         OpenDialogueAsset asset = dialogues.apply(dialogue);
         if (asset == null) return "No dialogue '" + dialogue + "'";
         return asset.findAnswer(answer) == null ? "Dialogue '" + dialogue + "' has no answer '" + answer + "'" : null;

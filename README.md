@@ -50,10 +50,10 @@ that does not hold, and the selector moves on. See `OpenDialogues_ExampleElder`.
 
 | Condition type | Holds when |
 | --- | --- |
-| `Opened` | `Dialogue` was opened at least `Min` times (default 1). |
-| `Answered` | `Answer` of `Dialogue` was picked at least `Min` times. |
+| `Opened` | `Dialogue` was opened between `Min` (default 1) and `Max` (optional) times. |
+| `Answered` | `Answer` of `Dialogue` was picked between `Min` and `Max` times. |
 | `Holding` | The item in hand matches `Item`. |
-| `Inventory` | The inventory holds at least `Min` items matching `Item`. |
+| `Inventory` | The inventory holds between `Min` and `Max` items matching `Item`. |
 | `Composite` | Every (`Operator` `And`, the default), or one (`Or`), of `Conditions` holds. |
 
 Every condition also takes `Not`: when true, it holds exactly when it would not.

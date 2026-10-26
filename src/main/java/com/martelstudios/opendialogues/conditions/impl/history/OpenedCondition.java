@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.schema.metadata.ui.UIEditor;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
+import com.martelstudios.opendialogues.conditions.CountBounds;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
@@ -14,7 +15,8 @@ import javax.annotation.Nullable;
 import java.util.function.Function;
 
 /**
- * Holds once the player opened a dialogue at least {@code Min} times, inline dialogues included.
+ * Holds while the player opened a dialogue between {@code Min} and {@code Max} times, inline
+ * dialogues included.
  */
 public class OpenedCondition extends DialogueCondition {
 
@@ -26,21 +28,27 @@ public class OpenedCondition extends DialogueCondition {
                                                                         .add()
                                                                         .append(new KeyedCodec<>("Min", Codec.INTEGER), (condition, min) -> condition.min = min, condition -> condition.min)
                                                                         .add()
+                                                                        .append(new KeyedCodec<>("Max", Codec.INTEGER), (condition, max) -> condition.max = max, condition -> condition.max)
+                                                                        .add()
                                                                         .build();
 
     protected String dialogue;
     protected int min = 1;
+    @Nullable
+    protected Integer max;
 
     protected OpenedCondition() {}
 
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {
-        return context.history().opened(dialogue) >= min;
+        return CountBounds.within(context.history().opened(dialogue), min, max);
     }
 
     @Nullable
     @Override
     public String validate(@Nonnull Function<String, OpenDialogueAsset> dialogues) {
+        String bounds = CountBounds.validate(min, max);
+        if (bounds != null) return bounds;
         return dialogues.apply(dialogue) == null ? "No dialogue '" + dialogue + "'" : null;
     }
 }
