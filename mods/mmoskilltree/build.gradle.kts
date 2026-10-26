@@ -34,8 +34,8 @@ repositories {
 dependencies {
     // Separate plugins at runtime, never bundled in. Only their public API is used here, the way a
     // modder outside this repository would.
-    compileOnly(project(":core"))
-    compileOnly(project(":extension"))
+    compileOnly(project(":quests:core"))
+    compileOnly(project(":quests:extension"))
 
     // MMO Skill Tree 1.7.2 and CommonLib 2.4.1, whose schema no longer breaks the asset editor, for the dev run and decompiled sources
     vineImplementation("curse.maven:mmo-skill-tree-1431313:9215826")

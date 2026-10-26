@@ -1006,14 +1006,14 @@ The persistence backends have tests of their own, run against H2 and SQLite, whi
 started:
 
 ```bash
-./gradlew :core:test
+./gradlew :quests:core:test
 ```
 
 Against PostgreSQL, with the compose file this repository ships:
 
 ```bash
 docker compose -f docker/postgres.yml up -d
-./gradlew :core:test -Popenquests.jdbc.url=jdbc:postgresql://localhost:5433/openquests -Popenquests.jdbc.user=openquests -Popenquests.jdbc.password=openquests
+./gradlew :quests:core:test -Popenquests.jdbc.url=jdbc:postgresql://localhost:5433/openquests -Popenquests.jdbc.user=openquests -Popenquests.jdbc.password=openquests
 ```
 
 The same compose file brings up Adminer to read and edit what the server wrote, on
