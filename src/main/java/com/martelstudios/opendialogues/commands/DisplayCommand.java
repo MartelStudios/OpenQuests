@@ -6,7 +6,6 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.OptionalAr
 import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractCommandCollection;
 import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
-import com.hypixel.hytale.server.core.command.system.suggestion.SuggestionProvider;
 import com.hypixel.hytale.server.core.permissions.provider.HytalePermissionsProvider;
 import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
@@ -30,7 +29,7 @@ public class DisplayCommand extends AbstractCommandCollection {
     public DisplayCommand(@Nonnull DialogueService dialogues, @Nonnull DialogueRegistry registry, @Nonnull Config<DisplayRules> rules) {
         super("display", "Chooses which display draws which dialogues");
         setPermissionGroups(HytalePermissionsProvider.GROUP_ADMIN);
-        SuggestionProvider displays = (sender, input, index, result) -> registry.getDisplayIds().forEach(result::suggest);
+        ChoiceArgType displays = new ChoiceArgType("Display", "Id of a registered display", sender -> registry.getDisplayIds().stream());
 
         addSubCommand(new DefaultCommand(registry, rules, displays));
         addSubCommand(new SetCommand(registry, rules, displays));
@@ -56,11 +55,11 @@ public class DisplayCommand extends AbstractCommandCollection {
         @Nonnull
         private final Config<DisplayRules> rules;
 
-        DefaultCommand(@Nonnull DialogueRegistry registry, @Nonnull Config<DisplayRules> rules, @Nonnull SuggestionProvider displays) {
+        DefaultCommand(@Nonnull DialogueRegistry registry, @Nonnull Config<DisplayRules> rules, @Nonnull ChoiceArgType displays) {
             super("default", "Sets the display for dialogues naming none");
             this.registry = registry;
             this.rules = rules;
-            this.displayArg = withRequiredArg("display", "Id of the display", STRING).suggest(displays);
+            this.displayArg = withRequiredArg("display", "Id of the display", displays);
         }
 
         @Override
@@ -90,11 +89,11 @@ public class DisplayCommand extends AbstractCommandCollection {
         @Nonnull
         private final Config<DisplayRules> rules;
 
-        SetCommand(@Nonnull DialogueRegistry registry, @Nonnull Config<DisplayRules> rules, @Nonnull SuggestionProvider displays) {
+        SetCommand(@Nonnull DialogueRegistry registry, @Nonnull Config<DisplayRules> rules, @Nonnull ChoiceArgType displays) {
             super("set", "Picks the display for some dialogues, over their own choice");
             this.registry = registry;
             this.rules = rules;
-            this.displayArg = withRequiredArg("display", "Id of the display", STRING).suggest(displays);
+            this.displayArg = withRequiredArg("display", "Id of the display", displays);
         }
 
         @Override
@@ -115,7 +114,7 @@ public class DisplayCommand extends AbstractCommandCollection {
     private static class UnsetCommand extends CommandBase {
 
         @Nonnull
-        private final RequiredArg<String> targetArg = withRequiredArg("target", "Target of the rule to remove", STRING);
+        private final RequiredArg<String> targetArg;
 
         @Nonnull
         private final Config<DisplayRules> rules;
@@ -123,7 +122,7 @@ public class DisplayCommand extends AbstractCommandCollection {
         UnsetCommand(@Nonnull Config<DisplayRules> rules) {
             super("unset", "Removes the rule on a target");
             this.rules = rules;
-            targetArg.suggest((sender, input, index, result) -> rules.get().getRules().forEach(rule -> result.suggest(rule.getTarget())));
+            this.targetArg = withRequiredArg("target", "Target of the rule to remove", new ChoiceArgType("Rule target", "Target of a display rule", sender -> rules.get().getRules().stream().map(DisplayRule::getTarget)));
         }
 
         @Override

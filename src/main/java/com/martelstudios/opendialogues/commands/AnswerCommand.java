@@ -37,7 +37,7 @@ public class AnswerCommand extends AbstractPlayerCommand {
         super(name, "Picks an answer of an open dialogue");
         setPermissionGroups(HytalePermissionsProvider.GROUP_ADVENTURER);
         this.dialogues = dialogues;
-        this.dialogueArg = withOptionalArg("dialogue", "The dialogue answered, when several are open", new OpenDialogueArgType(dialogues));
+        this.dialogueArg = withOptionalArg("dialogue", "The dialogue answered, when several are open", new ChoiceArgType("Open dialogue", "Id of one of your open dialogues", sender -> dialogues.openDialogues(sender.getUuid()).stream()));
     }
 
     @Override

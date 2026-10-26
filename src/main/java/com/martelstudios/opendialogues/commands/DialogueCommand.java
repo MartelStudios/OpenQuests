@@ -17,9 +17,12 @@ import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
+import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
 import com.martelstudios.opendialogues.services.DialogueService;
 
 import javax.annotation.Nonnull;
+import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * {@code /odialogues}, alias {@code /od}: opens a dialogue by id, picks its answers and sets which display draws it.
@@ -45,7 +48,7 @@ public class DialogueCommand extends AbstractCommandCollection {
     private static class OpenCommand extends AbstractPlayerCommand {
 
         @Nonnull
-        private final RequiredArg<String> dialogueArg = withRequiredArg("dialogue", "Id of the dialogue or router to open", new DialogueIdArgType());
+        private final RequiredArg<String> dialogueArg = withRequiredArg("dialogue", "Id of the dialogue or router to open", new ChoiceArgType("Dialogue or router", "Id of a dialogue or a router", sender -> dialogueAndRouterIds()));
 
         @Nonnull
         private final DialogueService dialogues;
@@ -54,6 +57,16 @@ public class DialogueCommand extends AbstractCommandCollection {
             super("open", "Opens a dialogue by id");
             setPermissionGroups(HytalePermissionsProvider.GROUP_WORLD_EDITOR);
             this.dialogues = dialogues;
+        }
+
+        /**
+         * Dialogues first, then routers no dialogue shadows, each read from its store so a reload is seen.
+         */
+        @Nonnull
+        private static Stream<String> dialogueAndRouterIds() {
+            Set<String> dialogueIds = OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap().keySet();
+            return Stream.concat(dialogueIds.stream().sorted(),
+                                 OpenDialogueRouterAsset.getAssetStore().getAssetMap().getAssetMap().keySet().stream().filter(id -> !dialogueIds.contains(id)).sorted());
         }
 
         @Override
