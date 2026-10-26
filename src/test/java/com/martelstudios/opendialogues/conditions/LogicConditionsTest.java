@@ -11,38 +11,50 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LogicConditionsTest {
 
     private static final String SEEN = "{ \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\" }";
+    private static final String NOT_SEEN = "{ \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\", \"Not\": true }";
 
     @Test
-    void allOfNothingHolds() {
-        assertTrue(condition("{ \"Type\": \"All\", \"Conditions\": [] }").test(context(new DialogueHistory())));
+    void andOfNothingHolds() {
+        assertTrue(condition("{ \"Type\": \"Composite\", \"Conditions\": [] }").test(context(new DialogueHistory())));
     }
 
     @Test
-    void anyOfNothingFails() {
-        assertFalse(condition("{ \"Type\": \"Any\", \"Conditions\": [] }").test(context(new DialogueHistory())));
+    void orOfNothingFails() {
+        assertFalse(condition("{ \"Type\": \"Composite\", \"Operator\": \"Or\", \"Conditions\": [] }").test(context(new DialogueHistory())));
     }
 
     @Test
-    void anyHoldsWhenOneConditionHolds() {
+    void andNeedsEveryCondition() {
+        DialogueCondition and = condition("{ \"Type\": \"Composite\", \"Conditions\": [ " + NOT_SEEN + ", " + SEEN + " ] }");
+
+        assertFalse(and.test(context(new DialogueHistory())));
+    }
+
+    @Test
+    void orHoldsWhenOneConditionHolds() {
         DialogueHistory history = new DialogueHistory();
         history.recordOpened("Elder_Welcome");
 
-        DialogueCondition any = condition("{ \"Type\": \"Any\", \"Conditions\": [ { \"Type\": \"Not\", \"Condition\": " + SEEN + " }, " + SEEN + " ] }");
+        DialogueCondition or = condition("{ \"Type\": \"Composite\", \"Operator\": \"Or\", \"Conditions\": [ " + NOT_SEEN + ", " + SEEN + " ] }");
 
-        assertTrue(any.test(context(history)));
-        assertTrue(any.test(context(new DialogueHistory())));
+        assertTrue(or.test(context(history)));
+        assertTrue(or.test(context(new DialogueHistory())));
     }
 
     @Test
-    void notInverts() {
-        DialogueCondition not = condition("{ \"Type\": \"Not\", \"Condition\": " + SEEN + " }");
+    void notOrHoldsWhenNoneHolds() {
+        DialogueCondition none = condition("{ \"Type\": \"Composite\", \"Operator\": \"Or\", \"Not\": true, \"Conditions\": [ " + SEEN + " ] }");
+        DialogueHistory history = new DialogueHistory();
 
-        assertTrue(not.test(context(new DialogueHistory())));
+        assertTrue(none.test(context(history)));
+
+        history.recordOpened("Elder_Welcome");
+        assertFalse(none.test(context(history)));
     }
 
     @Test
     void notFieldInvertsAnyCondition() {
-        DialogueCondition notSeen = condition("{ \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\", \"Not\": true }");
+        DialogueCondition notSeen = condition(NOT_SEEN);
         DialogueHistory history = new DialogueHistory();
 
         assertTrue(notSeen.test(context(history)));

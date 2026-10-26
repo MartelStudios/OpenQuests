@@ -4,7 +4,8 @@
     "Routes": [
       {
         "When": {
-          "Type": "Any",
+          "Type": "Composite",
+          "Operator": "Or",
           "Conditions": [
             { "Type": "Inventory", "Item": { "ItemId": "Weapon_Sword_Iron" } },
             { "Type": "Inventory", "Item": { "ItemId": "Weapon_Axe_Iron" } }

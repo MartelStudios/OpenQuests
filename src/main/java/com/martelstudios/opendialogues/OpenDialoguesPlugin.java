@@ -31,9 +31,7 @@ import com.martelstudios.opendialogues.conditions.impl.history.AnsweredCondition
 import com.martelstudios.opendialogues.conditions.impl.history.SeenCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.HoldingCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.InventoryCondition;
-import com.martelstudios.opendialogues.conditions.impl.logic.AllCondition;
-import com.martelstudios.opendialogues.conditions.impl.logic.AnyCondition;
-import com.martelstudios.opendialogues.conditions.impl.logic.NotCondition;
+import com.martelstudios.opendialogues.conditions.impl.logic.CompositeCondition;
 
 import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.martelstudios.opendialogues.services.DialogueResolver;
@@ -80,9 +78,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerAction(OpenDialogueAction.TYPE, OpenDialogueAction.class, OpenDialogueAction.CODEC);
         registry.registerAction(CommandDialogueAction.TYPE, CommandDialogueAction.class, CommandDialogueAction.CODEC);
 
-        registry.registerCondition(AllCondition.TYPE, AllCondition.class, AllCondition.CODEC);
-        registry.registerCondition(AnyCondition.TYPE, AnyCondition.class, AnyCondition.CODEC);
-        registry.registerCondition(NotCondition.TYPE, NotCondition.class, NotCondition.CODEC);
+        registry.registerCondition(CompositeCondition.TYPE, CompositeCondition.class, CompositeCondition.CODEC);
         registry.registerCondition(SeenCondition.TYPE, SeenCondition.class, SeenCondition.CODEC);
         registry.registerCondition(AnsweredCondition.TYPE, AnsweredCondition.class, AnsweredCondition.CODEC);
         registry.registerCondition(HoldingCondition.TYPE, HoldingCondition.class, HoldingCondition.CODEC);

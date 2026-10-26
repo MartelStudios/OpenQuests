@@ -58,8 +58,8 @@ class HistoryConditionsTest {
 
     @Test
     void validationReachesNestedConditions() {
-        DialogueCondition not = condition("{ \"Type\": \"Not\", \"Condition\": { \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\" } }");
+        DialogueCondition composite = condition("{ \"Type\": \"Composite\", \"Conditions\": [ { \"Type\": \"Seen\", \"Dialogue\": \"Elder_Welcome\" } ] }");
 
-        assertNotNull(not.validate(id -> null));
+        assertNotNull(composite.validate(id -> null));
     }
 }

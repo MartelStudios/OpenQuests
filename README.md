@@ -54,8 +54,7 @@ that does not hold, and the selector moves on. See `OpenDialogues_ExampleElder`.
 | `Answered` | `Answer` of `Dialogue` was picked at least `Min` times. |
 | `Holding` | The item in hand matches `Item`. |
 | `Inventory` | The inventory holds at least `Min` items matching `Item`. |
-| `All`, `Any` | Every, or one, of `Conditions` holds. |
-| `Not` | `Condition` does not hold. |
+| `Composite` | Every (`Operator` `And`, the default), or one (`Or`), of `Conditions` holds. |
 
 Every condition also takes `Not`: when true, it holds exactly when it would not.
 
