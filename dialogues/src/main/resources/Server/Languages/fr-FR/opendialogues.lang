@@ -1,2 +1,6 @@
 example.elder.name = Vieux Kweebec
 example.elder.epithet = Gardien des bois
+example.npc.elder.name = Ancien
+example.npc.hint = Parler
+example.letter.name = Lettre scellée
+example.letter.description = Une lettre qui attend d’être lue.
