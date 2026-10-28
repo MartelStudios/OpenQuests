@@ -2,6 +2,7 @@ package com.martelstudios.opendialogues;
 
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.builtin.asseteditor.event.AssetEditorFetchAutoCompleteDataEvent;
+import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -13,6 +14,7 @@ import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
+import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
@@ -89,7 +91,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         historyRecorder = new DialogueHistoryRecorder(getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC));
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
-        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, historyRecorder::history);
+        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus());
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
         registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService));
 

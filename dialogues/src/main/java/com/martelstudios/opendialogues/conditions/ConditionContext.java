@@ -18,6 +18,18 @@ import javax.annotation.Nullable;
 public record ConditionContext(@Nullable PlayerRef player, @Nullable Ref<EntityStore> entity, @Nullable Store<EntityStore> store, @Nonnull DialogueHistory history) {
 
     /**
+     * A player as found in their world.
+     *
+     * @param history {@code null} when it cannot be read from this thread, conditions then judge an empty one.
+     */
+    @Nonnull
+    public static ConditionContext of(@Nonnull PlayerRef player, @Nullable DialogueHistory history) {
+        Ref<EntityStore> entity = player.getReference();
+        Store<EntityStore> store = entity == null ? null : entity.getStore();
+        return new ConditionContext(player, entity, store, history != null ? history : new DialogueHistory());
+    }
+
+    /**
      * @return whether the entity can be read here, which only its world thread may do.
      */
     public boolean canReadEntity() {
