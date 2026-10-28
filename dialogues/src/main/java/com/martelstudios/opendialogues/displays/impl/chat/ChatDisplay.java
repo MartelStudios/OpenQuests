@@ -23,7 +23,14 @@ public class ChatDisplay implements DialogueDisplay {
         for (OpenDialoguesPage page : session.dialogue().getPages()) {
             player.sendMessage(Message.translation(page.getText()));
         }
+        refresh(player, session);
+    }
 
+    /**
+     * Prints the answers alone, below the pages the player already has in the chat.
+     */
+    @Override
+    public void refresh(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
         var responses = session.responses();
         for (int i = 0; i < responses.size(); i++) {
             player.sendMessage(Message.join(Message.raw("  " + (i + 1) + ". "), Message.translation(responses.get(i).getText())));

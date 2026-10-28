@@ -14,6 +14,7 @@ import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesPage;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.services.DialogueService;
@@ -33,7 +34,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
     private static final String ANSWERS_CONTAINER = "#Answers";
 
     @Nonnull
-    private final DialogueSession session;
+    private DialogueSession session;
 
     @Nonnull
     private final DialogueService dialogues;
@@ -56,6 +57,29 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
      */
     public boolean shows(@Nonnull DialogueSession session) {
         return this.session == session;
+    }
+
+    /**
+     * @return whether this page draws that dialogue, in whichever session.
+     */
+    public boolean shows(@Nonnull OpenDialogueAsset dialogue) {
+        return session.dialogue() == dialogue;
+    }
+
+    /**
+     * Takes over the session of the same dialogue and redraws its answers alone. Before the last
+     * page nothing shows them yet, so only the session changes.
+     */
+    public void refresh(@Nonnull DialogueSession session) {
+        this.session = session;
+        if (page < session.dialogue().getPages().length - 1) return;
+
+        UICommandBuilder commandBuilder = new UICommandBuilder();
+        UIEventBuilder eventBuilder = new UIEventBuilder();
+        commandBuilder.clear(ANSWERS_CONTAINER);
+        commandBuilder.set("#AnswersColumn.Visible", !session.responses().isEmpty());
+        answers(commandBuilder, eventBuilder);
+        sendUpdate(commandBuilder, eventBuilder, false);
     }
 
     /**
@@ -83,7 +107,10 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
             eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#NextButton", EventData.of(EventDataModel.KEY_ACTION, EventDataModel.ACTION_NEXT), false);
             return;
         }
+        answers(commandBuilder, eventBuilder);
+    }
 
+    private void answers(@Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder) {
         var responses = session.responses();
         for (int index = 0; index < responses.size(); index++) {
             String answer = ANSWERS_CONTAINER + "[" + index + "]";

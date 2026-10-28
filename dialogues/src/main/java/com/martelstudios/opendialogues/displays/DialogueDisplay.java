@@ -18,6 +18,14 @@ public interface DialogueDisplay {
     void show(@Nonnull PlayerRef player, @Nonnull DialogueSession session);
 
     /**
+     * Shows the answers of the dialogue on screen again, after they changed under the player. A
+     * display that cannot redraw them alone draws the whole dialogue anew.
+     */
+    default void refresh(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
+        show(player, session);
+    }
+
+    /**
      * Takes down a dialogue that ended.
      */
     void close(@Nonnull PlayerRef player, @Nonnull DialogueSession session);
