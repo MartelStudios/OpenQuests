@@ -96,7 +96,7 @@ Thirty-six quests across the Guttering Hollows, the pocket world a Goblin Breach
 
 All twenty-two quest types are in there, along with every constraint, the four scopes, all five reward types including rewards for failing, the three visibility modes, categories and chapters.
 
-⛏️ Running **MMO Skill Tree**? The **OpenQuests MMOSkillTree** plugin brings a chapter of its own, *The prospector's path*, from a first bit of XP to Mining mastery.
+⛏️ Running **MMO Skill Tree**? The **[OpenQuests MMOSkillTree](https://www.curseforge.com/hytale/mods/openquests-mmoskilltree)** plugin brings a chapter of its own, *The prospector's path*, from a first bit of XP to Mining mastery.
 
 ---
 
