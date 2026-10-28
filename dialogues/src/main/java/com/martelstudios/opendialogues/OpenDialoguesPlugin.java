@@ -91,7 +91,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         historyRecorder = new DialogueHistoryRecorder(getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC));
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
-        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), OpenDialoguesPlugin::dispatch);
+        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus());
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
         registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService));
 
@@ -151,14 +151,6 @@ public class OpenDialoguesPlugin extends JavaPlugin {
             String error = dialogue.findConditionError(OpenDialogueAsset::getDialogue);
             if (error != null) getLogger().atSevere().log("Dialogue '%s' has a broken answer condition: %s", dialogue.getId(), error);
         }
-    }
-
-    /**
-     * Keyed on the dialogue id under the event's own class, the one listeners register for.
-     */
-    @SuppressWarnings("unchecked")
-    private static void dispatch(@Nonnull DialogueEvent event) {
-        HytaleServer.get().getEventBus().dispatchFor((Class<DialogueEvent>) event.getClass(), event.getSession().dialogueId()).dispatch(event);
     }
 
     private static void suggest(@Nonnull AssetEditorFetchAutoCompleteDataEvent event, @Nonnull Collection<String> ids) {

@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues.services;
 
+import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
@@ -19,7 +20,6 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -62,7 +62,7 @@ public class DialogueService {
     private final Function<PlayerRef, ConditionContext> contexts;
 
     @Nonnull
-    private final Consumer<DialogueEvent> events;
+    private final IEventBus events;
 
     /**
      * @param rules           read on each opening, since the config behind them can be reloaded.
@@ -70,7 +70,7 @@ public class DialogueService {
      * @param contexts        what conditions are judged against for a player, read anew on each check.
      * @param events          where openings, answers and closings are announced.
      */
-    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, ConditionContext> contexts, @Nonnull Consumer<DialogueEvent> events) {
+    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, ConditionContext> contexts, @Nonnull IEventBus events) {
         this.registry = registry;
         this.rules = rules;
         this.fallbackDisplay = fallbackDisplay;
@@ -137,10 +137,10 @@ public class DialogueService {
         DialogueSession replaced = sessions.put(player.getUuid(), session);
         if (replaced != null && opening) closed(player, replaced);
         session.display().show(player, session);
-        if (opening) events.accept(new DialogueEvent.Opened(player, session));
+        if (opening) dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
         if (session.responses().isEmpty()) {
             sessions.remove(player.getUuid(), session);
-            events.accept(new DialogueEvent.Closed(player, session));
+            dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
         }
     }
 
@@ -165,7 +165,7 @@ public class DialogueService {
             return AnswerResult.REFRESHED;
         }
 
-        events.accept(new DialogueEvent.Answered(player, session, position));
+        dispatch(new DialogueEvent.Answered(player, session, position), DialogueEvent.Answered.class);
         DialogueContext context = new DialogueContext(this, player, session);
         for (DialogueAction action : response.getActions()) {
             action.execute(context);
@@ -204,17 +204,21 @@ public class DialogueService {
      */
     public void forget(@Nonnull PlayerRef player) {
         DialogueSession session = sessions.remove(player.getUuid());
-        if (session != null) events.accept(new DialogueEvent.Closed(player, session));
+        if (session != null) dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
     }
 
     private void closed(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
         session.display().close(player, session);
-        events.accept(new DialogueEvent.Closed(player, session));
+        dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
     }
 
     @Nonnull
     private DialogueDisplay displayFor(@Nonnull OpenDialogueAsset dialogue) {
         DialogueDisplay display = registry.getDisplay(chooseDisplay(dialogue).display());
         return display != null ? display : registry.getDisplay(fallbackDisplay);
+    }
+
+    private <E extends DialogueEvent> void dispatch(@Nonnull E event, @Nonnull Class<E> type) {
+        events.dispatchFor(type, event.getSession().dialogueId()).dispatch(event);
     }
 }

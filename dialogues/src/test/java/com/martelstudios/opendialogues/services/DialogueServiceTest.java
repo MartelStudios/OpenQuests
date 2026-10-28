@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues.services;
 
+import com.hypixel.hytale.event.EventBus;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
@@ -57,6 +58,7 @@ class DialogueServiceTest {
     private final PlayerRef player = new PlayerRef(null, UUID.randomUUID(), "Tester", "en-US", null, null);
     private final DialogueHistory history = new DialogueHistory();
     private final RecordingDisplay display = new RecordingDisplay();
+    private final EventBus bus = new EventBus(false);
     private final List<DialogueEvent> events = new ArrayList<>();
     private final DialogueService service;
 
@@ -73,7 +75,10 @@ class DialogueServiceTest {
                 return List.of();
             }
         };
-        service = new DialogueService(registry, () -> rules, DISPLAY, resolver, p -> new ConditionContext(p, null, null, history), events::add);
+        bus.registerGlobal(DialogueEvent.Opened.class, events::add);
+        bus.registerGlobal(DialogueEvent.Answered.class, events::add);
+        bus.registerGlobal(DialogueEvent.Closed.class, events::add);
+        service = new DialogueService(registry, () -> rules, DISPLAY, resolver, p -> new ConditionContext(p, null, null, history), bus);
     }
 
     private List<String> eventNames() {
