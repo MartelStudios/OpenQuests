@@ -7,7 +7,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
-import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.api.DialogueContext;
@@ -24,6 +23,7 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -65,17 +65,22 @@ public class DialogueService {
     @Nonnull
     private final Function<PlayerRef, DialogueHistory> histories;
 
+    @Nonnull
+    private final Consumer<DialogueEvent> events;
+
     /**
      * @param rules           read on each opening, since the config behind them can be reloaded.
      * @param fallbackDisplay drawing a dialogue when every display the rules name is missing.
      * @param histories       a player's history, {@code null} when it cannot be read from this thread.
+     * @param events          where openings, answers and closings are announced.
      */
-    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, DialogueHistory> histories) {
+    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, DialogueHistory> histories, @Nonnull Consumer<DialogueEvent> events) {
         this.registry = registry;
         this.rules = rules;
         this.fallbackDisplay = fallbackDisplay;
         this.resolver = resolver;
         this.histories = histories;
+        this.events = events;
     }
 
     /**
@@ -148,10 +153,10 @@ public class DialogueService {
         DialogueSession replaced = sessions.put(player.getUuid(), session);
         if (replaced != null && opening) closed(player, replaced);
         session.display().show(player, session);
-        if (opening) dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
+        if (opening) events.accept(new DialogueEvent.Opened(player, session));
         if (session.responses().isEmpty()) {
             sessions.remove(player.getUuid(), session);
-            dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
+            events.accept(new DialogueEvent.Closed(player, session));
         }
     }
 
@@ -176,7 +181,7 @@ public class DialogueService {
             return AnswerResult.REFRESHED;
         }
 
-        dispatch(new DialogueEvent.Answered(player, session, position), DialogueEvent.Answered.class);
+        events.accept(new DialogueEvent.Answered(player, session, position));
         DialogueContext context = new DialogueContext(this, player, session);
         for (DialogueAction action : response.getActions()) {
             action.execute(context);
@@ -215,21 +220,17 @@ public class DialogueService {
      */
     public void forget(@Nonnull PlayerRef player) {
         DialogueSession session = sessions.remove(player.getUuid());
-        if (session != null) dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
+        if (session != null) events.accept(new DialogueEvent.Closed(player, session));
     }
 
     private void closed(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
         session.display().close(player, session);
-        dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
+        events.accept(new DialogueEvent.Closed(player, session));
     }
 
     @Nonnull
     private DialogueDisplay displayFor(@Nonnull OpenDialogueAsset dialogue) {
         DialogueDisplay display = registry.getDisplay(chooseDisplay(dialogue).display());
         return display != null ? display : registry.getDisplay(fallbackDisplay);
-    }
-
-    private static <E extends DialogueEvent> void dispatch(@Nonnull E event, @Nonnull Class<E> type) {
-        HytaleServer.get().getEventBus().dispatchFor(type, event.getSession().dialogueId()).dispatch(event);
     }
 }
