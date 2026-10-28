@@ -11,7 +11,8 @@
     "Website": "https://github.com/MartelStudios/OpenQuests",
     "ServerVersion": "^0.7.0",
     "Dependencies": {
-        "Hytale:AssetModule": "*"
+        "Hytale:AssetModule": "*",
+        "Hytale:NPC": "*"
     },
     "OptionalDependencies": {
         
