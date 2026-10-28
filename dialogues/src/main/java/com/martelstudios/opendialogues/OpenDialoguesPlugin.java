@@ -2,6 +2,8 @@ package com.martelstudios.opendialogues;
 
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.builtin.asseteditor.event.AssetEditorFetchAutoCompleteDataEvent;
+import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.event.events.BootEvent;
@@ -63,6 +65,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     private DialogueService dialogueService;
 
+    private ComponentType<EntityStore, DialogueHistory> historyType;
+
     private DialogueHistoryRecorder historyRecorder;
 
     private DialogueResolver resolver;
@@ -102,7 +106,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerSelector(OpenDialoguesSequenceSelector.TYPE, OpenDialoguesSequenceSelector.class, OpenDialoguesSequenceSelector.CODEC);
         registry.registerSelector(OpenDialoguesWeightedSelector.TYPE, OpenDialoguesWeightedSelector.class, OpenDialoguesWeightedSelector.CODEC);
 
-        historyRecorder = new DialogueHistoryRecorder(getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC));
+        historyType = getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC);
+        historyRecorder = new DialogueHistoryRecorder(historyType);
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus());
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
@@ -188,5 +193,14 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     @Nonnull
     public DialogueService getDialogueService() {
         return dialogueService;
+    }
+
+    /**
+     * @return the persisted history of what each player opened and answered, for mods reading it
+     * through their own component access, online or offline.
+     */
+    @Nonnull
+    public ComponentType<EntityStore, DialogueHistory> getHistoryType() {
+        return historyType;
     }
 }
