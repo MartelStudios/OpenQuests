@@ -28,6 +28,10 @@ import com.martelstudios.opendialogues.history.DialogueHistoryRecorder;
 import com.martelstudios.opendialogues.displays.impl.chat.ChatDisplay;
 import com.martelstudios.opendialogues.displays.impl.page.PageDisplay;
 import com.martelstudios.opendialogues.services.DialogueService;
+import com.martelstudios.opendialogues.triggers.BuilderActionOpenDialogue;
+import com.martelstudios.opendialogues.triggers.OpenDialoguesOpenInteraction;
+import com.hypixel.hytale.server.npc.NPCPlugin;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 
 
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesAnsweredCondition;
@@ -85,6 +89,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         registry.registerAction(OpenDialoguesCloseAction.TYPE, OpenDialoguesCloseAction.class, OpenDialoguesCloseAction.CODEC);
         registry.registerAction(OpenDialoguesOpenAction.TYPE, OpenDialoguesOpenAction.class, OpenDialoguesOpenAction.CODEC);
+        getCodecRegistry(Interaction.CODEC).register(OpenDialoguesOpenInteraction.TYPE, OpenDialoguesOpenInteraction.class, OpenDialoguesOpenInteraction.CODEC);
+        NPCPlugin.get().registerCoreComponentType(BuilderActionOpenDialogue.TYPE, BuilderActionOpenDialogue::new);
         registry.registerAction(OpenDialoguesCommandAction.TYPE, OpenDialoguesCommandAction.class, OpenDialoguesCommandAction.CODEC);
 
         registry.registerCondition(OpenDialoguesCompositeCondition.TYPE, OpenDialoguesCompositeCondition.class, OpenDialoguesCompositeCondition.CODEC);
