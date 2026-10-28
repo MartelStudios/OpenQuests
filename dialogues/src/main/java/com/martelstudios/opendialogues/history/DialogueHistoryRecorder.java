@@ -113,8 +113,13 @@ public class DialogueHistoryRecorder {
             cleared.completeExceptionally(e);
             return;
         }
-        storage.update(playerId, holder -> cleared.complete(clear.apply(holder.getComponent(type))))
-                .whenComplete((ignored, error) -> cleared.complete(false));
+        // Reported once saved, so a failed write is not announced as a reset.
+        boolean[] result = new boolean[1];
+        storage.update(playerId, holder -> result[0] = clear.apply(holder.getComponent(type)))
+               .whenComplete((ignored, error) -> {
+                   if (error != null) cleared.completeExceptionally(error);
+                   else cleared.complete(result[0]);
+               });
     }
 
     /**
