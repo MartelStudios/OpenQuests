@@ -4,6 +4,7 @@ import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.builtin.asseteditor.event.AssetEditorFetchAutoCompleteDataEvent;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
+import com.hypixel.hytale.server.core.event.events.BootEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -62,6 +63,12 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     private DialogueResolver resolver;
 
+    /**
+     * Until then packs are half loaded: a router's inline dialogues load before the pack's
+     * dialogue folder, so a check would report targets that are only on their way.
+     */
+    private volatile boolean booted;
+
     public OpenDialoguesPlugin(@Nonnull JavaPluginInit init) {
         super(init);
         instance = this;
@@ -114,6 +121,11 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         onLoaded(OpenDialogueAsset.class, this::validateRouters);
         onLoaded(OpenDialogueAsset.class, this::validateAnswers);
         onLoaded(OpenDialogueRouterAsset.class, this::validateRouters);
+        getEventRegistry().register(BootEvent.class, event -> {
+            booted = true;
+            validateRouters();
+            validateAnswers();
+        });
 
         getEventRegistry().registerGlobal(DialogueEvent.Opened.class, historyRecorder::onOpened);
         getEventRegistry().registerGlobal(DialogueEvent.Answered.class, historyRecorder::onAnswered);
@@ -139,7 +151,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
      */
     private void validateRouters() {
         Map<String, String> errors = resolver.validate(OpenDialogueRouterAsset.getAssetStore().getAssetMap().getAssetMap().keySet());
-        errors.forEach((routerId, error) -> getLogger().atSevere().log("Router '%s' leads nowhere: %s", routerId, error));
+        if (booted) errors.forEach((routerId, error) -> getLogger().atSevere().log("Router '%s' leads nowhere: %s", routerId, error));
         resolver.setInvalidRouters(errors.keySet());
     }
 
@@ -147,6 +159,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
      * Only logged: a broken answer condition is still judged, as an unknown id never holds.
      */
     private void validateAnswers() {
+        if (!booted) return;
         for (OpenDialogueAsset dialogue : OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap().values()) {
             String error = dialogue.findConditionError(OpenDialogueAsset::getDialogue);
             if (error != null) getLogger().atSevere().log("Dialogue '%s' has a broken answer condition: %s", dialogue.getId(), error);
