@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class OpenDialoguesOpenInteractionTest {
 
@@ -14,5 +15,10 @@ class OpenDialoguesOpenInteractionTest {
 
         assertNotNull(interaction);
         assertEquals("OpenDialogues_ExampleElder", interaction.getDialogue());
+    }
+
+    @Test
+    void anEmptyDialogueIdIsRefused() {
+        assertNull(CodecJson.decode(OpenDialoguesOpenInteraction.CODEC, "{ \"Dialogue\": \"\" }"));
     }
 }

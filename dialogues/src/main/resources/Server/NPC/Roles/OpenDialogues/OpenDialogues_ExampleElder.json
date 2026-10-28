@@ -14,7 +14,7 @@
   "IsMemory": false,
   "DisableDamageGroups": [ "Self" ],
   "CombatConfig": {
-    "EntityEffect": "Immunity_Environmental"
+    "EntityEffects": [ "Immunity_Environmental" ]
   },
   "BusyStates": [ "$Interaction" ],
   "Invulnerable": true,

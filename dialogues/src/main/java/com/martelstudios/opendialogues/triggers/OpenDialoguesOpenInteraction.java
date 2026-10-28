@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.schema.metadata.ui.UIEditor;
+import com.hypixel.hytale.codec.validation.Validators;
 import com.hypixel.hytale.protocol.InteractionState;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
@@ -24,6 +25,7 @@ public class OpenDialoguesOpenInteraction extends SimpleInstantInteraction {
 
     public static final BuilderCodec<OpenDialoguesOpenInteraction> CODEC = BuilderCodec.builder(OpenDialoguesOpenInteraction.class, OpenDialoguesOpenInteraction::new, SimpleInstantInteraction.CODEC)
                                                                                        .append(new KeyedCodec<>("Dialogue", Codec.STRING, true), (interaction, dialogue) -> interaction.dialogue = dialogue, interaction -> interaction.dialogue)
+                                                                                       .addValidator(Validators.nonEmptyString())
                                                                                        .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
                                                                                        .add()
                                                                                        .build();
