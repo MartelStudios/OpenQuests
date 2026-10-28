@@ -14,6 +14,7 @@ import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
+import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
@@ -90,7 +91,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         historyRecorder = new DialogueHistoryRecorder(getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC));
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
-        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, historyRecorder::history, OpenDialoguesPlugin::dispatch);
+        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), OpenDialoguesPlugin::dispatch);
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
         registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService));
 

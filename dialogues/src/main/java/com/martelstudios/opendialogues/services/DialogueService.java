@@ -1,11 +1,7 @@
 package com.martelstudios.opendialogues.services;
 
-import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
-import com.martelstudios.opendialogues.history.DialogueHistory;
 import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.DialogueAction;
@@ -63,7 +59,7 @@ public class DialogueService {
     private final DialogueResolver resolver;
 
     @Nonnull
-    private final Function<PlayerRef, DialogueHistory> histories;
+    private final Function<PlayerRef, ConditionContext> contexts;
 
     @Nonnull
     private final Consumer<DialogueEvent> events;
@@ -71,15 +67,15 @@ public class DialogueService {
     /**
      * @param rules           read on each opening, since the config behind them can be reloaded.
      * @param fallbackDisplay drawing a dialogue when every display the rules name is missing.
-     * @param histories       a player's history, {@code null} when it cannot be read from this thread.
+     * @param contexts        what conditions are judged against for a player, read anew on each check.
      * @param events          where openings, answers and closings are announced.
      */
-    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, DialogueHistory> histories, @Nonnull Consumer<DialogueEvent> events) {
+    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, ConditionContext> contexts, @Nonnull Consumer<DialogueEvent> events) {
         this.registry = registry;
         this.rules = rules;
         this.fallbackDisplay = fallbackDisplay;
         this.resolver = resolver;
-        this.histories = histories;
+        this.contexts = contexts;
         this.events = events;
     }
 
@@ -104,7 +100,7 @@ public class DialogueService {
      * @return whether the id led to a dialogue.
      */
     public boolean open(@Nonnull PlayerRef player, @Nonnull String id) {
-        return show(player, resolver.resolve(id, contextFor(player)));
+        return show(player, resolver.resolve(id, contexts.apply(player)));
     }
 
     /**
@@ -113,7 +109,7 @@ public class DialogueService {
      * @return whether the target led to a dialogue.
      */
     public boolean open(@Nonnull PlayerRef player, @Nonnull OpenDialoguesTarget target) {
-        return show(player, resolver.resolve(target, contextFor(player)));
+        return show(player, resolver.resolve(target, contexts.apply(player)));
     }
 
     private boolean show(@Nonnull PlayerRef player, @Nullable OpenDialogueAsset dialogue) {
@@ -122,18 +118,6 @@ public class DialogueService {
         }
         open(player, dialogue);
         return true;
-    }
-
-    /**
-     * Off the player's world thread only the history could be read, and it cannot, so conditions
-     * judge an empty one.
-     */
-    @Nonnull
-    private ConditionContext contextFor(@Nonnull PlayerRef player) {
-        DialogueHistory history = histories.apply(player);
-        Ref<EntityStore> entity = player.getReference();
-        Store<EntityStore> store = entity == null ? null : entity.getStore();
-        return new ConditionContext(player, entity, store, history != null ? history : new DialogueHistory());
     }
 
     /**
@@ -149,7 +133,7 @@ public class DialogueService {
      *                answer, which history must not count as another opening.
      */
     private void present(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, boolean opening) {
-        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contextFor(player)), displayFor(dialogue));
+        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue));
         DialogueSession replaced = sessions.put(player.getUuid(), session);
         if (replaced != null && opening) closed(player, replaced);
         session.display().show(player, session);
@@ -176,7 +160,7 @@ public class DialogueService {
             return AnswerResult.NO_SUCH_ANSWER;
         }
         OpenDialoguesResponse response = session.responses().get(position - 1);
-        if (!response.isShownTo(contextFor(player))) {
+        if (!response.isShownTo(contexts.apply(player))) {
             present(player, session.dialogue(), false);
             return AnswerResult.REFRESHED;
         }
