@@ -81,6 +81,12 @@ A dialogue opens in the first registered display among: rules on its id, rules o
 in list order, the `*` rule, its own `Display`, the default. A rule naming a display no mod
 registered is skipped.
 
+## Resetting a player
+
+`/odialogues history reset <player> [--dialogue=<id>]` forgets what a player did, so routers and
+conditions treat them as new: every dialogue, or only the one named. It works on offline players,
+and closes the dialogue the player has open when it is the one forgotten. Admins only.
+
 ## Extending
 
 Other mods register through `OpenDialoguesPlugin.get().getRegistry()` during their `setup`:
