@@ -1,0 +1,27 @@
+{
+    "Group": "MartelStudios",
+    "Name": "OpenQuestsDialogues",
+    "Version": "0.1.0",
+    "Description": "Bridge between OpenQuests and OpenDialogues: dialogue quest objectives",
+    "Authors": [
+        {
+            "Name": "Hazard4U"
+        }
+    ],
+    "Website": "https://github.com/MartelStudios/OpenQuests",
+    "ServerVersion": "^0.7.0",
+    "Dependencies": {
+        "MartelStudios:OpenQuestsCore": "^5.0.0",
+        "MartelStudios:OpenQuests": "^5.0.0",
+        "MartelStudios:OpenDialogues": "*"
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "com.martelstudios.openquests.dialogues.OpenQuestsDialoguesPlugin",
+    "IncludesAssetPack": true,
+    "UpdateChecker": {
+        "CurseForge": ""
+    }
+}
