@@ -5,6 +5,8 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.martelstudios.opendialogues.actions.DialogueAction;
+import com.martelstudios.opendialogues.conditions.ConditionContext;
+import com.martelstudios.opendialogues.conditions.DialogueCondition;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,6 +23,8 @@ public class OpenDialoguesResponse {
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Actions", new ArrayCodec<>(DialogueAction.CODEC, DialogueAction[]::new)), (response, actions) -> response.actions = actions, response -> response.actions)
                                                                            .add()
+                                                                           .append(new KeyedCodec<>("When", DialogueCondition.CODEC), (response, when) -> response.when = when, response -> response.when)
+                                                                           .add()
                                                                            .build();
 
     @Nullable
@@ -28,6 +32,9 @@ public class OpenDialoguesResponse {
 
     private String text = "";
     private DialogueAction[] actions = new DialogueAction[0];
+
+    @Nullable
+    private DialogueCondition when;
 
     protected OpenDialoguesResponse() {}
 
@@ -53,5 +60,20 @@ public class OpenDialoguesResponse {
     @Nonnull
     public DialogueAction[] getActions() {
         return actions;
+    }
+
+    /**
+     * @return the condition the answer is shown under, or {@code null} to always show it.
+     */
+    @Nullable
+    public DialogueCondition getWhen() {
+        return when;
+    }
+
+    /**
+     * @return whether the player may see and pick the answer now.
+     */
+    public boolean isShownTo(@Nonnull ConditionContext context) {
+        return when == null || when.test(context);
     }
 }

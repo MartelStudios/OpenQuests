@@ -12,7 +12,8 @@ import javax.annotation.Nonnull;
 public interface DialogueDisplay {
 
     /**
-     * Shows a dialogue just opened, or opened again.
+     * Shows a dialogue just opened, or opened again. Without answers it has already ended: a
+     * blocking display stays up until the player closes it, and {@link #close} is not called.
      */
     void show(@Nonnull PlayerRef player, @Nonnull DialogueSession session);
 

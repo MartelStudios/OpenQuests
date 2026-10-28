@@ -110,6 +110,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .build());
 
         onLoaded(OpenDialogueAsset.class, this::validateRouters);
+        onLoaded(OpenDialogueAsset.class, this::validateAnswers);
         onLoaded(OpenDialogueRouterAsset.class, this::validateRouters);
 
         getEventRegistry().registerGlobal(DialogueEvent.Opened.class, historyRecorder::onOpened);
@@ -138,6 +139,16 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         Map<String, String> errors = resolver.validate(OpenDialogueRouterAsset.getAssetStore().getAssetMap().getAssetMap().keySet());
         errors.forEach((routerId, error) -> getLogger().atSevere().log("Router '%s' leads nowhere: %s", routerId, error));
         resolver.setInvalidRouters(errors.keySet());
+    }
+
+    /**
+     * Only logged: a broken answer condition is still judged, as an unknown id never holds.
+     */
+    private void validateAnswers() {
+        for (OpenDialogueAsset dialogue : OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap().values()) {
+            String error = dialogue.findConditionError(OpenDialogueAsset::getDialogue);
+            if (error != null) getLogger().atSevere().log("Dialogue '%s' has a broken answer condition: %s", dialogue.getId(), error);
+        }
     }
 
     private static void suggest(@Nonnull AssetEditorFetchAutoCompleteDataEvent event, @Nonnull Collection<String> ids) {

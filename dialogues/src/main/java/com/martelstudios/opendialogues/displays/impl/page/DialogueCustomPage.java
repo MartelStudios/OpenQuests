@@ -78,7 +78,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
 
         boolean lastPage = page >= pages.length - 1;
         commandBuilder.set("#NextButton.Visible", !lastPage);
-        commandBuilder.set("#AnswersColumn.Visible", lastPage);
+        commandBuilder.set("#AnswersColumn.Visible", lastPage && !session.responses().isEmpty());
         if (!lastPage) {
             eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#NextButton", EventData.of(EventDataModel.KEY_ACTION, EventDataModel.ACTION_NEXT), false);
             return;

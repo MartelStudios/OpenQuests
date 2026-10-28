@@ -15,11 +15,15 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.schema.metadata.ui.UIEditor;
 import com.hypixel.hytale.codec.validation.ValidatorCache;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
+import com.martelstudios.opendialogues.conditions.ConditionContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * One exchange shown to a player: a title, pages read in order, and the answers offered once they
@@ -138,6 +142,28 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     @Nonnull
     public OpenDialoguesResponse[] getResponses() {
         return responses;
+    }
+
+    /**
+     * @return the answers the player may see now, in file order.
+     */
+    @Nonnull
+    public List<OpenDialoguesResponse> visibleResponses(@Nonnull ConditionContext context) {
+        return Arrays.stream(responses).filter(response -> response.isShownTo(context)).toList();
+    }
+
+    /**
+     * Asked once every dialogue is loaded, as for routers, since a condition may name another dialogue.
+     *
+     * @return why the first broken answer condition cannot work, {@code null} if none is broken.
+     */
+    @Nullable
+    public String findConditionError(@Nonnull Function<String, OpenDialogueAsset> dialogues) {
+        for (OpenDialoguesResponse response : responses) {
+            String error = response.getWhen() == null ? null : response.getWhen().validate(dialogues);
+            if (error != null) return "Answer '" + answerKey(response) + "': " + error;
+        }
+        return null;
     }
 
     /**
