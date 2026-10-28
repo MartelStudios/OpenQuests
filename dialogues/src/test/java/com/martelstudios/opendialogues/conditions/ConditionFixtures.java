@@ -23,6 +23,13 @@ public final class ConditionFixtures {
 
     private ConditionFixtures() {}
 
+    /**
+     * Registers the conditions before decoding JSON that names them outside {@link #condition}.
+     */
+    public static void registerConditions() {
+        // Calling any member runs the static block.
+    }
+
     @Nonnull
     public static DialogueCondition condition(@Nonnull String json) {
         DialogueCondition condition = CodecJson.decode(DialogueCondition.CODEC, json);

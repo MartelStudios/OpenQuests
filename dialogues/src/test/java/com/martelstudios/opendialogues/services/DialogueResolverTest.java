@@ -26,8 +26,7 @@ class DialogueResolverTest {
     private static final String OPENED_WELCOME = "{ \"Type\": \"Opened\", \"Dialogue\": \"Welcome\" }";
 
     static {
-        // Loads the condition fixtures, which register the conditions routes read
-        ConditionFixtures.context(new DialogueHistory());
+        ConditionFixtures.registerConditions();
         DialogueRegistry registry = new DialogueRegistry();
         registry.registerSelector(OpenDialoguesSequenceSelector.TYPE, OpenDialoguesSequenceSelector.class, OpenDialoguesSequenceSelector.CODEC);
         registry.registerSelector(OpenDialoguesWeightedSelector.TYPE, OpenDialoguesWeightedSelector.class, OpenDialoguesWeightedSelector.CODEC);
