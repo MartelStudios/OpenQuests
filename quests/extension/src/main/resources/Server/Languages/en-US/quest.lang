@@ -311,3 +311,14 @@ chapter.athletics=Athletics
 chapter.combat=Combat
 chapter.goblin-breach=The Goblin Breach
 
+elder-greeting.title=Greet the elder
+elder-greeting.description=An old Kweebec watches over the grove. Travellers who stop by never regret it.
+elder-greeting.short=Speak with the old Kweebec of the grove
+elder-potion.title=A gift for the elder
+elder-potion.description=The elder's roots ache with age. A healing potion would ease them.
+elder-potion.short=Bring a lesser healing potion to the old Kweebec
+elder-potion-gather.title=Find a lesser healing potion
+elder-potion-gather.description=Craft or find a lesser healing potion.
+elder-potion-give.title=Offer the potion
+elder-potion-give.description=Hand the potion to the old Kweebec.
+chapter.old-kweebec=The old Kweebec
