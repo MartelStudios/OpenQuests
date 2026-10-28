@@ -18,12 +18,15 @@ import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
 import static com.martelstudios.opendialogues.dialogues.DialogueFixtures.dialogue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DialogueServiceTest {
@@ -57,17 +60,19 @@ class DialogueServiceTest {
 
     private final PlayerRef player = new PlayerRef(null, UUID.randomUUID(), "Tester", "en-US", null, null);
     private final DialogueHistory history = new DialogueHistory();
+    // Built before any dialogue is read, which needs the conditions the fixtures register
+    private final ConditionContext context = ConditionFixtures.context(history);
     private final RecordingDisplay display = new RecordingDisplay();
+    private final Map<String, OpenDialogueAsset> dialogues = new HashMap<>();
     private final EventBus bus = new EventBus(false);
     private final List<DialogueEvent> events = new ArrayList<>();
     private final DialogueService service;
 
     DialogueServiceTest() {
-        ConditionFixtures.context(history);
         DialogueRegistry registry = new DialogueRegistry();
         registry.registerAction(OpenDialoguesCloseAction.TYPE, OpenDialoguesCloseAction.class, OpenDialoguesCloseAction.CODEC);
         registry.registerDisplay(DISPLAY, display);
-        DialogueResolver resolver = new DialogueResolver(id -> null, id -> null, new Random(0));
+        DialogueResolver resolver = new DialogueResolver(dialogues::get, id -> null, new Random(0));
         // No rule, so every dialogue falls back to the test display without asking the asset store for its pack
         DisplayRules rules = new DisplayRules() {
             @Override
@@ -78,7 +83,7 @@ class DialogueServiceTest {
         bus.registerGlobal(DialogueEvent.Opened.class, events::add);
         bus.registerGlobal(DialogueEvent.Answered.class, events::add);
         bus.registerGlobal(DialogueEvent.Closed.class, events::add);
-        service = new DialogueService(registry, () -> rules, DISPLAY, resolver, p -> new ConditionContext(p, null, null, history), bus);
+        service = new DialogueService(registry, () -> rules, DISPLAY, resolver, p -> context, bus);
     }
 
     private List<String> eventNames() {
@@ -152,5 +157,40 @@ class DialogueServiceTest {
         assertEquals(AnswerResult.NO_SUCH_ANSWER, service.answer(player, "Elder", 0));
         assertEquals(AnswerResult.NO_SUCH_ANSWER, service.answer(player, "Elder", 2));
         assertEquals(List.of("Opened"), eventNames());
+    }
+
+    @Test
+    void eventsReachOnlyTheListenersOfTheirDialogue() {
+        List<DialogueEvent> elder = new ArrayList<>();
+        List<DialogueEvent> smith = new ArrayList<>();
+        bus.register(DialogueEvent.Opened.class, "Elder", elder::add);
+        bus.register(DialogueEvent.Opened.class, "Smith", smith::add);
+
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"));
+
+        assertEquals(1, elder.size());
+        assertTrue(smith.isEmpty());
+    }
+
+    @Test
+    void anIdOpensTheDialogueItLeadsTo() {
+        dialogues.put("Elder", dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"));
+
+        assertTrue(service.open(player, "Elder"));
+        assertFalse(service.open(player, "Missing"));
+
+        assertEquals(1, display.shown.size());
+        assertEquals(List.of("Opened"), eventNames());
+    }
+
+    @Test
+    void aPlayerLeavingEndsTheDialogueWithoutDrawing() {
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"));
+
+        service.forget(player);
+
+        assertEquals(List.of("Opened", "Closed"), eventNames());
+        assertTrue(display.closed.isEmpty());
+        assertEquals(AnswerResult.NO_DIALOGUE, service.answer(player, null, 1));
     }
 }
