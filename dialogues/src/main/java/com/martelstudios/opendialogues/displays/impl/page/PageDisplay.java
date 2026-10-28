@@ -41,6 +41,22 @@ public class PageDisplay implements DialogueDisplay {
     }
 
     /**
+     * Swaps the answers of the page on screen, which keeps the page the player is reading.
+     */
+    @Override
+    public void refresh(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
+        onWorldThread(player, (ref, store) -> {
+            PageManager pages = pageManager(ref, store);
+            if (pages == null) return;
+            if (pages.getCustomPage() instanceof DialogueCustomPage shown && shown.shows(session.dialogue())) {
+                shown.refresh(session);
+            } else {
+                show(player, session);
+            }
+        });
+    }
+
+    /**
      * Deferred, so an answer that closes its dialogue and opens the next one replaces the page:
      * the client drops a page that follows a close sent in the same breath.
      */

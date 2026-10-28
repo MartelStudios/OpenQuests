@@ -45,11 +45,17 @@ class DialogueServiceTest {
     private static final class RecordingDisplay implements DialogueDisplay {
 
         final List<DialogueSession> shown = new ArrayList<>();
+        final List<DialogueSession> refreshed = new ArrayList<>();
         final List<DialogueSession> closed = new ArrayList<>();
 
         @Override
         public void show(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
             shown.add(session);
+        }
+
+        @Override
+        public void refresh(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
+            refreshed.add(session);
         }
 
         @Override
@@ -114,15 +120,15 @@ class DialogueServiceTest {
     }
 
     @Test
-    void aStaleAnswerRedrawsTheDialogueWithoutRunningAnything() {
+    void aStaleAnswerRefreshesTheAnswersWithoutRunningAnything() {
         service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" }, { \"Text\": \"b\", " + UNTIL_WELCOME + ", " + CLOSE + " } ] }"));
         history.recordOpened("Elder_Welcome");
 
         assertEquals(AnswerResult.REFRESHED, service.answer(player, null, 2));
 
         assertEquals(List.of("Opened"), eventNames());
-        assertEquals(2, display.shown.size());
-        assertEquals(List.of("a"), texts(display.shown.getLast()));
+        assertEquals(1, display.shown.size());
+        assertEquals(List.of("a"), texts(display.refreshed.getLast()));
         assertTrue(display.closed.isEmpty());
         assertEquals(AnswerResult.NO_SUCH_ANSWER, service.answer(player, null, 2));
     }

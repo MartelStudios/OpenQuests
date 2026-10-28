@@ -38,7 +38,7 @@ public class DialogueService {
         /** No dialogue open, or not the one named. */
         NO_DIALOGUE,
         NO_SUCH_ANSWER,
-        /** The answer no longer applied: nothing ran and the dialogue was shown again. */
+        /** The answer no longer applied: nothing ran and the answers were shown again. */
         REFRESHED
     }
 
@@ -122,24 +122,31 @@ public class DialogueService {
 
     /**
      * Shows a dialogue to a player, one from the store or one written inline, in place of the
-     * dialogue open. With no answer for the player to see, it ends as soon as shown.
+     * dialogue open. With no answer for the player to see, it ends as soon as shown. Off the
+     * player's world thread, conditions see no history nor inventory, so answers needing them hide.
      */
     public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue) {
-        present(player, dialogue, true);
+        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue));
+        DialogueSession replaced = sessions.put(player.getUuid(), session);
+        if (replaced != null) closed(player, replaced);
+        session.display().show(player, session);
+        dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
+        endIfUnanswerable(player, session);
     }
 
     /**
-     * @param opening whether the player opened it, rather than it being redrawn after a stale
-     *                answer, which history must not count as another opening.
+     * Judges the answers again and redraws only them, so the player stays on the page they read.
+     * History does not count it as another opening.
      */
-    private void present(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, boolean opening) {
-        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue));
-        DialogueSession replaced = sessions.put(player.getUuid(), session);
-        if (replaced != null && opening) closed(player, replaced);
-        session.display().show(player, session);
-        if (opening) dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
-        if (session.responses().isEmpty()) {
-            sessions.remove(player.getUuid(), session);
+    private void refresh(@Nonnull PlayerRef player, @Nonnull DialogueSession stale) {
+        DialogueSession session = new DialogueSession(stale.dialogue(), stale.dialogue().visibleResponses(contexts.apply(player)), stale.display());
+        if (!sessions.replace(player.getUuid(), stale, session)) return;
+        session.display().refresh(player, session);
+        endIfUnanswerable(player, session);
+    }
+
+    private void endIfUnanswerable(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
+        if (session.responses().isEmpty() && sessions.remove(player.getUuid(), session)) {
             dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
         }
     }
@@ -161,7 +168,7 @@ public class DialogueService {
         }
         OpenDialoguesResponse response = session.responses().get(position - 1);
         if (!response.isShownTo(contexts.apply(player))) {
-            present(player, session.dialogue(), false);
+            refresh(player, session);
             return AnswerResult.REFRESHED;
         }
 

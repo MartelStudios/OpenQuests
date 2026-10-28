@@ -18,7 +18,7 @@ class ConditionalAnswersTest {
     private static final String SEEN_WELCOME = "\"When\": { \"Type\": \"Opened\", \"Dialogue\": \"Elder_Welcome\", \"Min\": 1 }";
 
     private static OpenDialogueAsset dialogue(String responses) {
-        ConditionFixtures.context(new DialogueHistory());
+        ConditionFixtures.registerConditions();
         OpenDialogueAsset dialogue = CodecJson.decode(OpenDialogueAsset.BODY_CODEC, "{ \"Responses\": [" + responses + "] }");
         assertNotNull(dialogue);
         return dialogue;
