@@ -122,7 +122,8 @@ public class DialogueService {
 
     /**
      * Shows a dialogue to a player, one from the store or one written inline, in place of the
-     * dialogue open. With no answer for the player to see, it ends as soon as shown.
+     * dialogue open. With no answer for the player to see, it ends as soon as shown. Off the
+     * player's world thread, conditions see no history nor inventory, so answers needing them hide.
      */
     public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue) {
         present(player, dialogue, true);
