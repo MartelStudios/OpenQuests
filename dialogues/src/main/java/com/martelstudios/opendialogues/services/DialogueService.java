@@ -18,18 +18,19 @@ import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
-import com.martelstudios.opendialogues.sessions.SessionStore;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
  * Opens dialogues, runs the answers players pick and closes them, whatever draws them and however
- * the player answered. Open dialogues last for the session only.
+ * the player answered. A player has one dialogue open at most, opening another ends it. Open
+ * dialogues last for the session only.
  */
 public class DialogueService {
 
@@ -38,10 +39,8 @@ public class DialogueService {
      */
     public enum AnswerResult {
         ANSWERED,
-        /** No dialogue open, or the one named is not open. */
+        /** No dialogue open, or not the one named. */
         NO_DIALOGUE,
-        /** Several dialogues open and none named. */
-        AMBIGUOUS,
         NO_SUCH_ANSWER,
         /** The answer no longer applied: nothing ran and the dialogue was shown again. */
         REFRESHED
@@ -49,7 +48,7 @@ public class DialogueService {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    private final SessionStore<DialogueSession> sessions = new SessionStore<>();
+    private final Map<UUID, DialogueSession> sessions = new ConcurrentHashMap<>();
 
     @Nonnull
     private final DialogueRegistry registry;
@@ -95,7 +94,7 @@ public class DialogueService {
 
     /**
      * Shows the dialogue an id leads to, a dialogue under it first, else what the router under it
-     * picks for that player, replacing the same dialogue if it was open.
+     * picks for that player, in place of the dialogue open.
      *
      * @return whether the id led to a dialogue.
      */
@@ -133,8 +132,8 @@ public class DialogueService {
     }
 
     /**
-     * Shows a dialogue to a player, one from the store or one written inline, replacing the same
-     * dialogue if it was open. With no answer for the player to see, it ends as soon as shown.
+     * Shows a dialogue to a player, one from the store or one written inline, in place of the
+     * dialogue open. With no answer for the player to see, it ends as soon as shown.
      */
     public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue) {
         present(player, dialogue, true);
@@ -146,11 +145,12 @@ public class DialogueService {
      */
     private void present(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, boolean opening) {
         DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contextFor(player)), displayFor(dialogue));
-        sessions.put(player.getUuid(), dialogue.getId(), session);
+        DialogueSession replaced = sessions.put(player.getUuid(), session);
+        if (replaced != null && opening) closed(player, replaced);
         session.display().show(player, session);
         if (opening) dispatch(new DialogueEvent.Opened(player, session), DialogueEvent.Opened.class);
         if (session.responses().isEmpty()) {
-            sessions.remove(player.getUuid(), dialogue.getId());
+            sessions.remove(player.getUuid(), session);
             dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
         }
     }
@@ -158,14 +158,14 @@ public class DialogueService {
     /**
      * Runs the actions of an answer the player was shown.
      *
-     * @param dialogueId the dialogue answered, or {@code null} when the player has a single one open.
+     * @param dialogueId the dialogue the answer was shown in, or {@code null} for whichever is open.
      * @param position   the answer's position among those shown, from 1.
      */
     @Nonnull
     public AnswerResult answer(@Nonnull PlayerRef player, @Nullable String dialogueId, int position) {
-        DialogueSession session = sessions.resolve(player.getUuid(), dialogueId);
-        if (session == null) {
-            return dialogueId == null && sessions.openIds(player.getUuid()).size() > 1 ? AnswerResult.AMBIGUOUS : AnswerResult.NO_DIALOGUE;
+        DialogueSession session = sessions.get(player.getUuid());
+        if (session == null || dialogueId != null && !dialogueId.equals(session.dialogueId())) {
+            return AnswerResult.NO_DIALOGUE;
         }
         if (position < 1 || position > session.responses().size()) {
             return AnswerResult.NO_SUCH_ANSWER;
@@ -185,13 +185,13 @@ public class DialogueService {
     }
 
     /**
-     * Ends one of the player's dialogues.
+     * Ends the player's dialogue if it is the one named.
      *
      * @return whether it was open.
      */
     public boolean close(@Nonnull PlayerRef player, @Nonnull String dialogueId) {
-        DialogueSession session = sessions.remove(player.getUuid(), dialogueId);
-        if (session == null) {
+        DialogueSession session = sessions.get(player.getUuid());
+        if (session == null || !session.dialogueId().equals(dialogueId) || !sessions.remove(player.getUuid(), session)) {
             return false;
         }
         closed(player, session);
@@ -199,20 +199,11 @@ public class DialogueService {
     }
 
     /**
-     * Ends every dialogue of a player leaving, without drawing anything: there is no one to draw for.
+     * Ends the dialogue of a player leaving, without drawing anything: there is no one to draw for.
      */
     public void forget(@Nonnull PlayerRef player) {
-        for (DialogueSession session : sessions.removeAll(player.getUuid())) {
-            dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
-        }
-    }
-
-    /**
-     * @return the ids of the player's open dialogues, in opening order.
-     */
-    @Nonnull
-    public List<String> openDialogues(@Nonnull UUID player) {
-        return sessions.openIds(player);
+        DialogueSession session = sessions.remove(player.getUuid());
+        if (session != null) dispatch(new DialogueEvent.Closed(player, session), DialogueEvent.Closed.class);
     }
 
     private void closed(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {

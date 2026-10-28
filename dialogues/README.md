@@ -7,8 +7,7 @@ dialogue or a router picking one. A dialogue wins when both share the id.
 ## Answering
 
 Answers are drawn by a **display**. The chat display lists them numbered; pick one with
-`/oda <n>`, or `/oda <n> <dialogue>` when several dialogues are open at once. The dialogue argument
-only suggests the dialogues you have open.
+`/oda <n>`. A player has one dialogue open at a time: opening another ends the one open.
 
 ## Writing dialogues
 

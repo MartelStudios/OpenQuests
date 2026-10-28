@@ -7,11 +7,9 @@ import com.martelstudios.opendialogues.dialogues.OpenDialoguesPage;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
- * Draws a dialogue in the chat: its pages, then its answers numbered for {@code /oda}. Several
- * dialogues can share the chat, so the answers end with the command naming their dialogue.
+ * Draws a dialogue in the chat: its pages, then its answers numbered for {@code /oda}.
  */
 public class ChatDisplay implements DialogueDisplay {
 
@@ -31,20 +29,12 @@ public class ChatDisplay implements DialogueDisplay {
             player.sendMessage(Message.join(Message.raw("  " + (i + 1) + ". "), Message.translation(responses.get(i).getText())));
         }
         if (!responses.isEmpty()) {
-            player.sendMessage(Message.raw("/oda <n> " + session.dialogueId()).italic(true));
+            player.sendMessage(Message.raw("/oda <n>").italic(true));
         }
     }
 
     @Override
     public void close(@Nonnull PlayerRef player, @Nonnull DialogueSession session) {
         // The chat keeps what it printed: nothing to take down.
-    }
-
-    /**
-     * @return the line telling the player which dialogues an answer could be for.
-     */
-    @Nonnull
-    public static Message ambiguous(@Nonnull List<String> openDialogues) {
-        return Message.raw("Several dialogues are open, name one: /oda <n> <" + String.join("|", openDialogues) + ">");
     }
 }
