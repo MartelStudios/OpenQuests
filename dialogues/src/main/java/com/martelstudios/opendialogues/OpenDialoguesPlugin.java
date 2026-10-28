@@ -120,7 +120,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         getEventRegistry().register(AssetEditorFetchAutoCompleteDataEvent.class, DialogueRegistry.DISPLAYS_DATA_SET, event -> suggest(event, registry.getDisplayIds()));
         getEventRegistry().register(AssetEditorFetchAutoCompleteDataEvent.class, DialogueRegistry.DIALOGUES_DATA_SET, event -> suggest(event, OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap().keySet()));
 
-        getCommandRegistry().registerCommand(new DialogueCommand(dialogueService, registry, displayRules));
+        getCommandRegistry().registerCommand(new DialogueCommand(dialogueService, registry, displayRules, historyRecorder));
         getCommandRegistry().registerCommand(new AnswerCommand("oda", dialogueService));
     }
 

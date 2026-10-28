@@ -17,6 +17,7 @@ import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
+import com.martelstudios.opendialogues.history.DialogueHistoryRecorder;
 import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
 import com.martelstudios.opendialogues.services.DialogueService;
 
@@ -25,7 +26,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- * {@code /odialogues}, alias {@code /od}: opens a dialogue by id, picks its answers and sets which display draws it.
+ * {@code /odialogues}, alias {@code /od}: opens a dialogue by id, picks its answers, sets which display draws it
+ * and resets players' history.
  */
 public class DialogueCommand extends AbstractCommandCollection {
 
@@ -35,7 +37,7 @@ public class DialogueCommand extends AbstractCommandCollection {
     static final AssetArgumentType<OpenDialogueAsset, DefaultAssetMap<String, OpenDialogueAsset>> DIALOGUE_ASSET = new AssetArgumentType<>(
         "Dialogue", OpenDialogueAsset.class, "Id of a dialogue");
 
-    public DialogueCommand(@Nonnull DialogueService dialogues, @Nonnull DialogueRegistry registry, @Nonnull Config<DisplayRules> displayRules) {
+    public DialogueCommand(@Nonnull DialogueService dialogues, @Nonnull DialogueRegistry registry, @Nonnull Config<DisplayRules> displayRules, @Nonnull DialogueHistoryRecorder recorder) {
         super("odialogues", "Opens and answers dialogues");
         addAliases("od");
 
@@ -43,6 +45,7 @@ public class DialogueCommand extends AbstractCommandCollection {
         addSubCommand(new OpenCommand(dialogues));
         addSubCommand(new AnswerCommand("answer", dialogues));
         addSubCommand(new DisplayCommand(dialogues, registry, displayRules));
+        addSubCommand(new HistoryCommand(dialogues, recorder));
     }
 
     private static class OpenCommand extends AbstractPlayerCommand {

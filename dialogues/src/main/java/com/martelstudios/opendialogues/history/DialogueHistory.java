@@ -73,6 +73,26 @@ public class DialogueHistory implements Component<EntityStore> {
     }
 
     /**
+     * Forgets everything the player did, as if they never met a dialogue.
+     *
+     * @return whether anything was recorded.
+     */
+    public boolean clear() {
+        if (dialogues.isEmpty()) return false;
+        dialogues.clear();
+        return true;
+    }
+
+    /**
+     * Forgets one dialogue's openings and answers, the others kept.
+     *
+     * @return whether that dialogue had anything recorded.
+     */
+    public boolean clear(@Nonnull String dialogueId) {
+        return dialogues.remove(dialogueId) != null;
+    }
+
+    /**
      * @return how many times the dialogue opened, 0 for one never seen.
      */
     public int opened(@Nonnull String dialogueId) {
