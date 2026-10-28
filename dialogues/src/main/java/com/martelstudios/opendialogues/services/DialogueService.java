@@ -199,6 +199,18 @@ public class DialogueService {
     }
 
     /**
+     * Ends whichever dialogue the player has open.
+     *
+     * @return whether one was open.
+     */
+    public boolean close(@Nonnull PlayerRef player) {
+        DialogueSession session = sessions.remove(player.getUuid());
+        if (session == null) return false;
+        closed(player, session);
+        return true;
+    }
+
+    /**
      * Ends the dialogue of a player leaving, without drawing anything: there is no one to draw for.
      */
     public void forget(@Nonnull PlayerRef player) {
