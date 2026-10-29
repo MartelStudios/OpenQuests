@@ -123,6 +123,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
             if (response.getIcon() != null) {
                 commandBuilder.set(answer + " #Icon.AssetPath", response.getIcon());
                 commandBuilder.set(answer + " #Icon.Visible", true);
+                commandBuilder.set(answer + " #Bullet.Visible", false);
             }
             Color color = response.getColor();
             if (color != null) {

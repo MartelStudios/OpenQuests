@@ -1,7 +1,7 @@
 // One answer of a dialogue, appended into #Answers of DialoguePage.ui. Answers are sentences, so
 // the label keeps their case and reads from the left, unlike vanilla buttons.
 // DialogueCustomPage retints the three backgrounds from the answer's colour (#ffffff leaves the
-// vanilla texture as is) and fills #Icon. #IconSlot keeps its width without an icon so texts line up.
+// vanilla texture as is) and swaps the #Bullet for #Icon when the answer has one, so texts line up.
 $C = "../../Common.ui";
 
 @AnswerLabelStyle = LabelStyle(FontSize: 15, TextColor: #d8dee6, HorizontalAlignment: Start, VerticalAlignment: Center, ShrinkTextToFit: true, MinShrinkTextToFitFontSize: 11);
@@ -19,6 +19,11 @@ Button #Answer {
 
   Group #IconSlot {
     Anchor: (Width: 30, Height: 20);
+
+    Group #Bullet {
+      Anchor: (Left: 6, Top: 6, Width: 8, Height: 8);
+      Background: (TexturePath: "Bullet.png", Color: #e8a93b);
+    }
 
     AssetImage #Icon {
       Anchor: (Width: 20, Height: 20);
