@@ -18,7 +18,7 @@
   "Responses": [
     {
       "Text": "Tell me more.",
-      "Color": "#2a6a3a",
+      "Color": "#8fe0a0",
       "Icon": "Icons/ItemsGenerated/Deco_Map.png",
       "Actions": [
         {

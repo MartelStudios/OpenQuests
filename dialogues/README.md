@@ -25,7 +25,8 @@ file name being its id. Prefix it with your pack's name.
 
 An answer also takes a `Color` and an `Icon`, both optional. On the page, `Color` fills the whole
 button (hovering and pressing shade it lighter and darker) and `Icon`, any image under `Icons`,
-sits before the text. Pick a dark tone: the text stays light. In the chat, `Color` colours the
+sits before the text. The colour tints the vanilla button, which already darkens it: pick a light
+tone, white leaves the button as it is. In the chat, `Color` colours the
 answer's text and icons are left out.
 
 Everything is edited in the Asset Editor, under the **OpenDialogueAsset** and
