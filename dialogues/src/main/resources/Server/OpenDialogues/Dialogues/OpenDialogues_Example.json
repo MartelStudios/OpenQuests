@@ -1,5 +1,6 @@
 {
   "Title": "Old Kweebec",
+  "Color": "#8fd18a",
   "Display": "Page",
   "Tags": {
     "Series": [
@@ -17,6 +18,8 @@
   "Responses": [
     {
       "Text": "Tell me more.",
+      "Color": "#2a6a3a",
+      "Icon": "Icons/ItemsGenerated/Deco_Map.png",
       "Actions": [
         {
           "Type": "Open",
@@ -26,6 +29,7 @@
     },
     {
       "Text": "Goodbye.",
+      "Icon": "Icons/ItemCategories/Items-Potion.png",
       "Actions": [
         {
           "Type": "Close"
