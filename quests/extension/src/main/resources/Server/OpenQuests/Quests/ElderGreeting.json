@@ -8,14 +8,5 @@
   "TargetQuantity": 1,
   "Dialogue": "OpenDialogues_ExampleElderWelcome",
   "UseHistory": true,
-  "SuccessfulRewards": [
-    {
-      "Type": "GrantQuest",
-      "AutoClaim": true,
-      "QuestAssetIds": [
-        "ElderPotion"
-      ]
-    }
-  ],
   "AutoTrack": true
 }
