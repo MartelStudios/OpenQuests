@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.protocol.Color;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
@@ -17,6 +18,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesPage;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
+import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
+import com.martelstudios.opendialogues.displays.AnswerTints;
 import com.martelstudios.opendialogues.services.DialogueService;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 
@@ -115,7 +118,18 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
         for (int index = 0; index < responses.size(); index++) {
             String answer = ANSWERS_CONTAINER + "[" + index + "]";
             commandBuilder.append(ANSWERS_CONTAINER, ANSWER_DOCUMENT);
-            commandBuilder.set(answer + ".TextSpans", Message.translation(responses.get(index).getText()));
+            OpenDialoguesResponse response = responses.get(index);
+            commandBuilder.set(answer + " #Label.TextSpans", Message.translation(response.getText()));
+            if (response.getIcon() != null) {
+                commandBuilder.set(answer + " #Icon.AssetPath", response.getIcon());
+                commandBuilder.set(answer + " #Icon.Visible", true);
+            }
+            Color color = response.getColor();
+            if (color != null) {
+                commandBuilder.set(answer + ".Style.Default.Background.Color", AnswerTints.base(color));
+                commandBuilder.set(answer + ".Style.Hovered.Background.Color", AnswerTints.hovered(color));
+                commandBuilder.set(answer + ".Style.Pressed.Background.Color", AnswerTints.pressed(color));
+            }
             eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, answer, EventData.of(EventDataModel.KEY_ACTION, EventDataModel.ACTION_ANSWER)
                                                                                                .append(EventDataModel.KEY_INDEX, String.valueOf(index)), false);
         }
