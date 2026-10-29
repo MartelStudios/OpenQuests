@@ -9,7 +9,7 @@ $C = "../../Common.ui";
 Button #Answer {
   LayoutMode: Left;
   Anchor: (Height: 44, Bottom: 6);
-  Padding: (Horizontal: 14);
+  Padding: (Left: 5, Right: 14);
   Style: ButtonStyle(
     Default: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Secondary.png", Border: $C.@ButtonBorder, Color: #ffffff)),
     Hovered: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Secondary_Hovered.png", Border: $C.@ButtonBorder, Color: #ffffff)),
@@ -18,7 +18,7 @@ Button #Answer {
   );
 
   Group #IconSlot {
-    Anchor: (Width: 28, Height: 20);
+    Anchor: (Width: 30, Height: 20);
 
     AssetImage #Icon {
       Anchor: (Width: 20, Height: 20);
