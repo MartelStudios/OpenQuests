@@ -21,6 +21,13 @@ file name being its id. Prefix it with your pack's name.
 | `Tags` | Hytale's asset tags, which server owners target to pick a display. A dialogue written inline also carries the tags of the one holding it. |
 | `Pages` | Objects with a `Text`, read in order. |
 | `Responses` | Objects with a `Text`, `Actions` run in order when picked, and an optional `Id` naming the answer for conditions. |
+| `Color` | Colours the title and pages in the chat. The page ignores it. |
+
+An answer also takes a `Color` and an `Icon`, both optional. On the page, `Color` fills the whole
+button (hovering and pressing shade it lighter and darker) and `Icon`, any image under `Icons`,
+sits before the text. The colour tints the vanilla button, which already darkens it: pick a light
+tone, white leaves the button as it is. In the chat, `Color` colours the
+answer's text and icons are left out.
 
 Everything is edited in the Asset Editor, under the **OpenDialogueAsset** and
 **OpenDialogueSpeakerAsset** types. Fields naming another asset (`Speaker`, and `Dialogue` in an

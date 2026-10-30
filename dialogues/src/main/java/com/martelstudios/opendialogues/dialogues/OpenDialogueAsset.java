@@ -14,6 +14,8 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.schema.metadata.ui.UIEditor;
 import com.hypixel.hytale.codec.validation.ValidatorCache;
+import com.hypixel.hytale.protocol.Color;
+import com.hypixel.hytale.server.core.codec.protocol.ColorCodec;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 
@@ -36,6 +38,8 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
      */
     public static final BuilderCodec<OpenDialogueAsset> BODY_CODEC = BuilderCodec.builder(OpenDialogueAsset.class, OpenDialogueAsset::new)
                                                                                  .append(new KeyedCodec<>("Title", Codec.STRING), (dialogue, title) -> dialogue.title = title, dialogue -> dialogue.title)
+                                                                                 .add()
+                                                                                 .append(new KeyedCodec<>("Color", new ColorCodec()), (dialogue, color) -> dialogue.color = color, dialogue -> dialogue.color)
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Display", Codec.STRING), (dialogue, display) -> dialogue.display = display, dialogue -> dialogue.display)
                                                                                  .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DISPLAYS_DATA_SET)))
@@ -68,6 +72,9 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     protected String title;
 
     @Nullable
+    protected Color color;
+
+    @Nullable
     protected String display;
 
     @Nullable
@@ -89,6 +96,14 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     @Nullable
     public String getTitle() {
         return title;
+    }
+
+    /**
+     * @return the colour of the title and pages in the chat, or {@code null} for the default one.
+     */
+    @Nullable
+    public Color getColor() {
+        return color;
     }
 
     /**

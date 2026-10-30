@@ -1,5 +1,6 @@
 {
   "Title": "Old Kweebec",
+  "Color": "#8fd18a",
   "Display": "Page",
   "Tags": {
     "Series": [
@@ -17,6 +18,8 @@
   "Responses": [
     {
       "Text": "Tell me more.",
+      "Color": "#8fe0a0",
+      "Icon": "Icons/ItemsGenerated/Deco_Map.png",
       "Actions": [
         {
           "Type": "Open",

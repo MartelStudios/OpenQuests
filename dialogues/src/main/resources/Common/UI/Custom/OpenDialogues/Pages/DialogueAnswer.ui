@@ -1,18 +1,39 @@
 // One answer of a dialogue, appended into #Answers of DialoguePage.ui. Answers are sentences, so
 // the label keeps their case and reads from the left, unlike vanilla buttons.
+// DialogueCustomPage retints the three backgrounds from the answer's colour (#ffffff leaves the
+// vanilla texture as is) and swaps the #Bullet for #Icon when the answer has one, so texts line up.
 $C = "../../Common.ui";
 
 @AnswerLabelStyle = LabelStyle(FontSize: 15, TextColor: #d8dee6, HorizontalAlignment: Start, VerticalAlignment: Center, ShrinkTextToFit: true, MinShrinkTextToFitFontSize: 11);
-@AnswerHoveredLabelStyle = LabelStyle(...@AnswerLabelStyle, TextColor: #ffffff);
 
-TextButton #Answer {
-  Text: "";
+Button #Answer {
+  LayoutMode: Left;
   Anchor: (Height: 44, Bottom: 6);
-  Padding: (Horizontal: 14);
-  Style: TextButtonStyle(
-    Default: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Secondary.png", Border: $C.@ButtonBorder), LabelStyle: @AnswerLabelStyle),
-    Hovered: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Secondary_Hovered.png", Border: $C.@ButtonBorder), LabelStyle: @AnswerHoveredLabelStyle),
-    Pressed: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Secondary_Pressed.png", Border: $C.@ButtonBorder), LabelStyle: @AnswerHoveredLabelStyle),
+  Padding: (Left: 5, Right: 14);
+  Style: ButtonStyle(
+    Default: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Secondary.png", Border: $C.@ButtonBorder, Color: #ffffff)),
+    Hovered: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Secondary_Hovered.png", Border: $C.@ButtonBorder, Color: #ffffff)),
+    Pressed: (Background: PatchStyle(TexturePath: "../../Common/Buttons/Secondary_Pressed.png", Border: $C.@ButtonBorder, Color: #ffffff)),
     Sounds: $C.@ButtonSounds
   );
+
+  Group #IconSlot {
+    Anchor: (Width: 30, Height: 20);
+
+    Group #Bullet {
+      Anchor: (Width: 8, Height: 8);
+      Background: (TexturePath: "Bullet.png", Color: #e8a93b);
+    }
+
+    AssetImage #Icon {
+      Anchor: (Width: 20, Height: 20);
+      Visible: false;
+    }
+  }
+
+  Label #Label {
+    FlexWeight: 1;
+    Text: "";
+    Style: @AnswerLabelStyle;
+  }
 }
