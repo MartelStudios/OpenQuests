@@ -37,14 +37,8 @@ Group {
       Anchor: (Left: 420, Right: 620, Top: 98, Bottom: 40);
       LayoutMode: Top;
 
-      Group {
-        Anchor: (Height: 42);
-        LayoutMode: Left;
-
-        Group { Anchor: (Width: 22, Height: 22, Top: 10, Right: 12); Background: "GemFrame.png"; Group { Background: (TexturePath: "GemCore.png", Color: @Amber); } }
-        Label #SideName { FlexWeight: 1; Text: ""; Style: @NameStyle; }
-      }
-      Label #SideEpithet { Anchor: (Height: 16, Left: 34); Text: ""; Style: @EpithetStyle; }
+      Label #SideName { Anchor: (Height: 42); Text: ""; Style: @NameStyle; }
+      Label #SideEpithet { Anchor: (Height: 16); Text: ""; Style: @EpithetStyle; }
       Group { Anchor: (Height: 2, Top: 10, Bottom: 18, Right: 120); Background: "Rule.png"; }
 
       Label #SideText { FlexWeight: 1; Text: ""; Style: @SpeechStyle; }
@@ -55,14 +49,8 @@ Group {
       LayoutMode: Top;
       Visible: false;
 
-      Group {
-        Anchor: (Height: 42);
-        LayoutMode: Left;
-
-        Group { Anchor: (Width: 22, Height: 22, Top: 10, Right: 12); Background: "GemFrame.png"; Group { Background: (TexturePath: "GemCore.png", Color: @Amber); } }
-        Label #CenteredName { FlexWeight: 1; Text: ""; Style: @NameStyle; }
-      }
-      Label #CenteredEpithet { Anchor: (Height: 16, Left: 34); Text: ""; Style: @EpithetStyle; }
+      Label #CenteredName { Anchor: (Height: 42); Text: ""; Style: @NameStyle; }
+      Label #CenteredEpithet { Anchor: (Height: 16); Text: ""; Style: @EpithetStyle; }
       Group { Anchor: (Height: 2, Top: 10, Bottom: 18, Right: 120); Background: "Rule.png"; }
 
       Label #CenteredText { FlexWeight: 1; Text: ""; Style: @SpeechStyle; }
