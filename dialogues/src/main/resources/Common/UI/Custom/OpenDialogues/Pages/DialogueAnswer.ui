@@ -21,7 +21,7 @@ Button #Answer {
     Anchor: (Width: 30, Height: 20);
 
     Group #Bullet {
-      Anchor: (Left: 6, Top: 6, Width: 8, Height: 8);
+      Anchor: (Width: 8, Height: 8);
       Background: (TexturePath: "Bullet.png", Color: #e8a93b);
     }
 
