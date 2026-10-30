@@ -15,10 +15,10 @@
     },
     {
       "Type": "BreakBlock",
-      "TitleKey": "openquestsexamples.quest.veins-silver.title",
-      "DescriptionKey": "openquestsexamples.quest.veins-silver.description",
+      "TitleKey": "openquestsexamples.quest.veins-iron.title",
+      "DescriptionKey": "openquestsexamples.quest.veins-iron.description",
       "TargetQuantity": 1,
-      "BlockToBreak": { "BlockTag": "Silver" }
+      "BlockToBreak": { "BlockTag": "Iron" }
     },
     {
       "Type": "BreakBlock",

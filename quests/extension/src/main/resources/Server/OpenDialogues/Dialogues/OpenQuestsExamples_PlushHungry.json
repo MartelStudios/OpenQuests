@@ -17,7 +17,7 @@
         "Operator": "And",
         "Conditions": [
           { "Type": "Inventory", "Item": { "ItemId": "Ore_Copper" }, "Min": 10 },
-          { "Type": "Inventory", "Item": { "ItemId": "Ore_Silver" }, "Min": 10 },
+          { "Type": "Inventory", "Item": { "ItemId": "Ore_Iron" }, "Min": 10 },
           { "Type": "Inventory", "Item": { "ItemId": "Ore_Gold" }, "Min": 10 }
         ]
       },
@@ -26,7 +26,7 @@
           "Type": "ConsumeInventory",
           "Items": [
             { "Item": { "ItemId": "Ore_Copper" }, "Quantity": 10 },
-            { "Item": { "ItemId": "Ore_Silver" }, "Quantity": 10 },
+            { "Item": { "ItemId": "Ore_Iron" }, "Quantity": 10 },
             { "Item": { "ItemId": "Ore_Gold" }, "Quantity": 10 }
           ]
         },

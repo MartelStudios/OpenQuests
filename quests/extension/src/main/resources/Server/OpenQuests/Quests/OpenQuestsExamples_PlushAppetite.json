@@ -15,10 +15,10 @@
     },
     {
       "Type": "Gather",
-      "TitleKey": "openquestsexamples.quest.appetite-silver.title",
-      "DescriptionKey": "openquestsexamples.quest.appetite-silver.description",
+      "TitleKey": "openquestsexamples.quest.appetite-iron.title",
+      "DescriptionKey": "openquestsexamples.quest.appetite-iron.description",
       "TargetQuantity": 10,
-      "ItemToGather": { "ItemId": "Ore_Silver" }
+      "ItemToGather": { "ItemId": "Ore_Iron" }
     },
     {
       "Type": "Gather",
