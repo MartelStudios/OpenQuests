@@ -29,7 +29,6 @@
     },
     {
       "Text": "Goodbye.",
-      "Icon": "Icons/ItemCategories/Items-Potion.png",
       "Actions": [
         {
           "Type": "Close"
