@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.core;
 
+import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.codec.util.RawJsonReader;
 import com.hypixel.hytale.server.core.HytaleServer;
@@ -131,12 +132,12 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
                                                     .setKeyFunction(OpenQuestCategory::getId)
                                                     .build());
 
-        // After the categories, which the quests name and are checked against
+        // After the categories and items, which the quests name and are checked against, even from the same pack
         getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenQuests/Quests/")
                                                     .setCodec(OpenQuestAsset.CODEC)
                                                     .setKeyFunction(OpenQuestAsset::getId)
-                                                    .loadsAfter(OpenQuestCategory.class)
+                                                    .loadsAfter(OpenQuestCategory.class, Item.class)
                                                     .build());
 
         // After the quests, which the assignments name and are checked against
