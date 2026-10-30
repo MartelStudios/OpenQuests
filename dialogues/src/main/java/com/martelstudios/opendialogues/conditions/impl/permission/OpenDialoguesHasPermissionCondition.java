@@ -19,6 +19,7 @@ public class OpenDialoguesHasPermissionCondition extends DialogueCondition {
     public static final BuilderCodec<OpenDialoguesHasPermissionCondition> CODEC = BuilderCodec.builder(OpenDialoguesHasPermissionCondition.class, OpenDialoguesHasPermissionCondition::new, DialogueCondition.BASE_CODEC)
                                                                                  .append(new KeyedCodec<>("Permission", Codec.STRING, true), (condition, permission) -> condition.permission = permission, condition -> condition.permission)
                                                                                  .addValidator(Validators.nonNull())
+                                                                                 .addValidator(Validators.nonEmptyString())
                                                                                  .add()
                                                                                  .build();
 
