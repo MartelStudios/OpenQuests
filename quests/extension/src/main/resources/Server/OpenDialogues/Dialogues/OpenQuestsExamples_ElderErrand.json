@@ -1,0 +1,48 @@
+{
+  "Title": "Old Kweebec",
+  "Display": "Page",
+  "Speaker": "LittleKweebec",
+  "Pages": [
+    {
+      "Text": "My old roots ache, traveller. Would you bring me a lesser healing potion?"
+    }
+  ],
+  "Responses": [
+    {
+      "Id": "Accept",
+      "Text": "I will find you one.",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "ElderPotion"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Id": "Abandon",
+      "Text": "I cannot help you after all.",
+      "Actions": [
+        {
+          "Type": "SetQuestState",
+          "Quest": "ElderPotion",
+          "State": "Abandoned"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Id": "Later",
+      "Text": "Not now.",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}
