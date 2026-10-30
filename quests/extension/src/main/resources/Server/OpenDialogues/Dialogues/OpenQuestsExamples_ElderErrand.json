@@ -11,6 +11,13 @@
     {
       "Id": "Accept",
       "Text": "I will find you one.",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "ElderPotion",
+        "States": ["InProgress", "Successful"],
+        "Min": 0,
+        "Max": 0
+      },
       "Actions": [
         {
           "Type": "AssignQuest",
@@ -24,6 +31,11 @@
     {
       "Id": "Abandon",
       "Text": "I cannot help you after all.",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "ElderPotion",
+        "States": ["InProgress"]
+      },
       "Actions": [
         {
           "Type": "SetQuestState",
