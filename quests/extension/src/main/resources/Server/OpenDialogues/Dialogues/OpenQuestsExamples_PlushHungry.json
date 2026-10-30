@@ -16,7 +16,7 @@
     {
       "Id": "Feed",
       "Text": "openquestsexamples.plush.hungry.feed",
-      "Color": "#ffd27a",
+      "Color": "#7aff81",
       "Icon": "Icons/ItemsGenerated/Ore_Gold.png",
       "When": {
         "Type": "Composite",
