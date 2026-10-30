@@ -36,6 +36,36 @@ public final class AnswerTints {
         return hex(color, channel -> channel * 3 / 4);
     }
 
+    /**
+     * @return halfway between the gold of a hover band and the colour darkened, so the band only leans towards it.
+     */
+    @Nonnull
+    public static String band(@Nonnull Color color) {
+        return band(color, 100);
+    }
+
+    /**
+     * @return the hover band a third brighter, for a pressed answer.
+     */
+    @Nonnull
+    public static String pressedBand(@Nonnull Color color) {
+        return band(color, 133);
+    }
+
+    @Nonnull
+    private static String band(@Nonnull Color color, int percent) {
+        return String.format("#%02x%02x%02x",
+                             lean(BAND_GOLD[0], color.red, percent),
+                             lean(BAND_GOLD[1], color.green, percent),
+                             lean(BAND_GOLD[2], color.blue, percent));
+    }
+
+    private static final int[] BAND_GOLD = {0x8a, 0x5a, 0x14};
+
+    private static int lean(int gold, byte channel, int percent) {
+        return Math.min(255, (gold + Byte.toUnsignedInt(channel) * 3 / 5) / 2 * percent / 100);
+    }
+
     @Nonnull
     private static String hex(@Nonnull Color color, @Nonnull IntUnaryOperator shade) {
         return String.format("#%02x%02x%02x",

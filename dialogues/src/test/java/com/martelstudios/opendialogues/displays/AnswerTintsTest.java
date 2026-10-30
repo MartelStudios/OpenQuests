@@ -27,4 +27,15 @@ class AnswerTintsTest {
         assertEquals("#1f4f2b", AnswerTints.pressed(rgb(0x2a, 0x6a, 0x3a)));
         assertEquals("#000000", AnswerTints.pressed(rgb(0, 0, 0)));
     }
+
+    @Test
+    void bandLeansHalfwayFromGold() {
+        assertEquals("#83401d", AnswerTints.band(rgb(0xd0, 0x40, 0x40)));
+        assertEquals("#452d0a", AnswerTints.band(rgb(0, 0, 0)));
+    }
+
+    @Test
+    void pressedBandIsBrighter() {
+        assertEquals("#ae5526", AnswerTints.pressedBand(rgb(0xd0, 0x40, 0x40)));
+    }
 }

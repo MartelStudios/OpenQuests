@@ -1,5 +1,5 @@
 // One answer of a dialogue, appended into #Answers of CinematicPage.ui: no background but a gold
-// band on hover. CinematicDialoguePage tints the #BulletCore with the answer's colour and swaps it for
+// band on hover. CinematicDialoguePage tints the #BulletCore and the band with the answer's colour, swaps the gem for
 // #Icon when the answer has one, so texts line up.
 $C = "../../Common.ui";
 
@@ -11,8 +11,8 @@ Button #Answer {
   Padding: (Left: 60, Right: 10);
   Style: ButtonStyle(
     Default: (Background: #000000(0)),
-    Hovered: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14(0.45))),
-    Pressed: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14(0.7))),
+    Hovered: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14(0.82))),
+    Pressed: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14)),
     Sounds: $C.@ButtonSounds
   );
 

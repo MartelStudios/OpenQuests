@@ -13,8 +13,8 @@ $C = "../../Common.ui";
 @SpeechStyle = LabelStyle(FontSize: 21, TextColor: @Cream, Wrap: true, VerticalAlignment: Start);
 @PageCountStyle = LabelStyle(FontSize: 13, TextColor: @Muted, HorizontalAlignment: End, VerticalAlignment: Center);
 @NextButtonStyle = (
-  Hovered: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14(0.35))),
-  Pressed: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14(0.55)))
+  Hovered: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14(0.64))),
+  Pressed: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14))
 );
 
 Group {

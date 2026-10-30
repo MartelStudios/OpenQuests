@@ -22,10 +22,12 @@ public class CinematicDialoguePage extends DialogueCustomPage {
     }
 
     /**
-     * The answers have no background to tint, so the colour goes to their gem.
+     * The answers have no background to tint: the colour goes to their gem and leans their hover band.
      */
     @Override
     protected void tint(@Nonnull UICommandBuilder commandBuilder, @Nonnull String answer, @Nonnull Color color) {
         commandBuilder.set(answer + " #BulletCore.Background.Color", AnswerTints.base(color));
+        commandBuilder.set(answer + ".Style.Hovered.Background.Color", AnswerTints.band(color));
+        commandBuilder.set(answer + ".Style.Pressed.Background.Color", AnswerTints.pressedBand(color));
     }
 }
