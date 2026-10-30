@@ -1,0 +1,19 @@
+{
+  "Title": "openquestsexamples.plush.speaker.name",
+  "Display": "Page",
+  "Speaker": "OpenQuestsExamples_PlushFed",
+  "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
+  "Pages": [
+    { "Text": "openquestsexamples.plush.story.page1" },
+    { "Text": "openquestsexamples.plush.story.page2" },
+    { "Text": "openquestsexamples.plush.story.page3" }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.plush.story.answer",
+      "Actions": [
+        { "Type": "Open", "Dialogue": "OpenQuestsExamples_PlushFed" }
+      ]
+    }
+  ]
+}

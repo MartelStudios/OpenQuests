@@ -1,0 +1,69 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": { "Type": "Opened", "Dialogue": "OpenQuestsExamples_PlushRustle", "Max": 0 },
+        "Then": { "Dialogue": "OpenQuestsExamples_PlushRustle" }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_PlushAppetite",
+          "States": ["InProgress", "Successful"],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": { "Dialogue": "OpenQuestsExamples_PlushIntro" }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            { "Type": "RequiresQuest", "QuestAssetId": "OpenQuestsExamples_PlushAppetite", "States": ["InProgress"] },
+            { "Type": "Holding", "Item": { "ItemId": "Ore_Gold" } }
+          ]
+        },
+        "Then": {
+          "Dialogue": {
+            "Title": "openquestsexamples.plush.speaker.name",
+            "Display": "Page",
+            "Speaker": "OpenQuestsExamples_Plush",
+            "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
+            "Pages": [
+              { "Text": "openquestsexamples.plush.sniff.text" }
+            ],
+            "Responses": [
+              {
+                "Text": "openquestsexamples.plush.sniff.answer",
+                "Icon": "Icons/ItemsGenerated/Ore_Gold.png",
+                "Actions": [
+                  { "Type": "Open", "Dialogue": "OpenQuestsExamples_PlushHungry" }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "When": { "Type": "RequiresQuest", "QuestAssetId": "OpenQuestsExamples_PlushAppetite", "States": ["InProgress"] },
+        "Then": { "Dialogue": "OpenQuestsExamples_PlushHungry" }
+      },
+      {
+        "When": { "Type": "RequiresQuest", "QuestAssetId": "OpenQuestsExamples_PlushAppetite", "States": ["Successful"] },
+        "Then": {
+          "Router": {
+            "Selector": {
+              "Type": "Weighted",
+              "Entries": [
+                { "Weight": 3, "Then": { "Dialogue": "OpenQuestsExamples_PlushFed" } },
+                { "Weight": 1, "Then": { "Dialogue": "OpenQuestsExamples_PlushMumble" } }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}
