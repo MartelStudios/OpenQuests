@@ -28,7 +28,7 @@
         "Then": {
           "Dialogue": {
             "Title": "openquestsexamples.plush.speaker.name",
-            "Display": "Page",
+            "Display": "Default",
             "Speaker": "OpenQuestsExamples_Plush",
             "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
             "Pages": [

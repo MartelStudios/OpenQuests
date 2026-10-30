@@ -1,6 +1,6 @@
 {
   "Title": "openquestsexamples.plush.rustle.title",
-  "Display": "Page",
+  "Display": "Default",
   "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
   "Pages": [
     { "Text": "openquestsexamples.plush.rustle.text" }

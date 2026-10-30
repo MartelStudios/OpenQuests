@@ -22,7 +22,7 @@ import java.util.function.BiConsumer;
  */
 public class PageDisplay implements DialogueDisplay {
 
-    public static final String ID = "Page";
+    public static final String ID = "Default";
     public static final String CINEMATIC_ID = "Cinematic";
 
     @Nonnull
