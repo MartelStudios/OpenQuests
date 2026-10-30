@@ -3,7 +3,7 @@
     "Type": "Sequence",
     "Routes": [
       {
-        "When": { "Type": "Opened", "Dialogue": "OpenQuestsExamples_PlushRustle", "Max": 0 },
+        "When": { "Type": "Opened", "Dialogue": "OpenQuestsExamples_PlushRustle", "Min": 0, "Max": 0 },
         "Then": { "Dialogue": "OpenQuestsExamples_PlushRustle" }
       },
       {

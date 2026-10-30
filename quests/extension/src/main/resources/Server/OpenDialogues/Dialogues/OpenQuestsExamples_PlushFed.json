@@ -81,7 +81,7 @@
     {
       "Id": "Story",
       "Text": "openquestsexamples.plush.fed.story",
-      "When": { "Type": "Answered", "Dialogue": "OpenQuestsExamples_PlushFed", "Answer": "Story", "Max": 0 },
+      "When": { "Type": "Answered", "Dialogue": "OpenQuestsExamples_PlushFed", "Answer": "Story", "Min": 0, "Max": 0 },
       "Actions": [
         { "Type": "Open", "Dialogue": "OpenQuestsExamples_PlushStory" }
       ]
@@ -89,7 +89,7 @@
     {
       "Id": "StoryAgain",
       "Text": "openquestsexamples.plush.fed.story-again",
-      "When": { "Type": "Answered", "Dialogue": "OpenQuestsExamples_PlushFed", "Answer": "Story", "Max": 0, "Not": true },
+      "When": { "Type": "Answered", "Dialogue": "OpenQuestsExamples_PlushFed", "Answer": "Story", "Min": 0, "Max": 0, "Not": true },
       "Actions": [
         { "Type": "Open", "Dialogue": "OpenQuestsExamples_PlushStory" }
       ]
