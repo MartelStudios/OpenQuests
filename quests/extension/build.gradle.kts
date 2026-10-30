@@ -102,7 +102,8 @@ val questExamplesManifest by tasks.registering {
                 "Website": "$url",
                 "ServerVersion": "$serverVersion",
                 "Dependencies": {
-                    "$group:OpenQuests": "*"
+                    "$group:OpenQuests": "*",
+                    "$group:OpenQuestsDialogues": "*"
                 },
                 "DisabledByDefault": false,
                 "IncludesAssetPack": true

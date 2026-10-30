@@ -10,7 +10,7 @@ tasks.withType<Javadoc>().configureEach {
 group = project.property("group").toString()
 
 hytaleWorkspace {
-    modProjects = listOf(":quests:core", ":quests:extension", ":dialogues", ":mods:mmoskilltree")
+    modProjects = listOf(":quests:core", ":quests:extension", ":dialogues", ":mods:mmoskilltree", ":mods:openquestsdialogues")
     hostProject = ":quests:extension"
 
     // Shared

@@ -1,0 +1,2 @@
+quest.default.dialogue = Talk with {dialogue}{quantity, plural, one {} other { {quantity, number} times}}
+quest.default.answer = Give an answer to {dialogue}{quantity, plural, one {} other { {quantity, number} times}}
