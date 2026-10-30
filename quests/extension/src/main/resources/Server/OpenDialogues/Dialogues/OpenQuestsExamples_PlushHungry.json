@@ -2,9 +2,15 @@
   "Title": "openquestsexamples.plush.speaker.name",
   "Display": "Page",
   "Speaker": "OpenQuestsExamples_Plush",
-  "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
+  "Tags": {
+    "Series": [
+      "OpenQuestsExamples_StrangePlush"
+    ]
+  },
   "Pages": [
-    { "Text": "openquestsexamples.plush.hungry.text" }
+    {
+      "Text": "openquestsexamples.plush.hungry.text"
+    }
   ],
   "Responses": [
     {
@@ -16,21 +22,56 @@
         "Type": "Composite",
         "Operator": "And",
         "Conditions": [
-          { "Type": "Inventory", "Item": { "ItemId": "Ore_Copper" }, "Min": 10 },
-          { "Type": "Inventory", "Item": { "ItemId": "Ore_Iron" }, "Min": 10 },
-          { "Type": "Inventory", "Item": { "ItemId": "Ore_Gold" }, "Min": 10 }
+          {
+            "Type": "Inventory",
+            "Item": {
+              "ItemId": "Ore_Copper"
+            },
+            "Min": 10
+          },
+          {
+            "Type": "Inventory",
+            "Item": {
+              "ItemId": "Ore_Iron"
+            },
+            "Min": 10
+          },
+          {
+            "Type": "Inventory",
+            "Item": {
+              "ItemId": "Ore_Gold"
+            },
+            "Min": 10
+          }
         ]
       },
       "Actions": [
         {
           "Type": "ConsumeInventory",
           "Items": [
-            { "Item": { "ItemId": "Ore_Copper" }, "Quantity": 10 },
-            { "Item": { "ItemId": "Ore_Iron" }, "Quantity": 10 },
-            { "Item": { "ItemId": "Ore_Gold" }, "Quantity": 10 }
+            {
+              "Item": {
+                "ItemId": "Ore_Copper"
+              },
+              "Quantity": 10
+            },
+            {
+              "Item": {
+                "ItemId": "Ore_Iron"
+              },
+              "Quantity": 10
+            },
+            {
+              "Item": {
+                "ItemId": "Ore_Gold"
+              },
+              "Quantity": 10
+            }
           ]
         },
-        { "Type": "Close" }
+        {
+          "Type": "Close"
+        }
       ]
     },
     {
@@ -40,19 +81,29 @@
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "OpenQuestsExamples_PlushAppetite",
-        "States": ["InProgress"]
+        "States": [
+          "InProgress"
+        ]
       },
       "Actions": [
-        { "Type": "SetQuestState", "Quest": "OpenQuestsExamples_PlushAppetite", "State": "Abandoned" },
-        { "Type": "Close" }
+        {
+          "Type": "SetQuestState",
+          "Quest": "OpenQuestsExamples_PlushAppetite",
+          "State": "Abandoned"
+        },
+        {
+          "Type": "Close"
+        }
       ]
     },
     {
       "Id": "Later",
       "Text": "openquestsexamples.plush.hungry.later",
-      "Icon": "Icons/ItemsGenerated/Ore_Copper.png",
+      "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Crude.png",
       "Actions": [
-        { "Type": "Close" }
+        {
+          "Type": "Close"
+        }
       ]
     }
   ]
