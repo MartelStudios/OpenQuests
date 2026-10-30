@@ -23,8 +23,9 @@ said last time._
 📝 **Everything in the Asset Editor.** Dialogues, speakers and routers are assets, checked as you type. Nest a whole
 conversation in a single file, or split it as you like.
 
-🎭 **Three ways to show a dialogue.** A framed panel, a cinematic band across the bottom of the screen, or plain chat.
-Each dialogue picks its own, and the server owner has the last word.
+🎭 **Three ways to show a dialogue, and yours.** A framed panel, a cinematic band across the bottom of the screen, or
+plain chat. Each dialogue picks its own, the server owner has the last word, and a mod can add a display matching its
+server's UI.
 
 🗣️ **Speakers.** A name, a title and a portrait, written once and shared by every dialogue they speak.
 
@@ -48,7 +49,7 @@ player hours later.
 
 ***
 
-## 🎭 Three displays
+## 🎭 Displays
 
 ### 🖼️ Default
 
@@ -75,6 +76,12 @@ The text and numbered answers straight in the chat, picked with `/oda <n>`. Noth
 
 A dialogue names its display. Server owners can override it for one dialogue, for a tag, for a whole pack or for
 everything, without touching the files.
+
+### 🎨 Your own
+
+Your server has its own look ? Give its dialogues the same. A display is a plugin's few lines: point the panel at your
+own `.ui` files, or draw dialogues any way you like, and register it under a name. Dialogues then name it like any
+other.
 
 ***
 
@@ -176,6 +183,22 @@ interaction to an item.
 
 Other mods plug in through `OpenDialoguesPlugin.get().getRegistry()`: answer actions, conditions, router selectors
 and whole new displays are one line each. `DialogueEvent.Opened`, `Answered` and `Closed` tell you what players do.
+
+A display in your server's style reuses the panel with your own layout, the way *Cinematic* does:
+
+```
+public class MyDialoguePage extends DialogueCustomPage {
+    public MyDialoguePage(PlayerRef player, DialogueSession session, DialogueService dialogues) {
+        super(player, session, dialogues, "MyMod/Dialogue/Page.ui", "MyMod/Dialogue/Answer.ui");
+    }
+}
+
+OpenDialoguesPlugin plugin = OpenDialoguesPlugin.get();
+plugin.getRegistry().registerDisplay("MyModPanel", new PageDisplay(plugin.getDialogueService(), MyDialoguePage::new));
+```
+
+Keep the element ids of the bundled `.ui` files and style the rest freely. For something else entirely, implement
+`DialogueDisplay`: `show` and `close`, and every answer goes back through `DialogueService.answer`.
 Declare `"MartelStudios:OpenDialogues"` in your `manifest.json`.
 
 ***
