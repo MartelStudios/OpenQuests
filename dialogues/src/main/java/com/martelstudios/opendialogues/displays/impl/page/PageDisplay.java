@@ -16,18 +16,24 @@ import javax.annotation.Nonnull;
 import java.util.function.BiConsumer;
 
 /**
- * Draws a dialogue as a custom page along the bottom of the screen. The server shows one custom
- * page at a time, so each dialogue shown replaces whatever page was open, another dialogue included.
+ * Draws a dialogue as a custom page along the bottom of the screen, in the look its factory gives.
+ * The server shows one custom page at a time, so each dialogue shown replaces whatever page was
+ * open, another dialogue included.
  */
 public class PageDisplay implements DialogueDisplay {
 
     public static final String ID = "Page";
+    public static final String CINEMATIC_ID = "Cinematic";
 
     @Nonnull
     private final DialogueService dialogues;
 
-    public PageDisplay(@Nonnull DialogueService dialogues) {
+    @Nonnull
+    private final PageFactory factory;
+
+    public PageDisplay(@Nonnull DialogueService dialogues, @Nonnull PageFactory factory) {
         this.dialogues = dialogues;
+        this.factory = factory;
     }
 
     @Override
@@ -36,7 +42,7 @@ public class PageDisplay implements DialogueDisplay {
             PageManager pages = pageManager(ref, store);
             if (pages == null) return;
             if (pages.getCustomPage() instanceof DialogueCustomPage shown) shown.leave();
-            pages.openCustomPage(ref, store, new DialogueCustomPage(player, session, dialogues));
+            pages.openCustomPage(ref, store, factory.create(player, session, dialogues));
         });
     }
 
@@ -68,6 +74,15 @@ public class PageDisplay implements DialogueDisplay {
             shown.leave();
             pages.setPage(ref, store, Page.None);
         });
+    }
+
+    /**
+     * Builds the page drawing one dialogue, {@link DialogueCustomPage} or a subclass with its own look.
+     */
+    @FunctionalInterface
+    public interface PageFactory {
+        @Nonnull
+        DialogueCustomPage create(@Nonnull PlayerRef player, @Nonnull DialogueSession session, @Nonnull DialogueService dialogues);
     }
 
     private static PageManager pageManager(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
