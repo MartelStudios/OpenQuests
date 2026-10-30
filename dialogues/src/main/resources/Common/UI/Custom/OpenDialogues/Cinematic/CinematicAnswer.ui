@@ -1,5 +1,5 @@
 // One answer of a dialogue, appended into #Answers of CinematicPage.ui: no background but a gold
-// band on hover. CinematicDialoguePage tints the #Bullet with the answer's colour and swaps it for
+// band on hover. CinematicDialoguePage tints the #BulletCore with the answer's colour and swaps it for
 // #Icon when the answer has one, so texts line up.
 $C = "../../Common.ui";
 
@@ -21,7 +21,9 @@ Button #Answer {
 
     Group #Bullet {
       Anchor: (Width: 16, Height: 16);
-      Background: (TexturePath: "Gem.png", Color: #e8a93b);
+      Background: "GemFrame.png";
+
+      Group #BulletCore { Background: (TexturePath: "GemCore.png", Color: #e8a93b); }
     }
 
     AssetImage #Icon {

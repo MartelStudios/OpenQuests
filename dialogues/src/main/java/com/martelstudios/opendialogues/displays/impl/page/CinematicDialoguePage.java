@@ -26,6 +26,6 @@ public class CinematicDialoguePage extends DialogueCustomPage {
      */
     @Override
     protected void tint(@Nonnull UICommandBuilder commandBuilder, @Nonnull String answer, @Nonnull Color color) {
-        commandBuilder.set(answer + " #Bullet.Background.Color", AnswerTints.base(color));
+        commandBuilder.set(answer + " #BulletCore.Background.Color", AnswerTints.base(color));
     }
 }

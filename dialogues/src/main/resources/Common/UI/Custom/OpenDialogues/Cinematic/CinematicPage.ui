@@ -25,10 +25,11 @@ Group {
 
     Group #Portrait {
       Anchor: (Left: 60, Bottom: 0, Width: 420, Height: 340);
+      LayoutMode: Center;
       Background: "Halo.png";
       Visible: false;
 
-      AssetImage #PortraitImage { Anchor: (Left: 60, Bottom: 18, Width: 250, Height: 250); }
+      AssetImage #PortraitImage { Anchor: (Width: 250, Height: 250); }
     }
 
     // #Side sits beside a portrait; without one, #Centered takes its room
@@ -40,7 +41,7 @@ Group {
         Anchor: (Height: 42);
         LayoutMode: Left;
 
-        Group { Anchor: (Width: 22, Height: 22, Top: 10, Right: 12); Background: (TexturePath: "Gem.png", Color: @Amber); }
+        Group { Anchor: (Width: 22, Height: 22, Top: 10, Right: 12); Background: "GemFrame.png"; Group { Background: (TexturePath: "GemCore.png", Color: @Amber); } }
         Label #SideName { FlexWeight: 1; Text: ""; Style: @NameStyle; }
       }
       Label #SideEpithet { Anchor: (Height: 16, Left: 34); Text: ""; Style: @EpithetStyle; }
@@ -58,7 +59,7 @@ Group {
         Anchor: (Height: 42);
         LayoutMode: Left;
 
-        Group { Anchor: (Width: 22, Height: 22, Top: 10, Right: 12); Background: (TexturePath: "Gem.png", Color: @Amber); }
+        Group { Anchor: (Width: 22, Height: 22, Top: 10, Right: 12); Background: "GemFrame.png"; Group { Background: (TexturePath: "GemCore.png", Color: @Amber); } }
         Label #CenteredName { FlexWeight: 1; Text: ""; Style: @NameStyle; }
       }
       Label #CenteredEpithet { Anchor: (Height: 16, Left: 34); Text: ""; Style: @EpithetStyle; }
@@ -89,7 +90,7 @@ Group {
       LayoutMode: Top;
       Visible: false;
 
-      Group { Anchor: (Height: 2, Left: 60, Bottom: 14); Background: "Rule.png"; }
+      Group { Anchor: (Height: 2, Left: 60, Bottom: 14); Background: "RuleCentered.png"; }
 
       Group #Answers {
         FlexWeight: 1;
