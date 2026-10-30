@@ -311,14 +311,3 @@ chapter.athletics=Athlétisme
 chapter.combat=Combat
 chapter.goblin-breach=La brèche gobeline
 
-elder-greeting.title=Saluer l'ancien
-elder-greeting.description=Un vieux Kweebec veille sur le bosquet. Les voyageurs qui s'y arrêtent ne le regrettent jamais.
-elder-greeting.short=Parlez au vieux Kweebec du bosquet
-elder-potion.title=Un présent pour l'ancien
-elder-potion.description=Les racines de l'ancien souffrent de l'âge. Une potion de soin les soulagerait.
-elder-potion.short=Apportez une potion de soin mineure au vieux Kweebec
-elder-potion-gather.title=Trouver une potion de soin mineure
-elder-potion-gather.description=Fabriquez ou trouvez une potion de soin mineure.
-elder-potion-give.title=Offrir la potion
-elder-potion-give.description=Remettez la potion au vieux Kweebec.
-chapter.old-kweebec=Le vieux Kweebec

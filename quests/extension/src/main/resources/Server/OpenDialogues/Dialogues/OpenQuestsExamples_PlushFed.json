@@ -1,0 +1,105 @@
+{
+  "Title": "openquestsexamples.plush.speaker.name",
+  "Display": "Page",
+  "Speaker": "OpenQuestsExamples_PlushFed",
+  "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
+  "Pages": [
+    { "Text": "openquestsexamples.plush.fed.text" }
+  ],
+  "Responses": [
+    {
+      "Id": "Up",
+      "Text": "openquestsexamples.plush.fed.up",
+      "Color": "#9fd8ff",
+      "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Iron.png",
+      "When": { "Type": "HasPermission", "Permission": "hytale.command.teleport.top" },
+      "Actions": [
+        { "Type": "Command", "Command": "tp top", "AsPlayer": true },
+        { "Type": "Close" }
+      ]
+    },
+    {
+      "Id": "UpRefused",
+      "Text": "openquestsexamples.plush.fed.up",
+      "Color": "#9fd8ff",
+      "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Iron.png",
+      "When": { "Type": "HasPermission", "Permission": "hytale.command.teleport.top", "Not": true },
+      "Actions": [
+        {
+          "Type": "Open",
+          "Dialogue": {
+            "Title": "openquestsexamples.plush.speaker.name",
+            "Display": "Page",
+            "Speaker": "OpenQuestsExamples_PlushFed",
+            "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
+            "Pages": [
+              { "Text": "openquestsexamples.plush.refused.text" }
+            ],
+            "Responses": [
+              {
+                "Text": "openquestsexamples.plush.refused.answer",
+                "Actions": [
+                  { "Type": "Close" }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "Id": "Sad",
+      "Text": "openquestsexamples.plush.fed.sad",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_PlushHomesick",
+        "States": ["InProgress", "Successful"],
+        "Min": 0,
+        "Max": 0
+      },
+      "Actions": [
+        { "Type": "AssignQuest", "Quest": "OpenQuestsExamples_PlushHomesick" },
+        { "Type": "Close" }
+      ]
+    },
+    {
+      "Id": "Home",
+      "Text": "openquestsexamples.plush.fed.home",
+      "Color": "#8fd18a",
+      "When": {
+        "Type": "Composite",
+        "Operator": "And",
+        "Conditions": [
+          { "Type": "RequiresQuest", "QuestAssetId": "OpenQuestsExamples_PlushHomesick", "States": ["Successful"] },
+          { "Type": "RequiresQuest", "QuestAssetId": "OpenQuestsExamples_PlushHome", "States": ["InProgress"] }
+        ]
+      },
+      "Actions": [
+        { "Type": "Close" }
+      ]
+    },
+    {
+      "Id": "Story",
+      "Text": "openquestsexamples.plush.fed.story",
+      "When": { "Type": "Answered", "Dialogue": "OpenQuestsExamples_PlushFed", "Answer": "Story", "Min": 0, "Max": 0 },
+      "Actions": [
+        { "Type": "Open", "Dialogue": "OpenQuestsExamples_PlushStory" }
+      ]
+    },
+    {
+      "Id": "StoryAgain",
+      "Text": "openquestsexamples.plush.fed.story-again",
+      "When": { "Type": "Answered", "Dialogue": "OpenQuestsExamples_PlushFed", "Answer": "Story", "Min": 0, "Max": 0, "Not": true },
+      "Actions": [
+        { "Type": "Open", "Dialogue": "OpenQuestsExamples_PlushStory" }
+      ]
+    },
+    {
+      "Id": "Bye",
+      "Text": "openquestsexamples.plush.fed.bye",
+      "Actions": [
+        { "Type": "Close" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "Parent": "Deco_Goblin_Plush",
+  "TranslationProperties": {
+    "Name": "openquestsexamples.plush.item.name",
+    "Description": "openquestsexamples.plush.item.description"
+  },
+  "MaxStack": 1,
+  "Interactions": {
+    "Secondary": {
+      "Interactions": [
+        {
+          "Type": "OpenDialoguesOpen",
+          "Dialogue": "OpenQuestsExamples_Plush"
+        }
+      ]
+    }
+  }
+}

@@ -66,6 +66,10 @@ Thirty-six quests across the Guttering Hollows, the pocket world a Goblin Breach
 
 🗓️ **The day's cull** is shared by every breach on the server: fifty goblins a day, all players together, renewed every day. It pays a random prize, sometimes a fresh breach fragment.
 
+### 🧸 The strange plush
+
+Strike your first veins and a goblin plush turns up in your pocket. It talks. Feed it ore and it brings you back to the surface whenever you are lost underground, then asks to see the goblin hills again. Five quests told through dialogues, with no NPC at all.
+
 ---
 
 ## 🌿 Survival

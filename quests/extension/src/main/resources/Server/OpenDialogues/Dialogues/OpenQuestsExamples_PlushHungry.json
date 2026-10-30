@@ -1,0 +1,110 @@
+{
+  "Title": "openquestsexamples.plush.speaker.name",
+  "Display": "Page",
+  "Speaker": "OpenQuestsExamples_Plush",
+  "Tags": {
+    "Series": [
+      "OpenQuestsExamples_StrangePlush"
+    ]
+  },
+  "Pages": [
+    {
+      "Text": "openquestsexamples.plush.hungry.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Id": "Feed",
+      "Text": "openquestsexamples.plush.hungry.feed",
+      "Color": "#ffd27a",
+      "Icon": "Icons/ItemsGenerated/Ore_Gold.png",
+      "When": {
+        "Type": "Composite",
+        "Operator": "And",
+        "Conditions": [
+          {
+            "Type": "Inventory",
+            "Item": {
+              "ItemId": "Ore_Copper"
+            },
+            "Min": 10
+          },
+          {
+            "Type": "Inventory",
+            "Item": {
+              "ItemId": "Ore_Iron"
+            },
+            "Min": 10
+          },
+          {
+            "Type": "Inventory",
+            "Item": {
+              "ItemId": "Ore_Gold"
+            },
+            "Min": 10
+          }
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "ConsumeInventory",
+          "Items": [
+            {
+              "Item": {
+                "ItemId": "Ore_Copper"
+              },
+              "Quantity": 10
+            },
+            {
+              "Item": {
+                "ItemId": "Ore_Iron"
+              },
+              "Quantity": 10
+            },
+            {
+              "Item": {
+                "ItemId": "Ore_Gold"
+              },
+              "Quantity": 10
+            }
+          ]
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Id": "GiveUp",
+      "Text": "openquestsexamples.plush.hungry.give-up",
+      "Color": "#e08a8a",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_PlushAppetite",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "SetQuestState",
+          "Quest": "OpenQuestsExamples_PlushAppetite",
+          "State": "Abandoned"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Id": "Later",
+      "Text": "openquestsexamples.plush.hungry.later",
+      "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Crude.png",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

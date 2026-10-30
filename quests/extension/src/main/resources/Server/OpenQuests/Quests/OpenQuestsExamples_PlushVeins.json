@@ -1,0 +1,54 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Ore_Copper.png",
+  "Categories": [
+    "SideQuest"
+  ],
+  "TitleKey": "openquestsexamples.quest.veins.title",
+  "DescriptionKey": "openquestsexamples.quest.veins.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.veins.short",
+  "QuestAssetIds": [
+    {
+      "Type": "BreakBlock",
+      "TitleKey": "openquestsexamples.quest.veins-copper.title",
+      "DescriptionKey": "openquestsexamples.quest.veins-copper.description",
+      "TargetQuantity": 1,
+      "BlockToBreak": {
+        "BlockTag": "Copper"
+      }
+    },
+    {
+      "Type": "BreakBlock",
+      "TitleKey": "openquestsexamples.quest.veins-iron.title",
+      "DescriptionKey": "openquestsexamples.quest.veins-iron.description",
+      "TargetQuantity": 1,
+      "BlockToBreak": {
+        "BlockTag": "Iron"
+      }
+    },
+    {
+      "Type": "BreakBlock",
+      "TitleKey": "openquestsexamples.quest.veins-gold.title",
+      "DescriptionKey": "openquestsexamples.quest.veins-gold.description",
+      "TargetQuantity": 1,
+      "BlockToBreak": {
+        "BlockTag": "Gold"
+      }
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "OpenQuestsExamples_MinerPlush",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_PlushVoice"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

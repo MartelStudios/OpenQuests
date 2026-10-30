@@ -1,0 +1,28 @@
+{
+  "Title": "openquestsexamples.plush.speaker.name",
+  "Display": "Page",
+  "Speaker": "OpenQuestsExamples_Plush",
+  "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
+  "Pages": [
+    { "Text": "openquestsexamples.plush.intro.page1" },
+    { "Text": "openquestsexamples.plush.intro.page2" },
+    { "Text": "openquestsexamples.plush.intro.page3" }
+  ],
+  "Responses": [
+    {
+      "Id": "Want",
+      "Text": "openquestsexamples.plush.intro.want",
+      "Actions": [
+        { "Type": "AssignQuest", "Quest": "OpenQuestsExamples_PlushAppetite" },
+        { "Type": "Close" }
+      ]
+    },
+    {
+      "Id": "Hush",
+      "Text": "openquestsexamples.plush.intro.hush",
+      "Actions": [
+        { "Type": "Close" }
+      ]
+    }
+  ]
+}

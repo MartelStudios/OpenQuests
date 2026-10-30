@@ -1,0 +1,40 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Ore_Gold.png",
+  "Categories": ["SideQuest"],
+  "TitleKey": "openquestsexamples.quest.appetite.title",
+  "DescriptionKey": "openquestsexamples.quest.appetite.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.appetite.short",
+  "QuestAssetIds": [
+    {
+      "Type": "Gather",
+      "TitleKey": "openquestsexamples.quest.appetite-copper.title",
+      "DescriptionKey": "openquestsexamples.quest.appetite-copper.description",
+      "TargetQuantity": 10,
+      "ItemToGather": { "ItemId": "Ore_Copper" }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "openquestsexamples.quest.appetite-iron.title",
+      "DescriptionKey": "openquestsexamples.quest.appetite-iron.description",
+      "TargetQuantity": 10,
+      "ItemToGather": { "ItemId": "Ore_Iron" }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "openquestsexamples.quest.appetite-gold.title",
+      "DescriptionKey": "openquestsexamples.quest.appetite-gold.description",
+      "TargetQuantity": 10,
+      "ItemToGather": { "ItemId": "Ore_Gold" }
+    },
+    {
+      "Type": "Dialogue",
+      "TitleKey": "openquestsexamples.quest.appetite-feed.title",
+      "DescriptionKey": "openquestsexamples.quest.appetite-feed.description",
+      "TargetQuantity": 1,
+      "Dialogue": "OpenQuestsExamples_PlushHungry",
+      "Answer": "Feed"
+    }
+  ],
+  "AutoTrack": true
+}

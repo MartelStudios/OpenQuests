@@ -47,7 +47,7 @@ A router picks a dialogue from what the player did: a welcome the first time, so
 it was read. Routers live under `Server/OpenDialogues/Routers/` (type **OpenDialogueRouterAsset**)
 and hold a `Selector`. A target (`Then`, `Default`) is `{ "Dialogue": … }` or `{ "Router": … }`,
 each an id or written inline, so routers nest. A target leading to no dialogue counts as a route
-that does not hold, and the selector moves on. See `OpenDialogues_ExampleElder`.
+that does not hold, and the selector moves on. See `OpenQuestsExamples_Plush` in the OpenQuests Examples pack.
 
 | Selector type | Picks |
 | --- | --- |
