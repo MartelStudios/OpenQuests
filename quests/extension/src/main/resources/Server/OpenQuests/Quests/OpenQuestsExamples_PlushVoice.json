@@ -1,0 +1,12 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ItemsGenerated/Deco_Goblin_Plush.png",
+  "Categories": ["SideQuest"],
+  "TitleKey": "openquestsexamples.quest.voice.title",
+  "DescriptionKey": "openquestsexamples.quest.voice.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.voice.short",
+  "TargetQuantity": 1,
+  "Dialogue": "OpenQuestsExamples_PlushIntro",
+  "UseHistory": true,
+  "AutoTrack": true
+}

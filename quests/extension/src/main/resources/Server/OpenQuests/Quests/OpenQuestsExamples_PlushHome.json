@@ -1,0 +1,22 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ItemsGenerated/Deco_Goblin_Plush.png",
+  "Categories": ["SideQuest"],
+  "TitleKey": "openquestsexamples.quest.home.title",
+  "DescriptionKey": "openquestsexamples.quest.home.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.home.short",
+  "TargetQuantity": 1,
+  "Dialogue": "OpenQuestsExamples_PlushFed",
+  "Answer": "Home",
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    { "Type": "Item", "ItemId": "PortalKey_Goblin_Breach", "Quantity": 1, "AutoClaim": false }
+  ],
+  "AutoTrack": true
+}
