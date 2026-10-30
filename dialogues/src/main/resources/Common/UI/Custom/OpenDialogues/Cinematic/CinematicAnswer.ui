@@ -1,0 +1,40 @@
+// One answer of a dialogue, appended into #Answers of CinematicPage.ui: no background but a gold
+// band on hover. CinematicDialoguePage tints the #BulletCore and the band with the answer's colour, swaps the gem for
+// #Icon when the answer has one, so texts line up.
+$C = "../../Common.ui";
+
+@AnswerLabelStyle = LabelStyle(FontSize: 17, TextColor: #ece2c8, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center, ShrinkTextToFit: true, MinShrinkTextToFitFontSize: 11);
+
+Button #Answer {
+  LayoutMode: Left;
+  Anchor: (Height: 40, Bottom: 2);
+  Padding: (Left: 60, Right: 10);
+  Style: ButtonStyle(
+    Default: (Background: #000000(0)),
+    Hovered: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14(0.82))),
+    Pressed: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14)),
+    Sounds: $C.@ButtonSounds
+  );
+
+  Group #IconSlot {
+    Anchor: (Width: 30, Height: 20);
+
+    Group #Bullet {
+      Anchor: (Width: 16, Height: 16);
+      Background: "GemFrame.png";
+
+      Group #BulletCore { Background: (TexturePath: "GemCore.png", Color: #e8a93b); }
+    }
+
+    AssetImage #Icon {
+      Anchor: (Width: 20, Height: 20);
+      Visible: false;
+    }
+  }
+
+  Label #Label {
+    FlexWeight: 1;
+    Text: "";
+    Style: @AnswerLabelStyle;
+  }
+}

@@ -42,6 +42,12 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
     @Nonnull
     private final DialogueService dialogues;
 
+    @Nonnull
+    private final String pageDocument;
+
+    @Nonnull
+    private final String answerDocument;
+
     private int page;
 
     /**
@@ -50,9 +56,19 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
     private boolean left;
 
     public DialogueCustomPage(@Nonnull PlayerRef playerRef, @Nonnull DialogueSession session, @Nonnull DialogueService dialogues) {
+        this(playerRef, session, dialogues, PAGE_DOCUMENT, ANSWER_DOCUMENT);
+    }
+
+    /**
+     * For another look: both documents must carry the element ids of DialoguePage.ui and DialogueAnswer.ui.
+     */
+    protected DialogueCustomPage(@Nonnull PlayerRef playerRef, @Nonnull DialogueSession session, @Nonnull DialogueService dialogues,
+                                 @Nonnull String pageDocument, @Nonnull String answerDocument) {
         super(playerRef, CustomPageLifetime.CanDismiss, EventDataModel.CODEC);
         this.session = session;
         this.dialogues = dialogues;
+        this.pageDocument = pageDocument;
+        this.answerDocument = answerDocument;
     }
 
     /**
@@ -94,7 +110,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
 
     @Override
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder commandBuilder, @Nonnull UIEventBuilder eventBuilder, @Nonnull Store<EntityStore> store) {
-        commandBuilder.append(PAGE_DOCUMENT);
+        commandBuilder.append(pageDocument);
         eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#CloseButton", EventData.of(EventDataModel.KEY_ACTION, EventDataModel.ACTION_CLOSE), false);
 
         String layout = speaker(commandBuilder);
@@ -117,7 +133,7 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
         var responses = session.responses();
         for (int index = 0; index < responses.size(); index++) {
             String answer = ANSWERS_CONTAINER + "[" + index + "]";
-            commandBuilder.append(ANSWERS_CONTAINER, ANSWER_DOCUMENT);
+            commandBuilder.append(ANSWERS_CONTAINER, answerDocument);
             OpenDialoguesResponse response = responses.get(index);
             commandBuilder.set(answer + " #Label.TextSpans", Message.translation(response.getText()));
             if (response.getIcon() != null) {
@@ -126,14 +142,21 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
                 commandBuilder.set(answer + " #Bullet.Visible", false);
             }
             Color color = response.getColor();
-            if (color != null) {
-                commandBuilder.set(answer + ".Style.Default.Background.Color", AnswerTints.base(color));
-                commandBuilder.set(answer + ".Style.Hovered.Background.Color", AnswerTints.hovered(color));
-                commandBuilder.set(answer + ".Style.Pressed.Background.Color", AnswerTints.pressed(color));
-            }
+            if (color != null) tint(commandBuilder, answer, color);
             eventBuilder.addEventBinding(CustomUIEventBindingType.Activating, answer, EventData.of(EventDataModel.KEY_ACTION, EventDataModel.ACTION_ANSWER)
                                                                                                .append(EventDataModel.KEY_INDEX, String.valueOf(index)), false);
         }
+    }
+
+    /**
+     * Shows an answer's colour, here on its button.
+     *
+     * @param answer the selector of the answer's root element.
+     */
+    protected void tint(@Nonnull UICommandBuilder commandBuilder, @Nonnull String answer, @Nonnull Color color) {
+        commandBuilder.set(answer + ".Style.Default.Background.Color", AnswerTints.base(color));
+        commandBuilder.set(answer + ".Style.Hovered.Background.Color", AnswerTints.hovered(color));
+        commandBuilder.set(answer + ".Style.Pressed.Background.Color", AnswerTints.pressed(color));
     }
 
     /**

@@ -65,7 +65,7 @@ tasks.named<Jar>("jar") {
 
 // The ship quests as content. They leave the jar and travel as an asset pack of
 // their own, so a server owner keeps the quest types and drops the example chain by deleting one file.
-val questExamples = listOf("Server/OpenQuests/**", "Server/OpenDialogues/**", "Server/Item/**", "Server/Languages/*/quest.lang", "Server/Languages/*/openquestsexamples.lang")
+val questExamples = listOf("Server/OpenQuests/**", "Server/OpenDialogues/**", "Server/Item/**", "Common/Icons/OpenQuestsExamples/**", "Server/Languages/*/quest.lang", "Server/Languages/*/openquestsexamples.lang")
 
 // Only the published jar loses them: stageAllModAssets and prepareRunServer link the dev run
 // against src/main/resources rather than this output, so runAllMods keeps the quests, and keeps

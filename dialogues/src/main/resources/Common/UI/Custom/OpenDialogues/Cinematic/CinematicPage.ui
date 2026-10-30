@@ -1,0 +1,99 @@
+// A dialogue over a black fade along the bottom of the screen: the speaker's portrait on a halo,
+// their name over the page being read, and on the right the next page arrow, or the answers once
+// on the last page. Same element ids as DialoguePage.ui, so DialogueCustomPage fills both.
+$C = "../../Common.ui";
+
+@Gold = #f4d58a;
+@Amber = #e8a93b;
+@Cream = #ece2c8;
+@Muted = #8e9aab;
+
+@NameStyle = LabelStyle(FontSize: 30, FontName: "Secondary", TextColor: @Gold, RenderBold: true, RenderUppercase: true, LetterSpacing: 1.5, VerticalAlignment: Center, ShrinkTextToFit: true, MinShrinkTextToFitFontSize: 16);
+@EpithetStyle = LabelStyle(FontSize: 12, TextColor: @Muted, RenderBold: true, RenderUppercase: true, LetterSpacing: 2.5, VerticalAlignment: Center, ShrinkTextToFit: true, MinShrinkTextToFitFontSize: 8);
+@SpeechStyle = LabelStyle(FontSize: 21, TextColor: @Cream, Wrap: true, VerticalAlignment: Start);
+@PageCountStyle = LabelStyle(FontSize: 13, TextColor: @Muted, HorizontalAlignment: End, VerticalAlignment: Center);
+@NextButtonStyle = (
+  Hovered: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14(0.64))),
+  Pressed: (Background: (TexturePath: "Band.png", HorizontalBorder: 180, VerticalBorder: 6, Color: #8a5a14))
+);
+
+Group {
+
+  Group #Bar {
+    Anchor: (Left: 0, Right: 0, Bottom: 0, Height: 360);
+    Background: "Backdrop.png";
+
+    Group #Portrait {
+      Anchor: (Left: 60, Bottom: 0, Width: 420, Height: 340);
+      LayoutMode: Center;
+      Background: "Halo.png";
+      Visible: false;
+
+      AssetImage #PortraitImage { Anchor: (Width: 250, Height: 250); }
+    }
+
+    // #Side sits beside a portrait; without one, #Centered takes its room
+    Group #Side {
+      Anchor: (Left: 420, Right: 620, Top: 98, Bottom: 40);
+      LayoutMode: Top;
+
+      Label #SideName { Anchor: (Height: 42); Text: ""; Style: @NameStyle; }
+      Label #SideEpithet { Anchor: (Height: 16); Text: ""; Style: @EpithetStyle; }
+      Group { Anchor: (Height: 2, Top: 10, Bottom: 18, Right: 120); Background: "Rule.png"; }
+
+      Label #SideText { FlexWeight: 1; Text: ""; Style: @SpeechStyle; }
+    }
+
+    Group #Centered {
+      Anchor: (Left: 120, Right: 620, Top: 98, Bottom: 40);
+      LayoutMode: Top;
+      Visible: false;
+
+      Label #CenteredName { Anchor: (Height: 42); Text: ""; Style: @NameStyle; }
+      Label #CenteredEpithet { Anchor: (Height: 16); Text: ""; Style: @EpithetStyle; }
+      Group { Anchor: (Height: 2, Top: 10, Bottom: 18, Right: 120); Background: "Rule.png"; }
+
+      Label #CenteredText { FlexWeight: 1; Text: ""; Style: @SpeechStyle; }
+    }
+
+    Label #PageCount { Anchor: (Right: 640, Bottom: 16, Width: 80, Height: 18); Text: ""; Style: @PageCountStyle; }
+
+    // The whole column turns the page, so the arrow is hard to miss and easy to hit
+    Button #NextButton {
+      Anchor: (Right: 80, Width: 500, Top: 98, Bottom: 8);
+      LayoutMode: Center;
+      Style: @NextButtonStyle;
+
+      Sprite #NextArrow {
+        Anchor: (Width: 48, Height: 48);
+        TexturePath: "../Pages/NextArrow.png";
+        Frame: (Width: 48, Height: 48, PerRow: 8, Count: 48);
+        FramesPerSecond: 20;
+      }
+    }
+
+    // The answers start 60 left of their gems, so the hover band fades in before the text
+    Group #AnswersColumn {
+      Anchor: (Right: 80, Width: 500, Top: 98, Bottom: 8);
+      LayoutMode: Top;
+      Visible: false;
+
+      Group { Anchor: (Height: 2, Left: 60, Bottom: 14); Background: "RuleCentered.png"; }
+
+      Group #Answers {
+        FlexWeight: 1;
+        LayoutMode: TopScrolling;
+        ScrollbarStyle: $C.@DefaultScrollbarStyle;
+      }
+    }
+  }
+
+  Button #CloseButton {
+    Anchor: (Width: 32, Height: 32, Right: 30, Bottom: 262);
+    Style: (
+      Default: (Background: "../../Common/ContainerCloseButton.png"),
+      Hovered: (Background: "../../Common/ContainerCloseButtonHovered.png"),
+      Pressed: (Background: "../../Common/ContainerCloseButtonPressed.png"),
+    );
+  }
+}

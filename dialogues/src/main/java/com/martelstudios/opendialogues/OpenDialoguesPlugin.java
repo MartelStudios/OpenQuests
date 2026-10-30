@@ -29,6 +29,8 @@ import com.martelstudios.opendialogues.routers.impl.weighted.OpenDialoguesWeight
 import com.martelstudios.opendialogues.history.DialogueHistory;
 import com.martelstudios.opendialogues.history.DialogueHistoryRecorder;
 import com.martelstudios.opendialogues.displays.impl.chat.ChatDisplay;
+import com.martelstudios.opendialogues.displays.impl.page.CinematicDialoguePage;
+import com.martelstudios.opendialogues.displays.impl.page.DialogueCustomPage;
 import com.martelstudios.opendialogues.displays.impl.page.PageDisplay;
 import com.martelstudios.opendialogues.services.DialogueService;
 import com.martelstudios.opendialogues.triggers.BuilderActionOpenDialogue;
@@ -115,7 +117,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus());
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
-        registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService));
+        registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService, DialogueCustomPage::new));
+        registry.registerDisplay(PageDisplay.CINEMATIC_ID, new PageDisplay(dialogueService, CinematicDialoguePage::new));
 
         getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenDialogues/Dialogues/")

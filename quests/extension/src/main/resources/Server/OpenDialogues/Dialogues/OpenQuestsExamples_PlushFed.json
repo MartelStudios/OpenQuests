@@ -1,6 +1,6 @@
 {
   "Title": "openquestsexamples.plush.speaker.name",
-  "Display": "Page",
+  "Display": "Default",
   "Speaker": "OpenQuestsExamples_PlushFed",
   "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
   "Pages": [
@@ -29,7 +29,7 @@
           "Type": "Open",
           "Dialogue": {
             "Title": "openquestsexamples.plush.speaker.name",
-            "Display": "Page",
+            "Display": "Default",
             "Speaker": "OpenQuestsExamples_PlushFed",
             "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
             "Pages": [
