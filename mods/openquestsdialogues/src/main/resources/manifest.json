@@ -1,7 +1,7 @@
 {
     "Group": "MartelStudios",
     "Name": "OpenQuestsDialogues",
-    "Version": "0.1.0",
+    "Version": "1.0.0",
     "Description": "Bridge between OpenQuests and OpenDialogues: dialogue quest objectives",
     "Authors": [
         {
