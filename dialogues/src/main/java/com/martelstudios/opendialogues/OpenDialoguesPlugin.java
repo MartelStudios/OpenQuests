@@ -16,6 +16,11 @@ import com.martelstudios.opendialogues.actions.impl.command.OpenDialoguesCommand
 import com.martelstudios.opendialogues.actions.impl.inventory.OpenDialoguesConsumeInventoryAction;
 import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesBiomeFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesGroupFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRoleFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesWorldFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesZoneFilter;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
@@ -108,6 +113,12 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerCondition(OpenDialoguesHoldingCondition.TYPE, OpenDialoguesHoldingCondition.class, OpenDialoguesHoldingCondition.CODEC);
         registry.registerCondition(OpenDialoguesInventoryCondition.TYPE, OpenDialoguesInventoryCondition.class, OpenDialoguesInventoryCondition.CODEC);
         registry.registerCondition(OpenDialoguesHasPermissionCondition.TYPE, OpenDialoguesHasPermissionCondition.class, OpenDialoguesHasPermissionCondition.CODEC);
+
+        registry.registerFilter(OpenDialoguesRoleFilter.TYPE, OpenDialoguesRoleFilter.class, OpenDialoguesRoleFilter.CODEC);
+        registry.registerFilter(OpenDialoguesGroupFilter.TYPE, OpenDialoguesGroupFilter.class, OpenDialoguesGroupFilter.CODEC);
+        registry.registerFilter(OpenDialoguesWorldFilter.TYPE, OpenDialoguesWorldFilter.class, OpenDialoguesWorldFilter.CODEC);
+        registry.registerFilter(OpenDialoguesZoneFilter.TYPE, OpenDialoguesZoneFilter.class, OpenDialoguesZoneFilter.CODEC);
+        registry.registerFilter(OpenDialoguesBiomeFilter.TYPE, OpenDialoguesBiomeFilter.class, OpenDialoguesBiomeFilter.CODEC);
 
         registry.registerSelector(OpenDialoguesSequenceSelector.TYPE, OpenDialoguesSequenceSelector.class, OpenDialoguesSequenceSelector.CODEC);
         registry.registerSelector(OpenDialoguesWeightedSelector.TYPE, OpenDialoguesWeightedSelector.class, OpenDialoguesWeightedSelector.CODEC);
