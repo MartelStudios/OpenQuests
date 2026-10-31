@@ -22,6 +22,6 @@
     "Main": "com.martelstudios.openquests.dialogues.OpenQuestsDialoguesPlugin",
     "IncludesAssetPack": true,
     "UpdateChecker": {
-        "CurseForge": ""
+        "CurseForge": "1775233"
     }
 }

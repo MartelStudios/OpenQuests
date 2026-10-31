@@ -21,6 +21,6 @@
     "Main": "com.martelstudios.opendialogues.OpenDialoguesPlugin",
     "IncludesAssetPack": true,
     "UpdateChecker": {
-        "CurseForge": ""
+        "CurseForge": "1775215"
     }
 }

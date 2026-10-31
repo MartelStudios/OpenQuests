@@ -14,6 +14,14 @@ on:
         description: 'Version of OpenDialogues to publish, or empty to leave it out'
         required: false
         default: ''
+      openquestsdialogues_version:
+        description: 'Version of the OpenQuests Dialogues bridge to publish, or empty to leave it out'
+        required: false
+        default: ''
+      examples_version:
+        description: 'Version of the OpenQuests Examples pack to publish, or empty to leave it out'
+        required: false
+        default: ''
       mmoskilltree_version:
         description: 'Version of the OpenQuests MMOSkillTree pack to publish with it, or empty to leave the pack out'
         required: false
@@ -30,38 +38,46 @@ jobs:
       tag: ${{ steps.pick.outputs.tag }}
 
     steps:
-      # A mod released alone gets a tag of its own, so it never takes an OpenQuests version, and a
-      # release carries only the files of what it releases
-      - name: Pick the tag and the files
+      # Every mod versioned on its own gets a tag of its own, so the next release of it alone finds
+      # its last one. The GitHub release hangs on the first tag and carries only what it releases.
+      - name: Pick the tags and the files
         id: pick
         env:
           VERSION: ${{ inputs.version }}
           DIALOGUES_VERSION: ${{ inputs.dialogues_version }}
+          BRIDGE_VERSION: ${{ inputs.openquestsdialogues_version }}
+          EXAMPLES_VERSION: ${{ inputs.examples_version }}
           PACK_VERSION: ${{ inputs.mmoskilltree_version }}
         run: |
           FILES=""
-          ALONE=()
+          TAGS=()
           if [[ -n "$VERSION" ]]; then
-            FILES+=$'quests/core/build/libs/*.jar\nquests/extension/build/libs/*.jar\nquests/extension/build/distributions/*.zip\n'
+            TAGS+=("v$VERSION")
+            FILES+=$'quests/core/build/libs/*.jar\nquests/extension/build/libs/*.jar\n'
           fi
           if [[ -n "$DIALOGUES_VERSION" ]]; then
-            ALONE+=("dialogues-v$DIALOGUES_VERSION")
+            TAGS+=("dialogues-v$DIALOGUES_VERSION")
             FILES+=$'dialogues/build/libs/*.jar\n'
           fi
+          if [[ -n "$BRIDGE_VERSION" ]]; then
+            TAGS+=("openquestsdialogues-v$BRIDGE_VERSION")
+            FILES+=$'mods/openquestsdialogues/build/libs/*.jar\n'
+          fi
+          if [[ -n "$EXAMPLES_VERSION" ]]; then
+            TAGS+=("examples-v$EXAMPLES_VERSION")
+            FILES+=$'quests/extension/build/distributions/*.zip\n'
+          fi
           if [[ -n "$PACK_VERSION" ]]; then
-            ALONE+=("mmoskilltree-v$PACK_VERSION")
+            TAGS+=("mmoskilltree-v$PACK_VERSION")
             FILES+=$'mods/mmoskilltree/build/libs/*.jar\n'
           fi
-          if [[ -n "$VERSION" ]]; then
-            TAG="v$VERSION"
-          elif [[ ${#ALONE[@]} -eq 1 ]]; then
-            TAG="${ALONE[0]}"
-          else
-            echo "::error::Give an OpenQuests version, or exactly one mod version to release it alone."
+          if [[ ${#TAGS[@]} -eq 0 ]]; then
+            echo "::error::Give at least one version to release."
             exit 1
           fi
+          TAG="${TAGS[0]}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          { echo "TAG=$TAG"; echo "FILES<<EOF"; printf '%s' "$FILES"; echo "EOF"; } >> "$GITHUB_ENV"
+          { echo "TAG=$TAG"; echo "TAGS=${TAGS[*]}"; echo "FILES<<EOF"; printf '%s' "$FILES"; echo "EOF"; } >> "$GITHUB_ENV"
 
       # An app installed on the repository is an actor the ruleset can name, which GITHUB_TOKEN
       # is not, and the version commit lands on main, so it needs that exception.
@@ -90,6 +106,8 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
           DIALOGUES_VERSION: ${{ inputs.dialogues_version }}
+          BRIDGE_VERSION: ${{ inputs.openquestsdialogues_version }}
+          EXAMPLES_VERSION: ${{ inputs.examples_version }}
           PACK_VERSION: ${{ inputs.mmoskilltree_version }}
         run: |
           if [[ -n "$VERSION" ]]; then
@@ -97,6 +115,12 @@ jobs:
           fi
           if [[ -n "$DIALOGUES_VERSION" ]]; then
             sed -i "s/^dialogues_version = .*/dialogues_version = $DIALOGUES_VERSION/" dialogues/gradle.properties
+          fi
+          if [[ -n "$BRIDGE_VERSION" ]]; then
+            sed -i "s/^openquestsdialogues_version = .*/openquestsdialogues_version = $BRIDGE_VERSION/" mods/openquestsdialogues/gradle.properties
+          fi
+          if [[ -n "$EXAMPLES_VERSION" ]]; then
+            sed -i "s/^examples_version = .*/examples_version = $EXAMPLES_VERSION/" quests/extension/gradle.properties
           fi
           if [[ -n "$PACK_VERSION" ]]; then
             sed -i "s/^mmoskilltree_version = .*/mmoskilltree_version = $PACK_VERSION/" mods/mmoskilltree/gradle.properties
@@ -113,8 +137,8 @@ jobs:
           git config user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
           git config user.email "${{ steps.app-token.outputs.installation-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
           git commit -am "chore: release ${TAG#v}"
-          git tag "$TAG"
-          git push origin HEAD "$TAG"
+          for tag in $TAGS; do git tag "$tag"; done
+          git push origin HEAD $TAGS
 
       - name: Publish the release
         uses: softprops/action-gh-release@v2
@@ -156,9 +180,20 @@ jobs:
             project_id: '1678101'
             file: quests/core/build/libs/OpenQuestsCore-*.jar
           - name: OpenQuests Examples
-            relations: openquests:requiredDependency
+            relations: openquests:requiredDependency,openquests-dialogues:requiredDependency
             project_id: '1680200'
             file: quests/extension/build/distributions/OpenQuestsExamples-*.zip
+            version_input: examples_version
+          - name: OpenDialogues
+            relations: ''
+            project_id: '1775215'
+            file: dialogues/build/libs/OpenDialogues-*.jar
+            version_input: dialogues_version
+          - name: OpenQuests Dialogues
+            relations: openquests:requiredDependency,opendialogues:requiredDependency
+            project_id: '1775233'
+            file: mods/openquestsdialogues/build/libs/OpenQuestsDialogues-*.jar
+            version_input: openquestsdialogues_version
           - name: OpenQuests MMOSkillTree
             relations: openquests:requiredDependency,mmo-skill-tree:requiredDependency,mmo-skill-tree-mastery-pack:optionalDependency
             project_id: '1752171'
