@@ -12,7 +12,7 @@ OpenQuests installs with an empty quest list, on purpose: your server, your ques
 
 ## ✨ What is inside
 
-Over sixty quests in eight chapters, in English and French. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, a tutorial, a hunt, a daily chore, a server event and a few secrets.
+Over sixty quests in eight chapters, in English and French. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
 
 🖼️ **Every quest has its icon**, from a crude hatchet to the breach's portal key, so the journal and its chapter graphs read at a glance.
 
@@ -68,7 +68,23 @@ Thirty-six quests across the Guttering Hollows, the pocket world a Goblin Breach
 
 ### 🧸 The strange plush
 
-Strike your first veins and a goblin plush turns up in your pocket. It talks. Feed it ore and it brings you back to the surface whenever you are lost underground, then asks to see the goblin hills again. Five quests told through dialogues, with no NPC at all.
+Five quests told entirely through dialogues, with no NPC at all: the chapter that shows off **OpenDialogues**.
+
+![Grizzle, the miner's plush, asks for ten copper, ten iron and ten gold ore](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/dialogue-cinematic.png?raw=true)
+
+⛏️ **First veins.** Strike copper, iron and gold, and a goblin plush turns up in your pocket.
+
+👂 **A voice in the pocket.** Use it and it rustles in gibberish. Ask what that was, and **Grizzle** introduces itself over several pages: a miner's plush, left behind when the breach swallowed its camp.
+
+🍽️ **Miner's appetite.** Grizzle wants ten copper, ten iron and ten gold ore. *Here, eat.* only shows once your bag holds all thirty, and takes them in one go. Wave gold under its nose before that and it sniffs at it. Refuse to feed it and the quest is abandoned on the spot.
+
+⬆️ **Well fed, it changes its tune.** A new title, new answers, and a way back to the surface whenever you are lost underground. Its story waits behind an answer that remembers you already heard it. Now and then you find it asleep, mumbling about gold.
+
+![Grizzle, well fed, offers to take you up, asks why you look sad, tells its story or says goodbye](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/dialogue-cinematic-fed.png?raw=true)
+
+🏠 **Homesick, then Home at last.** It sighs for the goblin hills. Carry it through a Goblin Breach and tell it, there, that it is home.
+
+📝 **Every dialogue feature in one story.** Pages, speakers and portraits, the cinematic and chat displays, coloured answers with icons, answers that hide until they make sense, lines picked by quest state or at random, and dialogues that hand out, complete or abandon quests through the **OpenQuests Dialogues** bridge.
 
 ---
 
