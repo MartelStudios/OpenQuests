@@ -37,6 +37,7 @@ public final class CharacterFixtures {
         registry.registerFilter(OpenDialoguesBiomeFilter.TYPE, OpenDialoguesBiomeFilter.class, OpenDialoguesBiomeFilter.CODEC);
         registry.registerTrait(OpenDialoguesDialogueTrait.TYPE, OpenDialoguesDialogueTrait.class, OpenDialoguesDialogueTrait.CODEC);
         registry.registerTrait(OpenDialoguesNameTrait.TYPE, OpenDialoguesNameTrait.class, OpenDialoguesNameTrait.CODEC);
+        registry.registerTrait(RecordingTrait.TYPE, RecordingTrait.class, RecordingTrait.CODEC);
     }
 
     private CharacterFixtures() {}

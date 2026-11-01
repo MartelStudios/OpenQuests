@@ -25,6 +25,8 @@ import com.martelstudios.opendialogues.characters.CharacterValidator;
 import com.martelstudios.opendialogues.characters.runtime.CharacterDeathSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterHintSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterScanSystem;
+import com.martelstudios.opendialogues.characters.runtime.CharacterService;
+import com.martelstudios.opendialogues.characters.runtime.NpcEligibility;
 import com.martelstudios.opendialogues.characters.runtime.CharacterSettings;
 import com.martelstudios.opendialogues.characters.runtime.CharacterTalkSystem;
 import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
@@ -91,6 +93,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     private DialogueService dialogueService;
 
+    private CharacterService characterService;
+
     private ComponentType<EntityStore, DialogueHistory> historyType;
 
     private ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
@@ -152,10 +156,11 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         historyRecorder = new DialogueHistoryRecorder(historyType);
         identityType = getEntityStoreRegistry().registerComponent(OpenDialoguesNPCIdentity.class, "OpenDialoguesNPCIdentity", OpenDialoguesNPCIdentity.CODEC);
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
-        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), identityType, uniqueCharactersType));
-        getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(identityType));
-        getEntityStoreRegistry().registerSystem(new CharacterHintSystem(identityType));
-        getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(identityType, uniqueCharactersType));
+        characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), new SplittableRandom(), (message, error) -> getLogger().atWarning().withCause(error).log("%s", message));
+        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), characterService, identityType, uniqueCharactersType));
+        getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType, uniqueCharactersType));
+        getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));
+        getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(characterService, identityType, uniqueCharactersType));
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus());
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
@@ -197,6 +202,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         onLoaded(OpenDialogueAsset.class, this::validateAnswers);
         onLoaded(OpenDialogueRouterAsset.class, this::validateRouters);
         onLoaded(OpenDialogueCharacterAsset.class, this::validateCharacters);
+        onLoaded(OpenDialogueCharacterAsset.class, () -> characterService.forgetFailures());
         onLoaded(OpenDialogueDistributionAsset.class, this::validateCharacters);
         getEventRegistry().register(BootEvent.class, event -> {
             booted = true;
@@ -293,5 +299,13 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     @Nonnull
     public ResourceType<EntityStore, UniqueCharacters> getUniqueCharactersType() {
         return uniqueCharactersType;
+    }
+
+    /**
+     * @return gives, applies and takes back NPC characters, for bridges and commands, on the world thread.
+     */
+    @Nonnull
+    public CharacterService getCharacterService() {
+        return characterService;
     }
 }

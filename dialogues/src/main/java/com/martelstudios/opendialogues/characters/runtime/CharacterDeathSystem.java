@@ -9,21 +9,21 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathComponent;
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathSystems;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.ReleaseReason;
 
 import javax.annotation.Nonnull;
-import java.util.UUID;
 
 /**
- * Frees the unique character a dying NPC carried, the rest of its identity dying with it.
+ * Releases the character a dying NPC carried, through the command buffer since the store is ticking.
  */
 public class CharacterDeathSystem extends DeathSystems.OnDeathSystem {
 
+    private final CharacterService service;
     private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
     private final ResourceType<EntityStore, UniqueCharacters> uniqueType;
 
-    public CharacterDeathSystem(@Nonnull ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, @Nonnull ResourceType<EntityStore, UniqueCharacters> uniqueType) {
+    public CharacterDeathSystem(@Nonnull CharacterService service, @Nonnull ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, @Nonnull ResourceType<EntityStore, UniqueCharacters> uniqueType) {
+        this.service = service;
         this.identityType = identityType;
         this.uniqueType = uniqueType;
     }
@@ -36,7 +36,9 @@ public class CharacterDeathSystem extends DeathSystems.OnDeathSystem {
 
     @Override
     public void onComponentAdded(@Nonnull Ref<EntityStore> ref, @Nonnull DeathComponent component, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
-        UUID npc = CharacterScanSystem.uuidOf(store, ref);
-        if (npc != null) store.getResource(uniqueType).release(npc, ReleaseReason.Death, OpenDialogueCharacterAsset::getCharacter);
+        CharacterNpc npc = CharacterNpc.of(commandBuffer, ref, identityType, uniqueType);
+        if (npc == null || npc.identity().getCharacter() == null) return;
+        service.release(npc, ReleaseReason.Death);
+        npc.commit(identityType);
     }
 }

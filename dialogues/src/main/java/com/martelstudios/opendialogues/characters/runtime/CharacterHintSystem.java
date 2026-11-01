@@ -17,14 +17,12 @@ import com.hypixel.hytale.server.core.modules.entity.component.Interactable;
 import com.hypixel.hytale.server.core.modules.entity.system.EntityInteractableSystems;
 import com.hypixel.hytale.server.core.modules.entity.tracker.EntityTrackerSystems;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
-import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  * Shows the F prompt over NPCs carrying a character. The client reads it from the Interactable
@@ -32,12 +30,15 @@ import java.util.Set;
  */
 public class CharacterHintSystem extends EntityTickingSystem<EntityStore> {
 
+    private final CharacterService service;
     private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
+    private final Set<Ref<EntityStore>> hinted = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
     private final ComponentType<EntityStore, EntityTrackerSystems.Visible> visibleType;
     private final Query<EntityStore> query;
     private final Set<Dependency<EntityStore>> dependencies = Set.of(new SystemDependency<>(Order.AFTER, EntityInteractableSystems.EntityTrackerUpdate.class));
 
-    public CharacterHintSystem(@Nonnull ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType) {
+    public CharacterHintSystem(@Nonnull CharacterService service, @Nonnull ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType) {
+        this.service = service;
         this.identityType = identityType;
         this.visibleType = EntityModule.get().getVisibleComponentType();
         this.query = Query.and(identityType, visibleType, Interactable.getComponentType());
@@ -69,16 +70,14 @@ public class CharacterHintSystem extends EntityTickingSystem<EntityStore> {
         OpenDialoguesNPCIdentity identity = archetypeChunk.getComponent(index, identityType);
         EntityTrackerSystems.Visible visible = archetypeChunk.getComponent(index, visibleType);
         if (identity == null || visible == null || identity.getCharacter() == null) return;
-        OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(identity.getCharacter());
-        if (character == null) return;
-
-        Map<Ref<EntityStore>, EntityTrackerSystems.EntityViewer> viewers = identity.isHintSent() ? visible.newlyVisibleTo : visible.visibleTo;
-        if (viewers.isEmpty()) return;
-        String hint = Arrays.stream(character.getTraits()).map(CharacterTrait::interactionHint).filter(Objects::nonNull).findFirst().orElse(null);
+        String hint = service.hint(identity);
         if (hint == null) return;
-        InteractableUpdate update = new InteractableUpdate(hint);
+
         Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
+        Map<Ref<EntityStore>, EntityTrackerSystems.EntityViewer> viewers = hinted.contains(ref) ? visible.newlyVisibleTo : visible.visibleTo;
+        if (viewers.isEmpty()) return;
+        InteractableUpdate update = new InteractableUpdate(hint);
         for (EntityTrackerSystems.EntityViewer viewer : viewers.values()) viewer.queueUpdate(ref, update);
-        identity.setHintSent(true);
+        hinted.add(ref);
     }
 }
