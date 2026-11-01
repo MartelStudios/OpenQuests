@@ -98,9 +98,12 @@ public class OpenDialoguesDialogueTrait extends CharacterTrait {
         return true;
     }
 
+    /**
+     * Only a revoked NPC lives on; a dead or removed one takes its components along.
+     */
     @Override
     public void onReleased(@Nonnull CharacterContext context, @Nonnull ReleaseReason reason) {
-        if (context.accessor() == null) return;
+        if (context.accessor() == null || reason != ReleaseReason.Revoked) return;
         Interactions interactions = context.accessor().getComponent(context.npc(), Interactions.getComponentType());
         if (interactions != null && interactionHint().equals(interactions.getInteractionHint())) interactions.setInteractionHint(null);
         context.accessor().tryRemoveComponent(context.npc(), Interactable.getComponentType());

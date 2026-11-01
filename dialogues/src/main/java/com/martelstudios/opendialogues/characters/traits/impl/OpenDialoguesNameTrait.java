@@ -66,9 +66,12 @@ public class OpenDialoguesNameTrait extends CharacterTrait {
         }
     }
 
+    /**
+     * Only a revoked NPC lives on; a dead or removed one takes its components along.
+     */
     @Override
     public void onReleased(@Nonnull CharacterContext context, @Nonnull ReleaseReason reason) {
-        if (context.accessor() == null) return;
+        if (context.accessor() == null || reason != ReleaseReason.Revoked) return;
         context.accessor().tryRemoveComponent(context.npc(), PersistentDisplayName.getComponentType());
         context.accessor().tryRemoveComponent(context.npc(), DisplayNameComponent.getComponentType());
         context.accessor().tryRemoveComponent(context.npc(), Nameplate.getComponentType());
