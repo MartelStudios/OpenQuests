@@ -90,12 +90,12 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
             List<Ref<EntityStore>> nearby = SpatialResource.getThreadLocalReferenceList();
             store.getResource(NPCPlugin.get().getNpcSpatialResource()).getSpatialStructure().collect(transform.getPosition(), radius, nearby);
             for (Ref<EntityStore> npc : List.copyOf(nearby)) {
-                if (npc.isValid() && seen.add(npc)) visit(world, store, npc, player.getWorldMapTracker(), distributions);
+                if (npc.isValid() && seen.add(npc)) visit(world, store, npc, playerRef, player.getWorldMapTracker(), distributions);
             }
         }
     }
 
-    private void visit(@Nonnull World world, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull WorldMapTracker tracker, @Nonnull List<OpenDialogueDistributionAsset> distributions) {
+    private void visit(@Nonnull World world, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef player, @Nonnull WorldMapTracker tracker, @Nonnull List<OpenDialogueDistributionAsset> distributions) {
         OpenDialoguesNPCIdentity stored = store.getComponent(ref, identityType);
         if (stored != null && stored.getCharacter() != null) {
             OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(stored.getCharacter());
@@ -109,7 +109,7 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
 
         OpenDialoguesNPCIdentity identity = stored == null ? new OpenDialoguesNPCIdentity() : (OpenDialoguesNPCIdentity) stored.clone();
         UniqueCharacters unique = store.getResource(uniqueType);
-        CharacterAssigner.Draw draw = CharacterAssigner.assign(identity.getDraws(), distributions, context(world, npc, tracker), id -> unique.isAvailable(id, OpenDialogueCharacterAsset::getCharacter), ThreadLocalRandom.current());
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(identity.getDraws(), distributions, context(store, ref, player, world, npc, tracker), id -> unique.isAvailable(id, OpenDialogueCharacterAsset::getCharacter), ThreadLocalRandom.current());
         if (draw.drawn().isEmpty()) return;
         draw.drawn().forEach(identity::recordDraw);
         String characterId = draw.character();
@@ -142,10 +142,10 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
     }
 
     @Nonnull
-    private static FilterContext context(@Nonnull World world, @Nonnull NPCEntity npc, @Nonnull WorldMapTracker tracker) {
+    private static FilterContext context(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef player, @Nonnull World world, @Nonnull NPCEntity npc, @Nonnull WorldMapTracker tracker) {
         WorldMapTracker.ZoneDiscoveryInfo zone = tracker.getCurrentZone();
         int roleIndex = npc.getRoleIndex();
-        return new FilterContext(world.getName(), npc.getRoleName(), zone == null ? null : zone.regionName(), tracker.getCurrentBiomeName(), group -> {
+        return new FilterContext(store, ref, player, world.getName(), npc.getRoleName(), zone == null ? null : zone.regionName(), tracker.getCurrentBiomeName(), group -> {
             int index = NPCGroup.getAssetMap().getIndexOrDefault(group, -1);
             return index >= 0 && WorldSupport.hasTagInGroup(index, roleIndex);
         });

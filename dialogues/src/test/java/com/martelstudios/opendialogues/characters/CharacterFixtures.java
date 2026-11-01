@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues.characters;
 
+import com.hypixel.hytale.component.Ref;
 import com.martelstudios.opendialogues.CodecJson;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.characters.filters.CharacterFilter;
@@ -47,6 +48,6 @@ public final class CharacterFixtures {
      */
     @Nonnull
     public static FilterContext kweebec(@Nullable String zone, @Nonnull String... groups) {
-        return new FilterContext("default", "Kweebec_Seedling", zone, "Forest", Set.of(groups)::contains);
+        return new FilterContext(null, new Ref<>(null), null, "default", "Kweebec_Seedling", zone, "Forest", Set.of(groups)::contains);
     }
 }
