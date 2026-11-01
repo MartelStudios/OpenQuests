@@ -76,13 +76,24 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-import java.util.SplittableRandom;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.random.RandomGenerator;
 
 /**
  * Dialogues and their speakers as assets: written in the Asset Editor, opened by id and drawn by
  * whichever display they name.
  */
 public class OpenDialoguesPlugin extends JavaPlugin {
+
+    /**
+     * Every world draws on its own thread, so each call asks that thread's generator.
+     */
+    private static final RandomGenerator THREAD_RANDOM = new RandomGenerator() {
+        @Override
+        public long nextLong() {
+            return ThreadLocalRandom.current().nextLong();
+        }
+    };
 
     private static OpenDialoguesPlugin instance;
 
@@ -157,13 +168,13 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         historyRecorder = new DialogueHistoryRecorder(historyType);
         identityType = getEntityStoreRegistry().registerComponent(OpenDialoguesNPCIdentity.class, "OpenDialoguesNPCIdentity", OpenDialoguesNPCIdentity.CODEC);
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
-        characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), new SplittableRandom(), (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType);
+        characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType);
         getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), characterService));
         getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterRemovalSystem(characterService, identityType, uniqueCharactersType));
-        resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
+        resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, THREAD_RANDOM);
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus(), OpenDialogueSpeakerAsset::getSpeaker);
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
         registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService, DialogueCustomPage::new));
