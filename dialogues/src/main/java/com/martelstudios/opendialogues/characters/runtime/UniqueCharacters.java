@@ -7,7 +7,7 @@ import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.component.Resource;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
-import com.martelstudios.opendialogues.characters.Uniqueness;
+import com.martelstudios.opendialogues.characters.ReleaseReason;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -58,7 +58,7 @@ public class UniqueCharacters implements Resource<EntityStore> {
      */
     public boolean isAvailable(@Nonnull String characterId, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
         OpenDialogueCharacterAsset character = characters.apply(characterId);
-        return character != null && (character.getUniqueness() == Uniqueness.None || !claims.containsKey(characterId));
+        return character != null && (!character.getUniqueness().claims() || !claims.containsKey(characterId));
     }
 
     /**
@@ -78,16 +78,16 @@ public class UniqueCharacters implements Resource<EntityStore> {
     }
 
     /**
-     * Frees what a dead NPC carried: {@code Alive} may be drawn again, {@code Forever} never.
+     * Frees what a released NPC carried, unless the reason consumes it; a consumed claim never changes again.
      *
      * @param characters finds a loaded character by id, {@code null} for one no pack declares any more.
      */
-    public void release(@Nonnull UUID npc, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
+    public void release(@Nonnull UUID npc, @Nonnull ReleaseReason reason, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
         String id = npc.toString();
         claims.entrySet().removeIf(entry -> {
-            if (!entry.getValue().npc.equals(id)) return false;
+            if (entry.getValue().consumed || !entry.getValue().npc.equals(id)) return false;
             OpenDialogueCharacterAsset character = characters.apply(entry.getKey());
-            if (character != null && character.getUniqueness() == Uniqueness.Forever) {
+            if (character != null && character.getUniqueness().consumedBy(reason)) {
                 entry.getValue().consumed = true;
                 return false;
             }

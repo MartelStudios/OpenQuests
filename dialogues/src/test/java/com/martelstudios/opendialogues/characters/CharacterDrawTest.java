@@ -3,12 +3,12 @@ package com.martelstudios.opendialogues.characters;
 import com.martelstudios.opendialogues.CodecJson;
 import com.martelstudios.opendialogues.characters.runtime.CharacterAssigner;
 import com.martelstudios.opendialogues.characters.runtime.CharacterDraw;
-import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SplittableRandom;
@@ -29,7 +29,7 @@ class CharacterDrawTest {
         List<OpenDialogueDistributionAsset.Entry> entries = entries("{ \"Character\": \"Mira\" }, {}");
         SplittableRandom random = new SplittableRandom(42);
 
-        for (int i = 0; i < 100; i++) assertNull(CharacterDraw.draw(entries, id -> false, random));
+        for (int i = 0; i < 100; i++) assertNull(CharacterDraw.draw(entries, id -> false, random).getCharacter());
     }
 
     @Test
@@ -37,16 +37,16 @@ class CharacterDrawTest {
         List<OpenDialogueDistributionAsset.Entry> entries = entries("{ \"Character\": \"Farmer\", \"Weight\": 3 }, { \"Character\": \"Mage\" }, { \"Weight\": 6 }");
         RandomGenerator rolls = rolls(0, 3, 4);
 
-        assertEquals("Farmer", CharacterDraw.draw(entries, id -> true, rolls));
-        assertEquals("Mage", CharacterDraw.draw(entries, id -> true, rolls));
-        assertNull(CharacterDraw.draw(entries, id -> true, rolls));
+        assertEquals("Farmer", CharacterDraw.draw(entries, id -> true, rolls).getCharacter());
+        assertEquals("Mage", CharacterDraw.draw(entries, id -> true, rolls).getCharacter());
+        assertNull(CharacterDraw.draw(entries, id -> true, rolls).getCharacter());
     }
 
     @Test
     void takenCharacterLeavesItsWeightToTheOthers() {
         List<OpenDialogueDistributionAsset.Entry> entries = entries("{ \"Character\": \"Mira\", \"Weight\": 5 }, { \"Character\": \"Farmer\" }, {}");
 
-        assertNull(CharacterDraw.draw(entries, "Farmer"::equals, rolls(1)));
+        assertNull(CharacterDraw.draw(entries, "Farmer"::equals, rolls(1)).getCharacter());
     }
 
     @Test
@@ -57,35 +57,66 @@ class CharacterDrawTest {
     @Test
     void assignRecordsNothingForever() {
         OpenDialogueDistributionAsset village = distribution("Village", "[]", "{}");
-        OpenDialoguesNPCIdentity identity = new OpenDialoguesNPCIdentity();
 
-        assertNull(CharacterAssigner.assign(identity, List.of(village), kweebec("Zone1"), id -> true, rolls(0)));
-        assertNull(CharacterAssigner.assign(identity, List.of(village), kweebec("Zone1"), id -> true, rolls()));
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(village), kweebec("Zone1"), id -> true, rolls(0));
+        assertEquals(List.of("Village"), draw.drawn());
+        assertNull(draw.character());
 
-        assertEquals(Set.of("Village"), identity.getDraws());
-        assertNull(identity.getCharacter());
+        assertEquals(List.of(), CharacterAssigner.assign(Set.of("Village"), List.of(village), kweebec("Zone1"), id -> true, rolls()).drawn());
     }
 
     @Test
     void assignSkipsFailingFilters() {
         OpenDialogueDistributionAsset temple = distribution("Temple", "[ { \"Type\": \"World\", \"Worlds\": [\"temple\"] } ]", "{ \"Character\": \"Farmer\" }");
-        OpenDialoguesNPCIdentity identity = new OpenDialoguesNPCIdentity();
 
-        assertNull(CharacterAssigner.assign(identity, List.of(temple), kweebec("Zone1"), id -> true, rolls()));
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(temple), kweebec("Zone1"), id -> true, rolls());
 
-        assertEquals(Set.of(), identity.getDraws());
+        assertEquals(List.of(), draw.drawn());
+        assertNull(draw.character());
     }
 
     @Test
     void assignStopsAtFirstCharacter() {
         OpenDialogueDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Mage\" }");
         OpenDialogueDistributionAsset a = distribution("A", "[]", "{ \"Character\": \"Farmer\" }");
-        OpenDialoguesNPCIdentity identity = new OpenDialoguesNPCIdentity();
 
-        assertEquals("Farmer", CharacterAssigner.assign(identity, List.of(b, a), kweebec("Zone1"), id -> true, rolls(0, 0)));
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(b, a), kweebec("Zone1"), id -> true, rolls(0, 0));
 
-        assertEquals("Farmer", identity.getCharacter());
-        assertEquals(Set.of("A"), identity.getDraws());
+        assertEquals("Farmer", draw.character());
+        assertEquals(List.of("A"), draw.drawn());
+    }
+
+    @Test
+    void assignOrdersByPriorityThenId() {
+        OpenDialogueDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Mage\" }", 5);
+        OpenDialogueDistributionAsset a = distribution("A", "[]", "{ \"Character\": \"Farmer\" }", 0);
+
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(a, b), kweebec("Zone1"), id -> true, rolls(0));
+
+        assertEquals("Mage", draw.character());
+        assertEquals(List.of("B"), draw.drawn());
+    }
+
+    @Test
+    void assignLeavesIdentityUntouched() {
+        OpenDialogueDistributionAsset a = distribution("A", "[]", "{}");
+        OpenDialogueDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Farmer\" }");
+        Set<String> already = new HashSet<>(Set.of("Old"));
+
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(already, List.of(a, b), kweebec("Zone1"), id -> true, rolls(0, 0));
+
+        assertEquals(List.of("A", "B"), draw.drawn());
+        assertEquals(Set.of("Old"), already);
+    }
+
+    @Test
+    void assignRecordsNothingWhenNoEntryIsEligible() {
+        OpenDialogueDistributionAsset village = distribution("Village", "[]", "{ \"Character\": \"Oak\" }");
+
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(village), kweebec("Zone1"), id -> false, rolls());
+
+        assertEquals(List.of(), draw.drawn());
+        assertNull(draw.character());
     }
 
     @Nonnull
@@ -95,7 +126,12 @@ class CharacterDrawTest {
 
     @Nonnull
     private static OpenDialogueDistributionAsset distribution(@Nonnull String id, @Nonnull String filters, @Nonnull String entries) {
-        OpenDialogueDistributionAsset distribution = CodecJson.decode(OpenDialogueDistributionAsset.CODEC, "{ \"Filters\": " + filters + ", \"Characters\": [ " + entries + " ] }");
+        return distribution(id, filters, entries, 0);
+    }
+
+    @Nonnull
+    private static OpenDialogueDistributionAsset distribution(@Nonnull String id, @Nonnull String filters, @Nonnull String entries, int priority) {
+        OpenDialogueDistributionAsset distribution = CodecJson.decode(OpenDialogueDistributionAsset.CODEC, "{ \"Priority\": " + priority + ", \"Filters\": " + filters + ", \"Characters\": [ " + entries + " ] }");
         if (distribution == null) throw new IllegalArgumentException("Unreadable distribution " + entries);
         distribution.id = id;
         return distribution;

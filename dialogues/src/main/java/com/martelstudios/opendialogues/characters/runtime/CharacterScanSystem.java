@@ -32,7 +32,7 @@ import com.hypixel.hytale.server.npc.role.support.WorldSupport;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
-import com.martelstudios.opendialogues.characters.Uniqueness;
+
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
 
 import javax.annotation.Nonnull;
@@ -108,16 +108,18 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
         if (npc == null || uuid == null || !untouched(store, ref, npc)) return;
 
         OpenDialoguesNPCIdentity identity = stored == null ? new OpenDialoguesNPCIdentity() : (OpenDialoguesNPCIdentity) stored.clone();
-        int drawsBefore = identity.getDraws().size();
         UniqueCharacters unique = store.getResource(uniqueType);
-        String characterId = CharacterAssigner.assign(identity, distributions, context(world, npc, tracker), id -> unique.isAvailable(id, OpenDialogueCharacterAsset::getCharacter), ThreadLocalRandom.current());
-        if (identity.getDraws().size() == drawsBefore) return;
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(identity.getDraws(), distributions, context(world, npc, tracker), id -> unique.isAvailable(id, OpenDialogueCharacterAsset::getCharacter), ThreadLocalRandom.current());
+        if (draw.drawn().isEmpty()) return;
+        draw.drawn().forEach(identity::recordDraw);
+        String characterId = draw.character();
+        identity.setCharacter(characterId);
 
         OpenDialogueCharacterAsset character = characterId == null ? null : OpenDialogueCharacterAsset.getCharacter(characterId);
         LOGGER.atFine().log("NPC %s (%s) drew %s.", uuid.getUuid(), npc.getRoleName(), characterId == null ? "nobody" : "character '" + characterId + "'");
         if (character != null) {
             identity.setName(drawName(character));
-            if (character.getUniqueness() != Uniqueness.None) unique.claim(characterId, uuid.getUuid());
+            if (character.getUniqueness().claims()) unique.claim(characterId, uuid.getUuid());
             if (identity.getName() != null) {
                 Message name = Message.translation(identity.getName());
                 store.putComponent(ref, PersistentDisplayName.getComponentType(), new PersistentDisplayName(name));

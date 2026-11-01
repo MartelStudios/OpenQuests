@@ -20,10 +20,10 @@ public final class CharacterDraw {
      * Characters a draw may no longer give leave first, so the others share their weight.
      *
      * @param available whether a character may still be given, by id.
-     * @return the id of the character drawn, {@code null} for nobody.
+     * @return the entry drawn, its character {@code null} for nobody; {@code null} when no entry was eligible.
      */
     @Nullable
-    public static String draw(@Nonnull List<OpenDialogueDistributionAsset.Entry> entries, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random) {
+    public static OpenDialogueDistributionAsset.Entry draw(@Nonnull List<OpenDialogueDistributionAsset.Entry> entries, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random) {
         List<OpenDialogueDistributionAsset.Entry> eligible = new ArrayList<>(entries.size());
         int total = 0;
         for (OpenDialogueDistributionAsset.Entry entry : entries) {
@@ -37,8 +37,8 @@ public final class CharacterDraw {
         int roll = random.nextInt(total);
         for (OpenDialogueDistributionAsset.Entry entry : eligible) {
             roll -= entry.getWeight();
-            if (roll < 0) return entry.getCharacter();
+            if (roll < 0) return entry;
         }
-        return eligible.getLast().getCharacter();
+        return eligible.getLast();
     }
 }

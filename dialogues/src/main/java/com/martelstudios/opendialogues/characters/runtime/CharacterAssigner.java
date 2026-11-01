@@ -5,9 +5,11 @@ import com.martelstudios.opendialogues.characters.filters.FilterContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.random.RandomGenerator;
 
@@ -16,28 +18,36 @@ import java.util.random.RandomGenerator;
  */
 public final class CharacterAssigner {
 
+    /**
+     * What the distributions drew for an NPC.
+     *
+     * @param drawn     the distributions that drew, in order, a draw of nobody included; to record for good.
+     * @param character the id of the character given, {@code null} when the NPC stays nobody.
+     */
+    public record Draw(@Nonnull List<String> drawn, @Nullable String character) {}
+
+    private static final Comparator<OpenDialogueDistributionAsset> ORDER = Comparator.comparingInt(OpenDialogueDistributionAsset::getPriority).reversed().thenComparing(OpenDialogueDistributionAsset::getId);
+
     private CharacterAssigner() {}
 
     /**
-     * Distributions draw in id order and once each, a draw of nobody kept for good. One whose
-     * filters fail draws nothing yet, so the NPC may still draw from it somewhere else.
+     * Distributions draw by priority then id, once each. One whose filters fail, or with no entry left
+     * to give, draws nothing yet, so the NPC may still draw from it later or elsewhere.
      *
-     * @return the id of the character given, {@code null} when the NPC stays nobody.
+     * @param alreadyDrawn the distributions that drew for the NPC before, left untouched.
      */
-    @Nullable
-    public static String assign(@Nonnull OpenDialoguesNPCIdentity identity, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull FilterContext context, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random) {
-        List<OpenDialogueDistributionAsset> ordered = distributions.stream().sorted(Comparator.comparing(OpenDialogueDistributionAsset::getId)).toList();
-        for (OpenDialogueDistributionAsset distribution : ordered) {
-            if (identity.getDraws().contains(distribution.getId()) || !holds(distribution, context)) continue;
+    @Nonnull
+    public static Draw assign(@Nonnull Set<String> alreadyDrawn, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull FilterContext context, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random) {
+        List<String> drawn = new ArrayList<>();
+        for (OpenDialogueDistributionAsset distribution : distributions.stream().sorted(ORDER).toList()) {
+            if (alreadyDrawn.contains(distribution.getId()) || !holds(distribution, context)) continue;
 
-            String character = CharacterDraw.draw(List.of(distribution.getEntries()), available, random);
-            identity.recordDraw(distribution.getId());
-            if (character != null) {
-                identity.setCharacter(character);
-                return character;
-            }
+            OpenDialogueDistributionAsset.Entry entry = CharacterDraw.draw(List.of(distribution.getEntries()), available, random);
+            if (entry == null) continue;
+            drawn.add(distribution.getId());
+            if (entry.getCharacter() != null) return new Draw(List.copyOf(drawn), entry.getCharacter());
         }
-        return null;
+        return new Draw(List.copyOf(drawn), null);
     }
 
     private static boolean holds(@Nonnull OpenDialogueDistributionAsset distribution, @Nonnull FilterContext context) {

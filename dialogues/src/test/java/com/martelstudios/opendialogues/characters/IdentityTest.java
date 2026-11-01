@@ -44,7 +44,7 @@ class IdentityTest {
         unique.claim("Mira", NPC);
         assertFalse(unique.isAvailable("Mira", characters::get));
 
-        unique.release(NPC, characters::get);
+        unique.release(NPC, ReleaseReason.Death, characters::get);
 
         assertTrue(unique.isAvailable("Mira", characters::get));
     }
@@ -54,7 +54,7 @@ class IdentityTest {
         UniqueCharacters unique = new UniqueCharacters();
         unique.claim("Oak", NPC);
 
-        unique.release(NPC, characters::get);
+        unique.release(NPC, ReleaseReason.Death, characters::get);
 
         assertFalse(unique.isAvailable("Oak", characters::get));
     }
@@ -84,10 +84,33 @@ class IdentityTest {
         UniqueCharacters unique = new UniqueCharacters();
         unique.claim("Gone", NPC);
 
-        unique.release(NPC, characters::get);
+        unique.release(NPC, ReleaseReason.Death, characters::get);
 
         assertEquals("Gone", CodecJson.roundTrip(OpenDialoguesNPCIdentity.CODEC, identity).getCharacter());
         assertNull(unique.claimant("Gone"));
+    }
+
+    @Test
+    void foreverSurvivesRemovalAfterDeath() {
+        UniqueCharacters unique = new UniqueCharacters();
+        unique.claim("Oak", NPC);
+
+        unique.release(NPC, ReleaseReason.Death, characters::get);
+        unique.release(NPC, ReleaseReason.Removed, characters::get);
+
+        assertFalse(unique.isAvailable("Oak", characters::get));
+    }
+
+    @Test
+    void foreverIsFreeAgainAfterRemovalOrRevocation() {
+        for (ReleaseReason reason : new ReleaseReason[] {ReleaseReason.Removed, ReleaseReason.Revoked}) {
+            UniqueCharacters unique = new UniqueCharacters();
+            unique.claim("Oak", NPC);
+
+            unique.release(NPC, reason, characters::get);
+
+            assertTrue(unique.isAvailable("Oak", characters::get), reason.name());
+        }
     }
 
     @Nonnull

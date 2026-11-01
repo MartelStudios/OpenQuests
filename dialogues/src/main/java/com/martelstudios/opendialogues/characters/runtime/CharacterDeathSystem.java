@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.modules.entity.damage.DeathComponent;
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathSystems;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
+import com.martelstudios.opendialogues.characters.ReleaseReason;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -36,6 +37,6 @@ public class CharacterDeathSystem extends DeathSystems.OnDeathSystem {
     @Override
     public void onComponentAdded(@Nonnull Ref<EntityStore> ref, @Nonnull DeathComponent component, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         UUID npc = CharacterScanSystem.uuidOf(store, ref);
-        if (npc != null) store.getResource(uniqueType).release(npc, OpenDialogueCharacterAsset::getCharacter);
+        if (npc != null) store.getResource(uniqueType).release(npc, ReleaseReason.Death, OpenDialogueCharacterAsset::getCharacter);
     }
 }

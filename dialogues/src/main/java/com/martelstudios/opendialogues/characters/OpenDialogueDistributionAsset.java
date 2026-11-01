@@ -60,6 +60,8 @@ public class OpenDialogueDistributionAsset implements JsonAssetWithMap<String, D
     }
 
     public static final AssetBuilderCodec<String, OpenDialogueDistributionAsset> CODEC = AssetBuilderCodec.builder(OpenDialogueDistributionAsset.class, OpenDialogueDistributionAsset::new, Codec.STRING, (distribution, id) -> distribution.id = id, distribution -> distribution.id, (distribution, data) -> distribution.data = data, distribution -> distribution.data)
+                                                                                                           .appendInherited(new KeyedCodec<>("Priority", Codec.INTEGER), (distribution, priority) -> distribution.priority = priority, distribution -> distribution.priority, (distribution, parent) -> distribution.priority = parent.priority)
+                                                                                                           .add()
                                                                                                            .appendInherited(new KeyedCodec<>("Filters", new ArrayCodec<>(CharacterFilter.CODEC, CharacterFilter[]::new)), (distribution, filters) -> distribution.filters = filters, distribution -> distribution.filters, (distribution, parent) -> distribution.filters = parent.filters)
                                                                                                            .add()
                                                                                                            .appendInherited(new KeyedCodec<>("Characters", new ArrayCodec<>(Entry.CODEC, Entry[]::new)), (distribution, entries) -> distribution.entries = entries, distribution -> distribution.entries, (distribution, parent) -> distribution.entries = parent.entries)
@@ -68,6 +70,8 @@ public class OpenDialogueDistributionAsset implements JsonAssetWithMap<String, D
 
     protected String id;
     protected AssetExtraInfo.Data data;
+
+    private int priority;
 
     private CharacterFilter[] filters = new CharacterFilter[0];
 
@@ -85,6 +89,13 @@ public class OpenDialogueDistributionAsset implements JsonAssetWithMap<String, D
     @Override
     public String getId() {
         return id;
+    }
+
+    /**
+     * @return the rank among distributions holding for one NPC, higher draws first, ties by id.
+     */
+    public int getPriority() {
+        return priority;
     }
 
     /**
