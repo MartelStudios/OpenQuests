@@ -14,6 +14,7 @@ import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
+import com.martelstudios.opendialogues.sessions.DialogueSource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -100,7 +101,17 @@ public class DialogueService {
      * @return whether the id led to a dialogue.
      */
     public boolean open(@Nonnull PlayerRef player, @Nonnull String id) {
-        return show(player, resolver.resolve(id, contexts.apply(player)));
+        return open(player, id, null);
+    }
+
+    /**
+     * Shows the dialogue an id leads to, as {@link #open(PlayerRef, String)} does, spoken from an NPC.
+     *
+     * @param source the NPC the conversation comes from, {@code null} for none.
+     * @return whether the id led to a dialogue.
+     */
+    public boolean open(@Nonnull PlayerRef player, @Nonnull String id, @Nullable DialogueSource source) {
+        return show(player, resolver.resolve(id, contexts.apply(player)), source);
     }
 
     /**
@@ -109,14 +120,24 @@ public class DialogueService {
      * @return whether the target led to a dialogue.
      */
     public boolean open(@Nonnull PlayerRef player, @Nonnull OpenDialoguesTarget target) {
-        return show(player, resolver.resolve(target, contexts.apply(player)));
+        return open(player, target, null);
     }
 
-    private boolean show(@Nonnull PlayerRef player, @Nullable OpenDialogueAsset dialogue) {
+    /**
+     * Shows the dialogue a target leads to for that player, spoken from an NPC.
+     *
+     * @param source the NPC the conversation comes from, {@code null} for none.
+     * @return whether the target led to a dialogue.
+     */
+    public boolean open(@Nonnull PlayerRef player, @Nonnull OpenDialoguesTarget target, @Nullable DialogueSource source) {
+        return show(player, resolver.resolve(target, contexts.apply(player)), source);
+    }
+
+    private boolean show(@Nonnull PlayerRef player, @Nullable OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
         if (dialogue == null) {
             return false;
         }
-        open(player, dialogue);
+        open(player, dialogue, source);
         return true;
     }
 
@@ -126,7 +147,16 @@ public class DialogueService {
      * player's world thread, conditions see no history nor inventory, so answers needing them hide.
      */
     public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue) {
-        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue));
+        open(player, dialogue, null);
+    }
+
+    /**
+     * Shows a dialogue as {@link #open(PlayerRef, OpenDialogueAsset)} does, spoken from an NPC.
+     *
+     * @param source the NPC the conversation comes from, {@code null} for none.
+     */
+    public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
+        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue), source);
         DialogueSession replaced = sessions.put(player.getUuid(), session);
         if (replaced != null) closed(player, replaced);
         session.display().show(player, session);
@@ -139,7 +169,7 @@ public class DialogueService {
      * History does not count it as another opening.
      */
     private void refresh(@Nonnull PlayerRef player, @Nonnull DialogueSession stale) {
-        DialogueSession session = new DialogueSession(stale.dialogue(), stale.dialogue().visibleResponses(contexts.apply(player)), stale.display());
+        DialogueSession session = new DialogueSession(stale.dialogue(), stale.dialogue().visibleResponses(contexts.apply(player)), stale.display(), stale.source());
         if (!sessions.replace(player.getUuid(), stale, session)) return;
         session.display().refresh(player, session);
         endIfUnanswerable(player, session);

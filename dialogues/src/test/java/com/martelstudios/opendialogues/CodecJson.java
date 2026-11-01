@@ -41,6 +41,18 @@ public final class CodecJson {
     }
 
     /**
+     * Decodes without running validators, for fields such as portraits whose files tests do not ship.
+     */
+    @Nonnull
+    public static <T> T decodeUnvalidated(@Nonnull Codec<T> codec, @Nonnull String json) {
+        try (RawJsonReader reader = RawJsonReader.fromBuffer(json.toCharArray())) {
+            return codec.decodeJson(reader, new AssetExtraInfo<>(new AssetExtraInfo.Data(OpenDialogueAsset.class, "Test", null)));
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Unreadable JSON " + json, e);
+        }
+    }
+
+    /**
      * Encodes then decodes, as a save and a reload would.
      */
     @Nonnull

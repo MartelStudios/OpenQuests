@@ -3,6 +3,7 @@ package com.martelstudios.opendialogues.services;
 import com.hypixel.hytale.event.EventBus;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
+import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.ConditionFixtures;
@@ -14,6 +15,7 @@ import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 import com.martelstudios.opendialogues.services.DialogueService.AnswerResult;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
+import com.martelstudios.opendialogues.sessions.DialogueSource;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
@@ -27,6 +29,7 @@ import java.util.UUID;
 import static com.martelstudios.opendialogues.dialogues.DialogueFixtures.dialogue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DialogueServiceTest {
@@ -77,6 +80,7 @@ class DialogueServiceTest {
     DialogueServiceTest() {
         DialogueRegistry registry = new DialogueRegistry();
         registry.registerAction(OpenDialoguesCloseAction.TYPE, OpenDialoguesCloseAction.class, OpenDialoguesCloseAction.CODEC);
+        registry.registerAction(OpenDialoguesOpenAction.TYPE, OpenDialoguesOpenAction.class, OpenDialoguesOpenAction.CODEC);
         registry.registerDisplay(DISPLAY, display);
         DialogueResolver resolver = new DialogueResolver(dialogues::get, id -> null, new Random(0));
         // No rule, so every dialogue falls back to the test display without asking the asset store for its pack
@@ -98,6 +102,28 @@ class DialogueServiceTest {
 
     private static List<String> texts(DialogueSession session) {
         return session.responses().stream().map(OpenDialoguesResponse::getText).toList();
+    }
+
+    @Test
+    void openActionCarriesSource() {
+        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira");
+        dialogues.put("Herbs", dialogue("Herbs", "{ \"Responses\": [ { \"Text\": \"bye\" } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\", \"Actions\": [ { \"Type\": \"Open\", \"Dialogue\": \"Herbs\" } ] } ] }"), mira);
+
+        service.answer(player, "Elder", 1);
+
+        assertEquals("Herbs", display.shown.getLast().dialogueId());
+        assertEquals(mira, display.shown.getLast().source());
+    }
+
+    @Test
+    void plainOpenDropsSource() {
+        dialogues.put("Herbs", dialogue("Herbs", "{ \"Responses\": [ { \"Text\": \"bye\" } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira"));
+
+        service.open(player, "Herbs");
+
+        assertNull(display.shown.getLast().source());
     }
 
     @Test
