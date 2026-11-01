@@ -1,5 +1,9 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
+import com.hypixel.hytale.component.ComponentAccessor;
+import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.modules.entity.component.DisplayNameComponent;
@@ -7,6 +11,7 @@ import com.hypixel.hytale.server.core.modules.entity.component.Interactable;
 import com.hypixel.hytale.server.core.modules.entity.component.PersistentDisplayName;
 import com.hypixel.hytale.server.core.modules.interaction.Interactions;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.characters.CharacterAssets;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.ReleaseReason;
@@ -22,32 +27,87 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.random.RandomGenerator;
 
 /**
- * Gives, applies and takes back characters, running their traits and firing the events. The scan,
- * bridges and commands all go through it; every method runs on the NPC's world thread.
+ * Gives, applies and takes back characters, running their traits, firing the events and saving
+ * the identity a call changed. Bridges and commands use the accessor methods, on the NPC's world thread.
  */
 public class CharacterService {
 
     private final CharacterAssets assets;
-    private final Predicate<CharacterNpc> eligible;
+    private final BiPredicate<ComponentAccessor<EntityStore>, Ref<EntityStore>> eligible;
     private final IEventBus events;
     private final RandomGenerator random;
     private final BiConsumer<String, Throwable> warnings;
+    private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
+    private final ResourceType<EntityStore, UniqueCharacters> uniqueType;
     private final Set<String> reported = ConcurrentHashMap.newKeySet();
 
     /**
      * @param eligible whether an NPC may receive a character at all, so no mod's NPC is taken over.
      * @param warnings where a failing trait is reported, with its exception.
      */
-    public CharacterService(@Nonnull CharacterAssets assets, @Nonnull Predicate<CharacterNpc> eligible, @Nonnull IEventBus events, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings) {
+    public CharacterService(@Nonnull CharacterAssets assets, @Nonnull BiPredicate<ComponentAccessor<EntityStore>, Ref<EntityStore>> eligible, @Nonnull IEventBus events, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings, ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, ResourceType<EntityStore, UniqueCharacters> uniqueType) {
         this.assets = assets;
         this.eligible = eligible;
         this.events = events;
         this.random = random;
         this.warnings = warnings;
+        this.identityType = identityType;
+        this.uniqueType = uniqueType;
+    }
+
+    /**
+     * Gives an NPC a character, as the scan would; refused for an ineligible NPC, one already carrying
+     * a character (revoke it first) and a unique character another NPC holds.
+     *
+     * @param accessor the NPC's store, or the command buffer while the store is ticking.
+     * @return whether the NPC now carries the character.
+     */
+    public boolean give(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref, @Nonnull String characterId) {
+        return Boolean.TRUE.equals(edit(accessor, ref, npc -> give(npc, characterId)));
+    }
+
+    /**
+     * Takes an NPC's character back: its traits undo what they did and a unique character is free again.
+     *
+     * @param accessor the NPC's store, or the command buffer while the store is ticking.
+     */
+    public void revoke(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref) {
+        edit(accessor, ref, npc -> {
+            release(npc, ReleaseReason.Revoked);
+            return null;
+        });
+    }
+
+    /**
+     * @return a copy of who the NPC became, {@code null} for an NPC that never drew; changing it saves nothing.
+     */
+    @Nullable
+    public OpenDialoguesNPCIdentity identity(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref) {
+        OpenDialoguesNPCIdentity identity = accessor.getComponent(ref, identityType);
+        return identity == null ? null : (OpenDialoguesNPCIdentity) identity.clone();
+    }
+
+    /**
+     * Runs an action on an NPC and saves its identity when the action changed it.
+     *
+     * @return what the action returned, {@code null} for an entity without UUID.
+     */
+    @Nullable
+    <T> T edit(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref, @Nonnull Function<CharacterNpc, T> action) {
+        CharacterNpc npc = CharacterNpc.of(accessor, ref, identityType, uniqueType);
+        return npc == null ? null : edit(npc, action);
+    }
+
+    <T> T edit(@Nonnull CharacterNpc npc, @Nonnull Function<CharacterNpc, T> action) {
+        OpenDialoguesNPCIdentity before = (OpenDialoguesNPCIdentity) npc.identity().clone();
+        T result = action.apply(npc);
+        if (!npc.identity().sameAs(before)) npc.save().accept(npc.identity());
+        return result;
     }
 
     /**
@@ -56,8 +116,8 @@ public class CharacterService {
      * @return the id of the character given, {@code null} when the NPC stays nobody for now.
      */
     @Nullable
-    public String draw(@Nonnull CharacterNpc npc, @Nonnull FilterContext context) {
-        if (npc.identity().getCharacter() != null || !eligible.test(npc)) return null;
+    String draw(@Nonnull CharacterNpc npc, @Nonnull FilterContext context) {
+        if (npc.identity().getCharacter() != null || !eligible.test(npc.accessor(), npc.ref())) return null;
         CharacterEvent.Drawing drawing = events.dispatchFor(CharacterEvent.Drawing.class, null).dispatch(new CharacterEvent.Drawing(context));
         if (drawing.isCancelled()) return null;
 
@@ -72,8 +132,8 @@ public class CharacterService {
      *
      * @return whether the NPC now carries the character.
      */
-    public boolean give(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
-        if (npc.identity().getCharacter() != null || !eligible.test(npc)) return false;
+    boolean give(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
+        if (npc.identity().getCharacter() != null || !eligible.test(npc.accessor(), npc.ref())) return false;
         OpenDialogueCharacterAsset character = assets.character(characterId);
         if (character == null || !npc.unique().isAvailable(characterId, assets::character)) return false;
 
@@ -90,7 +150,7 @@ public class CharacterService {
      * Runs the traits' {@code onApplied} again, for an NPC met after a reload. An NPC whose character
      * no pack declares any more is cleaned up, so it may draw again; its draws stay.
      */
-    public void apply(@Nonnull CharacterNpc npc) {
+    void apply(@Nonnull CharacterNpc npc) {
         String characterId = npc.identity().getCharacter();
         if (characterId == null) return;
         OpenDialogueCharacterAsset character = assets.character(characterId);
@@ -105,7 +165,7 @@ public class CharacterService {
     /**
      * @return whether a trait answered the player's F, in which case the NPC's own use must not run.
      */
-    public boolean use(@Nonnull CharacterNpc npc, @Nonnull PlayerRef player) {
+    boolean use(@Nonnull CharacterNpc npc, @Nonnull PlayerRef player) {
         OpenDialogueCharacterAsset character = characterOf(npc);
         if (character == null) return false;
         CharacterContext context = context(npc, character);
@@ -123,7 +183,7 @@ public class CharacterService {
      * Undoes the traits in reverse order, frees the claim as the reason allows and forgets the
      * character and name; draws stay. Releasing an NPC carrying nothing does nothing.
      */
-    public void release(@Nonnull CharacterNpc npc, @Nonnull ReleaseReason reason) {
+    void release(@Nonnull CharacterNpc npc, @Nonnull ReleaseReason reason) {
         String characterId = npc.identity().getCharacter();
         if (characterId == null) return;
         OpenDialogueCharacterAsset character = assets.character(characterId);

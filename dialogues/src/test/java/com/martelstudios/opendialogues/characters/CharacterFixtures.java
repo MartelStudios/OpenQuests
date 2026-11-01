@@ -55,6 +55,22 @@ public final class CharacterFixtures {
     }
 
     @Nonnull
+    public static OpenDialogueCharacterAsset character(@Nonnull String id, @Nonnull String json) {
+        OpenDialogueCharacterAsset character = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, json);
+        if (character == null) throw new IllegalArgumentException("Unreadable character " + json);
+        character.id = id;
+        return character;
+    }
+
+    @Nonnull
+    public static OpenDialogueDistributionAsset distribution(@Nonnull String id, @Nonnull String json) {
+        OpenDialogueDistributionAsset distribution = CodecJson.decode(OpenDialogueDistributionAsset.CODEC, json);
+        if (distribution == null) throw new IllegalArgumentException("Unreadable distribution " + json);
+        distribution.id = id;
+        return distribution;
+    }
+
+    @Nonnull
     public static CharacterTrait trait(@Nonnull String json) {
         CharacterTrait trait = CodecJson.decode(CharacterTrait.CODEC, json);
         if (trait == null) throw new IllegalArgumentException("Unreadable trait " + json);

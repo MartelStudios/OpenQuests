@@ -157,11 +157,11 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         historyRecorder = new DialogueHistoryRecorder(historyType);
         identityType = getEntityStoreRegistry().registerComponent(OpenDialoguesNPCIdentity.class, "OpenDialoguesNPCIdentity", OpenDialoguesNPCIdentity.CODEC);
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
-        characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), new SplittableRandom(), (message, error) -> getLogger().atWarning().withCause(error).log("%s", message));
-        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), characterService, identityType, uniqueCharactersType));
-        getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType, uniqueCharactersType));
+        characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), new SplittableRandom(), (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType);
+        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), characterService));
+        getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));
-        getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(characterService, identityType, uniqueCharactersType));
+        getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterRemovalSystem(characterService, identityType, uniqueCharactersType));
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus(), OpenDialogueSpeakerAsset::getSpeaker);

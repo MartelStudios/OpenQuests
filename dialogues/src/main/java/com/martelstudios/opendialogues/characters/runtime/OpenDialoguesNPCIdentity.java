@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -74,6 +75,13 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
      */
     public void recordDraw(@Nonnull String distributionId) {
         draws.add(distributionId);
+    }
+
+    /**
+     * @return whether the other identity saves the same, so an unchanged NPC is not written again.
+     */
+    public boolean sameAs(@Nonnull OpenDialoguesNPCIdentity other) {
+        return Objects.equals(character, other.character) && Objects.equals(name, other.name) && draws.equals(other.draws);
     }
 
     @Nonnull

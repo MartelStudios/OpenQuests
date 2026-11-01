@@ -16,7 +16,7 @@ import javax.annotation.Nonnull;
 
 /**
  * Releases the character of an NPC removed for good without dying, a command or a despawn. A chunk
- * unload is no release: the NPC comes back with its character.
+ * unload is no release: the NPC comes back with its character. Nothing is saved on the leaving entity.
  */
 public class CharacterRemovalSystem extends RefSystem<EntityStore> {
 

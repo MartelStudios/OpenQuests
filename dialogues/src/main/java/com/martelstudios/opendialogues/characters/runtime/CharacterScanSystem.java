@@ -1,9 +1,7 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
 import com.hypixel.hytale.builtin.tagset.config.NPCGroup;
-import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.spatial.SpatialResource;
 import com.hypixel.hytale.component.system.DelayedSystem;
@@ -22,7 +20,6 @@ import com.martelstudios.opendialogues.characters.filters.FilterContext;
 import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -35,15 +32,11 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
 
     private final double radius;
     private final CharacterService service;
-    private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
-    private final ResourceType<EntityStore, UniqueCharacters> uniqueType;
 
-    public CharacterScanSystem(@Nonnull CharacterSettings settings, @Nonnull CharacterService service, @Nonnull ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, @Nonnull ResourceType<EntityStore, UniqueCharacters> uniqueType) {
+    public CharacterScanSystem(@Nonnull CharacterSettings settings, @Nonnull CharacterService service) {
         super(settings.getScanInterval());
         this.radius = settings.getScanRadius();
         this.service = service;
-        this.identityType = identityType;
-        this.uniqueType = uniqueType;
     }
 
     /**
@@ -74,19 +67,18 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
     }
 
     private void visit(@Nonnull World world, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef player, @Nonnull WorldMapTracker tracker) {
-        CharacterNpc npc = CharacterNpc.of(store, ref, identityType, uniqueType);
         NPCEntity entity = store.getComponent(ref, NPCEntity.getComponentType());
-        if (npc == null || entity == null) return;
-        String before = npc.identity().getCharacter();
-        int drawsBefore = npc.identity().getDraws().size();
-
-        if (before != null) {
-            service.apply(npc);
-        } else {
+        if (entity == null) return;
+        service.edit(store, ref, npc -> {
+            if (npc.identity().getCharacter() != null) {
+                service.apply(npc);
+                return null;
+            }
+            int drawsBefore = npc.identity().getDraws().size();
             String drawn = service.draw(npc, context(store, ref, player, world, entity, tracker));
             if (npc.identity().getDraws().size() != drawsBefore) LOGGER.atFine().log("NPC %s (%s) drew %s.", npc.uuid(), entity.getRoleName(), drawn == null ? "nobody" : "character '" + drawn + "'");
-        }
-        if (!Objects.equals(before, npc.identity().getCharacter()) || npc.identity().getDraws().size() != drawsBefore) npc.commit(identityType);
+            return null;
+        });
     }
 
     @Nonnull

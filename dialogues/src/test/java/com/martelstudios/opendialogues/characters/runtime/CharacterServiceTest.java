@@ -1,14 +1,14 @@
-package com.martelstudios.opendialogues.characters;
+package com.martelstudios.opendialogues.characters.runtime;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.event.EventBus;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.opendialogues.CodecJson;
+import com.martelstudios.opendialogues.characters.CharacterFixtures;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
+import com.martelstudios.opendialogues.characters.RecordingTrait;
+import com.martelstudios.opendialogues.characters.ReleaseReason;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
-import com.martelstudios.opendialogues.characters.runtime.CharacterNpc;
-import com.martelstudios.opendialogues.characters.runtime.CharacterService;
-import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
-import com.martelstudios.opendialogues.characters.runtime.UniqueCharacters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SplittableRandom;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 import static com.martelstudios.opendialogues.characters.CharacterFixtures.kweebec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,7 +41,8 @@ class CharacterServiceTest {
     private final Map<String, OpenDialogueCharacterAsset> characters = new HashMap<>();
     private final List<OpenDialogueDistributionAsset> distributions = new ArrayList<>();
     private final UniqueCharacters unique = new UniqueCharacters();
-    private Predicate<CharacterNpc> eligible = npc -> true;
+    private final List<OpenDialoguesNPCIdentity> saved = new ArrayList<>();
+    private boolean eligible = true;
 
     @BeforeEach
     void listen() {
@@ -111,7 +111,7 @@ class CharacterServiceTest {
     @Test
     void giveRefusesIneligibleNpc() {
         character("Mira", "None", AB);
-        eligible = npc -> false;
+        eligible = false;
 
         assertRefused(service(), npc(), "Mira");
     }
@@ -238,6 +238,52 @@ class CharacterServiceTest {
         assertEquals("Mira", service.draw(npc, kweebec("Zone1")));
     }
 
+    @Test
+    void identityChangedByHookIsSaved() {
+        character("Mira", "None", "{ \"Type\": \"TestRecording\", \"Label\": \"a\", \"Consumes\": true, \"Writes\": true }");
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.edit(npc, n -> service.give(n, "Mira"));
+        saved.clear();
+
+        service.edit(npc, n -> service.use(n, player()));
+
+        assertEquals(1, saved.size());
+        assertEquals("a.used", saved.getFirst().getName());
+    }
+
+    @Test
+    void unchangedIdentityIsNotSaved() {
+        character("Mira", "None", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.edit(npc, n -> service.give(n, "Mira"));
+        assertEquals(1, saved.size());
+        saved.clear();
+
+        service.edit(npc, n -> {
+            service.apply(n);
+            return null;
+        });
+
+        assertEquals(List.of(), saved);
+    }
+
+    @Test
+    void revokedUniqueCanBeGivenAgain() {
+        character("Oak", "Forever", AB);
+        CharacterService service = service();
+        CharacterNpc first = npc();
+        CharacterNpc second = npc();
+        service.give(first, "Oak");
+
+        service.release(first, ReleaseReason.Revoked);
+
+        assertNull(first.identity().getCharacter());
+        assertTrue(service.give(second, "Oak"));
+        assertEquals(second.uuid(), unique.claimant("Oak"));
+    }
+
     private void assertRefused(@Nonnull CharacterService service, @Nonnull CharacterNpc npc, @Nonnull String characterId) {
         assertFalse(service.give(npc, characterId));
         assertEquals(List.of(), RecordingTrait.LOG);
@@ -246,12 +292,12 @@ class CharacterServiceTest {
 
     @Nonnull
     private CharacterService service() {
-        return new CharacterService(CharacterFixtures.assets(characters, distributions, Map.of(), Map.of(), id -> true), npc -> eligible.test(npc), bus, new SplittableRandom(1), (message, error) -> warnings.add(message));
+        return new CharacterService(CharacterFixtures.assets(characters, distributions, Map.of(), Map.of(), id -> true), (accessor, ref) -> eligible, bus, new SplittableRandom(1), (message, error) -> warnings.add(message), null, null);
     }
 
     @Nonnull
     private CharacterNpc npc() {
-        return new CharacterNpc(null, new Ref<>(null), UUID.randomUUID(), new OpenDialoguesNPCIdentity(), unique);
+        return new CharacterNpc(null, new Ref<>(null), UUID.randomUUID(), new OpenDialoguesNPCIdentity(), unique, saved::add);
     }
 
     @Nonnull
@@ -260,16 +306,10 @@ class CharacterServiceTest {
     }
 
     private void character(@Nonnull String id, @Nonnull String uniqueness, @Nonnull String traits) {
-        OpenDialogueCharacterAsset character = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{ \"Uniqueness\": \"" + uniqueness + "\", \"Traits\": [ " + traits + " ] }");
-        if (character == null) throw new IllegalArgumentException("Unreadable character " + traits);
-        character.id = id;
-        characters.put(id, character);
+        characters.put(id, CharacterFixtures.character(id, "{ \"Uniqueness\": \"" + uniqueness + "\", \"Traits\": [ " + traits + " ] }"));
     }
 
     private void distribution(@Nonnull String id, @Nonnull String entries) {
-        OpenDialogueDistributionAsset distribution = CodecJson.decode(OpenDialogueDistributionAsset.CODEC, "{ \"Characters\": [ " + entries + " ] }");
-        if (distribution == null) throw new IllegalArgumentException("Unreadable distribution " + entries);
-        distribution.id = id;
-        distributions.add(distribution);
+        distributions.add(CharacterFixtures.distribution(id, "{ \"Characters\": [ " + entries + " ] }"));
     }
 }

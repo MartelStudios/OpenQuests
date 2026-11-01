@@ -5,7 +5,6 @@ import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
-import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.EntityEventSystem;
@@ -24,13 +23,11 @@ public class CharacterTalkSystem extends EntityEventSystem<EntityStore, UseEntit
 
     private final CharacterService service;
     private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
-    private final ResourceType<EntityStore, UniqueCharacters> uniqueType;
 
-    public CharacterTalkSystem(@Nonnull CharacterService service, @Nonnull ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, @Nonnull ResourceType<EntityStore, UniqueCharacters> uniqueType) {
+    public CharacterTalkSystem(@Nonnull CharacterService service, @Nonnull ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType) {
         super(UseEntityEvent.Pre.class);
         this.service = service;
         this.identityType = identityType;
-        this.uniqueType = uniqueType;
     }
 
     @Override
@@ -38,8 +35,7 @@ public class CharacterTalkSystem extends EntityEventSystem<EntityStore, UseEntit
         Ref<EntityStore> target = event.getTargetEntity();
         if (!target.isValid() || store.getComponent(target, identityType) == null) return;
         PlayerRef player = store.getComponent(archetypeChunk.getReferenceTo(index), PlayerRef.getComponentType());
-        CharacterNpc npc = CharacterNpc.of(commandBuffer, target, identityType, uniqueType);
-        if (player != null && npc != null && service.use(npc, player)) event.setCancelled(true);
+        if (player != null && Boolean.TRUE.equals(service.edit(commandBuffer, target, npc -> service.use(npc, player)))) event.setCancelled(true);
     }
 
     @Nullable

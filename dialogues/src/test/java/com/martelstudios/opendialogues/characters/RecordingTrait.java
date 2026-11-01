@@ -10,9 +10,10 @@ import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
- * Writes {@code "<label>:<hook>"} to {@link #LOG} on every hook, and can throw from {@code onApplied}.
+ * Writes {@code "<label>:<hook>"} to {@link #LOG} on every hook, can throw from {@code onApplied} and {@code validate}, and rename the NPC on use.
  */
 public class RecordingTrait extends CharacterTrait {
 
@@ -27,11 +28,14 @@ public class RecordingTrait extends CharacterTrait {
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Consumes", Codec.BOOLEAN), (trait, consumes) -> trait.consumes = consumes, trait -> trait.consumes)
                                                                          .add()
+                                                                         .append(new KeyedCodec<>("Writes", Codec.BOOLEAN), (trait, writes) -> trait.writes = writes, trait -> trait.writes)
+                                                                         .add()
                                                                          .build();
 
     private String label = "";
     private boolean fails;
     private boolean consumes;
+    private boolean writes;
 
     @Override
     public void onAssigned(@Nonnull CharacterContext context) {
@@ -47,12 +51,18 @@ public class RecordingTrait extends CharacterTrait {
     @Override
     public boolean onUse(@Nonnull CharacterContext context, @Nonnull PlayerRef player) {
         LOG.add(label + ":use");
+        if (writes) context.identity().setName(label + ".used");
         return consumes;
     }
 
     @Override
     public void onReleased(@Nonnull CharacterContext context, @Nonnull ReleaseReason reason) {
         LOG.add(label + ":released");
+    }
+
+    @Override
+    public void validate(@Nonnull CharacterAssets assets, @Nonnull Consumer<String> problems) {
+        if (fails) throw new IllegalStateException("broken validation " + label);
     }
 
     @Override
