@@ -12,8 +12,11 @@ import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
+import com.martelstudios.opendialogues.dialogues.SpeakerView;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
+import com.martelstudios.opendialogues.sessions.DialogueSource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -64,19 +67,24 @@ public class DialogueService {
     @Nonnull
     private final IEventBus events;
 
+    @Nonnull
+    private final Function<String, OpenDialogueSpeakerAsset> speakers;
+
     /**
      * @param rules           read on each opening, since the config behind them can be reloaded.
      * @param fallbackDisplay drawing a dialogue when every display the rules name is missing.
      * @param contexts        what conditions are judged against for a player, read anew on each check.
      * @param events          where openings, answers and closings are announced.
+     * @param speakers        a speaker by id, {@code null} for one no pack declares.
      */
-    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, ConditionContext> contexts, @Nonnull IEventBus events) {
+    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, ConditionContext> contexts, @Nonnull IEventBus events, @Nonnull Function<String, OpenDialogueSpeakerAsset> speakers) {
         this.registry = registry;
         this.rules = rules;
         this.fallbackDisplay = fallbackDisplay;
         this.resolver = resolver;
         this.contexts = contexts;
         this.events = events;
+        this.speakers = speakers;
     }
 
     /**
@@ -97,36 +105,37 @@ public class DialogueService {
      * Shows the dialogue an id leads to, a dialogue under it first, else what the router under it
      * picks for that player, in place of the dialogue open.
      *
+     * @param source the NPC the conversation comes from, {@code null} for none.
      * @return whether the id led to a dialogue.
      */
-    public boolean open(@Nonnull PlayerRef player, @Nonnull String id) {
-        return show(player, resolver.resolve(id, contexts.apply(player)));
+    public boolean open(@Nonnull PlayerRef player, @Nonnull String id, @Nullable DialogueSource source) {
+        return show(player, resolver.resolve(id, contexts.apply(player)), source);
     }
 
     /**
-     * Shows the dialogue a target leads to for that player.
+     * Shows the dialogue a target leads to for that player, in place of the dialogue open.
      *
+     * @param source the NPC the conversation comes from, {@code null} for none.
      * @return whether the target led to a dialogue.
      */
-    public boolean open(@Nonnull PlayerRef player, @Nonnull OpenDialoguesTarget target) {
-        return show(player, resolver.resolve(target, contexts.apply(player)));
+    public boolean open(@Nonnull PlayerRef player, @Nonnull OpenDialoguesTarget target, @Nullable DialogueSource source) {
+        return show(player, resolver.resolve(target, contexts.apply(player)), source);
     }
 
-    private boolean show(@Nonnull PlayerRef player, @Nullable OpenDialogueAsset dialogue) {
+    private boolean show(@Nonnull PlayerRef player, @Nullable OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
         if (dialogue == null) {
             return false;
         }
-        open(player, dialogue);
+        open(player, dialogue, source);
         return true;
     }
 
     /**
-     * Shows a dialogue to a player, one from the store or one written inline, in place of the
-     * dialogue open. With no answer for the player to see, it ends as soon as shown. Off the
-     * player's world thread, conditions see no history nor inventory, so answers needing them hide.
+     * Shows a resolved dialogue in place of the dialogue open; with no answer to see, it ends as soon
+     * as shown. Off the player's world thread, conditions see no history nor inventory.
      */
-    public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue) {
-        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue));
+    void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
+        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue), source, SpeakerView.of(dialogue.getSpeakerId() == null ? null : speakers.apply(dialogue.getSpeakerId()), source, speakers));
         DialogueSession replaced = sessions.put(player.getUuid(), session);
         if (replaced != null) closed(player, replaced);
         session.display().show(player, session);
@@ -139,7 +148,7 @@ public class DialogueService {
      * History does not count it as another opening.
      */
     private void refresh(@Nonnull PlayerRef player, @Nonnull DialogueSession stale) {
-        DialogueSession session = new DialogueSession(stale.dialogue(), stale.dialogue().visibleResponses(contexts.apply(player)), stale.display());
+        DialogueSession session = new DialogueSession(stale.dialogue(), stale.dialogue().visibleResponses(contexts.apply(player)), stale.display(), stale.source(), stale.speaker());
         if (!sessions.replace(player.getUuid(), stale, session)) return;
         session.display().refresh(player, session);
         endIfUnanswerable(player, session);

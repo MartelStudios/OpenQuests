@@ -2,6 +2,8 @@ package com.martelstudios.opendialogues.api;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.opendialogues.actions.DialogueAction;
+import com.martelstudios.opendialogues.characters.filters.CharacterFilter;
+import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
 import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import com.martelstudios.opendialogues.routers.DialogueSelector;
@@ -49,6 +51,21 @@ public class DialogueRegistry {
      */
     public synchronized <T extends DialogueSelector> void registerSelector(@Nonnull String type, @Nonnull Class<T> selectorClass, @Nonnull BuilderCodec<T> codec) {
         DialogueSelector.CODEC.register(type, selectorClass, codec);
+    }
+
+    /**
+     * Adds a character filter kind under its {@code Type}, which carries the registering mod's prefix.
+     */
+    public synchronized <T extends CharacterFilter> void registerFilter(@Nonnull String type, @Nonnull Class<T> filterClass, @Nonnull BuilderCodec<T> codec) {
+        CharacterFilter.CODEC.register(type, filterClass, codec);
+    }
+
+    /**
+     * Adds a character trait kind under its {@code Type}, which carries the registering mod's prefix.
+     * Call it from the mod's setup, before characters load.
+     */
+    public synchronized <T extends CharacterTrait> void registerTrait(@Nonnull String type, @Nonnull Class<T> traitClass, @Nonnull BuilderCodec<T> codec) {
+        CharacterTrait.CODEC.register(type, traitClass, codec);
     }
 
     /**

@@ -17,7 +17,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesPage;
-import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
+import com.martelstudios.opendialogues.dialogues.SpeakerView;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
 import com.martelstudios.opendialogues.displays.AnswerTints;
 import com.martelstudios.opendialogues.services.DialogueService;
@@ -166,9 +166,9 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
      */
     @Nonnull
     private String speaker(@Nonnull UICommandBuilder commandBuilder) {
-        OpenDialogueSpeakerAsset speaker = session.dialogue().getSpeaker();
+        SpeakerView speaker = session.speaker();
 
-        String portrait = speaker == null ? null : speaker.getPortrait();
+        String portrait = speaker == null ? null : speaker.portrait();
         boolean hasPortrait = portrait != null && !portrait.isEmpty();
         String layout = hasPortrait ? "#Side" : "#Centered";
         commandBuilder.set("#Portrait.Visible", hasPortrait);
@@ -176,14 +176,14 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
         commandBuilder.set("#Centered.Visible", !hasPortrait);
         if (hasPortrait) commandBuilder.set("#PortraitImage.AssetPath", portrait);
 
-        String nameKey = speaker == null ? null : speaker.getName();
+        String nameKey = speaker == null ? null : speaker.name();
         if (nameKey != null) {
             commandBuilder.set(layout + "Name.TextSpans", Message.translation(nameKey));
         } else if (session.dialogue().getTitle() != null) {
             commandBuilder.set(layout + "Name.TextSpans", Message.translation(session.dialogue().getTitle()));
         }
 
-        String epithet = speaker == null ? null : speaker.getEpithet();
+        String epithet = speaker == null ? null : speaker.epithet();
         if (epithet != null) {
             commandBuilder.set(layout + "Epithet.TextSpans", Message.translation(epithet));
         } else {

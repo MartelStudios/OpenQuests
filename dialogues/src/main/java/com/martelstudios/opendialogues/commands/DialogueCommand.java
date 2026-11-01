@@ -75,7 +75,7 @@ public class DialogueCommand extends AbstractCommandCollection {
         @Override
         protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef playerRef, @Nonnull World world) {
             String dialogueId = context.get(dialogueArg);
-            if (!dialogues.open(playerRef, dialogueId)) {
+            if (!dialogues.open(playerRef, dialogueId, null)) {
                 context.sendMessage(Message.raw("No dialogue from '" + dialogueId + "'."));
             }
         }

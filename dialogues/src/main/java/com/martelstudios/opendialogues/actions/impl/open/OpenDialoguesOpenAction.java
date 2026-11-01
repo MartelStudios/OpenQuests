@@ -41,7 +41,7 @@ public class OpenDialoguesOpenAction extends DialogueAction {
     @Override
     public void execute(@Nonnull DialogueContext context) {
         context.dialogues().close(context.player(), context.session().dialogueId());
-        if (!context.dialogues().open(context.player(), OpenDialoguesTarget.of(dialogue, router))) {
+        if (!context.dialogues().open(context.player(), OpenDialoguesTarget.of(dialogue, router), context.session().source())) {
             context.player().sendMessage(Message.raw("No dialogue from '" + (dialogue != null ? dialogue : router) + "'."));
         }
     }
