@@ -3,6 +3,7 @@ package com.martelstudios.opendialogues;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.builtin.asseteditor.event.AssetEditorFetchAutoCompleteDataEvent;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
@@ -19,6 +20,8 @@ import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
+import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
+import com.martelstudios.opendialogues.characters.runtime.UniqueCharacters;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesBiomeFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesGroupFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRoleFilter;
@@ -80,6 +83,10 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     private ComponentType<EntityStore, DialogueHistory> historyType;
 
+    private ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
+
+    private ResourceType<EntityStore, UniqueCharacters> uniqueCharactersType;
+
     private DialogueHistoryRecorder historyRecorder;
 
     private DialogueResolver resolver;
@@ -129,6 +136,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         historyType = getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC);
         historyRecorder = new DialogueHistoryRecorder(historyType);
+        identityType = getEntityStoreRegistry().registerComponent(OpenDialoguesNPCIdentity.class, "OpenDialoguesNPCIdentity", OpenDialoguesNPCIdentity.CODEC);
+        uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus());
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
@@ -266,5 +275,21 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     @Nonnull
     public ComponentType<EntityStore, DialogueHistory> getHistoryType() {
         return historyType;
+    }
+
+    /**
+     * @return who each NPC became, saved on the NPC, for bridges finding a given NPC's character.
+     */
+    @Nonnull
+    public ComponentType<EntityStore, OpenDialoguesNPCIdentity> getIdentityType() {
+        return identityType;
+    }
+
+    /**
+     * @return the unique characters each world gave away, saved with the world.
+     */
+    @Nonnull
+    public ResourceType<EntityStore, UniqueCharacters> getUniqueCharactersType() {
+        return uniqueCharactersType;
     }
 }
