@@ -20,6 +20,10 @@ import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
+import com.martelstudios.opendialogues.characters.runtime.CharacterDeathSystem;
+import com.martelstudios.opendialogues.characters.runtime.CharacterScanSystem;
+import com.martelstudios.opendialogues.characters.runtime.CharacterSettings;
+import com.martelstudios.opendialogues.characters.runtime.CharacterTalkSystem;
 import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
 import com.martelstudios.opendialogues.characters.runtime.UniqueCharacters;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesBiomeFilter;
@@ -79,6 +83,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     private final Config<DisplayRules> displayRules;
 
+    private final Config<CharacterSettings> characterSettings;
+
     private DialogueService dialogueService;
 
     private ComponentType<EntityStore, DialogueHistory> historyType;
@@ -101,6 +107,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         super(init);
         instance = this;
         displayRules = withConfig("Displays", DisplayRules.CODEC);
+        characterSettings = withConfig("Characters", CharacterSettings.CODEC);
     }
 
     public static OpenDialoguesPlugin get() {
@@ -138,6 +145,9 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         historyRecorder = new DialogueHistoryRecorder(historyType);
         identityType = getEntityStoreRegistry().registerComponent(OpenDialoguesNPCIdentity.class, "OpenDialoguesNPCIdentity", OpenDialoguesNPCIdentity.CODEC);
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
+        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), identityType, uniqueCharactersType));
+        getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(identityType));
+        getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(identityType, uniqueCharactersType));
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus());
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());

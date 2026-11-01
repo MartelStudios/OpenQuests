@@ -5,6 +5,8 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.OpenDialoguesPlugin;
+import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
+import com.martelstudios.opendialogues.sessions.DialogueSource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,6 +33,22 @@ public final class DialogueTriggers {
         ref.getStore().getExternalData().getWorld().execute(() -> {
             if (dialogueId == null || !OpenDialoguesPlugin.get().getDialogueService().open(player, dialogueId)) {
                 LOGGER.atWarning().log("%s opens '%s', which leads to no dialogue.", source, dialogueId);
+            }
+        });
+    }
+
+    /**
+     * Opens what a target leads to, spoken from an NPC, deferred as {@link #openFor(PlayerRef, String, String)} is.
+     *
+     * @param caller the asset calling, named in the warning when the target leads nowhere.
+     */
+    public static void openFor(@Nonnull PlayerRef player, @Nonnull OpenDialoguesTarget target, @Nonnull DialogueSource from, @Nonnull String caller) {
+        Ref<EntityStore> ref = player.getReference();
+        if (ref == null || !ref.isValid()) return;
+
+        ref.getStore().getExternalData().getWorld().execute(() -> {
+            if (!OpenDialoguesPlugin.get().getDialogueService().open(player, target, from)) {
+                LOGGER.atWarning().log("%s opens a target leading to no dialogue.", caller);
             }
         });
     }
