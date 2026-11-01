@@ -15,8 +15,8 @@ import java.util.random.RandomGenerator;
 /**
  * The NPC a trait hook acts on, valid for that call only.
  *
- * @param accessor  the store to read and write the NPC's components with: a command buffer during
- *                  death, the store otherwise; {@code null} only off the server, in unit tests.
+ * @param accessor  the store to read and write the NPC's components with: a command buffer when the
+ *                  store is ticking (use, death, removal), the store otherwise; {@code null} in unit tests.
  * @param identity  who the NPC became; a hook may change it, the service saves it.
  * @param character the character the NPC carries.
  * @param random    the randomness a trait draws with, so draws stay testable.

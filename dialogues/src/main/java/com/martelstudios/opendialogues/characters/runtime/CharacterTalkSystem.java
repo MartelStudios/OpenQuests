@@ -38,7 +38,7 @@ public class CharacterTalkSystem extends EntityEventSystem<EntityStore, UseEntit
         Ref<EntityStore> target = event.getTargetEntity();
         if (!target.isValid() || store.getComponent(target, identityType) == null) return;
         PlayerRef player = store.getComponent(archetypeChunk.getReferenceTo(index), PlayerRef.getComponentType());
-        CharacterNpc npc = CharacterNpc.of(store, target, identityType, uniqueType);
+        CharacterNpc npc = CharacterNpc.of(commandBuffer, target, identityType, uniqueType);
         if (player != null && npc != null && service.use(npc, player)) event.setCancelled(true);
     }
 
