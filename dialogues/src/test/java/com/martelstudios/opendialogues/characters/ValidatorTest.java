@@ -55,6 +55,14 @@ class ValidatorTest {
         assertProblem(problems(Map.of("Blank", character("Blank", "{ \"Type\": \"Name\", \"Names\": \"Empty\" }")), List.of()), "Blank", "Empty");
     }
 
+    @Test
+    void brokenValidationDoesNotStopTheOthers() {
+        List<String> problems = problems(Map.of("Broken", character("Broken", "{ \"Type\": \"TestRecording\", \"Label\": \"a\", \"Throws\": true }")), List.of(distribution("Village", "{ \"Character\": \"Ghost\" }")));
+
+        assertProblem(problems, "Broken", "RecordingTrait");
+        assertProblem(problems, "Village", "Ghost");
+    }
+
     @Nonnull
     private static List<String> problems(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions) {
         return CharacterValidator.validate(CharacterFixtures.assets(characters, distributions, Map.of("Empty", EMPTY_LIST), Map.of(), Set.of("Hello")::contains));

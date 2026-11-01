@@ -123,7 +123,7 @@ public class CharacterService {
         CharacterEvent.Drawing drawing = events.dispatchFor(CharacterEvent.Drawing.class, null).dispatch(new CharacterEvent.Drawing(context));
         if (drawing.isCancelled()) return null;
 
-        CharacterAssigner.Draw draw = CharacterAssigner.assign(npc.identity().getDraws(), List.copyOf(assets.distributions()), context, id -> npc.unique().isAvailable(id, assets::character), random);
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(npc.identity().getDraws(), List.copyOf(assets.distributions()), context, id -> npc.unique().isAvailable(id, assets::character), random, this::warnOnce);
         draw.drawn().forEach(npc.identity()::recordDraw);
         return draw.character() != null && give(npc, draw.character()) ? draw.character() : null;
     }
@@ -278,6 +278,13 @@ public class CharacterService {
         } catch (RuntimeException e) {
             report(trait, character, hook, e);
         }
+    }
+
+    /**
+     * Once per message, since a broken filter fails again on every scan.
+     */
+    private void warnOnce(@Nonnull String message, @Nullable Throwable error) {
+        if (reported.add(message)) warnings.accept(message, error);
     }
 
     /**

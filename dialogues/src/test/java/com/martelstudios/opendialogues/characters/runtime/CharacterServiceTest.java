@@ -302,6 +302,21 @@ class CharacterServiceTest {
         assertNull(npc.identity().getCharacter());
     }
 
+    @Test
+    void brokenFilterSkipsItsDistributionOnly() {
+        character("Mira", "None", AB);
+        character("Oak", "None", AB);
+        distributions.add(CharacterFixtures.distribution("A", "{ \"Priority\": 5, \"Filters\": [ { \"Type\": \"TestThrowing\" } ], \"Characters\": [ { \"Character\": \"Mira\" } ] }"));
+        distribution("B", "{ \"Character\": \"Oak\" }");
+        CharacterService service = service();
+
+        assertEquals("Oak", service.draw(npc(), kweebec("Zone1")));
+        service.draw(npc(), kweebec("Zone1"));
+
+        assertEquals(1, warnings.size());
+        assertTrue(warnings.getFirst().contains("A"));
+    }
+
     private void assertRefused(@Nonnull CharacterService service, @Nonnull CharacterNpc npc, @Nonnull String characterId) {
         assertFalse(service.give(npc, characterId));
         assertEquals(List.of(), RecordingTrait.LOG);

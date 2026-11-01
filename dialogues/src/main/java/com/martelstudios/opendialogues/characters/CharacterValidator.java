@@ -35,7 +35,13 @@ public final class CharacterValidator {
             if (traits.length == 0) problems.add(prefix + "has no trait.");
             List<String> answering = Arrays.stream(traits).filter(CharacterTrait::consumesUse).map(trait -> trait.getClass().getSimpleName()).toList();
             if (answering.size() > 1) problems.add(prefix + "has several traits answering F, only the first answers: " + answering + ".");
-            for (CharacterTrait trait : traits) trait.validate(assets, problem -> problems.add(prefix + problem + "."));
+            for (CharacterTrait trait : traits) {
+                try {
+                    trait.validate(assets, problem -> problems.add(prefix + problem + "."));
+                } catch (RuntimeException e) {
+                    problems.add(prefix + "could not be checked by " + trait.getClass().getSimpleName() + ": " + e + ".");
+                }
+            }
         }
         return problems;
     }

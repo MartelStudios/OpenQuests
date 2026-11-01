@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SplittableRandom;
+import java.util.function.BiConsumer;
 import java.util.random.RandomGenerator;
 
 import static com.martelstudios.opendialogues.characters.CharacterFixtures.kweebec;
@@ -19,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class CharacterDrawTest {
+
+    private static final BiConsumer<String, Throwable> FAIL = (message, error) -> { throw new AssertionError(message, error); };
 
     static {
         CharacterFixtures.registerFilters();
@@ -58,18 +61,18 @@ class CharacterDrawTest {
     void assignRecordsNothingForever() {
         OpenDialogueDistributionAsset village = distribution("Village", "[]", "{}");
 
-        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(village), kweebec("Zone1"), id -> true, rolls(0));
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(village), kweebec("Zone1"), id -> true, rolls(0), FAIL);
         assertEquals(List.of("Village"), draw.drawn());
         assertNull(draw.character());
 
-        assertEquals(List.of(), CharacterAssigner.assign(Set.of("Village"), List.of(village), kweebec("Zone1"), id -> true, rolls()).drawn());
+        assertEquals(List.of(), CharacterAssigner.assign(Set.of("Village"), List.of(village), kweebec("Zone1"), id -> true, rolls(), FAIL).drawn());
     }
 
     @Test
     void assignSkipsFailingFilters() {
         OpenDialogueDistributionAsset temple = distribution("Temple", "[ { \"Type\": \"World\", \"Worlds\": [\"temple\"] } ]", "{ \"Character\": \"Farmer\" }");
 
-        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(temple), kweebec("Zone1"), id -> true, rolls());
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(temple), kweebec("Zone1"), id -> true, rolls(), FAIL);
 
         assertEquals(List.of(), draw.drawn());
         assertNull(draw.character());
@@ -80,7 +83,7 @@ class CharacterDrawTest {
         OpenDialogueDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Mage\" }");
         OpenDialogueDistributionAsset a = distribution("A", "[]", "{ \"Character\": \"Farmer\" }");
 
-        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(b, a), kweebec("Zone1"), id -> true, rolls(0, 0));
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(b, a), kweebec("Zone1"), id -> true, rolls(0, 0), FAIL);
 
         assertEquals("Farmer", draw.character());
         assertEquals(List.of("A"), draw.drawn());
@@ -91,7 +94,7 @@ class CharacterDrawTest {
         OpenDialogueDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Mage\" }", 5);
         OpenDialogueDistributionAsset a = distribution("A", "[]", "{ \"Character\": \"Farmer\" }", 0);
 
-        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(a, b), kweebec("Zone1"), id -> true, rolls(0));
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(a, b), kweebec("Zone1"), id -> true, rolls(0), FAIL);
 
         assertEquals("Mage", draw.character());
         assertEquals(List.of("B"), draw.drawn());
@@ -103,7 +106,7 @@ class CharacterDrawTest {
         OpenDialogueDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Farmer\" }");
         Set<String> already = new HashSet<>(Set.of("Old"));
 
-        CharacterAssigner.Draw draw = CharacterAssigner.assign(already, List.of(a, b), kweebec("Zone1"), id -> true, rolls(0, 0));
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(already, List.of(a, b), kweebec("Zone1"), id -> true, rolls(0, 0), FAIL);
 
         assertEquals(List.of("A", "B"), draw.drawn());
         assertEquals(Set.of("Old"), already);
@@ -113,7 +116,7 @@ class CharacterDrawTest {
     void assignRecordsNothingWhenNoEntryIsEligible() {
         OpenDialogueDistributionAsset village = distribution("Village", "[]", "{ \"Character\": \"Oak\" }");
 
-        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(village), kweebec("Zone1"), id -> false, rolls());
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(village), kweebec("Zone1"), id -> false, rolls(), FAIL);
 
         assertEquals(List.of(), draw.drawn());
         assertNull(draw.character());

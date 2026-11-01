@@ -1,15 +1,16 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
 import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
+import com.martelstudios.opendialogues.characters.filters.CharacterFilter;
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.random.RandomGenerator;
 
@@ -35,12 +36,13 @@ public final class CharacterAssigner {
      * to give, draws nothing yet, so the NPC may still draw from it later or elsewhere.
      *
      * @param alreadyDrawn the distributions that drew for the NPC before, left untouched.
+     * @param warnings     where a filter that throws is reported; its distribution then does not hold.
      */
     @Nonnull
-    public static Draw assign(@Nonnull Set<String> alreadyDrawn, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull FilterContext context, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random) {
+    public static Draw assign(@Nonnull Set<String> alreadyDrawn, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull FilterContext context, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings) {
         List<String> drawn = new ArrayList<>();
         for (OpenDialogueDistributionAsset distribution : distributions.stream().sorted(ORDER).toList()) {
-            if (alreadyDrawn.contains(distribution.getId()) || !holds(distribution, context)) continue;
+            if (alreadyDrawn.contains(distribution.getId()) || !holds(distribution, context, warnings)) continue;
 
             OpenDialogueDistributionAsset.Entry entry = CharacterDraw.draw(List.of(distribution.getEntries()), available, random);
             if (entry == null) continue;
@@ -50,7 +52,18 @@ public final class CharacterAssigner {
         return new Draw(List.copyOf(drawn), null);
     }
 
-    private static boolean holds(@Nonnull OpenDialogueDistributionAsset distribution, @Nonnull FilterContext context) {
-        return Arrays.stream(distribution.getFilters()).allMatch(filter -> filter.test(context));
+    /**
+     * A filter is often another mod's, so one that throws must never stop the scan.
+     */
+    private static boolean holds(@Nonnull OpenDialogueDistributionAsset distribution, @Nonnull FilterContext context, @Nonnull BiConsumer<String, Throwable> warnings) {
+        for (CharacterFilter filter : distribution.getFilters()) {
+            try {
+                if (!filter.test(context)) return false;
+            } catch (RuntimeException e) {
+                warnings.accept("Filter " + filter.getClass().getSimpleName() + " of distribution '" + distribution.getId() + "' failed.", e);
+                return false;
+            }
+        }
+        return true;
     }
 }
