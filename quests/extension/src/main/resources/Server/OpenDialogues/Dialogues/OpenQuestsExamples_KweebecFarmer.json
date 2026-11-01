@@ -5,6 +5,6 @@
     { "Text": "openquestsexamples.kweebec.farmer.text" }
   ],
   "Responses": [
-    { "Text": "openquestsexamples.kweebec.farmer.bye", "Actions": [ { "Type": "Close" } ] }
+    { "Id": "Bye", "Text": "openquestsexamples.kweebec.farmer.bye", "Actions": [ { "Type": "Close" } ] }
   ]
 }
