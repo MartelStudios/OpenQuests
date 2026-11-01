@@ -12,6 +12,8 @@ import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
+import com.martelstudios.opendialogues.dialogues.SpeakerView;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
@@ -156,7 +158,7 @@ public class DialogueService {
      * @param source the NPC the conversation comes from, {@code null} for none.
      */
     public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
-        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue), source);
+        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue), source, SpeakerView.of(dialogue.getSpeaker(), source, OpenDialogueSpeakerAsset::getSpeaker));
         DialogueSession replaced = sessions.put(player.getUuid(), session);
         if (replaced != null) closed(player, replaced);
         session.display().show(player, session);
@@ -169,7 +171,7 @@ public class DialogueService {
      * History does not count it as another opening.
      */
     private void refresh(@Nonnull PlayerRef player, @Nonnull DialogueSession stale) {
-        DialogueSession session = new DialogueSession(stale.dialogue(), stale.dialogue().visibleResponses(contexts.apply(player)), stale.display(), stale.source());
+        DialogueSession session = new DialogueSession(stale.dialogue(), stale.dialogue().visibleResponses(contexts.apply(player)), stale.display(), stale.source(), stale.speaker());
         if (!sessions.replace(player.getUuid(), stale, session)) return;
         session.display().refresh(player, session);
         endIfUnanswerable(player, session);

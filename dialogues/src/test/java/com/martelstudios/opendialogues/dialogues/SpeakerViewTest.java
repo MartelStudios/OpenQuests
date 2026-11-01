@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SpeakerViewTest {
 
-    private static final DialogueSource MIRA = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira");
+    private static final DialogueSource MIRA = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", "Lent");
 
     private final OpenDialogueSpeakerAsset villager = speaker("{ \"Name\": \"npc.villager\", \"Epithet\": \"npc.kweebec\", \"Portrait\": \"Icons/Villager.png\", \"AllowNPCOverride\": true }");
 
@@ -21,31 +21,38 @@ class SpeakerViewTest {
     void speakerWithoutOverrideIgnoresNpc() {
         OpenDialogueSpeakerAsset guard = speaker("{ \"Name\": \"npc.guard\" }");
 
-        assertEquals(new SpeakerView("npc.guard", null, null), SpeakerView.of(guard, MIRA, characters("{}")));
+        assertEquals(new SpeakerView("npc.guard", null, null), SpeakerView.of(guard, MIRA, lent("{}")));
     }
 
     @Test
     void overrideTakesNpcName() {
-        assertEquals(new SpeakerView("npc.mira", "npc.kweebec", "Icons/Villager.png"), SpeakerView.of(villager, MIRA, characters(null)));
+        assertEquals(new SpeakerView("npc.mira", "npc.kweebec", "Icons/Villager.png"), SpeakerView.of(villager, MIRA, lent(null)));
     }
 
     @Test
     void overrideFallsBackFieldByField() {
-        SpeakerView view = SpeakerView.of(villager, MIRA, characters("{ \"Portrait\": \"Icons/Mira.png\" }"));
+        SpeakerView view = SpeakerView.of(villager, MIRA, lent("{ \"Portrait\": \"Icons/Mira.png\" }"));
 
         assertEquals(new SpeakerView("npc.mira", "npc.kweebec", "Icons/Mira.png"), view);
     }
 
     @Test
     void overrideWithoutSourceKeepsSpeaker() {
-        assertEquals(new SpeakerView("npc.villager", "npc.kweebec", "Icons/Villager.png"), SpeakerView.of(villager, null, characters(null)));
+        assertEquals(new SpeakerView("npc.villager", "npc.kweebec", "Icons/Villager.png"), SpeakerView.of(villager, null, lent(null)));
     }
 
     @Test
     void overrideWithEmptyNameKeepsSpeakerName() {
-        DialogueSource nameless = new DialogueSource(UUID.randomUUID(), "Herbalist", null);
+        DialogueSource nameless = new DialogueSource(UUID.randomUUID(), "Herbalist", null, "Lent");
 
-        assertEquals("npc.villager", SpeakerView.of(villager, nameless, characters(null)).name());
+        assertEquals("npc.villager", SpeakerView.of(villager, nameless, lent(null)).name());
+    }
+
+    @Test
+    void sourceWithoutLentSpeakerKeepsOwnFields() {
+        DialogueSource plain = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", null);
+
+        assertEquals(new SpeakerView("npc.mira", "npc.kweebec", "Icons/Villager.png"), SpeakerView.of(villager, plain, lent("{ \"Portrait\": \"Icons/Mira.png\" }")));
     }
 
     @Nonnull
@@ -54,12 +61,12 @@ class SpeakerViewTest {
     }
 
     /**
-     * @param speaker the inline speaker lending its fields, {@code null} for a character without one.
-     * @return a lookup giving the source's character the speaker its fields come from.
+     * @param speaker the speaker lending its fields, {@code null} for one no pack declares.
+     * @return a lookup giving the speaker the source lends, by id.
      */
     @Nonnull
-    private static Function<String, OpenDialogueSpeakerAsset> characters(String speaker) {
-        Map<String, OpenDialogueSpeakerAsset> speakers = speaker == null ? Map.of() : Map.of("Herbalist", speaker(speaker));
+    private static Function<String, OpenDialogueSpeakerAsset> lent(String speaker) {
+        Map<String, OpenDialogueSpeakerAsset> speakers = speaker == null ? Map.of() : Map.of("Lent", speaker(speaker));
         return speakers::get;
     }
 }

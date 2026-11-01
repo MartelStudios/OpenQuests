@@ -16,18 +16,18 @@ import java.util.function.Function;
 public record SpeakerView(@Nullable String name, @Nullable String epithet, @Nullable String portrait) {
 
     /**
-     * Only a speaker allowing the NPC override takes the NPC's name and its character speaker's
+     * Only a speaker allowing the NPC override takes the NPC's name and the fields of the speaker it lends
      * fields, each one it does not set falling back to the speaker's own.
      *
-     * @param characterSpeakers the speaker a character lends, by character id, {@code null} for none.
+     * @param speakers a speaker by id, {@code null} for one no pack declares.
      * @return what to show, {@code null} without a speaker.
      */
     @Nullable
-    public static SpeakerView of(@Nullable OpenDialogueSpeakerAsset speaker, @Nullable DialogueSource source, @Nonnull Function<String, OpenDialogueSpeakerAsset> characterSpeakers) {
+    public static SpeakerView of(@Nullable OpenDialogueSpeakerAsset speaker, @Nullable DialogueSource source, @Nonnull Function<String, OpenDialogueSpeakerAsset> speakers) {
         if (speaker == null) return null;
         if (source == null || !speaker.isAllowNPCOverride()) return new SpeakerView(speaker.getName(), speaker.getEpithet(), speaker.getPortrait());
 
-        OpenDialogueSpeakerAsset lent = characterSpeakers.apply(source.character());
+        OpenDialogueSpeakerAsset lent = source.speaker() == null ? null : speakers.apply(source.speaker());
         return new SpeakerView(
             firstSet(source.name(), lent == null ? null : lent.getName(), speaker.getName()),
             firstSet(lent == null ? null : lent.getEpithet(), speaker.getEpithet()),

@@ -106,7 +106,7 @@ class DialogueServiceTest {
 
     @Test
     void openActionCarriesSource() {
-        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira");
+        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", null);
         dialogues.put("Herbs", dialogue("Herbs", "{ \"Responses\": [ { \"Text\": \"bye\" } ] }"));
         service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\", \"Actions\": [ { \"Type\": \"Open\", \"Dialogue\": \"Herbs\" } ] } ] }"), mira);
 
@@ -119,7 +119,7 @@ class DialogueServiceTest {
     @Test
     void plainOpenDropsSource() {
         dialogues.put("Herbs", dialogue("Herbs", "{ \"Responses\": [ { \"Text\": \"bye\" } ] }"));
-        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", null));
 
         service.open(player, "Herbs");
 
