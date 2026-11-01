@@ -1,0 +1,10 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_KweebecVillager",
+  "Pages": [
+    { "Text": "openquestsexamples.kweebec.farmer.text" }
+  ],
+  "Responses": [
+    { "Text": "openquestsexamples.kweebec.farmer.bye", "Actions": [ { "Type": "Close" } ] }
+  ]
+}

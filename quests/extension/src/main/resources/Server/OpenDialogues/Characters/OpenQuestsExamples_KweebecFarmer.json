@@ -1,0 +1,10 @@
+{
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": { "Dialogue": "OpenQuestsExamples_KweebecFarmer" },
+      "Speaker": { "Epithet": "openquestsexamples.kweebec.farmer.epithet" }
+    },
+    { "Type": "Name", "Names": "OpenQuestsExamples_KweebecNames" }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "Uniqueness": "Alive",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": { "Dialogue": "OpenQuestsExamples_KweebecChild" },
+      "Speaker": { "Epithet": "openquestsexamples.kweebec.child.epithet" }
+    },
+    { "Type": "Name", "Names": "OpenQuestsExamples_KweebecNames" }
+  ]
+}

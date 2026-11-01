@@ -144,6 +144,14 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     }
 
     /**
+     * @return the id of the speaker, {@code null} for none, for callers resolving it themselves.
+     */
+    @Nullable
+    public String getSpeakerId() {
+        return speaker;
+    }
+
+    /**
      * @return the pages, in reading order.
      */
     @Nonnull

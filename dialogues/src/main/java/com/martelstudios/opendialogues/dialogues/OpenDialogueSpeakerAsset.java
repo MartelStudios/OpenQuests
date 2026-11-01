@@ -30,6 +30,8 @@ public class OpenDialogueSpeakerAsset implements JsonAssetWithMap<String, Defaul
                                                                                                      .appendInherited(new KeyedCodec<>("Portrait", Codec.STRING), (speaker, portrait) -> speaker.portrait = portrait, speaker -> speaker.portrait, (speaker, parent) -> speaker.portrait = parent.portrait)
                                                                                                      .addValidator(ICON_VALIDATOR)
                                                                                                      .add()
+                                                                                                     .appendInherited(new KeyedCodec<>("AllowNPCOverride", Codec.BOOLEAN), (speaker, allow) -> speaker.allowNPCOverride = allow, speaker -> speaker.allowNPCOverride, (speaker, parent) -> speaker.allowNPCOverride = parent.allowNPCOverride)
+                                                                                                     .add()
                                                                                                      .build();
 
     /**
@@ -48,6 +50,8 @@ public class OpenDialogueSpeakerAsset implements JsonAssetWithMap<String, Defaul
 
     @Nullable
     private String portrait;
+
+    private boolean allowNPCOverride;
 
     protected OpenDialogueSpeakerAsset() {}
 
@@ -93,5 +97,12 @@ public class OpenDialogueSpeakerAsset implements JsonAssetWithMap<String, Defaul
     @Nullable
     public String getPortrait() {
         return portrait;
+    }
+
+    /**
+     * @return whether the NPC a conversation comes from lends this speaker its name and portrait.
+     */
+    public boolean isAllowNPCOverride() {
+        return allowNPCOverride;
     }
 }

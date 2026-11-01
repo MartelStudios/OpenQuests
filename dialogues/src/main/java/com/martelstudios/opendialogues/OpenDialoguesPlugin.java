@@ -3,6 +3,7 @@ package com.martelstudios.opendialogues;
 import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.builtin.asseteditor.event.AssetEditorFetchAutoCompleteDataEvent;
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
@@ -16,6 +17,28 @@ import com.martelstudios.opendialogues.actions.impl.command.OpenDialoguesCommand
 import com.martelstudios.opendialogues.actions.impl.inventory.OpenDialoguesConsumeInventoryAction;
 import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
+import com.martelstudios.opendialogues.characters.CharacterAssets;
+import com.martelstudios.opendialogues.characters.CharacterValidator;
+import com.martelstudios.opendialogues.characters.runtime.CharacterDeathSystem;
+import com.martelstudios.opendialogues.characters.runtime.CharacterHintSystem;
+import com.martelstudios.opendialogues.characters.runtime.CharacterRemovalSystem;
+import com.martelstudios.opendialogues.characters.runtime.CharacterScanSystem;
+import com.martelstudios.opendialogues.characters.runtime.CharacterService;
+import com.martelstudios.opendialogues.characters.runtime.NpcEligibility;
+import com.martelstudios.opendialogues.characters.runtime.CharacterSettings;
+import com.martelstudios.opendialogues.characters.runtime.CharacterTalkSystem;
+import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
+import com.martelstudios.opendialogues.characters.runtime.UniqueCharacters;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesBiomeFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesGroupFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRoleFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesWorldFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesZoneFilter;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
@@ -53,7 +76,8 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-import java.util.SplittableRandom;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.random.RandomGenerator;
 
 /**
  * Dialogues and their speakers as assets: written in the Asset Editor, opened by id and drawn by
@@ -61,15 +85,33 @@ import java.util.SplittableRandom;
  */
 public class OpenDialoguesPlugin extends JavaPlugin {
 
+    /**
+     * Every world draws on its own thread, so each call asks that thread's generator.
+     */
+    private static final RandomGenerator THREAD_RANDOM = new RandomGenerator() {
+        @Override
+        public long nextLong() {
+            return ThreadLocalRandom.current().nextLong();
+        }
+    };
+
     private static OpenDialoguesPlugin instance;
 
     private final DialogueRegistry registry = new DialogueRegistry();
 
     private final Config<DisplayRules> displayRules;
 
+    private final Config<CharacterSettings> characterSettings;
+
     private DialogueService dialogueService;
 
+    private CharacterService characterService;
+
     private ComponentType<EntityStore, DialogueHistory> historyType;
+
+    private ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
+
+    private ResourceType<EntityStore, UniqueCharacters> uniqueCharactersType;
 
     private DialogueHistoryRecorder historyRecorder;
 
@@ -85,6 +127,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         super(init);
         instance = this;
         displayRules = withConfig("Displays", DisplayRules.CODEC);
+        characterSettings = withConfig("Characters", CharacterSettings.CODEC);
     }
 
     public static OpenDialoguesPlugin get() {
@@ -109,13 +152,30 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerCondition(OpenDialoguesInventoryCondition.TYPE, OpenDialoguesInventoryCondition.class, OpenDialoguesInventoryCondition.CODEC);
         registry.registerCondition(OpenDialoguesHasPermissionCondition.TYPE, OpenDialoguesHasPermissionCondition.class, OpenDialoguesHasPermissionCondition.CODEC);
 
+        registry.registerFilter(OpenDialoguesRoleFilter.TYPE, OpenDialoguesRoleFilter.class, OpenDialoguesRoleFilter.CODEC);
+        registry.registerFilter(OpenDialoguesGroupFilter.TYPE, OpenDialoguesGroupFilter.class, OpenDialoguesGroupFilter.CODEC);
+        registry.registerFilter(OpenDialoguesWorldFilter.TYPE, OpenDialoguesWorldFilter.class, OpenDialoguesWorldFilter.CODEC);
+        registry.registerFilter(OpenDialoguesZoneFilter.TYPE, OpenDialoguesZoneFilter.class, OpenDialoguesZoneFilter.CODEC);
+        registry.registerFilter(OpenDialoguesBiomeFilter.TYPE, OpenDialoguesBiomeFilter.class, OpenDialoguesBiomeFilter.CODEC);
+
+        registry.registerTrait(OpenDialoguesDialogueTrait.TYPE, OpenDialoguesDialogueTrait.class, OpenDialoguesDialogueTrait.CODEC);
+        registry.registerTrait(OpenDialoguesNameTrait.TYPE, OpenDialoguesNameTrait.class, OpenDialoguesNameTrait.CODEC);
+
         registry.registerSelector(OpenDialoguesSequenceSelector.TYPE, OpenDialoguesSequenceSelector.class, OpenDialoguesSequenceSelector.CODEC);
         registry.registerSelector(OpenDialoguesWeightedSelector.TYPE, OpenDialoguesWeightedSelector.class, OpenDialoguesWeightedSelector.CODEC);
 
         historyType = getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC);
         historyRecorder = new DialogueHistoryRecorder(historyType);
-        resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
-        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus());
+        identityType = getEntityStoreRegistry().registerComponent(OpenDialoguesNPCIdentity.class, "OpenDialoguesNPCIdentity", OpenDialoguesNPCIdentity.CODEC);
+        uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
+        characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType);
+        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), characterService));
+        getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
+        getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));
+        getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(characterService, identityType));
+        getEntityStoreRegistry().registerSystem(new CharacterRemovalSystem(characterService, identityType, uniqueCharactersType));
+        resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, THREAD_RANDOM);
+        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus(), OpenDialogueSpeakerAsset::getSpeaker);
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
         registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService, DialogueCustomPage::new));
         registry.registerDisplay(PageDisplay.CINEMATIC_ID, new PageDisplay(dialogueService, CinematicDialoguePage::new));
@@ -135,14 +195,33 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .setCodec(OpenDialogueSpeakerAsset.CODEC)
                                                     .setKeyFunction(OpenDialogueSpeakerAsset::getId)
                                                     .build());
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueNameListAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenDialogues/Names/")
+                                                    .setCodec(OpenDialogueNameListAsset.CODEC)
+                                                    .setKeyFunction(OpenDialogueNameListAsset::getId)
+                                                    .build());
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueCharacterAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenDialogues/Characters/")
+                                                    .setCodec(OpenDialogueCharacterAsset.CODEC)
+                                                    .setKeyFunction(OpenDialogueCharacterAsset::getId)
+                                                    .build());
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueDistributionAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenDialogues/Distributions/")
+                                                    .setCodec(OpenDialogueDistributionAsset.CODEC)
+                                                    .setKeyFunction(OpenDialogueDistributionAsset::getId)
+                                                    .build());
 
         onLoaded(OpenDialogueAsset.class, this::validateRouters);
         onLoaded(OpenDialogueAsset.class, this::validateAnswers);
         onLoaded(OpenDialogueRouterAsset.class, this::validateRouters);
+        onLoaded(OpenDialogueCharacterAsset.class, this::validateCharacters);
+        onLoaded(OpenDialogueCharacterAsset.class, () -> characterService.forgetFailures());
+        onLoaded(OpenDialogueDistributionAsset.class, this::validateCharacters);
         getEventRegistry().register(BootEvent.class, event -> {
             booted = true;
             validateRouters();
             validateAnswers();
+            validateCharacters();
         });
 
         getEventRegistry().registerGlobal(DialogueEvent.Opened.class, historyRecorder::onOpened);
@@ -184,6 +263,14 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         }
     }
 
+    /**
+     * Only logged: a character leading nowhere still names its NPC, pressing F just opens nothing.
+     */
+    private void validateCharacters() {
+        if (!booted) return;
+        for (String problem : CharacterValidator.validate(CharacterAssets.live())) getLogger().atSevere().log("%s", problem);
+    }
+
     private static void suggest(@Nonnull AssetEditorFetchAutoCompleteDataEvent event, @Nonnull Collection<String> ids) {
         String query = event.getQuery().toLowerCase(Locale.ROOT);
         event.setResults(ids.stream().filter(id -> id.toLowerCase(Locale.ROOT).contains(query)).sorted().toArray(String[]::new));
@@ -209,5 +296,29 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     @Nonnull
     public ComponentType<EntityStore, DialogueHistory> getHistoryType() {
         return historyType;
+    }
+
+    /**
+     * @return who each NPC became, saved on the NPC, for bridges finding a given NPC's character.
+     */
+    @Nonnull
+    public ComponentType<EntityStore, OpenDialoguesNPCIdentity> getIdentityType() {
+        return identityType;
+    }
+
+    /**
+     * @return the unique characters each world gave away, saved with the world.
+     */
+    @Nonnull
+    public ResourceType<EntityStore, UniqueCharacters> getUniqueCharactersType() {
+        return uniqueCharactersType;
+    }
+
+    /**
+     * @return gives, applies and takes back NPC characters, for bridges and commands, on the world thread.
+     */
+    @Nonnull
+    public CharacterService getCharacterService() {
+        return characterService;
     }
 }

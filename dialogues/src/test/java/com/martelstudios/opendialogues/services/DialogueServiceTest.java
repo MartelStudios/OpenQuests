@@ -3,17 +3,22 @@ package com.martelstudios.opendialogues.services;
 import com.hypixel.hytale.event.EventBus;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
+import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.ConditionFixtures;
+import com.martelstudios.opendialogues.CodecJson;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
+import com.martelstudios.opendialogues.dialogues.SpeakerView;
 import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 import com.martelstudios.opendialogues.services.DialogueService.AnswerResult;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
+import com.martelstudios.opendialogues.sessions.DialogueSource;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
@@ -27,6 +32,7 @@ import java.util.UUID;
 import static com.martelstudios.opendialogues.dialogues.DialogueFixtures.dialogue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DialogueServiceTest {
@@ -70,6 +76,7 @@ class DialogueServiceTest {
     private final ConditionContext context = ConditionFixtures.context(history);
     private final RecordingDisplay display = new RecordingDisplay();
     private final Map<String, OpenDialogueAsset> dialogues = new HashMap<>();
+    private final Map<String, OpenDialogueSpeakerAsset> speakers = new HashMap<>();
     private final EventBus bus = new EventBus(false);
     private final List<DialogueEvent> events = new ArrayList<>();
     private final DialogueService service;
@@ -77,6 +84,7 @@ class DialogueServiceTest {
     DialogueServiceTest() {
         DialogueRegistry registry = new DialogueRegistry();
         registry.registerAction(OpenDialoguesCloseAction.TYPE, OpenDialoguesCloseAction.class, OpenDialoguesCloseAction.CODEC);
+        registry.registerAction(OpenDialoguesOpenAction.TYPE, OpenDialoguesOpenAction.class, OpenDialoguesOpenAction.CODEC);
         registry.registerDisplay(DISPLAY, display);
         DialogueResolver resolver = new DialogueResolver(dialogues::get, id -> null, new Random(0));
         // No rule, so every dialogue falls back to the test display without asking the asset store for its pack
@@ -89,7 +97,7 @@ class DialogueServiceTest {
         bus.registerGlobal(DialogueEvent.Opened.class, events::add);
         bus.registerGlobal(DialogueEvent.Answered.class, events::add);
         bus.registerGlobal(DialogueEvent.Closed.class, events::add);
-        service = new DialogueService(registry, () -> rules, DISPLAY, resolver, p -> context, bus);
+        service = new DialogueService(registry, () -> rules, DISPLAY, resolver, p -> context, bus, speakers::get);
     }
 
     private List<String> eventNames() {
@@ -101,8 +109,41 @@ class DialogueServiceTest {
     }
 
     @Test
+    void openActionCarriesSource() {
+        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", null);
+        dialogues.put("Herbs", dialogue("Herbs", "{ \"Responses\": [ { \"Text\": \"bye\" } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\", \"Actions\": [ { \"Type\": \"Open\", \"Dialogue\": \"Herbs\" } ] } ] }"), mira);
+
+        service.answer(player, "Elder", 1);
+
+        assertEquals("Herbs", display.shown.getLast().dialogueId());
+        assertEquals(mira, display.shown.getLast().source());
+    }
+
+    @Test
+    void sessionCarriesSpeakerViewBuiltAtOpen() {
+        speakers.put("Villager", CodecJson.decodeUnvalidated(OpenDialogueSpeakerAsset.CODEC, "{ \"Name\": \"npc.villager\", \"AllowNPCOverride\": true }"));
+        speakers.put("Lent", CodecJson.decodeUnvalidated(OpenDialogueSpeakerAsset.CODEC, "{ \"Epithet\": \"npc.herbalist\" }"));
+        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", "Lent");
+
+        service.open(player, dialogue("Elder", "{ \"Speaker\": \"Villager\", \"Responses\": [ { \"Text\": \"a\" } ] }"), mira);
+
+        assertEquals(new SpeakerView("npc.mira", "npc.herbalist", null), display.shown.getLast().speaker());
+    }
+
+    @Test
+    void plainOpenDropsSource() {
+        dialogues.put("Herbs", dialogue("Herbs", "{ \"Responses\": [ { \"Text\": \"bye\" } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", null));
+
+        service.open(player, "Herbs", null);
+
+        assertNull(display.shown.getLast().source());
+    }
+
+    @Test
     void openingShowsOnlyTheAnswersWhoseWhenHolds() {
-        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" }, { \"Text\": \"b\", " + AFTER_WELCOME + " }, { \"Text\": \"c\" } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" }, { \"Text\": \"b\", " + AFTER_WELCOME + " }, { \"Text\": \"c\" } ] }"), null);
 
         assertEquals(List.of("a", "c"), texts(display.shown.getFirst()));
         assertEquals(List.of("Opened"), eventNames());
@@ -110,7 +151,7 @@ class DialogueServiceTest {
 
     @Test
     void anAnswerRunsItsActionsAfterAnnouncingIt() {
-        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\", " + CLOSE + " } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\", " + CLOSE + " } ] }"), null);
 
         assertEquals(AnswerResult.ANSWERED, service.answer(player, "Elder", 1));
 
@@ -121,7 +162,7 @@ class DialogueServiceTest {
 
     @Test
     void aStaleAnswerRefreshesTheAnswersWithoutRunningAnything() {
-        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" }, { \"Text\": \"b\", " + UNTIL_WELCOME + ", " + CLOSE + " } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" }, { \"Text\": \"b\", " + UNTIL_WELCOME + ", " + CLOSE + " } ] }"), null);
         history.recordOpened("Elder_Welcome");
 
         assertEquals(AnswerResult.REFRESHED, service.answer(player, null, 2));
@@ -135,7 +176,7 @@ class DialogueServiceTest {
 
     @Test
     void aDialogueWithoutVisibleAnswerEndsAsSoonAsShown() {
-        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"b\", " + AFTER_WELCOME + " } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"b\", " + AFTER_WELCOME + " } ] }"), null);
 
         assertEquals(List.of("Opened", "Closed"), eventNames());
         assertEquals(1, display.shown.size());
@@ -145,8 +186,8 @@ class DialogueServiceTest {
 
     @Test
     void openingAnotherDialogueClosesTheOneOpen() {
-        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"));
-        service.open(player, dialogue("Smith", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), null);
+        service.open(player, dialogue("Smith", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), null);
 
         assertEquals(List.of("Opened", "Closed", "Opened"), eventNames());
         assertEquals("Elder", display.closed.getFirst().dialogueId());
@@ -157,7 +198,7 @@ class DialogueServiceTest {
     void anAnswerNeedsTheDialogueNamedAndAnAnswerShown() {
         assertEquals(AnswerResult.NO_DIALOGUE, service.answer(player, null, 1));
 
-        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), null);
 
         assertEquals(AnswerResult.NO_DIALOGUE, service.answer(player, "Smith", 1));
         assertEquals(AnswerResult.NO_SUCH_ANSWER, service.answer(player, "Elder", 0));
@@ -172,7 +213,7 @@ class DialogueServiceTest {
         bus.register(DialogueEvent.Opened.class, "Elder", elder::add);
         bus.register(DialogueEvent.Opened.class, "Smith", smith::add);
 
-        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), null);
 
         assertEquals(1, elder.size());
         assertTrue(smith.isEmpty());
@@ -182,8 +223,8 @@ class DialogueServiceTest {
     void anIdOpensTheDialogueItLeadsTo() {
         dialogues.put("Elder", dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"));
 
-        assertTrue(service.open(player, "Elder"));
-        assertFalse(service.open(player, "Missing"));
+        assertTrue(service.open(player, "Elder", null));
+        assertFalse(service.open(player, "Missing", null));
 
         assertEquals(1, display.shown.size());
         assertEquals(List.of("Opened"), eventNames());
@@ -191,7 +232,7 @@ class DialogueServiceTest {
 
     @Test
     void aPlayerLeavingEndsTheDialogueWithoutDrawing() {
-        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), null);
 
         service.forget(player);
 
