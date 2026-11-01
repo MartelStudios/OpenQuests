@@ -1,6 +1,11 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
 import com.hypixel.hytale.event.IEventBus;
+import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
+import com.hypixel.hytale.server.core.modules.entity.component.DisplayNameComponent;
+import com.hypixel.hytale.server.core.modules.entity.component.Interactable;
+import com.hypixel.hytale.server.core.modules.entity.component.PersistentDisplayName;
+import com.hypixel.hytale.server.core.modules.interaction.Interactions;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.characters.CharacterAssets;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
@@ -82,11 +87,17 @@ public class CharacterService {
     }
 
     /**
-     * Runs the traits' {@code onApplied} again, for an NPC met after a reload.
+     * Runs the traits' {@code onApplied} again, for an NPC met after a reload. An NPC whose character
+     * no pack declares any more is cleaned up, so it may draw again; its draws stay.
      */
     public void apply(@Nonnull CharacterNpc npc) {
-        OpenDialogueCharacterAsset character = characterOf(npc);
-        if (character == null) return;
+        String characterId = npc.identity().getCharacter();
+        if (characterId == null) return;
+        OpenDialogueCharacterAsset character = assets.character(characterId);
+        if (character == null) {
+            forgetStale(npc, characterId);
+            return;
+        }
         CharacterContext context = context(npc, character);
         each(character, "onApplied", trait -> trait.onApplied(context));
     }
@@ -149,6 +160,23 @@ public class CharacterService {
      */
     public void forgetFailures() {
         reported.clear();
+    }
+
+    /**
+     * No trait is left to undo what the core traits put on the NPC, so their components go here.
+     */
+    private void forgetStale(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
+        if (reported.add("stale/" + characterId)) warnings.accept("NPCs carry the character '" + characterId + "' no pack declares any more; they become nobody.", null);
+        npc.unique().release(npc.uuid(), ReleaseReason.Revoked, assets::character);
+        npc.identity().setCharacter(null);
+        npc.identity().setName(null);
+        if (npc.accessor() == null) return;
+        npc.accessor().tryRemoveComponent(npc.ref(), PersistentDisplayName.getComponentType());
+        npc.accessor().tryRemoveComponent(npc.ref(), DisplayNameComponent.getComponentType());
+        npc.accessor().tryRemoveComponent(npc.ref(), Nameplate.getComponentType());
+        Interactions interactions = npc.accessor().getComponent(npc.ref(), Interactions.getComponentType());
+        if (interactions != null) interactions.setInteractionHint(null);
+        npc.accessor().tryRemoveComponent(npc.ref(), Interactable.getComponentType());
     }
 
     @Nullable

@@ -190,6 +190,54 @@ class CharacterServiceTest {
         assertFalse(service.use(oak, player()));
     }
 
+    @Test
+    void deathThenRemovalKeepsForeverConsumed() {
+        character("Oak", "Forever", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.give(npc, "Oak");
+        RecordingTrait.LOG.clear();
+
+        service.release(npc, ReleaseReason.Death);
+        service.release(npc, ReleaseReason.Removed);
+
+        assertFalse(unique.isAvailable("Oak", characters::get));
+        assertEquals(List.of("b:released", "a:released"), RecordingTrait.LOG);
+    }
+
+    @Test
+    void removalFreesForever() {
+        character("Oak", "Forever", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.give(npc, "Oak");
+
+        service.release(npc, ReleaseReason.Removed);
+
+        assertTrue(unique.isAvailable("Oak", characters::get));
+    }
+
+    @Test
+    void applyOnUnknownCharacterCleansAndAllowsRedraw() {
+        character("Mira", "None", AB);
+        distribution("D2", "{ \"Character\": \"Mira\" }");
+        CharacterNpc npc = npc();
+        npc.identity().setCharacter("Gone");
+        npc.identity().setName("npc.gone");
+        npc.identity().recordDraw("D1");
+        unique.claim("Gone", npc.uuid());
+        CharacterService service = service();
+
+        service.apply(npc);
+
+        assertNull(npc.identity().getCharacter());
+        assertNull(npc.identity().getName());
+        assertEquals(Set.of("D1"), npc.identity().getDraws());
+        assertNull(unique.claimant("Gone"));
+        assertEquals(1, warnings.size());
+        assertEquals("Mira", service.draw(npc, kweebec("Zone1")));
+    }
+
     private void assertRefused(@Nonnull CharacterService service, @Nonnull CharacterNpc npc, @Nonnull String characterId) {
         assertFalse(service.give(npc, characterId));
         assertEquals(List.of(), RecordingTrait.LOG);
