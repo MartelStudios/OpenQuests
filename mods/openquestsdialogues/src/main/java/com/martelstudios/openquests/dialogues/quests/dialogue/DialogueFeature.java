@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.dialogues.quests.dialogue;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.opendialogues.characters.events.CharacterEvent;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
@@ -16,7 +17,7 @@ public final class DialogueFeature {
     private DialogueFeature() {}
 
     /**
-     * Registers the quest type and the dialogue events feeding it.
+     * Registers the quest type, the dialogue events feeding it and the death notices of its targets.
      */
     public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         services.getQuestProgressionService().registerQuestType(TYPE_ID, OpenQuestsDialogueAsset.class, OpenQuestsDialogueAsset.CODEC, DialogueQuestProgression.class, DialogueQuestProgression.CODEC);
@@ -25,5 +26,6 @@ public final class DialogueFeature {
         plugin.getEventRegistry().registerGlobal(DialogueEvent.Opened.class, events::onOpened);
         plugin.getEventRegistry().registerGlobal(DialogueEvent.Answered.class, events::onAnswered);
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, events::onQuestAssigned);
+        plugin.getEventRegistry().registerGlobal(CharacterEvent.Released.class, new DialogueQuestDeathNotices(services.getQuestProgressionService())::onReleased);
     }
 }

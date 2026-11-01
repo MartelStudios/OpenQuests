@@ -77,4 +77,55 @@ class DialogueHistoryTest {
         assertEquals(0, history.opened("Elder_Welcome"));
         assertEquals(0, history.answered("Elder_Welcome", "Accept"));
     }
+
+    @Test
+    void countsAreKeptPerCharacter() {
+        DialogueHistory history = new DialogueHistory();
+        history.recordOpened("Farmer", "Greeting");
+        history.recordOpened("Farmer", "Greeting");
+        history.recordOpened("Mage", "Greeting");
+        history.recordOpened(null, "Greeting");
+        history.recordAnswer("Farmer", "Greeting", "Bye");
+
+        assertEquals(4, history.opened("Greeting"));
+        assertEquals(2, history.count("Farmer", "Greeting", null));
+        assertEquals(2, history.count("Farmer", null, null));
+        assertEquals(4, history.count(null, null, null));
+        assertEquals(1, history.count("Farmer", null, "Bye"));
+        assertEquals(1, history.count(null, null, "Bye"));
+        assertEquals(0, history.count("Mage", null, "Bye"));
+    }
+
+    @Test
+    void perCharacterCountsSurviveACodecRoundTrip() {
+        DialogueHistory history = new DialogueHistory();
+        history.recordOpened("Farmer", "Greeting");
+        history.recordAnswer(null, "Greeting", "Bye");
+
+        DialogueHistory read = CodecJson.roundTrip(DialogueHistory.CODEC, history);
+
+        assertEquals(1, read.count("Farmer", "Greeting", null));
+        assertEquals(1, read.count(null, "Greeting", "Bye"));
+    }
+
+    @Test
+    void anOldHistoryLoadsWithoutCharacter() {
+        DialogueHistory read = CodecJson.decodeUnvalidated(DialogueHistory.CODEC, "{\"Dialogues\":{\"Greeting\":{\"Opened\":2,\"Answers\":{\"Bye\":1}}}}");
+
+        assertEquals(2, read.opened("Greeting"));
+        assertEquals(1, read.answered("Greeting", "Bye"));
+        assertEquals(0, read.count("Farmer", null, null));
+    }
+
+    @Test
+    void clearingADialogueClearsItUnderEveryCharacter() {
+        DialogueHistory history = new DialogueHistory();
+        history.recordOpened("Farmer", "Greeting");
+        history.recordOpened(null, "Greeting");
+        history.recordOpened("Farmer", "Harvest");
+
+        assertTrue(history.clear("Greeting"));
+        assertEquals(0, history.opened("Greeting"));
+        assertEquals(1, history.count("Farmer", "Harvest", null));
+    }
 }

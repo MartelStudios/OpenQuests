@@ -12,6 +12,8 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -79,5 +81,20 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
     @Nonnull
     public CharacterTrait[] getTraits() {
         return traits;
+    }
+
+    /**
+     * Names the character where no drawn name fits, such as a quest title shared by every carrier.
+     *
+     * @return the epithet translation key of its first dialogue trait's speaker, {@code null} for none.
+     */
+    @Nullable
+    public String getEpithet() {
+        for (CharacterTrait trait : traits) {
+            if (!(trait instanceof OpenDialoguesDialogueTrait dialogue) || dialogue.getSpeaker() == null) continue;
+            OpenDialogueSpeakerAsset speaker = OpenDialogueSpeakerAsset.getSpeaker(dialogue.getSpeaker());
+            return speaker == null ? null : speaker.getEpithet();
+        }
+        return null;
     }
 }

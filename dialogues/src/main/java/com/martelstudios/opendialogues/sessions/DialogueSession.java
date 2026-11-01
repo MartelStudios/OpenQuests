@@ -26,4 +26,12 @@ public record DialogueSession(@Nonnull OpenDialogueAsset dialogue, @Nonnull List
     public String dialogueId() {
         return dialogue.getId();
     }
+
+    /**
+     * @return the character of the NPC the conversation was opened from, {@code null} without one.
+     */
+    @Nullable
+    public String characterId() {
+        return source == null ? null : source.character();
+    }
 }

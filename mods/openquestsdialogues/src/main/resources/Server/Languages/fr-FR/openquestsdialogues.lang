@@ -1,2 +1,7 @@
 quest.default.dialogue = Discuter avec {dialogue}{quantity, plural, one {} other { {quantity, number} fois}}
 quest.default.answer = Donner une réponse à {dialogue}{quantity, plural, one {} other { {quantity, number} fois}}
+quest.default.any = Avoir une conversation{quantity, plural, one {} other { {quantity, number} fois}}
+quest.default.anyAnswer = Donner une réponse{quantity, plural, one {} other { {quantity, number} fois}}
+quest.default.character = Parler à {character}{quantity, plural, one {} other { {quantity, number} fois}}
+quest.default.characterDialogue = Parler de {dialogue} à {character}{quantity, plural, one {} other { {quantity, number} fois}}
+quest.default.characterAnswer = Répondre à {character}{quantity, plural, one {} other { {quantity, number} fois}}
