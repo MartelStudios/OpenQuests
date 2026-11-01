@@ -7,10 +7,13 @@ import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.spatial.SpatialResource;
 import com.hypixel.hytale.component.system.DelayedSystem;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.protocol.InteractionType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.UUIDComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
+import com.hypixel.hytale.server.core.modules.i18n.I18nModule;
 import com.hypixel.hytale.server.core.modules.entity.component.DisplayNameComponent;
 import com.hypixel.hytale.server.core.modules.entity.component.Interactable;
 import com.hypixel.hytale.server.core.modules.entity.component.PersistentDisplayName;
@@ -24,6 +27,7 @@ import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.interactions.UseNPCInteraction;
 import com.hypixel.hytale.server.npc.role.Role;
+import com.hypixel.hytale.server.npc.instructions.Instruction;
 import com.hypixel.hytale.server.npc.role.support.WorldSupport;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
@@ -49,6 +53,8 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
      * Shown when a character names no hint of its own.
      */
     public static final String DEFAULT_HINT = "server.interactionHints.generic";
+
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     private final double radius;
     private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
@@ -93,7 +99,7 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
         OpenDialoguesNPCIdentity stored = store.getComponent(ref, identityType);
         if (stored != null && stored.getCharacter() != null) {
             OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(stored.getCharacter());
-            if (character != null) makeTalkative(store, ref, character);
+            if (character != null) makeTalkative(store, ref, character, stored.getName());
             return;
         }
 
@@ -108,6 +114,7 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
         if (identity.getDraws().size() == drawsBefore) return;
 
         OpenDialogueCharacterAsset character = characterId == null ? null : OpenDialogueCharacterAsset.getCharacter(characterId);
+        LOGGER.atFine().log("NPC %s (%s) drew %s.", uuid.getUuid(), npc.getRoleName(), characterId == null ? "nobody" : "character '" + characterId + "'");
         if (character != null) {
             identity.setName(drawName(character));
             if (character.getUniqueness() != Uniqueness.None) unique.claim(characterId, uuid.getUuid());
@@ -116,7 +123,7 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
                 store.putComponent(ref, PersistentDisplayName.getComponentType(), new PersistentDisplayName(name));
                 store.putComponent(ref, DisplayNameComponent.getComponentType(), new DisplayNameComponent(name));
             }
-            makeTalkative(store, ref, character);
+            makeTalkative(store, ref, character, identity.getName());
         }
         store.putComponent(ref, identityType, identity);
     }
@@ -126,7 +133,8 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
      */
     private static boolean untouched(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull NPCEntity npc) {
         Role role = npc.getRole();
-        if (role != null && role.getInteractionInstruction() != null) return false;
+        Instruction instruction = role == null ? null : role.getInteractionInstruction();
+        if (instruction != null && instruction.componentCount() > 1) return false;
         Interactions interactions = store.getComponent(ref, Interactions.getComponentType());
         return interactions != null && UseNPCInteraction.DEFAULT_ID.equals(interactions.getInteractionId(InteractionType.Use));
     }
@@ -149,9 +157,14 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
     }
 
     /**
-     * Interactable is ensured on every scan, since nothing says it outlives a chunk reload.
+     * Interactable and the nameplate are ensured on every scan, since nothing says they outlive a
+     * chunk reload. A nameplate is plain text, so the name shows in the server language.
      */
-    private static void makeTalkative(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull OpenDialogueCharacterAsset character) {
+    private static void makeTalkative(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull OpenDialogueCharacterAsset character, @Nullable String name) {
+        if (name != null && store.getComponent(ref, Nameplate.getComponentType()) == null) {
+            String text = I18nModule.get().getMessage(I18nModule.DEFAULT_LANGUAGE, name);
+            store.putComponent(ref, Nameplate.getComponentType(), new Nameplate(text != null ? text : name));
+        }
         store.ensureComponent(ref, Interactable.getComponentType());
         Interactions interactions = store.getComponent(ref, Interactions.getComponentType());
         String hint = character.getHint() != null ? character.getHint() : DEFAULT_HINT;
