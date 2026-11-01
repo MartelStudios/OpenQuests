@@ -66,6 +66,9 @@ public class OpenQuestsDialogueAsset extends QuantityQuestAsset {
         return QuantityQuestProgression.Builder.of(new DialogueQuestProgression(), getId());
     }
 
+    /**
+     * Read by the death notices to find who holds a quest aimed at a character that just died.
+     */
     @Nullable
     public String getCharacter() {
         return character;

@@ -37,13 +37,21 @@ public final class CharacterDeathAnnouncer {
     @Nullable
     public static Message message(@Nonnull CharacterEvent.Released event) {
         OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(event.getCharacter());
-        String epithet = character == null ? null : character.getEpithet();
-        String name = event.getName();
+        return message(event.getName(), character == null ? null : character.getEpithet());
+    }
+
+    /**
+     * @param name    the translation key of the drawn name, {@code null} for a nameless NPC.
+     * @param epithet the translation key of the character's epithet, {@code null} for none.
+     * @return the line for that death, {@code null} when there is neither.
+     */
+    @Nullable
+    static Message message(@Nullable String name, @Nullable String epithet) {
         if (name == null && epithet == null) return null;
 
         String key = name == null ? "epithet" : epithet == null ? "name" : "named";
         Message message = Message.translation("opendialogues.character.death." + key);
-        if (name != null) message.param("name", name);
+        if (name != null) message.param("name", Message.translation(name));
         if (epithet != null) message.param("epithet", Message.translation(epithet));
         return message;
     }
