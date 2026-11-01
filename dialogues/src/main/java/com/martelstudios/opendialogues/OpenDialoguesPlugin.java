@@ -22,6 +22,8 @@ import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
 import com.martelstudios.opendialogues.characters.CharacterAssets;
 import com.martelstudios.opendialogues.characters.CharacterValidator;
+import com.martelstudios.opendialogues.characters.events.CharacterEvent;
+import com.martelstudios.opendialogues.characters.runtime.CharacterDeathAnnouncer;
 import com.martelstudios.opendialogues.characters.runtime.CharacterDeathSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterHintSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterRemovalSystem;
@@ -226,6 +228,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         getEventRegistry().registerGlobal(DialogueEvent.Opened.class, historyRecorder::onOpened);
         getEventRegistry().registerGlobal(DialogueEvent.Answered.class, historyRecorder::onAnswered);
+        getEventRegistry().registerGlobal(CharacterEvent.Released.class, CharacterDeathAnnouncer::onReleased);
 
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
         getEventRegistry().register(AssetEditorFetchAutoCompleteDataEvent.class, DialogueRegistry.DISPLAYS_DATA_SET, event -> suggest(event, registry.getDisplayIds()));

@@ -1,0 +1,3 @@
+character.death.named = Word spreads that {name}, {epithet}, has drawn their last breath.
+character.death.name = Word spreads that {name} has drawn their last breath.
+character.death.epithet = Word spreads that the {epithet} has drawn their last breath.
