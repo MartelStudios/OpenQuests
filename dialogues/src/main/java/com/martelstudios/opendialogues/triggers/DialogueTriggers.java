@@ -31,7 +31,7 @@ public final class DialogueTriggers {
         if (ref == null || !ref.isValid()) return;
 
         ref.getStore().getExternalData().getWorld().execute(() -> {
-            if (dialogueId == null || !OpenDialoguesPlugin.get().getDialogueService().open(player, dialogueId)) {
+            if (dialogueId == null || !OpenDialoguesPlugin.get().getDialogueService().open(player, dialogueId, null)) {
                 LOGGER.atWarning().log("%s opens '%s', which leads to no dialogue.", source, dialogueId);
             }
         });

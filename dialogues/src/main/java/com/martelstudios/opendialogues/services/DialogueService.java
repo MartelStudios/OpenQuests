@@ -67,19 +67,24 @@ public class DialogueService {
     @Nonnull
     private final IEventBus events;
 
+    @Nonnull
+    private final Function<String, OpenDialogueSpeakerAsset> speakers;
+
     /**
      * @param rules           read on each opening, since the config behind them can be reloaded.
      * @param fallbackDisplay drawing a dialogue when every display the rules name is missing.
      * @param contexts        what conditions are judged against for a player, read anew on each check.
      * @param events          where openings, answers and closings are announced.
+     * @param speakers        a speaker by id, {@code null} for one no pack declares.
      */
-    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, ConditionContext> contexts, @Nonnull IEventBus events) {
+    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, ConditionContext> contexts, @Nonnull IEventBus events, @Nonnull Function<String, OpenDialogueSpeakerAsset> speakers) {
         this.registry = registry;
         this.rules = rules;
         this.fallbackDisplay = fallbackDisplay;
         this.resolver = resolver;
         this.contexts = contexts;
         this.events = events;
+        this.speakers = speakers;
     }
 
     /**
@@ -100,15 +105,6 @@ public class DialogueService {
      * Shows the dialogue an id leads to, a dialogue under it first, else what the router under it
      * picks for that player, in place of the dialogue open.
      *
-     * @return whether the id led to a dialogue.
-     */
-    public boolean open(@Nonnull PlayerRef player, @Nonnull String id) {
-        return open(player, id, null);
-    }
-
-    /**
-     * Shows the dialogue an id leads to, as {@link #open(PlayerRef, String)} does, spoken from an NPC.
-     *
      * @param source the NPC the conversation comes from, {@code null} for none.
      * @return whether the id led to a dialogue.
      */
@@ -117,16 +113,7 @@ public class DialogueService {
     }
 
     /**
-     * Shows the dialogue a target leads to for that player.
-     *
-     * @return whether the target led to a dialogue.
-     */
-    public boolean open(@Nonnull PlayerRef player, @Nonnull OpenDialoguesTarget target) {
-        return open(player, target, null);
-    }
-
-    /**
-     * Shows the dialogue a target leads to for that player, spoken from an NPC.
+     * Shows the dialogue a target leads to for that player, in place of the dialogue open.
      *
      * @param source the NPC the conversation comes from, {@code null} for none.
      * @return whether the target led to a dialogue.
@@ -144,21 +131,11 @@ public class DialogueService {
     }
 
     /**
-     * Shows a dialogue to a player, one from the store or one written inline, in place of the
-     * dialogue open. With no answer for the player to see, it ends as soon as shown. Off the
-     * player's world thread, conditions see no history nor inventory, so answers needing them hide.
+     * Shows a resolved dialogue in place of the dialogue open; with no answer to see, it ends as soon
+     * as shown. Off the player's world thread, conditions see no history nor inventory.
      */
-    public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue) {
-        open(player, dialogue, null);
-    }
-
-    /**
-     * Shows a dialogue as {@link #open(PlayerRef, OpenDialogueAsset)} does, spoken from an NPC.
-     *
-     * @param source the NPC the conversation comes from, {@code null} for none.
-     */
-    public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
-        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue), source, SpeakerView.of(dialogue.getSpeaker(), source, OpenDialogueSpeakerAsset::getSpeaker));
+    void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
+        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue), source, SpeakerView.of(dialogue.getSpeakerId() == null ? null : speakers.apply(dialogue.getSpeakerId()), source, speakers));
         DialogueSession replaced = sessions.put(player.getUuid(), session);
         if (replaced != null) closed(player, replaced);
         session.display().show(player, session);
