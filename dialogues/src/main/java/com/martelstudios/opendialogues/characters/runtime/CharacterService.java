@@ -23,6 +23,7 @@ import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
@@ -45,6 +46,7 @@ public class CharacterService {
     private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
     private final ResourceType<EntityStore, UniqueCharacters> uniqueType;
     private final Set<String> reported = ConcurrentHashMap.newKeySet();
+    private final Map<String, OpenDialogueCharacterAsset> lastKnown = new ConcurrentHashMap<>();
 
     /**
      * @param eligible whether an NPC may receive a character at all, so no mod's NPC is taken over.
@@ -134,7 +136,7 @@ public class CharacterService {
      */
     boolean give(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
         if (npc.identity().getCharacter() != null || !eligible.test(npc.accessor(), npc.ref())) return false;
-        OpenDialogueCharacterAsset character = assets.character(characterId);
+        OpenDialogueCharacterAsset character = character(characterId);
         if (character == null || !npc.unique().isAvailable(characterId, assets::character)) return false;
 
         if (character.getUniqueness().claims()) npc.unique().claim(characterId, npc.uuid());
@@ -153,7 +155,7 @@ public class CharacterService {
     void apply(@Nonnull CharacterNpc npc) {
         String characterId = npc.identity().getCharacter();
         if (characterId == null) return;
-        OpenDialogueCharacterAsset character = assets.character(characterId);
+        OpenDialogueCharacterAsset character = character(characterId);
         if (character == null) {
             forgetStale(npc, characterId);
             return;
@@ -186,7 +188,11 @@ public class CharacterService {
     void release(@Nonnull CharacterNpc npc, @Nonnull ReleaseReason reason) {
         String characterId = npc.identity().getCharacter();
         if (characterId == null) return;
-        OpenDialogueCharacterAsset character = assets.character(characterId);
+        OpenDialogueCharacterAsset character = character(characterId);
+        releaseWith(npc, reason, characterId, character != null ? character : lastKnown.get(characterId));
+    }
+
+    private void releaseWith(@Nonnull CharacterNpc npc, @Nonnull ReleaseReason reason, @Nonnull String characterId, @Nullable OpenDialogueCharacterAsset character) {
         if (character != null) {
             CharacterContext context = context(npc, character);
             CharacterTrait[] traits = character.getTraits();
@@ -195,7 +201,7 @@ public class CharacterService {
                 run(trait, character, "onReleased", () -> trait.onReleased(context, reason));
             }
         }
-        npc.unique().release(npc.uuid(), reason, assets::character);
+        npc.unique().release(npc.uuid(), reason, id -> { OpenDialogueCharacterAsset found = character(id); return found != null ? found : lastKnown.get(id); });
         String name = npc.identity().getName();
         npc.identity().setCharacter(null);
         npc.identity().setName(null);
@@ -207,7 +213,7 @@ public class CharacterService {
      */
     @Nullable
     public String hint(@Nonnull OpenDialoguesNPCIdentity identity) {
-        OpenDialogueCharacterAsset character = identity.getCharacter() == null ? null : assets.character(identity.getCharacter());
+        OpenDialogueCharacterAsset character = identity.getCharacter() == null ? null : character(identity.getCharacter());
         if (character == null) return null;
         for (CharacterTrait trait : character.getTraits()) {
             if (trait.interactionHint() != null) return trait.interactionHint();
@@ -223,14 +229,14 @@ public class CharacterService {
     }
 
     /**
-     * No trait is left to undo what the core traits put on the NPC, so their components go here.
+     * Released through the traits last seen for that id. Known to no one since the server started,
+     * only the core traits' components can be removed.
      */
     private void forgetStale(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
         if (reported.add("stale/" + characterId)) warnings.accept("NPCs carry the character '" + characterId + "' no pack declares any more; they become nobody.", null);
-        npc.unique().release(npc.uuid(), ReleaseReason.Revoked, assets::character);
-        npc.identity().setCharacter(null);
-        npc.identity().setName(null);
-        if (npc.accessor() == null) return;
+        OpenDialogueCharacterAsset known = lastKnown.get(characterId);
+        releaseWith(npc, ReleaseReason.Revoked, characterId, known);
+        if (known != null || npc.accessor() == null) return;
         npc.accessor().tryRemoveComponent(npc.ref(), PersistentDisplayName.getComponentType());
         npc.accessor().tryRemoveComponent(npc.ref(), DisplayNameComponent.getComponentType());
         npc.accessor().tryRemoveComponent(npc.ref(), Nameplate.getComponentType());
@@ -241,7 +247,17 @@ public class CharacterService {
 
     @Nullable
     private OpenDialogueCharacterAsset characterOf(@Nonnull CharacterNpc npc) {
-        return npc.identity().getCharacter() == null ? null : assets.character(npc.identity().getCharacter());
+        return npc.identity().getCharacter() == null ? null : character(npc.identity().getCharacter());
+    }
+
+    /**
+     * Remembers every character seen, so NPCs still carrying one a reload deleted can be released by its traits.
+     */
+    @Nullable
+    private OpenDialogueCharacterAsset character(@Nonnull String characterId) {
+        OpenDialogueCharacterAsset character = assets.character(characterId);
+        if (character != null) lastKnown.put(characterId, character);
+        return character;
     }
 
     @Nonnull

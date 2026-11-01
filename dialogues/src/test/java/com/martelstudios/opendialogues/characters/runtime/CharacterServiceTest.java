@@ -284,6 +284,24 @@ class CharacterServiceTest {
         assertEquals(second.uuid(), unique.claimant("Oak"));
     }
 
+    @Test
+    void deletedCharacterIsReleasedThroughItsLastKnownTraits() {
+        character("Oak", "Forever", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.give(npc, "Oak");
+        characters.remove("Oak");
+        RecordingTrait.LOG.clear();
+        heard.clear();
+
+        service.apply(npc);
+
+        assertEquals(List.of("b:released", "a:released"), RecordingTrait.LOG);
+        assertEquals(ReleaseReason.Revoked, ((CharacterEvent.Released) heard.getFirst()).getReason());
+        assertNull(unique.claimant("Oak"));
+        assertNull(npc.identity().getCharacter());
+    }
+
     private void assertRefused(@Nonnull CharacterService service, @Nonnull CharacterNpc npc, @Nonnull String characterId) {
         assertFalse(service.give(npc, characterId));
         assertEquals(List.of(), RecordingTrait.LOG);
