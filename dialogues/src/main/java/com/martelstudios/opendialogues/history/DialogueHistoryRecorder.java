@@ -38,8 +38,8 @@ public class DialogueHistoryRecorder {
      * Counts the opening for the dialogue's player.
      */
     public void onOpened(@Nonnull DialogueEvent.Opened event) {
-        String dialogueId = event.getSession().dialogueId();
-        write(event.getPlayer(), history -> history.recordOpened(dialogueId));
+        DialogueSession session = event.getSession();
+        write(event.getPlayer(), history -> history.recordOpened(session.characterId(), session.dialogueId()));
     }
 
     /**
@@ -49,7 +49,7 @@ public class DialogueHistoryRecorder {
         DialogueSession session = event.getSession();
         OpenDialoguesResponse response = session.responses().get(event.getPosition() - 1);
         String answerKey = session.dialogue().answerKey(response);
-        write(event.getPlayer(), history -> history.recordAnswer(session.dialogueId(), answerKey));
+        write(event.getPlayer(), history -> history.recordAnswer(session.characterId(), session.dialogueId(), answerKey));
     }
 
     /**
