@@ -99,9 +99,18 @@ as `Dialogue` does.
 - A new cancellable event fired by `CharacterService.use` before any trait's `onUse`, carrying the
   NPC (ref, uuid, character, name) and the player. Cancelled means a listener showed something
   else; the traits then do not run.
-- The event fires only for a character with a trait that answers F (`consumesUse()`, today the
-  `Dialogue` trait), the same rule that shows the F hint (my call: F is not offered on other
-  characters, and "something else" always has a normal behaviour to reach).
+- F needs the `Interactable` component and a hint, which today only the `Dialogue` trait puts on
+  an NPC. OpenDialogues lets other mods require interaction for a character id (counted requests,
+  released when done). While required, the character scan ensures `Interactable` and a generic
+  hint on every NPC carrying it, and removes them once no request remains and no trait wants them.
+  The bridge requires interaction for each character targeted by at least one running `Deliver`
+  quest, so a character with only a name can receive deliveries (decided with the user).
+- The hint is on the NPC, not per player: every player sees F on it while some delivery to it runs.
+  Accepted.
+- F on a character no trait answers and no delivery takes over (a player without the quest, or
+  without any missing item) opens a generated "nothing to say" dialogue in OpenDialogues: "{name}
+  has nothing to tell you." with a "Goodbye" answer, so F never does nothing (decided with the
+  user). Built in code and translated per player like the generated delivery screen.
 - The bridge listens: the first running `Deliver` quest of that player whose `Character` matches and
   for which the player carries at least one missing item takes over: cancels the event and opens
   its screen. No priority between quests: whichever is found first; others come on later F presses.
@@ -121,7 +130,7 @@ as `Dialogue` does.
   - one page: "You bring me: {items}?" where `{items}` lists each item's translated name and
     "delivered/needed" (lang key in the bridge, en-US and fr-FR);
   - answers: "Give" (action `Deliver` for this quest, then close) and "Something else" (action
-    `UseCharacter`).
+    `UseCharacter`), or "Goodbye" (close) when the character has no trait answering F.
 - OpenDialogues gains a public way to open a dialogue built in code, absent from the asset store,
   and a way to build one (pages, responses with actions). Sessions already keep the dialogue object,
   answering and refreshing do not read the store.
