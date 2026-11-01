@@ -20,6 +20,8 @@ import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
+import com.martelstudios.opendialogues.characters.CharacterAssets;
+import com.martelstudios.opendialogues.characters.CharacterValidator;
 import com.martelstudios.opendialogues.characters.runtime.CharacterDeathSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterHintSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterScanSystem;
@@ -32,6 +34,8 @@ import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesGrou
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRoleFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesWorldFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesZoneFilter;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
@@ -40,7 +44,6 @@ import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
-import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.martelstudios.opendialogues.routers.impl.sequence.OpenDialoguesSequenceSelector;
 import com.martelstudios.opendialogues.routers.impl.weighted.OpenDialoguesWeightedSelector;
 import com.martelstudios.opendialogues.history.DialogueHistory;
@@ -138,6 +141,9 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerFilter(OpenDialoguesWorldFilter.TYPE, OpenDialoguesWorldFilter.class, OpenDialoguesWorldFilter.CODEC);
         registry.registerFilter(OpenDialoguesZoneFilter.TYPE, OpenDialoguesZoneFilter.class, OpenDialoguesZoneFilter.CODEC);
         registry.registerFilter(OpenDialoguesBiomeFilter.TYPE, OpenDialoguesBiomeFilter.class, OpenDialoguesBiomeFilter.CODEC);
+
+        registry.registerTrait(OpenDialoguesDialogueTrait.TYPE, OpenDialoguesDialogueTrait.class, OpenDialoguesDialogueTrait.CODEC);
+        registry.registerTrait(OpenDialoguesNameTrait.TYPE, OpenDialoguesNameTrait.class, OpenDialoguesNameTrait.CODEC);
 
         registry.registerSelector(OpenDialoguesSequenceSelector.TYPE, OpenDialoguesSequenceSelector.class, OpenDialoguesSequenceSelector.CODEC);
         registry.registerSelector(OpenDialoguesWeightedSelector.TYPE, OpenDialoguesWeightedSelector.class, OpenDialoguesWeightedSelector.CODEC);
@@ -243,23 +249,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
      */
     private void validateCharacters() {
         if (!booted) return;
-        for (OpenDialogueCharacterAsset character : OpenDialogueCharacterAsset.getAssetStore().getAssetMap().getAssetMap().values()) {
-            OpenDialoguesTarget target = character.getDialogue();
-            boolean leads = target.getDialogue() != null ? OpenDialogueAsset.getDialogue(target.getDialogue()) != null : OpenDialogueRouterAsset.getRouter(target.getRouter()) != null;
-            if (!leads) getLogger().atSevere().log("Character '%s' opens no known dialogue or router.", character.getId());
-
-            OpenDialogueNameListAsset names = character.getNames() == null ? null : OpenDialogueNameListAsset.getNameList(character.getNames());
-            if (character.getNames() != null && (names == null || names.getNames().length == 0)) {
-                getLogger().atSevere().log("Character '%s' draws its name from an unknown or empty list '%s'.", character.getId(), character.getNames());
-            }
-        }
-        for (OpenDialogueDistributionAsset distribution : OpenDialogueDistributionAsset.getAssetStore().getAssetMap().getAssetMap().values()) {
-            for (OpenDialogueDistributionAsset.Entry entry : distribution.getEntries()) {
-                if (entry.getCharacter() != null && OpenDialogueCharacterAsset.getCharacter(entry.getCharacter()) == null) {
-                    getLogger().atSevere().log("Distribution '%s' names an unknown character '%s'.", distribution.getId(), entry.getCharacter());
-                }
-            }
-        }
+        for (String problem : CharacterValidator.validate(CharacterAssets.live())) getLogger().atSevere().log("%s", problem);
     }
 
     private static void suggest(@Nonnull AssetEditorFetchAutoCompleteDataEvent event, @Nonnull Collection<String> ids) {

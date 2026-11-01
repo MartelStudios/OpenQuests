@@ -115,6 +115,6 @@ class IdentityTest {
 
     @Nonnull
     private static OpenDialogueCharacterAsset character(@Nonnull String uniqueness) {
-        return CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{ \"Dialogue\": { \"Dialogue\": \"Hello\" }, \"Uniqueness\": \"" + uniqueness + "\" }");
+        return CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{ \"Uniqueness\": \"" + uniqueness + "\" }");
     }
 }

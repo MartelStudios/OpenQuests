@@ -10,13 +10,21 @@ import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesGrou
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRoleFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesWorldFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesZoneFilter;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
+import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
- * Registers the character filters tests read, once per run, as the plugin does at setup.
+ * Registers the character filters and traits tests read, once per run, as the plugin does at setup.
  */
 public final class CharacterFixtures {
 
@@ -27,6 +35,8 @@ public final class CharacterFixtures {
         registry.registerFilter(OpenDialoguesWorldFilter.TYPE, OpenDialoguesWorldFilter.class, OpenDialoguesWorldFilter.CODEC);
         registry.registerFilter(OpenDialoguesZoneFilter.TYPE, OpenDialoguesZoneFilter.class, OpenDialoguesZoneFilter.CODEC);
         registry.registerFilter(OpenDialoguesBiomeFilter.TYPE, OpenDialoguesBiomeFilter.class, OpenDialoguesBiomeFilter.CODEC);
+        registry.registerTrait(OpenDialoguesDialogueTrait.TYPE, OpenDialoguesDialogueTrait.class, OpenDialoguesDialogueTrait.CODEC);
+        registry.registerTrait(OpenDialoguesNameTrait.TYPE, OpenDialoguesNameTrait.class, OpenDialoguesNameTrait.CODEC);
     }
 
     private CharacterFixtures() {}
@@ -41,6 +51,23 @@ public final class CharacterFixtures {
         CharacterFilter filter = CodecJson.decode(CharacterFilter.CODEC, json);
         if (filter == null) throw new IllegalArgumentException("Unreadable filter " + json);
         return filter;
+    }
+
+    @Nonnull
+    public static CharacterTrait trait(@Nonnull String json) {
+        CharacterTrait trait = CodecJson.decode(CharacterTrait.CODEC, json);
+        if (trait == null) throw new IllegalArgumentException("Unreadable trait " + json);
+        return trait;
+    }
+
+    /**
+     * Assets as packs would declare them, without the asset stores.
+     *
+     * @param leads whether a dialogue or router id leads somewhere.
+     */
+    @Nonnull
+    public static CharacterAssets assets(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull Map<String, OpenDialogueNameListAsset> nameLists, @Nonnull Map<String, OpenDialogueSpeakerAsset> speakers, @Nonnull Predicate<String> leads) {
+        return new CharacterAssets(characters::get, characters::values, () -> distributions, nameLists::get, speakers::get, target -> leads.test(target.getDialogue() != null ? target.getDialogue() : target.getRouter()));
     }
 
     /**

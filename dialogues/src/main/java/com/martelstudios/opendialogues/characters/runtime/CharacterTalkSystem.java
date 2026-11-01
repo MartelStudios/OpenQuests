@@ -12,12 +12,14 @@ import com.hypixel.hytale.server.core.event.events.ecs.UseEntityEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
-import com.martelstudios.opendialogues.sessions.DialogueSource;
-import com.martelstudios.opendialogues.triggers.DialogueTriggers;
+import com.martelstudios.opendialogues.characters.CharacterAssets;
+import com.martelstudios.opendialogues.characters.traits.CharacterContext;
+import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Pressing F on an NPC carrying a character opens its dialogue in place of the NPC's own use,
@@ -43,8 +45,13 @@ public class CharacterTalkSystem extends EntityEventSystem<EntityStore, UseEntit
         UUID npc = CharacterScanSystem.uuidOf(store, target);
         if (character == null || player == null || npc == null) return;
 
-        event.setCancelled(true);
-        DialogueTriggers.openFor(player, character.getDialogue(), new DialogueSource(npc, identity.getCharacter(), identity.getName()), "Character '" + identity.getCharacter() + "'");
+        CharacterContext context = new CharacterContext(store, target, npc, identity, character, CharacterAssets.live(), ThreadLocalRandom.current());
+        for (CharacterTrait trait : character.getTraits()) {
+            if (trait.onUse(context, player)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     @Nullable

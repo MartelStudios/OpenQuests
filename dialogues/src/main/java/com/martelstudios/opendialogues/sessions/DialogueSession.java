@@ -1,14 +1,18 @@
 package com.martelstudios.opendialogues.sessions;
 
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.dialogues.SpeakerView;
 import com.martelstudios.opendialogues.displays.DialogueDisplay;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A dialogue open for one player. Keeps the answers as shown when it opened, so "answer 2" means
@@ -34,7 +38,8 @@ public record DialogueSession(@Nonnull OpenDialogueAsset dialogue, @Nonnull List
     public SpeakerView speaker() {
         return SpeakerView.of(dialogue.getSpeaker(), source, characterId -> {
             OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(characterId);
-            return character == null ? null : character.getSpeaker();
+            if (character == null) return null;
+            return Arrays.stream(character.getTraits()).filter(OpenDialoguesDialogueTrait.class::isInstance).map(trait -> ((OpenDialoguesDialogueTrait) trait).getSpeaker()).filter(Objects::nonNull).findFirst().map(OpenDialogueSpeakerAsset::getSpeaker).orElse(null);
         });
     }
 }

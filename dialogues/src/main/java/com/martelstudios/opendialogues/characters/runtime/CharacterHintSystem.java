@@ -18,9 +18,12 @@ import com.hypixel.hytale.server.core.modules.entity.system.EntityInteractableSy
 import com.hypixel.hytale.server.core.modules.entity.tracker.EntityTrackerSystems;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
+import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -71,7 +74,9 @@ public class CharacterHintSystem extends EntityTickingSystem<EntityStore> {
 
         Map<Ref<EntityStore>, EntityTrackerSystems.EntityViewer> viewers = identity.isHintSent() ? visible.newlyVisibleTo : visible.visibleTo;
         if (viewers.isEmpty()) return;
-        InteractableUpdate update = new InteractableUpdate(CharacterScanSystem.hintOf(character));
+        String hint = Arrays.stream(character.getTraits()).map(CharacterTrait::interactionHint).filter(Objects::nonNull).findFirst().orElse(null);
+        if (hint == null) return;
+        InteractableUpdate update = new InteractableUpdate(hint);
         Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
         for (EntityTrackerSystems.EntityViewer viewer : viewers.values()) viewer.queueUpdate(ref, update);
         identity.setHintSent(true);

@@ -29,11 +29,14 @@ import com.hypixel.hytale.server.npc.interactions.UseNPCInteraction;
 import com.hypixel.hytale.server.npc.role.Role;
 import com.hypixel.hytale.server.npc.instructions.Instruction;
 import com.hypixel.hytale.server.npc.role.support.WorldSupport;
+import com.martelstudios.opendialogues.characters.CharacterAssets;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
 
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
+import com.martelstudios.opendialogues.characters.traits.CharacterContext;
+import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,11 +51,6 @@ import java.util.concurrent.ThreadLocalRandom;
  * ones carrying a character answer F again after their chunk reloaded.
  */
 public class CharacterScanSystem extends DelayedSystem<EntityStore> {
-
-    /**
-     * Shown when a character names no hint of its own.
-     */
-    public static final String DEFAULT_HINT = "server.interactionHints.generic";
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
@@ -97,14 +95,17 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
 
     private void visit(@Nonnull World world, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef player, @Nonnull WorldMapTracker tracker, @Nonnull List<OpenDialogueDistributionAsset> distributions) {
         OpenDialoguesNPCIdentity stored = store.getComponent(ref, identityType);
+        UUIDComponent uuid = store.getComponent(ref, UUIDComponent.getComponentType());
         if (stored != null && stored.getCharacter() != null) {
             OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(stored.getCharacter());
-            if (character != null) makeTalkative(store, ref, character, stored.getName());
+            if (character != null && uuid != null) {
+                CharacterContext context = new CharacterContext(store, ref, uuid.getUuid(), stored, character, CharacterAssets.live(), ThreadLocalRandom.current());
+                for (CharacterTrait trait : character.getTraits()) trait.onApplied(context);
+            }
             return;
         }
 
         NPCEntity npc = store.getComponent(ref, NPCEntity.getComponentType());
-        UUIDComponent uuid = store.getComponent(ref, UUIDComponent.getComponentType());
         if (npc == null || uuid == null || !untouched(store, ref, npc)) return;
 
         OpenDialoguesNPCIdentity identity = stored == null ? new OpenDialoguesNPCIdentity() : (OpenDialoguesNPCIdentity) stored.clone();
@@ -118,14 +119,10 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
         OpenDialogueCharacterAsset character = characterId == null ? null : OpenDialogueCharacterAsset.getCharacter(characterId);
         LOGGER.atFine().log("NPC %s (%s) drew %s.", uuid.getUuid(), npc.getRoleName(), characterId == null ? "nobody" : "character '" + characterId + "'");
         if (character != null) {
-            identity.setName(drawName(character));
             if (character.getUniqueness().claims()) unique.claim(characterId, uuid.getUuid());
-            if (identity.getName() != null) {
-                Message name = Message.translation(identity.getName());
-                store.putComponent(ref, PersistentDisplayName.getComponentType(), new PersistentDisplayName(name));
-                store.putComponent(ref, DisplayNameComponent.getComponentType(), new DisplayNameComponent(name));
-            }
-            makeTalkative(store, ref, character, identity.getName());
+            CharacterContext context = new CharacterContext(store, ref, uuid.getUuid(), identity, character, CharacterAssets.live(), ThreadLocalRandom.current());
+            for (CharacterTrait trait : character.getTraits()) trait.onAssigned(context);
+            for (CharacterTrait trait : character.getTraits()) trait.onApplied(context);
         }
         store.putComponent(ref, identityType, identity);
     }
@@ -149,36 +146,6 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
             int index = NPCGroup.getAssetMap().getIndexOrDefault(group, -1);
             return index >= 0 && WorldSupport.hasTagInGroup(index, roleIndex);
         });
-    }
-
-    @Nullable
-    private static String drawName(@Nonnull OpenDialogueCharacterAsset character) {
-        OpenDialogueNameListAsset list = character.getNames() == null ? null : OpenDialogueNameListAsset.getNameList(character.getNames());
-        if (list == null || list.getNames().length == 0) return null;
-        return list.getNames()[ThreadLocalRandom.current().nextInt(list.getNames().length)];
-    }
-
-    /**
-     * Interactable and the nameplate are ensured on every scan, since nothing says they outlive a
-     * chunk reload. A nameplate is plain text, so the name shows in the server language.
-     */
-    private static void makeTalkative(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull OpenDialogueCharacterAsset character, @Nullable String name) {
-        if (name != null && store.getComponent(ref, Nameplate.getComponentType()) == null) {
-            String text = I18nModule.get().getMessage(I18nModule.DEFAULT_LANGUAGE, name);
-            store.putComponent(ref, Nameplate.getComponentType(), new Nameplate(text != null ? text : name));
-        }
-        store.ensureComponent(ref, Interactable.getComponentType());
-        Interactions interactions = store.getComponent(ref, Interactions.getComponentType());
-        String hint = hintOf(character);
-        if (interactions != null && !hint.equals(interactions.getInteractionHint())) interactions.setInteractionHint(hint);
-    }
-
-    /**
-     * @return the translation key of the F prompt the character shows.
-     */
-    @Nonnull
-    static String hintOf(@Nonnull OpenDialogueCharacterAsset character) {
-        return character.getHint() != null ? character.getHint() : DEFAULT_HINT;
     }
 
     /**

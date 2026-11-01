@@ -1,30 +1,38 @@
 package com.martelstudios.opendialogues.characters;
 
 import com.martelstudios.opendialogues.CodecJson;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class CharacterAssetsTest {
 
     @Test
-    void characterDecodesEveryField() {
+    void characterDecodesTraits() {
+        CharacterFixtures.registerFilters();
         OpenDialogueCharacterAsset character = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, """
-            { "Dialogue": { "Dialogue": "Farmer_Hello" }, "Names": "Kweebec_Names", "Uniqueness": "Alive", "Hint": "npc.hint.talk" }
+            { "Uniqueness": "Alive", "Traits": [
+                { "Type": "Dialogue", "Dialogue": { "Dialogue": "Farmer_Hello" }, "Hint": "npc.hint.talk" },
+                { "Type": "Name", "Names": "Kweebec_Names" } ] }
             """);
 
         assertNotNull(character);
-        assertEquals("Farmer_Hello", character.getDialogue().getDialogue());
-        assertEquals("Kweebec_Names", character.getNames());
         assertEquals(Uniqueness.Alive, character.getUniqueness());
-        assertEquals("npc.hint.talk", character.getHint());
+        OpenDialoguesDialogueTrait dialogue = assertInstanceOf(OpenDialoguesDialogueTrait.class, character.getTraits()[0]);
+        assertEquals("Farmer_Hello", dialogue.getDialogue().getDialogue());
+        assertEquals("npc.hint.talk", dialogue.interactionHint());
+        OpenDialoguesNameTrait name = assertInstanceOf(OpenDialoguesNameTrait.class, character.getTraits()[1]);
+        assertEquals("Kweebec_Names", name.getNames());
     }
 
     @Test
     void characterDefaultsToRepeatable() {
-        OpenDialogueCharacterAsset character = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{ \"Dialogue\": { \"Router\": \"Farmer\" } }");
+        OpenDialogueCharacterAsset character = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{}");
 
         assertNotNull(character);
         assertEquals(Uniqueness.None, character.getUniqueness());
