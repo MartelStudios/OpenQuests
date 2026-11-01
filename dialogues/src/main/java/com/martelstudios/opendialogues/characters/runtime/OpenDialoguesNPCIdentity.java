@@ -37,6 +37,8 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
 
     private final Set<String> draws = new LinkedHashSet<>();
 
+    private boolean hintSent;
+
     /**
      * @return the id of the character the NPC carries, {@code null} while it is nobody.
      */
@@ -74,6 +76,17 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
      */
     public void recordDraw(@Nonnull String distributionId) {
         draws.add(distributionId);
+    }
+
+    /**
+     * @return whether every viewer got the F prompt since the NPC loaded; never saved, so a reload sends it again.
+     */
+    public boolean isHintSent() {
+        return hintSent;
+    }
+
+    public void setHintSent(boolean hintSent) {
+        this.hintSent = hintSent;
     }
 
     @Nonnull

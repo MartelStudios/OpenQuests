@@ -167,8 +167,16 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
         }
         store.ensureComponent(ref, Interactable.getComponentType());
         Interactions interactions = store.getComponent(ref, Interactions.getComponentType());
-        String hint = character.getHint() != null ? character.getHint() : DEFAULT_HINT;
+        String hint = hintOf(character);
         if (interactions != null && !hint.equals(interactions.getInteractionHint())) interactions.setInteractionHint(hint);
+    }
+
+    /**
+     * @return the translation key of the F prompt the character shows.
+     */
+    @Nonnull
+    static String hintOf(@Nonnull OpenDialogueCharacterAsset character) {
+        return character.getHint() != null ? character.getHint() : DEFAULT_HINT;
     }
 
     /**

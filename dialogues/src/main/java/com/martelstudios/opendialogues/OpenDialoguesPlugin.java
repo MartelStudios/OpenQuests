@@ -21,6 +21,7 @@ import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
 import com.martelstudios.opendialogues.characters.runtime.CharacterDeathSystem;
+import com.martelstudios.opendialogues.characters.runtime.CharacterHintSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterScanSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterSettings;
 import com.martelstudios.opendialogues.characters.runtime.CharacterTalkSystem;
@@ -147,6 +148,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), identityType, uniqueCharactersType));
         getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(identityType));
+        getEntityStoreRegistry().registerSystem(new CharacterHintSystem(identityType));
         getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(identityType, uniqueCharactersType));
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, new SplittableRandom());
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus());
