@@ -16,6 +16,9 @@ import com.martelstudios.opendialogues.actions.impl.command.OpenDialoguesCommand
 import com.martelstudios.opendialogues.actions.impl.inventory.OpenDialoguesConsumeInventoryAction;
 import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesBiomeFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesGroupFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRoleFilter;
@@ -29,6 +32,7 @@ import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
+import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.martelstudios.opendialogues.routers.impl.sequence.OpenDialoguesSequenceSelector;
 import com.martelstudios.opendialogues.routers.impl.weighted.OpenDialoguesWeightedSelector;
 import com.martelstudios.opendialogues.history.DialogueHistory;
@@ -146,14 +150,32 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .setCodec(OpenDialogueSpeakerAsset.CODEC)
                                                     .setKeyFunction(OpenDialogueSpeakerAsset::getId)
                                                     .build());
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueNameListAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenDialogues/Names/")
+                                                    .setCodec(OpenDialogueNameListAsset.CODEC)
+                                                    .setKeyFunction(OpenDialogueNameListAsset::getId)
+                                                    .build());
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueCharacterAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenDialogues/Characters/")
+                                                    .setCodec(OpenDialogueCharacterAsset.CODEC)
+                                                    .setKeyFunction(OpenDialogueCharacterAsset::getId)
+                                                    .build());
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueDistributionAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenDialogues/Distributions/")
+                                                    .setCodec(OpenDialogueDistributionAsset.CODEC)
+                                                    .setKeyFunction(OpenDialogueDistributionAsset::getId)
+                                                    .build());
 
         onLoaded(OpenDialogueAsset.class, this::validateRouters);
         onLoaded(OpenDialogueAsset.class, this::validateAnswers);
         onLoaded(OpenDialogueRouterAsset.class, this::validateRouters);
+        onLoaded(OpenDialogueCharacterAsset.class, this::validateCharacters);
+        onLoaded(OpenDialogueDistributionAsset.class, this::validateCharacters);
         getEventRegistry().register(BootEvent.class, event -> {
             booted = true;
             validateRouters();
             validateAnswers();
+            validateCharacters();
         });
 
         getEventRegistry().registerGlobal(DialogueEvent.Opened.class, historyRecorder::onOpened);
@@ -192,6 +214,30 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         for (OpenDialogueAsset dialogue : OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap().values()) {
             String error = dialogue.findConditionError(OpenDialogueAsset::getDialogue);
             if (error != null) getLogger().atSevere().log("Dialogue '%s' has a broken answer condition: %s", dialogue.getId(), error);
+        }
+    }
+
+    /**
+     * Only logged: a character leading nowhere still names its NPC, pressing F just opens nothing.
+     */
+    private void validateCharacters() {
+        if (!booted) return;
+        for (OpenDialogueCharacterAsset character : OpenDialogueCharacterAsset.getAssetStore().getAssetMap().getAssetMap().values()) {
+            OpenDialoguesTarget target = character.getDialogue();
+            boolean leads = target.getDialogue() != null ? OpenDialogueAsset.getDialogue(target.getDialogue()) != null : OpenDialogueRouterAsset.getRouter(target.getRouter()) != null;
+            if (!leads) getLogger().atSevere().log("Character '%s' opens no known dialogue or router.", character.getId());
+
+            OpenDialogueNameListAsset names = character.getNames() == null ? null : OpenDialogueNameListAsset.getNameList(character.getNames());
+            if (character.getNames() != null && (names == null || names.getNames().length == 0)) {
+                getLogger().atSevere().log("Character '%s' draws its name from an unknown or empty list '%s'.", character.getId(), character.getNames());
+            }
+        }
+        for (OpenDialogueDistributionAsset distribution : OpenDialogueDistributionAsset.getAssetStore().getAssetMap().getAssetMap().values()) {
+            for (OpenDialogueDistributionAsset.Entry entry : distribution.getEntries()) {
+                if (entry.getCharacter() != null && OpenDialogueCharacterAsset.getCharacter(entry.getCharacter()) == null) {
+                    getLogger().atSevere().log("Distribution '%s' names an unknown character '%s'.", distribution.getId(), entry.getCharacter());
+                }
+            }
         }
     }
 
