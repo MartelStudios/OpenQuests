@@ -178,4 +178,48 @@ public abstract class CharacterEvent {
             return reason;
         }
     }
+
+    /**
+     * A character scoped to the universe can never be carried again: quests aimed at it cannot be
+     * done. Keyed on the character id, fired on the thread that lost it, which need not be a holder's.
+     */
+    public static final class Lost extends CharacterEvent implements IEvent<String> {
+
+        /**
+         * What took the character's last carrier away.
+         */
+        public enum Cause {
+            /** The NPC died. */
+            Death,
+            /** The world holding the NPC closed for good, an instance done with or a world removed. */
+            WorldClosed
+        }
+
+        @Nonnull
+        private final String character;
+
+        @Nonnull
+        private final Cause cause;
+
+        public Lost(@Nonnull String character, @Nonnull Cause cause) {
+            this.character = character;
+            this.cause = cause;
+        }
+
+        /**
+         * @return the id of the character lost.
+         */
+        @Nonnull
+        public String getCharacter() {
+            return character;
+        }
+
+        /**
+         * @return what took its last carrier away.
+         */
+        @Nonnull
+        public Cause getCause() {
+            return cause;
+        }
+    }
 }

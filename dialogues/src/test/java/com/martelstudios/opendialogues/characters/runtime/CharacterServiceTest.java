@@ -399,6 +399,28 @@ class CharacterServiceTest {
     }
 
     @Test
+    void deathOfForeverUniverseFiresLost() {
+        scopedCharacter("Hero", "Forever", "Universe");
+        scopedCharacter("Oak", "Forever", "World");
+        List<CharacterEvent.Lost> lost = new ArrayList<>();
+        bus.registerGlobal(CharacterEvent.Lost.class, lost::add);
+        CharacterService service = service();
+        CharacterNpc hero = npcIn(unique, universe);
+        CharacterNpc oak = npcIn(unique, universe);
+        service.give(hero, "Hero");
+        service.give(oak, "Oak");
+
+        service.release(hero, ReleaseReason.Death);
+        service.release(oak, ReleaseReason.Death);
+
+        assertEquals(1, lost.size());
+        assertEquals("Hero", lost.getFirst().getCharacter());
+        assertEquals(CharacterEvent.Lost.Cause.Death, lost.getFirst().getCause());
+        assertTrue(service.isLost("Hero"));
+        assertFalse(service.isLost("Oak"));
+    }
+
+    @Test
     void worldCharacterStaysPerWorld() {
         scopedCharacter("Oak", "Alive", "World");
         UniverseCharacters universe = new UniverseCharacters();

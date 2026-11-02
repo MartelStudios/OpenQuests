@@ -118,6 +118,31 @@ public class UniverseCharacters {
         return lost;
     }
 
+    /**
+     * Settles the claims of a world closing for good: its NPCs leave without dying, yet a
+     * {@code Forever} character goes with them, the author wanting {@code Alive} for one that returns.
+     *
+     * @param world the config UUID of the closing world.
+     * @return the ids lost for good by this closing.
+     */
+    @Nonnull
+    public synchronized List<String> closeWorld(@Nonnull UUID world, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
+        String id = world.toString();
+        List<String> lost = new ArrayList<>();
+        boolean changed = claims.entrySet().removeIf(entry -> {
+            if (entry.getValue().consumed || !id.equals(entry.getValue().world)) return false;
+            OpenDialogueCharacterAsset character = characters.apply(entry.getKey());
+            if (character != null && character.getUniqueness().consumedBy(ReleaseReason.Death)) {
+                entry.getValue().consumed = true;
+                lost.add(entry.getKey());
+                return false;
+            }
+            return true;
+        });
+        if (changed || !lost.isEmpty()) onChange.run();
+        return lost;
+    }
+
     private synchronized void putAll(@Nonnull Map<String, Claim> read) {
         claims.putAll(read);
     }

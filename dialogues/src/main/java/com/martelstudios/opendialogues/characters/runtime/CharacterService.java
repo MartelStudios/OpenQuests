@@ -287,11 +287,20 @@ public class CharacterService {
                 run(trait, character, "onReleased", () -> trait.onReleased(context, reason));
             }
         }
-        npc.unique().release(npc.uuid(), reason, this::knownCharacter);
+        List<String> lost = npc.unique().release(npc.uuid(), reason, this::knownCharacter);
         String name = npc.identity().getName();
         npc.identity().setCharacter(null);
         npc.identity().setName(null);
         events.dispatchFor(CharacterEvent.Released.class, characterId).dispatch(new CharacterEvent.Released(npc.ref(), npc.uuid(), characterId, name, reason));
+        for (String id : lost) events.dispatchFor(CharacterEvent.Lost.class, id).dispatch(new CharacterEvent.Lost(id, CharacterEvent.Lost.Cause.Death));
+    }
+
+    /**
+     * @return what settles the universe characters of a world closing for good, to listen to world removals.
+     */
+    @Nonnull
+    public CharacterWorldClosing worldClosing() {
+        return new CharacterWorldClosing(universe, this::knownCharacter, events);
     }
 
     /**
