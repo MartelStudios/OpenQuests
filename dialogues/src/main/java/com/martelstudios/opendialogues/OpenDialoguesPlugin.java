@@ -181,7 +181,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         universeCharactersType = Universe.registerResource(UniverseCharacters.class, "OpenDialoguesUniqueCharacters", UniverseCharacters.CODEC);
         characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
-        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), characterService));
+        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings::get, characterService));
         characterService.onUnanswered(NothingToSay::open);
         getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));

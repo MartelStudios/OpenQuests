@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Every few seconds, finds the NPCs near each player of a world: those carrying a character get
@@ -30,12 +31,17 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
+    private final Supplier<CharacterSettings> settings;
     private final double radius;
     private final CharacterService service;
 
-    public CharacterScanSystem(@Nonnull CharacterSettings settings, @Nonnull CharacterService service) {
-        super(settings.getScanInterval());
-        this.radius = settings.getScanRadius();
+    /**
+     * @param settings read anew on each visit, so stopping draws needs no restart.
+     */
+    public CharacterScanSystem(@Nonnull Supplier<CharacterSettings> settings, @Nonnull CharacterService service) {
+        super(settings.get().getScanInterval());
+        this.settings = settings;
+        this.radius = settings.get().getScanRadius();
         this.service = service;
     }
 
@@ -74,6 +80,7 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
                 service.apply(npc);
                 return null;
             }
+            if (!settings.get().isDraws()) return null;
             int drawsBefore = npc.identity().getDraws().size();
             String drawn = service.draw(npc, context(store, ref, player, world, entity, tracker));
             if (npc.identity().getDraws().size() != drawsBefore) LOGGER.atFine().log("NPC %s (%s) drew %s.", npc.uuid(), entity.getRoleName(), drawn == null ? "nobody" : "character '" + drawn + "'");
