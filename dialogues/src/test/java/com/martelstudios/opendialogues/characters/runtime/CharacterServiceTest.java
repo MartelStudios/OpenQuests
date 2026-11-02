@@ -9,6 +9,7 @@ import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
 import com.martelstudios.opendialogues.characters.RecordingTrait;
 import com.martelstudios.opendialogues.characters.ReleaseReason;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -172,6 +173,75 @@ class CharacterServiceTest {
 
         assertEquals("Mira", npc.identity().getCharacter());
         assertEquals(Set.of("Village"), npc.identity().getDraws());
+    }
+
+    @Test
+    void cancelledUsingKeepsTraitsQuiet() {
+        character("Mira", "None", "{ \"Type\": \"TestRecording\", \"Label\": \"a\", \"Consumes\": true }");
+        CharacterService service = service();
+        CharacterNpc mira = npc();
+        service.give(mira, "Mira");
+        RecordingTrait.LOG.clear();
+        bus.registerGlobal(CharacterEvent.Using.class, event -> event.setCancelled(true));
+
+        assertTrue(service.use(mira, player()));
+        assertEquals(List.of(), RecordingTrait.LOG);
+    }
+
+    @Test
+    void useWithoutTakeOverSkipsUsing() {
+        character("Mira", "None", "{ \"Type\": \"TestRecording\", \"Label\": \"a\", \"Consumes\": true }");
+        CharacterService service = service();
+        CharacterNpc mira = npc();
+        service.give(mira, "Mira");
+        RecordingTrait.LOG.clear();
+        List<CharacterEvent.Using> usings = new ArrayList<>();
+        bus.registerGlobal(CharacterEvent.Using.class, usings::add);
+
+        assertTrue(service.use(mira, player(), false));
+        assertEquals(List.of("a:use"), RecordingTrait.LOG);
+        assertEquals(List.of(), usings);
+        assertTrue(service.use(mira, player()));
+        assertEquals(1, usings.size());
+    }
+
+    @Test
+    void demandedCharacterWithoutAnswerFallsBack() {
+        character("Oak", "None", AB);
+        CharacterService service = service();
+        CharacterNpc oak = npc();
+        service.give(oak, "Oak");
+        List<String> fallbacks = new ArrayList<>();
+        service.demandInteraction("Oak"::equals);
+        service.onUnanswered((context, player) -> fallbacks.add(context.character().getId()));
+
+        assertTrue(service.use(oak, player()));
+        assertEquals(List.of("Oak"), fallbacks);
+    }
+
+    @Test
+    void undemandedCharacterWithoutAnswerDoesNothing() {
+        character("Oak", "None", AB);
+        CharacterService service = service();
+        CharacterNpc oak = npc();
+        service.give(oak, "Oak");
+        List<String> fallbacks = new ArrayList<>();
+        service.onUnanswered((context, player) -> fallbacks.add(context.character().getId()));
+
+        assertFalse(service.use(oak, player()));
+        assertEquals(List.of(), fallbacks);
+    }
+
+    @Test
+    void demandGivesTheDefaultHint() {
+        character("Oak", "None", AB);
+        CharacterService service = service();
+        CharacterNpc oak = npc();
+        service.give(oak, "Oak");
+
+        assertNull(service.hint(oak.identity()));
+        service.demandInteraction("Oak"::equals);
+        assertEquals(OpenDialoguesDialogueTrait.DEFAULT_HINT, service.hint(oak.identity()));
     }
 
     @Test

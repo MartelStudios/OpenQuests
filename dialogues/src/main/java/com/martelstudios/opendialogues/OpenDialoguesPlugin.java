@@ -13,6 +13,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
+import com.martelstudios.opendialogues.actions.impl.character.OpenDialoguesUseCharacterAction;
 import com.martelstudios.opendialogues.actions.impl.command.OpenDialoguesCommandAction;
 import com.martelstudios.opendialogues.actions.impl.inventory.OpenDialoguesConsumeInventoryAction;
 import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction;
@@ -31,6 +32,7 @@ import com.martelstudios.opendialogues.characters.runtime.CharacterScanSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterService;
 import com.martelstudios.opendialogues.characters.runtime.NpcEligibility;
 import com.martelstudios.opendialogues.characters.runtime.CharacterSettings;
+import com.martelstudios.opendialogues.characters.runtime.NothingToSay;
 import com.martelstudios.opendialogues.characters.runtime.CharacterTalkSystem;
 import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
 import com.martelstudios.opendialogues.characters.runtime.UniqueCharacters;
@@ -146,6 +148,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         NPCPlugin.get().registerCoreComponentType(BuilderActionOpenDialogue.TYPE, BuilderActionOpenDialogue::new);
         registry.registerAction(OpenDialoguesCommandAction.TYPE, OpenDialoguesCommandAction.class, OpenDialoguesCommandAction.CODEC);
         registry.registerAction(OpenDialoguesConsumeInventoryAction.TYPE, OpenDialoguesConsumeInventoryAction.class, OpenDialoguesConsumeInventoryAction.CODEC);
+        registry.registerAction(OpenDialoguesUseCharacterAction.TYPE, OpenDialoguesUseCharacterAction.class, OpenDialoguesUseCharacterAction.CODEC);
 
         registry.registerCondition(OpenDialoguesCompositeCondition.TYPE, OpenDialoguesCompositeCondition.class, OpenDialoguesCompositeCondition.CODEC);
         registry.registerCondition(OpenDialoguesOpenedCondition.TYPE, OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition.CODEC);
@@ -172,6 +175,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType);
         getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), characterService));
+        characterService.onUnanswered(NothingToSay::open);
         getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(characterService, identityType));
