@@ -11,9 +11,11 @@ import com.martelstudios.opendialogues.characters.ReleaseReason;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -49,9 +51,64 @@ public class UniqueCharacters implements Resource<EntityStore>, CharacterClaims 
     public static final BuilderCodec<UniqueCharacters> CODEC = BuilderCodec.builder(UniqueCharacters.class, UniqueCharacters::new)
                                                                            .append(new KeyedCodec<>("Claims", new MapCodec<>(Claim.CODEC, HashMap<String, Claim>::new)), (unique, claims) -> unique.claims.putAll(claims), unique -> unique.claims)
                                                                            .add()
+                                                                           .append(new KeyedCodec<>("Generation", Codec.INTEGER), (unique, generation) -> unique.generation = generation, unique -> unique.generation)
+                                                                           .add()
+                                                                           .append(new KeyedCodec<>("UniverseGeneration", Codec.INTEGER), (unique, generation) -> unique.universeGeneration = generation, unique -> unique.universeGeneration)
+                                                                           .add()
+                                                                           .append(new KeyedCodec<>("DeadGeneration", Codec.INTEGER), (unique, generation) -> unique.deadGeneration = generation, unique -> unique.deadGeneration)
+                                                                           .add()
                                                                            .build();
 
     private final Map<String, Claim> claims = new HashMap<>();
+    private int generation;
+    private int universeGeneration;
+    private int deadGeneration;
+
+    /**
+     * @return how many times this world's characters were reset; an NPC drawn under an older one is stale.
+     */
+    public int generation() {
+        return generation;
+    }
+
+    /**
+     * Forgets every claim, consumed ones included, so NPCs drawn before are stale.
+     */
+    public void reset() {
+        claims.clear();
+        generation++;
+    }
+
+    /**
+     * Applies the universe resets this world missed while unloaded: a full reset empties every
+     * claim, a dead reset drops the consumed ones.
+     *
+     * @return the ids of the claims dropped, sorted.
+     */
+    @Nonnull
+    public List<String> catchUp(int universeGeneration, int deadGeneration) {
+        List<String> dropped = new ArrayList<>();
+        if (universeGeneration > this.universeGeneration) {
+            dropped.addAll(claims.keySet());
+            claims.clear();
+        } else if (deadGeneration > this.deadGeneration) {
+            claims.entrySet().removeIf(entry -> entry.getValue().consumed && dropped.add(entry.getKey()));
+        }
+        this.universeGeneration = Math.max(this.universeGeneration, universeGeneration);
+        this.deadGeneration = Math.max(this.deadGeneration, deadGeneration);
+        dropped.sort(null);
+        return dropped;
+    }
+
+    /**
+     * @return each claimed character with the UUID of its carrier, or {@code consumed}, sorted by id.
+     */
+    @Nonnull
+    public Map<String, String> describe() {
+        Map<String, String> described = new TreeMap<>();
+        claims.forEach((characterId, claim) -> described.put(characterId, claim.consumed ? "consumed" : claim.npc));
+        return described;
+    }
 
     /**
      * @param characters finds a loaded character by id, {@code null} for one no pack declares.
@@ -116,6 +173,9 @@ public class UniqueCharacters implements Resource<EntityStore>, CharacterClaims 
     public Resource<EntityStore> clone() {
         UniqueCharacters clone = new UniqueCharacters();
         claims.forEach((characterId, claim) -> clone.claims.put(characterId, new Claim(claim.npc, claim.consumed)));
+        clone.generation = generation;
+        clone.universeGeneration = universeGeneration;
+        clone.deadGeneration = deadGeneration;
         return clone;
     }
 }

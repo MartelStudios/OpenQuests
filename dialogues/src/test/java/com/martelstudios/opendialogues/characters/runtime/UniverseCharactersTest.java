@@ -151,6 +151,64 @@ class UniverseCharactersTest {
         assertEquals(List.of(false, false, false, false), locked);
     }
 
+    @Test
+    void resetEmptiesClaimsAndBumpsGeneration() {
+        character("Oak", "Alive");
+        character("Mage", "Forever");
+        UUID mage = UUID.randomUUID();
+        universe.claimIfAvailable("Oak", UUID.randomUUID(), WORLD_A, lookup);
+        universe.claimIfAvailable("Mage", mage, WORLD_A, lookup);
+        universe.release(mage, ReleaseReason.Death, lookup);
+
+        universe.reset();
+
+        assertEquals(1, universe.generation());
+        assertTrue(universe.isAvailable("Oak", lookup));
+        assertTrue(universe.isAvailable("Mage", lookup));
+        assertFalse(universe.isLost("Mage"));
+    }
+
+    @Test
+    void resetDeadFreesOnlyConsumed() {
+        character("Oak", "Alive");
+        character("Mage", "Forever");
+        UUID mage = UUID.randomUUID();
+        universe.claimIfAvailable("Oak", UUID.randomUUID(), WORLD_A, lookup);
+        universe.claimIfAvailable("Mage", mage, WORLD_A, lookup);
+        universe.release(mage, ReleaseReason.Death, lookup);
+
+        assertEquals(List.of("Mage"), universe.resetDead());
+
+        assertFalse(universe.isAvailable("Oak", lookup));
+        assertTrue(universe.isAvailable("Mage", lookup));
+        assertEquals(1, universe.deadGeneration());
+        assertEquals(0, universe.generation());
+    }
+
+    @Test
+    void generationsSurviveCodec() {
+        universe.reset();
+        universe.resetDead();
+
+        UniverseCharacters read = CodecJson.roundTrip(UniverseCharacters.CODEC, universe);
+
+        assertEquals(1, read.generation());
+        assertEquals(1, read.deadGeneration());
+    }
+
+    @Test
+    void describeShowsCarriersAndConsumed() {
+        character("Oak", "Alive");
+        character("Mage", "Forever");
+        UUID oak = UUID.randomUUID();
+        UUID mage = UUID.randomUUID();
+        universe.claimIfAvailable("Oak", oak, WORLD_A, lookup);
+        universe.claimIfAvailable("Mage", mage, WORLD_A, lookup);
+        universe.release(mage, ReleaseReason.Death, lookup);
+
+        assertEquals(Map.of("Mage", "consumed", "Oak", oak.toString()), universe.describe());
+    }
+
     private void character(@Nonnull String id, @Nonnull String uniqueness) {
         characters.put(id, CharacterFixtures.character(id, "{ \"Uniqueness\": \"" + uniqueness + "\", \"Scope\": \"Universe\" }"));
     }
