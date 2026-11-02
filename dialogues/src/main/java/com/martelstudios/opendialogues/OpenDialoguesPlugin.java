@@ -50,6 +50,7 @@ import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialo
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
+import com.martelstudios.opendialogues.commands.characters.CharacterCommand;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
@@ -248,6 +249,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         getCommandRegistry().registerCommand(new DialogueCommand(dialogueService, registry, displayRules, historyRecorder));
         getCommandRegistry().registerCommand(new AnswerCommand("oda", dialogueService));
+        getCommandRegistry().registerCommand(new CharacterCommand(characterService, characterSettings));
     }
 
     /**
