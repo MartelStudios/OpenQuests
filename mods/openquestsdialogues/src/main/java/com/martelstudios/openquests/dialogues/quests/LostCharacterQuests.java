@@ -1,6 +1,7 @@
 package com.martelstudios.openquests.dialogues.quests;
 
 import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
@@ -9,6 +10,9 @@ import com.martelstudios.opendialogues.OpenDialoguesPlugin;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
+import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
+import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -49,6 +53,7 @@ public final class LostCharacterQuests {
         LostCharacterQuests quests = new LostCharacterQuests(services.getQuestProgressionService(), OpenDialoguesPlugin.get().getCharacterService()::isLost);
         plugin.getEventRegistry().registerGlobal(CharacterEvent.Lost.class, quests::onLost);
         plugin.getEventRegistry().registerGlobal(QuestLoadedEvent.class, quests::onLoaded);
+        plugin.getEventRegistry().registerGlobal(EventPriority.LATE, QuestAddedToPlayerStoreEvent.class, quests::onAssigned);
     }
 
     /**
@@ -81,12 +86,40 @@ public final class LostCharacterQuests {
     }
 
     /**
-     * Fails a quest loaded after its target was lost. Ending runs later on a holder's world thread,
-     * after the history catch up a new quest gets on that same thread.
+     * Fails a quest its holder brings back after its target was lost. A quest loading because it is
+     * being assigned is not in its holder's store yet: {@link #onAssigned} checks it instead.
      */
     public void onLoaded(@Nonnull QuestLoadedEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
-        if (shouldFail(targetOf(quest.getAsset()), quest.isOver(), isLost)) failOnHolderThread(quest);
+        if (!shouldFail(targetOf(quest.getAsset()), quest.isOver(), isLost)) return;
+
+        UUID holder = quest.getPlayers().stream().findFirst().orElse(null);
+        if (holder == null) {
+            fail(quest);
+            return;
+        }
+        EntityComponents.update(holder, components -> {
+            QuestStoreComponent store = components.getComponent(QuestStoreComponent.getComponentType());
+            if (failsOnLoad(targetOf(quest.getAsset()), quest.isOver(), isLost, store != null && store.getQuestIds().contains(quest.getId()))) fail(quest);
+        });
+    }
+
+    /**
+     * Fails a quest assigned after its target was lost, once the history catch up queued before it
+     * on the holder's thread had its chance to complete the quest.
+     */
+    public void onAssigned(@Nonnull QuestAddedToPlayerStoreEvent event) {
+        AbstractQuestProgression<?> quest = event.getQuest();
+        if (!shouldFail(targetOf(quest.getAsset()), quest.isOver(), isLost)) return;
+        EntityComponents.update(event.getPlayerId(), components -> fail(quest));
+    }
+
+    /**
+     * @param inHolderStore whether the holder already holds the quest, which a quest being assigned does not.
+     * @return whether a loaded quest must fail now rather than once assigned.
+     */
+    public static boolean failsOnLoad(@Nullable String target, boolean over, @Nonnull Predicate<String> isLost, boolean inHolderStore) {
+        return inHolderStore && shouldFail(target, over, isLost);
     }
 
     /**

@@ -30,6 +30,12 @@ class LostCharacterQuestsTest {
     }
 
     @Test
+    void quest_loaded_before_reaching_its_holder_waits_for_the_history_catch_up() {
+        assertFalse(LostCharacterQuests.failsOnLoad("Hero", false, HERO_LOST, false));
+        assertTrue(LostCharacterQuests.failsOnLoad("Hero", false, HERO_LOST, true));
+    }
+
+    @Test
     void other_quest_types_have_no_target() {
         assertNull(LostCharacterQuests.targetOf(null));
     }
