@@ -5,6 +5,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.dialogues.actions.QuestActionsFeature;
 import com.martelstudios.openquests.dialogues.conditions.QuestConditionsFeature;
+import com.martelstudios.openquests.dialogues.quests.LostCharacterQuests;
 import com.martelstudios.openquests.dialogues.quests.deliver.DeliverFeature;
 import com.martelstudios.openquests.dialogues.quests.dialogue.DialogueFeature;
 
@@ -29,6 +30,7 @@ public class OpenQuestsDialoguesPlugin extends JavaPlugin {
 
         DialogueFeature.register(this, services);
         DeliverFeature.register(this, services);
+        LostCharacterQuests.register(this, services);
         QuestActionsFeature.register();
         QuestConditionsFeature.register();
     }

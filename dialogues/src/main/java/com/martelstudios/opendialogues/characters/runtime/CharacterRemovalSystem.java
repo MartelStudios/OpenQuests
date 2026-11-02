@@ -5,7 +5,6 @@ import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.RemoveReason;
-import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
@@ -22,12 +21,10 @@ public class CharacterRemovalSystem extends RefSystem<EntityStore> {
 
     private final CharacterService service;
     private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
-    private final ResourceType<EntityStore, UniqueCharacters> uniqueType;
 
-    public CharacterRemovalSystem(@Nonnull CharacterService service, @Nonnull ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, @Nonnull ResourceType<EntityStore, UniqueCharacters> uniqueType) {
+    public CharacterRemovalSystem(@Nonnull CharacterService service, @Nonnull ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType) {
         this.service = service;
         this.identityType = identityType;
-        this.uniqueType = uniqueType;
     }
 
     @Nonnull
@@ -42,7 +39,7 @@ public class CharacterRemovalSystem extends RefSystem<EntityStore> {
     @Override
     public void onEntityRemove(@Nonnull Ref<EntityStore> ref, @Nonnull RemoveReason reason, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         if (reason == RemoveReason.UNLOAD) return;
-        CharacterNpc npc = CharacterNpc.of(commandBuffer, ref, identityType, uniqueType);
+        CharacterNpc npc = service.npc(commandBuffer, ref);
         if (npc != null) service.release(npc, ReleaseReason.Removed);
     }
 }

@@ -36,6 +36,15 @@ class CharacterAssetsTest {
 
         assertNotNull(character);
         assertEquals(Uniqueness.None, character.getUniqueness());
+        assertEquals(CharacterScope.World, character.getScope());
+    }
+
+    @Test
+    void characterDecodesScope() {
+        OpenDialogueCharacterAsset character = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{ \"Uniqueness\": \"Forever\", \"Scope\": \"Universe\" }");
+
+        assertNotNull(character);
+        assertEquals(CharacterScope.Universe, character.getScope());
     }
 
     @Test

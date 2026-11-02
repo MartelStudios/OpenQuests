@@ -4,6 +4,10 @@ import com.hypixel.hytale.assetstore.map.DefaultAssetMap;
 import com.hypixel.hytale.builtin.asseteditor.event.AssetEditorFetchAutoCompleteDataEvent;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.ResourceType;
+import com.hypixel.hytale.event.EventPriority;
+import com.hypixel.hytale.server.core.universe.Universe;
+import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
+import com.hypixel.hytale.server.core.universe.resources.UniverseResourceType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
@@ -36,6 +40,7 @@ import com.martelstudios.opendialogues.characters.runtime.NothingToSay;
 import com.martelstudios.opendialogues.characters.runtime.CharacterTalkSystem;
 import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
 import com.martelstudios.opendialogues.characters.runtime.UniqueCharacters;
+import com.martelstudios.opendialogues.characters.runtime.UniverseCharacters;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesBiomeFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesGroupFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRoleFilter;
@@ -116,6 +121,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     private ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
 
     private ResourceType<EntityStore, UniqueCharacters> uniqueCharactersType;
+    private UniverseResourceType<UniverseCharacters> universeCharactersType;
 
     private DialogueHistoryRecorder historyRecorder;
 
@@ -173,13 +179,14 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         historyRecorder = new DialogueHistoryRecorder(historyType);
         identityType = getEntityStoreRegistry().registerComponent(OpenDialoguesNPCIdentity.class, "OpenDialoguesNPCIdentity", OpenDialoguesNPCIdentity.CODEC);
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
-        characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType);
+        universeCharactersType = Universe.registerResource(UniverseCharacters.class, "OpenDialoguesUniqueCharacters", UniverseCharacters.CODEC);
+        characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
         getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), characterService));
         characterService.onUnanswered(NothingToSay::open);
         getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(characterService, identityType));
-        getEntityStoreRegistry().registerSystem(new CharacterRemovalSystem(characterService, identityType, uniqueCharactersType));
+        getEntityStoreRegistry().registerSystem(new CharacterRemovalSystem(characterService, identityType));
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, THREAD_RANDOM);
         dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus(), OpenDialogueSpeakerAsset::getSpeaker);
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
@@ -233,6 +240,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         getEventRegistry().registerGlobal(DialogueEvent.Opened.class, historyRecorder::onOpened);
         getEventRegistry().registerGlobal(DialogueEvent.Answered.class, historyRecorder::onAnswered);
         getEventRegistry().registerGlobal(CharacterEvent.Released.class, CharacterDeathAnnouncer::onReleased);
+        getEventRegistry().registerGlobal(EventPriority.LAST, RemoveWorldEvent.class, characterService.worldClosing()::onRemoveWorld);
 
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
         getEventRegistry().register(AssetEditorFetchAutoCompleteDataEvent.class, DialogueRegistry.DISPLAYS_DATA_SET, event -> suggest(event, registry.getDisplayIds()));
@@ -319,6 +327,17 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     @Nonnull
     public ResourceType<EntityStore, UniqueCharacters> getUniqueCharactersType() {
         return uniqueCharactersType;
+    }
+
+    /**
+     * Read from the universe each time, which loads its resources only after the plugins' setup;
+     * every change is saved at once, a crash would otherwise hand a lost character out again.
+     */
+    @Nonnull
+    private UniverseCharacters universeCharacters() {
+        UniverseCharacters characters = Universe.get().getResource(universeCharactersType);
+        characters.setOnChange(() -> Universe.get().flushResource(universeCharactersType));
+        return characters;
     }
 
     /**

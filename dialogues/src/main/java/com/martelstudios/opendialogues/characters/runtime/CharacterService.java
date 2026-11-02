@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.random.RandomGenerator;
 
 /**
@@ -48,6 +49,7 @@ public class CharacterService {
     private final BiConsumer<String, Throwable> warnings;
     private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
     private final ResourceType<EntityStore, UniqueCharacters> uniqueType;
+    private final Supplier<UniverseCharacters> universe;
     private final Set<String> reported = ConcurrentHashMap.newKeySet();
     private final Map<String, OpenDialogueCharacterAsset> lastKnown = new ConcurrentHashMap<>();
     private final List<Predicate<String>> demands = new CopyOnWriteArrayList<>();
@@ -56,8 +58,9 @@ public class CharacterService {
     /**
      * @param eligible whether an NPC may receive a character at all, so no mod's NPC is taken over.
      * @param warnings where a failing trait is reported, with its exception.
+     * @param universe the registry of characters scoped to the universe, read once the universe is up.
      */
-    public CharacterService(@Nonnull CharacterAssets assets, @Nonnull BiPredicate<ComponentAccessor<EntityStore>, Ref<EntityStore>> eligible, @Nonnull IEventBus events, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings, ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, ResourceType<EntityStore, UniqueCharacters> uniqueType) {
+    public CharacterService(@Nonnull CharacterAssets assets, @Nonnull BiPredicate<ComponentAccessor<EntityStore>, Ref<EntityStore>> eligible, @Nonnull IEventBus events, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings, ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, ResourceType<EntityStore, UniqueCharacters> uniqueType, @Nonnull Supplier<UniverseCharacters> universe) {
         this.assets = assets;
         this.eligible = eligible;
         this.events = events;
@@ -65,6 +68,7 @@ public class CharacterService {
         this.warnings = warnings;
         this.identityType = identityType;
         this.uniqueType = uniqueType;
+        this.universe = universe;
     }
 
     /**
@@ -106,8 +110,16 @@ public class CharacterService {
      */
     @Nullable
     <T> T edit(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref, @Nonnull Function<CharacterNpc, T> action) {
-        CharacterNpc npc = CharacterNpc.of(accessor, ref, identityType, uniqueType);
+        CharacterNpc npc = npc(accessor, ref);
         return npc == null ? null : edit(npc, action);
+    }
+
+    /**
+     * @return the NPC with its claims routed by scope, {@code null} for an entity without UUID.
+     */
+    @Nullable
+    CharacterNpc npc(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref) {
+        return CharacterNpc.of(accessor, ref, identityType, uniqueType, universe.get(), this::knownCharacter);
     }
 
     <T> T edit(@Nonnull CharacterNpc npc, @Nonnull Function<CharacterNpc, T> action) {
@@ -142,9 +154,8 @@ public class CharacterService {
     boolean give(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
         if (npc.identity().getCharacter() != null || !eligible.test(npc.accessor(), npc.ref())) return false;
         OpenDialogueCharacterAsset character = character(characterId);
-        if (character == null || !npc.unique().isAvailable(characterId, assets::character)) return false;
+        if (character == null || !npc.unique().claimIfAvailable(characterId, npc.uuid(), assets::character)) return false;
 
-        if (character.getUniqueness().claims()) npc.unique().claim(characterId, npc.uuid());
         npc.identity().setCharacter(characterId);
         CharacterContext context = context(npc, character);
         each(character, "onAssigned", trait -> trait.onAssigned(context));
@@ -276,11 +287,20 @@ public class CharacterService {
                 run(trait, character, "onReleased", () -> trait.onReleased(context, reason));
             }
         }
-        npc.unique().release(npc.uuid(), reason, id -> { OpenDialogueCharacterAsset found = character(id); return found != null ? found : lastKnown.get(id); });
+        List<String> lost = npc.unique().release(npc.uuid(), reason, this::knownCharacter);
         String name = npc.identity().getName();
         npc.identity().setCharacter(null);
         npc.identity().setName(null);
         events.dispatchFor(CharacterEvent.Released.class, characterId).dispatch(new CharacterEvent.Released(npc.ref(), npc.uuid(), characterId, name, reason));
+        for (String id : lost) events.dispatchFor(CharacterEvent.Lost.class, id).dispatch(new CharacterEvent.Lost(id, CharacterEvent.Lost.Cause.Death));
+    }
+
+    /**
+     * @return what settles the universe characters of a world closing for good, to listen to world removals.
+     */
+    @Nonnull
+    public CharacterWorldClosing worldClosing() {
+        return new CharacterWorldClosing(universe, this::knownCharacter, events);
     }
 
     /**
@@ -316,6 +336,20 @@ public class CharacterService {
         Interactions interactions = npc.accessor().getComponent(npc.ref(), Interactions.getComponentType());
         if (interactions != null) interactions.setInteractionHint(null);
         npc.accessor().tryRemoveComponent(npc.ref(), Interactable.getComponentType());
+    }
+
+    /**
+     * @return whether the character is scoped to the universe and its last carrier was consumed,
+     * so no NPC anywhere will carry it again.
+     */
+    public boolean isLost(@Nonnull String characterId) {
+        return universe.get().isLost(characterId);
+    }
+
+    @Nullable
+    private OpenDialogueCharacterAsset knownCharacter(@Nonnull String characterId) {
+        OpenDialogueCharacterAsset found = character(characterId);
+        return found != null ? found : lastKnown.get(characterId);
     }
 
     @Nullable

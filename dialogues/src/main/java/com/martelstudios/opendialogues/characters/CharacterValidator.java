@@ -33,6 +33,7 @@ public final class CharacterValidator {
             String prefix = "Character '" + character.getId() + "' ";
             CharacterTrait[] traits = character.getTraits();
             if (traits.length == 0) problems.add(prefix + "has no trait.");
+            if (character.getScope() == CharacterScope.Universe && !character.getUniqueness().claims()) problems.add(prefix + "sets Scope Universe without Uniqueness, it has no effect.");
             List<String> answering = Arrays.stream(traits).filter(CharacterTrait::consumesUse).map(trait -> trait.getClass().getSimpleName()).toList();
             if (answering.size() > 1) problems.add(prefix + "has several traits answering F, only the first answers: " + answering + ".");
             for (CharacterTrait trait : traits) {

@@ -1,0 +1,11 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
+  "Categories": ["SideQuest"],
+  "TitleKey": "openquestsexamples.quest.kweebecmage.title",
+  "DescriptionKey": "openquestsexamples.quest.kweebecmage.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.kweebecmage.short",
+  "TargetQuantity": 1,
+  "Character": "OpenQuestsExamples_KweebecMage",
+  "AutoTrack": true
+}

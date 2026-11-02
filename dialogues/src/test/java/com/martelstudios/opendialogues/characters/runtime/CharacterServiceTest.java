@@ -42,6 +42,7 @@ class CharacterServiceTest {
     private final Map<String, OpenDialogueCharacterAsset> characters = new HashMap<>();
     private final List<OpenDialogueDistributionAsset> distributions = new ArrayList<>();
     private final UniqueCharacters unique = new UniqueCharacters();
+    private final UniverseCharacters universe = new UniverseCharacters();
     private final List<OpenDialoguesNPCIdentity> saved = new ArrayList<>();
     private boolean eligible = true;
 
@@ -387,6 +388,57 @@ class CharacterServiceTest {
         assertTrue(warnings.getFirst().contains("A"));
     }
 
+    @Test
+    void universeCharacterGivenInOneWorldIsRefusedInAnother() {
+        scopedCharacter("Hero", "Alive", "Universe");
+        UniverseCharacters universe = new UniverseCharacters();
+        CharacterService service = service();
+
+        assertTrue(service.give(npcIn(new UniqueCharacters(), universe), "Hero"));
+        assertFalse(service.give(npcIn(new UniqueCharacters(), universe), "Hero"));
+    }
+
+    @Test
+    void deathOfForeverUniverseFiresLost() {
+        scopedCharacter("Hero", "Forever", "Universe");
+        scopedCharacter("Oak", "Forever", "World");
+        List<CharacterEvent.Lost> lost = new ArrayList<>();
+        bus.registerGlobal(CharacterEvent.Lost.class, lost::add);
+        CharacterService service = service();
+        CharacterNpc hero = npcIn(unique, universe);
+        CharacterNpc oak = npcIn(unique, universe);
+        service.give(hero, "Hero");
+        service.give(oak, "Oak");
+
+        service.release(hero, ReleaseReason.Death);
+        service.release(oak, ReleaseReason.Death);
+
+        assertEquals(1, lost.size());
+        assertEquals("Hero", lost.getFirst().getCharacter());
+        assertEquals(CharacterEvent.Lost.Cause.Death, lost.getFirst().getCause());
+        assertTrue(service.isLost("Hero"));
+        assertFalse(service.isLost("Oak"));
+    }
+
+    @Test
+    void worldCharacterStaysPerWorld() {
+        scopedCharacter("Oak", "Alive", "World");
+        UniverseCharacters universe = new UniverseCharacters();
+        CharacterService service = service();
+
+        assertTrue(service.give(npcIn(new UniqueCharacters(), universe), "Oak"));
+        assertTrue(service.give(npcIn(new UniqueCharacters(), universe), "Oak"));
+    }
+
+    @Nonnull
+    private CharacterNpc npcIn(@Nonnull UniqueCharacters world, @Nonnull UniverseCharacters universe) {
+        return new CharacterNpc(null, new Ref<>(null), UUID.randomUUID(), new OpenDialoguesNPCIdentity(), new ScopedClaims(world, universe, UUID.randomUUID(), characters::get), saved::add);
+    }
+
+    private void scopedCharacter(@Nonnull String id, @Nonnull String uniqueness, @Nonnull String scope) {
+        characters.put(id, CharacterFixtures.character(id, "{ \"Uniqueness\": \"" + uniqueness + "\", \"Scope\": \"" + scope + "\", \"Traits\": [ " + AB + " ] }"));
+    }
+
     private void assertRefused(@Nonnull CharacterService service, @Nonnull CharacterNpc npc, @Nonnull String characterId) {
         assertFalse(service.give(npc, characterId));
         assertEquals(List.of(), RecordingTrait.LOG);
@@ -395,7 +447,7 @@ class CharacterServiceTest {
 
     @Nonnull
     private CharacterService service() {
-        return new CharacterService(CharacterFixtures.assets(characters, distributions, Map.of(), Map.of(), id -> true), (accessor, ref) -> eligible, bus, new SplittableRandom(1), (message, error) -> warnings.add(message), null, null);
+        return new CharacterService(CharacterFixtures.assets(characters, distributions, Map.of(), Map.of(), id -> true), (accessor, ref) -> eligible, bus, new SplittableRandom(1), (message, error) -> warnings.add(message), null, null, () -> universe);
     }
 
     @Nonnull
