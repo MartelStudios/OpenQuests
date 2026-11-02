@@ -40,11 +40,21 @@ class DeliveryTakeTest {
     }
 
     @Test
-    void given_items_are_summed_by_item_in_slot_order() {
-        Map<String, Integer> given = DeliveryTake.byItem(new String[]{"Stick", "Fibre", null, "Stick", "Oak"}, new int[]{2, 3, 0, 4, 0});
+    void each_carried_item_gives_what_it_alone_would_take() {
+        Predicate<String> anyPlant = id -> id.equals("Fibre") || id.equals("Leaf");
+        Map<String, Integer> givable = DeliveryTake.givable(new String[]{"Leaf", "Fibre", null, "Oak", "Fibre"}, new int[]{5, 3, 0, 9, 4}, List.of(anyPlant), new int[]{6});
 
-        assertEquals(List.of("Stick", "Fibre"), List.copyOf(given.keySet()));
-        assertEquals(6, given.get("Stick"));
-        assertEquals(3, given.get("Fibre"));
+        assertEquals(List.of("Leaf", "Fibre"), List.copyOf(givable.keySet()));
+        assertEquals(5, givable.get("Leaf"));
+        assertEquals(6, givable.get("Fibre"));
+    }
+
+    @Test
+    void only_what_left_the_inventory_is_credited() {
+        // Planned 3 and 2, but the second slot gave up 1 only
+        int[] removed = {3, 1};
+        DeliveryTake.Taken credited = DeliveryTake.take(new String[]{"Fibre", "Stick"}, removed, List.of(is("Fibre"), is("Stick")), new int[]{3, 2});
+
+        assertArrayEquals(new int[]{3, 1}, credited.perItem());
     }
 }

@@ -51,9 +51,7 @@ public final class DeliveryTakeOver {
         for (DeliverQuestProgression quest : quests) {
             OpenQuestsDeliverAsset asset = quest.getAsset();
             characters.add(asset.getCharacter());
-            int[] questMissing = new int[asset.getItems().length];
-            for (int i = 0; i < questMissing.length; i++) questMissing[i] = quest.missing(i);
-            missing.add(questMissing);
+            missing.add(Deliveries.missing(quest));
             carried.add(inventory.carried(asset.getItems()));
         }
 
@@ -65,10 +63,7 @@ public final class DeliveryTakeOver {
         DialogueSource source = new DialogueSource(event.getUuid(), event.getCharacter(), event.getName(), speakerOf(event.getCharacter()));
         String dialogue = quest.getAsset().getDialogue();
         if (dialogue != null) DialogueTriggers.openFor(player, OpenDialoguesTarget.of(dialogue, null), source, "Delivery quest '" + quest.getAssetId() + "'");
-        else {
-            DeliveryTake.Taken taken = DeliveryTake.take(inventory.ids, inventory.quantities, DeliveryInventory.filters(quest.getAsset().getItems()), missing.get(picked));
-            DeliveryScreen.open(player, quest, source, answersF(event.getCharacter()), DeliveryTake.byItem(inventory.ids, taken.removals()));
-        }
+        else DeliveryScreen.open(player, quest, source, answersF(event.getCharacter()), Deliveries.givable(quest, inventory));
     }
 
     /**

@@ -46,15 +46,31 @@ public final class DeliveryTake {
     }
 
     /**
-     * Sums the removals by the item each slot holds, in slot order, so a screen names what the
-     * player actually hands over, whatever filter accepted it.
+     * @return for each item id carried, in slot order, how many handing over that item alone would
+     * take, which is what its button gives; ids giving nothing are left out.
      */
     @Nonnull
-    public static Map<String, Integer> byItem(@Nonnull String[] slotIds, @Nonnull int[] removals) {
-        Map<String, Integer> given = new LinkedHashMap<>();
-        for (int slot = 0; slot < slotIds.length; slot++) {
-            if (removals[slot] > 0) given.merge(slotIds[slot], removals[slot], Integer::sum);
+    public static Map<String, Integer> givable(@Nonnull String[] slotIds, @Nonnull int[] slotQuantities, @Nonnull List<Predicate<String>> items, @Nonnull int[] missing) {
+        Map<String, Integer> givable = new LinkedHashMap<>();
+        for (String id : slotIds) {
+            if (id == null || givable.containsKey(id)) continue;
+            int total = 0;
+            for (int removal : take(only(slotIds, id), slotQuantities, items, missing).removals()) total += removal;
+            givable.put(id, total);
         }
-        return given;
+        givable.values().removeIf(total -> total == 0);
+        return givable;
+    }
+
+    /**
+     * @return the slots with every item but one emptied, so a take hands over that item alone.
+     */
+    @Nonnull
+    public static String[] only(@Nonnull String[] slotIds, @Nonnull String itemId) {
+        String[] only = new String[slotIds.length];
+        for (int slot = 0; slot < slotIds.length; slot++) {
+            if (itemId.equals(slotIds[slot])) only[slot] = itemId;
+        }
+        return only;
     }
 }

@@ -8,5 +8,5 @@ quest.default.characterAnswer = Répondre à {character}{quantity, plural, one {
 quest.default.deliver = Apporter des objets à {character}
 quest.default.someone = quelqu'un
 delivery.list = Tu m'apportes {items} ?
-delivery.give = Remettre {items}.
+delivery.give = Remettre {item}.
 delivery.other = Autre chose.

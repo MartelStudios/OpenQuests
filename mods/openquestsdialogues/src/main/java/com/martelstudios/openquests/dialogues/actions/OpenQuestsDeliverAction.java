@@ -34,13 +34,6 @@ public class OpenQuestsDeliverAction extends DialogueAction {
     OpenQuestsDeliverAction() {}
 
     /**
-     * For the generated delivery screen, which knows the quest it opened for.
-     */
-    public OpenQuestsDeliverAction(@Nonnull String quest) {
-        this.quest = quest;
-    }
-
-    /**
      * Defers to the player's world thread when called elsewhere, since only it may touch the inventory.
      */
     @Override
@@ -51,7 +44,7 @@ public class OpenQuestsDeliverAction extends DialogueAction {
 
         Store<EntityStore> store = ref.getStore();
         Runnable deliver = () -> {
-            if (ref.isValid()) Deliveries.deliver(OpenQuestsServices.installed().getQuestProgressionService(), store, ref, player.getUuid(), quest);
+            if (ref.isValid()) Deliveries.deliver(OpenQuestsServices.installed().getQuestProgressionService(), store, ref, player.getUuid(), quest, null);
         };
         if (store.isInThread()) deliver.run();
         else store.getExternalData().getWorld().execute(deliver);
