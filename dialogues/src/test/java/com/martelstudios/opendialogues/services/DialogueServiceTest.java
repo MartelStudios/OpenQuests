@@ -240,4 +240,17 @@ class DialogueServiceTest {
         assertTrue(display.closed.isEmpty());
         assertEquals(AnswerResult.NO_DIALOGUE, service.answer(player, null, 1));
     }
+
+    @Test
+    void aGeneratedDialogueOpensAndAnswers() {
+        OpenDialogueAsset dialogue = OpenDialogueAsset.generated("Generated_Test", null, new String[]{"Hello there."},
+            new OpenDialoguesResponse[]{OpenDialoguesResponse.generated("Bye", "Goodbye.", new OpenDialoguesCloseAction())});
+
+        service.open(player, dialogue, null);
+
+        assertEquals("Generated_Test", display.shown.getLast().dialogueId());
+        assertEquals(List.of("Goodbye."), texts(display.shown.getLast()));
+        assertEquals(AnswerResult.ANSWERED, service.answer(player, "Generated_Test", 1));
+        assertEquals(List.of("Opened", "Answered", "Closed"), eventNames());
+    }
 }

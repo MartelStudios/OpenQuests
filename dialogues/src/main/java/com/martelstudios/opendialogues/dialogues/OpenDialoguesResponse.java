@@ -53,6 +53,18 @@ public class OpenDialoguesResponse {
     protected OpenDialoguesResponse() {}
 
     /**
+     * Builds an answer for a dialogue made in code: always shown, its text as given.
+     */
+    @Nonnull
+    public static OpenDialoguesResponse generated(@Nonnull String id, @Nonnull String text, @Nonnull DialogueAction... actions) {
+        OpenDialoguesResponse response = new OpenDialoguesResponse();
+        response.id = id;
+        response.text = text;
+        response.actions = actions.clone();
+        return response;
+    }
+
+    /**
      * @return the name history records the answer under, or {@code null} to record it by position.
      */
     @Nullable
