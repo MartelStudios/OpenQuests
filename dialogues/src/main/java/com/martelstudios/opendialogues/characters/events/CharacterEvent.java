@@ -121,6 +121,9 @@ public abstract class CharacterEvent {
 
         private boolean cancelled;
 
+        /**
+         * @param player who pressed F.
+         */
         public Using(@Nonnull Ref<EntityStore> npc, @Nonnull UUID uuid, @Nonnull String character, @Nullable String name, @Nonnull PlayerRef player) {
             super(npc, uuid, character, name);
             this.player = player;

@@ -46,10 +46,16 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset {
 
         protected DeliverItem() {}
 
+        /**
+         * @return which items count towards this entry.
+         */
         public QuestItemFilter getItem() {
             return item;
         }
 
+        /**
+         * @return how many the character wants, at least 1.
+         */
         public int getQuantity() {
             return quantity;
         }
@@ -106,15 +112,24 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset {
         return total;
     }
 
+    /**
+     * @return the id of the character the items go to.
+     */
     public String getCharacter() {
         return character;
     }
 
+    /**
+     * @return the requested items, in the order their counts are kept.
+     */
     @Nonnull
     public DeliverItem[] getItems() {
         return items;
     }
 
+    /**
+     * @return the author's delivery dialogue id, {@code null} for the generated screen.
+     */
     @Nullable
     public String getDialogue() {
         return dialogue;

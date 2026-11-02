@@ -26,6 +26,9 @@ public final class DeliveryTakeOver {
 
     private final QuestProgressionService progression;
 
+    /**
+     * @param progression where the running deliveries are looked up on each press.
+     */
     public DeliveryTakeOver(@Nonnull QuestProgressionService progression) {
         this.progression = progression;
     }
@@ -93,11 +96,15 @@ public final class DeliveryTakeOver {
         return -1;
     }
 
+    /**
+     * Leaves out a quest whose constraints refuse this player's progress now, such as a step a
+     * composite has not reached yet, since its screen would take nothing.
+     */
     @Nonnull
     private List<DeliverQuestProgression> running(@Nonnull UUID playerId) {
         List<DeliverQuestProgression> running = new ArrayList<>();
         for (UUID questId : progression.getQuestIdsForType(DeliverQuestProgression.class)) {
-            if (progression.getLiveQuest(questId) instanceof DeliverQuestProgression quest && !quest.isOver() && quest.getAsset() != null && quest.getPlayers().contains(playerId)) running.add(quest);
+            if (progression.getLiveQuest(questId) instanceof DeliverQuestProgression quest && !quest.isOver() && quest.getAsset() != null && quest.getPlayers().contains(playerId) && quest.allowsProgress(playerId)) running.add(quest);
         }
         return running;
     }
