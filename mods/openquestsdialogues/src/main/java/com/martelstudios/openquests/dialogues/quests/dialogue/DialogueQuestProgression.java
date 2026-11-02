@@ -53,7 +53,7 @@ public class DialogueQuestProgression extends QuantityQuestProgression<DialogueQ
      * The epithet rather than a drawn name, since one title serves every NPC carrying the character.
      */
     @Nonnull
-    private static Message characterName(@Nonnull String characterId) {
+    public static Message characterName(@Nonnull String characterId) {
         OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(characterId);
         String epithet = character == null ? null : character.getEpithet();
         return epithet != null ? Message.translation(epithet) : Message.raw(characterId);

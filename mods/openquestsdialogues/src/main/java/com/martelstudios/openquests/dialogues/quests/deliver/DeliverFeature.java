@@ -1,0 +1,22 @@
+package com.martelstudios.openquests.dialogues.quests.deliver;
+
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.martelstudios.openquests.core.OpenQuestsServices;
+
+import javax.annotation.Nonnull;
+
+/**
+ * Bring items to an NPC character through a delivery screen on F.
+ */
+public final class DeliverFeature {
+    public static final String TYPE_ID = "Deliver";
+
+    private DeliverFeature() {}
+
+    /**
+     * Registers the quest type.
+     */
+    public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
+        services.getQuestProgressionService().registerQuestType(TYPE_ID, OpenQuestsDeliverAsset.class, OpenQuestsDeliverAsset.CODEC, DeliverQuestProgression.class, DeliverQuestProgression.CODEC);
+    }
+}

@@ -5,3 +5,4 @@ quest.default.anyAnswer = Donner une réponse{quantity, plural, one {} other { {
 quest.default.character = Parler à {character}{quantity, plural, one {} other { {quantity, number} fois}}
 quest.default.characterDialogue = Parler de {dialogue} à {character}{quantity, plural, one {} other { {quantity, number} fois}}
 quest.default.characterAnswer = Répondre à {character}{quantity, plural, one {} other { {quantity, number} fois}}
+quest.default.deliver = Apporter des objets à {character}
