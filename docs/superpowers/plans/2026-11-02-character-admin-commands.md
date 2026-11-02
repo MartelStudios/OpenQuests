@@ -92,6 +92,7 @@
   - `public List<String> resetDead()`: `universe.get().resetDead()`.
   - `public int resetWorld(Store<EntityStore> store)`: `store.getResource(uniqueType).reset()` then `settleLoaded(store)`.
   - `public int settleLoaded(Store<EntityStore> store)`: catches the world registry up, collects the refs of entities holding `identityType` through `store.forEachChunk(identityType, ...)` (refs gathered first, edited after the loop), runs `edit(store, ref, npc -> null)` on each, returns how many were stale.
+  - `public void settle(ComponentAccessor<EntityStore> accessor, Ref<EntityStore> ref)`: `edit(accessor, ref, npc -> null)`, for commands outside the package (`edit` stays package-private).
   - `public UniqueCharacters worldRegistry(Store<EntityStore> store)` and `public UniverseCharacters universeRegistry()` for `info`.
 
 - [ ] **Step 1: Write failing tests** in `CharacterServiceTest` (helpers as existing; `npc()` passes `unique` twice):
@@ -155,7 +156,7 @@
 - Consumes: Task 2 `CharacterService` public API, Task 3 `CharacterSettings` and `Config<CharacterSettings>` (`save()` after a change).
 - Behaviour:
   - Each targeted ref that is not an NPC (`NPCEntity` component absent) gets `...notNpc`.
-  - `info`: NPC UUID and role, character id or `...info.nobody`, name key rendered with `Message.translation(name)`, draws joined by `, `, uniqueness and scope, claim state from the matching registry `describe()` (`carried`, `consumed`, `free`). Calls `service.edit(store, ref, npc -> null)` before `service.identity(store, ref)`, so a stale NPC shows clean.
+  - `info`: NPC UUID and role, character id or `...info.nobody`, name key rendered with `Message.translation(name)`, draws joined by `, `, uniqueness and scope, claim state from the matching registry `describe()` (`carried`, `consumed`, `free`). Calls `service.settle(store, ref)` before `service.identity(store, ref)`, so a stale NPC shows clean.
   - `assign <character>`: arg `AssetArgumentType<OpenDialogueCharacterAsset, ...>("Character", OpenDialogueCharacterAsset.class, key)`; one message per `AssignResult`.
   - `unassign`: `...unassign.done` with the id, or `...unassign.nobody`.
   - `reset`: `resetUniverse()`, then for each `Universe.get().getWorlds().values()` `world.execute(() -> settleLoaded(store))`, each world replying `...reset.world` with its name and count; first line `...reset.universe`.
