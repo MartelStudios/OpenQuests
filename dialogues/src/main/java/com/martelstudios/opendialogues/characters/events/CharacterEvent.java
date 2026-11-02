@@ -3,6 +3,7 @@ package com.martelstudios.opendialogues.characters.events;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.event.ICancellable;
 import com.hypixel.hytale.event.IEvent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.characters.ReleaseReason;
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
@@ -106,6 +107,44 @@ public abstract class CharacterEvent {
         @Nullable
         public String getName() {
             return name;
+        }
+    }
+
+    /**
+     * A player pressed F on an NPC carrying a character, before any trait answers. Cancelling means
+     * a listener showed the player something else, and the traits stay quiet for that press.
+     */
+    public static final class Using extends OfCharacter implements ICancellable {
+
+        @Nonnull
+        private final PlayerRef player;
+
+        private boolean cancelled;
+
+        /**
+         * @param player who pressed F.
+         */
+        public Using(@Nonnull Ref<EntityStore> npc, @Nonnull UUID uuid, @Nonnull String character, @Nullable String name, @Nonnull PlayerRef player) {
+            super(npc, uuid, character, name);
+            this.player = player;
+        }
+
+        /**
+         * @return who pressed F.
+         */
+        @Nonnull
+        public PlayerRef getPlayer() {
+            return player;
+        }
+
+        @Override
+        public boolean isCancelled() {
+            return cancelled;
+        }
+
+        @Override
+        public void setCancelled(boolean cancelled) {
+            this.cancelled = cancelled;
         }
     }
 

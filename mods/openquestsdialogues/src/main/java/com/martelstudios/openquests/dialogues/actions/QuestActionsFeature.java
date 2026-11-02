@@ -17,5 +17,6 @@ public final class QuestActionsFeature {
         DialogueRegistry registry = OpenDialoguesPlugin.get().getRegistry();
         registry.registerAction(OpenQuestsAssignQuestAction.TYPE, OpenQuestsAssignQuestAction.class, OpenQuestsAssignQuestAction.CODEC);
         registry.registerAction(OpenQuestsSetQuestStateAction.TYPE, OpenQuestsSetQuestStateAction.class, OpenQuestsSetQuestStateAction.CODEC);
+        registry.registerAction(OpenQuestsDeliverAction.TYPE, OpenQuestsDeliverAction.class, OpenQuestsDeliverAction.CODEC);
     }
 }

@@ -1,3 +1,5 @@
 character.death.named = On murmure que {name}, {epithet}, a rendu son dernier souffle.
 character.death.name = On murmure que {name} a rendu son dernier souffle.
 character.death.epithet = On murmure que celui qu'on appelait {epithet} a rendu son dernier souffle.
+character.nothing = {name} n'a rien à te dire.
+character.goodbye = Au revoir.

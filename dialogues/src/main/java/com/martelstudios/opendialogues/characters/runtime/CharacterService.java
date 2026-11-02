@@ -19,6 +19,7 @@ import com.martelstudios.opendialogues.characters.events.CharacterEvent;
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,10 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.random.RandomGenerator;
 
 /**
@@ -47,6 +50,8 @@ public class CharacterService {
     private final ResourceType<EntityStore, UniqueCharacters> uniqueType;
     private final Set<String> reported = ConcurrentHashMap.newKeySet();
     private final Map<String, OpenDialogueCharacterAsset> lastKnown = new ConcurrentHashMap<>();
+    private final List<Predicate<String>> demands = new CopyOnWriteArrayList<>();
+    private volatile BiConsumer<CharacterContext, PlayerRef> unanswered = (context, player) -> {};
 
     /**
      * @param eligible whether an NPC may receive a character at all, so no mod's NPC is taken over.
@@ -162,14 +167,27 @@ public class CharacterService {
         }
         CharacterContext context = context(npc, character);
         each(character, "onApplied", trait -> trait.onApplied(context));
+        syncDemand(npc, character);
     }
 
     /**
      * @return whether a trait answered the player's F, in which case the NPC's own use must not run.
      */
     boolean use(@Nonnull CharacterNpc npc, @Nonnull PlayerRef player) {
+        return use(npc, player, true);
+    }
+
+    /**
+     * @param takeOver whether listeners of {@link CharacterEvent.Using} may answer first; false once
+     *                 one of them already showed its screen and now hands the NPC back.
+     */
+    boolean use(@Nonnull CharacterNpc npc, @Nonnull PlayerRef player, boolean takeOver) {
         OpenDialogueCharacterAsset character = characterOf(npc);
         if (character == null) return false;
+        if (takeOver) {
+            CharacterEvent.Using using = events.dispatchFor(CharacterEvent.Using.class, character.getId()).dispatch(new CharacterEvent.Using(npc.ref(), npc.uuid(), character.getId(), npc.identity().getName(), player));
+            if (using.isCancelled()) return true;
+        }
         CharacterContext context = context(npc, character);
         for (CharacterTrait trait : character.getTraits()) {
             try {
@@ -178,7 +196,64 @@ public class CharacterService {
                 report(trait, character, "onUse", e);
             }
         }
+        if (!demanded(character.getId())) return false;
+        unanswered.accept(context, player);
+        return true;
+    }
+
+    /**
+     * Runs an NPC's normal use, its traits only, for a screen that took F over and hands it back.
+     *
+     * @return whether a trait or the fallback answered.
+     */
+    public boolean useWithoutTakeOver(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef player) {
+        return Boolean.TRUE.equals(edit(accessor, ref, npc -> use(npc, player, false)));
+    }
+
+    /**
+     * Makes the characters a predicate names answer F even without a trait for it, for a mod that
+     * takes F over on them. Asked on every scan, so a predicate turning false lets F go.
+     */
+    public void demandInteraction(@Nonnull Predicate<String> demanded) {
+        demands.add(demanded);
+    }
+
+    /**
+     * Answers F on a demanded character no trait nor listener answered, so the press never does nothing.
+     */
+    public void onUnanswered(@Nonnull BiConsumer<CharacterContext, PlayerRef> fallback) {
+        this.unanswered = fallback;
+    }
+
+    private boolean demanded(@Nonnull String characterId) {
+        for (Predicate<String> demand : demands) {
+            if (demand.test(characterId)) return true;
+        }
         return false;
+    }
+
+    @Nullable
+    private static String traitHint(@Nonnull OpenDialogueCharacterAsset character) {
+        for (CharacterTrait trait : character.getTraits()) {
+            if (trait.interactionHint() != null) return trait.interactionHint();
+        }
+        return null;
+    }
+
+    /**
+     * Gives a demanded character without its own F the components a trait would, and takes them
+     * back once no demand remains; a trait owning F keeps them its way.
+     */
+    private void syncDemand(@Nonnull CharacterNpc npc, @Nonnull OpenDialogueCharacterAsset character) {
+        if (npc.accessor() == null || traitHint(character) != null) return;
+        Interactions interactions = npc.accessor().getComponent(npc.ref(), Interactions.getComponentType());
+        if (demanded(character.getId())) {
+            npc.accessor().ensureAndGetComponent(npc.ref(), Interactable.getComponentType());
+            if (interactions != null && !OpenDialoguesDialogueTrait.DEFAULT_HINT.equals(interactions.getInteractionHint())) interactions.setInteractionHint(OpenDialoguesDialogueTrait.DEFAULT_HINT);
+        } else if (interactions != null && OpenDialoguesDialogueTrait.DEFAULT_HINT.equals(interactions.getInteractionHint())) {
+            interactions.setInteractionHint(null);
+            npc.accessor().tryRemoveComponent(npc.ref(), Interactable.getComponentType());
+        }
     }
 
     /**
@@ -215,10 +290,8 @@ public class CharacterService {
     public String hint(@Nonnull OpenDialoguesNPCIdentity identity) {
         OpenDialogueCharacterAsset character = identity.getCharacter() == null ? null : character(identity.getCharacter());
         if (character == null) return null;
-        for (CharacterTrait trait : character.getTraits()) {
-            if (trait.interactionHint() != null) return trait.interactionHint();
-        }
-        return null;
+        String hint = traitHint(character);
+        return hint != null || !demanded(character.getId()) ? hint : OpenDialoguesDialogueTrait.DEFAULT_HINT;
     }
 
     /**

@@ -85,6 +85,26 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
 
     protected OpenDialogueAsset() {}
 
+    /**
+     * Speaker that shows the source NPC's drawn name and lent epithet, for dialogues built in code.
+     */
+    public static final String NPC_SPEAKER = "OpenDialogues_Npc";
+
+    /**
+     * Builds a dialogue outside the asset store, for screens whose text is only known when shown.
+     * Its texts are shown as given, a text that is no translation key reading as is.
+     */
+    @Nonnull
+    public static OpenDialogueAsset generated(@Nonnull String id, @Nullable String speakerId, @Nonnull String[] pageTexts, @Nonnull OpenDialoguesResponse[] responses) {
+        OpenDialogueAsset dialogue = new OpenDialogueAsset();
+        dialogue.id = id;
+        dialogue.speaker = speakerId;
+        dialogue.pages = new OpenDialoguesPage[pageTexts.length];
+        for (int i = 0; i < pageTexts.length; i++) dialogue.pages[i] = new OpenDialoguesPage(pageTexts[i]);
+        dialogue.responses = responses.clone();
+        return dialogue;
+    }
+
     @Override
     public String getId() {
         return id;

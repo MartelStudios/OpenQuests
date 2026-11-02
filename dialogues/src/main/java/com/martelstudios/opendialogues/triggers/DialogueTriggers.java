@@ -5,6 +5,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.OpenDialoguesPlugin;
+import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
 
@@ -51,5 +52,16 @@ public final class DialogueTriggers {
                 LOGGER.atWarning().log("%s opens a target leading to no dialogue.", caller);
             }
         });
+    }
+
+    /**
+     * Opens a dialogue built in code, deferred like the others since a press of F arrives while the
+     * store is ticking and opening reads the player's history.
+     */
+    public static void openFor(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, @Nullable DialogueSource from) {
+        Ref<EntityStore> ref = player.getReference();
+        if (ref == null || !ref.isValid()) return;
+
+        ref.getStore().getExternalData().getWorld().execute(() -> OpenDialoguesPlugin.get().getDialogueService().open(player, dialogue, from));
     }
 }

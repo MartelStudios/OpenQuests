@@ -134,7 +134,7 @@ public class DialogueService {
      * Shows a resolved dialogue in place of the dialogue open; with no answer to see, it ends as soon
      * as shown. Off the player's world thread, conditions see no history nor inventory.
      */
-    void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
+    public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
         DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue), source, SpeakerView.of(dialogue.getSpeakerId() == null ? null : speakers.apply(dialogue.getSpeakerId()), source, speakers));
         DialogueSession replaced = sessions.put(player.getUuid(), session);
         if (replaced != null) closed(player, replaced);

@@ -53,6 +53,29 @@ public class OpenDialoguesResponse {
     protected OpenDialoguesResponse() {}
 
     /**
+     * Builds an answer for a dialogue made in code: always shown, its text as given.
+     */
+    @Nonnull
+    public static OpenDialoguesResponse generated(@Nonnull String id, @Nonnull String text, @Nonnull DialogueAction... actions) {
+        OpenDialoguesResponse response = new OpenDialoguesResponse();
+        response.id = id;
+        response.text = text;
+        response.actions = actions.clone();
+        return response;
+    }
+
+    /**
+     * Sets the image a generated answer draws on a page, such as the icon of an item it hands over.
+     *
+     * @param icon a path relative to {@code Common/}, or {@code null} for none.
+     */
+    @Nonnull
+    public OpenDialoguesResponse withIcon(@Nullable String icon) {
+        this.icon = icon;
+        return this;
+    }
+
+    /**
      * @return the name history records the answer under, or {@code null} to record it by position.
      */
     @Nullable

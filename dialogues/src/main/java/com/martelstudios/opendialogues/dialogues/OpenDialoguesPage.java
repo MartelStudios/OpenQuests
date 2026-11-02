@@ -21,6 +21,10 @@ public class OpenDialoguesPage {
 
     protected OpenDialoguesPage() {}
 
+    OpenDialoguesPage(@Nonnull String text) {
+        this.text = text;
+    }
+
     /**
      * @return the text of the page, or its translation key.
      */
