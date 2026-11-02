@@ -84,17 +84,14 @@ public final class LostCharacterQuests {
 
     /**
      * Fails a quest its holder brings back after its target was lost. A quest loading because it is
-     * being assigned is not in its holder's store yet: {@link #onAssigned} checks it instead.
+     * being assigned has no holder yet, or is not in their store: {@link #onAssigned} checks it instead.
      */
     public void onLoaded(@Nonnull QuestLoadedEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
         if (!shouldFail(targetOf(quest.getAsset()), quest.isOver(), isLost)) return;
 
         UUID holder = quest.getPlayers().stream().findFirst().orElse(null);
-        if (holder == null) {
-            fail(quest);
-            return;
-        }
+        if (holder == null) return;
         EntityComponents.update(holder, components -> {
             QuestStoreComponent store = components.getComponent(QuestStoreComponent.getComponentType());
             if (failsOnLoad(targetOf(quest.getAsset()), quest.isOver(), isLost, store != null && store.getQuestIds().contains(quest.getId()))) fail(quest);
