@@ -1,13 +1,13 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.opendialogues.OpenDialoguesPlugin;
 import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
 import com.martelstudios.opendialogues.api.PlayerTexts;
 import com.martelstudios.opendialogues.characters.traits.CharacterContext;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
+import com.martelstudios.opendialogues.triggers.DialogueTriggers;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -35,6 +35,6 @@ public final class NothingToSay {
         OpenDialogueAsset dialogue = OpenDialogueAsset.generated(DIALOGUE_ID, OpenDialogueAsset.NPC_SPEAKER,
             new String[]{PlayerTexts.translate(player, "opendialogues.character.nothing", Map.of("name", name))},
             new OpenDialoguesResponse[]{OpenDialoguesResponse.generated("Goodbye", PlayerTexts.translate(player, "opendialogues.character.goodbye", Map.of()), new OpenDialoguesCloseAction())});
-        OpenDialoguesPlugin.get().getDialogueService().open(player, dialogue, new DialogueSource(context.uuid(), context.character().getId(), nameKey, null));
+        DialogueTriggers.openFor(player, dialogue, new DialogueSource(context.uuid(), context.character().getId(), nameKey, null));
     }
 }

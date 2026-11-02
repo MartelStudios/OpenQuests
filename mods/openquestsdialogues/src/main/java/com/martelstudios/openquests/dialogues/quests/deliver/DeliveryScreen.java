@@ -1,13 +1,13 @@
 package com.martelstudios.openquests.dialogues.quests.deliver;
 
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.opendialogues.OpenDialoguesPlugin;
 import com.martelstudios.opendialogues.actions.impl.character.OpenDialoguesUseCharacterAction;
 import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
 import com.martelstudios.opendialogues.api.PlayerTexts;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
+import com.martelstudios.opendialogues.triggers.DialogueTriggers;
 import com.martelstudios.openquests.dialogues.actions.OpenQuestsDeliverAction;
 import com.martelstudios.openquests.dialogues.quests.deliver.OpenQuestsDeliverAsset.DeliverItem;
 
@@ -47,7 +47,7 @@ public final class DeliveryScreen {
                                      : OpenDialoguesResponse.generated("Goodbye", PlayerTexts.translate(player, "opendialogues.character.goodbye", Map.of()), new OpenDialoguesCloseAction());
 
         OpenDialogueAsset dialogue = OpenDialogueAsset.generated(DIALOGUE_ID, OpenDialogueAsset.NPC_SPEAKER, new String[]{page}, new OpenDialoguesResponse[]{give, exit});
-        OpenDialoguesPlugin.get().getDialogueService().open(player, dialogue, source);
+        DialogueTriggers.openFor(player, dialogue, source);
     }
 
     @Nonnull
