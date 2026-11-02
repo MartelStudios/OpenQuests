@@ -1,11 +1,8 @@
 package com.martelstudios.openquests.dialogues.quests;
 
-import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.OpenDialoguesPlugin;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
 import com.martelstudios.openquests.core.OpenQuestsServices;
@@ -123,29 +120,17 @@ public final class LostCharacterQuests {
     }
 
     /**
-     * On the world thread of a holder, where every other change to the quest is made. With nobody
-     * online there is no such thread, and no session either for the outcome to race.
+     * On the world thread of a holder, online ones first, where every other change to the quest is
+     * made; followed to another world when theirs is the one closing. With no holder, at once.
      */
     private void failOnHolderThread(@Nonnull AbstractQuestProgression<?> quest) {
-        Ref<EntityStore> reference = firstOnlineHolder(quest);
-        if (reference == null) {
-            fail(quest);
-            return;
-        }
-        reference.getStore().getExternalData().getWorld().execute(() -> fail(quest));
+        UUID holder = quest.getPlayers().stream().filter(playerId -> Universe.get().getPlayer(playerId) != null).findFirst()
+                           .orElse(quest.getPlayers().stream().findFirst().orElse(null));
+        if (holder == null) fail(quest);
+        else EntityComponents.update(holder, components -> fail(quest));
     }
 
     private void fail(@Nonnull AbstractQuestProgression<?> quest) {
         if (shouldFail(targetOf(quest.getAsset()), quest.isOver(), isLost)) progression.progress(new SetStateVisitor(QuestState.FAILED), List.of(quest.getId()));
-    }
-
-    @Nullable
-    private static Ref<EntityStore> firstOnlineHolder(@Nonnull AbstractQuestProgression<?> quest) {
-        for (UUID playerId : quest.getPlayers()) {
-            PlayerRef online = Universe.get().getPlayer(playerId);
-            Ref<EntityStore> reference = online == null ? null : online.getReference();
-            if (reference != null && reference.isValid()) return reference;
-        }
-        return null;
     }
 }
