@@ -145,7 +145,7 @@ public class CharacterService {
 
         CharacterAssigner.Draw draw = CharacterAssigner.assign(npc.identity().getDraws(), List.copyOf(assets.distributions()), context, id -> npc.unique().isAvailable(id, assets::character), random, this::warnOnce);
         draw.drawn().forEach(npc.identity()::recordDraw);
-        if (!draw.drawn().isEmpty()) stamp(npc);
+        if (!draw.drawn().isEmpty()) stamp(npc, universe.get().generation());
         return draw.character() != null && give(npc, draw.character()) ? draw.character() : null;
     }
 
@@ -158,10 +158,11 @@ public class CharacterService {
     boolean give(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
         if (npc.identity().getCharacter() != null || !eligible.test(npc.accessor(), npc.ref())) return false;
         OpenDialogueCharacterAsset character = character(characterId);
+        int generation = universe.get().generation();
         if (character == null || !npc.unique().claimIfAvailable(characterId, npc.uuid(), assets::character)) return false;
 
         npc.identity().setCharacter(characterId);
-        stamp(npc);
+        stamp(npc, generation);
         CharacterContext context = context(npc, character);
         each(character, "onAssigned", trait -> trait.onAssigned(context));
         each(character, "onApplied", trait -> trait.onApplied(context));
@@ -297,19 +298,20 @@ public class CharacterService {
      */
     void settle(@Nonnull CharacterNpc npc) {
         UniverseCharacters registry = universe.get();
-        npc.world().catchUp(registry.generation(), registry.deadGeneration());
+        int generation = registry.generation();
+        npc.world().catchUp(generation, registry.deadGeneration());
         if (npc.identity().isBlank() || !isBehind(npc.identity(), npc.world())) return;
         release(npc, ReleaseReason.Revoked);
         npc.identity().clearDraws();
-        stamp(npc);
+        stamp(npc, generation);
     }
 
     private boolean isBehind(@Nonnull OpenDialoguesNPCIdentity identity, @Nonnull UniqueCharacters world) {
         return identity.getUniverseGeneration() != universe.get().generation() || identity.getWorldGeneration() != world.generation();
     }
 
-    private void stamp(@Nonnull CharacterNpc npc) {
-        npc.identity().stamp(universe.get().generation(), npc.world().generation());
+    private static void stamp(@Nonnull CharacterNpc npc, int universeGeneration) {
+        npc.identity().stamp(universeGeneration, npc.world().generation());
     }
 
     /**

@@ -519,6 +519,24 @@ class CharacterServiceTest {
     }
 
     @Test
+    void resetRightAfterAClaimLeavesTheNpcStale() {
+        scopedCharacter("Hero", "Alive", "Universe");
+        CharacterService service = service();
+        CharacterNpc hero = npcIn(unique, universe);
+        boolean[] once = {true};
+        universe.setOnChange(() -> {
+            if (once[0]) {
+                once[0] = false;
+                universe.reset();
+            }
+        });
+
+        service.give(hero, "Hero");
+
+        assertEquals(0, hero.identity().getUniverseGeneration());
+    }
+
+    @Test
     void deadResetOfUniverseCharacterReturnsIt() {
         scopedCharacter("Mage", "Forever", "Universe");
         CharacterService service = service();
