@@ -4,6 +4,7 @@ import com.martelstudios.opendialogues.CodecJson;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +64,13 @@ class ValidatorTest {
         assertProblem(problems, "Village", "Ghost");
     }
 
+    @Test
+    void universeScopeWithoutUniqueness() {
+        String hello = "{ \"Type\": \"Dialogue\", \"Dialogue\": { \"Dialogue\": \"Hello\" } }";
+        assertProblem(problems(Map.of("Everywhere", character("Everywhere", "\"Scope\": \"Universe\"", hello)), List.of()), "Everywhere", "Scope");
+        assertTrue(problems(Map.of("Hero", character("Hero", "\"Uniqueness\": \"Alive\", \"Scope\": \"Universe\"", hello)), List.of()).isEmpty());
+    }
+
     @Nonnull
     private static List<String> problems(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions) {
         return CharacterValidator.validate(CharacterFixtures.assets(characters, distributions, Map.of("Empty", EMPTY_LIST), Map.of(), Set.of("Hello")::contains));
@@ -74,7 +82,12 @@ class ValidatorTest {
 
     @Nonnull
     private static OpenDialogueCharacterAsset character(@Nonnull String id, @Nonnull String traits) {
-        OpenDialogueCharacterAsset character = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{ \"Traits\": [ " + traits + " ] }");
+        return character(id, null, traits);
+    }
+
+    @Nonnull
+    private static OpenDialogueCharacterAsset character(@Nonnull String id, @Nullable String fields, @Nonnull String traits) {
+        OpenDialogueCharacterAsset character = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{ " + (fields == null ? "" : fields + ", ") + "\"Traits\": [ " + traits + " ] }");
         if (character == null) throw new IllegalArgumentException("Unreadable character " + traits);
         character.id = id;
         return character;

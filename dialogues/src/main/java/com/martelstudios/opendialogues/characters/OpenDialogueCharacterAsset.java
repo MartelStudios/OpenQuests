@@ -27,6 +27,8 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
     public static final AssetBuilderCodec<String, OpenDialogueCharacterAsset> CODEC = AssetBuilderCodec.builder(OpenDialogueCharacterAsset.class, OpenDialogueCharacterAsset::new, Codec.STRING, (character, id) -> character.id = id, character -> character.id, (character, data) -> character.data = data, character -> character.data)
                                                                                                         .appendInherited(new KeyedCodec<>("Uniqueness", new EnumCodec<>(Uniqueness.class)), (character, uniqueness) -> character.uniqueness = uniqueness, character -> character.uniqueness, (character, parent) -> character.uniqueness = parent.uniqueness)
                                                                                                         .add()
+                                                                                                        .appendInherited(new KeyedCodec<>("Scope", new EnumCodec<>(CharacterScope.class)), (character, scope) -> character.scope = scope, character -> character.scope, (character, parent) -> character.scope = parent.scope)
+                                                                                                        .add()
                                                                                                         .appendInherited(new KeyedCodec<>("Traits", new ArrayCodec<>(CharacterTrait.CODEC, CharacterTrait[]::new)), (character, traits) -> character.traits = traits, character -> character.traits, (character, parent) -> character.traits = parent.traits)
                                                                                                         .add()
                                                                                                         .build();
@@ -41,6 +43,9 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
 
     @Nonnull
     private Uniqueness uniqueness = Uniqueness.None;
+
+    @Nonnull
+    private CharacterScope scope = CharacterScope.World;
 
     @Nonnull
     private CharacterTrait[] traits = new CharacterTrait[0];
@@ -68,11 +73,19 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
     }
 
     /**
-     * @return how many NPCs of one world may carry the character.
+     * @return how many NPCs may carry the character, per world or universe as its scope says.
      */
     @Nonnull
     public Uniqueness getUniqueness() {
         return uniqueness;
+    }
+
+    /**
+     * @return whether the uniqueness holds per world or across the universe.
+     */
+    @Nonnull
+    public CharacterScope getScope() {
+        return scope;
     }
 
     /**

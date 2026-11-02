@@ -1,7 +1,7 @@
 package com.martelstudios.opendialogues.characters;
 
 /**
- * How many NPCs of one world may carry a character.
+ * How many NPCs of one world, or of the universe with {@link CharacterScope#Universe}, may carry a character.
  */
 public enum Uniqueness {
     /** Any number, each drawn on its own. */
