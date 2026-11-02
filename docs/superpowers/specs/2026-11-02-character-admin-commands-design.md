@@ -21,8 +21,8 @@ A new root command `/ocharacters`, alias `/oc`, admin group, every message trans
 | `reset` | Whole universe: every NPC forgets its character, name and draws; both unique registries are emptied, consumed claims included. |
 | `reset dead` | Frees the unique characters lost for good (consumed claims), in the universe registry and every world's. No living NPC is touched. |
 | `reset world` | Current world only: its NPCs forget character, name and draws; its world registry is emptied. |
-| `scan` | Shows whether the scan runs. |
-| `scan stop` / `scan start` | Stops or restarts the draw and apply scan; saved in the `Characters` config, so it survives a restart. |
+| `draws` | Shows whether NPCs draw characters. |
+| `draws stop` / `draws start` | Stops or restarts new draws; saved in the `Characters` config, so it survives a restart. The scan keeps running, so resets still settle and traits still apply. |
 
 Targeted NPC: Hytale's native targeting through `AbstractTargetEntityCommand` (entity in view,
 `--entity`, `--radius`, `--world`), each target handled on its own.
@@ -51,7 +51,8 @@ Targeted NPC: Hytale's native targeting through `AbstractTargetEntityCommand` (e
 - Components are read and written only on their world thread.
 - Command names carry the mod prefix; bare words only as aliases. `/oc` is free in Hytale 0.7.4
   and in our mods.
-- `CharacterScanSystem` reads its settings at construction; the stop flag must be read live.
+- `CharacterScanSystem` reads its settings at construction; the draws flag must be read live.
+- A reset must work with draws stopped: stale NPCs settle through the scan, so only drawing stops.
 
 ## Approaches
 
@@ -110,9 +111,10 @@ Catching up, on the world thread, whenever `CharacterService` builds a `Characte
 - `unassign`: `revoke`. Draws stay, so the NPC does not redraw from the same distributions; to
   redraw, `reset`.
 - `info`: reads `CharacterService.identity` after catching up, plus the character asset.
-- `scan stop|start`: sets a saved `Scan` boolean (default true) in `CharacterSettings` and saves
-  the config; `CharacterScanSystem` checks it on every tick. A stopped scan neither draws nor
-  re-applies; F and the commands still work.
+- `draws stop|start`: sets a saved `Draws` boolean (default true) in `CharacterSettings` and saves
+  the config, checked live before each draw. The scan keeps running: it still settles stale NPCs
+  and re-applies traits, it only stops giving characters to NPCs without one. `assign` still
+  works (user's call: only automatic assignment stops).
 
 ### Messages
 
@@ -140,7 +142,7 @@ Keys under `opendialogues.commands.characters.*` in `opendialogues.lang` (en-US,
 
 - Unit: stale identity released and stamped; registry catch-up for universe reset and dead reset;
   consumed claims dropped; a claim taken after the reset survives the stale NPC's release; old
-  saves (all zeros) not stale; `Scan` flag codec default.
+  saves (all zeros) not stale; `Draws` flag codec default; a stale NPC settles while draws are stopped and stays without character.
 - In game on the second server (port 5521): `info` on a villager, `assign`/`unassign`, `reset world`
-  with names changing, `scan stop` survives a restart, kill the `Forever` Kweebec mage then
+  with names changing, `draws stop` survives a restart and a `reset` then leaves NPCs nameless, kill the `Forever` Kweebec mage then
   `reset dead` and see it drawn again, `reset` with a far NPC settling when approached.
