@@ -12,6 +12,7 @@ import com.martelstudios.opendialogues.characters.ReleaseReason;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -20,7 +21,7 @@ import java.util.function.Function;
  * Which unique characters a world already gave away, saved with the world: an NPC in an unloaded
  * chunk still holds its character, so only its death frees it.
  */
-public class UniqueCharacters implements Resource<EntityStore> {
+public class UniqueCharacters implements Resource<EntityStore>, CharacterClaims {
 
     /**
      * The NPC carrying a character, or the mark that its last carrier died for good.
@@ -56,6 +57,7 @@ public class UniqueCharacters implements Resource<EntityStore> {
      * @param characters finds a loaded character by id, {@code null} for one no pack declares.
      * @return whether a draw may still give that character in this world, never for an unknown one.
      */
+    @Override
     public boolean isAvailable(@Nonnull String characterId, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
         OpenDialogueCharacterAsset character = characters.apply(characterId);
         return character != null && (!character.getUniqueness().claims() || !claims.containsKey(characterId));
@@ -66,6 +68,16 @@ public class UniqueCharacters implements Resource<EntityStore> {
      */
     public void claim(@Nonnull String characterId, @Nonnull UUID npc) {
         claims.put(characterId, new Claim(npc.toString(), false));
+    }
+
+    /**
+     * Only ever asked on the world's thread, so the check and the claim need no lock.
+     */
+    @Override
+    public boolean claimIfAvailable(@Nonnull String characterId, @Nonnull UUID npc, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
+        if (!isAvailable(characterId, characters)) return false;
+        if (characters.apply(characterId).getUniqueness().claims()) claim(characterId, npc);
+        return true;
     }
 
     /**
@@ -81,8 +93,11 @@ public class UniqueCharacters implements Resource<EntityStore> {
      * Frees what a released NPC carried, unless the reason consumes it; a consumed claim never changes again.
      *
      * @param characters finds a loaded character by id, {@code null} for one no pack declares any more.
+     * @return nothing: a world character lost in one world may still come up in another.
      */
-    public void release(@Nonnull UUID npc, @Nonnull ReleaseReason reason, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
+    @Nonnull
+    @Override
+    public List<String> release(@Nonnull UUID npc, @Nonnull ReleaseReason reason, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
         String id = npc.toString();
         claims.entrySet().removeIf(entry -> {
             if (entry.getValue().consumed || !entry.getValue().npc.equals(id)) return false;
@@ -93,6 +108,7 @@ public class UniqueCharacters implements Resource<EntityStore> {
             }
             return true;
         });
+        return List.of();
     }
 
     @Nonnull
