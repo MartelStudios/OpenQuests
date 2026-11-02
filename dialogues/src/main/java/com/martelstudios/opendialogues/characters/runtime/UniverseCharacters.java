@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * The unique characters scoped to the universe that some world already gave away, saved with the
@@ -56,8 +57,10 @@ public class UniverseCharacters {
     private final Map<String, Claim> claims = new HashMap<>();
     private volatile Runnable onChange = () -> {};
 
+
     /**
-     * @param onChange run after every change, under the lock, so the registry gets saved.
+     * @param onChange run after every change, outside the lock: saving encodes the registry under
+     * the storage lock, so calling it under ours could deadlock with a scheduled save.
      */
     public void setOnChange(@Nonnull Runnable onChange) {
         this.onChange = onChange;
@@ -78,12 +81,14 @@ public class UniverseCharacters {
      * @param world the config UUID of the NPC's world, which a closing world settles by.
      * @return whether the character was free.
      */
-    public synchronized boolean claimIfAvailable(@Nonnull String characterId, @Nonnull UUID npc, @Nonnull UUID world, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
-        if (!isAvailable(characterId, characters)) return false;
-        if (characters.apply(characterId).getUniqueness().claims()) {
-            claims.put(characterId, new Claim(npc.toString(), world.toString(), false));
-            onChange.run();
+    public boolean claimIfAvailable(@Nonnull String characterId, @Nonnull UUID npc, @Nonnull UUID world, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
+        boolean claimed;
+        synchronized (this) {
+            if (!isAvailable(characterId, characters)) return false;
+            claimed = characters.apply(characterId).getUniqueness().claims();
+            if (claimed) claims.put(characterId, new Claim(npc.toString(), world.toString(), false));
         }
+        if (claimed) onChange.run();
         return true;
     }
 
@@ -101,21 +106,9 @@ public class UniverseCharacters {
      * @return the ids lost for good by this release.
      */
     @Nonnull
-    public synchronized List<String> release(@Nonnull UUID npc, @Nonnull ReleaseReason reason, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
+    public List<String> release(@Nonnull UUID npc, @Nonnull ReleaseReason reason, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
         String id = npc.toString();
-        List<String> lost = new ArrayList<>();
-        boolean changed = claims.entrySet().removeIf(entry -> {
-            if (entry.getValue().consumed || !entry.getValue().npc.equals(id)) return false;
-            OpenDialogueCharacterAsset character = characters.apply(entry.getKey());
-            if (character != null && character.getUniqueness().consumedBy(reason)) {
-                entry.getValue().consumed = true;
-                lost.add(entry.getKey());
-                return false;
-            }
-            return true;
-        });
-        if (changed || !lost.isEmpty()) onChange.run();
-        return lost;
+        return settle(claim -> claim.npc.equals(id), reason, characters);
     }
 
     /**
@@ -126,19 +119,32 @@ public class UniverseCharacters {
      * @return the ids lost for good by this closing.
      */
     @Nonnull
-    public synchronized List<String> closeWorld(@Nonnull UUID world, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
+    public List<String> closeWorld(@Nonnull UUID world, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
         String id = world.toString();
+        return settle(claim -> id.equals(claim.world), ReleaseReason.Death, characters);
+    }
+
+    /**
+     * Frees the matching claims, or consumes those the reason consumes.
+     *
+     * @return the ids consumed.
+     */
+    @Nonnull
+    private List<String> settle(@Nonnull Predicate<Claim> matches, @Nonnull ReleaseReason reason, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
         List<String> lost = new ArrayList<>();
-        boolean changed = claims.entrySet().removeIf(entry -> {
-            if (entry.getValue().consumed || !id.equals(entry.getValue().world)) return false;
-            OpenDialogueCharacterAsset character = characters.apply(entry.getKey());
-            if (character != null && character.getUniqueness().consumedBy(ReleaseReason.Death)) {
-                entry.getValue().consumed = true;
-                lost.add(entry.getKey());
-                return false;
-            }
-            return true;
-        });
+        boolean changed;
+        synchronized (this) {
+            changed = claims.entrySet().removeIf(entry -> {
+                if (entry.getValue().consumed || !matches.test(entry.getValue())) return false;
+                OpenDialogueCharacterAsset character = characters.apply(entry.getKey());
+                if (character != null && character.getUniqueness().consumedBy(reason)) {
+                    entry.getValue().consumed = true;
+                    lost.add(entry.getKey());
+                    return false;
+                }
+                return true;
+            });
+        }
         if (changed || !lost.isEmpty()) onChange.run();
         return lost;
     }

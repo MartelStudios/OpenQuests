@@ -134,6 +134,23 @@ class UniverseCharactersTest {
         assertEquals(1, changes[0]);
     }
 
+    @Test
+    void changesAreReportedOutsideTheLock() {
+        character("Hero", "Forever");
+        UUID npc = UUID.randomUUID();
+        List<Boolean> locked = new java.util.ArrayList<>();
+        universe.setOnChange(() -> locked.add(Thread.holdsLock(universe)));
+
+        universe.claimIfAvailable("Hero", npc, WORLD_A, lookup);
+        universe.release(npc, ReleaseReason.Death, lookup);
+        universe.claimIfAvailable("Kid", UUID.randomUUID(), WORLD_A, lookup);
+        character("Kid", "Alive");
+        universe.claimIfAvailable("Kid", UUID.randomUUID(), WORLD_A, lookup);
+        universe.closeWorld(WORLD_A, lookup);
+
+        assertEquals(List.of(false, false, false, false), locked);
+    }
+
     private void character(@Nonnull String id, @Nonnull String uniqueness) {
         characters.put(id, CharacterFixtures.character(id, "{ \"Uniqueness\": \"" + uniqueness + "\", \"Scope\": \"Universe\" }"));
     }
