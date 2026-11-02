@@ -1,7 +1,9 @@
 package com.martelstudios.openquests.dialogues.quests.deliver;
 
 import javax.annotation.Nonnull;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 /**
@@ -41,5 +43,18 @@ public final class DeliveryTake {
             }
         }
         return new Taken(removals, perItem);
+    }
+
+    /**
+     * Sums the removals by the item each slot holds, in slot order, so a screen names what the
+     * player actually hands over, whatever filter accepted it.
+     */
+    @Nonnull
+    public static Map<String, Integer> byItem(@Nonnull String[] slotIds, @Nonnull int[] removals) {
+        Map<String, Integer> given = new LinkedHashMap<>();
+        for (int slot = 0; slot < slotIds.length; slot++) {
+            if (removals[slot] > 0) given.merge(slotIds[slot], removals[slot], Integer::sum);
+        }
+        return given;
     }
 }

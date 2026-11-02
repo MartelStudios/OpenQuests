@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.dialogues.quests.deliver;
 
+import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.impl.character.OpenDialoguesUseCharacterAction;
 import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
@@ -9,7 +10,6 @@ import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
 import com.martelstudios.opendialogues.triggers.DialogueTriggers;
 import com.martelstudios.openquests.dialogues.actions.OpenQuestsDeliverAction;
-import com.martelstudios.openquests.dialogues.quests.deliver.OpenQuestsDeliverAsset.DeliverItem;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -27,21 +27,26 @@ public final class DeliveryScreen {
     private DeliveryScreen() {}
 
     /**
-     * Lists each item with its progress when all can be named, a generic line otherwise.
+     * Names what the player would hand over, leaving the quest's progress to the HUD and journal.
      *
      * @param answersF whether the character has its own F to hand back to, else the screen says goodbye.
+     * @param given    how many of each item id the delivery would take now, in inventory order.
      */
-    public static void open(@Nonnull PlayerRef player, @Nonnull DeliverQuestProgression quest, @Nonnull DialogueSource source, boolean answersF) {
-        DeliverItem[] items = quest.getAsset().getItems();
+    public static void open(@Nonnull PlayerRef player, @Nonnull DeliverQuestProgression quest, @Nonnull DialogueSource source, boolean answersF, @Nonnull Map<String, Integer> given) {
         List<String> lines = new ArrayList<>();
-        for (int i = 0; i < items.length && lines != null; i++) {
-            String nameKey = items[i].nameKey();
-            if (nameKey == null) lines = null;
-            else lines.add(PlayerTexts.translate(player, nameKey, Map.of()) + " " + quest.delivered(i) + "/" + items[i].getQuantity());
+        String icon = null;
+        for (Map.Entry<String, Integer> entry : given.entrySet()) {
+            Item item = Item.getAssetMap().getAsset(entry.getKey());
+            String name = item == null ? entry.getKey() : PlayerTexts.translate(player, item.getTranslationKey(), Map.of());
+            lines.add(entry.getValue() + " " + name);
+            // One icon cannot stand for several items
+            if (item != null && given.size() == 1) icon = item.getIcon();
         }
+        String items = String.join(", ", lines);
 
-        String page = lines != null ? text(player, "delivery.list", Map.of("items", String.join(", ", lines))) : text(player, "delivery.generic", Map.of());
-        OpenDialoguesResponse give = OpenDialoguesResponse.generated("Give", text(player, lines != null ? "delivery.give" : "delivery.deliver", Map.of()), new OpenQuestsDeliverAction(quest.getAssetId()), new OpenDialoguesCloseAction());
+        String page = text(player, "delivery.list", Map.of("items", items));
+        OpenDialoguesResponse give = OpenDialoguesResponse.generated("Give", text(player, "delivery.give", Map.of("items", items)), new OpenQuestsDeliverAction(quest.getAssetId()), new OpenDialoguesCloseAction())
+                                                          .withIcon(icon);
         OpenDialoguesResponse exit = answersF
                                      ? OpenDialoguesResponse.generated("SomethingElse", text(player, "delivery.other", Map.of()), new OpenDialoguesUseCharacterAction())
                                      : OpenDialoguesResponse.generated("Goodbye", PlayerTexts.translate(player, "opendialogues.character.goodbye", Map.of()), new OpenDialoguesCloseAction());

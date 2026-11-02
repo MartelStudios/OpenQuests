@@ -3,9 +3,11 @@ package com.martelstudios.openquests.dialogues.quests.deliver;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DeliveryTakeTest {
 
@@ -35,5 +37,14 @@ class DeliveryTakeTest {
 
         assertArrayEquals(new int[]{4, 0}, taken.removals());
         assertArrayEquals(new int[]{3, 1}, taken.perItem());
+    }
+
+    @Test
+    void given_items_are_summed_by_item_in_slot_order() {
+        Map<String, Integer> given = DeliveryTake.byItem(new String[]{"Stick", "Fibre", null, "Stick", "Oak"}, new int[]{2, 3, 0, 4, 0});
+
+        assertEquals(List.of("Stick", "Fibre"), List.copyOf(given.keySet()));
+        assertEquals(6, given.get("Stick"));
+        assertEquals(3, given.get("Fibre"));
     }
 }

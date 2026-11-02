@@ -6,7 +6,6 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.schema.metadata.ui.UIEditor;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
@@ -33,16 +32,11 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset {
                                                                            .append(new KeyedCodec<>("Quantity", Codec.INTEGER, true), (item, quantity) -> item.quantity = quantity, item -> item.quantity)
                                                                            .addValidator(Validators.min(1))
                                                                            .add()
-                                                                           .append(new KeyedCodec<>("NameKey", Codec.STRING), (item, key) -> item.nameKey = key, item -> item.nameKey)
-                                                                           .add()
                                                                            .build();
 
         protected QuestItemFilter item;
 
         protected int quantity = 1;
-
-        @Nullable
-        protected String nameKey;
 
         protected DeliverItem() {}
 
@@ -58,17 +52,6 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset {
          */
         public int getQuantity() {
             return quantity;
-        }
-
-        /**
-         * @return the translation key naming the item to the player: the asset's own, else the item's
-         * name, {@code null} for a tag nobody named.
-         */
-        @Nullable
-        public String nameKey() {
-            if (nameKey != null) return nameKey;
-            Message name = item == null ? null : item.getName();
-            return name == null ? null : name.getMessageId();
         }
     }
 

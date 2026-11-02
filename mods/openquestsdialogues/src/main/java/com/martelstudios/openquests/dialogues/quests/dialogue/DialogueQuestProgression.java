@@ -50,12 +50,13 @@ public class DialogueQuestProgression extends QuantityQuestProgression<DialogueQ
     }
 
     /**
-     * The epithet rather than a drawn name, since one title serves every NPC carrying the character.
+     * The epithet rather than a drawn name, since one title serves every NPC carrying the character;
+     * "someone" for a character without one.
      */
     @Nonnull
     public static Message characterName(@Nonnull String characterId) {
         OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(characterId);
         String epithet = character == null ? null : character.getEpithet();
-        return epithet != null ? Message.translation(epithet) : Message.raw(characterId);
+        return Message.translation(epithet != null ? epithet : "openquestsdialogues.quest.default.someone");
     }
 }
