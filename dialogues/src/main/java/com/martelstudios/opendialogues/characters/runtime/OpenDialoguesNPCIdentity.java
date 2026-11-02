@@ -28,7 +28,15 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
                                                                                    .add()
                                                                                    .append(new KeyedCodec<>("Draws", new ArrayCodec<>(Codec.STRING, String[]::new)), (identity, draws) -> identity.draws.addAll(List.of(draws)), identity -> identity.draws.toArray(String[]::new))
                                                                                    .add()
+                                                                                   .append(new KeyedCodec<>("UniverseGeneration", Codec.INTEGER), (identity, generation) -> identity.universeGeneration = generation, identity -> identity.universeGeneration)
+                                                                                   .add()
+                                                                                   .append(new KeyedCodec<>("WorldGeneration", Codec.INTEGER), (identity, generation) -> identity.worldGeneration = generation, identity -> identity.worldGeneration)
+                                                                                   .add()
                                                                                    .build();
+
+    private int universeGeneration;
+
+    private int worldGeneration;
 
     @Nullable
     private String character;
@@ -78,10 +86,47 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
     }
 
     /**
+     * Forgets the distributions that drew, so they draw again.
+     */
+    public void clearDraws() {
+        draws.clear();
+    }
+
+    /**
+     * @return the universe reset generation the NPC drew under.
+     */
+    public int getUniverseGeneration() {
+        return universeGeneration;
+    }
+
+    /**
+     * @return the world reset generation the NPC drew under.
+     */
+    public int getWorldGeneration() {
+        return worldGeneration;
+    }
+
+    /**
+     * Records the generations the NPC now drew under; an NPC behind either one is stale.
+     */
+    public void stamp(int universe, int world) {
+        universeGeneration = universe;
+        worldGeneration = world;
+    }
+
+    /**
+     * @return whether the NPC carries nothing worth saving: no character, no name, no draw.
+     */
+    public boolean isBlank() {
+        return character == null && name == null && draws.isEmpty();
+    }
+
+    /**
      * @return whether the other identity saves the same, so an unchanged NPC is not written again.
      */
     public boolean sameAs(@Nonnull OpenDialoguesNPCIdentity other) {
-        return Objects.equals(character, other.character) && Objects.equals(name, other.name) && draws.equals(other.draws);
+        return Objects.equals(character, other.character) && Objects.equals(name, other.name) && draws.equals(other.draws)
+               && universeGeneration == other.universeGeneration && worldGeneration == other.worldGeneration;
     }
 
     @Nonnull
@@ -91,6 +136,8 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
         clone.character = character;
         clone.name = name;
         clone.draws.addAll(draws);
+        clone.universeGeneration = universeGeneration;
+        clone.worldGeneration = worldGeneration;
         return clone;
     }
 }
