@@ -1,0 +1,19 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_KweebecVillager",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.seedling.feathers.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.seedling.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

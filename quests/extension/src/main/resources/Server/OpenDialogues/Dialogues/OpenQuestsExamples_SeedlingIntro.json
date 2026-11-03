@@ -1,0 +1,34 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_KweebecVillager",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.seedling.intro.page1"
+    },
+    {
+      "Text": "openquestsexamples.temple.seedling.intro.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.seedling.intro.yes",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "OpenQuestsExamples_SeedlingFeathersLight"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.seedling.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

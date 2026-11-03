@@ -1,0 +1,22 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Temple_Kweebec_Seedling_Static"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-(forgotten-temple-goblins|Forgotten_Temple-.*)"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "OpenQuestsExamples_TempleSeedling",
+      "Weight": 1
+    }
+  ]
+}

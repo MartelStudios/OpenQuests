@@ -1,0 +1,84 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Crystal_Fragments_Blue.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.seedlingshardsblue.title",
+  "DescriptionKey": "openquestsexamples.quest.seedlingshardsblue.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.seedlingshardsblue.short",
+  "Character": "OpenQuestsExamples_TempleSeedling",
+  "Dialogue": "OpenQuestsExamples_SeedlingGift",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Crystal_Blue"
+      },
+      "Quantity": 2
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Popcorn",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Candy_Cane",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 20,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Pie_Pumpkin",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 25,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence_Concentrated",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Gadget_Assembly",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 10,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "PortalKey_Goblin_Breach",
+            "Quantity": 1
+          }
+        }
+      ]
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_SeedlingFeathersBlue"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

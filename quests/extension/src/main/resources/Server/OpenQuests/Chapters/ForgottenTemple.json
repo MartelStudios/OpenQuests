@@ -4,11 +4,68 @@
   "Order": 1,
   "Icon": "Icons/ItemsGenerated/Furniture_Temple_Emerald_Torch.png",
   "Quests": [
-    { "Quest": "DefeatForgottenTempleGuardian" },
-    { "Quest": "EnterForgottenTemple" },
-    { "Quest": "TalkToRootlingMerchant" },
-    { "Quest": "TempleTrial" },
-    { "Quest": "TempleOffering" },
-    { "Quest": "Flawless" }
+    {
+      "Quest": "DefeatForgottenTempleGuardian"
+    },
+    {
+      "Quest": "EnterForgottenTemple"
+    },
+    {
+      "Quest": "TalkToRootlingMerchant"
+    },
+    {
+      "Quest": "TempleTrial"
+    },
+    {
+      "Quest": "TempleOffering"
+    },
+    {
+      "Quest": "Flawless"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingFeathersLight"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingFeathersDark"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingFeathersRed"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShell"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsGreen"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsCyan"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsPink"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsWhite"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingFeatherBlue"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsBlue"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingFeathersBlue"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsPurple"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsYellow"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsRed"
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingRainbow"
+    }
   ]
 }
