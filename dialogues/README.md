@@ -64,7 +64,8 @@ that does not hold, and the selector moves on. See `OpenQuestsExamples_Plush` in
 
 Every condition also takes `Not`: when true, it holds exactly when it would not.
 
-`Item` takes an `ItemId`, a `ResourceTypeId` or a `BlockTag`. An answer is named by its `Id`, or by
+`Item` takes an `ItemId`, a `ResourceTypeId`, a `BlockTag` or a bench `Category` (`GoblinLab_Runes`
+for any rune). An answer is named by its `Id`, or by
 its position in the file from 1 when it has none. Dialogues written inline count too: their
 generated id, suggested in the Asset Editor, follows where they sit in their file, so moving one
 forgets what players did with it. Each player's history is saved with them.
@@ -94,6 +95,78 @@ registered is skipped.
 conditions treat them as new: every dialogue, or only the one named. It works on offline players,
 and closes the dialogue the player has open when it is the one forgotten. Admins only.
 
+## Characters
+
+Passive NPCs near players draw a **character**: a name, a dialogue on F, and whatever other traits
+mods add. Three asset types, each in its own folder under `Server/OpenDialogues/`, all editable in
+the Asset Editor and inheriting through `Parent`.
+
+**`Characters/`** (type **OpenDialogueCharacterAsset**):
+
+| Field | Meaning |
+| --- | --- |
+| `Uniqueness` | `None` (default): any number of NPCs carry it. `Alive`: one at a time, free again when it dies. `Forever`: one, and once dead it is never drawn again. |
+| `Scope` | `World` (default): uniqueness counts per world. `Universe`: across every world and instance. |
+| `Traits` | What the character does. `Dialogue` opens `Dialogue` (`{ "Dialogue": … }` or `{ "Router": … }`) on F, spoken by `Speaker`. `Name` draws a name from `Names`, a name list id or one written inline. |
+
+```json
+{
+  "Uniqueness": "Forever",
+  "Scope": "Universe",
+  "Traits": [
+    { "Type": "Dialogue", "Dialogue": { "Router": "MyPack_Seer" }, "Speaker": { "Epithet": "mypack.seer.epithet" } },
+    { "Type": "Name", "Names": "MyPack_ElfNames" }
+  ]
+}
+```
+
+A speaker with `AllowNPCOverride` takes the NPC's name and the fields of the speaker the trait lends,
+so one villager speaker serves many characters. A dialogue with no `Speaker` shows no name at all:
+handy for an animal, whose lines read as the player's own thoughts.
+
+**`Names/`** (type **OpenDialogueNameListAsset**): `Names`, a list of translation keys, one drawn
+per NPC.
+
+**`Distributions/`** (type **OpenDialogueDistributionAsset**): which NPCs draw what.
+
+| Field | Meaning |
+| --- | --- |
+| `Filters` | Every filter must hold for the NPC. |
+| `Characters` | Entries with a `Weight` and a `Character`; an entry without a character is the chance to draw nobody, kept for good. |
+| `Priority` | Higher first when several distributions hold for one NPC, ties by id. |
+
+| Filter type | Holds when |
+| --- | --- |
+| `Role` | The NPC's role is one of `Roles`. |
+| `Group` | The role belongs to one of the NPC groups `Groups`. |
+| `World` | The world name matches one of `Worlds`, each a regular expression on the whole name: `default`, or `instance-Forgotten_Temple-.*` for every copy of an instance. |
+| `Zone` | The scanning player stands in one of `Zones`. |
+| `Biome` | The scanning player stands in one of `Biomes`. |
+
+Every filter also takes `Not`. NPCs that already react to F (merchants, quest givers) are skipped.
+
+A world closing for good frees its `Alive` characters and loses its `Forever` + `Universe` ones:
+keep such characters in worlds that stay, the overworld or a persistent instance.
+
+The plugin's `Characters.json` holds `ScanRadius` (blocks around each player, 24), `ScanInterval`
+(seconds, 5) and `Draws` (false stops new draws). Admins steer characters with `/ocharacters`
+(alias `/oc`) on the NPC in view:
+
+| Command | Does |
+| --- | --- |
+| `info` | Shows the character, name and claim of the NPC. |
+| `assign <character>` | Gives the NPC a character, replacing its own. |
+| `unassign` | Takes the NPC's character back. |
+| `reset` | Forgets every character of every world, so NPCs draw again. |
+| `reset world` | Same, for the current world only. |
+| `reset dead` | Brings back the `Forever` characters lost for good. |
+| `draws stop`, `draws start` | Stops and resumes new draws; NPCs keep what they carry. |
+
+With OpenQuests and the OpenQuestsDialogues bridge, quests aim at a character: `Dialogue` (talk to
+it, or pick an answer) and `Deliver` (bring it items, which takes over F while the quest runs). A
+quest aimed at a `Forever` + `Universe` character fails once that character is lost. See the
+Forgotten Temple and Kweebec village characters in the OpenQuests Examples pack.
+
 ## Extending
 
 Other mods register through `OpenDialoguesPlugin.get().getRegistry()` during their `setup`:
@@ -101,6 +174,8 @@ Other mods register through `OpenDialoguesPlugin.get().getRegistry()` during the
 - `registerAction(type, class, codec)`: an answer action, its `Type` carrying the mod's prefix.
 - `registerCondition(type, class, codec)`: a condition routes can read, extending `DialogueCondition`.
 - `registerSelector(type, class, codec)`: a way for routers to pick, extending `DialogueSelector`.
+- `registerFilter(type, class, codec)`: a distribution filter, extending `CharacterFilter`.
+- `registerTrait(type, class, codec)`: something a character does, extending `CharacterTrait`.
 - `registerDisplay(id, display)`: something drawing dialogues, named by their `Display` field.
 
 `DialogueEvent.Opened`, `Answered` and `Closed` are dispatched keyed on the dialogue id.

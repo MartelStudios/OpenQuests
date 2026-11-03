@@ -20,6 +20,13 @@ from the character they talk to, and finishing it can depend on what they answer
 merchant" or "Agree to help the blacksmith" is one quest, usable as a step of any chain. With `"UseHistory": true`,
 what the player said before getting the quest counts too.
 
+🎁 **`Deliver`** asks the player to bring items to a character. While the quest runs, F on that character opens the
+delivery, your own dialogue or a generated one, and items can be handed over a few at a time.
+
+👥 **Aimed at a character.** Both quest types can name an OpenDialogues character instead of a dialogue: "talk to the
+village mage" works whichever NPC became the mage. A quest aimed at a character unique for the whole server fails on
+its own if that character is lost for good.
+
 ### 🎬 Answer actions
 
 📜 **`AssignQuest`** hands the player a quest, named by id or written right there in the dialogue. The quest's own

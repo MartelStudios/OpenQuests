@@ -38,6 +38,17 @@ Over sixty quests in eight chapters, in English and French. A whole campaign thr
 
 🕯️ **An offering** follows: throw ten Essence of Life at the foot of the altar. Picking one back up to throw it again does not count twice.
 
+👥 **The temple has its people**, one of each for the whole server:
+
+* 🌱 **A curious seedling** who has never been outside wants feathers, then crystal shards of every colour, and pays in
+  trinkets he pilfered from the elders and the goblins.
+* 🦌 **A doe** with a strange gaze eats the seeds you bring. As they get rarer, she sheds a hide more precious each time.
+* 😟 **A worried sapling** tells you about the goblin lab and its broken generator, and sends you looking for scrap.
+* 🔧 **The goblin scientist** runs the lab repairs: the gateway to the breach, the boiler, the engine, the compressor.
+  Talk to her before she leaves.
+* 🛡️ **A dreaming guard** wants to hear how you beat each boss of the breach, then to see a rune you forged, and sends
+  you back through with a fragment.
+
 ### 🕳️ The Goblin Breach
 
 Thirty-six quests across the Guttering Hollows, the pocket world a Goblin Breach portal opens on. The chapter graph lays them out by region, and every link shows what leads where.
