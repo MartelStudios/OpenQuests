@@ -9,10 +9,12 @@ import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.asset.type.item.config.ResourceType;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 
 /**
- * Which items a condition accepts: one item, every item under a tag, or every item of a resource
- * type, the families recipes accept such as any sword or any flower. Same keys as OpenQuests.
+ * Which items a condition accepts: one item, every item under a tag, every item of a bench category
+ * (any rune), or every item of a resource type, the families recipes accept such as any sword or any
+ * flower. Same keys as OpenQuests, plus the category.
  */
 public class OpenDialoguesItemFilter {
 
@@ -21,6 +23,8 @@ public class OpenDialoguesItemFilter {
     public static final BuilderCodec<OpenDialoguesItemFilter> CODEC = BuilderCodec.builder(OpenDialoguesItemFilter.class, OpenDialoguesItemFilter::new)
                                                                              .append(new KeyedCodec<>("BlockTag", Codec.STRING), (filter, tag) -> filter.blockTag = tag, filter -> filter.blockTag)
                                                                              .add()
+                                                                             .append(new KeyedCodec<>("Category", Codec.STRING), (filter, category) -> filter.category = category, filter -> filter.category)
+                                                                             .add()
                                                                              .append(new KeyedCodec<>("ItemId", Codec.STRING), (filter, id) -> filter.itemId = id, filter -> filter.itemId)
                                                                              .addValidator(Item.VALIDATOR_CACHE.getValidator())
                                                                              .add()
@@ -28,8 +32,8 @@ public class OpenDialoguesItemFilter {
                                                                              .addValidator(ResourceType.VALIDATOR_CACHE.getValidator())
                                                                              .add()
                                                                              .validator((filter, results) -> {
-                                                                                 if (filter.blockTag == null && filter.itemId == null && filter.resourceTypeId == null) {
-                                                                                     results.fail("One of BlockTag, ItemId or ResourceTypeId must be set");
+                                                                                 if (filter.blockTag == null && filter.category == null && filter.itemId == null && filter.resourceTypeId == null) {
+                                                                                     results.fail("One of BlockTag, Category, ItemId or ResourceTypeId must be set");
                                                                                  }
                                                                              })
                                                                              .afterDecode(filter -> {
@@ -41,6 +45,9 @@ public class OpenDialoguesItemFilter {
     protected String blockTag;
 
     protected int blockTagIndex = NO_TAG;
+
+    @Nullable
+    protected String category;
 
     @Nullable
     protected String itemId;
@@ -59,7 +66,16 @@ public class OpenDialoguesItemFilter {
         if (id.equals(itemId)) return true;
         if (blockTagIndex != NO_TAG && Item.getAssetMap().getKeysForTag(blockTagIndex).contains(id)) return true;
 
-        return resourceTypeId != null && isOfResourceType(Item.getAssetMap().getAsset(id));
+        Item item = Item.getAssetMap().getAsset(id);
+        if (category != null && inCategory(item == null ? null : item.getCategories())) return true;
+        return resourceTypeId != null && isOfResourceType(item);
+    }
+
+    /**
+     * @param categories an item's bench categories, {@code null} for none.
+     */
+    boolean inCategory(@Nullable String[] categories) {
+        return categories != null && Arrays.asList(categories).contains(category);
     }
 
     private boolean isOfResourceType(@Nullable Item item) {
