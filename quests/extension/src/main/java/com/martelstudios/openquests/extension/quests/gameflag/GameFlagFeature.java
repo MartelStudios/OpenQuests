@@ -26,6 +26,9 @@ public final class GameFlagFeature {
         return listenerType;
     }
 
+    /**
+     * Registers the quest type, its player listener and the system checking flags every tick.
+     */
     public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         services.getQuestProgressionService().registerQuestType(TYPE_ID, GameFlagQuestAsset.class, GameFlagQuestAsset.CODEC, GameFlagQuestProgression.class, GameFlagQuestProgression.CODEC);
 

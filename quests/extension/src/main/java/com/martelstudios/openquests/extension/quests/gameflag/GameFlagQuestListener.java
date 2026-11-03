@@ -11,6 +11,9 @@ import javax.annotation.Nonnull;
  */
 public class GameFlagQuestListener extends QuestListenerComponent {
 
+    /**
+     * @return the type registered by {@link GameFlagFeature}, {@code null} before it registers.
+     */
     public static ComponentType<EntityStore, GameFlagQuestListener> getComponentType() {
         return GameFlagFeature.getListenerType();
     }
