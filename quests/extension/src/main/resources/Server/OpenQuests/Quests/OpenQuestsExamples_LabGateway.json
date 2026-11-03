@@ -1,0 +1,20 @@
+{
+  "Type": "GameFlag",
+  "Flag": "goblin_lab_gate",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Gadget_Assembly",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "Icon": "Icons/ItemsGenerated/PortalKey_Goblin_Breach.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.labgateway.title",
+  "DescriptionKey": "openquestsexamples.quest.labgateway.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.labgateway.short",
+  "AutoTrack": true
+}

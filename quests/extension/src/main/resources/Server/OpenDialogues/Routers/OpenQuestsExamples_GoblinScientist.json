@@ -1,0 +1,89 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_LabGateway",
+              "States": [
+                "InProgress",
+                "Successful",
+                "Failed",
+                "Abandoned"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_LabGenerator",
+              "States": [
+                "Successful"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_ScientistGateway"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_LabGateway",
+          "States": [
+            "InProgress",
+            "Successful",
+            "Failed",
+            "Abandoned"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_ScientistNoPower"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_LabTeleporter",
+              "States": [
+                "InProgress",
+                "Successful",
+                "Failed",
+                "Abandoned"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_LabGateway",
+              "States": [
+                "Successful"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_ScientistWorkshop"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_ScientistScold"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_KweebecVillager",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.sapling.generator.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.sapling.generator.thanks",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "OpenQuestsExamples_LabScrap"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

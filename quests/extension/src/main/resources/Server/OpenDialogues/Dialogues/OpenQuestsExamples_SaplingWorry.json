@@ -1,0 +1,28 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_KweebecVillager",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.sapling.worry.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.sapling.worry.which",
+      "Actions": [
+        {
+          "Type": "Open",
+          "Dialogue": "OpenQuestsExamples_SaplingGenerator"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.sapling.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

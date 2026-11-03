@@ -1,0 +1,20 @@
+{
+  "Type": "GameFlag",
+  "Flag": "goblin_lab_power",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Scraps",
+      "Quantity": 5,
+      "AutoClaim": true
+    }
+  ],
+  "Icon": "Icons/ItemsGenerated/GoblinLab_Generator.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.labgenerator.title",
+  "DescriptionKey": "openquestsexamples.quest.labgenerator.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.labgenerator.short",
+  "AutoTrack": true
+}

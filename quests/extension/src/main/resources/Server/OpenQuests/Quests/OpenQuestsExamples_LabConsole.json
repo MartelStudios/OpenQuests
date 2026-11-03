@@ -1,0 +1,20 @@
+{
+  "Type": "GameFlag",
+  "Flag": "goblin_breach_duration",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Crystal_Void",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ],
+  "Icon": "Icons/ItemsGenerated/GoblinLab_Console.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.labconsole.title",
+  "DescriptionKey": "openquestsexamples.quest.labconsole.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.labconsole.short",
+  "AutoTrack": true
+}

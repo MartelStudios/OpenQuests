@@ -1,0 +1,34 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_GoblinScientist",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.goblin.scientist.gateway.page1"
+    },
+    {
+      "Text": "openquestsexamples.goblin.scientist.gateway.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.goblin.scientist.gateway.yes",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "OpenQuestsExamples_LabGateway"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.goblin.scientist.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

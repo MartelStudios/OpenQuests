@@ -1,0 +1,19 @@
+{
+  "Uniqueness": "Forever",
+  "Scope": "Universe",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "OpenQuestsExamples_TempleSapling"
+      },
+      "Speaker": {
+        "Epithet": "openquestsexamples.temple.sapling.epithet"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "OpenQuestsExamples_KweebecNames"
+    }
+  ]
+}

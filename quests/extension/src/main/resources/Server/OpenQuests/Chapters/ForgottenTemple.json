@@ -96,6 +96,30 @@
     },
     {
       "Quest": "OpenQuestsExamples_DoeEternalRoots"
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabScrap"
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabGenerator"
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabGateway"
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabTeleporter"
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabBoiler"
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabEngine"
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabCompressor"
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabConsole"
     }
   ]
 }
