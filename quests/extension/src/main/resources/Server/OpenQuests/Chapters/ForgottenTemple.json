@@ -66,6 +66,36 @@
     },
     {
       "Quest": "OpenQuestsExamples_SeedlingRainbow"
+    },
+    {
+      "Quest": "OpenQuestsExamples_DoeWheat"
+    },
+    {
+      "Quest": "OpenQuestsExamples_DoeLettuce"
+    },
+    {
+      "Quest": "OpenQuestsExamples_DoeCarrotCorn"
+    },
+    {
+      "Quest": "OpenQuestsExamples_DoeCauliflowerTurnip"
+    },
+    {
+      "Quest": "OpenQuestsExamples_DoeAuberginePumpkin"
+    },
+    {
+      "Quest": "OpenQuestsExamples_DoeTomatoChilli"
+    },
+    {
+      "Quest": "OpenQuestsExamples_DoeRiceCotton"
+    },
+    {
+      "Quest": "OpenQuestsExamples_DoeOnionPotato"
+    },
+    {
+      "Quest": "OpenQuestsExamples_DoeEternal"
+    },
+    {
+      "Quest": "OpenQuestsExamples_DoeEternalRoots"
     }
   ]
 }

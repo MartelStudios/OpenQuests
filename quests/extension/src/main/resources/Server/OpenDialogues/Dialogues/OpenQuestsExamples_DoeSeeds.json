@@ -1,0 +1,56 @@
+{
+  "Display": "Cinematic",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.doe.seeds.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.doe.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_DoeWheat",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "OpenQuestsExamples_DoeWheat"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_DoeLettuce",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "OpenQuestsExamples_DoeLettuce"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.leave",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

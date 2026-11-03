@@ -1,0 +1,33 @@
+{
+  "Display": "Cinematic",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.doe.intro.page1"
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.intro.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.doe.intro.search",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "OpenQuestsExamples_DoeWheat"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.leave",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

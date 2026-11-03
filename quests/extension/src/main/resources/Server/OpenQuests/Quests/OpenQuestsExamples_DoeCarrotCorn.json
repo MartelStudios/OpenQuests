@@ -1,0 +1,72 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Carrot.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.doecarrotcorn.title",
+  "DescriptionKey": "openquestsexamples.quest.doecarrotcorn.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.doecarrotcorn.short",
+  "Character": "OpenQuestsExamples_TempleDoe",
+  "Dialogue": "OpenQuestsExamples_DoeMoult",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Carrot"
+      },
+      "Quantity": 2
+    },
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Corn"
+      },
+      "Quantity": 2
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 5
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 8
+          }
+        }
+      ]
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Leather_Soft",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_DoeCauliflowerTurnip"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

@@ -1,0 +1,72 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Aubergine.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.doeauberginepumpkin.title",
+  "DescriptionKey": "openquestsexamples.quest.doeauberginepumpkin.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.doeauberginepumpkin.short",
+  "Character": "OpenQuestsExamples_TempleDoe",
+  "Dialogue": "OpenQuestsExamples_DoeMoult",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Aubergine"
+      },
+      "Quantity": 2
+    },
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Pumpkin"
+      },
+      "Quantity": 2
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 5
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 8
+          }
+        }
+      ]
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Leather_Medium",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_DoeTomatoChilli"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

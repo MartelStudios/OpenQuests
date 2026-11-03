@@ -1,0 +1,60 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Lettuce.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.doelettuce.title",
+  "DescriptionKey": "openquestsexamples.quest.doelettuce.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.doelettuce.short",
+  "Character": "OpenQuestsExamples_TempleDoe",
+  "Dialogue": "OpenQuestsExamples_DoeSeeds",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Lettuce"
+      },
+      "Quantity": 5
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 5
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 8
+          }
+        }
+      ]
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_DoeCarrotCorn"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

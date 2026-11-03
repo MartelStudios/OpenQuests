@@ -1,0 +1,60 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Wheat.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.doewheat.title",
+  "DescriptionKey": "openquestsexamples.quest.doewheat.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.doewheat.short",
+  "Character": "OpenQuestsExamples_TempleDoe",
+  "Dialogue": "OpenQuestsExamples_DoeSeeds",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Wheat"
+      },
+      "Quantity": 5
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 5
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 8
+          }
+        }
+      ]
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_DoeLettuce"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

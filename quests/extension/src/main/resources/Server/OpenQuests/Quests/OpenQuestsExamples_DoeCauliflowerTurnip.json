@@ -1,0 +1,72 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Cauliflower.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.doecauliflowerturnip.title",
+  "DescriptionKey": "openquestsexamples.quest.doecauliflowerturnip.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.doecauliflowerturnip.short",
+  "Character": "OpenQuestsExamples_TempleDoe",
+  "Dialogue": "OpenQuestsExamples_DoeMoult",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Cauliflower"
+      },
+      "Quantity": 2
+    },
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Turnip"
+      },
+      "Quantity": 2
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 5
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 8
+          }
+        }
+      ]
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Leather_Light",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_DoeAuberginePumpkin"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

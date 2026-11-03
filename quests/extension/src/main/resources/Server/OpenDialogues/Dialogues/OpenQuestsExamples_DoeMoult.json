@@ -1,0 +1,173 @@
+{
+  "Display": "Cinematic",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.doe.moult.page1"
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.moult.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.doe.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_DoeCarrotCorn",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "OpenQuestsExamples_DoeCarrotCorn"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_DoeCauliflowerTurnip",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "OpenQuestsExamples_DoeCauliflowerTurnip"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_DoeAuberginePumpkin",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "OpenQuestsExamples_DoeAuberginePumpkin"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_DoeTomatoChilli",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "OpenQuestsExamples_DoeTomatoChilli"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_DoeRiceCotton",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "OpenQuestsExamples_DoeRiceCotton"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_DoeOnionPotato",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "OpenQuestsExamples_DoeOnionPotato"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_DoeEternal",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "OpenQuestsExamples_DoeEternal"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "OpenQuestsExamples_DoeEternalRoots",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "OpenQuestsExamples_DoeEternalRoots"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.doe.leave",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

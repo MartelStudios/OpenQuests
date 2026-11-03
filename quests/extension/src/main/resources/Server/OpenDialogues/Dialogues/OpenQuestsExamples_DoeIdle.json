@@ -1,0 +1,18 @@
+{
+  "Display": "Cinematic",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.doe.idle.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.doe.leave",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}
