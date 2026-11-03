@@ -29,7 +29,7 @@
 - A malformed `Worlds` pattern such as `(`: refused at decode with the pattern in the message, never a filter that silently matches nothing (Task 1 test).
 - A `GameFlag` quest assigned after the device was already repaired: succeeds on the first check (Task 3 test on `isReached`, Task 9 in game).
 - A flag lowered by `goblins reset` after a quest succeeded: the quest stays successful, nothing re-opens (Task 3 visitor skips quests that are over).
-- Two boss quests finished before talking to the guard: one conversation completes both tales and both rune quests, nothing is lost (Task 7 in game).
+- Two boss quests finished before talking to the guard: each conversation tells one boss, the second tale opens on the next F, nothing is lost (Task 7 in game).
 
 ---
 
@@ -251,10 +251,10 @@ The router's last route is a scolding flavour dialogue. Rewards: small lab resou
 
 For each boss `<Boss>` in `Revenant`, `Glutton`, `Voidtaken`, `Heart`:
 - the boss quest gains `OpenQuestsExamples_GuardTale<Boss>` in a `GrantQuest` of its `SuccessfulRewards` (add to the existing `GrantQuest` ids when there is one, else add one with `AutoClaim: true`);
-- `OpenQuestsExamples_GuardTale<Boss>`: `Dialogue` objective with `Character` only, reward `Ingredient_Rune_Shard` ×2 and `GrantQuest` `OpenQuestsExamples_GuardRune<Boss>`;
-- `OpenQuestsExamples_GuardRune<Boss>`: `Dialogue` objective with `Character`, `Dialogue` `OpenQuestsExamples_GuardRune`, `Answer` `ShowRune`, reward `PortalKey_Goblin_Breach` ×1.
+- `OpenQuestsExamples_GuardTale<Boss>`: `Dialogue` objective with `Character` and `Dialogue` `OpenQuestsExamples_GuardTale<Boss>` (a roleplay dialogue about that boss alone), reward `Ingredient_Rune_Shard` ×2 and `GrantQuest` `OpenQuestsExamples_GuardRune<Boss>`;
+- `OpenQuestsExamples_GuardRune<Boss>`: `Dialogue` objective with `Character`, `Dialogue` `OpenQuestsExamples_GuardRune<Boss>`, `Answer` `ShowRune`, reward `PortalKey_Goblin_Breach` ×1.
 
-Router order: any `GuardTale*` in progress opens the tale dialogue; any `GuardRune*` in progress opens `OpenQuestsExamples_GuardRune`, whose `ShowRune` answer has `When` `{ "Type": "Holding", "Item": { "Category": "GoblinLab_Runes" } }`; otherwise an adventure-dreaming flavour dialogue.
+Each conversation validates one boss only (user's call): the router routes to the first boss, in the order above, whose tale is in progress, then to the first whose rune quest is in progress; each `GuardRune<Boss>` dialogue's `ShowRune` answer has `When` `{ "Type": "Holding", "Item": { "Category": "GoblinLab_Runes" } }`; otherwise an adventure-dreaming flavour dialogue.
 
 - [ ] **Step 1: Sheet, assets, lang** (`openquestsexamples.temple.guard.*`).
 - [ ] **Step 2: Headless boot**, expect no load error or validation warning.

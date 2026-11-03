@@ -165,7 +165,7 @@ Dreams of adventure and of what the portal feels like. Loop, once per boss quest
 Voidtaken, Heart): the boss quest's success grants "tell me" (`Dialogue` aimed at the guard, reward 2
 `Ingredient_Rune_Shard`, enough to craft a rune at once), whose success grants "show me a rune" (`Dialogue` with an answer
 gated by `Holding` `Category` `GoblinLab_Runes`, reward `PortalKey_Goblin_Breach`). One "tell me" and one "show me" quest per boss,
-so two bosses in a row never collide (my call). The boss quests gain a second `GrantQuest` id in their existing
+each with its own roleplay dialogue about that boss, so one conversation validates one boss only (user's call). The boss quests gain a second `GrantQuest` id in their existing
 `SuccessfulRewards` (my call: a reward list change, not an asset type change, so saves are safe). The loop ends when no boss quest is left.
 
 ### The doe (`Temple_Deer_Doe`)
