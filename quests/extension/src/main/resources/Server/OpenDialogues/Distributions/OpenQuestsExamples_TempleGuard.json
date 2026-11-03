@@ -1,0 +1,22 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Temple_Kweebec_Razorleaf_Guard"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-(forgotten-temple-goblins|Forgotten_Temple-.*)"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "OpenQuestsExamples_TempleGuard",
+      "Weight": 1
+    }
+  ]
+}

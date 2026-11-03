@@ -120,6 +120,30 @@
     },
     {
       "Quest": "OpenQuestsExamples_LabConsole"
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardTaleRevenant"
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardRuneRevenant"
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardTaleGlutton"
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardRuneGlutton"
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardTaleVoidtaken"
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardRuneVoidtaken"
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardTaleHeart"
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardRuneHeart"
     }
   ]
 }

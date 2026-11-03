@@ -1,0 +1,29 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ModelsGenerated/Goblin_Glutton.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.guardtaleglutton.title",
+  "DescriptionKey": "openquestsexamples.quest.guardtaleglutton.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.guardtaleglutton.short",
+  "TargetQuantity": 1,
+  "Character": "OpenQuestsExamples_TempleGuard",
+  "Dialogue": "OpenQuestsExamples_GuardTaleGlutton",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Rune_Shard",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_GuardRuneGlutton"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}
