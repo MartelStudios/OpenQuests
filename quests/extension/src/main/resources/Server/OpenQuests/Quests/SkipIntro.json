@@ -8,8 +8,5 @@
   "QuestAssetId": "Intro",
   "States": ["Abandoned"],
   "AnnounceOutcome": false,
-  "AutoTrack": true,
-  "Tags": {
-    "OQ_HUD_DESC": []
-  }
+  "AutoTrack": true
 }

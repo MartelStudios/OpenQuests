@@ -10,8 +10,5 @@
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "PortalKey_Goblin_Breach"
-  },
-  "Tags": {
-    "OQ_HUD_DESC": []
   }
 }

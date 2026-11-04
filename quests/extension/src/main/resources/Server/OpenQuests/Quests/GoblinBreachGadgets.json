@@ -10,8 +10,5 @@
   "TargetQuantity": 3,
   "ItemToCraft": {
     "ItemId": "Ingredient_Gadget_Assembly"
-  },
-  "Tags": {
-    "OQ_HUD_DESC": []
   }
 }

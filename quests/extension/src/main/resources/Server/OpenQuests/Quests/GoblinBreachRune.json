@@ -10,8 +10,5 @@
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Rune_Fireball"
-  },
-  "Tags": {
-    "OQ_HUD_DESC": []
   }
 }

@@ -12,7 +12,7 @@ definition never touches saved progression.
 One quest, as the tracker draws it. *Introduction* combines its two children with `OR`, so either
 branch ends it, hence the rule between them. *Master the basics* combines its own four with `AND`,
 and nests one level further. *Gather fibre* is done: complete icon, greyed, counter dropped. The two
-grey lines are short descriptions, shown because their assets carry the `OQ_HUD_DESC` tag.
+grey lines are short descriptions, shown whenever a quest has one.
 
 ## Modules
 
@@ -490,10 +490,10 @@ leave the trigger volume plugin, so an asset naming one is refused at boot.
 their pace instead, added up across every stretch: `TargetQuantity` is then a duration.
 
 The tracker only lists quests that asked for it. `AutoTrack` puts every quest made from the asset on
-the panel; `OQ_HUD_DESC` shows its short description under its title, greyed and smaller:
+the panel. A quest with a short description shows it under its title, greyed and smaller:
 
 ```json
-{ "Type": "Composite", "TitleKey": "…", "AutoTrack": true, "Tags": { "OQ_HUD_DESC": [] } }
+{ "Type": "Composite", "TitleKey": "…", "AutoTrack": true }
 ```
 
 A quest running against a deadline, whichever constraint set it, gets a gold bar and a clock under
