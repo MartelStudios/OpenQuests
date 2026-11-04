@@ -1,0 +1,8 @@
+{
+  "Type": "Craft",
+  "TitleKey": "openquestsexamples.quest.guardrune.craft.title",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "Category": "GoblinLab_Runes"
+  }
+}

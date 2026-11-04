@@ -1,0 +1,8 @@
+{
+  "Type": "QuestState",
+  "TitleKey": "openquestsexamples.quest.guardtaleglutton.boss.title",
+  "QuestAssetId": "GoblinBreachGlutton",
+  "States": [
+    "Successful"
+  ]
+}

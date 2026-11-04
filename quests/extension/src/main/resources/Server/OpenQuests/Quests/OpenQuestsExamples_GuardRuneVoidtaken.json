@@ -1,5 +1,5 @@
 {
-  "Type": "Dialogue",
+  "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
   "Categories": [
     "Temple"
@@ -7,10 +7,10 @@
   "TitleKey": "openquestsexamples.quest.guardrunevoidtaken.title",
   "DescriptionKey": "openquestsexamples.quest.guardrunevoidtaken.description",
   "ShortDescriptionKey": "openquestsexamples.quest.guardrunevoidtaken.short",
-  "TargetQuantity": 1,
-  "Character": "OpenQuestsExamples_TempleGuard",
-  "Dialogue": "OpenQuestsExamples_GuardRuneVoidtaken",
-  "Answer": "ShowRune",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_GuardRuneVoidtakenCraft",
+    "OpenQuestsExamples_GuardRuneVoidtakenShow"
+  ],
   "SuccessfulRewards": [
     {
       "Type": "Item",

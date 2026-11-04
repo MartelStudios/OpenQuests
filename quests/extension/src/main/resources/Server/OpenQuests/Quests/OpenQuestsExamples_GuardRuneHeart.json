@@ -1,5 +1,5 @@
 {
-  "Type": "Dialogue",
+  "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
   "Categories": [
     "Temple"
@@ -7,10 +7,10 @@
   "TitleKey": "openquestsexamples.quest.guardruneheart.title",
   "DescriptionKey": "openquestsexamples.quest.guardruneheart.description",
   "ShortDescriptionKey": "openquestsexamples.quest.guardruneheart.short",
-  "TargetQuantity": 1,
-  "Character": "OpenQuestsExamples_TempleGuard",
-  "Dialogue": "OpenQuestsExamples_GuardRuneHeart",
-  "Answer": "ShowRune",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_GuardRuneHeartCraft",
+    "OpenQuestsExamples_GuardRuneHeartShow"
+  ],
   "SuccessfulRewards": [
     {
       "Type": "Item",

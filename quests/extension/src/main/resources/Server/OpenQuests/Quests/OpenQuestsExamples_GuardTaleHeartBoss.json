@@ -1,0 +1,8 @@
+{
+  "Type": "QuestState",
+  "TitleKey": "openquestsexamples.quest.guardtaleheart.boss.title",
+  "QuestAssetId": "GoblinBreachHeart",
+  "States": [
+    "Successful"
+  ]
+}

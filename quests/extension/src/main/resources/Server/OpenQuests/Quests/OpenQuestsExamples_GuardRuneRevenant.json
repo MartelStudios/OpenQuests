@@ -1,5 +1,5 @@
 {
-  "Type": "Dialogue",
+  "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
   "Categories": [
     "Temple"
@@ -7,10 +7,10 @@
   "TitleKey": "openquestsexamples.quest.guardrunerevenant.title",
   "DescriptionKey": "openquestsexamples.quest.guardrunerevenant.description",
   "ShortDescriptionKey": "openquestsexamples.quest.guardrunerevenant.short",
-  "TargetQuantity": 1,
-  "Character": "OpenQuestsExamples_TempleGuard",
-  "Dialogue": "OpenQuestsExamples_GuardRuneRevenant",
-  "Answer": "ShowRune",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_GuardRuneRevenantCraft",
+    "OpenQuestsExamples_GuardRuneRevenantShow"
+  ],
   "SuccessfulRewards": [
     {
       "Type": "Item",

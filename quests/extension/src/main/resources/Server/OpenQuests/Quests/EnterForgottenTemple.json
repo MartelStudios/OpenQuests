@@ -15,7 +15,8 @@
         "TalkToRootlingMerchant",
         "OpenQuestsExamples_MeetSapling",
         "OpenQuestsExamples_MeetSeedling",
-        "OpenQuestsExamples_MeetStag"
+        "OpenQuestsExamples_MeetStag",
+        "OpenQuestsExamples_MeetGuard"
       ],
       "AutoClaim": true
     }

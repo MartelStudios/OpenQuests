@@ -1,5 +1,5 @@
 {
-  "Type": "Dialogue",
+  "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
   "Categories": [
     "Temple"
@@ -7,10 +7,10 @@
   "TitleKey": "openquestsexamples.quest.guardruneglutton.title",
   "DescriptionKey": "openquestsexamples.quest.guardruneglutton.description",
   "ShortDescriptionKey": "openquestsexamples.quest.guardruneglutton.short",
-  "TargetQuantity": 1,
-  "Character": "OpenQuestsExamples_TempleGuard",
-  "Dialogue": "OpenQuestsExamples_GuardRuneGlutton",
-  "Answer": "ShowRune",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_GuardRuneGluttonCraft",
+    "OpenQuestsExamples_GuardRuneGluttonShow"
+  ],
   "SuccessfulRewards": [
     {
       "Type": "Item",

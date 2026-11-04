@@ -1,0 +1,8 @@
+{
+  "Type": "Dialogue",
+  "TitleKey": "openquestsexamples.quest.guardrune.show.title",
+  "TargetQuantity": 1,
+  "Character": "OpenQuestsExamples_TempleGuard",
+  "Dialogue": "OpenQuestsExamples_GuardRuneGlutton",
+  "Answer": "ShowRune"
+}

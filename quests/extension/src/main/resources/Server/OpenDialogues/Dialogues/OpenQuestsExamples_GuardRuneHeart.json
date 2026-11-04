@@ -11,10 +11,23 @@
       "Id": "ShowRune",
       "Text": "openquestsexamples.temple.guard.rune.show",
       "When": {
-        "Type": "Holding",
-        "Item": {
-          "Category": "GoblinLab_Runes"
-        }
+        "Type": "Composite",
+        "Operator": "And",
+        "Conditions": [
+          {
+            "Type": "Holding",
+            "Item": {
+              "Category": "GoblinLab_Runes"
+            }
+          },
+          {
+            "Type": "RequiresQuest",
+            "QuestAssetId": "OpenQuestsExamples_GuardRuneHeartCraft",
+            "States": [
+              "Successful"
+            ]
+          }
+        ]
       },
       "Actions": [
         {

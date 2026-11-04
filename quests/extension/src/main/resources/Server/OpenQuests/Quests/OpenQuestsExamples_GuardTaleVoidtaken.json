@@ -1,5 +1,5 @@
 {
-  "Type": "Dialogue",
+  "Type": "Composite",
   "Icon": "Icons/ModelsGenerated/Bear_Voidtaken.png",
   "Categories": [
     "Temple"
@@ -7,9 +7,10 @@
   "TitleKey": "openquestsexamples.quest.guardtalevoidtaken.title",
   "DescriptionKey": "openquestsexamples.quest.guardtalevoidtaken.description",
   "ShortDescriptionKey": "openquestsexamples.quest.guardtalevoidtaken.short",
-  "TargetQuantity": 1,
-  "Character": "OpenQuestsExamples_TempleGuard",
-  "Dialogue": "OpenQuestsExamples_GuardTaleVoidtaken",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_GuardTaleVoidtakenBoss",
+    "OpenQuestsExamples_GuardTaleVoidtakenTell"
+  ],
   "SuccessfulRewards": [
     {
       "Type": "Item",
@@ -24,6 +25,5 @@
       ],
       "AutoClaim": true
     }
-  ],
-  "AutoTrack": true
+  ]
 }

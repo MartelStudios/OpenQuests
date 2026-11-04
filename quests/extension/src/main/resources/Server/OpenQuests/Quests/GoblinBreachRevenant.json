@@ -39,13 +39,6 @@
         "GoblinBreachRune"
       ],
       "AutoClaim": true
-    },
-    {
-      "Type": "GrantQuest",
-      "QuestAssetIds": [
-        "OpenQuestsExamples_GuardTaleRevenant"
-      ],
-      "AutoClaim": true
     }
   ]
 }

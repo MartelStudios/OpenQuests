@@ -7,7 +7,37 @@
           "Type": "RequiresQuest",
           "QuestAssetId": "OpenQuestsExamples_GuardTaleRevenant",
           "States": [
-            "InProgress"
+            "InProgress",
+            "Successful",
+            "Failed",
+            "Abandoned"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_GuardIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_GuardTaleRevenantBoss",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_GuardTaleRevenantTell",
+              "States": [
+                "InProgress"
+              ]
+            }
           ]
         },
         "Then": {
@@ -16,10 +46,23 @@
       },
       {
         "When": {
-          "Type": "RequiresQuest",
-          "QuestAssetId": "OpenQuestsExamples_GuardTaleGlutton",
-          "States": [
-            "InProgress"
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_GuardTaleGluttonBoss",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_GuardTaleGluttonTell",
+              "States": [
+                "InProgress"
+              ]
+            }
           ]
         },
         "Then": {
@@ -28,10 +71,23 @@
       },
       {
         "When": {
-          "Type": "RequiresQuest",
-          "QuestAssetId": "OpenQuestsExamples_GuardTaleVoidtaken",
-          "States": [
-            "InProgress"
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_GuardTaleVoidtakenBoss",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_GuardTaleVoidtakenTell",
+              "States": [
+                "InProgress"
+              ]
+            }
           ]
         },
         "Then": {
@@ -40,10 +96,23 @@
       },
       {
         "When": {
-          "Type": "RequiresQuest",
-          "QuestAssetId": "OpenQuestsExamples_GuardTaleHeart",
-          "States": [
-            "InProgress"
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_GuardTaleHeartBoss",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_GuardTaleHeartTell",
+              "States": [
+                "InProgress"
+              ]
+            }
           ]
         },
         "Then": {
@@ -53,7 +122,7 @@
       {
         "When": {
           "Type": "RequiresQuest",
-          "QuestAssetId": "OpenQuestsExamples_GuardRuneRevenant",
+          "QuestAssetId": "OpenQuestsExamples_GuardRuneRevenantShow",
           "States": [
             "InProgress"
           ]
@@ -65,7 +134,7 @@
       {
         "When": {
           "Type": "RequiresQuest",
-          "QuestAssetId": "OpenQuestsExamples_GuardRuneGlutton",
+          "QuestAssetId": "OpenQuestsExamples_GuardRuneGluttonShow",
           "States": [
             "InProgress"
           ]
@@ -77,7 +146,7 @@
       {
         "When": {
           "Type": "RequiresQuest",
-          "QuestAssetId": "OpenQuestsExamples_GuardRuneVoidtaken",
+          "QuestAssetId": "OpenQuestsExamples_GuardRuneVoidtakenShow",
           "States": [
             "InProgress"
           ]
@@ -89,7 +158,7 @@
       {
         "When": {
           "Type": "RequiresQuest",
-          "QuestAssetId": "OpenQuestsExamples_GuardRuneHeart",
+          "QuestAssetId": "OpenQuestsExamples_GuardRuneHeartShow",
           "States": [
             "InProgress"
           ]
