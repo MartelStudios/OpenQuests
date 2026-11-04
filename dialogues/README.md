@@ -142,6 +142,7 @@ per NPC.
 | `World` | The world name matches one of `Worlds`, each a regular expression on the whole name: `default`, or `instance-Forgotten_Temple-.*` for every copy of an instance. |
 | `Zone` | The scanning player stands in one of `Zones`. |
 | `Biome` | The scanning player stands in one of `Biomes`. |
+| `Unobstructed` | No block hitbox (tall grass, a bush) overlaps the upper half of the NPC's hitbox, where it stands at the draw, so players can aim F at it. Suited to NPCs that do not move. |
 
 Every filter also takes `Not`. NPCs that already react to F (merchants, quest givers) are skipped.
 
