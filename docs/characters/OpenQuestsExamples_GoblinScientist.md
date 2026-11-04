@@ -8,7 +8,8 @@
   invulnerable, who directs the vanilla lab repairs.
 - **Distribution:** `OpenQuestsExamples_GoblinScientist`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
-- **Name:** her vanilla name, no `Name` trait. **Speaker:** `OpenQuestsExamples_GoblinScientist`
+- **Name:** "Makinomagistra" / "Machinarque", the only entry of `OpenQuestsExamples_ScientistNames`,
+  so the nameplate tells her apart and stays the same when she is redrawn. **Speaker:** `OpenQuestsExamples_GoblinScientist`
   (`AllowNPCOverride`, epithet "Lab foreman" / "Contremaîtresse du labo").
 
 ## Personality and voice
@@ -53,6 +54,7 @@ hide (engine), void hearts (compressor, console).
 - `OpenDialogues/Characters/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Distributions/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Speakers/OpenQuestsExamples_GoblinScientist.json`
+- `OpenDialogues/Names/OpenQuestsExamples_ScientistNames.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Scientist{NoPower,Gateway,Workshop,Scold}.json`
 - `OpenQuests/Quests/OpenQuestsExamples_Lab{Gateway,Teleporter,Boiler,Engine,Compressor,Console}.json`
@@ -65,3 +67,4 @@ hide (engine), void hearts (compressor, console).
 - 2026-11-03: quests given through her dialogue; missing her is missing the event (user).
 - 2026-11-03: the lab quests sit in the ForgottenTemple chapter (the lab is in the temple, and the
   GoblinBreach chapter is a positioned graph built from `GrantQuest` links).
+- 2026-11-04: name tag "Machinarque", kept over an invented name (user).

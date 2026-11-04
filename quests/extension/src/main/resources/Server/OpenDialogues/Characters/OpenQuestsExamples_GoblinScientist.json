@@ -8,6 +8,10 @@
         "Router": "OpenQuestsExamples_GoblinScientist"
       },
       "Speaker": "OpenQuestsExamples_GoblinScientist"
+    },
+    {
+      "Type": "Name",
+      "Names": "OpenQuestsExamples_ScientistNames"
     }
   ]
 }

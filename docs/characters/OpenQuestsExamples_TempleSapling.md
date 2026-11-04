@@ -8,8 +8,8 @@
   throw things.
 - **Distribution:** `OpenQuestsExamples_TempleSapling`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
-- **Name:** drawn from `OpenQuestsExamples_KweebecNames`; epithet "Worried sapling" / "Bourgeon
-  inquiet". **Speaker:** `OpenQuestsExamples_KweebecVillager`.
+- **Name:** drawn from `OpenQuestsExamples_KweebecNames`; epithet "Young Kweebec" / "Jeune
+  Kweebec". **Speaker:** `OpenQuestsExamples_KweebecVillager`.
 
 ## Personality and voice
 
@@ -55,3 +55,4 @@ through the "Which generator?" answer of `OpenQuestsExamples_SaplingWorry`.
   non-guard, a little scared (user).
 - 2026-11-03: the generator quest completes on the universe game flag, so one repair completes it
   for every player holding it (user).
+- 2026-11-04: epithet "Young Kweebec" / "Jeune Kweebec", "Bourgeon" read too childish (user).
