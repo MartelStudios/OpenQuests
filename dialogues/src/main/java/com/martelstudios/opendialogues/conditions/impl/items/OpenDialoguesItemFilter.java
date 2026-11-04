@@ -4,12 +4,16 @@ import com.hypixel.hytale.assetstore.AssetRegistry;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.protocol.BenchRequirement;
 import com.hypixel.hytale.protocol.ItemResourceType;
+import com.hypixel.hytale.server.core.asset.type.item.config.CraftingRecipe;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
 import com.hypixel.hytale.server.core.asset.type.item.config.ResourceType;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Which items a condition accepts: one item, every item under a tag, every item of a bench category
@@ -67,15 +71,37 @@ public class OpenDialoguesItemFilter {
         if (blockTagIndex != NO_TAG && Item.getAssetMap().getKeysForTag(blockTagIndex).contains(id)) return true;
 
         Item item = Item.getAssetMap().getAsset(id);
-        if (category != null && inCategory(item == null ? null : item.getCategories())) return true;
+        if (category != null && isInCategory(item)) return true;
         return resourceTypeId != null && isOfResourceType(item);
     }
 
     /**
-     * @param categories an item's bench categories, {@code null} for none.
+     * @param item the item asset, {@code null} for an id with none.
+     * @return whether a bench lists the item under the category, read off the recipe the item
+     * declares: an item's own {@code Categories} only place it in the creative library.
      */
-    boolean inCategory(@Nullable String[] categories) {
-        return categories != null && Arrays.asList(categories).contains(category);
+    private boolean isInCategory(@Nullable Item item) {
+        if (item == null) return false;
+
+        List<CraftingRecipe> recipes = new ArrayList<>();
+        item.collectRecipesToGenerate(recipes);
+
+        for (CraftingRecipe recipe : recipes) {
+            if (benchesList(recipe.getBenchRequirement())) return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param benches the benches a recipe is made at, {@code null} for none.
+     */
+    boolean benchesList(@Nullable BenchRequirement[] benches) {
+        if (benches == null) return false;
+
+        for (BenchRequirement bench : benches) {
+            if (bench.categories != null && Arrays.asList(bench.categories).contains(category)) return true;
+        }
+        return false;
     }
 
     private boolean isOfResourceType(@Nullable Item item) {
