@@ -1,0 +1,25 @@
+{
+  "Type": "Composite",
+  "Operator": "Or",
+  "Icon": "Icons/ItemsGenerated/GoblinLab_Generator.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.meetscientist.title",
+  "DescriptionKey": "openquestsexamples.quest.meetscientist.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.meetscientist.short",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_MeetScientistTalk",
+    "OpenQuestsExamples_LabAllRepaired"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_LabGateway"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

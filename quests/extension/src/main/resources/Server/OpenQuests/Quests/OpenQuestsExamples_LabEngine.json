@@ -1,14 +1,5 @@
 {
-  "Type": "GameFlag",
-  "Flag": "goblin_lab_recipe_b",
-  "SuccessfulRewards": [
-    {
-      "Type": "Item",
-      "ItemId": "Ingredient_Gadget_Assembly",
-      "Quantity": 2,
-      "AutoClaim": true
-    }
-  ],
+  "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/GoblinLab_Tinkering_Bench_Recipeset_B.png",
   "Categories": [
     "Temple"
@@ -16,5 +7,32 @@
   "TitleKey": "openquestsexamples.quest.labengine.title",
   "DescriptionKey": "openquestsexamples.quest.labengine.description",
   "ShortDescriptionKey": "openquestsexamples.quest.labengine.short",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_LabEngineRepair",
+    {
+      "Type": "Composite",
+      "Operator": "Or",
+      "TitleKey": "openquestsexamples.quest.labreport.title",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_LabEngineTalk",
+        "OpenQuestsExamples_LabAllRepaired"
+      ]
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Gadget_Assembly",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_LabConsole"
+      ],
+      "AutoClaim": true
+    }
+  ],
   "AutoTrack": true
 }

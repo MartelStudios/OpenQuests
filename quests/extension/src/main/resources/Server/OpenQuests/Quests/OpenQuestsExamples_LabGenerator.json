@@ -7,6 +7,13 @@
       "ItemId": "Ingredient_Scraps",
       "Quantity": 5,
       "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_MeetScientist"
+      ],
+      "AutoClaim": true
     }
   ],
   "Icon": "Icons/ItemsGenerated/GoblinLab_Generator.png",

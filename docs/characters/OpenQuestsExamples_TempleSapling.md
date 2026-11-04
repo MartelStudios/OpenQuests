@@ -36,7 +36,7 @@ quests lead to the generator, then to the goblin scientist (`OpenQuestsExamples_
 |---|---|---|
 | `OpenQuestsExamples_MeetSapling` | `Dialogue`, answer `Accept` of `OpenQuestsExamples_SaplingGenerator` | grants `LabScrap` |
 | `OpenQuestsExamples_LabScrap` | `Gather` 10 `Ingredient_Scraps` (breaches outside) | grants `LabGenerator` |
-| `OpenQuestsExamples_LabGenerator` | `GameFlag` `goblin_lab_power` | 5 scraps |
+| `OpenQuestsExamples_LabGenerator` | `GameFlag` `goblin_lab_power` | 5 scraps, grants `MeetScientist` |
 
 `EnterForgottenTemple` grants `MeetSapling`. The "Thank you" answer of
 `OpenQuestsExamples_SaplingGenerator`, reached through "Which generator?" in
