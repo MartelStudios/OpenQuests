@@ -1,3 +1,0 @@
-# ============= Git settings =============
-# Force LF for specific configuration and Unity metadata files
-*.json text eol=lf
