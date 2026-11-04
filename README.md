@@ -442,9 +442,11 @@ comes back as soon as its asset does.
 
 ## Built-in quest types
 
-The types counting items or blocks name them the same way, with one of three keys: `ItemId` for a
-single item, `BlockTag` for every item under a tag, or `ResourceTypeId` for a family the game
-already defines, such as `Flowers` or `Meats`. A block is matched through the item it comes from.
+The types counting items or blocks name them the same way, with one of four keys: `ItemId` for a
+single item, `BlockTag` for every item under a tag, `ResourceTypeId` for a family the game already
+defines, such as `Flowers` or `Meats`, or `Category` for every item whose own recipe a bench lists
+under that category, such as `GoblinLab_Runes` for any rune. A block is matched through the item it
+comes from.
 
 ```json
 "ItemToGather": { "ResourceTypeId": "Meats" }
