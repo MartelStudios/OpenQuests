@@ -1,24 +1,24 @@
 {
   "Type": "Deliver",
-  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Onion.png",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Carrot.png",
   "Categories": [
     "Temple"
   ],
-  "TitleKey": "openquestsexamples.quest.doeonionpotato.title",
-  "DescriptionKey": "openquestsexamples.quest.doeonionpotato.description",
-  "ShortDescriptionKey": "openquestsexamples.quest.doeonionpotato.short",
-  "Character": "OpenQuestsExamples_TempleDoe",
-  "Dialogue": "OpenQuestsExamples_DoeMoult",
+  "TitleKey": "openquestsexamples.quest.stagcarrotcorn.title",
+  "DescriptionKey": "openquestsexamples.quest.stagcarrotcorn.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.stagcarrotcorn.short",
+  "Character": "OpenQuestsExamples_TempleStag",
+  "Dialogue": "OpenQuestsExamples_StagMoult",
   "Items": [
     {
       "Item": {
-        "ItemId": "Plant_Seeds_Onion"
+        "ItemId": "Plant_Seeds_Carrot"
       },
       "Quantity": 2
     },
     {
       "Item": {
-        "ItemId": "Plant_Seeds_Potato"
+        "ItemId": "Plant_Seeds_Corn"
       },
       "Quantity": 2
     }
@@ -33,7 +33,7 @@
           "Reward": {
             "Type": "Item",
             "ItemId": "Ingredient_Life_Essence",
-            "Quantity": 5
+            "Quantity": 3
           }
         },
         {
@@ -41,7 +41,7 @@
           "Reward": {
             "Type": "Item",
             "ItemId": "Ingredient_Life_Essence",
-            "Quantity": 8
+            "Quantity": 5
           }
         },
         {
@@ -49,21 +49,21 @@
           "Reward": {
             "Type": "Item",
             "ItemId": "Ingredient_Life_Essence",
-            "Quantity": 12
+            "Quantity": 8
           }
         }
       ]
     },
     {
       "Type": "Item",
-      "ItemId": "Ingredient_Leather_Storm",
+      "ItemId": "Ingredient_Leather_Soft",
       "Quantity": 2,
       "AutoClaim": true
     },
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "OpenQuestsExamples_DoeEternal"
+        "OpenQuestsExamples_StagCauliflowerTurnip"
       ],
       "AutoClaim": true
     }

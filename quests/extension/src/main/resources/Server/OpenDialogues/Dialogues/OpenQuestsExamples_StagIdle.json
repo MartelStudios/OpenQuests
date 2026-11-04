@@ -2,12 +2,12 @@
   "Display": "Cinematic",
   "Pages": [
     {
-      "Text": "openquestsexamples.temple.doe.content.text"
+      "Text": "openquestsexamples.temple.stag.idle.text"
     }
   ],
   "Responses": [
     {
-      "Text": "openquestsexamples.temple.doe.leave",
+      "Text": "openquestsexamples.temple.stag.leave",
       "Actions": [
         {
           "Type": "Close"

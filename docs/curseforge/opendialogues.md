@@ -40,7 +40,7 @@ greets a newcomer and a regular differently.
 
 🔀 **Routers.** One id, many dialogues: the first whose condition holds, or one drawn at random by weight.
 
-👥 **Characters for passive NPCs.** Villagers, children, even a doe draw a character as players come near: a name of
+👥 **Characters for passive NPCs.** Villagers, children, even a stag draw a character as players come near: a name of
 their own, a dialogue on F, and a place in your quests. Keep one unique for the whole server, give a role a few
 characters drawn by weight, and choose where each appears, down to an instance like the Forgotten Temple.
 
@@ -130,7 +130,7 @@ dialogues and quests talk to each other:
   is one quest.
 * **Answers that hand out quests** with `AssignQuest`, or end them with `SetQuestState`.
 * **A `RequiresQuest` condition:** an answer that only shows while a quest is running, or once it is done.
-* **Quests aimed at a character:** talk to the Kweebec mage, bring seeds to the temple doe. A quest aimed at a
+* **Quests aimed at a character:** talk to the Kweebec mage, bring seeds to the enchanted stag. A quest aimed at a
   character lost for good fails on its own.
 
 ***

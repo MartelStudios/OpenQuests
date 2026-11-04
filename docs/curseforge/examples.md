@@ -42,7 +42,7 @@ Over sixty quests in eight chapters, in English and French. A whole campaign thr
 
 * 🌱 **A curious seedling** who has never been outside wants feathers, then crystal shards of every colour, and pays in
   trinkets he pilfered from the elders and the goblins.
-* 🦌 **A doe** with a strange gaze eats the seeds you bring. As they get rarer, she sheds a hide more precious each time.
+* 🦌 **An enchanted stag** with a strange gaze eats the seeds you bring. As they get rarer, he sheds a hide more precious each time.
 * 😟 **A worried sapling** tells you about the goblin lab and its broken generator, and sends you looking for scrap.
 * 🔧 **The goblin scientist** runs the lab repairs: the gateway to the breach, the boiler, the engine, the compressor.
   Talk to her before she leaves.

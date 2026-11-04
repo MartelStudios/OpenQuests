@@ -2,19 +2,19 @@
   "Display": "Cinematic",
   "Pages": [
     {
-      "Text": "openquestsexamples.temple.doe.intro.page1"
+      "Text": "openquestsexamples.temple.stag.intro.page1"
     },
     {
-      "Text": "openquestsexamples.temple.doe.intro.page2"
+      "Text": "openquestsexamples.temple.stag.intro.page2"
     }
   ],
   "Responses": [
     {
-      "Text": "openquestsexamples.temple.doe.intro.search",
+      "Text": "openquestsexamples.temple.stag.intro.search",
       "Actions": [
         {
           "Type": "AssignQuest",
-          "Quest": "OpenQuestsExamples_DoeWheat"
+          "Quest": "OpenQuestsExamples_StagWheat"
         },
         {
           "Type": "Close"
@@ -22,7 +22,7 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.leave",
+      "Text": "openquestsexamples.temple.stag.leave",
       "Actions": [
         {
           "Type": "Close"

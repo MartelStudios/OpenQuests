@@ -72,7 +72,7 @@ Hollows fragment 0/2/10/15.
 
 - 2026-11-03: feathers first (siblings), shards before feathers get hard (elders), then rare
   feathers and rare shards in turn; rarity from spawn weights, drop tables and world gen (user).
-- 2026-11-03: rewards are pilfered trinkets; no plain essence of life (the doe gives it); final
+- 2026-11-03: rewards are pilfered trinkets; no plain essence of life (the enchanted stag gives it); final
   reward the Deepworks fragment, rarest draw the Guttering Hollows fragment, gadget assembly just
   below (user).
 - 2026-11-03: the seashell stays, `Deco_Coral_Shell` generates in zone 1 and 2 shallow oceans.

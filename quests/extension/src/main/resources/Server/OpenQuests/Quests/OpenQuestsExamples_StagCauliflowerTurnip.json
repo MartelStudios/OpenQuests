@@ -1,20 +1,26 @@
 {
   "Type": "Deliver",
-  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Lettuce.png",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Cauliflower.png",
   "Categories": [
     "Temple"
   ],
-  "TitleKey": "openquestsexamples.quest.doelettuce.title",
-  "DescriptionKey": "openquestsexamples.quest.doelettuce.description",
-  "ShortDescriptionKey": "openquestsexamples.quest.doelettuce.short",
-  "Character": "OpenQuestsExamples_TempleDoe",
-  "Dialogue": "OpenQuestsExamples_DoeSeeds",
+  "TitleKey": "openquestsexamples.quest.stagcauliflowerturnip.title",
+  "DescriptionKey": "openquestsexamples.quest.stagcauliflowerturnip.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.stagcauliflowerturnip.short",
+  "Character": "OpenQuestsExamples_TempleStag",
+  "Dialogue": "OpenQuestsExamples_StagMoult",
   "Items": [
     {
       "Item": {
-        "ItemId": "Plant_Seeds_Lettuce"
+        "ItemId": "Plant_Seeds_Cauliflower"
       },
-      "Quantity": 5
+      "Quantity": 2
+    },
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Turnip"
+      },
+      "Quantity": 2
     }
   ],
   "SuccessfulRewards": [
@@ -49,9 +55,15 @@
       ]
     },
     {
+      "Type": "Item",
+      "ItemId": "Ingredient_Leather_Light",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "OpenQuestsExamples_DoeCarrotCorn"
+        "OpenQuestsExamples_StagAuberginePumpkin"
       ],
       "AutoClaim": true
     }

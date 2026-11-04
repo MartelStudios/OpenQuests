@@ -5,7 +5,7 @@
       {
         "When": {
           "Type": "RequiresQuest",
-          "QuestAssetId": "OpenQuestsExamples_DoeWheat",
+          "QuestAssetId": "OpenQuestsExamples_StagWheat",
           "States": [
             "InProgress",
             "Successful",
@@ -16,24 +16,24 @@
           "Max": 0
         },
         "Then": {
-          "Dialogue": "OpenQuestsExamples_DoeIntro"
+          "Dialogue": "OpenQuestsExamples_StagIntro"
         }
       },
       {
         "When": {
           "Type": "RequiresQuest",
-          "QuestAssetId": "OpenQuestsExamples_DoeEternalRoots",
+          "QuestAssetId": "OpenQuestsExamples_StagEternalRoots",
           "States": [
             "Successful"
           ]
         },
         "Then": {
-          "Dialogue": "OpenQuestsExamples_DoeContent"
+          "Dialogue": "OpenQuestsExamples_StagContent"
         }
       },
       {
         "Then": {
-          "Dialogue": "OpenQuestsExamples_DoeIdle"
+          "Dialogue": "OpenQuestsExamples_StagIdle"
         }
       }
     ]

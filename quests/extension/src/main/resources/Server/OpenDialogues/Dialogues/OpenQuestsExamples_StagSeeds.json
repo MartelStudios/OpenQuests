@@ -2,15 +2,15 @@
   "Display": "Cinematic",
   "Pages": [
     {
-      "Text": "openquestsexamples.temple.doe.seeds.text"
+      "Text": "openquestsexamples.temple.stag.seeds.text"
     }
   ],
   "Responses": [
     {
-      "Text": "openquestsexamples.temple.doe.give",
+      "Text": "openquestsexamples.temple.stag.give",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "OpenQuestsExamples_DoeWheat",
+        "QuestAssetId": "OpenQuestsExamples_StagWheat",
         "States": [
           "InProgress"
         ]
@@ -18,7 +18,7 @@
       "Actions": [
         {
           "Type": "Deliver",
-          "Quest": "OpenQuestsExamples_DoeWheat"
+          "Quest": "OpenQuestsExamples_StagWheat"
         },
         {
           "Type": "Close"
@@ -26,10 +26,10 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.give",
+      "Text": "openquestsexamples.temple.stag.give",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "OpenQuestsExamples_DoeLettuce",
+        "QuestAssetId": "OpenQuestsExamples_StagLettuce",
         "States": [
           "InProgress"
         ]
@@ -37,7 +37,7 @@
       "Actions": [
         {
           "Type": "Deliver",
-          "Quest": "OpenQuestsExamples_DoeLettuce"
+          "Quest": "OpenQuestsExamples_StagLettuce"
         },
         {
           "Type": "Close"
@@ -45,7 +45,7 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.leave",
+      "Text": "openquestsexamples.temple.stag.leave",
       "Actions": [
         {
           "Type": "Close"

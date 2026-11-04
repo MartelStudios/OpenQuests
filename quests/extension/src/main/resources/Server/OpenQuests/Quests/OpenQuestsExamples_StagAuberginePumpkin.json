@@ -1,24 +1,24 @@
 {
   "Type": "Deliver",
-  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Rice.png",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Aubergine.png",
   "Categories": [
     "Temple"
   ],
-  "TitleKey": "openquestsexamples.quest.doericecotton.title",
-  "DescriptionKey": "openquestsexamples.quest.doericecotton.description",
-  "ShortDescriptionKey": "openquestsexamples.quest.doericecotton.short",
-  "Character": "OpenQuestsExamples_TempleDoe",
-  "Dialogue": "OpenQuestsExamples_DoeMoult",
+  "TitleKey": "openquestsexamples.quest.stagauberginepumpkin.title",
+  "DescriptionKey": "openquestsexamples.quest.stagauberginepumpkin.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.stagauberginepumpkin.short",
+  "Character": "OpenQuestsExamples_TempleStag",
+  "Dialogue": "OpenQuestsExamples_StagMoult",
   "Items": [
     {
       "Item": {
-        "ItemId": "Plant_Seeds_Rice"
+        "ItemId": "Plant_Seeds_Aubergine"
       },
       "Quantity": 2
     },
     {
       "Item": {
-        "ItemId": "Plant_Seeds_Cotton"
+        "ItemId": "Plant_Seeds_Pumpkin"
       },
       "Quantity": 2
     }
@@ -33,7 +33,7 @@
           "Reward": {
             "Type": "Item",
             "ItemId": "Ingredient_Life_Essence",
-            "Quantity": 5
+            "Quantity": 3
           }
         },
         {
@@ -41,7 +41,7 @@
           "Reward": {
             "Type": "Item",
             "ItemId": "Ingredient_Life_Essence",
-            "Quantity": 8
+            "Quantity": 5
           }
         },
         {
@@ -49,21 +49,21 @@
           "Reward": {
             "Type": "Item",
             "ItemId": "Ingredient_Life_Essence",
-            "Quantity": 12
+            "Quantity": 8
           }
         }
       ]
     },
     {
       "Type": "Item",
-      "ItemId": "Ingredient_Leather_Scaled",
+      "ItemId": "Ingredient_Leather_Medium",
       "Quantity": 2,
       "AutoClaim": true
     },
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "OpenQuestsExamples_DoeOnionPotato"
+        "OpenQuestsExamples_StagTomatoChilli"
       ],
       "AutoClaim": true
     }

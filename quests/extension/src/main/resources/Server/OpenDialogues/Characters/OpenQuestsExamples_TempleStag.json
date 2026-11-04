@@ -5,8 +5,12 @@
     {
       "Type": "Dialogue",
       "Dialogue": {
-        "Router": "OpenQuestsExamples_TempleDoe"
+        "Router": "OpenQuestsExamples_TempleStag"
       }
+    },
+    {
+      "Type": "Name",
+      "Names": "OpenQuestsExamples_StagNames"
     }
   ]
 }

@@ -2,18 +2,18 @@
   "Display": "Cinematic",
   "Pages": [
     {
-      "Text": "openquestsexamples.temple.doe.moult.page1"
+      "Text": "openquestsexamples.temple.stag.moult.page1"
     },
     {
-      "Text": "openquestsexamples.temple.doe.moult.page2"
+      "Text": "openquestsexamples.temple.stag.moult.page2"
     }
   ],
   "Responses": [
     {
-      "Text": "openquestsexamples.temple.doe.give",
+      "Text": "openquestsexamples.temple.stag.give",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "OpenQuestsExamples_DoeCarrotCorn",
+        "QuestAssetId": "OpenQuestsExamples_StagCarrotCorn",
         "States": [
           "InProgress"
         ]
@@ -21,7 +21,7 @@
       "Actions": [
         {
           "Type": "Deliver",
-          "Quest": "OpenQuestsExamples_DoeCarrotCorn"
+          "Quest": "OpenQuestsExamples_StagCarrotCorn"
         },
         {
           "Type": "Close"
@@ -29,10 +29,10 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.give",
+      "Text": "openquestsexamples.temple.stag.give",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "OpenQuestsExamples_DoeCauliflowerTurnip",
+        "QuestAssetId": "OpenQuestsExamples_StagCauliflowerTurnip",
         "States": [
           "InProgress"
         ]
@@ -40,7 +40,7 @@
       "Actions": [
         {
           "Type": "Deliver",
-          "Quest": "OpenQuestsExamples_DoeCauliflowerTurnip"
+          "Quest": "OpenQuestsExamples_StagCauliflowerTurnip"
         },
         {
           "Type": "Close"
@@ -48,10 +48,10 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.give",
+      "Text": "openquestsexamples.temple.stag.give",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "OpenQuestsExamples_DoeAuberginePumpkin",
+        "QuestAssetId": "OpenQuestsExamples_StagAuberginePumpkin",
         "States": [
           "InProgress"
         ]
@@ -59,7 +59,7 @@
       "Actions": [
         {
           "Type": "Deliver",
-          "Quest": "OpenQuestsExamples_DoeAuberginePumpkin"
+          "Quest": "OpenQuestsExamples_StagAuberginePumpkin"
         },
         {
           "Type": "Close"
@@ -67,10 +67,10 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.give",
+      "Text": "openquestsexamples.temple.stag.give",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "OpenQuestsExamples_DoeTomatoChilli",
+        "QuestAssetId": "OpenQuestsExamples_StagTomatoChilli",
         "States": [
           "InProgress"
         ]
@@ -78,7 +78,7 @@
       "Actions": [
         {
           "Type": "Deliver",
-          "Quest": "OpenQuestsExamples_DoeTomatoChilli"
+          "Quest": "OpenQuestsExamples_StagTomatoChilli"
         },
         {
           "Type": "Close"
@@ -86,10 +86,10 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.give",
+      "Text": "openquestsexamples.temple.stag.give",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "OpenQuestsExamples_DoeRiceCotton",
+        "QuestAssetId": "OpenQuestsExamples_StagRiceCotton",
         "States": [
           "InProgress"
         ]
@@ -97,7 +97,7 @@
       "Actions": [
         {
           "Type": "Deliver",
-          "Quest": "OpenQuestsExamples_DoeRiceCotton"
+          "Quest": "OpenQuestsExamples_StagRiceCotton"
         },
         {
           "Type": "Close"
@@ -105,10 +105,10 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.give",
+      "Text": "openquestsexamples.temple.stag.give",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "OpenQuestsExamples_DoeOnionPotato",
+        "QuestAssetId": "OpenQuestsExamples_StagOnionPotato",
         "States": [
           "InProgress"
         ]
@@ -116,7 +116,7 @@
       "Actions": [
         {
           "Type": "Deliver",
-          "Quest": "OpenQuestsExamples_DoeOnionPotato"
+          "Quest": "OpenQuestsExamples_StagOnionPotato"
         },
         {
           "Type": "Close"
@@ -124,10 +124,10 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.give",
+      "Text": "openquestsexamples.temple.stag.give",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "OpenQuestsExamples_DoeEternal",
+        "QuestAssetId": "OpenQuestsExamples_StagEternal",
         "States": [
           "InProgress"
         ]
@@ -135,7 +135,7 @@
       "Actions": [
         {
           "Type": "Deliver",
-          "Quest": "OpenQuestsExamples_DoeEternal"
+          "Quest": "OpenQuestsExamples_StagEternal"
         },
         {
           "Type": "Close"
@@ -143,10 +143,10 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.give",
+      "Text": "openquestsexamples.temple.stag.give",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "OpenQuestsExamples_DoeEternalRoots",
+        "QuestAssetId": "OpenQuestsExamples_StagEternalRoots",
         "States": [
           "InProgress"
         ]
@@ -154,7 +154,7 @@
       "Actions": [
         {
           "Type": "Deliver",
-          "Quest": "OpenQuestsExamples_DoeEternalRoots"
+          "Quest": "OpenQuestsExamples_StagEternalRoots"
         },
         {
           "Type": "Close"
@@ -162,7 +162,7 @@
       ]
     },
     {
-      "Text": "openquestsexamples.temple.doe.leave",
+      "Text": "openquestsexamples.temple.stag.leave",
       "Actions": [
         {
           "Type": "Close"

@@ -1,20 +1,26 @@
 {
   "Type": "Deliver",
-  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Tomato_Eternal.png",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Rice.png",
   "Categories": [
     "Temple"
   ],
-  "TitleKey": "openquestsexamples.quest.doeeternal.title",
-  "DescriptionKey": "openquestsexamples.quest.doeeternal.description",
-  "ShortDescriptionKey": "openquestsexamples.quest.doeeternal.short",
-  "Character": "OpenQuestsExamples_TempleDoe",
-  "Dialogue": "OpenQuestsExamples_DoeMoult",
+  "TitleKey": "openquestsexamples.quest.stagricecotton.title",
+  "DescriptionKey": "openquestsexamples.quest.stagricecotton.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.stagricecotton.short",
+  "Character": "OpenQuestsExamples_TempleStag",
+  "Dialogue": "OpenQuestsExamples_StagMoult",
   "Items": [
     {
       "Item": {
-        "ItemId": "Plant_Seeds_Tomato_Eternal"
+        "ItemId": "Plant_Seeds_Rice"
       },
-      "Quantity": 1
+      "Quantity": 2
+    },
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Cotton"
+      },
+      "Quantity": 2
     }
   ],
   "SuccessfulRewards": [
@@ -50,14 +56,14 @@
     },
     {
       "Type": "Item",
-      "ItemId": "Ingredient_Leather_Dark",
+      "ItemId": "Ingredient_Leather_Scaled",
       "Quantity": 2,
       "AutoClaim": true
     },
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "OpenQuestsExamples_DoeEternalRoots"
+        "OpenQuestsExamples_StagOnionPotato"
       ],
       "AutoClaim": true
     }

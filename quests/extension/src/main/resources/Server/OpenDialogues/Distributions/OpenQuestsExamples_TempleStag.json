@@ -3,7 +3,7 @@
     {
       "Type": "Role",
       "Roles": [
-        "Temple_Deer_Doe"
+        "Temple_Deer_Stag"
       ]
     },
     {
@@ -15,7 +15,7 @@
   ],
   "Characters": [
     {
-      "Character": "OpenQuestsExamples_TempleDoe",
+      "Character": "OpenQuestsExamples_TempleStag",
       "Weight": 1
     }
   ]

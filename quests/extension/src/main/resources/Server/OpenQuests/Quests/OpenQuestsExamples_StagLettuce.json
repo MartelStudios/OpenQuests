@@ -1,26 +1,20 @@
 {
   "Type": "Deliver",
-  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Aubergine.png",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Lettuce.png",
   "Categories": [
     "Temple"
   ],
-  "TitleKey": "openquestsexamples.quest.doeauberginepumpkin.title",
-  "DescriptionKey": "openquestsexamples.quest.doeauberginepumpkin.description",
-  "ShortDescriptionKey": "openquestsexamples.quest.doeauberginepumpkin.short",
-  "Character": "OpenQuestsExamples_TempleDoe",
-  "Dialogue": "OpenQuestsExamples_DoeMoult",
+  "TitleKey": "openquestsexamples.quest.staglettuce.title",
+  "DescriptionKey": "openquestsexamples.quest.staglettuce.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.staglettuce.short",
+  "Character": "OpenQuestsExamples_TempleStag",
+  "Dialogue": "OpenQuestsExamples_StagSeeds",
   "Items": [
     {
       "Item": {
-        "ItemId": "Plant_Seeds_Aubergine"
+        "ItemId": "Plant_Seeds_Lettuce"
       },
-      "Quantity": 2
-    },
-    {
-      "Item": {
-        "ItemId": "Plant_Seeds_Pumpkin"
-      },
-      "Quantity": 2
+      "Quantity": 5
     }
   ],
   "SuccessfulRewards": [
@@ -55,15 +49,9 @@
       ]
     },
     {
-      "Type": "Item",
-      "ItemId": "Ingredient_Leather_Medium",
-      "Quantity": 2,
-      "AutoClaim": true
-    },
-    {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "OpenQuestsExamples_DoeTomatoChilli"
+        "OpenQuestsExamples_StagCarrotCorn"
       ],
       "AutoClaim": true
     }
