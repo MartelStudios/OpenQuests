@@ -44,7 +44,7 @@ Over sixty quests in eight chapters, in English and French. A whole campaign thr
   trinkets he pilfered from the elders and the goblins.
 * 🦌 **An enchanted stag** with a strange gaze eats the seeds you bring. As they get rarer, he sheds a hide more precious each time.
 * 😟 **A young Kweebec** tells you about the goblin lab and its broken generator, and sends you looking for scrap.
-* 🔧 **The goblin scientist** runs the lab repairs: the gateway to the breach, the boiler, the engine, the compressor.
+* 🔧 **The goblin scientist** runs the lab repairs and wants a report after each: the gateway to the breach, the teleporter, the boiler, the engine, the compressor.
   Talk to her before she leaves.
 * 🛡️ **A dreaming guard** wants to hear how you beat each boss of the breach, then to see a rune you forged, and sends
   you back through with a fragment.

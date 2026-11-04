@@ -7,6 +7,13 @@
       "ItemId": "Ingredient_Crystal_Void",
       "Quantity": 3,
       "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_LabThrough"
+      ],
+      "AutoClaim": true
     }
   ],
   "Icon": "Icons/ItemsGenerated/GoblinLab_Console.png",

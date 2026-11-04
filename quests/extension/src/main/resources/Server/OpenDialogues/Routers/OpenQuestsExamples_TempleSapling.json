@@ -21,6 +21,43 @@
       },
       {
         "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_LabThroughEnter",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "OpenQuestsExamples_LabThroughTell",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_SaplingThrough"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_LabThrough",
+          "States": [
+            "Successful"
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_SaplingGrateful"
+        }
+      },
+      {
+        "When": {
           "Type": "RequiresQuest",
           "QuestAssetId": "OpenQuestsExamples_LabGenerator",
           "States": [

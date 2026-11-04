@@ -37,6 +37,7 @@ quests lead to the generator, then to the goblin scientist (`OpenQuestsExamples_
 | `OpenQuestsExamples_MeetSapling` | `Dialogue`, answer `Accept` of `OpenQuestsExamples_SaplingGenerator` | grants `LabScrap` |
 | `OpenQuestsExamples_LabScrap` | `Gather` 10 `Ingredient_Scraps` (breaches outside) | grants `LabGenerator` |
 | `OpenQuestsExamples_LabGenerator` | `GameFlag` `goblin_lab_power` | 5 scraps, grants `MeetScientist` |
+| `OpenQuestsExamples_LabThrough` | granted by `LabConsole`: `LabThroughEnter` (`EnterWorld` the breach), then `LabThroughTell` (`Dialogue` on `SaplingThrough`) | 1 `PortalKey_The_Deepworks` |
 
 `EnterForgottenTemple` grants `MeetSapling`. The "Thank you" answer of
 `OpenQuestsExamples_SaplingGenerator`, reached through "Which generator?" in
@@ -48,9 +49,9 @@ quests existed gets the same answer assigning `LabScrap` directly.
 - `OpenDialogues/Characters/OpenQuestsExamples_TempleSapling.json`
 - `OpenDialogues/Distributions/OpenQuestsExamples_TempleSapling.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleSapling.json`
-- `OpenDialogues/Dialogues/OpenQuestsExamples_Sapling{Worry,Generator,Waiting,Relieved}.json`
+- `OpenDialogues/Dialogues/OpenQuestsExamples_Sapling{Worry,Generator,Waiting,Relieved,Through,Grateful}.json`
 - `OpenQuests/Quests/OpenQuestsExamples_MeetSapling.json`
-- `OpenQuests/Quests/OpenQuestsExamples_Lab{Scrap,Generator}.json`, chapter `ForgottenTemple`
+- `OpenQuests/Quests/OpenQuestsExamples_Lab{Scrap,Generator}.json`, `OpenQuestsExamples_LabThrough{,Enter,Tell}.json`, chapter `ForgottenTemple`
 - Lang keys `openquestsexamples.temple.sapling.*`, `openquestsexamples.quest.lab{scrap,generator}.*`
 
 ## Decision log
@@ -61,3 +62,4 @@ quests existed gets the same answer assigning `LabScrap` directly.
   for every player holding it (user).
 - 2026-11-04: epithet "Young Kweebec" / "Jeune Kweebec", "Bourgeon" read too childish (user).
 - 2026-11-04: a meeting quest from `EnterForgottenTemple` leads to him, not auto tracked; its description says who to look for, since where he stands is drawn by the scan (user).
+- 2026-11-04: the lab line ends with him: going through the gate in his parents' place, then telling him, which pays a Deepworks fragment taken from their things (user).

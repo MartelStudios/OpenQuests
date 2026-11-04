@@ -48,7 +48,7 @@ done) and `LabAllRepaired`. In chapter `ForgottenTemple`.
 | `OpenQuestsExamples_LabBoiler` | `goblin_lab_recipe_a` | 1 gadget assembly | `LabConsole` |
 | `OpenQuestsExamples_LabEngine` | `goblin_lab_recipe_b` | 2 gadget assemblies | `LabConsole` |
 | `OpenQuestsExamples_LabCompressor` | `goblin_lab_recipe_c` | 2 gadget assemblies | `LabConsole` |
-| `OpenQuestsExamples_LabConsole` | `goblin_breach_duration` | 3 void crystals | |
+| `OpenQuestsExamples_LabConsole` | `goblin_breach_duration` | 3 void crystals | `LabThrough`, back to the young Kweebec |
 
 The three machines run in parallel. `LabConsole` is a plain `GameFlag`, without a report: `MaxQuests`
 1 keeps the three grants to one quest, and `RequiresQuest` on each machine holds its progress back
