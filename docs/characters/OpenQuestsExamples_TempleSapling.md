@@ -34,11 +34,14 @@ quests lead to the generator, then to the goblin scientist (`OpenQuestsExamples_
 
 | Quest | Objective | Reward |
 |---|---|---|
+| `OpenQuestsExamples_MeetSapling` | `Dialogue`, answer `Accept` of `OpenQuestsExamples_SaplingGenerator` | grants `LabScrap` |
 | `OpenQuestsExamples_LabScrap` | `Gather` 10 `Ingredient_Scraps` (breaches outside) | grants `LabGenerator` |
 | `OpenQuestsExamples_LabGenerator` | `GameFlag` `goblin_lab_power` | 5 scraps |
 
-`LabScrap` is assigned by the "Thank you" answer of `OpenQuestsExamples_SaplingGenerator`, reached
-through the "Which generator?" answer of `OpenQuestsExamples_SaplingWorry`.
+`EnterForgottenTemple` grants `MeetSapling`. The "Thank you" answer of
+`OpenQuestsExamples_SaplingGenerator`, reached through "Which generator?" in
+`OpenQuestsExamples_SaplingWorry`, completes it; a player who entered the temple before meeting
+quests existed gets the same answer assigning `LabScrap` directly.
 
 ## Assets
 
@@ -46,6 +49,7 @@ through the "Which generator?" answer of `OpenQuestsExamples_SaplingWorry`.
 - `OpenDialogues/Distributions/OpenQuestsExamples_TempleSapling.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleSapling.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Sapling{Worry,Generator,Waiting,Relieved}.json`
+- `OpenQuests/Quests/OpenQuestsExamples_MeetSapling.json`
 - `OpenQuests/Quests/OpenQuestsExamples_Lab{Scrap,Generator}.json`, chapter `ForgottenTemple`
 - Lang keys `openquestsexamples.temple.sapling.*`, `openquestsexamples.quest.lab{scrap,generator}.*`
 
@@ -56,3 +60,4 @@ through the "Which generator?" answer of `OpenQuestsExamples_SaplingWorry`.
 - 2026-11-03: the generator quest completes on the universe game flag, so one repair completes it
   for every player holding it (user).
 - 2026-11-04: epithet "Young Kweebec" / "Jeune Kweebec", "Bourgeon" read too childish (user).
+- 2026-11-04: a meeting quest from `EnterForgottenTemple` leads to him, not auto tracked; its description says who to look for, since where he stands is drawn by the scan (user).

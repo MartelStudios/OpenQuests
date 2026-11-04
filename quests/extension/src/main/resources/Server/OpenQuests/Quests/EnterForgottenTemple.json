@@ -12,7 +12,10 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "TalkToRootlingMerchant"
+        "TalkToRootlingMerchant",
+        "OpenQuestsExamples_MeetSapling",
+        "OpenQuestsExamples_MeetSeedling",
+        "OpenQuestsExamples_MeetStag"
       ],
       "AutoClaim": true
     }
