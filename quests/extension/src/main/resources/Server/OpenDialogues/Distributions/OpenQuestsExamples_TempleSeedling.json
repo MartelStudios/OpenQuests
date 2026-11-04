@@ -11,6 +11,9 @@
       "Worlds": [
         "instance-(forgotten-temple-goblins|Forgotten_Temple-.*)"
       ]
+    },
+    {
+      "Type": "Unobstructed"
     }
   ],
   "Characters": [

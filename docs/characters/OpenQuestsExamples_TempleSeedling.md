@@ -5,8 +5,9 @@
 - **Id:** `OpenQuestsExamples_TempleSeedling` (OpenQuestsExamples pack).
 - **Uniqueness:** `Forever`, **Scope:** `Universe`: one seedling of the universe carries him, for good.
 - **Carrier:** `Temple_Kweebec_Seedling_Static`, the Kweebec children of the Forgotten Temple.
-- **Distribution:** `OpenQuestsExamples_TempleSeedling`, filters `Role` and `World`
-  `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
+- **Distribution:** `OpenQuestsExamples_TempleSeedling`, filters `Role`, `World`
+  `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)` and `Unobstructed` (no tall grass
+  hiding his hitbox), weight 1, no empty weight.
 - **Name:** drawn from `OpenQuestsExamples_KweebecNames`; epithet "Curious seedling" / "Petit curieux".
 - **Speaker:** `OpenQuestsExamples_KweebecVillager`, cinematic display.
 
@@ -78,3 +79,5 @@ Hollows fragment 0/2/10/15.
 - 2026-11-03: the seashell stays, `Deco_Coral_Shell` generates in zone 1 and 2 shallow oceans.
 - 2026-11-03: one shared delivery dialogue with one answer per quest, gated by the quest running,
   instead of one dialogue per quest.
+- 2026-11-04: `Unobstructed` filter, so the draw skips a seedling buried in tall grass, whose
+  hitbox takes F away from him (user).
