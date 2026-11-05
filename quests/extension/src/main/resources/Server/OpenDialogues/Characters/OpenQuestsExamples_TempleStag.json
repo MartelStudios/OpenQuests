@@ -1,0 +1,16 @@
+{
+  "Uniqueness": "Forever",
+  "Scope": "Universe",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "OpenQuestsExamples_TempleStag"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "OpenQuestsExamples_StagNames"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "Display": "Cinematic",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.stag.intro.page1"
+    },
+    {
+      "Text": "openquestsexamples.temple.stag.intro.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.stag.intro.search",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "OpenQuestsExamples_StagWheat"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.stag.leave",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "Display": "Cinematic",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.stag.idle.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.stag.leave",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

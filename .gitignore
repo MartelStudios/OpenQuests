@@ -11,3 +11,5 @@ run/*
 .project
 .settings/
 .vscode
+# Local design specs and plans
+docs/superpowers/

@@ -1,0 +1,19 @@
+{
+  "Uniqueness": "Forever",
+  "Scope": "Universe",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "OpenQuestsExamples_TempleSeedling"
+      },
+      "Speaker": {
+        "Epithet": "openquestsexamples.temple.seedling.epithet"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "OpenQuestsExamples_KweebecNames"
+    }
+  ]
+}

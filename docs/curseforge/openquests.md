@@ -102,6 +102,7 @@ the chapter's file is written for you.
 | <code>KillPlayer</code>                                  | Killing players, optionally a designated one                       |
 | <code>ReachLocation</code>                               | Entering a radius around a position                                |
 | <code>EnterWorld</code>                                  | Entering a world whose name matches a pattern                      |
+| <code>GameFlag</code>                                    | A server game flag reaching a level, such as a goblin lab repair   |
 | <code>TriggerVolume</code>                               | Entering trigger volumes, even in generated worlds                 |
 | <code>Walk</code>, <code>Run</code>, <code>Sprint</code> | Covering a distance, or a time, at that pace                       |
 | <code>Jump</code>                                        | Jumping a number of times                                          |

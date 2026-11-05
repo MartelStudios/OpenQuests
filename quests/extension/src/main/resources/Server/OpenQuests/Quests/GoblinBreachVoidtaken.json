@@ -36,6 +36,13 @@
         "GoblinBreachGlider"
       ],
       "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_GuardTaleVoidtaken"
+      ],
+      "AutoClaim": true
     }
   ]
 }

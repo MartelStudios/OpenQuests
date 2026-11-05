@@ -1,0 +1,50 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_GoblinScientist",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.goblin.scientist.workshop.page1"
+    },
+    {
+      "Text": "openquestsexamples.goblin.scientist.workshop.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.goblin.scientist.workshop.yes",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "OpenQuestsExamples_LabTeleporter"
+        },
+        {
+          "Type": "AssignQuest",
+          "Quest": "OpenQuestsExamples_LabBoiler"
+        },
+        {
+          "Type": "AssignQuest",
+          "Quest": "OpenQuestsExamples_LabEngine"
+        },
+        {
+          "Type": "AssignQuest",
+          "Quest": "OpenQuestsExamples_LabCompressor"
+        },
+        {
+          "Type": "AssignQuest",
+          "Quest": "OpenQuestsExamples_LabConsole"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.goblin.scientist.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

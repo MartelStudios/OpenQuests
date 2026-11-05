@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues.characters;
 
+import com.martelstudios.opendialogues.characters.filters.CharacterFilter;
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
 import com.hypixel.hytale.component.Ref;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import java.util.Set;
 import static com.martelstudios.opendialogues.characters.CharacterFixtures.filter;
 import static com.martelstudios.opendialogues.characters.CharacterFixtures.kweebec;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FiltersTest {
@@ -50,5 +52,28 @@ class FiltersTest {
     @Test
     void notInvertsFilter() {
         assertFalse(filter("{ \"Type\": \"World\", \"Worlds\": [\"default\"], \"Not\": true }").test(kweebec("Zone1")));
+    }
+
+    @Test
+    void worldFilterMatchesExactNames() {
+        assertTrue(filter("{ \"Type\": \"World\", \"Worlds\": [\"default\"] }").test(kweebec("Zone1")));
+    }
+
+    @Test
+    void worldFilterMatchesTheWholeNameAsARegex() {
+        CharacterFilter temple = filter("{ \"Type\": \"World\", \"Worlds\": [\"instance-(forgotten-temple-goblins|Forgotten_Temple-.*)\"] }");
+
+        assertTrue(temple.test(inWorld("instance-forgotten-temple-goblins")));
+        assertTrue(temple.test(inWorld("instance-Forgotten_Temple-1b2c")));
+        assertFalse(temple.test(inWorld("my-instance-forgotten-temple-goblins")));
+    }
+
+    @Test
+    void aMalformedWorldPatternIsRefused() {
+        assertThrows(IllegalArgumentException.class, () -> filter("{ \"Type\": \"World\", \"Worlds\": [\"(\"] }"));
+    }
+
+    private static FilterContext inWorld(String world) {
+        return new FilterContext(null, new Ref<>(null), null, world, "Kweebec_Seedling", "Zone1", "Forest", Set.<String>of()::contains);
     }
 }

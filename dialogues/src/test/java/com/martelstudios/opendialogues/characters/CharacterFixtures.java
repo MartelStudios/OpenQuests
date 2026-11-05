@@ -8,6 +8,7 @@ import com.martelstudios.opendialogues.characters.filters.FilterContext;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesBiomeFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesGroupFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRoleFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesUnobstructedFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesWorldFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesZoneFilter;
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
@@ -35,6 +36,7 @@ public final class CharacterFixtures {
         registry.registerFilter(OpenDialoguesWorldFilter.TYPE, OpenDialoguesWorldFilter.class, OpenDialoguesWorldFilter.CODEC);
         registry.registerFilter(OpenDialoguesZoneFilter.TYPE, OpenDialoguesZoneFilter.class, OpenDialoguesZoneFilter.CODEC);
         registry.registerFilter(OpenDialoguesBiomeFilter.TYPE, OpenDialoguesBiomeFilter.class, OpenDialoguesBiomeFilter.CODEC);
+        registry.registerFilter(OpenDialoguesUnobstructedFilter.TYPE, OpenDialoguesUnobstructedFilter.class, OpenDialoguesUnobstructedFilter.CODEC);
         registry.registerFilter(ThrowingFilter.TYPE, ThrowingFilter.class, ThrowingFilter.CODEC);
         registry.registerTrait(OpenDialoguesDialogueTrait.TYPE, OpenDialoguesDialogueTrait.class, OpenDialoguesDialogueTrait.CODEC);
         registry.registerTrait(OpenDialoguesNameTrait.TYPE, OpenDialoguesNameTrait.class, OpenDialoguesNameTrait.CODEC);

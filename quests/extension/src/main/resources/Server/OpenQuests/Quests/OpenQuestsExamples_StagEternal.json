@@ -1,0 +1,66 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Tomato_Eternal.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.stageternal.title",
+  "DescriptionKey": "openquestsexamples.quest.stageternal.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.stageternal.short",
+  "Character": "OpenQuestsExamples_TempleStag",
+  "Dialogue": "OpenQuestsExamples_StagMoult",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Tomato_Eternal"
+      },
+      "Quantity": 1
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 5
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 8
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 12
+          }
+        }
+      ]
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Leather_Dark",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_StagEternalRoots"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

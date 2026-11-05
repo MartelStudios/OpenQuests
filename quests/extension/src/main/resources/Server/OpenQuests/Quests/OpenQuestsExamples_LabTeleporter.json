@@ -1,0 +1,20 @@
+{
+  "Type": "GameFlag",
+  "Flag": "goblin_lab_teleporter",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Scraps",
+      "Quantity": 10,
+      "AutoClaim": true
+    }
+  ],
+  "Icon": "Icons/ItemsGenerated/Teleporter.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.labteleporter.title",
+  "DescriptionKey": "openquestsexamples.quest.labteleporter.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.labteleporter.short",
+  "AutoTrack": true
+}

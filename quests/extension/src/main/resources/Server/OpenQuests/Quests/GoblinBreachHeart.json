@@ -26,6 +26,13 @@
       "ItemId": "Ingredient_Voidheart",
       "Quantity": 2,
       "AutoClaim": false
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_GuardTaleHeart"
+      ],
+      "AutoClaim": true
     }
   ]
 }

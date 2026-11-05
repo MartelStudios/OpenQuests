@@ -466,6 +466,7 @@ already defines, such as `Flowers` or `Meats`. A block is matched through the it
 | `KillPlayer` | Killing players, optionally a designated one. |
 | `ReachLocation` | Entering a radius around a position. |
 | `EnterWorld` | Entering a world whose name matches a regular expression. |
+| `GameFlag` | A server game flag (`/gameflags list`) reaching `Level` (1 by default), such as `goblin_lab_power` once the goblin lab generator is repaired. Flags belong to the whole server: one repair completes the quest for everyone holding it, and a quest given afterwards completes at once. |
 | `TriggerVolume` | A `TriggerEventType` on trigger volumes whose whole name matches `VolumeNamePattern`, a number of times. Volumes pasted with a prefab keep their name, sometimes with a suffix, so this finds a spot in a generated world: `"(trash_pile_trigger\|enkindled_trigger_\|void_tower_trigger).*"` is the top of any breach watchtower. |
 | `Walk` | Covering a distance at the slow pace, the one the player holds a key for. |
 | `Run` | Covering a distance at the default pace. |

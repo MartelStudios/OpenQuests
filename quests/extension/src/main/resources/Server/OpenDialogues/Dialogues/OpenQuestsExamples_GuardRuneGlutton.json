@@ -1,0 +1,35 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_KweebecVillager",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.guard.rune.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Id": "ShowRune",
+      "Text": "openquestsexamples.temple.guard.rune.show",
+      "When": {
+        "Type": "Holding",
+        "Item": {
+          "Category": "GoblinLab_Runes"
+        }
+      },
+      "Actions": [
+        {
+          "Type": "Open",
+          "Dialogue": "OpenQuestsExamples_GuardRuneSeen"
+        }
+      ]
+    },
+    {
+      "Text": "openquestsexamples.temple.guard.rune.later",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

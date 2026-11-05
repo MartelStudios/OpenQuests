@@ -1,0 +1,108 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_GuardTaleRevenant",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_GuardTaleRevenant"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_GuardTaleGlutton",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_GuardTaleGlutton"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_GuardTaleVoidtaken",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_GuardTaleVoidtaken"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_GuardTaleHeart",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_GuardTaleHeart"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_GuardRuneRevenant",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_GuardRuneRevenant"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_GuardRuneGlutton",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_GuardRuneGlutton"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_GuardRuneVoidtaken",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_GuardRuneVoidtaken"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "OpenQuestsExamples_GuardRuneHeart",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_GuardRuneHeart"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "OpenQuestsExamples_GuardDream"
+        }
+      }
+    ]
+  }
+}

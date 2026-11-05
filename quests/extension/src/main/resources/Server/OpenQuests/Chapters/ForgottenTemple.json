@@ -4,11 +4,334 @@
   "Order": 1,
   "Icon": "Icons/ItemsGenerated/Furniture_Temple_Emerald_Torch.png",
   "Quests": [
-    { "Quest": "DefeatForgottenTempleGuardian" },
-    { "Quest": "EnterForgottenTemple" },
-    { "Quest": "TalkToRootlingMerchant" },
-    { "Quest": "TempleTrial" },
-    { "Quest": "TempleOffering" },
-    { "Quest": "Flawless" }
+    {
+      "Quest": "DefeatForgottenTempleGuardian",
+      "Position": {
+        "X": 0,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "EnterForgottenTemple",
+      "Position": {
+        "X": 1,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "TalkToRootlingMerchant",
+      "Position": {
+        "X": 2,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "TempleTrial",
+      "Position": {
+        "X": 3,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "TempleOffering",
+      "Position": {
+        "X": 4,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "Flawless",
+      "Position": {
+        "X": 6,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingFeathersLight",
+      "Position": {
+        "X": 0,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingFeathersDark",
+      "Position": {
+        "X": 1,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingFeathersRed",
+      "Position": {
+        "X": 2,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShell",
+      "Position": {
+        "X": 3,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsGreen",
+      "Position": {
+        "X": 4,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsCyan",
+      "Position": {
+        "X": 5,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsPink",
+      "Position": {
+        "X": 6,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsWhite",
+      "Position": {
+        "X": 7,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingFeatherBlue",
+      "Position": {
+        "X": 8,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsBlue",
+      "Position": {
+        "X": 9,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingFeathersBlue",
+      "Position": {
+        "X": 10,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsPurple",
+      "Position": {
+        "X": 11,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsYellow",
+      "Position": {
+        "X": 12,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingShardsRed",
+      "Position": {
+        "X": 13,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_SeedlingRainbow",
+      "Position": {
+        "X": 14,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_StagWheat",
+      "Position": {
+        "X": 0,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_StagLettuce",
+      "Position": {
+        "X": 1,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_StagCarrotCorn",
+      "Position": {
+        "X": 2,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_StagCauliflowerTurnip",
+      "Position": {
+        "X": 3,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_StagAuberginePumpkin",
+      "Position": {
+        "X": 4,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_StagTomatoChilli",
+      "Position": {
+        "X": 5,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_StagRiceCotton",
+      "Position": {
+        "X": 6,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_StagOnionPotato",
+      "Position": {
+        "X": 7,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_StagEternal",
+      "Position": {
+        "X": 8,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_StagEternalRoots",
+      "Position": {
+        "X": 9,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabScrap",
+      "Position": {
+        "X": 0,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabGenerator",
+      "Position": {
+        "X": 1,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabGateway",
+      "Position": {
+        "X": 2,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabTeleporter",
+      "Position": {
+        "X": 3,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabBoiler",
+      "Position": {
+        "X": 4,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabEngine",
+      "Position": {
+        "X": 5,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabCompressor",
+      "Position": {
+        "X": 6,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_LabConsole",
+      "Position": {
+        "X": 7,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardTaleRevenant",
+      "Position": {
+        "X": 0,
+        "Y": 4
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardRuneRevenant",
+      "Position": {
+        "X": 1,
+        "Y": 4
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardTaleGlutton",
+      "Position": {
+        "X": 0,
+        "Y": 5
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardRuneGlutton",
+      "Position": {
+        "X": 1,
+        "Y": 5
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardTaleVoidtaken",
+      "Position": {
+        "X": 0,
+        "Y": 6
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardRuneVoidtaken",
+      "Position": {
+        "X": 1,
+        "Y": 6
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardTaleHeart",
+      "Position": {
+        "X": 0,
+        "Y": 7
+      }
+    },
+    {
+      "Quest": "OpenQuestsExamples_GuardRuneHeart",
+      "Position": {
+        "X": 1,
+        "Y": 7
+      }
+    }
   ]
 }
