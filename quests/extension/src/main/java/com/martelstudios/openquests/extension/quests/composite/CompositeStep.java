@@ -3,7 +3,6 @@ package com.martelstudios.openquests.extension.quests.composite;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
-import com.martelstudios.openquests.core.models.QuestVisibility;
 import com.martelstudios.openquests.extension.journal.QuestMark;
 
 import javax.annotation.Nonnull;
@@ -18,14 +17,12 @@ public record CompositeStep(@Nullable AbstractQuestProgression<?> run, @Nullable
 
     /**
      * @return whether a panel or a page lists this step: its run's visibility while it has one,
-     * otherwise its asset's against what the group recorded.
+     * otherwise its asset's against what the group recorded, which may be nothing.
      */
     public boolean isListed() {
         if (run != null) return run.isVisible();
-        if (asset == null) return false;
 
-        QuestVisibility visibility = asset.getVisibility();
-        return visibility.isReachedByOutcome(recorded == null ? QuestState.SUCCESSFUL : recorded);
+        return asset != null && asset.getVisibility().isReachedByOutcome(recorded);
     }
 
     /**

@@ -55,6 +55,19 @@ class CompositeStepsTest {
     }
 
     @Test
+    void aStepNobodyCanSpeakForIsNotAssumedToHaveSucceeded() {
+        CompositeScene scene = new CompositeScene(CompositeQuestAsset.Operator.AND)
+            .gone(QuestVisibility.WHEN_COMPLETED, null)
+            .gone(QuestVisibility.WHEN_SUCCESSFUL, null);
+
+        List<CompositeStep> listed = scene.steps().listedIn(scene.group);
+
+        assertEquals(1, listed.size());
+        assertEquals(QuestMark.LOST, listed.get(0).markFor(VIEWER));
+        assertEquals("0/1", tally(scene));
+    }
+
+    @Test
     void aLockedGroupOnlyNamesWhatIsAlwaysListed() {
         assertEquals(List.of("step0"), previewed(CompositeQuestAsset.Operator.AND, QuestMark.LOCKED));
         assertEquals(List.of("step0"), previewed(CompositeQuestAsset.Operator.AND, null));

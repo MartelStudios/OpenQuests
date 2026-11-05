@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * What the tracker draws for a composite whose steps are not all worth showing.
@@ -48,6 +49,22 @@ class CompositeQuestHudRendererTest {
         UICommandBuilder builder = render(CompositeQuestAsset.Operator.AND, QuestVisibility.NEVER, QuestVisibility.ALWAYS);
 
         assertEquals(1, appended(builder, ROW));
+    }
+
+    @Test
+    void aLostStepDrawsAGreyLineWithNoMark() {
+        CompositeScene scene = new CompositeScene(CompositeQuestAsset.Operator.AND).gone(QuestVisibility.ALWAYS, null);
+
+        UICommandBuilder builder = new UICommandBuilder();
+        new CompositeQuestHudRenderer(scene.steps()).render(new QuestHudContext(builder, UUID.randomUUID()), scene.group);
+
+        assertEquals(1, appended(builder, ROW));
+
+        var icons = Arrays.stream(builder.getCommands())
+                          .filter(command -> command.selector != null && command.selector.endsWith("#IconComplete.Visible"))
+                          .toList();
+        assertEquals(2, icons.size(), "the group's line, then the step's");
+        assertTrue(icons.get(1).data.contains("false"));
     }
 
     private static UICommandBuilder render(CompositeQuestAsset.Operator operator, QuestVisibility... steps) {

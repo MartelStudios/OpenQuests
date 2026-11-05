@@ -5,6 +5,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.Instant;
 
 /**
@@ -39,10 +40,12 @@ public final class QuestHudRows {
      * #Progress} and icon names. A quest that ended greys out either way; which mark it takes is
      * what says whether it was worth anything.
      *
+     * @param state how it stands, or {@code null} for one that ended with nobody able to say how,
+     *              which greys out and takes no mark.
      * @return the selector of the line, for whatever the caller wants to add to it.
      */
     @Nonnull
-    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull String documentPath, @Nonnull Message title, @Nonnull QuestState state) {
+    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull String documentPath, @Nonnull Message title, @Nullable QuestState state) {
         String rowSelector = context.appendRow(documentPath);
         boolean completed = state != QuestState.IN_PROGRESS;
 
@@ -58,7 +61,7 @@ public final class QuestHudRows {
     }
 
     @Nonnull
-    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull Message title, @Nonnull QuestState state) {
+    public static String appendRow(@Nonnull QuestHudContext context, @Nonnull Message title, @Nullable QuestState state) {
         return appendRow(context, ROW_DOCUMENT, title, state);
     }
 

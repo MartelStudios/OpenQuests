@@ -1,7 +1,6 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.extension.hud.QuestHudContext;
 import com.martelstudios.openquests.extension.hud.QuestHudRenderer;
 import com.martelstudios.openquests.extension.hud.QuestHudRows;
@@ -66,11 +65,11 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
     /**
      * A completed child leaves the store, so nothing is left to draw it. Leaving a hole where it
      * was would read as if it had never been asked for. The group remembers which way it went;
-     * read as a success when even it cannot say, which is what a child gone from the store means.
+     * when even it cannot say, the line takes no mark, as in the journal.
      */
     private void renderArchivedChild(@Nonnull QuestHudContext context, @Nonnull CompositeStep step) {
         if (step.asset() == null) return;
 
-        QuestHudRows.appendRow(context, AbstractQuestProgression.titleOf(step.asset()), step.recorded() == null ? QuestState.SUCCESSFUL : step.recorded());
+        QuestHudRows.appendRow(context, AbstractQuestProgression.titleOf(step.asset()), step.recorded());
     }
 }
