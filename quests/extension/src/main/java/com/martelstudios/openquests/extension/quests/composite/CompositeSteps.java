@@ -2,9 +2,12 @@ package com.martelstudios.openquests.extension.quests.composite;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.models.QuestVisibility;
+import com.martelstudios.openquests.extension.journal.QuestMark;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -49,16 +52,29 @@ public final class CompositeSteps {
     }
 
     /**
+     * @param mark what became of the group, the only thing left to judge its steps by.
      * @return the steps a preview of this group may name, with no run to ask.
      */
     @Nonnull
-    public List<OpenQuestAsset> previewedIn(@Nonnull CompositeQuestAsset composite) {
+    public List<OpenQuestAsset> previewedIn(@Nonnull CompositeQuestAsset composite, @Nullable QuestMark mark) {
         List<OpenQuestAsset> previewed = new ArrayList<>();
 
         for (String assetId : composite.getAssetIds()) {
             OpenQuestAsset asset = assets.apply(assetId);
-            if (asset != null && asset.getVisibility() != QuestVisibility.NEVER) previewed.add(asset);
+            if (asset != null && isPreviewed(asset.getVisibility(), composite, mark)) previewed.add(asset);
         }
         return previewed;
+    }
+
+    /**
+     * An OR that succeeded never says through which branch, and a lost group not even how it ended.
+     * With no mark at all the steps count as never handed out.
+     */
+    private static boolean isPreviewed(@Nonnull QuestVisibility visibility, @Nonnull CompositeQuestAsset composite, @Nullable QuestMark mark) {
+        boolean wonByUnknownBranch = composite.getOperator() == CompositeQuestAsset.Operator.OR && mark == QuestMark.SUCCESSFUL;
+        if (wonByUnknownBranch || mark == QuestMark.LOST) return visibility.isReachedByOutcome(null);
+
+        QuestState outcome = mark == null ? null : mark.toState();
+        return outcome == null ? visibility.isReachedBy(null) : visibility.isReachedByOutcome(outcome);
     }
 }

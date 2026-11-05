@@ -126,7 +126,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
     }
 
     private void renderPreview(@Nonnull QuestPageContext context, @Nonnull CompositeQuestAsset composite) {
-        List<OpenQuestAsset> previewed = steps.previewedIn(composite);
+        List<OpenQuestAsset> previewed = steps.previewedIn(composite, context.getMark());
         boolean separated = composite.getOperator() == CompositeQuestAsset.Operator.OR;
 
         // A group that succeeded through an OR did so on one branch, and the asset never says
