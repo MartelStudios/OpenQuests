@@ -1,7 +1,7 @@
 {
   "Type": "Composite",
   "Operator": "Or",
-  "Icon": "Icons/ItemsGenerated/GoblinLab_Generator.png",
+  "Icon": "Icons/ModelsGenerated/Goblin_Scientist.png",
   "Categories": [
     "Temple"
   ],
