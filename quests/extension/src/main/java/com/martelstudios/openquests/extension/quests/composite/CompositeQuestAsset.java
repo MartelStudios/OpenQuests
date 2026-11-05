@@ -38,7 +38,7 @@ public class CompositeQuestAsset extends OpenQuestAsset {
      */
     protected boolean persistChildrenHistory;
 
-    protected CompositeQuestAsset() {}
+    CompositeQuestAsset() {}
 
     @Override
     public AbstractQuestProgression.Builder<CompositeQuestProgression, ?> builder() {

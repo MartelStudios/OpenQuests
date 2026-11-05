@@ -30,7 +30,7 @@ public final class QuestHudContext {
      */
     private final UUID viewer;
 
-    QuestHudContext(@Nonnull UICommandBuilder builder, @Nonnull UUID viewer) {
+    public QuestHudContext(@Nonnull UICommandBuilder builder, @Nonnull UUID viewer) {
         this.builder = builder;
         this.viewer = viewer;
     }

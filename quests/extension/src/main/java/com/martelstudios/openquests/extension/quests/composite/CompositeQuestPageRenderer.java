@@ -2,9 +2,6 @@ package com.martelstudios.openquests.extension.quests.composite;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.models.QuestState;
-import com.martelstudios.openquests.core.models.QuestVisibility;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.extension.journal.QuestMark;
 import com.martelstudios.openquests.extension.journal.QuestPageContext;
 import com.martelstudios.openquests.extension.journal.QuestPageRenderer;
@@ -13,7 +10,6 @@ import com.martelstudios.openquests.extension.journal.QuestShape;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -28,10 +24,10 @@ import java.util.UUID;
  */
 public final class CompositeQuestPageRenderer implements QuestPageRenderer {
 
-    private final QuestProgressionService progression;
+    private final CompositeSteps steps;
 
-    public CompositeQuestPageRenderer(@Nonnull QuestProgressionService progression) {
-        this.progression = progression;
+    public CompositeQuestPageRenderer(@Nonnull CompositeSteps steps) {
+        this.steps = steps;
     }
 
     /** Between the children of an OR composite: only one of them has to succeed. */
@@ -58,7 +54,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
         }
 
         if (composite != null && composite.getAsset() != null) {
-            QuestPageRows.setProgress(context, selector, tallyOf(context, composite));
+            QuestPageRows.setProgress(context, selector, tallyOf(context.getViewer(), composite));
             renderSteps(context, composite, composite.getAsset());
             return;
         }
@@ -71,7 +67,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
 
     private void renderRow(@Nonnull QuestPageContext context, @Nullable CompositeQuestProgression composite, @Nullable OpenQuestAsset asset) {
         if (composite != null) {
-            QuestPageRows.appendLine(context, composite.getTitle(), tallyOf(context, composite));
+            QuestPageRows.appendLine(context, composite.getTitle(), tallyOf(context.getViewer(), composite));
             return;
         }
 
@@ -83,22 +79,22 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * it never writes onto.
      */
     private void renderSteps(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite, @Nonnull CompositeQuestAsset asset) {
-        List<Step> steps = stepsOf(context, composite, asset);
+        List<CompositeStep> ordered = orderedSteps(context.getViewer(), composite);
         boolean separated = asset.getOperator() == CompositeQuestAsset.Operator.OR;
 
-        for (int i = 0; i < steps.size(); i++) {
+        for (int i = 0; i < ordered.size(); i++) {
             if (separated) openBranch(context, i == 0);
 
-            Step step = steps.get(i);
+            CompositeStep step = ordered.get(i);
+            AbstractQuestProgression<?> child = step.run();
 
             // The group is what knows how a child it can no longer reach went, so it says so
             // before the line asks the journal, which cannot place that child at all
-            if (step.child() == null) {
-                context.marking(step.mark(), () -> renderChild(context, step.assetId()));
+            if (child == null) {
+                context.marking(step.markFor(context.getViewer()), () -> renderChild(context, step.asset()));
                 continue;
             }
 
-            AbstractQuestProgression<?> child = step.child();
             context.listing(child, () -> QuestPageRows.render(context, QuestShape.ROW, "", child, child.getAsset()));
         }
     }
@@ -106,48 +102,16 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
     /**
      * The children worth listing, what is left to do before what is behind. A player opening a
      * chain is looking for the step they are on, not for the ones they already cleared.
-     *
-     * <p>Walked by index, since {@code questIds} and the asset ids are built together and a child
-     * that kept no trace of itself is only nameable through its asset.
      */
     @Nonnull
-    private List<Step> stepsOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite, @Nonnull CompositeQuestAsset asset) {
-        UUID[] questIds = composite.getChildIds();
-        String[] assetIds = asset.getAssetIds();
+    private List<CompositeStep> orderedSteps(@Nonnull UUID viewer, @Nonnull CompositeQuestProgression composite) {
+        List<CompositeStep> listed = steps.listedIn(composite);
 
-        List<Step> steps = new ArrayList<>(questIds.length);
+        // Stable, so the order the chain was written in survives inside each half. A step nobody
+        // kept is behind the player whatever became of it: nothing is left for them to do about it.
+        listed.sort(Comparator.comparing(step -> step.markFor(viewer) != QuestMark.IN_PROGRESS));
 
-        for (int i = 0; i < questIds.length; i++) {
-            AbstractQuestProgression<?> child = progression.getQuest(questIds[i]);
-            String assetId = i < assetIds.length ? assetIds[i] : null;
-
-            if (composite.isStepListed(child, questIds[i], assetId)) steps.add(new Step(child, assetId, markOf(context, composite, questIds[i])));
-        }
-
-        // Stable, so the order the chain was written in survives inside each half
-        steps.sort(Comparator.comparing(Step::finished));
-
-        return steps;
-    }
-
-    /**
-     * What became of one child: read off the child itself where it is still there to ask, off the
-     * group where it is not: a child told to keep no trace leaves nothing but what the group
-     * wrote down about it.
-     *
-     * @return {@link QuestMark#LOST} when neither can say. Not a guess at the likeliest outcome:
-     * a step nobody kept was once read as one that succeeded, and a journal saying in green
-     * something it does not know is worse than one admitting it lost the thread.
-     */
-    @Nonnull
-    private QuestMark markOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite, @Nonnull UUID childId) {
-        AbstractQuestProgression<?> child = progression.getQuest(childId);
-
-        // What it came to for whoever is reading, not for everyone else still on it
-        if (child != null) return QuestMark.of(child.getStateFor(context.getViewer()));
-
-        QuestState recorded = composite.outcomeOf(childId);
-        return recorded == null ? QuestMark.LOST : QuestMark.of(recorded);
+        return listed;
     }
 
     /**
@@ -155,17 +119,14 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * hole where it was would read as if it had never been asked for, and the line is what lets
      * the player open a step the store no longer holds.
      */
-    private void renderChild(@Nonnull QuestPageContext context, @Nullable String assetId) {
-        if (assetId == null) return;
-
-        OpenQuestAsset childAsset = OpenQuestAsset.getAsset(assetId);
+    private void renderChild(@Nonnull QuestPageContext context, @Nullable OpenQuestAsset childAsset) {
         if (childAsset == null) return;
 
-        context.listing(assetId, () -> QuestPageRows.appendLine(context, AbstractQuestProgression.titleOf(childAsset)));
+        context.listing(childAsset.getId(), () -> QuestPageRows.appendLine(context, AbstractQuestProgression.titleOf(childAsset)));
     }
 
     private void renderPreview(@Nonnull QuestPageContext context, @Nonnull CompositeQuestAsset composite) {
-        List<String> assetIds = previewedSteps(composite);
+        List<OpenQuestAsset> previewed = steps.previewedIn(composite);
         boolean separated = composite.getOperator() == CompositeQuestAsset.Operator.OR;
 
         // A group that succeeded through an OR did so on one branch, and the asset never says
@@ -174,28 +135,14 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
         // whichever way the player was going to take.
         boolean undecided = separated && context.getMark() == QuestMark.SUCCESSFUL;
 
-        for (int i = 0; i < assetIds.size(); i++) {
+        for (int i = 0; i < previewed.size(); i++) {
             if (separated) openBranch(context, i == 0);
 
-            String childAssetId = assetIds.get(i);
+            OpenQuestAsset childAsset = previewed.get(i);
 
-            if (undecided) context.marking(null, () -> renderChild(context, childAssetId));
-            else renderChild(context, childAssetId);
+            if (undecided) context.marking(null, () -> renderChild(context, childAsset));
+            else renderChild(context, childAsset);
         }
-    }
-
-    /**
-     * The children a preview may name: with no run to ask, only one that is never listed is left out.
-     */
-    @Nonnull
-    private static List<String> previewedSteps(@Nonnull CompositeQuestAsset composite) {
-        List<String> assetIds = new ArrayList<>();
-
-        for (String assetId : composite.getAssetIds()) {
-            OpenQuestAsset asset = OpenQuestAsset.getAsset(assetId);
-            if (asset == null || asset.getVisibility() != QuestVisibility.NEVER) assetIds.add(assetId);
-        }
-        return assetIds;
     }
 
     /**
@@ -207,21 +154,11 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * succeeded: a tally is read as a fact. A step kept out of sight is not counted at all.
      */
     @Nonnull
-    private String tallyOf(@Nonnull QuestPageContext context, @Nonnull CompositeQuestProgression composite) {
-        CompositeQuestAsset asset = composite.getAsset();
-        UUID[] questIds = composite.getChildIds();
-        String[] assetIds = asset == null ? new String[0] : asset.getAssetIds();
-        int listed = 0;
-        int successful = 0;
+    String tallyOf(@Nonnull UUID viewer, @Nonnull CompositeQuestProgression composite) {
+        List<CompositeStep> listed = steps.listedIn(composite);
+        long successful = listed.stream().filter(step -> step.markFor(viewer) == QuestMark.SUCCESSFUL).count();
 
-        for (int i = 0; i < questIds.length; i++) {
-            UUID childId = questIds[i];
-            if (!composite.isStepListed(progression.getQuest(childId), childId, i < assetIds.length ? assetIds[i] : null)) continue;
-
-            listed++;
-            if (markOf(context, composite, childId) == QuestMark.SUCCESSFUL) successful++;
-        }
-        return successful + "/" + listed;
+        return successful + "/" + listed.size();
     }
 
     /**
@@ -233,20 +170,5 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
         if (!first) context.appendRow(SEPARATOR_DOCUMENT);
 
         context.restartStripes();
-    }
-
-    /**
-     * A child of the group, whether it still has a progression, only the asset that named it, or
-     * nothing left but the group's word that it was once asked for.
-     */
-    private record Step(AbstractQuestProgression<?> child, String assetId, @Nonnull QuestMark mark) {
-
-        /**
-         * @return whether this belongs below the line rather than above it. A step nobody kept is
-         * behind the player whatever became of it: there is nothing left for them to do about it.
-         */
-        boolean finished() {
-            return mark != QuestMark.IN_PROGRESS;
-        }
     }
 }
