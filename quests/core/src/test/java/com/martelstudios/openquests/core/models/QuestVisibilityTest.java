@@ -33,4 +33,12 @@ class QuestVisibilityTest {
         assertFalse(QuestVisibility.WHEN_SUCCESSFUL.isReachedBy(failed));
         assertTrue(QuestVisibility.WHEN_SUCCESSFUL.isReachedBy(succeeded));
     }
+
+    @Test
+    void aStepGoneFromTheStoreIsJudgedByItsOutcome() {
+        assertFalse(QuestVisibility.NEVER.isReachedByOutcome(QuestState.SUCCESSFUL));
+        assertFalse(QuestVisibility.WHEN_SUCCESSFUL.isReachedByOutcome(QuestState.FAILED));
+        assertTrue(QuestVisibility.WHEN_SUCCESSFUL.isReachedByOutcome(QuestState.SUCCESSFUL));
+        assertTrue(QuestVisibility.WHEN_STARTED.isReachedByOutcome(QuestState.ABANDONED));
+    }
 }

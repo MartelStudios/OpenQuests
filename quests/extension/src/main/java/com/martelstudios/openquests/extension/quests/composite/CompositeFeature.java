@@ -22,7 +22,7 @@ public final class CompositeFeature {
     public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         services.getQuestProgressionService().registerQuestType(TYPE_ID, CompositeQuestAsset.class, CompositeQuestAsset.CODEC, CompositeQuestProgression.class, CompositeQuestProgression.CODEC);
 
-        QuestHudService.register(new CompositeQuestHudRenderer(services.getQuestProgressionService()));
+        QuestHudService.register(new CompositeQuestHudRenderer(services.getQuestProgressionService()::getQuest));
         QuestPageService.register(new CompositeQuestPageRenderer(services.getQuestProgressionService()));
 
         CompositeQuestEvents events = new CompositeQuestEvents(services.getQuestProgressionService());

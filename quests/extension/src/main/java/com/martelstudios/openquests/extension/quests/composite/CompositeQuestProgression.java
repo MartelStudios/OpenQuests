@@ -151,6 +151,20 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
     }
 
     /**
+     * @return whether a panel or a page lists this step: its own visibility while it is still
+     * there to ask, otherwise its asset's against what the group recorded, or a success if nothing.
+     */
+    public boolean isStepListed(@Nullable AbstractQuestProgression<?> step, @Nonnull UUID stepId, @Nullable String assetId) {
+        if (step != null) return step.isVisible();
+
+        OpenQuestAsset asset = assetId == null ? null : OpenQuestAsset.getAsset(assetId);
+        if (asset == null) return false;
+
+        QuestState outcome = outcomeOf(stepId);
+        return asset.getVisibility().isReachedByOutcome(outcome == null ? QuestState.SUCCESSFUL : outcome);
+    }
+
+    /**
      * Writes down how a child stands, unless what is written already is news as late. A child that
      * is running again (which one kept alive by {@code StopOnComplete:false} can be) has its outcome
      * struck out rather than left standing: the group would otherwise keep counting an end the

@@ -3,13 +3,13 @@ package com.martelstudios.openquests.extension.quests.composite;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.extension.hud.QuestHudContext;
 import com.martelstudios.openquests.extension.hud.QuestHudRenderer;
 import com.martelstudios.openquests.extension.hud.QuestHudRows;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
+import java.util.function.Function;
 
 /**
  * A title carrying the group, then its children one level in. The composite shows no progress of
@@ -17,10 +17,13 @@ import java.util.UUID;
  */
 public final class CompositeQuestHudRenderer implements QuestHudRenderer {
 
-    private final QuestProgressionService progression;
+    private final Function<UUID, AbstractQuestProgression<?>> quests;
 
-    public CompositeQuestHudRenderer(@Nonnull QuestProgressionService progression) {
-        this.progression = progression;
+    /**
+     * @param quests finds a child still in memory, and answers {@code null} for one that is not.
+     */
+    public CompositeQuestHudRenderer(@Nonnull Function<UUID, AbstractQuestProgression<?>> quests) {
+        this.quests = quests;
     }
 
     /** Carries the composite line and, under it, the container its children draw into. */
@@ -48,7 +51,8 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
 
     /**
      * Walks the children by index, since {@code questIds} and the asset ids are built together and
-     * a child archived on completion is only nameable through its asset.
+     * a child archived on completion is only nameable through its asset. The rule only stands
+     * between two lines drawn: an OR with one branch in sight reads as a plain step.
      */
     private void renderChildren(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite) {
         CompositeQuestAsset asset = composite.getAsset();
@@ -59,13 +63,19 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
 
         boolean separated = asset.getOperator() == CompositeQuestAsset.Operator.OR;
 
-        for (int i = 0; i < questIds.length; i++) {
-            if (separated && i > 0) context.appendRow(SEPARATOR_DOCUMENT);
+        boolean drawnOne = false;
 
-            AbstractQuestProgression<?> child = progression.getQuest(questIds[i]);
+        for (int i = 0; i < questIds.length; i++) {
+            AbstractQuestProgression<?> child = quests.apply(questIds[i]);
+            String assetId = i < assetIds.length ? assetIds[i] : null;
+
+            if (!composite.isStepListed(child, questIds[i], assetId)) continue;
+
+            if (separated && drawnOne) context.appendRow(SEPARATOR_DOCUMENT);
+            drawnOne = true;
 
             if (child == null) {
-                renderArchivedChild(context, composite, questIds[i], i < assetIds.length ? assetIds[i] : null);
+                renderArchivedChild(context, composite, questIds[i], assetId);
                 continue;
             }
 

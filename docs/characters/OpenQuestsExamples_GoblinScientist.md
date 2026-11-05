@@ -36,7 +36,8 @@ what she can no longer hear, and the chain goes on without her.
 ## Quests and rewards
 
 `LabGenerator` grants `OpenQuestsExamples_MeetScientist`, an `Or` of the `Accept` answer of
-`ScientistGateway` and `OpenQuestsExamples_LabAllRepaired` (hidden, `And` of all seven lab flags).
+`ScientistGateway` and `OpenQuestsExamples_LabAllRepaired` (`And` of all seven lab flags, with
+`Visibility: Never` and `AnnounceOutcome: false`, so the tracker and the journal show only the talk branch).
 Each repair below is a composite: `Lab<Device>Repair` (`GameFlag`), then an `Or` of
 `Lab<Device>Talk` (`Dialogue` on `ScientistReport<Device>`, opened by her router once the repair is
 done) and `LabAllRepaired`. In chapter `ForgottenTemple`.
@@ -84,3 +85,4 @@ hide (engine), void hearts (compressor, console).
 - 2026-11-04: repairs chained through reports to her, so the journal leads to her dialogues; gateway, teleporter, then three machines in parallel converging on the console (user).
 - 2026-11-04: a finished lab settles the reports she can no longer hear, since flags are universe wide and repairs come in any order (user).
 - 2026-11-04: no special case for a repair another player made (user).
+- 2026-11-05: `LabAllRepaired` silent as well as hidden: each of its flag steps otherwise announces the lab repaired at every single repair.

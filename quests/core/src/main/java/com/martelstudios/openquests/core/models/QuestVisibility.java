@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.core.models;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -57,6 +58,18 @@ public enum QuestVisibility {
             case WHEN_COMPLETED -> quest.isCompleted();
             case WHEN_SUCCESSFUL -> quest.isSuccessful();
             case NEVER -> false;
+        };
+    }
+
+    /**
+     * @return whether a run that ended this way is listed, for a step that left the store and can
+     * only be judged by the outcome its group recorded.
+     */
+    public boolean isReachedByOutcome(@Nonnull QuestState outcome) {
+        return switch (this) {
+            case NEVER -> false;
+            case WHEN_SUCCESSFUL -> outcome == QuestState.SUCCESSFUL;
+            default -> true;
         };
     }
 }
