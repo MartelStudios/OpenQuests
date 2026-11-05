@@ -25,7 +25,7 @@ public class QuestTrackerHud extends CustomUIHud {
     private static final int MAX_QUESTS = 5;
 
     /**
-     * The width {@code QuestTrackerHud.ui} gives the panel.
+     * The width {@code QuestTrackerHud.ui} gives the viewport, which the panel fills.
      */
     private static final int PANEL_WIDTH = 350;
 
