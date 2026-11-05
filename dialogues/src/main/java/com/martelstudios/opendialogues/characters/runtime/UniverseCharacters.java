@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -52,10 +53,68 @@ public class UniverseCharacters {
     public static final BuilderCodec<UniverseCharacters> CODEC = BuilderCodec.builder(UniverseCharacters.class, UniverseCharacters::new)
                                                                              .append(new KeyedCodec<>("Claims", new MapCodec<>(Claim.CODEC, HashMap<String, Claim>::new)), UniverseCharacters::putAll, UniverseCharacters::snapshot)
                                                                              .add()
+                                                                             .append(new KeyedCodec<>("Generation", Codec.INTEGER), (universe, generation) -> universe.generation = generation, UniverseCharacters::generation)
+                                                                             .add()
+                                                                             .append(new KeyedCodec<>("DeadGeneration", Codec.INTEGER), (universe, generation) -> universe.deadGeneration = generation, UniverseCharacters::deadGeneration)
+                                                                             .add()
                                                                              .build();
 
     private final Map<String, Claim> claims = new HashMap<>();
     private volatile Runnable onChange = () -> {};
+    private int generation;
+    private int deadGeneration;
+
+    /**
+     * @return how many times every character was reset; worlds and NPCs behind it catch up when met.
+     */
+    public synchronized int generation() {
+        return generation;
+    }
+
+    /**
+     * @return how many times lost characters were brought back; worlds behind it drop their consumed claims.
+     */
+    public synchronized int deadGeneration() {
+        return deadGeneration;
+    }
+
+    /**
+     * Forgets every claim, consumed ones included, and starts a new generation.
+     */
+    public void reset() {
+        synchronized (this) {
+            claims.clear();
+            generation++;
+        }
+        onChange.run();
+    }
+
+    /**
+     * Brings back the characters lost for good, here and, once they catch up, in every world.
+     *
+     * @return the ids freed here, sorted.
+     */
+    @Nonnull
+    public List<String> resetDead() {
+        List<String> freed = new ArrayList<>();
+        synchronized (this) {
+            claims.entrySet().removeIf(entry -> entry.getValue().consumed && freed.add(entry.getKey()));
+            deadGeneration++;
+        }
+        onChange.run();
+        freed.sort(null);
+        return freed;
+    }
+
+    /**
+     * @return each claimed character with the UUID of its carrier, or {@code consumed}, sorted by id.
+     */
+    @Nonnull
+    public synchronized Map<String, String> describe() {
+        Map<String, String> described = new TreeMap<>();
+        claims.forEach((characterId, claim) -> described.put(characterId, claim.consumed ? "consumed" : claim.npc));
+        return described;
+    }
 
 
     /**

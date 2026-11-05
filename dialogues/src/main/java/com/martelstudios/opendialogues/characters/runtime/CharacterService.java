@@ -4,6 +4,7 @@ import com.hypixel.hytale.component.ComponentAccessor;
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.ResourceType;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.modules.entity.component.DisplayNameComponent;
@@ -23,6 +24,7 @@ import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialo
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -124,6 +126,7 @@ public class CharacterService {
 
     <T> T edit(@Nonnull CharacterNpc npc, @Nonnull Function<CharacterNpc, T> action) {
         OpenDialoguesNPCIdentity before = (OpenDialoguesNPCIdentity) npc.identity().clone();
+        settle(npc);
         T result = action.apply(npc);
         if (!npc.identity().sameAs(before)) npc.save().accept(npc.identity());
         return result;
@@ -142,6 +145,7 @@ public class CharacterService {
 
         CharacterAssigner.Draw draw = CharacterAssigner.assign(npc.identity().getDraws(), List.copyOf(assets.distributions()), context, id -> npc.unique().isAvailable(id, assets::character), random, this::warnOnce);
         draw.drawn().forEach(npc.identity()::recordDraw);
+        if (!draw.drawn().isEmpty()) stamp(npc, universe.get().generation());
         return draw.character() != null && give(npc, draw.character()) ? draw.character() : null;
     }
 
@@ -154,14 +158,160 @@ public class CharacterService {
     boolean give(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
         if (npc.identity().getCharacter() != null || !eligible.test(npc.accessor(), npc.ref())) return false;
         OpenDialogueCharacterAsset character = character(characterId);
+        int generation = universe.get().generation();
         if (character == null || !npc.unique().claimIfAvailable(characterId, npc.uuid(), assets::character)) return false;
 
         npc.identity().setCharacter(characterId);
+        stamp(npc, generation);
         CharacterContext context = context(npc, character);
         each(character, "onAssigned", trait -> trait.onAssigned(context));
         each(character, "onApplied", trait -> trait.onApplied(context));
         events.dispatchFor(CharacterEvent.Assigned.class, characterId).dispatch(new CharacterEvent.Assigned(npc.ref(), npc.uuid(), characterId, npc.identity().getName()));
         return true;
+    }
+
+    /**
+     * Why {@link #assign} refused, or that it did not.
+     */
+    public enum AssignResult {
+        Assigned,
+        UnknownCharacter,
+        Ineligible,
+        /** A unique character another NPC carries or that is lost for good. */
+        Taken
+    }
+
+    /**
+     * Replaces an NPC's character by hand; a refusal leaves its current one in place. Its draws stay.
+     *
+     * @param accessor the NPC's store, or the command buffer while the store is ticking.
+     */
+    @Nonnull
+    public AssignResult assign(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref, @Nonnull String characterId) {
+        AssignResult result = edit(accessor, ref, npc -> assign(npc, characterId));
+        return result != null ? result : AssignResult.Ineligible;
+    }
+
+    @Nonnull
+    AssignResult assign(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
+        if (character(characterId) == null) return AssignResult.UnknownCharacter;
+        if (!eligible.test(npc.accessor(), npc.ref())) return AssignResult.Ineligible;
+        if (!characterId.equals(npc.identity().getCharacter()) && !npc.unique().isAvailable(characterId, assets::character)) return AssignResult.Taken;
+        release(npc, ReleaseReason.Revoked);
+        return give(npc, characterId) ? AssignResult.Assigned : AssignResult.Taken;
+    }
+
+    /**
+     * Takes an NPC's character back, as {@link #revoke} does, telling which one it carried.
+     *
+     * @return the id of the character taken, {@code null} when the NPC carried none.
+     */
+    @Nullable
+    public String unassign(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref) {
+        return edit(accessor, ref, this::unassign);
+    }
+
+    @Nullable
+    String unassign(@Nonnull CharacterNpc npc) {
+        String characterId = npc.identity().getCharacter();
+        release(npc, ReleaseReason.Revoked);
+        return characterId;
+    }
+
+    /**
+     * Brings an NPC left behind by a reset up to date, so what is read from it next is current.
+     */
+    public void settle(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref) {
+        edit(accessor, ref, npc -> null);
+    }
+
+    /**
+     * Forgets every character of every world: worlds and NPCs settle as they are met.
+     */
+    public void resetUniverse() {
+        universe.get().reset();
+    }
+
+    /**
+     * Brings back the characters lost for good; worlds drop their consumed claims as they are met.
+     *
+     * @return the universe scoped characters freed, sorted.
+     */
+    @Nonnull
+    public List<String> resetDead() {
+        return universe.get().resetDead();
+    }
+
+    /**
+     * Forgets every character of one world, settling its loaded NPCs now.
+     *
+     * @return how many loaded NPCs gave their character back.
+     */
+    public int resetWorld(@Nonnull Store<EntityStore> store) {
+        store.getResource(uniqueType).reset();
+        return settleLoaded(store);
+    }
+
+    /**
+     * Settles a world's registry and every loaded NPC holding an identity, on that world's thread,
+     * so names above heads change now rather than at the next scan.
+     *
+     * @return how many NPCs were stale.
+     */
+    public int settleLoaded(@Nonnull Store<EntityStore> store) {
+        UniverseCharacters registry = universe.get();
+        store.getResource(uniqueType).catchUp(registry.generation(), registry.deadGeneration());
+        List<Ref<EntityStore>> refs = new ArrayList<>();
+        store.forEachChunk(identityType, (chunk, buffer) -> {
+            for (int i = 0; i < chunk.size(); i++) refs.add(chunk.getReferenceTo(i));
+        });
+        int settled = 0;
+        for (Ref<EntityStore> ref : refs) {
+            if (!ref.isValid()) continue;
+            OpenDialoguesNPCIdentity before = store.getComponent(ref, identityType);
+            boolean stale = before != null && !before.isBlank() && isBehind(before, store.getResource(uniqueType));
+            settle(store, ref);
+            if (stale) settled++;
+        }
+        return settled;
+    }
+
+    /**
+     * @return a world's unique registry, to describe its claims.
+     */
+    @Nonnull
+    public UniqueCharacters worldRegistry(@Nonnull Store<EntityStore> store) {
+        return store.getResource(uniqueType);
+    }
+
+    /**
+     * @return the universe's unique registry, to describe its claims.
+     */
+    @Nonnull
+    public UniverseCharacters universeRegistry() {
+        return universe.get();
+    }
+
+    /**
+     * Catches the world registry up with universe resets, then releases an NPC drawn before the
+     * last reset and clears its draws so it draws again. A blank NPC is left unwritten.
+     */
+    void settle(@Nonnull CharacterNpc npc) {
+        UniverseCharacters registry = universe.get();
+        int generation = registry.generation();
+        npc.world().catchUp(generation, registry.deadGeneration());
+        if (npc.identity().isBlank() || !isBehind(npc.identity(), npc.world())) return;
+        release(npc, ReleaseReason.Revoked);
+        npc.identity().clearDraws();
+        stamp(npc, generation);
+    }
+
+    private boolean isBehind(@Nonnull OpenDialoguesNPCIdentity identity, @Nonnull UniqueCharacters world) {
+        return identity.getUniverseGeneration() != universe.get().generation() || identity.getWorldGeneration() != world.generation();
+    }
+
+    private static void stamp(@Nonnull CharacterNpc npc, int universeGeneration) {
+        npc.identity().stamp(universeGeneration, npc.world().generation());
     }
 
     /**

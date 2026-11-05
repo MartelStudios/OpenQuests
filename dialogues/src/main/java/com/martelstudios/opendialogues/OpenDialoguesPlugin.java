@@ -50,6 +50,7 @@ import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialo
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;
+import com.martelstudios.opendialogues.commands.characters.CharacterCommand;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
@@ -181,7 +182,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         universeCharactersType = Universe.registerResource(UniverseCharacters.class, "OpenDialoguesUniqueCharacters", UniverseCharacters.CODEC);
         characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
-        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings.get(), characterService));
+        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings::get, characterService));
         characterService.onUnanswered(NothingToSay::open);
         getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));
@@ -248,6 +249,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
         getCommandRegistry().registerCommand(new DialogueCommand(dialogueService, registry, displayRules, historyRecorder));
         getCommandRegistry().registerCommand(new AnswerCommand("oda", dialogueService));
+        getCommandRegistry().registerCommand(new CharacterCommand(characterService, characterSettings));
     }
 
     /**

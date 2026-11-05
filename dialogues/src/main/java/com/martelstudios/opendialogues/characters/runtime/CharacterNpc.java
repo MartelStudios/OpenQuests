@@ -20,9 +20,10 @@ import java.util.function.Function;
  *
  * @param accessor the store or command buffer the NPC is read and written through, {@code null} in unit tests.
  * @param unique   the unique characters as the NPC's world sees them, its own and the universe's.
+ * @param world    the NPC's world registry alone, whose reset generations tell a stale NPC.
  * @param save     writes the identity back on the NPC.
  */
-record CharacterNpc(@Nullable ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref, @Nonnull UUID uuid, @Nonnull OpenDialoguesNPCIdentity identity, @Nonnull CharacterClaims unique, @Nonnull Consumer<OpenDialoguesNPCIdentity> save) {
+record CharacterNpc(@Nullable ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref, @Nonnull UUID uuid, @Nonnull OpenDialoguesNPCIdentity identity, @Nonnull CharacterClaims unique, @Nonnull UniqueCharacters world, @Nonnull Consumer<OpenDialoguesNPCIdentity> save) {
 
     /**
      * @param scopes finds a character to read its scope.
@@ -35,7 +36,8 @@ record CharacterNpc(@Nullable ComponentAccessor<EntityStore> accessor, @Nonnull 
         OpenDialoguesNPCIdentity stored = accessor.getComponent(ref, identityType);
         OpenDialoguesNPCIdentity identity = stored == null ? new OpenDialoguesNPCIdentity() : (OpenDialoguesNPCIdentity) stored.clone();
         UUID worldId = accessor.getExternalData().getWorld().getWorldConfig().getUuid();
-        CharacterClaims claims = new ScopedClaims(accessor.getResource(uniqueType), universe, worldId, scopes);
-        return new CharacterNpc(accessor, ref, uuid.getUuid(), identity, claims, changed -> accessor.putComponent(ref, identityType, changed));
+        UniqueCharacters world = accessor.getResource(uniqueType);
+        CharacterClaims claims = new ScopedClaims(world, universe, worldId, scopes);
+        return new CharacterNpc(accessor, ref, uuid.getUuid(), identity, claims, world, changed -> accessor.putComponent(ref, identityType, changed));
     }
 }

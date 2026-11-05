@@ -5,7 +5,8 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 
 /**
- * How far and how often the scan looks for NPCs to give characters, read once at startup.
+ * How far and how often the scan looks for NPCs to give characters, read once at startup, and
+ * whether they may draw, read live.
  */
 public class CharacterSettings {
 
@@ -14,7 +15,11 @@ public class CharacterSettings {
                                                                             .add()
                                                                             .append(new KeyedCodec<>("ScanInterval", Codec.FLOAT), (settings, interval) -> settings.scanInterval = interval, settings -> settings.scanInterval)
                                                                             .add()
+                                                                            .append(new KeyedCodec<>("Draws", Codec.BOOLEAN), (settings, draws) -> settings.draws = draws, settings -> settings.draws)
+                                                                            .add()
                                                                             .build();
+
+    private boolean draws = true;
 
     private double scanRadius = 24;
 
@@ -32,5 +37,16 @@ public class CharacterSettings {
      */
     public float getScanInterval() {
         return scanInterval;
+    }
+
+    /**
+     * @return whether NPCs without a character may draw one; the scan runs either way.
+     */
+    public boolean isDraws() {
+        return draws;
+    }
+
+    public void setDraws(boolean draws) {
+        this.draws = draws;
     }
 }

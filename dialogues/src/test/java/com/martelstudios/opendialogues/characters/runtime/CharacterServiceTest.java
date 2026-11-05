@@ -430,9 +430,196 @@ class CharacterServiceTest {
         assertTrue(service.give(npcIn(new UniqueCharacters(), universe), "Oak"));
     }
 
+    @Test
+    void staleNpcIsReleasedAfterUniverseReset() {
+        character("Mira", "None", AB);
+        distribution("Village", "{ \"Character\": \"Mira\" }");
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.edit(npc, n -> service.draw(n, kweebec("Zone1")));
+        RecordingTrait.LOG.clear();
+
+        universe.reset();
+        service.edit(npc, n -> null);
+
+        assertNull(npc.identity().getCharacter());
+        assertEquals(Set.of(), npc.identity().getDraws());
+        assertEquals(List.of("b:released", "a:released"), RecordingTrait.LOG);
+        assertEquals(ReleaseReason.Revoked, ((CharacterEvent.Released) heard.getLast()).getReason());
+        assertEquals(1, npc.identity().getUniverseGeneration());
+        assertEquals(0, npc.identity().getWorldGeneration());
+    }
+
+    @Test
+    void staleNpcIsReleasedAfterWorldReset() {
+        character("Mira", "None", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.edit(npc, n -> service.give(n, "Mira"));
+
+        unique.reset();
+        service.edit(npc, n -> null);
+
+        assertNull(npc.identity().getCharacter());
+        assertEquals(0, npc.identity().getUniverseGeneration());
+        assertEquals(1, npc.identity().getWorldGeneration());
+    }
+
+    @Test
+    void blankIdentityIsNotWritten() {
+        universe.reset();
+        unique.reset();
+
+        service().edit(npc(), n -> null);
+
+        assertEquals(List.of(), saved);
+    }
+
+    @Test
+    void oldSaveIsNotStale() {
+        character("Mira", "None", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.give(npc, "Mira");
+        RecordingTrait.LOG.clear();
+
+        service.edit(npc, n -> null);
+
+        assertEquals("Mira", npc.identity().getCharacter());
+        assertEquals(List.of(), RecordingTrait.LOG);
+    }
+
+    @Test
+    void claimTakenAfterResetSurvivesStaleRelease() {
+        character("Oak", "Alive", AB);
+        CharacterService service = service();
+        CharacterNpc first = npc();
+        CharacterNpc second = npc();
+        service.edit(first, n -> service.give(n, "Oak"));
+
+        unique.reset();
+        assertEquals(true, service.<Boolean>edit(second, n -> service.give(n, "Oak")));
+        service.edit(first, n -> null);
+
+        assertEquals(second.uuid(), unique.claimant("Oak"));
+    }
+
+    @Test
+    void deadResetLetsForeverBeDrawnAgain() {
+        character("Oak", "Forever", AB);
+        CharacterService service = service();
+        CharacterNpc first = npc();
+        service.edit(first, n -> service.give(n, "Oak"));
+        service.release(first, ReleaseReason.Death);
+        assertEquals(false, service.<Boolean>edit(npc(), n -> service.give(n, "Oak")));
+
+        service.resetDead();
+
+        assertEquals(true, service.<Boolean>edit(npc(), n -> service.give(n, "Oak")));
+    }
+
+    @Test
+    void resetRightAfterAClaimLeavesTheNpcStale() {
+        scopedCharacter("Hero", "Alive", "Universe");
+        CharacterService service = service();
+        CharacterNpc hero = npcIn(unique, universe);
+        boolean[] once = {true};
+        universe.setOnChange(() -> {
+            if (once[0]) {
+                once[0] = false;
+                universe.reset();
+            }
+        });
+
+        service.give(hero, "Hero");
+
+        assertEquals(0, hero.identity().getUniverseGeneration());
+    }
+
+    @Test
+    void deadResetOfUniverseCharacterReturnsIt() {
+        scopedCharacter("Mage", "Forever", "Universe");
+        CharacterService service = service();
+        CharacterNpc mage = npcIn(unique, universe);
+        service.give(mage, "Mage");
+        service.release(mage, ReleaseReason.Death);
+
+        assertEquals(List.of("Mage"), service.resetDead());
+        assertFalse(service.isLost("Mage"));
+    }
+
+    @Test
+    void assignReplacesCharacter() {
+        character("Mira", "None", AB);
+        character("Oak", "None", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.give(npc, "Mira");
+
+        assertEquals(CharacterService.AssignResult.Assigned, service.assign(npc, "Oak"));
+
+        assertEquals("Oak", npc.identity().getCharacter());
+        assertEquals("Mira", ((CharacterEvent.Released) heard.stream().filter(CharacterEvent.Released.class::isInstance).findFirst().orElseThrow()).getCharacter());
+    }
+
+    @Test
+    void assignToTakenUniqueKeepsOldCharacter() {
+        character("Oak", "Alive", AB);
+        character("Mira", "None", AB);
+        CharacterService service = service();
+        service.give(npc(), "Oak");
+        CharacterNpc npc = npc();
+        service.give(npc, "Mira");
+        heard.clear();
+
+        assertEquals(CharacterService.AssignResult.Taken, service.assign(npc, "Oak"));
+
+        assertEquals("Mira", npc.identity().getCharacter());
+        assertEquals(List.of(), heard);
+    }
+
+    @Test
+    void assignUniqueAlreadyCarriedBySameNpc() {
+        character("Oak", "Alive", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.give(npc, "Oak");
+
+        assertEquals(CharacterService.AssignResult.Assigned, service.assign(npc, "Oak"));
+        assertEquals("Oak", npc.identity().getCharacter());
+    }
+
+    @Test
+    void assignUnknownCharacter() {
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+
+        assertEquals(CharacterService.AssignResult.UnknownCharacter, service.assign(npc, "Ghost"));
+        assertNull(npc.identity().getCharacter());
+    }
+
+    @Test
+    void assignToIneligibleNpc() {
+        character("Mira", "None", AB);
+        eligible = false;
+
+        assertEquals(CharacterService.AssignResult.Ineligible, service().assign(npc(), "Mira"));
+    }
+
+    @Test
+    void unassignReturnsTheCharacterCarried() {
+        character("Mira", "None", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.give(npc, "Mira");
+
+        assertEquals("Mira", service.unassign(npc));
+        assertNull(service.unassign(npc));
+    }
+
     @Nonnull
     private CharacterNpc npcIn(@Nonnull UniqueCharacters world, @Nonnull UniverseCharacters universe) {
-        return new CharacterNpc(null, new Ref<>(null), UUID.randomUUID(), new OpenDialoguesNPCIdentity(), new ScopedClaims(world, universe, UUID.randomUUID(), characters::get), saved::add);
+        return new CharacterNpc(null, new Ref<>(null), UUID.randomUUID(), new OpenDialoguesNPCIdentity(), new ScopedClaims(world, universe, UUID.randomUUID(), characters::get), world, saved::add);
     }
 
     private void scopedCharacter(@Nonnull String id, @Nonnull String uniqueness, @Nonnull String scope) {
@@ -452,7 +639,7 @@ class CharacterServiceTest {
 
     @Nonnull
     private CharacterNpc npc() {
-        return new CharacterNpc(null, new Ref<>(null), UUID.randomUUID(), new OpenDialoguesNPCIdentity(), unique, saved::add);
+        return new CharacterNpc(null, new Ref<>(null), UUID.randomUUID(), new OpenDialoguesNPCIdentity(), unique, unique, saved::add);
     }
 
     @Nonnull
