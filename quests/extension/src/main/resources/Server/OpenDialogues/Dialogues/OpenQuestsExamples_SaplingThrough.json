@@ -1,0 +1,19 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_KweebecVillager",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.temple.sapling.through.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.temple.sapling.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

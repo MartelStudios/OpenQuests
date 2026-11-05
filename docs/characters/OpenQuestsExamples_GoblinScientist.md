@@ -8,7 +8,8 @@
   invulnerable, who directs the vanilla lab repairs.
 - **Distribution:** `OpenQuestsExamples_GoblinScientist`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
-- **Name:** her vanilla name, no `Name` trait. **Speaker:** `OpenQuestsExamples_GoblinScientist`
+- **Name:** "Makinomagistra" / "Machinarque", the only entry of `OpenQuestsExamples_ScientistNames`,
+  so the nameplate tells her apart and stays the same when she is redrawn. **Speaker:** `OpenQuestsExamples_GoblinScientist`
   (`AllowNPCOverride`, epithet "Lab foreman" / "Contremaîtresse du labo").
 
 ## Personality and voice
@@ -26,24 +27,33 @@ A working lab, and the Gateway open.
 
 ## Backstory and relations
 
-Vanilla: once every device is repaired she opens the Gateway, walks through it and vanishes. She
-spawns again only as a visitor at 20 % of later spawns. Her character is then released as
-`Removed`, not lost, and redrawn on her when she visits. Her arc ends with her departure; players
-who never talked to her before miss her quests (user's call). Quests already assigned keep
-completing after she left.
+Vanilla: once the gate flag is up and no device in her range is broken, she opens the Gateway,
+walks through it and vanishes. She spawns again only as a visitor at 20 % of later spawns. Her
+character is then released as `Removed`, not lost, and redrawn on her when she visits. Her arc ends
+with her departure: every talk step is an `Or` with `LabAllRepaired`, so a finished lab settles
+what she can no longer hear, and the chain goes on without her.
 
 ## Quests and rewards
 
-All `GameFlag` quests, in chapter `ForgottenTemple`.
+`LabGenerator` grants `OpenQuestsExamples_MeetScientist`, an `Or` of the `Accept` answer of
+`ScientistGateway` and `OpenQuestsExamples_LabAllRepaired` (hidden, `And` of all seven lab flags).
+Each repair below is a composite: `Lab<Device>Repair` (`GameFlag`), then an `Or` of
+`Lab<Device>Talk` (`Dialogue` on `ScientistReport<Device>`, opened by her router once the repair is
+done) and `LabAllRepaired`. In chapter `ForgottenTemple`.
 
-| Quest | Flag | Reward | Given by |
+| Quest | Flag | Reward | Grants |
 |---|---|---|---|
-| `OpenQuestsExamples_LabGateway` | `goblin_lab_gate` | 1 gadget assembly | `ScientistGateway`, once `LabGenerator` succeeded |
-| `OpenQuestsExamples_LabTeleporter` | `goblin_lab_teleporter` | 10 scraps | `ScientistWorkshop`, once `LabGateway` succeeded |
-| `OpenQuestsExamples_LabBoiler` | `goblin_lab_recipe_a` | 1 gadget assembly | same |
-| `OpenQuestsExamples_LabEngine` | `goblin_lab_recipe_b` | 2 gadget assemblies | same |
-| `OpenQuestsExamples_LabCompressor` | `goblin_lab_recipe_c` | 2 gadget assemblies | same |
-| `OpenQuestsExamples_LabConsole` | `goblin_breach_duration` | 3 void crystals | same |
+| `OpenQuestsExamples_LabGateway` | `goblin_lab_gate` | 1 gadget assembly | `LabTeleporter` |
+| `OpenQuestsExamples_LabTeleporter` | `goblin_lab_teleporter` | 10 scraps | `LabBoiler`, `LabEngine`, `LabCompressor` |
+| `OpenQuestsExamples_LabBoiler` | `goblin_lab_recipe_a` | 1 gadget assembly | `LabConsole` |
+| `OpenQuestsExamples_LabEngine` | `goblin_lab_recipe_b` | 2 gadget assemblies | `LabConsole` |
+| `OpenQuestsExamples_LabCompressor` | `goblin_lab_recipe_c` | 2 gadget assemblies | `LabConsole` |
+| `OpenQuestsExamples_LabConsole` | `goblin_breach_duration` | 3 void crystals | `LabThrough`, back to the young Kweebec |
+
+The three machines run in parallel. `LabConsole` is a plain `GameFlag`, without a report: `MaxQuests`
+1 keeps the three grants to one quest, and `RequiresQuest` on each machine holds its progress back
+until all three are done. Each machine's report answers "What now?" with what
+`ScientistRepairsLeft` picks from how many are done.
 
 Descriptions point at the GoblinBreach chapter: silk from the nests (boiler), the voidtaken bear's
 hide (engine), void hearts (compressor, console).
@@ -53,15 +63,24 @@ hide (engine), void hearts (compressor, console).
 - `OpenDialogues/Characters/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Distributions/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Speakers/OpenQuestsExamples_GoblinScientist.json`
+- `OpenDialogues/Names/OpenQuestsExamples_ScientistNames.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_GoblinScientist.json`
-- `OpenDialogues/Dialogues/OpenQuestsExamples_Scientist{NoPower,Gateway,Workshop,Scold}.json`
-- `OpenQuests/Quests/OpenQuestsExamples_Lab{Gateway,Teleporter,Boiler,Engine,Compressor,Console}.json`
+- `OpenDialogues/Routers/OpenQuestsExamples_ScientistRepairsLeft.json`
+- `OpenDialogues/Dialogues/OpenQuestsExamples_Scientist{NoPower,Gateway,Scold}.json`,
+  `OpenQuestsExamples_ScientistReport{Gateway,Teleporter,Boiler,Engine,Compressor}.json`,
+  `OpenQuestsExamples_ScientistLeft{Two,One,None}.json`
+- `OpenQuests/Quests/OpenQuestsExamples_MeetScientist{,Talk}.json`, `OpenQuestsExamples_LabAllRepaired.json`
+- `OpenQuests/Quests/OpenQuestsExamples_Lab{Gateway,Teleporter,Boiler,Engine,Compressor}{,Repair,Talk}.json`,
+  `OpenQuestsExamples_LabConsole.json`
 - Lang keys `openquestsexamples.goblin.scientist.*`, `openquestsexamples.quest.lab*`
 
 ## Decision log
 
 - 2026-11-03: carried by the vanilla scientist, quests around the lab repairs through a new
   `GameFlag` objective, since a repair fires no event (user).
-- 2026-11-03: quests given through her dialogue; missing her is missing the event (user).
 - 2026-11-03: the lab quests sit in the ForgottenTemple chapter (the lab is in the temple, and the
   GoblinBreach chapter is a positioned graph built from `GrantQuest` links).
+- 2026-11-04: name tag "Machinarque", kept over an invented name (user).
+- 2026-11-04: repairs chained through reports to her, so the journal leads to her dialogues; gateway, teleporter, then three machines in parallel converging on the console (user).
+- 2026-11-04: a finished lab settles the reports she can no longer hear, since flags are universe wide and repairs come in any order (user).
+- 2026-11-04: no special case for a repair another player made (user).

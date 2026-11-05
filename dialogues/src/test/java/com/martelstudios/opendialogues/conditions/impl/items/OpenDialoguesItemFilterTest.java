@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues.conditions.impl.items;
 
+import com.hypixel.hytale.protocol.BenchRequirement;
 import com.martelstudios.opendialogues.CodecJson;
 import org.junit.jupiter.api.Test;
 
@@ -34,12 +35,19 @@ class OpenDialoguesItemFilterTest {
     }
 
     @Test
-    void aCategoryMatchesItemsListingIt() {
+    void aCategoryIsReadOffTheBenchesOfARecipe() {
         OpenDialoguesItemFilter filter = CodecJson.decode(OpenDialoguesItemFilter.CODEC, "{ \"Category\": \"GoblinLab_Runes\" }");
 
         assertNotNull(filter);
-        assertTrue(filter.inCategory(new String[] {"Items.Ingredients", "GoblinLab_Runes"}));
-        assertFalse(filter.inCategory(new String[] {"Items.Ingredients"}));
-        assertFalse(filter.inCategory(null));
+        assertTrue(filter.benchesList(new BenchRequirement[] {bench("Other"), bench("GoblinLab_Runes")}));
+        assertFalse(filter.benchesList(new BenchRequirement[] {bench("Other")}));
+        assertFalse(filter.benchesList(new BenchRequirement[] {new BenchRequirement()}));
+        assertFalse(filter.benchesList(null));
+    }
+
+    private static BenchRequirement bench(String category) {
+        BenchRequirement bench = new BenchRequirement();
+        bench.categories = new String[] {category};
+        return bench;
     }
 }

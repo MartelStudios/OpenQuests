@@ -34,8 +34,9 @@ fragment he gives last).
 
 ## Quests and rewards
 
-Each step is a `Deliver` aimed at him, chained by `GrantQuest`; the first is assigned by his intro
-dialogue. Every delivery goes through `OpenQuestsExamples_SeedlingGift` and pays one `Random` draw
+`EnterForgottenTemple` grants `OpenQuestsExamples_MeetSeedling`, completed by the `Accept` answer of
+his intro, which grants the first step (assigned directly for a player without the meeting quest).
+Each step is a `Deliver` aimed at him, chained by `GrantQuest`. Every delivery goes through `OpenQuestsExamples_SeedlingGift` and pays one `Random` draw
 of its tier.
 
 | Quest | Items | Tier |
@@ -66,7 +67,7 @@ Hollows fragment 0/2/10/15.
 - `OpenDialogues/Distributions/OpenQuestsExamples_TempleSeedling.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleSeedling.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Seedling{Intro,Feathers,Shards,Gift,Rainbow,Thanks}.json`
-- `OpenQuests/Quests/OpenQuestsExamples_Seedling*.json`, listed in chapter `ForgottenTemple`
+- `OpenQuests/Quests/OpenQuestsExamples_MeetSeedling.json`, `OpenQuestsExamples_Seedling*.json`, listed in chapter `ForgottenTemple`
 - Lang keys `openquestsexamples.temple.seedling.*` and `openquestsexamples.quest.seedling*`
 
 ## Decision log
@@ -81,3 +82,4 @@ Hollows fragment 0/2/10/15.
   instead of one dialogue per quest.
 - 2026-11-04: `Unobstructed` filter, so the draw skips a seedling buried in tall grass, whose
   hitbox takes F away from him (user).
+- 2026-11-04: a meeting quest from `EnterForgottenTemple` leads to him, not auto tracked (user).

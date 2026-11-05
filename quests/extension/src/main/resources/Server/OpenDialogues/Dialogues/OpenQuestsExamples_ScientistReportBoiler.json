@@ -1,0 +1,20 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_GoblinScientist",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.goblin.scientist.report.boiler.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.goblin.scientist.report.next",
+      "Actions": [
+        {
+          "Type": "Open",
+          "Router": "OpenQuestsExamples_ScientistRepairsLeft"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Wheat.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "openquestsexamples.quest.meetstag.title",
+  "DescriptionKey": "openquestsexamples.quest.meetstag.description",
+  "ShortDescriptionKey": "openquestsexamples.quest.meetstag.short",
+  "TargetQuantity": 1,
+  "Character": "OpenQuestsExamples_TempleStag",
+  "Dialogue": "OpenQuestsExamples_StagIntro",
+  "Answer": "Accept",
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_StagWheat"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

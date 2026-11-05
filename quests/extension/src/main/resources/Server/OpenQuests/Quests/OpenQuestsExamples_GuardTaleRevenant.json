@@ -1,5 +1,5 @@
 {
-  "Type": "Dialogue",
+  "Type": "Composite",
   "Icon": "Icons/ModelsGenerated/Skeleton_Elite.png",
   "Categories": [
     "Temple"
@@ -7,9 +7,10 @@
   "TitleKey": "openquestsexamples.quest.guardtalerevenant.title",
   "DescriptionKey": "openquestsexamples.quest.guardtalerevenant.description",
   "ShortDescriptionKey": "openquestsexamples.quest.guardtalerevenant.short",
-  "TargetQuantity": 1,
-  "Character": "OpenQuestsExamples_TempleGuard",
-  "Dialogue": "OpenQuestsExamples_GuardTaleRevenant",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_GuardTaleRevenantBoss",
+    "OpenQuestsExamples_GuardTaleRevenantTell"
+  ],
   "SuccessfulRewards": [
     {
       "Type": "Item",
@@ -24,6 +25,5 @@
       ],
       "AutoClaim": true
     }
-  ],
-  "AutoTrack": true
+  ]
 }

@@ -33,7 +33,9 @@ old magic of the temple.
 
 ## Quests and rewards
 
-`Deliver` quests aimed at him, chained by `GrantQuest`, the first assigned by his intro. Every one
+`EnterForgottenTemple` grants `OpenQuestsExamples_MeetStag`, completed by the `Accept` answer of his
+intro, which grants the first delivery (assigned directly for a player without the meeting quest).
+`Deliver` quests aimed at him, chained by `GrantQuest`. Every one
 pays a random amount of `Ingredient_Life_Essence` (3, 5 or 8 at weights 50, 35, 15 for quests 1 to
 5; 5, 8 or 12 for quests 6 to 10). From quest 3 he also sheds 2 leathers, ordered by `ItemLevel`.
 
@@ -57,7 +59,7 @@ pays a random amount of `Ingredient_Life_Essence` (3, 5 or 8 at weights 50, 35, 
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleStag.json`
 - `OpenDialogues/Names/OpenQuestsExamples_StagNames.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Stag{Intro,Idle,Seeds,Moult,Content}.json`
-- `OpenQuests/Quests/OpenQuestsExamples_Stag*.json`, listed in chapter `ForgottenTemple`
+- `OpenQuests/Quests/OpenQuestsExamples_MeetStag.json`, `OpenQuestsExamples_Stag*.json`, listed in chapter `ForgottenTemple`
 - Lang keys `openquestsexamples.temple.stag.*` and `openquestsexamples.quest.stag*`
 
 ## Decision log
@@ -71,3 +73,4 @@ pays a random amount of `Ingredient_Life_Essence` (3, 5 or 8 at weights 50, 35, 
   by the quest running.
 - 2026-11-04: moved from the temple doe to the antlered stag, named "Enchanted Stag" / "Cerf
   enchanté" so players can tell him apart; ids renamed from `Doe` to `Stag` (user).
+- 2026-11-04: a meeting quest from `EnterForgottenTemple` leads to him, not auto tracked (user).

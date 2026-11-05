@@ -1,5 +1,5 @@
 {
-  "Type": "Dialogue",
+  "Type": "Composite",
   "Icon": "Icons/ModelsGenerated/Void_Anomaly_Crystal.png",
   "Categories": [
     "Temple"
@@ -7,9 +7,10 @@
   "TitleKey": "openquestsexamples.quest.guardtaleheart.title",
   "DescriptionKey": "openquestsexamples.quest.guardtaleheart.description",
   "ShortDescriptionKey": "openquestsexamples.quest.guardtaleheart.short",
-  "TargetQuantity": 1,
-  "Character": "OpenQuestsExamples_TempleGuard",
-  "Dialogue": "OpenQuestsExamples_GuardTaleHeart",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_GuardTaleHeartBoss",
+    "OpenQuestsExamples_GuardTaleHeartTell"
+  ],
   "SuccessfulRewards": [
     {
       "Type": "Item",
@@ -24,6 +25,5 @@
       ],
       "AutoClaim": true
     }
-  ],
-  "AutoTrack": true
+  ]
 }

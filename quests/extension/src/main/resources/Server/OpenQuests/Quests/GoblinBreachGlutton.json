@@ -26,13 +26,6 @@
       "ItemId": "Ingredient_Gadget_Assembly",
       "Quantity": 2,
       "AutoClaim": false
-    },
-    {
-      "Type": "GrantQuest",
-      "QuestAssetIds": [
-        "OpenQuestsExamples_GuardTaleGlutton"
-      ],
-      "AutoClaim": true
     }
   ]
 }

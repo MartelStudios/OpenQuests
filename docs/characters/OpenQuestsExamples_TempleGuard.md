@@ -32,17 +32,19 @@ loop back into the breach.
 
 ## Quests and rewards
 
-One loop per boss quest of the GoblinBreach chapter (`Revenant`, `Glutton`, `Voidtaken`, `Heart`):
-the boss quest's success grants the tale, the tale grants the rune quest.
+`EnterForgottenTemple` grants `OpenQuestsExamples_MeetGuard`, completed by the `Accept` answer of his
+intro, which grants one tale per boss quest of the GoblinBreach chapter (`Revenant`, `Glutton`,
+`Voidtaken`, `Heart`). A player without the meeting quest gets the same answer assigning the tales.
 
-| Quest | Objective | Reward |
+| Quest | Made of | Reward |
 |---|---|---|
-| `OpenQuestsExamples_GuardTale<Boss>` | `Dialogue` on `OpenQuestsExamples_GuardTale<Boss>`, a roleplay dialogue about that boss | 2 `Ingredient_Rune_Shard`, grants the rune quest |
-| `OpenQuestsExamples_GuardRune<Boss>` | `Dialogue` answer `ShowRune` on `OpenQuestsExamples_GuardRune<Boss>`, shown only with a rune in hand (`Holding` `Category` `GoblinLab_Runes`) | 1 `PortalKey_Goblin_Breach` |
+| `OpenQuestsExamples_GuardTale<Boss>` | `GuardTale<Boss>Boss` (`QuestState`, boss quest successful, earlier kills count), `GuardTale<Boss>Tell` (`Dialogue` on `GuardTale<Boss>`) | 2 `Ingredient_Rune_Shard`, grants the rune quest |
+| `OpenQuestsExamples_GuardRune<Boss>` | `GuardRune<Boss>Craft` (`Craft`, any rune), `GuardRune<Boss>Show` (`Dialogue`, answer `ShowRune`) | 1 `PortalKey_Goblin_Breach` |
 
-The router opens the first boss tale in progress, then the first rune quest in progress, otherwise
-his dreaming line. Each conversation validates one boss only. The loop ends when no boss quest is
-left.
+The router opens his intro first, then the first tale whose boss is beaten, then the first rune
+quest in progress, otherwise his dreaming line. `ShowRune` asks for a rune in hand (`Holding`,
+`Category` `GoblinLab_Runes`) and for the craft step done, so the steps run in order. Rune recipes
+need `goblin_lab_power`, which ties this line to the generator.
 
 ## Assets
 
@@ -50,9 +52,9 @@ left.
 - `OpenDialogues/Distributions/OpenQuestsExamples_TempleGuard.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleGuard.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Guard{Tale,Rune}{Revenant,Glutton,Voidtaken,Heart}.json`,
-  `OpenQuestsExamples_GuardRuneSeen.json`, `OpenQuestsExamples_GuardDream.json`
+  `OpenQuestsExamples_GuardRuneSeen.json`, `OpenQuestsExamples_GuardDream.json`,
+  `OpenQuestsExamples_GuardIntro.json`
 - `OpenQuests/Quests/OpenQuestsExamples_Guard*.json`, chapter `ForgottenTemple`
-- `GoblinBreach{Revenant,Glutton,Voidtaken,Heart}.json` gained a `GrantQuest` of the tale.
 - Lang keys `openquestsexamples.temple.guard.*`, `openquestsexamples.quest.guard*`
 
 ## Decision log
@@ -62,5 +64,5 @@ left.
 - 2026-11-03: the rune quest comes back after each boss tale; the loop stops with the boss quests
   (user).
 - 2026-11-03: one roleplay dialogue per boss, so one conversation validates one boss (user).
-- 2026-11-03: the tale grant is a separate `GrantQuest` reward on each boss quest, leaving the
-  chapter's own rewards untouched.
+- 2026-11-04: a meeting quest grants the tales, so his line is one tree in the journal and the boss quests stay untouched (user).
+- 2026-11-04: rune quests are composites, craft then show, any rune, so the player keeps the choice (user).

@@ -7,6 +7,13 @@
       "ItemId": "Ingredient_Crystal_Void",
       "Quantity": 3,
       "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_LabThrough"
+      ],
+      "AutoClaim": true
     }
   ],
   "Icon": "Icons/ItemsGenerated/GoblinLab_Console.png",
@@ -16,5 +23,32 @@
   "TitleKey": "openquestsexamples.quest.labconsole.title",
   "DescriptionKey": "openquestsexamples.quest.labconsole.description",
   "ShortDescriptionKey": "openquestsexamples.quest.labconsole.short",
-  "AutoTrack": true
+  "AutoTrack": true,
+  "Constraints": [
+    {
+      "Type": "MaxQuests",
+      "Count": 1
+    },
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "OpenQuestsExamples_LabBoiler",
+      "States": [
+        "Successful"
+      ]
+    },
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "OpenQuestsExamples_LabEngine",
+      "States": [
+        "Successful"
+      ]
+    },
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "OpenQuestsExamples_LabCompressor",
+      "States": [
+        "Successful"
+      ]
+    }
+  ]
 }

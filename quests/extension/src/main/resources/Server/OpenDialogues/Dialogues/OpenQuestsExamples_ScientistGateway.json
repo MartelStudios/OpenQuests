@@ -14,13 +14,10 @@
       "Text": "openquestsexamples.goblin.scientist.gateway.yes",
       "Actions": [
         {
-          "Type": "AssignQuest",
-          "Quest": "OpenQuestsExamples_LabGateway"
-        },
-        {
           "Type": "Close"
         }
-      ]
+      ],
+      "Id": "Accept"
     },
     {
       "Text": "openquestsexamples.goblin.scientist.bye",

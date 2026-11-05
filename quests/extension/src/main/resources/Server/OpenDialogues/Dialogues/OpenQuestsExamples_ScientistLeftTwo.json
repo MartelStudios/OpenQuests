@@ -1,0 +1,19 @@
+{
+  "Display": "Cinematic",
+  "Speaker": "OpenQuestsExamples_GoblinScientist",
+  "Pages": [
+    {
+      "Text": "openquestsexamples.goblin.scientist.report.lefttwo.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "openquestsexamples.goblin.scientist.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "Type": "Dialogue",
+  "Type": "Composite",
   "Icon": "Icons/ModelsGenerated/Goblin_Glutton.png",
   "Categories": [
     "Temple"
@@ -7,9 +7,10 @@
   "TitleKey": "openquestsexamples.quest.guardtaleglutton.title",
   "DescriptionKey": "openquestsexamples.quest.guardtaleglutton.description",
   "ShortDescriptionKey": "openquestsexamples.quest.guardtaleglutton.short",
-  "TargetQuantity": 1,
-  "Character": "OpenQuestsExamples_TempleGuard",
-  "Dialogue": "OpenQuestsExamples_GuardTaleGlutton",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_GuardTaleGluttonBoss",
+    "OpenQuestsExamples_GuardTaleGluttonTell"
+  ],
   "SuccessfulRewards": [
     {
       "Type": "Item",
@@ -24,6 +25,5 @@
       ],
       "AutoClaim": true
     }
-  ],
-  "AutoTrack": true
+  ]
 }

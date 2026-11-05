@@ -1,14 +1,5 @@
 {
-  "Type": "GameFlag",
-  "Flag": "goblin_lab_teleporter",
-  "SuccessfulRewards": [
-    {
-      "Type": "Item",
-      "ItemId": "Ingredient_Scraps",
-      "Quantity": 10,
-      "AutoClaim": true
-    }
-  ],
+  "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Teleporter.png",
   "Categories": [
     "Temple"
@@ -16,5 +7,34 @@
   "TitleKey": "openquestsexamples.quest.labteleporter.title",
   "DescriptionKey": "openquestsexamples.quest.labteleporter.description",
   "ShortDescriptionKey": "openquestsexamples.quest.labteleporter.short",
+  "QuestAssetIds": [
+    "OpenQuestsExamples_LabTeleporterRepair",
+    {
+      "Type": "Composite",
+      "Operator": "Or",
+      "TitleKey": "openquestsexamples.quest.labreport.title",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_LabTeleporterTalk",
+        "OpenQuestsExamples_LabAllRepaired"
+      ]
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Scraps",
+      "Quantity": 10,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "OpenQuestsExamples_LabBoiler",
+        "OpenQuestsExamples_LabEngine",
+        "OpenQuestsExamples_LabCompressor"
+      ],
+      "AutoClaim": true
+    }
+  ],
   "AutoTrack": true
 }
