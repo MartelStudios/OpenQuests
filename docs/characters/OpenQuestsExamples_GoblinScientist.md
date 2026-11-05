@@ -44,11 +44,11 @@ done) and `LabAllRepaired`. In chapter `ForgottenTemple`.
 
 | Quest | Flag | Reward | Grants |
 |---|---|---|---|
-| `OpenQuestsExamples_LabGateway` | `goblin_lab_gate` | 1 gadget assembly | `LabTeleporter` |
+| `OpenQuestsExamples_LabGateway` | `goblin_lab_gate` | 1 dubious assembly | `LabTeleporter` |
 | `OpenQuestsExamples_LabTeleporter` | `goblin_lab_teleporter` | 10 scraps | `LabBoiler`, `LabEngine`, `LabCompressor` |
-| `OpenQuestsExamples_LabBoiler` | `goblin_lab_recipe_a` | 1 gadget assembly | `LabConsole` |
-| `OpenQuestsExamples_LabEngine` | `goblin_lab_recipe_b` | 2 gadget assemblies | `LabConsole` |
-| `OpenQuestsExamples_LabCompressor` | `goblin_lab_recipe_c` | 2 gadget assemblies | `LabConsole` |
+| `OpenQuestsExamples_LabBoiler` | `goblin_lab_recipe_a` | 1 dubious assembly | `LabConsole` |
+| `OpenQuestsExamples_LabEngine` | `goblin_lab_recipe_b` | 2 dubious assemblies | `LabConsole` |
+| `OpenQuestsExamples_LabCompressor` | `goblin_lab_recipe_c` | 2 dubious assemblies | `LabConsole` |
 | `OpenQuestsExamples_LabConsole` | `goblin_breach_duration` | 3 void crystals | `LabThrough`, back to the young Kweebec |
 
 The three machines run in parallel. `LabConsole` is a plain `GameFlag`, without a report: `MaxQuests`
@@ -56,8 +56,8 @@ The three machines run in parallel. `LabConsole` is a plain `GameFlag`, without 
 until all three are done. Each machine's report answers "What now?" with what
 `ScientistRepairsLeft` picks from how many are done.
 
-Descriptions point at the GoblinBreach chapter: silk from the nests (boiler), the voidtaken bear's
-hide (engine), void hearts (compressor, console).
+Descriptions point at the GoblinBreach chapter: silk from the nests (boiler), the Voidtaken Grizzly's
+hide (engine), Voidhearts (compressor, console).
 
 ## Assets
 
@@ -85,4 +85,5 @@ hide (engine), void hearts (compressor, console).
 - 2026-11-04: repairs chained through reports to her, so the journal leads to her dialogues; gateway, teleporter, then three machines in parallel converging on the console (user).
 - 2026-11-04: a finished lab settles the reports she can no longer hear, since flags are universe wide and repairs come in any order (user).
 - 2026-11-04: no special case for a repair another player made (user).
+- 2026-11-05: her lines and quests name items and places as the game's own lang files do: "le portail", "Néant", "montage douteux" (user).
 - 2026-11-05: `LabAllRepaired` silent as well as hidden: each of its flag steps otherwise announces the lab repaired at every single repair.
