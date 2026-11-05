@@ -6,8 +6,5 @@
   "TitleKey": "quest.run-master.title",
   "DescriptionKey": "quest.run-master.description",
   "ShortDescriptionKey": "quest.run-master.short",
-  "TargetQuantity": 10000,
-  "Tags": {
-    "OQ_HUD_DESC": []
-  }
+  "TargetQuantity": 10000
 }

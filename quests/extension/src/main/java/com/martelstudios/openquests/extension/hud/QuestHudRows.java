@@ -7,8 +7,6 @@ import com.martelstudios.openquests.core.models.QuestState;
 import javax.annotation.Nonnull;
 import java.time.Instant;
 
-import static com.martelstudios.openquests.extension.tags.OpenQuestsTags.DESCRIPTION_TAG;
-
 /**
  * The look of a plain line. A renderer is free to ignore all of this and append its own document,
  * but a quest that only has a title to show gets it from here.
@@ -95,13 +93,11 @@ public final class QuestHudRows {
     }
 
     /**
-     * Adds the short description under the title, for an asset that asked for it: the HUD says what
+     * Adds the short description under the title, when the quest has one: the HUD says what
      * to do, the journal tells the story. Left to the caller, since a type drawing its own document
      * decides where the line goes.
      */
     public static void appendDescription(@Nonnull QuestHudContext context, @Nonnull String rowSelector, @Nonnull AbstractQuestProgression<?> quest) {
-        if (!quest.hasTag(DESCRIPTION_TAG)) return;
-
         Message summary = quest.getShortDescription();
         if (summary.getMessageId() == null && (summary.getRawText() == null || summary.getRawText().isEmpty())) return;
 

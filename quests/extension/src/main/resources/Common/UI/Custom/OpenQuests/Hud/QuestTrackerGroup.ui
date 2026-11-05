@@ -15,7 +15,7 @@ Group #QuestGroup {
     Label #Progress { Text: ""; Style: $Rows.@QuestProgressStyle; }
   }
 
-  // Shown only for an asset tagged HUD_DESC
+  // Shown only for a quest with a short description
   Label #Description { Text: ""; Anchor: (Left: 20, Width: 230, Top: 2); Style: $Rows.@QuestDescriptionStyle; Visible: false; }
 
   // Shown only for a quest running against the clock, above its steps since it bounds them all

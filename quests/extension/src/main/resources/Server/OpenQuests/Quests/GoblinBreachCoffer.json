@@ -29,8 +29,5 @@
         { "Reward": { "Type": "Item", "ItemId": "Potion_Health_Greater", "Quantity": 3 } }
       ]
     }
-  ],
-  "Tags": {
-    "OQ_HUD_DESC": []
-  }
+  ]
 }
