@@ -38,7 +38,7 @@ what she can no longer hear, and the chain goes on without her.
 
 `LabGenerator` grants `OpenQuestsExamples_MeetScientist`, an `Or` of the `Accept` answer of
 `ScientistGateway` and `OpenQuestsExamples_LabAllRepaired` (`And` of all seven lab flags, with
-`Visibility: Never` and `AnnounceOutcome: false`, so the tracker and the journal show only the talk branch).
+`Visibility: WhenSuccessful` and `AnnounceOutcome: false`, so it shows only once it won; its flags stay `Never`).
 Each repair below is a composite: `Lab<Device>Repair` (`GameFlag`), then an `Or` of
 `Lab<Device>Talk` (`Dialogue` on `ScientistReport<Device>`, opened by her router once the repair is
 done) and `LabAllRepaired`. In chapter `ForgottenTemple`.
@@ -90,3 +90,4 @@ hide (engine), Voidhearts (compressor, console).
 - 2026-11-05: nameplates hold names, not titles, as long as Hytale cannot translate them: she draws a random name like the other characters (user).
 - 2026-11-05: compressor quest titled "Sous pression" / "Under pressure", her gateway report opens with "Il vit, mon portail vit !" (user).
 - 2026-11-05: quest texts name her by her translated function, "la contremaîtresse du labo" / "the lab foreman", since her nameplate is now a random name (user).
+- 2026-11-05: `LabAllRepaired` listed once it succeeded, so a player arriving in a repaired lab reads why the quest ended instead of a `0/1` (user).

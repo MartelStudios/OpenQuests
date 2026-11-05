@@ -1,6 +1,6 @@
 {
   "Type": "Composite",
-  "Visibility": "Never",
+  "Visibility": "WhenSuccessful",
   "AnnounceOutcome": false,
   "TitleKey": "openquestsexamples.quest.laballrepaired.title",
   "QuestAssetIds": [
