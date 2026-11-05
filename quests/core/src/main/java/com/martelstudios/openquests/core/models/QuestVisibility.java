@@ -59,4 +59,17 @@ public enum QuestVisibility {
             case NEVER -> false;
         };
     }
+
+    /**
+     * @param outcome how the run stands, or {@code null} for one that ended with nobody able to say how.
+     * @return whether that is enough to list it, for a step only its group can still speak for.
+     */
+    public boolean isReachedByOutcome(@Nullable QuestState outcome) {
+        return switch (this) {
+            case ALWAYS, WHEN_STARTED -> true;
+            case WHEN_PROGRESSED, WHEN_COMPLETED -> outcome != QuestState.IN_PROGRESS;
+            case WHEN_SUCCESSFUL -> outcome == QuestState.SUCCESSFUL;
+            case NEVER -> false;
+        };
+    }
 }

@@ -29,7 +29,7 @@ elders handle. He dreams of having every colour, a rainbow nobody else in the te
 ## Backstory and relations
 
 Born in the temple, sheltered by the elders, never outside. Lives near the goblin lab, which is
-where most of his "found" treasures come from (gadget assemblies, breach fragments, the Deepworks
+where most of his "found" treasures come from (dubious assemblies, breach fragments, the Deepworks
 fragment he gives last).
 
 ## Quests and rewards
@@ -41,7 +41,7 @@ of its tier.
 
 | Quest | Items | Tier |
 |---|---|---|
-| `OpenQuestsExamples_SeedlingFeathersLight` | 3 light feathers | 1 |
+| `OpenQuestsExamples_SeedlingFeathersLight` | 3 white feathers | 1 |
 | `OpenQuestsExamples_SeedlingFeathersDark` | 3 dark feathers | 1 |
 | `OpenQuestsExamples_SeedlingFeathersRed` | 3 red feathers | 1 |
 | `OpenQuestsExamples_SeedlingShell` | 1 `Deco_Coral_Shell` | 1 |
@@ -58,7 +58,7 @@ of its tier.
 | `OpenQuestsExamples_SeedlingRainbow` | talk to him | `PortalKey_The_Deepworks` |
 
 Random weights per tier (T1 / T2 / T3 / T4): popcorn ×2 35/25/15/10, candy cane ×2 35/25/15/10,
-pumpkin pie 25/25/20/15, greater essence of life 4/15/25/30, gadget assembly 1/6/15/20, Guttering
+pumpkin pie 25/25/20/15, greater essence of life 4/15/25/30, dubious assembly 1/6/15/20, Guttering
 Hollows fragment 0/2/10/15.
 
 ## Assets
@@ -83,3 +83,4 @@ Hollows fragment 0/2/10/15.
 - 2026-11-04: `Unobstructed` filter, so the draw skips a seedling buried in tall grass, whose
   hitbox takes F away from him (user).
 - 2026-11-04: a meeting quest from `EnterForgottenTemple` leads to him, not auto tracked (user).
+- 2026-11-05: his quests name items and birds as the game's lang files do: "fragments de cristal", "plumes blanches", "merlebleus" (user).

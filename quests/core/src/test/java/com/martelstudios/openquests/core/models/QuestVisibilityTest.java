@@ -33,4 +33,25 @@ class QuestVisibilityTest {
         assertFalse(QuestVisibility.WHEN_SUCCESSFUL.isReachedBy(failed));
         assertTrue(QuestVisibility.WHEN_SUCCESSFUL.isReachedBy(succeeded));
     }
+
+    @Test
+    void aStepGoneFromTheStoreIsJudgedByItsOutcome() {
+        assertFalse(QuestVisibility.NEVER.isReachedByOutcome(QuestState.SUCCESSFUL));
+        assertFalse(QuestVisibility.WHEN_SUCCESSFUL.isReachedByOutcome(QuestState.FAILED));
+        assertTrue(QuestVisibility.WHEN_SUCCESSFUL.isReachedByOutcome(QuestState.SUCCESSFUL));
+        assertTrue(QuestVisibility.WHEN_STARTED.isReachedByOutcome(QuestState.ABANDONED));
+    }
+
+    @Test
+    void anEndNobodyCanNameOnlyReachesWhatAskedForAnEnd() {
+        assertTrue(QuestVisibility.WHEN_COMPLETED.isReachedByOutcome(null));
+        assertFalse(QuestVisibility.WHEN_SUCCESSFUL.isReachedByOutcome(null));
+        assertFalse(QuestVisibility.NEVER.isReachedByOutcome(null));
+    }
+
+    @Test
+    void aRunStillGoingHasNotCompleted() {
+        assertFalse(QuestVisibility.WHEN_COMPLETED.isReachedByOutcome(QuestState.IN_PROGRESS));
+        assertTrue(QuestVisibility.WHEN_STARTED.isReachedByOutcome(QuestState.IN_PROGRESS));
+    }
 }

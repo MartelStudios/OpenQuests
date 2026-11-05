@@ -8,8 +8,9 @@
   invulnerable, who directs the vanilla lab repairs.
 - **Distribution:** `OpenQuestsExamples_GoblinScientist`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
-- **Name:** "Makinomagistra" / "Machinarque", the only entry of `OpenQuestsExamples_ScientistNames`,
-  so the nameplate tells her apart and stays the same when she is redrawn. **Speaker:** `OpenQuestsExamples_GoblinScientist`
+- **Name:** drawn from `OpenQuestsExamples_KweebecNames`, shared for now, since a nameplate holds a name, not a
+  title. A new draw can change it when she comes back as a visitor. "Makinomagistra" / "Machinarque"
+  stays only the speaker's fallback name; quest texts call her by her epithet. **Speaker:** `OpenQuestsExamples_GoblinScientist`
   (`AllowNPCOverride`, epithet "Lab foreman" / "Contremaîtresse du labo").
 
 ## Personality and voice
@@ -36,18 +37,19 @@ what she can no longer hear, and the chain goes on without her.
 ## Quests and rewards
 
 `LabGenerator` grants `OpenQuestsExamples_MeetScientist`, an `Or` of the `Accept` answer of
-`ScientistGateway` and `OpenQuestsExamples_LabAllRepaired` (hidden, `And` of all seven lab flags).
+`ScientistGateway` and `OpenQuestsExamples_LabAllRepaired` (`And` of all seven lab flags, with
+`Visibility: WhenSuccessful` and `AnnounceOutcome: false`, so it shows only once it won; its flags stay `Never`).
 Each repair below is a composite: `Lab<Device>Repair` (`GameFlag`), then an `Or` of
 `Lab<Device>Talk` (`Dialogue` on `ScientistReport<Device>`, opened by her router once the repair is
 done) and `LabAllRepaired`. In chapter `ForgottenTemple`.
 
 | Quest | Flag | Reward | Grants |
 |---|---|---|---|
-| `OpenQuestsExamples_LabGateway` | `goblin_lab_gate` | 1 gadget assembly | `LabTeleporter` |
+| `OpenQuestsExamples_LabGateway` | `goblin_lab_gate` | 1 dubious assembly | `LabTeleporter` |
 | `OpenQuestsExamples_LabTeleporter` | `goblin_lab_teleporter` | 10 scraps | `LabBoiler`, `LabEngine`, `LabCompressor` |
-| `OpenQuestsExamples_LabBoiler` | `goblin_lab_recipe_a` | 1 gadget assembly | `LabConsole` |
-| `OpenQuestsExamples_LabEngine` | `goblin_lab_recipe_b` | 2 gadget assemblies | `LabConsole` |
-| `OpenQuestsExamples_LabCompressor` | `goblin_lab_recipe_c` | 2 gadget assemblies | `LabConsole` |
+| `OpenQuestsExamples_LabBoiler` | `goblin_lab_recipe_a` | 1 dubious assembly | `LabConsole` |
+| `OpenQuestsExamples_LabEngine` | `goblin_lab_recipe_b` | 2 dubious assemblies | `LabConsole` |
+| `OpenQuestsExamples_LabCompressor` | `goblin_lab_recipe_c` | 2 dubious assemblies | `LabConsole` |
 | `OpenQuestsExamples_LabConsole` | `goblin_breach_duration` | 3 void crystals | `LabThrough`, back to the young Kweebec |
 
 The three machines run in parallel. `LabConsole` is a plain `GameFlag`, without a report: `MaxQuests`
@@ -55,15 +57,14 @@ The three machines run in parallel. `LabConsole` is a plain `GameFlag`, without 
 until all three are done. Each machine's report answers "What now?" with what
 `ScientistRepairsLeft` picks from how many are done.
 
-Descriptions point at the GoblinBreach chapter: silk from the nests (boiler), the voidtaken bear's
-hide (engine), void hearts (compressor, console).
+Descriptions point at the GoblinBreach chapter: silk from the nests (boiler), the Voidtaken Grizzly's
+hide (engine), Voidhearts (compressor, console).
 
 ## Assets
 
 - `OpenDialogues/Characters/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Distributions/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Speakers/OpenQuestsExamples_GoblinScientist.json`
-- `OpenDialogues/Names/OpenQuestsExamples_ScientistNames.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_ScientistRepairsLeft.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Scientist{NoPower,Gateway,Scold}.json`,
@@ -84,3 +85,9 @@ hide (engine), void hearts (compressor, console).
 - 2026-11-04: repairs chained through reports to her, so the journal leads to her dialogues; gateway, teleporter, then three machines in parallel converging on the console (user).
 - 2026-11-04: a finished lab settles the reports she can no longer hear, since flags are universe wide and repairs come in any order (user).
 - 2026-11-04: no special case for a repair another player made (user).
+- 2026-11-05: her lines and quests name items and places as the game's own lang files do: "le portail", "Néant", "montage douteux" (user).
+- 2026-11-05: `LabAllRepaired` silent as well as hidden: each of its flag steps otherwise announces the lab repaired at every single repair.
+- 2026-11-05: nameplates hold names, not titles, as long as Hytale cannot translate them: she draws a random name like the other characters (user).
+- 2026-11-05: compressor quest titled "Sous pression" / "Under pressure", her gateway report opens with "Il vit, mon portail vit !" (user).
+- 2026-11-05: quest texts name her by her translated function, "la contremaîtresse du labo" / "the lab foreman", since her nameplate is now a random name (user).
+- 2026-11-05: `LabAllRepaired` listed once it succeeded, so a player arriving in a repaired lab reads why the quest ended instead of a `0/1` (user).

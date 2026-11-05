@@ -1,15 +1,11 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
-import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.core.models.QuestState;
-import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.extension.hud.QuestHudContext;
 import com.martelstudios.openquests.extension.hud.QuestHudRenderer;
 import com.martelstudios.openquests.extension.hud.QuestHudRows;
 
 import javax.annotation.Nonnull;
-import java.util.UUID;
 
 /**
  * A title carrying the group, then its children one level in. The composite shows no progress of
@@ -17,10 +13,10 @@ import java.util.UUID;
  */
 public final class CompositeQuestHudRenderer implements QuestHudRenderer {
 
-    private final QuestProgressionService progression;
+    private final CompositeSteps steps;
 
-    public CompositeQuestHudRenderer(@Nonnull QuestProgressionService progression) {
-        this.progression = progression;
+    public CompositeQuestHudRenderer(@Nonnull CompositeSteps steps) {
+        this.steps = steps;
     }
 
     /** Carries the composite line and, under it, the container its children draw into. */
@@ -47,45 +43,33 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
     }
 
     /**
-     * Walks the children by index, since {@code questIds} and the asset ids are built together and
-     * a child archived on completion is only nameable through its asset.
+     * The rule only stands between two lines drawn: an OR with one branch in sight reads as a plain
+     * step.
      */
     private void renderChildren(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite) {
         CompositeQuestAsset asset = composite.getAsset();
         if (asset == null) return;
 
-        UUID[] questIds = composite.getChildIds();
-        String[] assetIds = asset.getAssetIds();
-
         boolean separated = asset.getOperator() == CompositeQuestAsset.Operator.OR;
+        boolean drawnOne = false;
 
-        for (int i = 0; i < questIds.length; i++) {
-            if (separated && i > 0) context.appendRow(SEPARATOR_DOCUMENT);
+        for (CompositeStep step : steps.listedIn(composite)) {
+            if (separated && drawnOne) context.appendRow(SEPARATOR_DOCUMENT);
+            drawnOne = true;
 
-            AbstractQuestProgression<?> child = progression.getQuest(questIds[i]);
-
-            if (child == null) {
-                renderArchivedChild(context, composite, questIds[i], i < assetIds.length ? assetIds[i] : null);
-                continue;
-            }
-
-            QuestHudRows.render(context, child);
+            if (step.run() != null) QuestHudRows.render(context, step.run());
+            else renderArchivedChild(context, step);
         }
     }
 
     /**
      * A completed child leaves the store, so nothing is left to draw it. Leaving a hole where it
      * was would read as if it had never been asked for. The group remembers which way it went;
-     * read as a success when even it cannot say, which is what a child gone from the store means.
+     * when even it cannot say, the line takes no mark, as in the journal.
      */
-    private void renderArchivedChild(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite, @Nonnull UUID questId, String assetId) {
-        if (assetId == null) return;
+    private void renderArchivedChild(@Nonnull QuestHudContext context, @Nonnull CompositeStep step) {
+        if (step.asset() == null) return;
 
-        OpenQuestAsset asset = OpenQuestAsset.getAsset(assetId);
-        if (asset == null) return;
-
-        QuestState outcome = composite.outcomeOf(questId);
-
-        QuestHudRows.appendRow(context, AbstractQuestProgression.titleOf(asset), outcome == null ? QuestState.SUCCESSFUL : outcome);
+        QuestHudRows.appendRow(context, AbstractQuestProgression.titleOf(step.asset()), step.recorded());
     }
 }

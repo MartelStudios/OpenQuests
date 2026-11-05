@@ -25,9 +25,15 @@ public class QuestTrackerHud extends CustomUIHud {
     private static final int MAX_QUESTS = 5;
 
     /**
-     * The width {@code QuestTrackerHud.ui} gives the panel.
+     * The width {@code QuestTrackerHud.ui} gives the viewport, which the panel fills.
      */
     private static final int PANEL_WIDTH = 350;
+
+    /**
+     * What the panel leaves free at the bottom of the screen, wherever it sits: the vanilla key
+     * hints stand 50 from the edge, about 45 for each of up to five lines.
+     */
+    private static final int PANEL_BOTTOM = 280;
 
     /**
      * A floor between two pushes, not a heartbeat: the panel is redrawn when something changed,
@@ -120,7 +126,7 @@ public class QuestTrackerHud extends CustomUIHud {
 
         HudSettings placement = settings.resolve(viewer);
         builder.set("#QuestTrackerPanel.Visible", placement.getVisible() && context.getRowCount() > 0);
-        builder.setObject("#QuestTrackerPanel.Anchor", anchorOf(placement));
+        builder.setObject("#QuestTrackerViewport.Anchor", anchorOf(placement));
         update(true, builder);
 
         long refreshMillis = context.getRefreshMillis();
@@ -128,13 +134,15 @@ public class QuestTrackerHud extends CustomUIHud {
     }
 
     /**
-     * An anchor goes out whole, so the panel's width is restated along with its position.
+     * An anchor goes out whole, so the viewport's width and lower limit are restated along with
+     * its position.
      */
     @Nonnull
     private static Anchor anchorOf(@Nonnull HudSettings settings) {
         Anchor anchor = new Anchor();
         anchor.setWidth(Value.of(PANEL_WIDTH));
         anchor.setTop(Value.of(Math.max(0, settings.getTop())));
+        anchor.setBottom(Value.of(PANEL_BOTTOM));
 
         Value<Integer> offset = Value.of(Math.max(0, settings.getOffset()));
         if (settings.getSide() == HudSettings.Side.LEFT) anchor.setLeft(offset); else anchor.setRight(offset);

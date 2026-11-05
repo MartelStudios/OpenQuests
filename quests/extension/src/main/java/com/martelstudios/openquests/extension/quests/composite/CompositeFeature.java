@@ -5,6 +5,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestLoadedEvent;
 import com.martelstudios.openquests.core.events.QuestUnloadedEvent;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.extension.hud.QuestHudService;
 import com.martelstudios.openquests.extension.journal.QuestPageService;
 
@@ -22,8 +23,9 @@ public final class CompositeFeature {
     public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         services.getQuestProgressionService().registerQuestType(TYPE_ID, CompositeQuestAsset.class, CompositeQuestAsset.CODEC, CompositeQuestProgression.class, CompositeQuestProgression.CODEC);
 
-        QuestHudService.register(new CompositeQuestHudRenderer(services.getQuestProgressionService()));
-        QuestPageService.register(new CompositeQuestPageRenderer(services.getQuestProgressionService()));
+        CompositeSteps steps = new CompositeSteps(services.getQuestProgressionService()::getQuest, OpenQuestAsset::getAsset);
+        QuestHudService.register(new CompositeQuestHudRenderer(steps));
+        QuestPageService.register(new CompositeQuestPageRenderer(steps));
 
         CompositeQuestEvents events = new CompositeQuestEvents(services.getQuestProgressionService());
         plugin.getEventRegistry().registerGlobal(QuestLoadedEvent.class, events::handleQuestLoaded);
