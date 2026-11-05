@@ -1,15 +1,22 @@
+// An anchor has no MaxHeight, so the limit comes from a scrolling viewport with no scrollbar, as in
+// the vanilla KillFeed.ui: the panel inside hugs its rows and whatever passes the viewport is cut.
+// The parent has no layout mode, so Top and Bottom bound the viewport instead of adding margins.
 Group #QuestTrackerParent {
-  LayoutMode: Top;
 
-  Group #QuestTrackerPanel {
-    Anchor: (Width: 350, Right: 24, Top: 120);
-    Padding: (Horizontal: 20, Top: 20, Bottom: 20);
-    Background: (TexturePath: "ObjectivePanelContainer.png", Border: 15);
-    LayoutMode: Top;
-    Visible: false;
+  Group #QuestTrackerViewport {
+    Anchor: (Width: 350, Right: 24, Top: 120, Bottom: 280);
+    LayoutMode: TopScrolling;
+    ScrollbarStyle: (Spacing: 0, Size: 0);
 
-    Group #QuestList {
+    Group #QuestTrackerPanel {
+      Padding: (Horizontal: 20, Top: 20, Bottom: 20);
+      Background: (TexturePath: "ObjectivePanelContainer.png", Border: 15);
       LayoutMode: Top;
+      Visible: false;
+
+      Group #QuestList {
+        LayoutMode: Top;
+      }
     }
   }
 }
