@@ -10,7 +10,7 @@
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
 - **Name:** drawn from `OpenQuestsExamples_KweebecNames`, shared for now, since a nameplate holds a name, not a
   title. A new draw can change it when she comes back as a visitor. "Makinomagistra" / "Machinarque"
-  stays her title in quest texts and the speaker's fallback name. **Speaker:** `OpenQuestsExamples_GoblinScientist`
+  stays only the speaker's fallback name; quest texts call her by her epithet. **Speaker:** `OpenQuestsExamples_GoblinScientist`
   (`AllowNPCOverride`, epithet "Lab foreman" / "Contremaîtresse du labo").
 
 ## Personality and voice
@@ -89,3 +89,4 @@ hide (engine), Voidhearts (compressor, console).
 - 2026-11-05: `LabAllRepaired` silent as well as hidden: each of its flag steps otherwise announces the lab repaired at every single repair.
 - 2026-11-05: nameplates hold names, not titles, as long as Hytale cannot translate them: she draws a random name like the other characters (user).
 - 2026-11-05: compressor quest titled "Sous pression" / "Under pressure", her gateway report opens with "Il vit, mon portail vit !" (user).
+- 2026-11-05: quest texts name her by her translated function, "la contremaîtresse du labo" / "the lab foreman", since her nameplate is now a random name (user).
