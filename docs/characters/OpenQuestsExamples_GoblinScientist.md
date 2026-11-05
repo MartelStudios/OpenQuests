@@ -88,3 +88,4 @@ hide (engine), Voidhearts (compressor, console).
 - 2026-11-05: her lines and quests name items and places as the game's own lang files do: "le portail", "Néant", "montage douteux" (user).
 - 2026-11-05: `LabAllRepaired` silent as well as hidden: each of its flag steps otherwise announces the lab repaired at every single repair.
 - 2026-11-05: nameplates hold names, not titles, as long as Hytale cannot translate them: she draws a random name like the other characters (user).
+- 2026-11-05: compressor quest titled "Sous pression" / "Under pressure", her gateway report opens with "Il vit, mon portail vit !" (user).
