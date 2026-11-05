@@ -8,8 +8,9 @@
   invulnerable, who directs the vanilla lab repairs.
 - **Distribution:** `OpenQuestsExamples_GoblinScientist`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
-- **Name:** "Makinomagistra" / "Machinarque", the only entry of `OpenQuestsExamples_ScientistNames`,
-  so the nameplate tells her apart and stays the same when she is redrawn. **Speaker:** `OpenQuestsExamples_GoblinScientist`
+- **Name:** drawn from `OpenQuestsExamples_KweebecNames`, shared for now, since a nameplate holds a name, not a
+  title. A new draw can change it when she comes back as a visitor. "Makinomagistra" / "Machinarque"
+  stays her title in quest texts and the speaker's fallback name. **Speaker:** `OpenQuestsExamples_GoblinScientist`
   (`AllowNPCOverride`, epithet "Lab foreman" / "Contremaîtresse du labo").
 
 ## Personality and voice
@@ -64,7 +65,6 @@ hide (engine), Voidhearts (compressor, console).
 - `OpenDialogues/Characters/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Distributions/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Speakers/OpenQuestsExamples_GoblinScientist.json`
-- `OpenDialogues/Names/OpenQuestsExamples_ScientistNames.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_ScientistRepairsLeft.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Scientist{NoPower,Gateway,Scold}.json`,
@@ -87,3 +87,4 @@ hide (engine), Voidhearts (compressor, console).
 - 2026-11-04: no special case for a repair another player made (user).
 - 2026-11-05: her lines and quests name items and places as the game's own lang files do: "le portail", "Néant", "montage douteux" (user).
 - 2026-11-05: `LabAllRepaired` silent as well as hidden: each of its flag steps otherwise announces the lab repaired at every single repair.
+- 2026-11-05: nameplates hold names, not titles, as long as Hytale cannot translate them: she draws a random name like the other characters (user).
