@@ -67,9 +67,10 @@ public enum QuestVisibility {
      */
     public boolean isReachedByOutcome(@Nonnull QuestState outcome) {
         return switch (this) {
-            case NEVER -> false;
+            case ALWAYS, WHEN_STARTED -> true;
+            case WHEN_PROGRESSED, WHEN_COMPLETED -> outcome != QuestState.IN_PROGRESS;
             case WHEN_SUCCESSFUL -> outcome == QuestState.SUCCESSFUL;
-            default -> true;
+            case NEVER -> false;
         };
     }
 }
