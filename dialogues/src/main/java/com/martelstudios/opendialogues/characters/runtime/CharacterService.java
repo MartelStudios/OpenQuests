@@ -21,6 +21,7 @@ import com.martelstudios.opendialogues.characters.filters.FilterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.nameplates.TranslatedNameplate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -483,6 +484,7 @@ public class CharacterService {
         npc.accessor().tryRemoveComponent(npc.ref(), PersistentDisplayName.getComponentType());
         npc.accessor().tryRemoveComponent(npc.ref(), DisplayNameComponent.getComponentType());
         npc.accessor().tryRemoveComponent(npc.ref(), Nameplate.getComponentType());
+        npc.accessor().tryRemoveComponent(npc.ref(), TranslatedNameplate.getComponentType());
         Interactions interactions = npc.accessor().getComponent(npc.ref(), Interactions.getComponentType());
         if (interactions != null) interactions.setInteractionHint(null);
         npc.accessor().tryRemoveComponent(npc.ref(), Interactable.getComponentType());

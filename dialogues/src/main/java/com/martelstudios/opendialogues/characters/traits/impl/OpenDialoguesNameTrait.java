@@ -12,14 +12,16 @@ import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
 import com.martelstudios.opendialogues.characters.ReleaseReason;
 import com.martelstudios.opendialogues.characters.traits.CharacterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
+import com.martelstudios.opendialogues.nameplates.NameplateTexts;
+import com.martelstudios.opendialogues.nameplates.TranslatedNameplate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 /**
- * Gives the NPC a name drawn once from a list. The nameplate is plain text, so it shows in the
- * server's default language; dialogues show the name in each player's language.
+ * Gives the NPC a name drawn once from a list, shown on its nameplate and in dialogues in each
+ * player's language. A nameplate set by hand is kept.
  */
 public class OpenDialoguesNameTrait extends CharacterTrait {
 
@@ -60,9 +62,16 @@ public class OpenDialoguesNameTrait extends CharacterTrait {
         if (context.accessor().getComponent(context.npc(), DisplayNameComponent.getComponentType()) == null) {
             context.accessor().putComponent(context.npc(), DisplayNameComponent.getComponentType(), new DisplayNameComponent(Message.translation(name)));
         }
-        if (context.accessor().getComponent(context.npc(), Nameplate.getComponentType()) == null) {
-            String text = I18nModule.get().getMessage(I18nModule.DEFAULT_LANGUAGE, name);
-            context.accessor().putComponent(context.npc(), Nameplate.getComponentType(), new Nameplate(text != null ? text : name));
+        Nameplate plate = context.accessor().getComponent(context.npc(), Nameplate.getComponentType());
+        if (plate != null) {
+            boolean ours = NameplateTexts.isOurs(plate.getText(), name, I18nModule.get().getMessage(I18nModule.DEFAULT_LANGUAGE, name));
+            // A plate set by hand or by the role wins; ours is added on the next scan, not in the removal's packet.
+            if (ours) context.accessor().tryRemoveComponent(context.npc(), Nameplate.getComponentType());
+            else context.accessor().tryRemoveComponent(context.npc(), TranslatedNameplate.getComponentType());
+            return;
+        }
+        if (context.accessor().getComponent(context.npc(), TranslatedNameplate.getComponentType()) == null) {
+            context.accessor().putComponent(context.npc(), TranslatedNameplate.getComponentType(), new TranslatedNameplate(name));
         }
     }
 
@@ -75,6 +84,7 @@ public class OpenDialoguesNameTrait extends CharacterTrait {
         context.accessor().tryRemoveComponent(context.npc(), PersistentDisplayName.getComponentType());
         context.accessor().tryRemoveComponent(context.npc(), DisplayNameComponent.getComponentType());
         context.accessor().tryRemoveComponent(context.npc(), Nameplate.getComponentType());
+        context.accessor().tryRemoveComponent(context.npc(), TranslatedNameplate.getComponentType());
     }
 
     @Override

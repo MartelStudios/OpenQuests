@@ -92,3 +92,4 @@ hide (engine), Voidhearts (compressor, console).
 - 2026-11-05: compressor quest titled "Sous pression" / "Under pressure", her gateway report opens with "Il vit, mon portail vit !" (user).
 - 2026-11-05: quest texts name her by her translated function, "la contremaîtresse du labo" / "the lab foreman", since her nameplate is now a random name (user).
 - 2026-11-05: `LabAllRepaired` listed once it succeeded, so a player arriving in a repaired lab reads why the quest ended instead of a `0/1` (user).
+- 2026-11-07: nameplates now show in each player's language (`TranslatedNameplate`); she keeps a drawn name, a plate still shows one text, never name and title together (user).

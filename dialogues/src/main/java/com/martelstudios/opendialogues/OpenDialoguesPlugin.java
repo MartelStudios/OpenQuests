@@ -13,6 +13,10 @@ import com.hypixel.hytale.server.core.io.adapter.PacketFilter;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.protocol.packets.worldmap.UpdateWorldMapVisible;
 import com.martelstudios.opendialogues.map.CharacterMarkerProvider;
+import com.martelstudios.opendialogues.nameplates.TranslatedNameplate;
+import com.martelstudios.opendialogues.nameplates.TranslatedNameplateRemoval;
+import com.martelstudios.opendialogues.nameplates.TranslatedNameplateSystem;
+import com.hypixel.hytale.server.core.modules.entity.tracker.EntityTrackerSystems;
 import com.martelstudios.opendialogues.characters.runtime.CharacterPositions;
 import com.martelstudios.opendialogues.characters.runtime.CharacterPositionsAccess;
 import com.hypixel.hytale.server.core.universe.resources.UniverseResourceType;
@@ -130,6 +134,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     private ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
 
+    private ComponentType<EntityStore, TranslatedNameplate> translatedNameplateType;
+
     private ResourceType<EntityStore, UniqueCharacters> uniqueCharactersType;
     private UniverseResourceType<UniverseCharacters> universeCharactersType;
 
@@ -193,6 +199,9 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         historyType = getEntityStoreRegistry().registerComponent(DialogueHistory.class, "OpenDialoguesHistory", DialogueHistory.CODEC);
         historyRecorder = new DialogueHistoryRecorder(historyType);
         identityType = getEntityStoreRegistry().registerComponent(OpenDialoguesNPCIdentity.class, "OpenDialoguesNPCIdentity", OpenDialoguesNPCIdentity.CODEC);
+        translatedNameplateType = getEntityStoreRegistry().registerComponent(TranslatedNameplate.class, "OpenDialoguesTranslatedNameplate", TranslatedNameplate.CODEC);
+        getEntityStoreRegistry().registerSystem(new TranslatedNameplateSystem(EntityTrackerSystems.Visible.getComponentType(), translatedNameplateType));
+        getEntityStoreRegistry().registerSystem(new TranslatedNameplateRemoval(EntityTrackerSystems.Visible.getComponentType(), translatedNameplateType));
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         universeCharactersType = Universe.registerResource(UniverseCharacters.class, "OpenDialoguesUniqueCharacters", UniverseCharacters.CODEC);
         CharacterAssets characterAssets = CharacterAssets.live();
@@ -353,6 +362,14 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     @Nonnull
     public ComponentType<EntityStore, OpenDialoguesNPCIdentity> getIdentityType() {
         return identityType;
+    }
+
+    /**
+     * @return the nameplate shown to each viewer in their language, for any entity.
+     */
+    @Nonnull
+    public ComponentType<EntityStore, TranslatedNameplate> getTranslatedNameplateType() {
+        return translatedNameplateType;
     }
 
     /**
