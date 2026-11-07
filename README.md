@@ -511,7 +511,8 @@ respawn nor a lowered maximum counts as a loss.
 
 The tracker only lists quests that asked for it. `AutoTrack` puts every quest made from the asset on
 the panel. A tracked quest also puts its target on the compass; every running one shows it on the map.
-A quest type points at a target by implementing `TargetedQuest`. A quest with a short description shows it under its title, greyed and smaller:
+A quest type points at a target by implementing `TargetedQuest`; a mod showing targets listens to
+`PlayerQuestTargetsChangedEvent` to know when a player's may have changed. A quest with a short description shows it under its title, greyed and smaller:
 
 ```json
 { "Type": "Composite", "TitleKey": "…", "AutoTrack": true }
