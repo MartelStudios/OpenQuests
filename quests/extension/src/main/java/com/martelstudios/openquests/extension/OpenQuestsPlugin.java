@@ -36,6 +36,8 @@ import com.martelstudios.openquests.extension.quests.useblock.UseBlockFeature;
 import com.martelstudios.openquests.extension.quests.useentity.UseEntityFeature;
 import com.martelstudios.openquests.extension.rewards.choice.ChoiceRewardFeature;
 import com.martelstudios.openquests.extension.rewards.command.CommandRewardFeature;
+import com.martelstudios.openquests.extension.rewards.droplist.DroplistRewardFeature;
+import com.martelstudios.openquests.extension.rewards.effect.EffectRewardFeature;
 import com.martelstudios.openquests.extension.rewards.grantquest.GrantQuestRewardFeature;
 import com.martelstudios.openquests.extension.rewards.item.ItemRewardFeature;
 import com.martelstudios.openquests.extension.rewards.random.RandomRewardFeature;
@@ -96,6 +98,8 @@ public class OpenQuestsPlugin extends JavaPlugin {
         CommandRewardFeature.register(this, services);
         RandomRewardFeature.register(this, services);
         ChoiceRewardFeature.register(this, services);
+        EffectRewardFeature.register(this, services);
+        DroplistRewardFeature.register(this, services);
 
         // Constraints
         TimeConstraintsFeature.register(this, services);

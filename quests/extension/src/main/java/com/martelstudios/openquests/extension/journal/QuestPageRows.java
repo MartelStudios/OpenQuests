@@ -21,6 +21,7 @@ public final class QuestPageRows {
     public static final String LINE_DOCUMENT = "OpenQuests/Pages/QuestPageLineRow.ui";
     public static final String QUEST_LINE_DOCUMENT = "OpenQuests/Pages/QuestPageQuestLine.ui";
     public static final String ITEM_LINE_DOCUMENT = "OpenQuests/Pages/QuestPageItemLine.ui";
+    public static final String IMAGE_LINE_DOCUMENT = "OpenQuests/Pages/QuestPageImageLine.ui";
     public static final String CONDITION_LINE_DOCUMENT = "OpenQuests/Pages/QuestPageConditionLine.ui";
 
     private static final String COMMON_DOCUMENT = "OpenQuests/Pages/QuestPageCommon.ui";
@@ -98,6 +99,29 @@ public final class QuestPageRows {
         context.getBuilder().set(lineSelector + "#Label.TextSpans", label);
 
         if (value != null) context.getBuilder().set(lineSelector + "#Value.Text", value);
+
+        stripe(context, lineSelector);
+
+        return lineSelector;
+    }
+
+    /**
+     * A line led by a picture of the game's assets in place of an item slot, never a link.
+     *
+     * @param assetPath the picture, relative to the client's assets. Null leaves the slot empty.
+     */
+    @Nonnull
+    public static String appendImageLine(@Nonnull QuestPageContext context, @Nullable String assetPath, @Nonnull Message label, @Nullable Message value) {
+        String lineSelector = context.appendRow(IMAGE_LINE_DOCUMENT);
+
+        if (assetPath != null) {
+            context.getBuilder().set(lineSelector + "#Icon.AssetPath", assetPath)
+                   .set(lineSelector + "#Icon.Visible", true);
+        }
+
+        context.getBuilder().set(lineSelector + "#Label.TextSpans", label);
+
+        if (value != null) context.getBuilder().set(lineSelector + "#Value.TextSpans", value);
 
         stripe(context, lineSelector);
 

@@ -1,0 +1,13 @@
+// A reward line led by a picture from the game's assets, such as an effect's status icon, sized
+// like an item slot so its label lines up with every other line of the list.
+$P = "QuestPageCommon.ui";
+
+Group #ImageLine {
+  LayoutMode: Left;
+  Anchor: (Height: 28, Top: 2);
+
+  AssetImage #Icon { Anchor: (Width: 24, Height: 24, Top: 2, Right: 6); Visible: false; }
+
+  Label #Label { Text: ""; FlexWeight: 1; Style: $P.@LineLabelStyle; }
+  Label #Value { Text: ""; Anchor: (Width: $P.@ValueWidth); Style: $P.@ProgressStyle; }
+}

@@ -13,6 +13,7 @@ import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +39,22 @@ public class ItemReward extends QuestReward {
 
     @Override
     public boolean grant(@Nonnull OpenQuestsServices services, @Nonnull UUID sourceQuestId, @Nonnull EntityComponents playerComponents) {
+        ItemContainer inventory = inventoryOf(playerComponents);
+        if (inventory == null) return false;
+
+        // Add with allOrNothing
+        var transaction = inventory.addItemStack(new ItemStack(itemId, quantity), true, false, ItemContainer.DEFAULT_FILTER);
+
+        return transaction.succeeded();
+    }
+
+    /**
+     * The player's inventory as one container, hotbar first, for any reward that hands items over.
+     *
+     * @return {@code null} if the player carries no inventory at all.
+     */
+    @Nullable
+    public static ItemContainer inventoryOf(@Nonnull EntityComponents playerComponents) {
         List<ItemContainer> containers = new ArrayList<>(InventoryComponent.HOTBAR_FIRST.length);
 
         for (var inventoryType : InventoryComponent.HOTBAR_FIRST) {
@@ -45,14 +62,9 @@ public class ItemReward extends QuestReward {
             if (inventory != null) containers.add(inventory.getInventory());
         }
 
-        if (containers.isEmpty()) return false;
+        if (containers.isEmpty()) return null;
 
-        var combined = new CombinedItemContainer(containers.toArray(new ItemContainer[0]));
-
-        // Add with allOrNothing
-        var transaction = combined.addItemStack(new ItemStack(itemId, quantity), true, false, ItemContainer.DEFAULT_FILTER);
-
-        return transaction.succeeded();
+        return new CombinedItemContainer(containers.toArray(new ItemContainer[0]));
     }
 
     public String getItemId() {
