@@ -446,6 +446,7 @@ public class CharacterService {
         npc.identity().setCharacter(null);
         npc.identity().setName(null);
         npc.identity().setEpithet(null);
+        npc.identity().setNameplate(null);
         events.dispatchFor(CharacterEvent.Released.class, characterId).dispatch(new CharacterEvent.Released(npc.ref(), npc.uuid(), characterId, name, epithet, reason));
         for (String id : lost) events.dispatchFor(CharacterEvent.Lost.class, id).dispatch(new CharacterEvent.Lost(id, CharacterEvent.Lost.Cause.Death));
     }

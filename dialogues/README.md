@@ -108,7 +108,7 @@ the Asset Editor and inheriting through `Parent`.
 
 | Field | Meaning |
 | --- | --- |
-| `Name` | Translation key of its fixed name, shown on the nameplate and in dialogues. A `Name` trait draws one per NPC instead. |
+| `Name` | Translation key of its fixed name, shown on the nameplate and in dialogues, in each player's language. A `Name` trait draws one per NPC instead. |
 | `Epithet` | Translation key of its fixed epithet, also the title of quests aimed at it. An `Epithet` trait draws one per NPC instead. |
 | `Portrait` | Portrait image shown in dialogues, a path relative to `Common/` under `Icons/`. |
 | `Uniqueness` | `None` (default): any number of NPCs carry it. `Alive`: one at a time, free again when it dies. `Forever`: one, and once dead it is never drawn again. |
