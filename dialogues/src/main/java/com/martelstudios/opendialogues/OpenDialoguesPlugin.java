@@ -195,8 +195,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         identityType = getEntityStoreRegistry().registerComponent(OpenDialoguesNPCIdentity.class, "OpenDialoguesNPCIdentity", OpenDialoguesNPCIdentity.CODEC);
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         universeCharactersType = Universe.registerResource(UniverseCharacters.class, "OpenDialoguesUniqueCharacters", UniverseCharacters.CODEC);
-        characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
         CharacterAssets characterAssets = CharacterAssets.live();
+        characterService = new CharacterService(characterAssets, NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
         ResourceType<EntityStore, CharacterPositions> positionsType = getEntityStoreRegistry().registerResource(CharacterPositions.class, "OpenDialoguesCharacterPositions", CharacterPositions.CODEC);
         CharacterPositionsAccess positions = new CharacterPositionsAccess(positionsType, characterService);
         characterMarkers = new CharacterMarkerProvider(positions, player -> historyRecorder.history(player), characterAssets::character);
@@ -280,6 +280,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     @Override
     protected void shutdown() {
         if (mapWatcher != null) PacketAdapters.deregisterInbound(mapWatcher);
+        if (characterMarkers != null && Universe.get() != null) Universe.get().getWorlds().values().forEach(world -> world.getWorldMapManager().getMarkerProviders().remove(CharacterMarkerProvider.ID, characterMarkers));
         super.shutdown();
     }
 

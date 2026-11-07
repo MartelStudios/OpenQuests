@@ -7,6 +7,7 @@ import com.hypixel.hytale.server.core.io.adapter.PacketAdapters;
 import com.hypixel.hytale.server.core.io.adapter.PacketFilter;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.events.AddWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
@@ -30,6 +31,7 @@ import java.util.UUID;
 public final class MapFeature {
 
     private final QuestTargets targets;
+    private final QuestTargetMarkerProvider provider;
     private final PacketFilter watcher;
 
     /**
@@ -39,7 +41,7 @@ public final class MapFeature {
     public MapFeature(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services, @Nonnull QuestTrackService tracks) {
         CompositeSteps steps = new CompositeSteps(services.getQuestProgressionService()::getQuest, OpenQuestAsset::getAsset);
         targets = new QuestTargets(services.getQuestProgressionService()::getQuest, steps, tracks::isTracked);
-        QuestTargetMarkerProvider provider = new QuestTargetMarkerProvider(targets, services.getQuestPlayerStateService()::getQuestStore);
+        provider = new QuestTargetMarkerProvider(targets, services.getQuestPlayerStateService()::getQuestStore);
 
         plugin.getEventRegistry().registerGlobal(AddWorldEvent.class, event -> event.getWorld().getWorldMapManager().addMarkerProvider(QuestTargetMarkerProvider.ID, provider));
         plugin.getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> provider.forget(event.getPlayerRef().getUuid()));
@@ -59,10 +61,11 @@ public final class MapFeature {
     }
 
     /**
-     * Stops following players' maps, as the packet watcher outlives the plugin otherwise.
+     * Stops following players' maps and leaves every world's map, as both outlive the plugin otherwise.
      */
     public void shutdown() {
         PacketAdapters.deregisterInbound(watcher);
+        if (Universe.get() != null) Universe.get().getWorlds().values().forEach(world -> world.getWorldMapManager().getMarkerProviders().remove(QuestTargetMarkerProvider.ID, provider));
     }
 
     private static void fireOnChange(@Nonnull JavaPlugin plugin, @Nonnull IEventBus events) {
