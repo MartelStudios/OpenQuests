@@ -1,7 +1,5 @@
 package com.martelstudios.opendialogues.map;
 
-import com.hypixel.hytale.component.ResourceType;
-import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
@@ -13,9 +11,9 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.worldmap.WorldMapManager;
 import com.hypixel.hytale.server.core.universe.world.worldmap.markers.MapMarkerBuilder;
 import com.hypixel.hytale.server.core.universe.world.worldmap.markers.MarkersCollector;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
-import com.martelstudios.opendialogues.characters.runtime.CharacterService;
+import com.martelstudios.opendialogues.characters.runtime.CharacterPositions;
+import com.martelstudios.opendialogues.characters.runtime.CharacterPositionsAccess;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 
 import javax.annotation.Nonnull;
@@ -55,8 +53,7 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
         }
     }
 
-    private final ResourceType<EntityStore, CharacterPositions> positionsType;
-    private final CharacterService characters;
+    private final CharacterPositionsAccess positions;
     private final Function<PlayerRef, DialogueHistory> histories;
     private final Function<String, OpenDialogueCharacterAsset> assets;
     private final List<CharacterStatusProvider> statusProviders = new CopyOnWriteArrayList<>();
@@ -67,12 +64,12 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     private final Set<UUID> mapOpen = ConcurrentHashMap.newKeySet();
 
     /**
+     * @param positions only read here: the scan and releases write them.
      * @param histories a player's dialogue history, read on their world thread, {@code null} elsewhere.
      * @param assets    finds a loaded character by id, {@code null} for one no pack declares.
      */
-    public CharacterMarkerProvider(@Nonnull ResourceType<EntityStore, CharacterPositions> positionsType, @Nonnull CharacterService characters, @Nonnull Function<PlayerRef, DialogueHistory> histories, @Nonnull Function<String, OpenDialogueCharacterAsset> assets) {
-        this.positionsType = positionsType;
-        this.characters = characters;
+    public CharacterMarkerProvider(@Nonnull CharacterPositionsAccess positions, @Nonnull Function<PlayerRef, DialogueHistory> histories, @Nonnull Function<String, OpenDialogueCharacterAsset> assets) {
+        this.positions = positions;
         this.histories = histories;
         this.assets = assets;
     }
@@ -114,16 +111,6 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     }
 
     /**
-     * @return a world's positions, first forgetting those a reset made stale; on the world thread.
-     */
-    @Nonnull
-    public CharacterPositions positions(@Nonnull Store<EntityStore> store) {
-        CharacterPositions positions = store.getResource(positionsType);
-        positions.catchUp(characters.universeRegistry().generation(), characters.worldRegistry(store).generation());
-        return positions;
-    }
-
-    /**
      * Runs on the world map thread: never reads a component, only schedules a recompute. The
      * server hands a {@code Player} alone, whose identity getters are all marked for removal.
      */
@@ -150,7 +137,7 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
             if (playerRef == null) return;
             if (!world.getWorldConfig().getUuid().equals(playerRef.getWorldUuid())) return;
             stale.remove(playerId);
-            CharacterPositions positions = positions(world.getEntityStore().getStore());
+            CharacterPositions positions = this.positions.positions(world.getEntityStore().getStore());
             positionsByWorld.put(world.getName(), positions);
             version = positions.version();
             built.put(playerId, build(world.getName(), version, positions.view(), histories.apply(playerRef), statuses(playerId)));

@@ -1,4 +1,4 @@
-package com.martelstudios.opendialogues.map;
+package com.martelstudios.opendialogues.characters.runtime;
 
 import org.joml.Vector3d;
 import org.junit.jupiter.api.Test;

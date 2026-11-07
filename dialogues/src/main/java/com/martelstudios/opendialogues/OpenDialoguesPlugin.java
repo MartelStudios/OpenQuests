@@ -13,7 +13,8 @@ import com.hypixel.hytale.server.core.io.adapter.PacketFilter;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.protocol.packets.worldmap.UpdateWorldMapVisible;
 import com.martelstudios.opendialogues.map.CharacterMarkerProvider;
-import com.martelstudios.opendialogues.map.CharacterPositions;
+import com.martelstudios.opendialogues.characters.runtime.CharacterPositions;
+import com.martelstudios.opendialogues.characters.runtime.CharacterPositionsAccess;
 import com.hypixel.hytale.server.core.universe.resources.UniverseResourceType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.HytaleServer;
@@ -197,8 +198,9 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         characterService = new CharacterService(CharacterAssets.live(), NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
         CharacterAssets characterAssets = CharacterAssets.live();
         ResourceType<EntityStore, CharacterPositions> positionsType = getEntityStoreRegistry().registerResource(CharacterPositions.class, "OpenDialoguesCharacterPositions", CharacterPositions.CODEC);
-        characterMarkers = new CharacterMarkerProvider(positionsType, characterService, player -> historyRecorder.history(player), characterAssets::character);
-        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings::get, characterService, characterMarkers::positions));
+        CharacterPositionsAccess positions = new CharacterPositionsAccess(positionsType, characterService);
+        characterMarkers = new CharacterMarkerProvider(positions, player -> historyRecorder.history(player), characterAssets::character);
+        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings::get, characterService, positions::positions));
         characterService.onUnanswered(NothingToSay::open);
         getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));
@@ -262,7 +264,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> characterMarkers.forget(event.getPlayerRef().getUuid()));
         getEventRegistry().registerGlobal(DialogueEvent.Closed.class, event -> characterMarkers.invalidate(event.getPlayer().getUuid()));
-        getEventRegistry().registerGlobal(CharacterEvent.Released.class, event -> characterMarkers.positions(event.getNpc().getStore()).forget(event.getUuid()));
+        getEventRegistry().registerGlobal(CharacterEvent.Released.class, event -> positions.positions(event.getNpc().getStore()).forget(event.getUuid()));
         getEventRegistry().registerGlobal(AddWorldEvent.class, event -> event.getWorld().getWorldMapManager().addMarkerProvider(CharacterMarkerProvider.ID, characterMarkers));
         mapWatcher = PacketAdapters.registerInbound((PlayerPacketWatcher) (player, packet) -> {
             if (packet instanceof UpdateWorldMapVisible visible) characterMarkers.setMapOpen(player.getUuid(), visible.visible);

@@ -16,7 +16,6 @@ import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.server.npc.role.support.WorldSupport;
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
-import com.martelstudios.opendialogues.map.CharacterPositions;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;

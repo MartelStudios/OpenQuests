@@ -1,4 +1,4 @@
-package com.martelstudios.opendialogues.map;
+package com.martelstudios.opendialogues.characters.runtime;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
