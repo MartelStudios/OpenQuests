@@ -6,9 +6,17 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.math.vector.Vector3dUtil;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.targets.QuestTarget;
+import com.martelstudios.openquests.core.targets.TargetedQuest;
 import org.joml.Vector3d;
 
-public class ReachLocationQuestAsset extends OpenQuestAsset {
+import javax.annotation.Nullable;
+
+/**
+ * Reach a spot within a radius. Shown on the map, and on the compass once tracked, unless the asset
+ * says {@code ShowOnMap: false}.
+ */
+public class ReachLocationQuestAsset extends OpenQuestAsset implements TargetedQuest {
 
     public static final BuilderCodec<ReachLocationQuestAsset> CODEC =
         BuilderCodec.builder(ReachLocationQuestAsset.class, ReachLocationQuestAsset::new, OpenQuestAsset.BASE_CODEC)
@@ -16,12 +24,21 @@ public class ReachLocationQuestAsset extends OpenQuestAsset {
             .add()
             .append(new KeyedCodec<>("Radius", Codec.DOUBLE), (asset, radius) -> asset.radius = radius, asset -> Double.valueOf(asset.radius))
             .add()
+            .append(new KeyedCodec<>("ShowOnMap", Codec.BOOLEAN), (asset, show) -> asset.showOnMap = show, asset -> asset.showOnMap)
+            .add()
             .build();
 
     protected Vector3d position;
     protected double radius;
+    protected boolean showOnMap = true;
 
-    private ReachLocationQuestAsset() {}
+    protected ReachLocationQuestAsset() {}
+
+    @Nullable
+    @Override
+    public QuestTarget target() {
+        return showOnMap && position != null ? new QuestTarget.Location(position) : null;
+    }
 
     @Override
     public AbstractQuestProgression.Builder<ReachLocationQuestProgression, ?> builder() {

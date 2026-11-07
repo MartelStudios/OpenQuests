@@ -43,6 +43,9 @@ import com.martelstudios.openquests.extension.rewards.grantquest.GrantQuestRewar
 import com.martelstudios.openquests.extension.rewards.item.ItemRewardFeature;
 import com.martelstudios.openquests.extension.rewards.random.RandomRewardFeature;
 import com.martelstudios.openquests.extension.track.QuestTrackService;
+import com.martelstudios.openquests.extension.map.MapFeature;
+import com.martelstudios.openquests.extension.map.QuestTargets;
+import com.hypixel.hytale.server.core.io.adapter.PacketAdapters;
 
 import javax.annotation.Nonnull;
 
@@ -52,8 +55,41 @@ import javax.annotation.Nonnull;
  */
 public class OpenQuestsPlugin extends JavaPlugin {
 
+    private static OpenQuestsPlugin instance;
+
+    private QuestTrackService tracks;
+
+    private MapFeature.Registered map;
+
     public OpenQuestsPlugin(@Nonnull JavaPluginInit init) {
         super(init);
+        instance = this;
+    }
+
+    public static OpenQuestsPlugin get() {
+        return instance;
+    }
+
+    /**
+     * @return which quests each player tracks, for mods drawing them.
+     */
+    @Nonnull
+    public QuestTrackService getTrackService() {
+        return tracks;
+    }
+
+    /**
+     * @return where each player's running quests lead, for mods showing it.
+     */
+    @Nonnull
+    public QuestTargets getQuestTargets() {
+        return map.targets();
+    }
+
+    @Override
+    protected void shutdown() {
+        if (map != null) PacketAdapters.deregisterInbound(map.watcher());
+        super.shutdown();
     }
 
     @Override
@@ -65,7 +101,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
 
         // Shared machinery, before the types that declare themselves to it
         ListenerFeature.register(this, services);
-        QuestTrackService tracks = new QuestTrackService(services.getQuestProgressionService(), services.getQuestPlayerStateService(), services.events());
+        tracks = new QuestTrackService(services.getQuestProgressionService(), services.getQuestPlayerStateService(), services.events());
 
         // Quests
         GatherFeature.register(this, services);
@@ -79,6 +115,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         CompositeFeature.register(this, services);
         HudFeature.register(this, services, tracks);
         JournalFeature.register(this, services, tracks);
+        map = MapFeature.register(this, services, tracks);
         FeedbackFeature.register(this, services);
         KillFeature.register(this, services);
         CraftFeature.register(this, services);
