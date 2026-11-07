@@ -45,7 +45,7 @@ their own, a dialogue on F, and a place in your quests. Keep one unique for the 
 characters drawn by weight, and choose where each appears, down to an instance like the Forgotten Temple.
 
 🗺️ **On the map.** Characters a player has met show on their world map with their name; one can show from the start,
-or never.
+or never. A key character can also show on the compass of every player nearby.
 
 🖱️ **Opened from the world.** Press F on an NPC, use an item, run a command: each opens a dialogue.
 

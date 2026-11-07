@@ -2,6 +2,7 @@ package com.martelstudios.opendialogues.map;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Transform;
+import com.hypixel.hytale.protocol.Position;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
@@ -15,6 +16,7 @@ import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.runtime.CharacterPositions;
 import com.martelstudios.opendialogues.characters.runtime.CharacterPositionsAccess;
 import com.martelstudios.opendialogues.history.DialogueHistory;
+import org.joml.Vector3d;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -46,9 +48,15 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     /**
      * How one character's NPCs show to a player.
      *
-     * @param epithet the name of an NPC that drew none, {@code null} for none.
+     * @param epithet      the name of an NPC that drew none, {@code null} for none.
+     * @param compassRange within how many blocks an NPC also shows on the compass, {@code 0} for none.
      */
-    record Look(@Nonnull CharacterMarkerRule.Shown shown, @Nullable String epithet) {}
+    record Look(@Nonnull CharacterMarkerRule.Shown shown, @Nullable String epithet, double compassRange) {}
+
+    /**
+     * A marker the compass shows only while the player stands within {@code range} blocks of it.
+     */
+    record Near(@Nonnull MapMarker marker, double range) {}
 
     /**
      * Which characters a player sees in one world, told by UUID so a world recreated under the same
@@ -65,13 +73,23 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
      *
      * @param undecided whether some NPC carries a character the decision did not judge.
      */
-    record Built(@Nonnull Seen from, int version, @Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass, boolean undecided) {
+    record Built(@Nonnull Seen from, int version, @Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass, @Nonnull List<Near> near, boolean undecided) {
 
         /**
          * A closed map shows nothing but the compass, which shows every marker it is given.
+         *
+         * @param player where the player stands, which brings the {@link Near} markers in range.
          */
-        void replay(boolean mapOpen, @Nonnull MarkersCollector collector) {
-            for (MapMarker marker : mapOpen ? all : compass) collector.addIgnoreViewDistance(marker);
+        void replay(boolean mapOpen, @Nonnull Vector3d player, @Nonnull MarkersCollector collector) {
+            if (mapOpen) {
+                for (MapMarker marker : all) collector.addIgnoreViewDistance(marker);
+                return;
+            }
+            for (MapMarker marker : compass) collector.addIgnoreViewDistance(marker);
+            for (Near near : near) {
+                Position at = near.marker().transform.position;
+                if (player.distanceSquared(at.x, at.y, at.z) <= near.range() * near.range()) collector.addIgnoreViewDistance(near.marker());
+            }
         }
     }
 
@@ -160,7 +178,8 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
         }
         PlayerMarkers entry = markers;
         Built built = follow(entry, world.getWorldConfig().getUuid(), () -> world.execute(() -> settle(playerId, entry, world.getWorldConfig().getUuid(), () -> decide(world, playerId, entry))));
-        if (built != null) built.replay(entry.mapOpen, collector);
+        // The transform is a plain field the world thread writes: a torn read only misjudges one call
+        if (built != null) built.replay(entry.mapOpen, playerRef.getTransform().getPosition(), collector);
     }
 
     /**
@@ -258,7 +277,7 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
             OpenDialogueCharacterAsset character = assets.apply(characterId);
             if (character == null) continue;
             CharacterMarkerRule.Shown shown = CharacterMarkerRule.resolve(character.getMapVisibility(), character.getMapIcon(), met.test(characterId), CharacterMarkerRule.merge(statuses.getOrDefault(characterId, List.of())));
-            if (shown != null) looks.put(characterId, new Look(shown, character.getEpithet()));
+            if (shown != null) looks.put(characterId, new Look(shown, character.getEpithet(), character.getCompassRange()));
         }
         return Map.copyOf(looks);
     }
@@ -270,6 +289,7 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     static Built join(@Nonnull Seen seen, int version, @Nonnull Map<String, Collection<CharacterPositions.Spot>> spots) {
         List<MapMarker> all = new ArrayList<>();
         List<MapMarker> compass = new ArrayList<>();
+        List<Near> near = new ArrayList<>();
         boolean undecided = false;
         for (Map.Entry<String, Collection<CharacterPositions.Spot>> entry : spots.entrySet()) {
             Look look = seen.shown.get(entry.getKey());
@@ -278,19 +298,21 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
                 continue;
             }
             for (CharacterPositions.Spot spot : entry.getValue()) {
-                MapMarker marker = marker(spot, look.shown(), spot.name() != null ? spot.name() : look.epithet());
+                MapMarker marker = marker(spot, look, spot.name() != null ? spot.name() : look.epithet());
                 all.add(marker);
                 if (look.shown().onCompass()) compass.add(marker);
+                else if (look.compassRange() > 0) near.add(new Near(marker, look.compassRange()));
             }
         }
-        return new Built(seen, version, List.copyOf(all), List.copyOf(compass), undecided);
+        return new Built(seen, version, List.copyOf(all), List.copyOf(compass), List.copyOf(near), undecided);
     }
 
     @Nonnull
-    private static MapMarker marker(@Nonnull CharacterPositions.Spot spot, @Nonnull CharacterMarkerRule.Shown shown, @Nullable String name) {
+    private static MapMarker marker(@Nonnull CharacterPositions.Spot spot, @Nonnull Look look, @Nullable String name) {
+        CharacterMarkerRule.Shown shown = look.shown();
         MapMarkerBuilder builder = new MapMarkerBuilder("OpenDialogues:" + spot.npc(), shown.image(), new Transform(spot.position()));
         if (name != null) builder.withName(Message.translation(name));
-        if (shown.onCompass()) builder.withCompassImage(shown.image());
+        if (shown.onCompass() || look.compassRange() > 0) builder.withCompassImage(shown.image());
         return builder.build();
     }
 }

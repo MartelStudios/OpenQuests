@@ -109,6 +109,7 @@ the Asset Editor and inheriting through `Parent`.
 | `Scope` | `World` (default): uniqueness counts per world. `Universe`: across every world and instance. |
 | `MapVisibility` | When its NPCs show on a player's map. `WhenMet` (default): once the player talked to it, or while a running quest leads to it. `Always`: as soon as an NPC carries it. `Never`: not even for a quest. |
 | `MapIcon` | The map image, a path under `UI/WorldMap/MapMarkers/` (`MyPack/Seer.png`). Default `Coordinate.png`. |
+| `CompassRange` | Within how many blocks a player also sees its NPCs on the compass, while they show on the map. Pair with `Always` to guide players to a key character. Default `0`: only a tracked quest puts it there. |
 | `Traits` | What the character does. `Dialogue` opens `Dialogue` (`{ "Dialogue": … }` or `{ "Router": … }`) on F, spoken by `Speaker`. `Name` draws a name from `Names`, a name list id or one written inline. |
 
 ```json
