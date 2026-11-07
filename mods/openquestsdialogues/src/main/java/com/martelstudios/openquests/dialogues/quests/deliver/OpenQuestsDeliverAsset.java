@@ -11,6 +11,9 @@ import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
+import com.martelstudios.openquests.core.targets.QuestTarget;
+import com.martelstudios.openquests.core.targets.TargetedQuest;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -18,7 +21,7 @@ import javax.annotation.Nullable;
  * Bring items to an NPC character, in one go or several. F on the character shows a delivery
  * screen before its normal behaviour while the player carries something still missing.
  */
-public class OpenQuestsDeliverAsset extends QuantityQuestAsset {
+public class OpenQuestsDeliverAsset extends QuantityQuestAsset implements TargetedQuest {
 
     /**
      * One requested item and how many of it.
@@ -100,6 +103,12 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset {
      */
     public String getCharacter() {
         return character;
+    }
+
+    @Nullable
+    @Override
+    public QuestTarget target() {
+        return character == null ? null : new QuestTarget.Character(character);
     }
 
     /**
