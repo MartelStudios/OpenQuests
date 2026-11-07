@@ -27,6 +27,9 @@ quest.default.walk-for = Marchez pendant {quantity, plural, one {une seconde} ot
 quest.default.run-for = Courez pendant {quantity, plural, one {une seconde} other {{quantity, number} secondes}}
 quest.default.sprint-for = Sprintez pendant {quantity, plural, one {une seconde} other {{quantity, number} secondes}}
 quest.default.jump = Sautez {quantity, plural, one {une fois} other {{quantity, number} fois}}
+quest.default.cast-spell = Lancez {spell} {quantity, plural, one {une fois} other {{quantity, number} fois}}
+quest.default.any-spell = un sort
+quest.default.keyword-spell = un sort ({keyword})
 
 page.title = Journal de quêtes
 page.empty = Rien pour l'instant.
