@@ -86,8 +86,8 @@ public final class CharacterFixtures {
      * @param leads whether a dialogue, router or other asset id is declared.
      */
     @Nonnull
-    public static CharacterAssets assets(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull Map<String, OpenDialogueNameListAsset> nameLists, @Nonnull Map<String, OpenDialogueSpeakerAsset> speakers, @Nonnull Predicate<String> leads) {
-        return new CharacterAssets(characters::get, characters::values, () -> distributions, nameLists::get, speakers::get, (type, id) -> leads.test(id));
+    public static CharacterAssets assets(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull Map<String, OpenDialogueTextListAsset> textLists, @Nonnull Map<String, OpenDialogueSpeakerAsset> speakers, @Nonnull Predicate<String> leads) {
+        return new CharacterAssets(characters::get, characters::values, () -> distributions, textLists::get, speakers::get, (type, id) -> leads.test(id));
     }
 
     /**

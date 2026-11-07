@@ -24,7 +24,7 @@ class TraitsTest {
 
     @Test
     void nameTraitDrawsWithContextRandom() {
-        OpenDialogueNameListAsset list = CodecJson.decode(OpenDialogueNameListAsset.CODEC, "{ \"Names\": [\"npc.a\", \"npc.b\", \"npc.c\"] }");
+        OpenDialogueTextListAsset list = CodecJson.decode(OpenDialogueTextListAsset.CODEC, "{ \"Texts\": [\"npc.a\", \"npc.b\", \"npc.c\"] }");
         CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of("List", list), Map.of(), id -> true);
         CharacterTrait name = CharacterFixtures.trait("{ \"Type\": \"Name\", \"Names\": \"List\" }");
         OpenDialoguesNPCIdentity identity = new OpenDialoguesNPCIdentity();

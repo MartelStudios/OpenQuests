@@ -17,7 +17,7 @@ class ValidatorTest {
         CharacterFixtures.registerFilters();
     }
 
-    private static final OpenDialogueNameListAsset EMPTY_LIST = CodecJson.decode(OpenDialogueNameListAsset.CODEC, "{ \"Names\": [] }");
+    private static final OpenDialogueTextListAsset EMPTY_LIST = CodecJson.decode(OpenDialogueTextListAsset.CODEC, "{ \"Names\": [] }");
 
     @Test
     void distributionNamingUnknownCharacter() {

@@ -17,14 +17,14 @@ import java.util.function.Supplier;
  * @param characterById    a character by id, {@code null} for one no pack declares.
  * @param allCharacters    every character loaded.
  * @param allDistributions every distribution loaded.
- * @param nameListById     a name list by id, {@code null} for one no pack declares.
+ * @param textListById     a text list by id, {@code null} for one no pack declares.
  * @param speakerById      a speaker by id, {@code null} for one no pack declares.
  * @param declared         whether a pack declares an asset of that class under that id.
  */
 public record CharacterAssets(@Nonnull Function<String, OpenDialogueCharacterAsset> characterById,
                               @Nonnull Supplier<Collection<OpenDialogueCharacterAsset>> allCharacters,
                               @Nonnull Supplier<Collection<OpenDialogueDistributionAsset>> allDistributions,
-                              @Nonnull Function<String, OpenDialogueNameListAsset> nameListById,
+                              @Nonnull Function<String, OpenDialogueTextListAsset> textListById,
                               @Nonnull Function<String, OpenDialogueSpeakerAsset> speakerById,
                               @Nonnull BiPredicate<Class<?>, String> declared) {
 
@@ -36,7 +36,7 @@ public record CharacterAssets(@Nonnull Function<String, OpenDialogueCharacterAss
         return new CharacterAssets(OpenDialogueCharacterAsset::getCharacter,
                                    () -> OpenDialogueCharacterAsset.getAssetStore().getAssetMap().getAssetMap().values(),
                                    () -> OpenDialogueDistributionAsset.getAssetStore().getAssetMap().getAssetMap().values(),
-                                   OpenDialogueNameListAsset::getNameList,
+                                   OpenDialogueTextListAsset::getTextList,
                                    OpenDialogueSpeakerAsset::getSpeaker,
                                    CharacterAssets::declaredInStore);
     }
@@ -58,11 +58,11 @@ public record CharacterAssets(@Nonnull Function<String, OpenDialogueCharacterAss
     }
 
     /**
-     * @return the name list under that id, {@code null} for one no pack declares.
+     * @return the text list under that id, {@code null} for one no pack declares.
      */
     @Nullable
-    public OpenDialogueNameListAsset nameList(@Nonnull String id) {
-        return nameListById.apply(id);
+    public OpenDialogueTextListAsset textList(@Nonnull String id) {
+        return textListById.apply(id);
     }
 
     /**

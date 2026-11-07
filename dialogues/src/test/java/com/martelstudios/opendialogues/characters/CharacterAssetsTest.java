@@ -48,11 +48,11 @@ class CharacterAssetsTest {
     }
 
     @Test
-    void nameListDecodesKeys() {
-        OpenDialogueNameListAsset names = CodecJson.decode(OpenDialogueNameListAsset.CODEC, "{ \"Names\": [\"npc.mira\", \"npc.oak\"] }");
+    void textListDecodesKeys() {
+        OpenDialogueTextListAsset texts = CodecJson.decode(OpenDialogueTextListAsset.CODEC, "{ \"Texts\": [\"npc.mira\", \"npc.oak\"] }");
 
-        assertNotNull(names);
-        assertEquals(2, names.getNames().length);
+        assertNotNull(texts);
+        assertEquals(2, texts.getTexts().length);
     }
 
     @Test

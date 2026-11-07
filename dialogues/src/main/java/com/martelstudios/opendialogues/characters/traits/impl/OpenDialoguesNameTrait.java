@@ -8,7 +8,7 @@ import com.hypixel.hytale.server.core.modules.entity.component.DisplayNameCompon
 import com.hypixel.hytale.server.core.modules.entity.component.PersistentDisplayName;
 import com.hypixel.hytale.server.core.modules.i18n.I18nModule;
 import com.martelstudios.opendialogues.characters.CharacterAssets;
-import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueTextListAsset;
 import com.martelstudios.opendialogues.characters.ReleaseReason;
 import com.martelstudios.opendialogues.characters.traits.CharacterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
@@ -28,7 +28,7 @@ public class OpenDialoguesNameTrait extends CharacterTrait {
     public static final String TYPE = "Name";
 
     public static final BuilderCodec<OpenDialoguesNameTrait> CODEC = BuilderCodec.builder(OpenDialoguesNameTrait.class, OpenDialoguesNameTrait::new, CharacterTrait.BASE_CODEC)
-                                                                                 .append(new KeyedCodec<>("Names", OpenDialogueNameListAsset.CONTAINED_CODEC), (trait, names) -> trait.names = names, trait -> trait.names)
+                                                                                 .append(new KeyedCodec<>("Names", OpenDialogueTextListAsset.CONTAINED_CODEC), (trait, names) -> trait.names = names, trait -> trait.names)
                                                                                  .add()
                                                                                  .build();
 
@@ -47,9 +47,9 @@ public class OpenDialoguesNameTrait extends CharacterTrait {
 
     @Override
     public void onAssigned(@Nonnull CharacterContext context) {
-        OpenDialogueNameListAsset list = names == null ? null : context.assets().nameList(names);
-        if (list == null || list.getNames().length == 0) return;
-        context.identity().setName(list.getNames()[context.random().nextInt(list.getNames().length)]);
+        OpenDialogueTextListAsset list = names == null ? null : context.assets().textList(names);
+        if (list == null || list.getTexts().length == 0) return;
+        context.identity().setName(list.getTexts()[context.random().nextInt(list.getTexts().length)]);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class OpenDialoguesNameTrait extends CharacterTrait {
 
     @Override
     public void validate(@Nonnull CharacterAssets assets, @Nonnull Consumer<String> problems) {
-        OpenDialogueNameListAsset list = names == null ? null : assets.nameList(names);
-        if (list == null || list.getNames().length == 0) problems.accept("draws its name from an unknown or empty list '" + names + "'");
+        OpenDialogueTextListAsset list = names == null ? null : assets.textList(names);
+        if (list == null || list.getTexts().length == 0) problems.accept("draws its name from an unknown or empty list '" + names + "'");
     }
 }

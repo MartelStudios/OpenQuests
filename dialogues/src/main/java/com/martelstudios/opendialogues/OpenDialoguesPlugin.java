@@ -36,7 +36,7 @@ import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
-import com.martelstudios.opendialogues.characters.OpenDialogueNameListAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueTextListAsset;
 import com.martelstudios.opendialogues.characters.CharacterAssets;
 import com.martelstudios.opendialogues.characters.CharacterValidator;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
@@ -236,10 +236,10 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .setCodec(OpenDialogueSpeakerAsset.CODEC)
                                                     .setKeyFunction(OpenDialogueSpeakerAsset::getId)
                                                     .build());
-        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueNameListAsset.class, new DefaultAssetMap<>())
-                                                    .setPath("OpenDialogues/Names/")
-                                                    .setCodec(OpenDialogueNameListAsset.CODEC)
-                                                    .setKeyFunction(OpenDialogueNameListAsset::getId)
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueTextListAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenDialogues/TextLists/")
+                                                    .setCodec(OpenDialogueTextListAsset.CODEC)
+                                                    .setKeyFunction(OpenDialogueTextListAsset::getId)
                                                     .build());
         getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueCharacterAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenDialogues/Characters/")
