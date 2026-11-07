@@ -32,7 +32,7 @@ public class ReachLocationQuestAsset extends OpenQuestAsset implements TargetedQ
     protected double radius;
     protected boolean showOnMap = true;
 
-    protected ReachLocationQuestAsset() {}
+    private ReachLocationQuestAsset() {}
 
     @Nullable
     @Override
