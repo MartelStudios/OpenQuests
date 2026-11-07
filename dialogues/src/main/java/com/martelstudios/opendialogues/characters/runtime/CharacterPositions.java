@@ -73,6 +73,7 @@ public class CharacterPositions implements Resource<EntityStore> {
     private final Map<UUID, Placed> npcs = new ConcurrentHashMap<>();
     private volatile int universeGeneration;
     private volatile int worldGeneration;
+    /** Bumped by the world thread alone, its only writer, so the unatomic increment loses nothing. */
     private volatile int version;
 
     /**
