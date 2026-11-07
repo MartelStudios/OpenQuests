@@ -94,8 +94,9 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
     }
 
     /**
-     * Quest stores are safe from any thread, so the list is computed right here. A closed map
-     * shows nothing but the compass, which shows every marker it is given.
+     * Computed here: quests are written from any world's thread anyway, and the invalidation passing
+     * through a concurrent map orders this read after the write that fired it. A closed map shows
+     * only the compass, which shows every marker it gets.
      */
     @SuppressWarnings("removal")
     @Override
