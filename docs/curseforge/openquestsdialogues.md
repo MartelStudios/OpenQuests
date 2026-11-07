@@ -27,6 +27,9 @@ delivery, your own dialogue or a generated one, and items can be handed over a f
 village mage" works whichever NPC became the mage. A quest aimed at a character unique for the whole server fails on
 its own if that character is lost for good.
 
+🗺️ **On the map.** While such a quest runs, its character shows on the map with a "to turn in" mark, and on the compass
+while the quest is tracked.
+
 ### 🎬 Answer actions
 
 📜 **`AssignQuest`** hands the player a quest, named by id or written right there in the dialogue. The quest's own

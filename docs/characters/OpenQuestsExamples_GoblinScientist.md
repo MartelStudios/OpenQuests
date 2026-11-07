@@ -4,6 +4,7 @@
 
 - **Id:** `OpenQuestsExamples_GoblinScientist` (OpenQuestsExamples pack).
 - **Uniqueness:** `Forever`, **Scope:** `Universe`.
+- **Map:** `Always`: the lab foreman is who a newcomer looks for, so the map shows her as soon as an NPC carries her.
 - **Carrier:** `Goblin_Scientist` ("Goblin Makinomagistra" / "Gobelin machinarque"), friendly and
   invulnerable, who directs the vanilla lab repairs.
 - **Distribution:** `OpenQuestsExamples_GoblinScientist`, filters `Role` and `World`

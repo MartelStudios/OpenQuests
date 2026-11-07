@@ -4,6 +4,7 @@
 
 - **Id:** `OpenQuestsExamples_TempleStag` (OpenQuestsExamples pack).
 - **Uniqueness:** `Forever`, **Scope:** `Universe`.
+- **Map:** `Never`: finding the stag is part of his charm, so no map or quest shows where he grazes.
 - **Carrier:** `Temple_Deer_Stag`, the antlered temple deer: invulnerable and not timid
   (`Template_Temple`), unlike the overworld deer that flee players.
 - **Distribution:** `OpenQuestsExamples_TempleStag`, filters `Role` and `World`

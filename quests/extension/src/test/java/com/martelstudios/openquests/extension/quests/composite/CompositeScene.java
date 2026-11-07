@@ -1,11 +1,13 @@
 package com.martelstudios.openquests.extension.quests.composite;
 
+import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.models.QuestStateVersion;
 import com.martelstudios.openquests.core.models.QuestVisibility;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,8 +17,9 @@ import java.util.UUID;
 
 /**
  * A group off a server: no store and no asset map behind it, so it answers both lookups itself.
+ * Public so tests of other packages build groups without subclassing the asset.
  */
-final class CompositeScene {
+public final class CompositeScene {
 
     private final Map<UUID, AbstractQuestProgression<?>> quests = new HashMap<>();
     private final Map<String, OpenQuestAsset> assets = new HashMap<>();
@@ -24,7 +27,56 @@ final class CompositeScene {
     final Group group;
 
     CompositeScene(CompositeQuestAsset.Operator operator) {
-        this.group = new Group(new TestAsset(operator, QuestVisibility.ALWAYS, "group"));
+        this(operator, QuestVisibility.ALWAYS);
+    }
+
+    /**
+     * A running group with no step yet, itself found by {@link #quest}.
+     */
+    public CompositeScene(@Nonnull CompositeQuestAsset.Operator operator, @Nonnull QuestVisibility visibility) {
+        this.group = new Group(new TestAsset(operator, visibility, "group"));
+        quests.put(group.getId(), group);
+    }
+
+    /**
+     * @return the group's run.
+     */
+    @Nonnull
+    public CompositeQuestProgression group() {
+        return group;
+    }
+
+    /**
+     * Adds a running step carrying that asset.
+     *
+     * @return the step's run.
+     */
+    @Nonnull
+    public AbstractQuestProgression<?> step(@Nonnull OpenQuestAsset asset) {
+        String id = "step" + group.asset.getAssetIds().length;
+        assets.put(id, asset);
+        Step step = new Step(asset);
+        quests.put(step.getId(), step);
+        group.adopt(step);
+        group.asset.addStep(id);
+        return step;
+    }
+
+    /**
+     * Puts a constraint on the group's asset.
+     */
+    @Nonnull
+    public CompositeScene constrain(@Nonnull QuestConstraint constraint) {
+        group.asset.constrain(constraint);
+        return this;
+    }
+
+    /**
+     * @return a run of the scene, the group or a step still in the store, {@code null} for another.
+     */
+    @Nullable
+    public AbstractQuestProgression<?> quest(@Nonnull UUID questId) {
+        return quests.get(questId);
     }
 
     /** Adds a step still in the store. */
@@ -43,7 +95,11 @@ final class CompositeScene {
         return this;
     }
 
-    CompositeSteps steps() {
+    /**
+     * @return the steps lookup a list of this group is judged by.
+     */
+    @Nonnull
+    public CompositeSteps steps() {
         return new CompositeSteps(quests::get, assets::get);
     }
 
@@ -72,6 +128,20 @@ final class CompositeScene {
         }
     }
 
+    /** A step that is not a group, reading the asset it carries. */
+    static final class Step extends AbstractQuestProgression<Step> {
+        private final OpenQuestAsset asset;
+
+        Step(OpenQuestAsset asset) {
+            this.asset = asset;
+        }
+
+        @Override
+        public OpenQuestAsset getAsset() {
+            return asset;
+        }
+    }
+
     static final class TestAsset extends CompositeQuestAsset {
         TestAsset(Operator operator, QuestVisibility visibility, String id) {
             this.operator = operator;
@@ -82,6 +152,10 @@ final class CompositeScene {
         void addStep(String stepId) {
             assetIds = Arrays.copyOf(assetIds, assetIds.length + 1);
             assetIds[assetIds.length - 1] = stepId;
+        }
+
+        void constrain(QuestConstraint constraint) {
+            constraints = new QuestConstraint[]{constraint};
         }
     }
 }

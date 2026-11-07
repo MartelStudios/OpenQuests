@@ -9,6 +9,9 @@ import com.martelstudios.opendialogues.history.DialogueHistory;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
+import com.martelstudios.openquests.core.targets.QuestTarget;
+import com.martelstudios.openquests.core.targets.TargetedQuest;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -18,7 +21,7 @@ import java.util.Objects;
  * each narrow what counts and are all optional, so none counts any conversation. With
  * {@code UseHistory}, what the player did before the quest counts too.
  */
-public class OpenQuestsDialogueAsset extends QuantityQuestAsset {
+public class OpenQuestsDialogueAsset extends QuantityQuestAsset implements TargetedQuest {
 
     public static final BuilderCodec<OpenQuestsDialogueAsset> CODEC =
         BuilderCodec.builder(OpenQuestsDialogueAsset.class, OpenQuestsDialogueAsset::new, QuantityQuestAsset.BASE_CODEC)
@@ -72,6 +75,12 @@ public class OpenQuestsDialogueAsset extends QuantityQuestAsset {
     @Nullable
     public String getCharacter() {
         return character;
+    }
+
+    @Nullable
+    @Override
+    public QuestTarget target() {
+        return character == null ? null : new QuestTarget.Character(character);
     }
 
     @Nullable

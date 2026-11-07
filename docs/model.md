@@ -418,6 +418,7 @@ classDiagram
         class ReachLocationQuestAsset {
             Vector3d position
             double radius
+            boolean showOnMap
         }
         class ReachLocationQuestProgression
         class QuestStateQuestAsset {

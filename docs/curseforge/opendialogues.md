@@ -44,6 +44,9 @@ greets a newcomer and a regular differently.
 their own, a dialogue on F, and a place in your quests. Keep one unique for the whole server, give a role a few
 characters drawn by weight, and choose where each appears, down to an instance like the Forgotten Temple.
 
+🗺️ **On the map.** Characters a player has met show on their world map with their name; one can show from the start,
+or never.
+
 🖱️ **Opened from the world.** Press F on an NPC, use an item, run a command: each opens a dialogue.
 
 🛡️ **Checked at boot.** A missing dialogue or a router going round in circles is logged when assets load, not met by a
