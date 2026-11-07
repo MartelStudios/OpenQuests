@@ -297,6 +297,12 @@ classDiagram
         class GatherQuestProgression {
             QuestItemFilter itemToGather
         }
+        class CastSpellQuestAsset {
+            QuestSpellFilter spellToCast
+        }
+        class CastSpellQuestProgression {
+            QuestSpellFilter spellToCast
+        }
         class ConsumeItemQuestAsset {
             QuestItemFilter itemToConsume
         }
@@ -432,6 +438,8 @@ classDiagram
     QuantityQuestProgression <|-- GatherQuestProgression
     QuantityQuestAsset <|-- ConsumeItemQuestAsset
     QuantityQuestProgression <|-- ConsumeItemQuestProgression
+    QuantityQuestAsset <|-- CastSpellQuestAsset
+    QuantityQuestProgression <|-- CastSpellQuestProgression
     QuantityQuestAsset <|-- CraftQuestAsset
     QuantityQuestProgression <|-- CraftQuestProgression
     QuantityQuestAsset <|-- InteractivelyPickupQuestAsset

@@ -27,6 +27,9 @@ quest.default.walk-for = Walk for {quantity, plural, one {a second} other {{quan
 quest.default.run-for = Run for {quantity, plural, one {a second} other {{quantity, number} seconds}}
 quest.default.sprint-for = Sprint for {quantity, plural, one {a second} other {{quantity, number} seconds}}
 quest.default.jump = Jump {quantity, plural, one {once} other {{quantity, number} times}}
+quest.default.cast-spell = Cast {spell} {quantity, plural, one {once} other {{quantity, number} times}}
+quest.default.any-spell = a spell
+quest.default.keyword-spell = a spell ({keyword})
 
 page.title = Quest journal
 page.empty = Nothing here yet.

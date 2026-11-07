@@ -15,6 +15,7 @@ import com.martelstudios.openquests.extension.journal.JournalFeature;
 import com.martelstudios.openquests.extension.listener.ListenerFeature;
 import com.martelstudios.openquests.extension.quests.breakblock.BreakBlockFeature;
 import com.martelstudios.openquests.extension.quests.composite.CompositeFeature;
+import com.martelstudios.openquests.extension.quests.castspell.CastSpellFeature;
 import com.martelstudios.openquests.extension.quests.consumeitem.ConsumeItemFeature;
 import com.martelstudios.openquests.extension.quests.craft.CraftFeature;
 import com.martelstudios.openquests.extension.quests.dropitem.DropItemFeature;
@@ -82,6 +83,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         BreakBlockFeature.register(this, services);
         PlaceBlockFeature.register(this, services);
         ConsumeItemFeature.register(this, services);
+        CastSpellFeature.register(this, services);
         UseEntityFeature.register(this, services);
         QuestStateFeature.register(this, services);
         MovementFeature.register(this, services);

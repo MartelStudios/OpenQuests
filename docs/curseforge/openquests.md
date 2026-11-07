@@ -92,6 +92,7 @@ the chapter's file is written for you.
 | <code>InteractivelyPickup</code>                         | Picking a quantity up by hand                                      |
 | <code>Craft</code>                                       | Crafting a quantity of an item, whatever the recipe                |
 | <code>Consume</code>                                     | Eating or drinking a quantity of an item                           |
+| <code>CastSpell</code>                                   | Casting spells, any or named by rune or keyword                    |
 | <code>DropItem</code>                                    | Throwing a quantity of an item out of the inventory                |
 | <code>PickupItem</code>                                  | Picking a quantity of an item up, off the ground or by hand        |
 | <code>BreakBlock</code>                                  | Breaking a number of blocks                                        |
