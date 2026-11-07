@@ -9,9 +9,10 @@ import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.world.events.AddWorldEvent;
 import com.martelstudios.openquests.core.OpenQuestsServices;
-import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
+import com.martelstudios.openquests.core.events.QuestStateChangedEvent;
+import com.martelstudios.openquests.core.events.QuestUpdatedEvent;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.openquests.extension.map.events.PlayerQuestTargetsChangedEvent;
@@ -66,7 +67,9 @@ public final class MapFeature {
 
     private static void fireOnChange(@Nonnull JavaPlugin plugin, @Nonnull IEventBus events) {
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, event -> fire(events, event.getPlayerId()));
-        plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, event -> event.getQuest().getPlayers().forEach(player -> fire(events, player)));
+        // Progress counts too: a step listed once its group progressed appears then
+        plugin.getEventRegistry().registerGlobal(QuestStateChangedEvent.class, event -> event.getQuest().getPlayers().forEach(player -> fire(events, player)));
+        plugin.getEventRegistry().registerGlobal(QuestUpdatedEvent.class, event -> event.getQuest().getPlayers().forEach(player -> fire(events, player)));
         plugin.getEventRegistry().registerGlobal(QuestPlayerAbandonedEvent.class, event -> fire(events, event.getPlayerId()));
         plugin.getEventRegistry().registerGlobal(QuestPlayerRemovedEvent.class, event -> fire(events, event.getPlayerId()));
         plugin.getEventRegistry().registerGlobal(QuestTrackedEvent.class, event -> fire(events, event.getPlayerId()));

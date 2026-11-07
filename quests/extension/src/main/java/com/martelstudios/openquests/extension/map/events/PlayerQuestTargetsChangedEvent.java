@@ -6,8 +6,8 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * Fired when what a player's running quests lead to may have changed: a quest added, ended,
- * abandoned, tracked or untracked. Whatever shows those targets computes them again. Keyed by
+ * Fired when what a player's running quests lead to may have changed: a quest added, progressed,
+ * ended, abandoned, tracked or untracked. Whatever shows those targets computes them again. Keyed by
  * nothing, as listeners care about every player.
  */
 public class PlayerQuestTargetsChangedEvent implements IEvent<Void> {
