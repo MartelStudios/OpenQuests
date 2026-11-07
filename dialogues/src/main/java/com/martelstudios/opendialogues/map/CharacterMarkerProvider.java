@@ -41,9 +41,12 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     /**
-     * A player's markers, as computed in one world from one version of its positions.
+     * A player's markers, as computed in one world from one version of its positions. The world is
+     * told by UUID and its positions held, so a world recreated under the same name is not mistaken for it.
+     *
+     * @param positions {@code null} when the computation failed before reading them.
      */
-    record Built(@Nonnull String world, int version, @Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass) {
+    record Built(@Nonnull UUID world, @Nullable CharacterPositions positions, int version, @Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass) {
 
         /**
          * A closed map shows nothing but the compass, which shows every marker it is given.
@@ -58,7 +61,6 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     private final Function<String, OpenDialogueCharacterAsset> assets;
     private final List<CharacterStatusProvider> statusProviders = new CopyOnWriteArrayList<>();
     private final Map<UUID, Built> built = new ConcurrentHashMap<>();
-    private final Map<String, CharacterPositions> positionsByWorld = new ConcurrentHashMap<>();
     private final Set<UUID> stale = ConcurrentHashMap.newKeySet();
     private final Set<UUID> pending = ConcurrentHashMap.newKeySet();
     private final Set<UUID> mapOpen = ConcurrentHashMap.newKeySet();
@@ -119,9 +121,8 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     public void update(@Nonnull World world, @Nonnull Player player, @Nonnull MarkersCollector collector) {
         UUID playerId = player.getPlayerRef().getUuid();
         Built current = built.get(playerId);
-        boolean here = current != null && current.world.equals(world.getName());
-        CharacterPositions positions = positionsByWorld.get(world.getName());
-        boolean fresh = here && positions != null && current.version == positions.version() && !stale.contains(playerId);
+        boolean here = current != null && current.world.equals(world.getWorldConfig().getUuid());
+        boolean fresh = here && current.positions != null && current.version == current.positions.version() && !stale.contains(playerId);
         if (!fresh && pending.add(playerId)) world.execute(() -> recompute(world, playerId));
         if (here) current.replay(mapOpen.contains(playerId), collector);
     }
@@ -131,19 +132,20 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
      * second until something changes.
      */
     private void recompute(@Nonnull World world, @Nonnull UUID playerId) {
+        UUID worldId = world.getWorldConfig().getUuid();
+        CharacterPositions positions = null;
         int version = -1;
         try {
             PlayerRef playerRef = Universe.get().getPlayer(playerId);
             if (playerRef == null) return;
-            if (!world.getWorldConfig().getUuid().equals(playerRef.getWorldUuid())) return;
+            if (!worldId.equals(playerRef.getWorldUuid())) return;
             stale.remove(playerId);
-            CharacterPositions positions = this.positions.positions(world.getEntityStore().getStore());
-            positionsByWorld.put(world.getName(), positions);
+            positions = this.positions.positions(world.getEntityStore().getStore());
             version = positions.version();
-            built.put(playerId, build(world.getName(), version, positions.view(), histories.apply(playerRef), statuses(playerId)));
+            built.put(playerId, build(worldId, positions, version, positions.view(), histories.apply(playerRef), statuses(playerId)));
         } catch (RuntimeException e) {
             LOGGER.atWarning().withCause(e).log("Could not compute the character markers of player %s.", playerId);
-            built.put(playerId, new Built(world.getName(), version, List.of(), List.of()));
+            built.put(playerId, new Built(worldId, positions, version, List.of(), List.of()));
         } finally {
             pending.remove(playerId);
         }
@@ -166,7 +168,7 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     }
 
     @Nonnull
-    Built build(@Nonnull String world, int version, @Nonnull Map<String, Collection<CharacterPositions.Spot>> spots, @Nullable DialogueHistory history, @Nonnull Map<String, List<CharacterMapStatus>> statuses) {
+    Built build(@Nonnull UUID world, @Nonnull CharacterPositions positions, int version,@Nonnull Map<String, Collection<CharacterPositions.Spot>> spots, @Nullable DialogueHistory history, @Nonnull Map<String, List<CharacterMapStatus>> statuses) {
         List<MapMarker> all = new ArrayList<>();
         List<MapMarker> compass = new ArrayList<>();
         spots.forEach((characterId, npcs) -> {
@@ -181,7 +183,7 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
                 if (shown.onCompass()) compass.add(marker);
             }
         });
-        return new Built(world, version, List.copyOf(all), List.copyOf(compass));
+        return new Built(world, positions, version, List.copyOf(all), List.copyOf(compass));
     }
 
     @Nonnull

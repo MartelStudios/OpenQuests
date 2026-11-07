@@ -35,9 +35,10 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     /**
-     * A player's markers as computed for one world.
+     * A player's markers as computed for one world, told by UUID so one recreated under the same
+     * name is not mistaken for it.
      */
-    private record Built(@Nonnull String world, @Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass) {}
+    private record Built(@Nonnull UUID world,@Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass) {}
 
     private final QuestTargets targets;
     private final Function<UUID, QuestStoreComponent> stores;
@@ -90,8 +91,8 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
     public void update(@Nonnull World world, @Nonnull Player player, @Nonnull MarkersCollector collector) {
         UUID playerId = player.getPlayerRef().getUuid();
         Built current = built.get(playerId);
-        if (current == null || !current.world.equals(world.getName()) || stale.remove(playerId)) {
-            current = build(playerId, world.getName());
+        if (current == null || !current.world.equals(world.getWorldConfig().getUuid()) || stale.remove(playerId)) {
+            current = build(playerId, world);
             built.put(playerId, current);
         }
         for (MapMarker marker : mapOpen.contains(playerId) ? current.all : current.compass) collector.addIgnoreViewDistance(marker);
@@ -101,14 +102,15 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
      * A failure leaves an empty list, not retried ten times a second until something changes.
      */
     @Nonnull
-    private Built build(@Nonnull UUID playerId, @Nonnull String world) {
+    private Built build(@Nonnull UUID playerId, @Nonnull World in) {
+        UUID world = in.getWorldConfig().getUuid();
         List<MapMarker> all = new ArrayList<>();
         List<MapMarker> compass = new ArrayList<>();
         try {
             QuestStoreComponent store = stores.apply(playerId);
             if (store == null) return new Built(world, List.of(), List.of());
             for (QuestTargets.Running running : targets.runningFor(playerId, store.getQuestIds())) {
-                if (!(running.target() instanceof QuestTarget.Location location) || !targets.shownIn(running.quest(), world)) continue;
+                if (!(running.target() instanceof QuestTarget.Location location) || !targets.shownIn(running.quest(), in.getName())) continue;
                 MapMarkerBuilder builder = new MapMarkerBuilder("OpenQuests:" + running.quest().getId(), IMAGE, new Transform(location.position())).withName(running.quest().getTitle());
                 if (running.tracked()) builder.withCompassImage(IMAGE);
                 MapMarker marker = builder.build();
