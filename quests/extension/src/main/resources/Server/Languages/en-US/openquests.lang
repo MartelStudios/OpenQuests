@@ -60,6 +60,7 @@ page.reward.random = One of these, at random
 page.reward.random.chance = {chance, number}% chance:
 page.reward.choice = {count, plural, one {One of these, your choice} other {{count, number} of these, your choice}}
 page.reward.effect = Effect: {effect}
+page.reward.droplist = Loot: {droplist}
 choice.title = Choose your reward
 choice.left = {count, plural, one {1 pick left} other {{count, number} picks left}}
 choice.pick = Choose

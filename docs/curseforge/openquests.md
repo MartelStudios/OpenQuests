@@ -124,6 +124,7 @@ the same item thrown and picked up, or the same block placed and broken, from co
 | <code>Random</code>     | Draws one of its rewards, each with its own weight        |
 | <code>Choice</code>     | Opens a popup where the player picks what they get        |
 | <code>Effect</code>     | Puts an effect on the player, a food buff or a potion     |
+| <code>Droplist</code>   | Rolls one of the game's drop lists, a dungeon chest say   |
 
 ![In the Rewards tab, Claim on The veilbound coffer opens a Choose your reward popup, and picking Greater Health Potion closes it](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-reward-choice.gif?raw=true)
 

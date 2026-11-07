@@ -718,6 +718,9 @@ same words for everyone's defaults, granted to `hytale:WorldEditor`.
   it. `OverlapBehavior` (`Extend`, `Overwrite` or `Ignore`) overrides what the effect does when the
   player already has it. A player who is not in a world, or whom the effect refuses, is still owed
   it and gets it on the next attempt.
+- `Droplist`: rolls one of the game's drop lists (`"Droplist": "Portals_Goblin_Chest_Tier1"`)
+  `Rolls` times (1 by default) and gives what comes out, hotbar first, all or nothing. A full
+  inventory leaves it owed, and the next attempt rolls again.
 
 ## Constraints
 
