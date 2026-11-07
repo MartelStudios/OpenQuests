@@ -13,6 +13,7 @@ import com.hypixel.hytale.server.core.io.adapter.PacketFilter;
 import com.hypixel.hytale.server.core.io.adapter.PlayerPacketWatcher;
 import com.hypixel.hytale.protocol.packets.worldmap.UpdateWorldMapVisible;
 import com.martelstudios.opendialogues.map.CharacterMarkerProvider;
+import com.martelstudios.opendialogues.nameplates.TranslatedNameplate;
 import com.martelstudios.opendialogues.characters.runtime.CharacterPositions;
 import com.martelstudios.opendialogues.characters.runtime.CharacterPositionsAccess;
 import com.hypixel.hytale.server.core.universe.resources.UniverseResourceType;
@@ -129,6 +130,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     private ComponentType<EntityStore, DialogueHistory> historyType;
 
     private ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
+
+    private ComponentType<EntityStore, TranslatedNameplate> translatedNameplateType;
 
     private ResourceType<EntityStore, UniqueCharacters> uniqueCharactersType;
     private UniverseResourceType<UniverseCharacters> universeCharactersType;
@@ -353,6 +356,14 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     @Nonnull
     public ComponentType<EntityStore, OpenDialoguesNPCIdentity> getIdentityType() {
         return identityType;
+    }
+
+    /**
+     * @return the nameplate shown to each viewer in their language, for any entity.
+     */
+    @Nonnull
+    public ComponentType<EntityStore, TranslatedNameplate> getTranslatedNameplateType() {
+        return translatedNameplateType;
     }
 
     /**
