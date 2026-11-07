@@ -35,6 +35,8 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
                                                                                                         .add()
                                                                                                         .appendInherited(new KeyedCodec<>("MapIcon", Codec.STRING), (character, icon) -> character.mapIcon = icon, character -> character.mapIcon, (character, parent) -> character.mapIcon = parent.mapIcon)
                                                                                                         .add()
+                                                                                                        .appendInherited(new KeyedCodec<>("CompassRange", Codec.DOUBLE), (character, range) -> character.compassRange = range, character -> character.compassRange, (character, parent) -> character.compassRange = parent.compassRange)
+                                                                                                        .add()
                                                                                                         .build();
 
     /**
@@ -60,6 +62,8 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
     @Nullable
     private String mapIcon;
 
+    private double compassRange;
+
     protected OpenDialogueCharacterAsset() {}
 
     /**
@@ -76,6 +80,14 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
     @Nullable
     public String getMapIcon() {
         return mapIcon;
+    }
+
+    /**
+     * @return within how many blocks a player sees the character's shown NPCs on the compass,
+     * {@code 0} for never by distance alone.
+     */
+    public double getCompassRange() {
+        return compassRange;
     }
 
     /**

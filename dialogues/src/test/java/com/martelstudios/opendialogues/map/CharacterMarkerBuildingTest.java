@@ -47,7 +47,7 @@ class CharacterMarkerBuildingTest {
     void nameFallsBackToTheEpithet() {
         positions.record("farmer", SORREL, new Vector3d(), "names.sorrel");
         positions.record("farmer", TANSY, new Vector3d(), null);
-        CharacterMarkerProvider.Look look = new CharacterMarkerProvider.Look(new CharacterMarkerRule.Shown("Coordinate.png", false), "epithets.farmer");
+        CharacterMarkerProvider.Look look = new CharacterMarkerProvider.Look(new CharacterMarkerRule.Shown("Coordinate.png", false), "epithets.farmer", 0);
 
         CharacterMarkerProvider.Built built = CharacterMarkerProvider.join(seen(Map.of("farmer", look)), positions.version(), positions.view());
 
