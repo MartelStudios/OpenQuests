@@ -45,7 +45,6 @@ import com.martelstudios.openquests.extension.rewards.random.RandomRewardFeature
 import com.martelstudios.openquests.extension.track.QuestTrackService;
 import com.martelstudios.openquests.extension.map.MapFeature;
 import com.martelstudios.openquests.extension.map.QuestTargets;
-import com.hypixel.hytale.server.core.io.adapter.PacketAdapters;
 
 import javax.annotation.Nonnull;
 
@@ -59,7 +58,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
 
     private QuestTrackService tracks;
 
-    private MapFeature.Registered map;
+    private MapFeature map;
 
     public OpenQuestsPlugin(@Nonnull JavaPluginInit init) {
         super(init);
@@ -88,7 +87,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
 
     @Override
     protected void shutdown() {
-        if (map != null) PacketAdapters.deregisterInbound(map.watcher());
+        if (map != null) map.shutdown();
         super.shutdown();
     }
 
@@ -115,7 +114,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         CompositeFeature.register(this, services);
         HudFeature.register(this, services, tracks);
         JournalFeature.register(this, services, tracks);
-        map = MapFeature.register(this, services, tracks);
+        map = new MapFeature(this, services, tracks);
         FeedbackFeature.register(this, services);
         KillFeature.register(this, services);
         CraftFeature.register(this, services);

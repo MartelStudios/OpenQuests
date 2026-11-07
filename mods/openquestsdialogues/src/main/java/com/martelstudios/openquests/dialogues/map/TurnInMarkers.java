@@ -9,8 +9,8 @@ import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.targets.QuestTarget;
 import com.martelstudios.openquests.extension.OpenQuestsPlugin;
-import com.martelstudios.openquests.extension.map.MapFeature;
 import com.martelstudios.openquests.extension.map.QuestTargets;
+import com.martelstudios.openquests.extension.map.events.PlayerQuestTargetsChangedEvent;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ public final class TurnInMarkers implements CharacterStatusProvider {
     public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         CharacterMarkerProvider markers = OpenDialoguesPlugin.get().getCharacterMarkers();
         markers.addStatusProvider(new TurnInMarkers(OpenQuestsPlugin.get().getQuestTargets(), services.getQuestPlayerStateService()::getQuestStore));
-        MapFeature.onPlayerQuestsChanged(plugin, markers::invalidate);
+        plugin.getEventRegistry().registerGlobal(PlayerQuestTargetsChangedEvent.class, event -> markers.invalidate(event.getPlayerId()));
     }
 
     @Nonnull
