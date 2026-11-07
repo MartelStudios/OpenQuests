@@ -15,6 +15,9 @@ public class PlayerQuestTargetsChangedEvent implements IEvent<Void> {
     @Nonnull
     private final UUID playerId;
 
+    /**
+     * @param playerId the player whose targets may have changed, possibly offline.
+     */
     public PlayerQuestTargetsChangedEvent(@Nonnull UUID playerId) {
         this.playerId = playerId;
     }
