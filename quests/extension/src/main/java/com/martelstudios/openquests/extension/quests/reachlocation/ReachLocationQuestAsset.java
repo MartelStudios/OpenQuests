@@ -37,7 +37,7 @@ public class ReachLocationQuestAsset extends OpenQuestAsset implements TargetedQ
     @Nullable
     @Override
     public QuestTarget target() {
-        return showOnMap && position != null ? new QuestTarget.Location(position) : null;
+        return showOnMap && position != null ? new QuestTarget.Location(new Vector3d(position)) : null;
     }
 
     @Override
