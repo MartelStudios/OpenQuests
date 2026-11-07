@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues.dialogues;
 
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
 
 import javax.annotation.Nonnull;
@@ -16,22 +17,24 @@ import java.util.function.Function;
 public record SpeakerView(@Nullable String name, @Nullable String epithet, @Nullable String portrait) {
 
     /**
-     * Only a speaker allowing the NPC override takes the NPC's name and the fields of the speaker it lends
-     * fields, each one it does not set falling back to the speaker's own.
+     * A dialogue using the source character shows the source's resolved name and epithet and its
+     * character's portrait, each one unset falling back to the dialogue's own character.
      *
-     * @param speakers a speaker by id, {@code null} for one no pack declares.
-     * @return what to show, {@code null} without a speaker.
+     * @param characters a character by id, {@code null} for one no pack declares.
+     * @return what to show, {@code null} when nobody speaks.
      */
     @Nullable
-    public static SpeakerView of(@Nullable OpenDialogueSpeakerAsset speaker, @Nullable DialogueSource source, @Nonnull Function<String, OpenDialogueSpeakerAsset> speakers) {
-        if (speaker == null) return null;
-        if (source == null || !speaker.isAllowNPCOverride()) return new SpeakerView(speaker.getName(), speaker.getEpithet(), speaker.getPortrait());
-
-        OpenDialogueSpeakerAsset lent = source.speaker() == null ? null : speakers.apply(source.speaker());
-        return new SpeakerView(
-            firstSet(source.name(), lent == null ? null : lent.getName(), speaker.getName()),
-            firstSet(lent == null ? null : lent.getEpithet(), speaker.getEpithet()),
-            firstSet(lent == null ? null : lent.getPortrait(), speaker.getPortrait()));
+    public static SpeakerView of(@Nullable String characterId, boolean useSource, @Nullable DialogueSource source, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
+        OpenDialogueCharacterAsset character = characterId == null ? null : characters.apply(characterId);
+        if (useSource && source != null) {
+            OpenDialogueCharacterAsset sourceCharacter = characters.apply(source.character());
+            return new SpeakerView(
+                firstSet(source.name(), character == null ? null : character.getName()),
+                firstSet(source.epithet(), character == null ? null : character.getEpithet()),
+                firstSet(sourceCharacter == null ? null : sourceCharacter.getPortrait(), character == null ? null : character.getPortrait()));
+        }
+        if (character == null) return null;
+        return new SpeakerView(character.getName(), character.getEpithet(), character.getPortrait());
     }
 
     @Nullable

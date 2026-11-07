@@ -12,7 +12,6 @@ import com.martelstudios.opendialogues.characters.ReleaseReason;
 import com.martelstudios.opendialogues.characters.traits.CharacterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
-import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
 import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
@@ -23,8 +22,8 @@ import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 /**
- * Pressing F on the NPC opens a dialogue or router, spoken from the NPC. Its speaker lends a
- * portrait or an epithet to speakers allowing the NPC override.
+ * Pressing F on the NPC opens a dialogue or router with the NPC as source, so dialogues using the
+ * source character show its name, epithet and portrait.
  */
 public class OpenDialoguesDialogueTrait extends CharacterTrait {
 
@@ -34,16 +33,11 @@ public class OpenDialoguesDialogueTrait extends CharacterTrait {
                                                                                      .append(new KeyedCodec<>("Dialogue", OpenDialoguesTarget.CODEC), (trait, dialogue) -> trait.dialogue = dialogue, trait -> trait.dialogue)
                                                                                      .addValidator(Validators.nonNull())
                                                                                      .add()
-                                                                                     .append(new KeyedCodec<>("Speaker", OpenDialogueSpeakerAsset.CONTAINED_CODEC), (trait, speaker) -> trait.speaker = speaker, trait -> trait.speaker)
-                                                                                     .add()
                                                                                      .append(new KeyedCodec<>("Hint", Codec.STRING), (trait, hint) -> trait.hint = hint, trait -> trait.hint)
                                                                                      .add()
                                                                                      .build();
 
     private OpenDialoguesTarget dialogue;
-
-    @Nullable
-    private String speaker;
 
     @Nullable
     private String hint;
@@ -56,14 +50,6 @@ public class OpenDialoguesDialogueTrait extends CharacterTrait {
     @Nonnull
     public OpenDialoguesTarget getDialogue() {
         return dialogue;
-    }
-
-    /**
-     * @return the id of the speaker whose set fields the NPC lends, {@code null} for none.
-     */
-    @Nullable
-    public String getSpeaker() {
-        return speaker;
     }
 
     @Override
@@ -91,7 +77,7 @@ public class OpenDialoguesDialogueTrait extends CharacterTrait {
     @Override
     public boolean onUse(@Nonnull CharacterContext context, @Nonnull PlayerRef player) {
         String characterId = context.character().getId();
-        DialogueTriggers.openFor(player, dialogue, new DialogueSource(context.uuid(), characterId, context.character().displayName(context.identity()), speaker), "Character '" + characterId + "'");
+        DialogueTriggers.openFor(player, dialogue, new DialogueSource(context.uuid(), characterId, context.character().displayName(context.identity()), context.character().displayEpithet(context.identity())), "Character '" + characterId + "'");
         return true;
     }
 
@@ -111,6 +97,5 @@ public class OpenDialoguesDialogueTrait extends CharacterTrait {
         String target = dialogue.getDialogue() != null ? dialogue.getDialogue() : dialogue.getRouter();
         boolean leads = target != null && assets.declares(dialogue.getDialogue() != null ? OpenDialogueAsset.class : OpenDialogueRouterAsset.class, target);
         if (!leads) problems.accept("opens no known dialogue or router '" + target + "'");
-        if (speaker != null && assets.speaker(speaker) == null) problems.accept("lends an unknown speaker '" + speaker + "'");
     }
 }

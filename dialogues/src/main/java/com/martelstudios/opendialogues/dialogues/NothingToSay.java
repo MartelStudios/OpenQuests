@@ -30,9 +30,9 @@ public final class NothingToSay {
                       : epithet != null ? PlayerTexts.translate(player, epithet, Map.of())
                       : context.character().getId();
 
-        OpenDialogueAsset dialogue = OpenDialogueAsset.generated(DIALOGUE_ID, OpenDialogueAsset.NPC_SPEAKER,
+        OpenDialogueAsset dialogue = OpenDialogueAsset.generated(DIALOGUE_ID, null, true,
             new String[]{PlayerTexts.translate(player, "opendialogues.character.nothing", Map.of("name", name))},
             new OpenDialoguesResponse[]{OpenDialoguesResponse.generated("Goodbye", PlayerTexts.translate(player, "opendialogues.character.goodbye", Map.of()), new OpenDialoguesCloseAction())});
-        DialogueTriggers.openFor(player, dialogue, new DialogueSource(context.uuid(), context.character().getId(), nameKey, null));
+        DialogueTriggers.openFor(player, dialogue, new DialogueSource(context.uuid(), context.character().getId(), nameKey, epithet));
     }
 }

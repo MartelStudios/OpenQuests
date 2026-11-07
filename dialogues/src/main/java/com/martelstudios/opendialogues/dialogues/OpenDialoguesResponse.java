@@ -7,6 +7,7 @@ import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.protocol.Color;
 import com.hypixel.hytale.server.core.codec.protocol.ColorCodec;
 import com.martelstudios.opendialogues.actions.DialogueAction;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
 
@@ -26,7 +27,7 @@ public class OpenDialoguesResponse {
                                                                            .append(new KeyedCodec<>("Color", new ColorCodec()), (response, color) -> response.color = color, response -> response.color)
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Icon", Codec.STRING), (response, icon) -> response.icon = icon, response -> response.icon)
-                                                                           .addValidator(OpenDialogueSpeakerAsset.ICON_VALIDATOR)
+                                                                           .addValidator(OpenDialogueCharacterAsset.ICON_VALIDATOR)
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Actions", new ArrayCodec<>(DialogueAction.CODEC, DialogueAction[]::new)), (response, actions) -> response.actions = actions, response -> response.actions)
                                                                            .add()

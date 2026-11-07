@@ -9,7 +9,7 @@ No code required. Write dialogues in the Asset Editor, drop the plugin in `mods/
 
 ![Grizzle, the miner's plush, asks for ten copper, ten iron and ten gold ore](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/dialogue-cinematic.png?raw=true)
 
-_A speaker with a name, a title and a portrait, answers with icons and colours, and a story that remembers what you
+_A character with a name, a title and a portrait, answers with icons and colours, and a story that remembers what you
 said last time._
 
 > 📦 **Want to see it in action ?** Install
@@ -20,14 +20,15 @@ said last time._
 
 ## ✨ What you get
 
-📝 **Everything in the Asset Editor.** Dialogues, speakers and routers are assets, checked as you type. Nest a whole
+📝 **Everything in the Asset Editor.** Dialogues, characters and routers are assets, checked as you type. Nest a whole
 conversation in a single file, or split it as you like.
 
 🎭 **Three ways to show a dialogue, and yours.** A framed panel, a cinematic band across the bottom of the screen, or
 plain chat. Each dialogue picks its own, the server owner has the last word, and a mod can add a display matching its
 server's UI.
 
-🗣️ **Speakers.** A name, a title and a portrait, written once and shared by every dialogue they speak.
+🗣️ **Characters who speak.** A name, a title and a portrait, written once on the character and shared by
+every dialogue it speaks. A villager dialogue can speak as whichever NPC the player talks to.
 
 📄 **Pages and answers.** Several pages read one after the other, then answers that close the dialogue, open the next
 one or run a command.
@@ -72,7 +73,7 @@ Long texts are cut into pages, with an arrow to turn them and a counter of where
 
 ![The cinematic display after Grizzle was fed: the epithet now reads Well-fed plush, and four new answers are offered](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/dialogue-cinematic-fed.png?raw=true)
 
-The speaker's portrait, large, over a band darkening the bottom of the screen, and the answers on the right. The world
+The character's portrait, large, over a band darkening the bottom of the screen, and the answers on the right. The world
 stays in view: made for characters you meet.
 
 ### 💬 Chat
@@ -151,7 +152,7 @@ A dialogue is a JSON asset under `Server/OpenDialogues/Dialogues/`, edited in th
 ```
 {
   "Title": "grizzle.name",
-  "Speaker": "MyPack_Grizzle",
+  "Character": "MyPack_Grizzle",
   "Display": "Cinematic",
   "Pages": [
     { "Text": "grizzle.hungry.text" }

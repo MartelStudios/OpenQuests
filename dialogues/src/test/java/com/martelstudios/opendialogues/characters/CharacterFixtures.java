@@ -15,7 +15,6 @@ import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTra
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesEpithetTrait;
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
-import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -88,8 +87,8 @@ public final class CharacterFixtures {
      * @param leads whether a dialogue, router or other asset id is declared.
      */
     @Nonnull
-    public static CharacterAssets assets(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull Map<String, OpenDialogueTextListAsset> textLists, @Nonnull Map<String, OpenDialogueSpeakerAsset> speakers, @Nonnull Predicate<String> leads) {
-        return new CharacterAssets(characters::get, characters::values, () -> distributions, textLists::get, speakers::get, (type, id) -> leads.test(id));
+    public static CharacterAssets assets(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull Map<String, OpenDialogueTextListAsset> textLists, @Nonnull Predicate<String> leads) {
+        return new CharacterAssets(characters::get, characters::values, () -> distributions, textLists::get, (type, id) -> leads.test(id));
     }
 
     /**

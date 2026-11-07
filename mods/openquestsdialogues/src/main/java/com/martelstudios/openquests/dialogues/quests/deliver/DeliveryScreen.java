@@ -49,7 +49,7 @@ public final class DeliveryScreen {
                       ? OpenDialoguesResponse.generated("SomethingElse", text(player, "delivery.other", Map.of()), new OpenDialoguesUseCharacterAction())
                       : OpenDialoguesResponse.generated("Goodbye", PlayerTexts.translate(player, "opendialogues.character.goodbye", Map.of()), new OpenDialoguesCloseAction()));
 
-        OpenDialogueAsset dialogue = OpenDialogueAsset.generated(DIALOGUE_ID, OpenDialogueAsset.NPC_SPEAKER, new String[]{page}, responses.toArray(OpenDialoguesResponse[]::new));
+        OpenDialogueAsset dialogue = OpenDialogueAsset.generated(DIALOGUE_ID, null, true, new String[]{page}, responses.toArray(OpenDialoguesResponse[]::new));
         DialogueTriggers.openFor(player, dialogue, source);
     }
 

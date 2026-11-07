@@ -643,7 +643,7 @@ class CharacterServiceTest {
 
     @Nonnull
     private CharacterService service() {
-        return new CharacterService(CharacterFixtures.assets(characters, distributions, Map.of(), Map.of(), id -> true), (accessor, ref) -> eligible, bus, new SplittableRandom(1), (message, error) -> warnings.add(message), null, null, () -> universe);
+        return new CharacterService(CharacterFixtures.assets(characters, distributions, Map.of(), id -> true), (accessor, ref) -> eligible, bus, new SplittableRandom(1), (message, error) -> warnings.add(message), null, null, () -> universe);
     }
 
     @Nonnull

@@ -67,7 +67,6 @@ import com.martelstudios.opendialogues.commands.DialogueCommand;
 import com.martelstudios.opendialogues.commands.characters.CharacterCommand;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
-import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
@@ -218,7 +217,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new CharacterDeathSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterRemovalSystem(characterService, identityType));
         resolver = new DialogueResolver(OpenDialogueAsset::getDialogue, OpenDialogueRouterAsset::getRouter, THREAD_RANDOM);
-        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus(), OpenDialogueSpeakerAsset::getSpeaker);
+        dialogueService = new DialogueService(registry, displayRules::get, ChatDisplay.ID, resolver, player -> ConditionContext.of(player, historyRecorder.history(player)), HytaleServer.get().getEventBus(), OpenDialogueCharacterAsset::getCharacter);
         registry.registerDisplay(ChatDisplay.ID, new ChatDisplay());
         registry.registerDisplay(PageDisplay.ID, new PageDisplay(dialogueService, DialogueCustomPage::new));
         registry.registerDisplay(PageDisplay.CINEMATIC_ID, new PageDisplay(dialogueService, CinematicDialoguePage::new));
@@ -232,11 +231,6 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .setPath("OpenDialogues/Routers/")
                                                     .setCodec(OpenDialogueRouterAsset.CODEC)
                                                     .setKeyFunction(OpenDialogueRouterAsset::getId)
-                                                    .build());
-        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueSpeakerAsset.class, new DefaultAssetMap<>())
-                                                    .setPath("OpenDialogues/Speakers/")
-                                                    .setCodec(OpenDialogueSpeakerAsset.CODEC)
-                                                    .setKeyFunction(OpenDialogueSpeakerAsset::getId)
                                                     .build());
         getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueTextListAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenDialogues/TextLists/")
@@ -320,6 +314,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         for (OpenDialogueAsset dialogue : OpenDialogueAsset.getAssetStore().getAssetMap().getAssetMap().values()) {
             String error = dialogue.findConditionError(OpenDialogueAsset::getDialogue);
             if (error != null) getLogger().atSevere().log("Dialogue '%s' has a broken answer condition: %s", dialogue.getId(), error);
+            String characterError = dialogue.findCharacterError(OpenDialogueCharacterAsset::getCharacter);
+            if (characterError != null) getLogger().atSevere().log("Dialogue '%s': %s", dialogue.getId(), characterError);
         }
     }
 

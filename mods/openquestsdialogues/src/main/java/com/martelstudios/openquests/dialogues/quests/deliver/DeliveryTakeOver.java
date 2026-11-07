@@ -6,7 +6,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
-import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
 import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
 import com.martelstudios.opendialogues.triggers.DialogueTriggers;
@@ -60,7 +59,7 @@ public final class DeliveryTakeOver {
         event.setCancelled(true);
 
         DeliverQuestProgression quest = quests.get(picked);
-        DialogueSource source = new DialogueSource(event.getUuid(), event.getCharacter(), event.getName(), speakerOf(event.getCharacter()));
+        DialogueSource source = new DialogueSource(event.getUuid(), event.getCharacter(), event.getName(), event.getEpithet());
         String dialogue = quest.getAsset().getDialogue();
         if (dialogue != null) DialogueTriggers.openFor(player, OpenDialoguesTarget.of(dialogue, null), source, "Delivery quest '" + quest.getAssetId() + "'");
         else DeliveryScreen.open(player, quest, source, answersF(event.getCharacter()), Deliveries.givable(quest, inventory));
@@ -105,19 +104,6 @@ public final class DeliveryTakeOver {
             if (progression.getLiveQuest(questId) instanceof DeliverQuestProgression quest && !quest.isOver() && quest.getAsset() != null && quest.getPlayers().contains(playerId) && quest.allowsProgress(playerId)) running.add(quest);
         }
         return running;
-    }
-
-    /**
-     * The character's dialogue speaker, lent to the screen so it shows the same epithet and portrait.
-     */
-    @Nullable
-    private static String speakerOf(@Nonnull String characterId) {
-        OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(characterId);
-        if (character == null) return null;
-        for (CharacterTrait trait : character.getTraits()) {
-            if (trait instanceof OpenDialoguesDialogueTrait dialogue) return dialogue.getSpeaker();
-        }
-        return null;
     }
 
     private static boolean answersF(@Nonnull String characterId) {

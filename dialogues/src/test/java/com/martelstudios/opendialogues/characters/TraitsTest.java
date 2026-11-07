@@ -25,7 +25,7 @@ class TraitsTest {
     @Test
     void nameTraitDrawsWithContextRandom() {
         OpenDialogueTextListAsset list = CodecJson.decode(OpenDialogueTextListAsset.CODEC, "{ \"Texts\": [\"npc.a\", \"npc.b\", \"npc.c\"] }");
-        CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of("List", list), Map.of(), id -> true);
+        CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of("List", list), id -> true);
         CharacterTrait name = CharacterFixtures.trait("{ \"Type\": \"Name\", \"Names\": \"List\" }");
         OpenDialoguesNPCIdentity identity = new OpenDialoguesNPCIdentity();
         RandomGenerator lastOfThree = new RandomGenerator() {
@@ -48,7 +48,7 @@ class TraitsTest {
     @Test
     void epithetTraitDrawsFromItsList() {
         OpenDialogueTextListAsset list = CodecJson.decode(OpenDialogueTextListAsset.CODEC, "{ \"Texts\": [\"key.epithet\"] }");
-        CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of("Epithets", list), Map.of(), id -> true);
+        CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of("Epithets", list), id -> true);
         CharacterTrait epithet = CharacterFixtures.trait("{ \"Type\": \"Epithet\", \"Epithets\": \"Epithets\" }");
         OpenDialoguesNPCIdentity identity = new OpenDialoguesNPCIdentity();
 
@@ -59,7 +59,7 @@ class TraitsTest {
 
     @Test
     void epithetTraitReportsUnknownList() {
-        CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of(), Map.of(), id -> true);
+        CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of(), id -> true);
         CharacterTrait epithet = CharacterFixtures.trait("{ \"Type\": \"Epithet\", \"Epithets\": \"Missing\" }");
         List<String> problems = new java.util.ArrayList<>();
 
