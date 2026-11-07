@@ -461,6 +461,7 @@ comes from.
 | `BreakBlock` | Breaking a number of blocks, named by id or by block tag. With `"AntiAbuse": true`, a block any player placed does not count, even one placed before the quest: the world marks every placed block, one bit per block, saved with its chunk. |
 | `PlaceBlock` | Placing a number of blocks, matched on the item they are placed from. With `"AntiAbuse": true`, placing again a block broken out of a player's placement does not count. |
 | `Consume` | Eating or drinking a quantity of an item. |
+| `CastSpell` | Casting spells, the runes slotted in the ability bench, a number of times. See below. |
 | `DropItem` | Throwing a quantity of an item out of the inventory, counted as it leaves. What a full inventory spills does not count. With `"AntiAbuse": true`, what the player picked back up after throwing it does not count again, which the quest keeps track of in its own save. |
 | `PickupItem` | Picking a quantity of an item up off the ground or by hand, counted as it arrives. With `"AntiAbuse": true`, what the player threw themselves while holding the quest does not count. |
 | `UseEntity` | Interacting with NPCs of a group a number of times. |
@@ -488,6 +489,16 @@ comes from.
 The other types (`TICK`, `TAG_ADDED`, `TAG_REMOVED`, `BLOCK_PLACED`, `BLOCK_BROKEN`, `BLOCK_USED`,
 `SIGNAL_RECEIVED`, `ENTITY_DIED`, `VOLUME_CREATE`) only drive the volume's own effects and never
 leave the trigger volume plugin, so an asset naming one is refused at boot.
+
+A spell counts once its cast goes through: one refused for want of mana, or still on cooldown, does not.
+`SpellToCast` names the spells, with `SpellIds` for runes (any item whose `Ability` sits in the
+`Core` slot, modded ones included) and `AbilityKeywords` for every spell carrying one of them, such as
+`Fire`. Either key accepts a spell; leaving `SpellToCast` out counts every spell. A time limit is
+the `TimeLimit` constraint, as for any other type.
+
+```json
+{ "Type": "CastSpell", "TargetQuantity": 5, "SpellToCast": { "AbilityKeywords": ["Fire"] } }
+```
 
 `Walk`, `Run` and `Sprint` count metres. With `"Measure": "Seconds"` they count the seconds spent moving at
 their pace instead, added up across every stretch: `TargetQuantity` is then a duration.
