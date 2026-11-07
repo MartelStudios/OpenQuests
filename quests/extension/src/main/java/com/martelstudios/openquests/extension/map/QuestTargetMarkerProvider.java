@@ -4,6 +4,7 @@ import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.vector.Transform;
 import com.hypixel.hytale.protocol.packets.worldmap.MapMarker;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.worldmap.WorldMapManager;
 import com.hypixel.hytale.server.core.universe.world.worldmap.markers.MapMarkerBuilder;
@@ -12,12 +13,14 @@ import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.targets.QuestTarget;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Puts the locations a player's running quests lead to on their map, and on their compass while
@@ -87,10 +90,11 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
     }
 
     /**
-     * @return whether anything is kept of the player.
+     * @return the player's entry, {@code null} for one never called for or forgotten.
      */
-    boolean knows(@Nonnull UUID playerId) {
-        return players.containsKey(playerId);
+    @Nullable
+    PlayerMarkers entry(@Nonnull UUID playerId) {
+        return players.get(playerId);
     }
 
     /**
@@ -101,21 +105,33 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
     @SuppressWarnings("removal")
     @Override
     public void update(@Nonnull World world, @Nonnull Player player, @Nonnull MarkersCollector collector) {
-        UUID playerId = player.getPlayerRef().getUuid();
+        PlayerRef playerRef = player.getPlayerRef();
+        UUID playerId = playerRef.getUuid();
         PlayerMarkers markers = players.get(playerId);
         if (markers == null) {
             // A call that comes after the player left must not keep them
-            if (stores.apply(playerId) == null) return;
+            if (!playerRef.isValid() || stores.apply(playerId) == null) return;
             markers = players.computeIfAbsent(playerId, id -> new PlayerMarkers());
         }
-        Built current = markers.built;
-        if (current == null || !current.world.equals(world.getWorldConfig().getUuid()) || markers.stale) {
-            markers.stale = false;
-            current = build(playerId, world);
-            markers.built = current;
-        }
+        Built current = follow(markers, world.getWorldConfig().getUuid(), () -> build(playerId, world));
         for (MapMarker marker : markers.mapOpen ? current.all : current.compass) collector.addIgnoreViewDistance(marker);
     }
+
+    /**
+     * @param build computes the player's markers in this world.
+     * @return the kept markers, built again when the player changed world or something they did changed.
+     */
+    @Nonnull
+    Built follow(@Nonnull PlayerMarkers markers, @Nonnull UUID worldId, @Nonnull Supplier<Built> build) {
+        Built current = markers.built;
+        if (current == null || !current.world.equals(worldId) || markers.stale) {
+            markers.stale = false;
+            current = build.get();
+            markers.built = current;
+        }
+        return current;
+    }
+
 
     /**
      * A failure leaves an empty list, not retried ten times a second until something changes.
