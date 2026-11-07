@@ -144,13 +144,13 @@ mana-master.short=Dépensez 25 000 points de mana
 
 health-novice.title=Premiers bleus
 health-novice.description=Tout aventurier commence quelque part.
-health-novice.short=Perdez 100 points de santé
+health-novice.short=Dépensez 100 points de santé
 health-adept.title=Peau dure
 health-adept.description=Ce qui ne vous tue pas...
-health-adept.short=Perdez 1 000 points de santé
+health-adept.short=Dépensez 1 000 points de santé
 health-master.title=Increvable
 health-master.description=Dix mille blessures, toujours debout.
-health-master.short=Perdez 10 000 points de santé
+health-master.short=Dépensez 10 000 points de santé
 
 temple-trial.title=L'épreuve du Temple
 temple-trial.description=Le temple jauge ceux qui y entrent. Rares sont ceux qu'il juge dignes.

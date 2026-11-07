@@ -475,7 +475,7 @@ comes from.
 | `Run` | Covering a distance at the default pace. |
 | `Sprint` | Covering a distance at the fast pace. |
 | `Jump` | Jumping a number of times. |
-| `LoseStat` | Losing a number of points of the stat named by `Stat`: `Health`, `Stamina`, `Mana`, `Oxygen`, or one another mod adds. |
+| `LoseStat` | Spending a number of points of the stat named by `Stat`: `Health`, `Stamina`, `Mana`, `Oxygen`, or one another mod adds. |
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Between `Min` (1 by default) and `Max` (no limit by default) of the player's quests from `QuestAssetId` standing in the listed `States` (every state by default), running ones included: the same four fields as the `RequiresQuest` constraint. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation (`"Min": 0, "Max": 0` for none). |
 | `NoOp` | Nothing on its own: a command, a reward, a constraint or a plugin ends it. |
