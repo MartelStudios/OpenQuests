@@ -64,8 +64,11 @@ public class OpenDialoguesNameTrait extends CharacterTrait {
         }
         Nameplate plate = context.accessor().getComponent(context.npc(), Nameplate.getComponentType());
         if (plate != null) {
-            if (!NameplateTexts.isOurs(plate.getText(), name, I18nModule.get().getMessage(I18nModule.DEFAULT_LANGUAGE, name))) return;
-            context.accessor().tryRemoveComponent(context.npc(), Nameplate.getComponentType());
+            boolean ours = NameplateTexts.isOurs(plate.getText(), name, I18nModule.get().getMessage(I18nModule.DEFAULT_LANGUAGE, name));
+            // A plate set by hand or by the role wins; ours is added on the next scan, not in the removal's packet.
+            if (ours) context.accessor().tryRemoveComponent(context.npc(), Nameplate.getComponentType());
+            else context.accessor().tryRemoveComponent(context.npc(), TranslatedNameplate.getComponentType());
+            return;
         }
         if (context.accessor().getComponent(context.npc(), TranslatedNameplate.getComponentType()) == null) {
             context.accessor().putComponent(context.npc(), TranslatedNameplate.getComponentType(), new TranslatedNameplate(name));
