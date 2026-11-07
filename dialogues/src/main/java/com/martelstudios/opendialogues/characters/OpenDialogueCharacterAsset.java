@@ -31,6 +31,10 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
                                                                                                         .add()
                                                                                                         .appendInherited(new KeyedCodec<>("Traits", new ArrayCodec<>(CharacterTrait.CODEC, CharacterTrait[]::new)), (character, traits) -> character.traits = traits, character -> character.traits, (character, parent) -> character.traits = parent.traits)
                                                                                                         .add()
+                                                                                                        .appendInherited(new KeyedCodec<>("MapVisibility", new EnumCodec<>(MapVisibility.class)), (character, visibility) -> character.mapVisibility = visibility, character -> character.mapVisibility, (character, parent) -> character.mapVisibility = parent.mapVisibility)
+                                                                                                        .add()
+                                                                                                        .appendInherited(new KeyedCodec<>("MapIcon", Codec.STRING), (character, icon) -> character.mapIcon = icon, character -> character.mapIcon, (character, parent) -> character.mapIcon = parent.mapIcon)
+                                                                                                        .add()
                                                                                                         .build();
 
     /**
@@ -50,7 +54,29 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
     @Nonnull
     private CharacterTrait[] traits = new CharacterTrait[0];
 
+    @Nonnull
+    private MapVisibility mapVisibility = MapVisibility.WhenMet;
+
+    @Nullable
+    private String mapIcon;
+
     protected OpenDialogueCharacterAsset() {}
+
+    /**
+     * @return when the NPCs carrying the character appear on a player's map.
+     */
+    @Nonnull
+    public MapVisibility getMapVisibility() {
+        return mapVisibility;
+    }
+
+    /**
+     * @return the map image under {@code UI/WorldMap/MapMarkers/}, {@code null} for the default one.
+     */
+    @Nullable
+    public String getMapIcon() {
+        return mapIcon;
+    }
 
     /**
      * @return the store every pack's characters are loaded into.
