@@ -23,14 +23,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Puts the NPCs carrying a character on each player's map, and on their compass when another mod
- * says so. Computes rarely, on the player's world thread, and replays the result on every call.
+ * says so. Decides which characters show on the player's world thread when something the player did
+ * changes; follows NPC moves by joining that decision with the positions, without asking again.
  */
 public final class CharacterMarkerProvider implements WorldMapManager.MarkerProvider {
 
@@ -40,20 +43,28 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     /**
-     * A player's markers, as computed in one world from one version of its positions. The world is
-     * told by UUID and its positions held, so a world recreated under the same name is not mistaken for it.
+     * How one character's NPCs show to a player.
      *
-     * @param positions {@code null} when the computation failed.
+     * @param epithet the name of an NPC that drew none, {@code null} for none.
      */
-    record Built(@Nonnull UUID world, @Nullable CharacterPositions positions, int version, @Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass) {
+    record Look(@Nonnull CharacterMarkerRule.Shown shown, @Nullable String epithet) {}
 
-        /**
-         * @return whether the computation failed: kept until the next invalidation rather than
-         * retried at every call.
-         */
-        boolean failed() {
-            return positions == null;
-        }
+    /**
+     * Which characters a player sees in one world, told by UUID so a world recreated under the same
+     * name is not mistaken for it.
+     *
+     * @param positions the world's positions, {@code null} when the computation failed: kept until
+     *                  the next invalidation rather than retried at every call.
+     * @param decided   every character judged, shown or not; another one appearing calls for a recompute.
+     */
+    record Seen(@Nonnull UUID world, @Nullable CharacterPositions positions, @Nonnull Set<String> decided, @Nonnull Map<String, Look> shown) {}
+
+    /**
+     * A player's markers, from one decision and one version of the positions.
+     *
+     * @param undecided whether some NPC carries a character the decision did not judge.
+     */
+    record Built(@Nonnull Seen from, int version, @Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass, boolean undecided) {
 
         /**
          * A closed map shows nothing but the compass, which shows every marker it is given.
@@ -130,30 +141,34 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     }
 
     /**
-     * Runs on the world map thread: never reads a component, only schedules a recompute. The
-     * server hands a {@code Player} alone, whose identity getters are all marked for removal.
+     * Runs on the world map thread: never reads a component, only schedules a recompute and joins
+     * its result with the positions, which are safe to read from any thread. The server hands a
+     * {@code Player} alone, whose identity getters are all marked for removal.
      */
     @SuppressWarnings("removal")
     @Override
     public void update(@Nonnull World world, @Nonnull Player player, @Nonnull MarkersCollector collector) {
         UUID playerId = player.getPlayerRef().getUuid();
         PlayerMarkers markers = players.computeIfAbsent(playerId, id -> new PlayerMarkers());
-        Built current = markers.built;
-        boolean here = current != null && current.world.equals(world.getWorldConfig().getUuid());
-        boolean fresh = here && !markers.stale && (current.failed() || current.version == current.positions.version());
-        if (!fresh && markers.pending.compareAndSet(false, true)) world.execute(() -> recompute(world, playerId, markers));
-        if (here) current.replay(markers.mapOpen, collector);
+        Seen seen = markers.seen;
+        boolean here = seen != null && seen.world.equals(world.getWorldConfig().getUuid());
+        if ((!here || markers.stale) && markers.pending.compareAndSet(false, true)) world.execute(() -> recompute(world, playerId, markers));
+        if (!here || seen.positions == null) return;
+
+        // Read before the view, so a change in between only makes the next call join again
+        int version = seen.positions.version();
+        Built built = markers.built;
+        if (built == null || built.from != seen || built.version != version) {
+            built = join(seen, version, seen.positions.view());
+            markers.built = built;
+            if (built.undecided) markers.stale = true;
+        }
+        built.replay(markers.mapOpen, collector);
     }
 
-    /**
-     * A failure leaves an empty list marked failed, so it is not retried ten times a second until
-     * the next invalidation.
-     */
     private void recompute(@Nonnull World world, @Nonnull UUID playerId, @Nonnull PlayerMarkers markers) {
         UUID worldId = world.getWorldConfig().getUuid();
         try {
-            CharacterPositions positions;
-            int version;
             PlayerRef playerRef = Universe.get().getPlayer(playerId);
             if (playerRef == null) {
                 // A call that came after the player left must not keep them
@@ -162,14 +177,14 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
             }
             if (!worldId.equals(playerRef.getWorldUuid())) return;
             markers.stale = false;
-            positions = this.positions.positions(world.getEntityStore().getStore());
-            version = positions.version();
-            Built built = build(worldId, positions, version, positions.view(), histories.apply(playerRef), statuses(playerId));
-            if (players.get(playerId) != markers) return;
-            markers.built = built;
+            CharacterPositions positions = this.positions.positions(world.getEntityStore().getStore());
+            Set<String> decided = Set.copyOf(positions.view().keySet());
+            DialogueHistory history = histories.apply(playerRef);
+            Seen seen = new Seen(worldId, positions, decided, looks(decided, id -> history != null && history.count(id, null, null) > 0, statuses(playerId)));
+            if (players.get(playerId) == markers) markers.seen = seen;
         } catch (RuntimeException e) {
             LOGGER.atWarning().withCause(e).log("Could not compute the character markers of player %s.", playerId);
-            markers.built = new Built(worldId, null, -1, List.of(), List.of());
+            markers.seen = new Seen(worldId, null, Set.of(), Map.of());
         } finally {
             markers.pending.set(false);
         }
@@ -191,23 +206,43 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
         return statuses;
     }
 
+    /**
+     * @param met whether the player talked to a character.
+     * @return how each shown character looks; one left out stays off the map.
+     */
     @Nonnull
-    Built build(@Nonnull UUID world, @Nonnull CharacterPositions positions, int version,@Nonnull Map<String, Collection<CharacterPositions.Spot>> spots, @Nullable DialogueHistory history, @Nonnull Map<String, List<CharacterMapStatus>> statuses) {
+    Map<String, Look> looks(@Nonnull Collection<String> characterIds, @Nonnull Predicate<String> met, @Nonnull Map<String, List<CharacterMapStatus>> statuses) {
+        Map<String, Look> looks = new HashMap<>();
+        for (String characterId : characterIds) {
+            OpenDialogueCharacterAsset character = assets.apply(characterId);
+            if (character == null) continue;
+            CharacterMarkerRule.Shown shown = CharacterMarkerRule.resolve(character.getMapVisibility(), character.getMapIcon(), met.test(characterId), CharacterMarkerRule.merge(statuses.getOrDefault(characterId, List.of())));
+            if (shown != null) looks.put(characterId, new Look(shown, character.getEpithet()));
+        }
+        return Map.copyOf(looks);
+    }
+
+    /**
+     * @return one marker per NPC of each shown character.
+     */
+    @Nonnull
+    static Built join(@Nonnull Seen seen, int version, @Nonnull Map<String, Collection<CharacterPositions.Spot>> spots) {
         List<MapMarker> all = new ArrayList<>();
         List<MapMarker> compass = new ArrayList<>();
-        spots.forEach((characterId, npcs) -> {
-            OpenDialogueCharacterAsset character = assets.apply(characterId);
-            if (character == null) return;
-            boolean met = history != null && history.count(characterId, null, null) > 0;
-            CharacterMarkerRule.Shown shown = CharacterMarkerRule.resolve(character.getMapVisibility(), character.getMapIcon(), met, CharacterMarkerRule.merge(statuses.getOrDefault(characterId, List.of())));
-            if (shown == null) return;
-            for (CharacterPositions.Spot spot : npcs) {
-                MapMarker marker = marker(spot, shown, spot.name() != null ? spot.name() : character.getEpithet());
-                all.add(marker);
-                if (shown.onCompass()) compass.add(marker);
+        boolean undecided = false;
+        for (Map.Entry<String, Collection<CharacterPositions.Spot>> entry : spots.entrySet()) {
+            Look look = seen.shown.get(entry.getKey());
+            if (look == null) {
+                undecided |= !seen.decided.contains(entry.getKey());
+                continue;
             }
-        });
-        return new Built(world, positions, version, List.copyOf(all), List.copyOf(compass));
+            for (CharacterPositions.Spot spot : entry.getValue()) {
+                MapMarker marker = marker(spot, look.shown(), spot.name() != null ? spot.name() : look.epithet());
+                all.add(marker);
+                if (look.shown().onCompass()) compass.add(marker);
+            }
+        }
+        return new Built(seen, version, List.copyOf(all), List.copyOf(compass), undecided);
     }
 
     @Nonnull

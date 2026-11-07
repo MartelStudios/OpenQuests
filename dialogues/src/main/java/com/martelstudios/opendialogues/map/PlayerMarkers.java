@@ -8,10 +8,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 final class PlayerMarkers {
 
-    /** {@code null} until first computed. */
+    /** Which characters the player sees, {@code null} until first decided. */
+    volatile CharacterMarkerProvider.Seen seen;
+
+    /** The markers joined from {@link #seen} and the positions, {@code null} until first joined. */
     volatile CharacterMarkerProvider.Built built;
 
-    /** Starts stale, so the first call computes. */
+    /** Starts stale, so the first call decides. */
     volatile boolean stale = true;
 
     volatile boolean mapOpen;
