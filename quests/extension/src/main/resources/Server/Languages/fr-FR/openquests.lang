@@ -30,11 +30,12 @@ quest.default.jump = Sautez {quantity, plural, one {une fois} other {{quantity, 
 quest.default.cast-spell = Lancez {spell} {quantity, plural, one {une fois} other {{quantity, number} fois}}
 quest.default.any-spell = un sort
 quest.default.keyword-spell = un sort ({keyword})
-quest.default.lose-stat = Perdez {quantity, number} points de {stat}
-stat.Health = santé
-stat.Stamina = endurance
-stat.Mana = mana
-stat.Oxygen = oxygène
+quest.default.lose-stat = Perdez {quantity, number} points {stat}
+stat.Health = de santé
+stat.Stamina = d'endurance
+stat.Mana = de mana
+stat.other = de {id}
+stat.Oxygen = d'oxygène
 
 page.title = Journal de quêtes
 page.empty = Rien pour l'instant.

@@ -62,7 +62,7 @@ public class LoseStatQuestProgression extends QuantityQuestProgression<LoseStatQ
     @Override
     public Message getDefaultTitle() {
         String stat = getStat();
-        Message name = NAMED_STATS.contains(stat) ? Message.translation("openquests.stat." + stat) : Message.raw(stat);
+        Message name = NAMED_STATS.contains(stat) ? Message.translation("openquests.stat." + stat) : Message.translation("openquests.stat.other").param("id", stat);
 
         return Message.translation("openquests.quest.default.lose-stat").param("quantity", getTargetQuantity()).param("stat", name);
     }
