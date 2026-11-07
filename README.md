@@ -467,7 +467,7 @@ comes from.
 | `UseEntity` | Interacting with NPCs of a group a number of times. |
 | `KillNpc` | Killing NPCs of a group, either an existing one or one written inline. |
 | `KillPlayer` | Killing players, optionally a designated one. |
-| `ReachLocation` | Entering a radius around a position. |
+| `ReachLocation` | Entering a radius around a position. Shown on the map, and on the compass while tracked, unless `"ShowOnMap": false`. |
 | `EnterWorld` | Entering a world whose name matches a regular expression. |
 | `GameFlag` | A server game flag (`/gameflags list`) reaching `Level` (1 by default), such as `goblin_lab_power` once the goblin lab generator is repaired. Flags belong to the whole server: one repair completes the quest for everyone holding it, and a quest given afterwards completes at once. |
 | `TriggerVolume` | A `TriggerEventType` on trigger volumes whose whole name matches `VolumeNamePattern`, a number of times. Volumes pasted with a prefab keep their name, sometimes with a suffix, so this finds a spot in a generated world: `"(trash_pile_trigger\|enkindled_trigger_\|void_tower_trigger).*"` is the top of any breach watchtower. |
@@ -510,7 +510,8 @@ least 25 mana. Only falls count, so what the stat regains never takes progress b
 respawn nor a lowered maximum counts as a loss.
 
 The tracker only lists quests that asked for it. `AutoTrack` puts every quest made from the asset on
-the panel. A quest with a short description shows it under its title, greyed and smaller:
+the panel. A tracked quest also puts its target on the compass; every running one shows it on the map.
+A quest type points at a target by implementing `TargetedQuest`. A quest with a short description shows it under its title, greyed and smaller:
 
 ```json
 { "Type": "Composite", "TitleKey": "…", "AutoTrack": true }

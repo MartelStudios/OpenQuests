@@ -107,6 +107,8 @@ the Asset Editor and inheriting through `Parent`.
 | --- | --- |
 | `Uniqueness` | `None` (default): any number of NPCs carry it. `Alive`: one at a time, free again when it dies. `Forever`: one, and once dead it is never drawn again. |
 | `Scope` | `World` (default): uniqueness counts per world. `Universe`: across every world and instance. |
+| `MapVisibility` | When its NPCs show on a player's map. `WhenMet` (default): once the player talked to it, or while a running quest leads to it. `Always`: as soon as an NPC carries it. `Never`: not even for a quest. |
+| `MapIcon` | The map image, a path under `UI/WorldMap/MapMarkers/` (`MyPack/Seer.png`). Default `Coordinate.png`. |
 | `Traits` | What the character does. `Dialogue` opens `Dialogue` (`{ "Dialogue": … }` or `{ "Router": … }`) on F, spoken by `Speaker`. `Name` draws a name from `Names`, a name list id or one written inline. |
 
 ```json
@@ -123,6 +125,10 @@ the Asset Editor and inheriting through `Parent`.
 A speaker with `AllowNPCOverride` takes the NPC's name and the fields of the speaker the trait lends,
 so one villager speaker serves many characters. A dialogue with no `Speaker` shows no name at all:
 handy for an animal, whose lines read as the player's own thoughts.
+
+A mod reveals characters on a player's map, sets their icon or puts them on the compass through
+`OpenDialoguesPlugin.get().getCharacterMarkers().addStatusProvider(...)`, and calls `invalidate(player)`
+when what it says changed.
 
 **`Names/`** (type **OpenDialogueNameListAsset**): `Names`, a list of translation keys, one drawn
 per NPC.
