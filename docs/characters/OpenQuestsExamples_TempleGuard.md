@@ -49,7 +49,7 @@ need `goblin_lab_power`, which ties this line to the generator.
 ## Assets
 
 - `OpenDialogues/Characters/OpenQuestsExamples_TempleGuard.json`
-- `OpenDialogues/Distributions/OpenQuestsExamples_TempleGuard.json`
+- `OpenDialogues/CharacterDistributions/OpenQuestsExamples_TempleGuard.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleGuard.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Guard{Tale,Rune}{Revenant,Glutton,Voidtaken,Heart}.json`,
   `OpenQuestsExamples_GuardRuneSeen.json`, `OpenQuestsExamples_GuardDream.json`,

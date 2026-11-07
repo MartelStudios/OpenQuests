@@ -56,7 +56,7 @@ pays a random amount of `Ingredient_Life_Essence` (3, 5 or 8 at weights 50, 35, 
 ## Assets
 
 - `OpenDialogues/Characters/OpenQuestsExamples_TempleStag.json`
-- `OpenDialogues/Distributions/OpenQuestsExamples_TempleStag.json`
+- `OpenDialogues/CharacterDistributions/OpenQuestsExamples_TempleStag.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleStag.json`
 - `OpenDialogues/Names/OpenQuestsExamples_StagNames.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Stag{Intro,Idle,Seeds,Moult,Content}.json`

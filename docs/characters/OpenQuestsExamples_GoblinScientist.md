@@ -64,7 +64,7 @@ hide (engine), Voidhearts (compressor, console).
 ## Assets
 
 - `OpenDialogues/Characters/OpenQuestsExamples_GoblinScientist.json`
-- `OpenDialogues/Distributions/OpenQuestsExamples_GoblinScientist.json`
+- `OpenDialogues/CharacterDistributions/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Speakers/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_ScientistRepairsLeft.json`

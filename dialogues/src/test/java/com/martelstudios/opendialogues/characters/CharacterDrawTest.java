@@ -29,7 +29,7 @@ class CharacterDrawTest {
 
     @Test
     void drawNeverPicksUnavailableCharacter() {
-        List<OpenDialogueDistributionAsset.Entry> entries = entries("{ \"Character\": \"Mira\" }, {}");
+        List<OpenDialogueCharacterDistributionAsset.Entry> entries = entries("{ \"Character\": \"Mira\" }, {}");
         SplittableRandom random = new SplittableRandom(42);
 
         for (int i = 0; i < 100; i++) assertNull(CharacterDraw.draw(entries, id -> false, random).getCharacter());
@@ -37,7 +37,7 @@ class CharacterDrawTest {
 
     @Test
     void drawFollowsWeights() {
-        List<OpenDialogueDistributionAsset.Entry> entries = entries("{ \"Character\": \"Farmer\", \"Weight\": 3 }, { \"Character\": \"Mage\" }, { \"Weight\": 6 }");
+        List<OpenDialogueCharacterDistributionAsset.Entry> entries = entries("{ \"Character\": \"Farmer\", \"Weight\": 3 }, { \"Character\": \"Mage\" }, { \"Weight\": 6 }");
         RandomGenerator rolls = rolls(0, 3, 4);
 
         assertEquals("Farmer", CharacterDraw.draw(entries, id -> true, rolls).getCharacter());
@@ -47,7 +47,7 @@ class CharacterDrawTest {
 
     @Test
     void takenCharacterLeavesItsWeightToTheOthers() {
-        List<OpenDialogueDistributionAsset.Entry> entries = entries("{ \"Character\": \"Mira\", \"Weight\": 5 }, { \"Character\": \"Farmer\" }, {}");
+        List<OpenDialogueCharacterDistributionAsset.Entry> entries = entries("{ \"Character\": \"Mira\", \"Weight\": 5 }, { \"Character\": \"Farmer\" }, {}");
 
         assertNull(CharacterDraw.draw(entries, "Farmer"::equals, rolls(1)).getCharacter());
     }
@@ -59,7 +59,7 @@ class CharacterDrawTest {
 
     @Test
     void assignRecordsNothingForever() {
-        OpenDialogueDistributionAsset village = distribution("Village", "[]", "{}");
+        OpenDialogueCharacterDistributionAsset village = distribution("Village", "[]", "{}");
 
         CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(village), kweebec("Zone1"), id -> true, rolls(0), FAIL);
         assertEquals(List.of("Village"), draw.drawn());
@@ -70,7 +70,7 @@ class CharacterDrawTest {
 
     @Test
     void assignSkipsFailingFilters() {
-        OpenDialogueDistributionAsset temple = distribution("Temple", "[ { \"Type\": \"World\", \"Worlds\": [\"temple\"] } ]", "{ \"Character\": \"Farmer\" }");
+        OpenDialogueCharacterDistributionAsset temple = distribution("Temple", "[ { \"Type\": \"World\", \"Worlds\": [\"temple\"] } ]", "{ \"Character\": \"Farmer\" }");
 
         CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(temple), kweebec("Zone1"), id -> true, rolls(), FAIL);
 
@@ -80,8 +80,8 @@ class CharacterDrawTest {
 
     @Test
     void assignStopsAtFirstCharacter() {
-        OpenDialogueDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Mage\" }");
-        OpenDialogueDistributionAsset a = distribution("A", "[]", "{ \"Character\": \"Farmer\" }");
+        OpenDialogueCharacterDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Mage\" }");
+        OpenDialogueCharacterDistributionAsset a = distribution("A", "[]", "{ \"Character\": \"Farmer\" }");
 
         CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(b, a), kweebec("Zone1"), id -> true, rolls(0, 0), FAIL);
 
@@ -91,8 +91,8 @@ class CharacterDrawTest {
 
     @Test
     void assignOrdersByPriorityThenId() {
-        OpenDialogueDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Mage\" }", 5);
-        OpenDialogueDistributionAsset a = distribution("A", "[]", "{ \"Character\": \"Farmer\" }", 0);
+        OpenDialogueCharacterDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Mage\" }", 5);
+        OpenDialogueCharacterDistributionAsset a = distribution("A", "[]", "{ \"Character\": \"Farmer\" }", 0);
 
         CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(a, b), kweebec("Zone1"), id -> true, rolls(0), FAIL);
 
@@ -102,8 +102,8 @@ class CharacterDrawTest {
 
     @Test
     void assignLeavesIdentityUntouched() {
-        OpenDialogueDistributionAsset a = distribution("A", "[]", "{}");
-        OpenDialogueDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Farmer\" }");
+        OpenDialogueCharacterDistributionAsset a = distribution("A", "[]", "{}");
+        OpenDialogueCharacterDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Farmer\" }");
         Set<String> already = new HashSet<>(Set.of("Old"));
 
         CharacterAssigner.Draw draw = CharacterAssigner.assign(already, List.of(a, b), kweebec("Zone1"), id -> true, rolls(0, 0), FAIL);
@@ -114,7 +114,7 @@ class CharacterDrawTest {
 
     @Test
     void assignRecordsNothingWhenNoEntryIsEligible() {
-        OpenDialogueDistributionAsset village = distribution("Village", "[]", "{ \"Character\": \"Oak\" }");
+        OpenDialogueCharacterDistributionAsset village = distribution("Village", "[]", "{ \"Character\": \"Oak\" }");
 
         CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(village), kweebec("Zone1"), id -> false, rolls(), FAIL);
 
@@ -123,18 +123,18 @@ class CharacterDrawTest {
     }
 
     @Nonnull
-    private static List<OpenDialogueDistributionAsset.Entry> entries(@Nonnull String entries) {
+    private static List<OpenDialogueCharacterDistributionAsset.Entry> entries(@Nonnull String entries) {
         return List.of(distribution("Test", "[]", entries).getEntries());
     }
 
     @Nonnull
-    private static OpenDialogueDistributionAsset distribution(@Nonnull String id, @Nonnull String filters, @Nonnull String entries) {
+    private static OpenDialogueCharacterDistributionAsset distribution(@Nonnull String id, @Nonnull String filters, @Nonnull String entries) {
         return distribution(id, filters, entries, 0);
     }
 
     @Nonnull
-    private static OpenDialogueDistributionAsset distribution(@Nonnull String id, @Nonnull String filters, @Nonnull String entries, int priority) {
-        OpenDialogueDistributionAsset distribution = CodecJson.decode(OpenDialogueDistributionAsset.CODEC, "{ \"Priority\": " + priority + ", \"Filters\": " + filters + ", \"Characters\": [ " + entries + " ] }");
+    private static OpenDialogueCharacterDistributionAsset distribution(@Nonnull String id, @Nonnull String filters, @Nonnull String entries, int priority) {
+        OpenDialogueCharacterDistributionAsset distribution = CodecJson.decode(OpenDialogueCharacterDistributionAsset.CODEC, "{ \"Priority\": " + priority + ", \"Filters\": " + filters + ", \"Characters\": [ " + entries + " ] }");
         if (distribution == null) throw new IllegalArgumentException("Unreadable distribution " + entries);
         distribution.id = id;
         return distribution;

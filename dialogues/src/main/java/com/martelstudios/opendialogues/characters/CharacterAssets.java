@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  */
 public record CharacterAssets(@Nonnull Function<String, OpenDialogueCharacterAsset> characterById,
                               @Nonnull Supplier<Collection<OpenDialogueCharacterAsset>> allCharacters,
-                              @Nonnull Supplier<Collection<OpenDialogueDistributionAsset>> allDistributions,
+                              @Nonnull Supplier<Collection<OpenDialogueCharacterDistributionAsset>> allDistributions,
                               @Nonnull Function<String, OpenDialogueTextListAsset> textListById,
                               @Nonnull BiPredicate<Class<?>, String> declared) {
 
@@ -32,7 +32,7 @@ public record CharacterAssets(@Nonnull Function<String, OpenDialogueCharacterAss
     public static CharacterAssets live() {
         return new CharacterAssets(OpenDialogueCharacterAsset::getCharacter,
                                    () -> OpenDialogueCharacterAsset.getAssetStore().getAssetMap().getAssetMap().values(),
-                                   () -> OpenDialogueDistributionAsset.getAssetStore().getAssetMap().getAssetMap().values(),
+                                   () -> OpenDialogueCharacterDistributionAsset.getAssetStore().getAssetMap().getAssetMap().values(),
                                    OpenDialogueTextListAsset::getTextList,
                                    CharacterAssets::declaredInStore);
     }
@@ -49,7 +49,7 @@ public record CharacterAssets(@Nonnull Function<String, OpenDialogueCharacterAss
      * @return every distribution loaded, in no particular order.
      */
     @Nonnull
-    public Collection<OpenDialogueDistributionAsset> distributions() {
+    public Collection<OpenDialogueCharacterDistributionAsset> distributions() {
         return allDistributions.get();
     }
 

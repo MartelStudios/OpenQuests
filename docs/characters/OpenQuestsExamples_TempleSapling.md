@@ -47,7 +47,7 @@ quests existed gets the same answer assigning `LabScrap` directly.
 ## Assets
 
 - `OpenDialogues/Characters/OpenQuestsExamples_TempleSapling.json`
-- `OpenDialogues/Distributions/OpenQuestsExamples_TempleSapling.json`
+- `OpenDialogues/CharacterDistributions/OpenQuestsExamples_TempleSapling.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleSapling.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Sapling{Worry,Generator,Waiting,Relieved,Through,Grateful}.json`
 - `OpenQuests/Quests/OpenQuestsExamples_MeetSapling.json`

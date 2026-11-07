@@ -5,7 +5,7 @@ import com.hypixel.hytale.event.EventBus;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.characters.CharacterFixtures;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
-import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterDistributionAsset;
 import com.martelstudios.opendialogues.characters.RecordingTrait;
 import com.martelstudios.opendialogues.characters.ReleaseReason;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
@@ -40,7 +40,7 @@ class CharacterServiceTest {
     private final List<CharacterEvent> heard = new ArrayList<>();
     private final List<String> warnings = new ArrayList<>();
     private final Map<String, OpenDialogueCharacterAsset> characters = new HashMap<>();
-    private final List<OpenDialogueDistributionAsset> distributions = new ArrayList<>();
+    private final List<OpenDialogueCharacterDistributionAsset> distributions = new ArrayList<>();
     private final UniqueCharacters unique = new UniqueCharacters();
     private final UniverseCharacters universe = new UniverseCharacters();
     private final List<OpenDialoguesNPCIdentity> saved = new ArrayList<>();

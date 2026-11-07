@@ -1,6 +1,6 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
-import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterDistributionAsset;
 import com.martelstudios.opendialogues.characters.filters.CharacterFilter;
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
 
@@ -27,7 +27,7 @@ public final class CharacterAssigner {
      */
     public record Draw(@Nonnull List<String> drawn, @Nullable String character) {}
 
-    private static final Comparator<OpenDialogueDistributionAsset> ORDER = Comparator.comparingInt(OpenDialogueDistributionAsset::getPriority).reversed().thenComparing(OpenDialogueDistributionAsset::getId);
+    private static final Comparator<OpenDialogueCharacterDistributionAsset> ORDER = Comparator.comparingInt(OpenDialogueCharacterDistributionAsset::getPriority).reversed().thenComparing(OpenDialogueCharacterDistributionAsset::getId);
 
     private CharacterAssigner() {}
 
@@ -39,12 +39,12 @@ public final class CharacterAssigner {
      * @param warnings     where a filter that throws is reported; its distribution then does not hold.
      */
     @Nonnull
-    public static Draw assign(@Nonnull Set<String> alreadyDrawn, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull FilterContext context, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings) {
+    public static Draw assign(@Nonnull Set<String> alreadyDrawn, @Nonnull List<OpenDialogueCharacterDistributionAsset> distributions, @Nonnull FilterContext context, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings) {
         List<String> drawn = new ArrayList<>();
-        for (OpenDialogueDistributionAsset distribution : distributions.stream().sorted(ORDER).toList()) {
+        for (OpenDialogueCharacterDistributionAsset distribution : distributions.stream().sorted(ORDER).toList()) {
             if (alreadyDrawn.contains(distribution.getId()) || !holds(distribution, context, warnings)) continue;
 
-            OpenDialogueDistributionAsset.Entry entry = CharacterDraw.draw(List.of(distribution.getEntries()), available, random);
+            OpenDialogueCharacterDistributionAsset.Entry entry = CharacterDraw.draw(List.of(distribution.getEntries()), available, random);
             if (entry == null) continue;
             drawn.add(distribution.getId());
             if (entry.getCharacter() != null) return new Draw(List.copyOf(drawn), entry.getCharacter());
@@ -55,7 +55,7 @@ public final class CharacterAssigner {
     /**
      * A filter is often another mod's, so one that throws must never stop the scan.
      */
-    private static boolean holds(@Nonnull OpenDialogueDistributionAsset distribution, @Nonnull FilterContext context, @Nonnull BiConsumer<String, Throwable> warnings) {
+    private static boolean holds(@Nonnull OpenDialogueCharacterDistributionAsset distribution, @Nonnull FilterContext context, @Nonnull BiConsumer<String, Throwable> warnings) {
         for (CharacterFilter filter : distribution.getFilters()) {
             try {
                 if (!filter.test(context)) return false;

@@ -67,7 +67,7 @@ class ValidatorTest {
     }
 
     @Nonnull
-    private static List<String> problems(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions) {
+    private static List<String> problems(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueCharacterDistributionAsset> distributions) {
         return CharacterValidator.validate(CharacterFixtures.assets(characters, distributions, Map.of("Empty", EMPTY_LIST), Set.of("Hello")::contains));
     }
 
@@ -89,8 +89,8 @@ class ValidatorTest {
     }
 
     @Nonnull
-    private static OpenDialogueDistributionAsset distribution(@Nonnull String id, @Nonnull String entries) {
-        OpenDialogueDistributionAsset distribution = CodecJson.decode(OpenDialogueDistributionAsset.CODEC, "{ \"Characters\": [ " + entries + " ] }");
+    private static OpenDialogueCharacterDistributionAsset distribution(@Nonnull String id, @Nonnull String entries) {
+        OpenDialogueCharacterDistributionAsset distribution = CodecJson.decode(OpenDialogueCharacterDistributionAsset.CODEC, "{ \"Characters\": [ " + entries + " ] }");
         if (distribution == null) throw new IllegalArgumentException("Unreadable distribution " + entries);
         distribution.id = id;
         return distribution;

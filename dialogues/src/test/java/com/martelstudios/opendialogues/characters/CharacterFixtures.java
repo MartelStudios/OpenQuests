@@ -67,8 +67,8 @@ public final class CharacterFixtures {
     }
 
     @Nonnull
-    public static OpenDialogueDistributionAsset distribution(@Nonnull String id, @Nonnull String json) {
-        OpenDialogueDistributionAsset distribution = CodecJson.decode(OpenDialogueDistributionAsset.CODEC, json);
+    public static OpenDialogueCharacterDistributionAsset distribution(@Nonnull String id, @Nonnull String json) {
+        OpenDialogueCharacterDistributionAsset distribution = CodecJson.decode(OpenDialogueCharacterDistributionAsset.CODEC, json);
         if (distribution == null) throw new IllegalArgumentException("Unreadable distribution " + json);
         distribution.id = id;
         return distribution;
@@ -87,7 +87,7 @@ public final class CharacterFixtures {
      * @param leads whether a dialogue, router or other asset id is declared.
      */
     @Nonnull
-    public static CharacterAssets assets(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull Map<String, OpenDialogueTextListAsset> textLists, @Nonnull Predicate<String> leads) {
+    public static CharacterAssets assets(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueCharacterDistributionAsset> distributions, @Nonnull Map<String, OpenDialogueTextListAsset> textLists, @Nonnull Predicate<String> leads) {
         return new CharacterAssets(characters::get, characters::values, () -> distributions, textLists::get, (type, id) -> leads.test(id));
     }
 

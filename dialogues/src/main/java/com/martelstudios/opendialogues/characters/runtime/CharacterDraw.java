@@ -1,6 +1,6 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
-import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterDistributionAsset;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,10 +23,10 @@ public final class CharacterDraw {
      * @return the entry drawn, its character {@code null} for nobody; {@code null} when no entry was eligible.
      */
     @Nullable
-    public static OpenDialogueDistributionAsset.Entry draw(@Nonnull List<OpenDialogueDistributionAsset.Entry> entries, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random) {
-        List<OpenDialogueDistributionAsset.Entry> eligible = new ArrayList<>(entries.size());
+    public static OpenDialogueCharacterDistributionAsset.Entry draw(@Nonnull List<OpenDialogueCharacterDistributionAsset.Entry> entries, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random) {
+        List<OpenDialogueCharacterDistributionAsset.Entry> eligible = new ArrayList<>(entries.size());
         int total = 0;
-        for (OpenDialogueDistributionAsset.Entry entry : entries) {
+        for (OpenDialogueCharacterDistributionAsset.Entry entry : entries) {
             if (entry.getCharacter() == null || available.test(entry.getCharacter())) {
                 eligible.add(entry);
                 total += entry.getWeight();
@@ -35,7 +35,7 @@ public final class CharacterDraw {
         if (eligible.isEmpty()) return null;
 
         int roll = random.nextInt(total);
-        for (OpenDialogueDistributionAsset.Entry entry : eligible) {
+        for (OpenDialogueCharacterDistributionAsset.Entry entry : eligible) {
             roll -= entry.getWeight();
             if (roll < 0) return entry;
         }

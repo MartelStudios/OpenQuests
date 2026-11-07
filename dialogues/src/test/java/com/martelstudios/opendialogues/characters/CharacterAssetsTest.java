@@ -92,7 +92,7 @@ class CharacterAssetsTest {
     @Test
     void distributionEntryWithoutCharacterIsNothing() {
         CharacterFixtures.registerFilters();
-        OpenDialogueDistributionAsset distribution = CodecJson.decode(OpenDialogueDistributionAsset.CODEC, """
+        OpenDialogueCharacterDistributionAsset distribution = CodecJson.decode(OpenDialogueCharacterDistributionAsset.CODEC, """
             { "Filters": [ { "Type": "Group", "Groups": ["Kweebec_Civilian"] } ], "Characters": [ { "Weight": 6 } ] }
             """);
 
@@ -104,6 +104,6 @@ class CharacterAssetsTest {
 
     @Test
     void distributionRefusesZeroWeight() {
-        assertNull(CodecJson.decode(OpenDialogueDistributionAsset.CODEC, "{ \"Characters\": [ { \"Weight\": 0 } ] }"));
+        assertNull(CodecJson.decode(OpenDialogueCharacterDistributionAsset.CODEC, "{ \"Characters\": [ { \"Weight\": 0 } ] }"));
     }
 }

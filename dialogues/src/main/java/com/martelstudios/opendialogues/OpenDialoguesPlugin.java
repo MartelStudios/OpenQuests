@@ -35,7 +35,7 @@ import com.martelstudios.opendialogues.actions.impl.inventory.OpenDialoguesConsu
 import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
-import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterDistributionAsset;
 import com.martelstudios.opendialogues.characters.OpenDialogueTextListAsset;
 import com.martelstudios.opendialogues.characters.CharacterAssets;
 import com.martelstudios.opendialogues.characters.CharacterValidator;
@@ -242,10 +242,10 @@ public class OpenDialoguesPlugin extends JavaPlugin {
                                                     .setCodec(OpenDialogueCharacterAsset.CODEC)
                                                     .setKeyFunction(OpenDialogueCharacterAsset::getId)
                                                     .build());
-        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueDistributionAsset.class, new DefaultAssetMap<>())
-                                                    .setPath("OpenDialogues/Distributions/")
-                                                    .setCodec(OpenDialogueDistributionAsset.CODEC)
-                                                    .setKeyFunction(OpenDialogueDistributionAsset::getId)
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenDialogueCharacterDistributionAsset.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenDialogues/CharacterDistributions/")
+                                                    .setCodec(OpenDialogueCharacterDistributionAsset.CODEC)
+                                                    .setKeyFunction(OpenDialogueCharacterDistributionAsset::getId)
                                                     .build());
 
         onLoaded(OpenDialogueAsset.class, this::validateRouters);
@@ -253,7 +253,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         onLoaded(OpenDialogueRouterAsset.class, this::validateRouters);
         onLoaded(OpenDialogueCharacterAsset.class, this::validateCharacters);
         onLoaded(OpenDialogueCharacterAsset.class, () -> characterService.forgetFailures());
-        onLoaded(OpenDialogueDistributionAsset.class, this::validateCharacters);
+        onLoaded(OpenDialogueCharacterDistributionAsset.class, this::validateCharacters);
         getEventRegistry().register(BootEvent.class, event -> {
             booted = true;
             validateRouters();

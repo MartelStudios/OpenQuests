@@ -141,7 +141,7 @@ when what it says changed.
 **`TextLists/`** (type **OpenDialogueTextListAsset**): `Texts`, a list of translation keys a trait draws one of
 per NPC, such as a name.
 
-**`Distributions/`** (type **OpenDialogueDistributionAsset**): which NPCs draw what.
+**`CharacterDistributions/`** (type **OpenDialogueCharacterDistributionAsset**): which NPCs draw what.
 
 | Field | Meaning |
 | --- | --- |
