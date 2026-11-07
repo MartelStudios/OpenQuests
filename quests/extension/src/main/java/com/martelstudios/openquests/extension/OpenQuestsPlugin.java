@@ -65,6 +65,9 @@ public class OpenQuestsPlugin extends JavaPlugin {
         instance = this;
     }
 
+    /**
+     * @return the loaded plugin, for mods reaching its services; {@code null} before it is constructed.
+     */
     public static OpenQuestsPlugin get() {
         return instance;
     }

@@ -28,7 +28,7 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
     /** Id under which every world registers the provider. */
     public static final String ID = "OpenQuestsTargets";
 
-    /** Vanilla image, the one the spec settled on until a dedicated one is drawn. */
+    /** Vanilla image every client already has, so the mod ships none for it. */
     public static final String IMAGE = "Coordinate.png";
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
