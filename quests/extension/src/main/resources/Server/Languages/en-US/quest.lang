@@ -122,6 +122,36 @@ jump-master.title=Skyward
 jump-master.description=Gravity is a suggestion.
 jump-master.short=Jump 2,500 times
 
+stamina-novice.title=Second wind
+stamina-novice.description=Until the legs beg for mercy.
+stamina-novice.short=Spend 100 stamina
+stamina-adept.title=Hard worker
+stamina-adept.description=Effort becomes a habit.
+stamina-adept.short=Spend 1,000 stamina
+stamina-master.title=Bottomless lungs
+stamina-master.description=Fatigue has forgotten your name.
+stamina-master.short=Spend 10,000 stamina
+
+mana-novice.title=First spark
+mana-novice.description=The arcane answers a first call.
+mana-novice.short=Spend 250 mana
+mana-adept.title=Spellslinger
+mana-adept.description=Magic flows like water.
+mana-adept.short=Spend 2,500 mana
+mana-master.title=Archmage
+mana-master.description=The weave bends to your will.
+mana-master.short=Spend 25,000 mana
+
+health-novice.title=First bruises
+health-novice.description=Every adventurer starts somewhere.
+health-novice.short=Spend 100 health
+health-adept.title=Thick skin
+health-adept.description=What does not kill you...
+health-adept.short=Spend 1,000 health
+health-master.title=Unbreakable
+health-master.description=Ten thousand wounds, still standing.
+health-master.short=Spend 10,000 health
+
 temple-trial.title=The Temple's trial
 temple-trial.description=The temple measures those who enter it. Few are found worthy.
 temple-trial.short=Complete the temple's trials within three minutes
@@ -309,5 +339,6 @@ chapter.woodcutting=Woodcutting
 chapter.daily-life=Daily life
 chapter.athletics=Athletics
 chapter.combat=Combat
+chapter.endurance=Endurance
 chapter.goblin-breach=The Goblin Breach
 

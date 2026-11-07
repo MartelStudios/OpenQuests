@@ -375,6 +375,15 @@ classDiagram
         }
     }
 
+    namespace extension_stat {
+        class LoseStatQuestAsset {
+            String stat
+        }
+        class LoseStatQuestProgression {
+            double pending
+        }
+    }
+
     namespace extension_kill {
         class KillNpcQuestAsset {
             String npcGroupId
@@ -465,6 +474,8 @@ classDiagram
     TravelQuestProgression <|-- SprintQuestProgression
     QuantityQuestAsset <|-- JumpQuestAsset
     MovementQuestProgression <|-- JumpQuestProgression
+    QuantityQuestAsset <|-- LoseStatQuestAsset
+    QuantityQuestProgression <|-- LoseStatQuestProgression
 
     QuantityQuestAsset <|-- KillNpcQuestAsset
     QuantityQuestProgression <|-- KillNpcQuestProgression

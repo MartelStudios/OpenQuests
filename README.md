@@ -475,6 +475,7 @@ comes from.
 | `Run` | Covering a distance at the default pace. |
 | `Sprint` | Covering a distance at the fast pace. |
 | `Jump` | Jumping a number of times. |
+| `LoseStat` | Spending a number of points of the stat named by `Stat`: `Health`, `Stamina`, `Mana`, `Oxygen`, or one another mod adds. |
 | `Composite` | Its children, combined with `AND` or `OR`. `OR` children are separated in the tracker by an `OR` rule. |
 | `QuestState` | Between `Min` (1 by default) and `Max` (no limit by default) of the player's quests from `QuestAssetId` standing in the listed `States` (every state by default), running ones included: the same four fields as the `RequiresQuest` constraint. Can go back to `IN_PROGRESS`, so it also expresses a standing obligation (`"Min": 0, "Max": 0` for none). |
 | `NoOp` | Nothing on its own: a command, a reward, a constraint or a plugin ends it. |
@@ -502,6 +503,11 @@ the `TimeLimit` constraint, as for any other type.
 
 `Walk`, `Run` and `Sprint` count metres. With `"Measure": "Seconds"` they count the seconds spent moving at
 their pace instead, added up across every stretch: `TargetQuantity` is then a duration.
+
+`LoseStat` counts in the stat's own points, and each stat has its own scale: `Health` and `Mana` go
+from 0 to 100, `Stamina` from 0 to 10. A sprint costs about 0.8 stamina a second and a staff spell at
+least 25 mana. Only falls count, so what the stat regains never takes progress back, and neither a
+respawn nor a lowered maximum counts as a loss.
 
 The tracker only lists quests that asked for it. `AutoTrack` puts every quest made from the asset on
 the panel. A quest with a short description shows it under its title, greyed and smaller:

@@ -122,6 +122,36 @@ jump-master.title=Vers le ciel
 jump-master.description=La gravité n'est qu'une suggestion.
 jump-master.short=Sautez 2 500 fois
 
+stamina-novice.title=Second souffle
+stamina-novice.description=Jusqu'à ce que les jambes demandent grâce.
+stamina-novice.short=Dépensez 100 points d'endurance
+stamina-adept.title=Bourreau de travail
+stamina-adept.description=L'effort devient une habitude.
+stamina-adept.short=Dépensez 1 000 points d'endurance
+stamina-master.title=Poumons sans fond
+stamina-master.description=La fatigue a oublié votre nom.
+stamina-master.short=Dépensez 10 000 points d'endurance
+
+mana-novice.title=Première étincelle
+mana-novice.description=L'arcane répond à un premier appel.
+mana-novice.short=Dépensez 250 points de mana
+mana-adept.title=Lanceur de sorts
+mana-adept.description=La magie coule comme de l'eau.
+mana-adept.short=Dépensez 2 500 points de mana
+mana-master.title=Archimage
+mana-master.description=La trame plie sous votre volonté.
+mana-master.short=Dépensez 25 000 points de mana
+
+health-novice.title=Premiers bleus
+health-novice.description=Tout aventurier commence quelque part.
+health-novice.short=Dépensez 100 points de santé
+health-adept.title=Peau dure
+health-adept.description=Ce qui ne vous tue pas...
+health-adept.short=Dépensez 1 000 points de santé
+health-master.title=Increvable
+health-master.description=Dix mille blessures, toujours debout.
+health-master.short=Dépensez 10 000 points de santé
+
 temple-trial.title=L'épreuve du Temple
 temple-trial.description=Le temple jauge ceux qui y entrent. Rares sont ceux qu'il juge dignes.
 temple-trial.short=Réussissez les épreuves du temple en moins de trois minutes
@@ -309,5 +339,6 @@ chapter.woodcutting=Le bûcheronnage
 chapter.daily-life=La vie quotidienne
 chapter.athletics=Athlétisme
 chapter.combat=Combat
+chapter.endurance=Endurance
 chapter.goblin-breach=La brèche gobeline
 

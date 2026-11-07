@@ -1,0 +1,11 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Stamina",
+  "Icon": "Icons/ItemsGenerated/Potion_Stamina_Greater.png",
+  "Categories": ["Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "quest.stamina-master.title",
+  "DescriptionKey": "quest.stamina-master.description",
+  "ShortDescriptionKey": "quest.stamina-master.short",
+  "TargetQuantity": 10000
+}

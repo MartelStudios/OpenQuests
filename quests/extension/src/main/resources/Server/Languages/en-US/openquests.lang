@@ -30,6 +30,12 @@ quest.default.jump = Jump {quantity, plural, one {once} other {{quantity, number
 quest.default.cast-spell = Cast {spell} {quantity, plural, one {once} other {{quantity, number} times}}
 quest.default.any-spell = a spell
 quest.default.keyword-spell = a spell ({keyword})
+quest.default.lose-stat = Spend {quantity, number} {stat}
+stat.Health = health
+stat.Stamina = stamina
+stat.Mana = mana
+stat.other = {id}
+stat.Oxygen = oxygen
 
 page.title = Quest journal
 page.empty = Nothing here yet.
