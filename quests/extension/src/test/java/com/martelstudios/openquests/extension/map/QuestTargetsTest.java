@@ -72,6 +72,47 @@ class QuestTargetsTest {
         assertNull(hidden.target());
     }
 
+    @Test
+    void abandonedStepGivesNoTarget() {
+        CompositeScene scene = scene(QuestVisibility.ALWAYS);
+        abandon(scene.step(spot("Always")));
+
+        assertTrue(targets(scene, Set.of()).runningFor(PLAYER, List.of(scene.group().getId())).isEmpty());
+    }
+
+    @Test
+    void abandonedGroupGivesNoTarget() {
+        CompositeScene scene = scene(QuestVisibility.ALWAYS);
+        scene.step(spot("Always"));
+        abandon(scene.group());
+
+        assertTrue(targets(scene, Set.of()).runningFor(PLAYER, List.of(scene.group().getId())).isEmpty());
+    }
+
+    @Test
+    void locationOnCompassOnlyWhileTracked() {
+        CompositeScene scene = scene(QuestVisibility.ALWAYS);
+        scene.step(spot("Always"));
+
+        QuestTargetMarkerProvider.Built untracked = markers(targets(scene, Set.of()), scene);
+        QuestTargetMarkerProvider.Built tracked = markers(targets(scene, Set.of(scene.group().getId())), scene);
+
+        assertEquals(1, untracked.all().size());
+        assertTrue(untracked.compass().isEmpty());
+        assertNull(untracked.all().getFirst().compassImage);
+        assertEquals(1, tracked.compass().size());
+        assertEquals(QuestTargetMarkerProvider.IMAGE, tracked.compass().getFirst().compassImage);
+    }
+
+    private static QuestTargetMarkerProvider.Built markers(QuestTargets targets, CompositeScene scene) {
+        return new QuestTargetMarkerProvider(targets, player -> null).build(UUID.randomUUID(), "default", targets.runningFor(PLAYER, List.of(scene.group().getId())));
+    }
+
+    private static void abandon(AbstractQuestProgression<?> quest) {
+        quest.apply(new AbstractQuestProgression.Join(PLAYER));
+        quest.apply(new AbstractQuestProgression.Abandon(PLAYER));
+    }
+
     private static QuestTargets targets(CompositeScene scene, Set<UUID> tracked) {
         return new QuestTargets(scene::quest, scene.steps(), (quest, player) -> tracked.contains(quest.getId()));
     }

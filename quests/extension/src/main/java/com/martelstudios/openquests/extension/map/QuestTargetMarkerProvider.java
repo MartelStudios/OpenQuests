@@ -122,22 +122,30 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
     @Nonnull
     private Built build(@Nonnull UUID playerId, @Nonnull World in) {
         UUID world = in.getWorldConfig().getUuid();
-        List<MapMarker> all = new ArrayList<>();
-        List<MapMarker> compass = new ArrayList<>();
         try {
             QuestStoreComponent store = stores.apply(playerId);
-            if (store == null) return new Built(world, List.of(), List.of());
-            for (QuestTargets.Running running : targets.runningFor(playerId, store.getQuestIds())) {
-                if (!(running.target() instanceof QuestTarget.Location location) || !targets.shownIn(running.quest(), in.getName())) continue;
-                MapMarkerBuilder builder = new MapMarkerBuilder("OpenQuests:" + running.quest().getId(), IMAGE, new Transform(location.position())).withName(running.quest().getTitle());
-                if (running.tracked()) builder.withCompassImage(IMAGE);
-                MapMarker marker = builder.build();
-                all.add(marker);
-                if (running.tracked()) compass.add(marker);
-            }
+            return store == null ? new Built(world, List.of(), List.of()) : build(world, in.getName(), targets.runningFor(playerId, store.getQuestIds()));
         } catch (RuntimeException e) {
             LOGGER.atWarning().withCause(e).log("Could not compute the quest markers of player %s.", playerId);
             return new Built(world, List.of(), List.of());
+        }
+    }
+
+    /**
+     * @return one marker per running quest leading to a location shown in that world, on the
+     * compass while the quest is tracked.
+     */
+    @Nonnull
+    Built build(@Nonnull UUID world, @Nonnull String worldName, @Nonnull List<QuestTargets.Running> running) {
+        List<MapMarker> all = new ArrayList<>();
+        List<MapMarker> compass = new ArrayList<>();
+        for (QuestTargets.Running quest : running) {
+            if (!(quest.target() instanceof QuestTarget.Location location) || !targets.shownIn(quest.quest(), worldName)) continue;
+            MapMarkerBuilder builder = new MapMarkerBuilder("OpenQuests:" + quest.quest().getId(), IMAGE, new Transform(location.position())).withName(quest.quest().getTitle());
+            if (quest.tracked()) builder.withCompassImage(IMAGE);
+            MapMarker marker = builder.build();
+            all.add(marker);
+            if (quest.tracked()) compass.add(marker);
         }
         return new Built(world, List.copyOf(all), List.copyOf(compass));
     }

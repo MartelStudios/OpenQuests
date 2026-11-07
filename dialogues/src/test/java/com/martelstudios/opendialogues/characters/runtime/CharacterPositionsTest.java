@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
+import com.martelstudios.opendialogues.CodecJson;
 import org.joml.Vector3d;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +14,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CharacterPositionsTest {
 
     private static final UUID NPC = UUID.fromString("00000000-0000-0000-0000-000000000001");
+
+    @Test
+    void savedPositionsReloadWithTheirGenerations() {
+        CharacterPositions positions = new CharacterPositions();
+        positions.catchUp(1, 2);
+        positions.record("farmer", NPC, new Vector3d(1, 2, 3), "names.sorrel");
+        positions.record("mage", new UUID(0, 2), new Vector3d(4, 5, 6), null);
+
+        CharacterPositions reloaded = CodecJson.roundTrip(CharacterPositions.CODEC, positions);
+        reloaded.catchUp(1, 2);
+
+        assertEquals(positions.view(), reloaded.view());
+    }
 
     @Test
     void releaseForgetsTheNpc() {
