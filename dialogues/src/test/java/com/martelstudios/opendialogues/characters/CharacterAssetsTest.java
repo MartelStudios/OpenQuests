@@ -7,6 +7,7 @@ import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameT
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -79,6 +80,17 @@ class CharacterAssetsTest {
         assertEquals("key.drawn", fixed.displayEpithet(drawn));
         assertEquals("key.fixed", fixed.displayEpithet(new OpenDialoguesNPCIdentity()));
         assertNull(plain.displayEpithet(new OpenDialoguesNPCIdentity()));
+    }
+
+    @Test
+    void identityKeepsTheNameplateItSet() {
+        OpenDialoguesNPCIdentity identity = new OpenDialoguesNPCIdentity();
+        identity.setNameplate("key.name");
+
+        OpenDialoguesNPCIdentity copy = (OpenDialoguesNPCIdentity) identity.clone();
+
+        assertEquals("key.name", copy.getNameplate());
+        assertFalse(new OpenDialoguesNPCIdentity().sameAs(identity));
     }
 
     @Test
