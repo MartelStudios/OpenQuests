@@ -43,9 +43,17 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
      * A player's markers, as computed in one world from one version of its positions. The world is
      * told by UUID and its positions held, so a world recreated under the same name is not mistaken for it.
      *
-     * @param positions {@code null} when the computation failed before reading them.
+     * @param positions {@code null} when the computation failed.
      */
     record Built(@Nonnull UUID world, @Nullable CharacterPositions positions, int version, @Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass) {
+
+        /**
+         * @return whether the computation failed: kept until the next invalidation rather than
+         * retried at every call.
+         */
+        boolean failed() {
+            return positions == null;
+        }
 
         /**
          * A closed map shows nothing but the compass, which shows every marker it is given.
@@ -132,20 +140,20 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
         PlayerMarkers markers = players.computeIfAbsent(playerId, id -> new PlayerMarkers());
         Built current = markers.built;
         boolean here = current != null && current.world.equals(world.getWorldConfig().getUuid());
-        boolean fresh = here && current.positions != null && current.version == current.positions.version() && !markers.stale;
+        boolean fresh = here && !markers.stale && (current.failed() || current.version == current.positions.version());
         if (!fresh && markers.pending.compareAndSet(false, true)) world.execute(() -> recompute(world, playerId, markers));
         if (here) current.replay(markers.mapOpen, collector);
     }
 
     /**
-     * A failure leaves an empty list for the current positions, so it is not retried ten times a
-     * second until something changes.
+     * A failure leaves an empty list marked failed, so it is not retried ten times a second until
+     * the next invalidation.
      */
     private void recompute(@Nonnull World world, @Nonnull UUID playerId, @Nonnull PlayerMarkers markers) {
         UUID worldId = world.getWorldConfig().getUuid();
-        CharacterPositions positions = null;
-        int version = -1;
         try {
+            CharacterPositions positions;
+            int version;
             PlayerRef playerRef = Universe.get().getPlayer(playerId);
             if (playerRef == null) {
                 // A call that came after the player left must not keep them
@@ -157,10 +165,11 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
             positions = this.positions.positions(world.getEntityStore().getStore());
             version = positions.version();
             Built built = build(worldId, positions, version, positions.view(), histories.apply(playerRef), statuses(playerId));
-            if (players.get(playerId) == markers) markers.built = built;
+            if (players.get(playerId) != markers) return;
+            markers.built = built;
         } catch (RuntimeException e) {
             LOGGER.atWarning().withCause(e).log("Could not compute the character markers of player %s.", playerId);
-            markers.built = new Built(worldId, positions, version, List.of(), List.of());
+            markers.built = new Built(worldId, null, -1, List.of(), List.of());
         } finally {
             markers.pending.set(false);
         }
