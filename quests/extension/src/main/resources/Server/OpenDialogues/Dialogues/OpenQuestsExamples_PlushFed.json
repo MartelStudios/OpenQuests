@@ -1,7 +1,7 @@
 {
   "Title": "openquestsexamples.plush.speaker.name",
   "Display": "Default",
-  "Speaker": "OpenQuestsExamples_PlushFed",
+  "Character": "OpenQuestsExamples_PlushFed",
   "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
   "Pages": [
     { "Text": "openquestsexamples.plush.fed.text" }
@@ -30,7 +30,7 @@
           "Dialogue": {
             "Title": "openquestsexamples.plush.speaker.name",
             "Display": "Default",
-            "Speaker": "OpenQuestsExamples_PlushFed",
+            "Character": "OpenQuestsExamples_PlushFed",
             "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
             "Pages": [
               { "Text": "openquestsexamples.plush.refused.text" }

@@ -1,6 +1,7 @@
 {
   "Display": "Cinematic",
-  "Speaker": "OpenQuestsExamples_KweebecVillager",
+  "Character": "OpenQuestsExamples_KweebecVillager",
+  "UseSourceCharacter": true,
   "Pages": [
     {
       "Text": "openquestsexamples.temple.seedling.intro.page1"

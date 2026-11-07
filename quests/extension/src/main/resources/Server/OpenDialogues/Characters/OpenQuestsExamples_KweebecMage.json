@@ -1,12 +1,17 @@
 {
+  "Epithet": "openquestsexamples.kweebec.mage.epithet",
   "Uniqueness": "Forever",
   "Scope": "Universe",
   "Traits": [
     {
       "Type": "Dialogue",
-      "Dialogue": { "Dialogue": "OpenQuestsExamples_KweebecMage" },
-      "Speaker": { "Epithet": "openquestsexamples.kweebec.mage.epithet" }
+      "Dialogue": {
+        "Dialogue": "OpenQuestsExamples_KweebecMage"
+      }
     },
-    { "Type": "Name", "Names": "OpenQuestsExamples_KweebecNames" }
+    {
+      "Type": "Name",
+      "Names": "OpenQuestsExamples_KweebecNames"
+    }
   ]
 }

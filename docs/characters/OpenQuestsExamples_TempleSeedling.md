@@ -9,7 +9,7 @@
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)` and `Unobstructed` (no tall grass
   hiding his hitbox), weight 1, no empty weight.
 - **Name:** drawn from `OpenQuestsExamples_KweebecNames`; epithet "Curious seedling" / "Petit curieux".
-- **Speaker:** `OpenQuestsExamples_KweebecVillager`, cinematic display.
+- **Dialogues:** name `OpenQuestsExamples_KweebecVillager` with `UseSourceCharacter`, cinematic display.
 
 ## Personality and voice
 

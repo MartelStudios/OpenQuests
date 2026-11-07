@@ -10,8 +10,8 @@
 - **Distribution:** `OpenQuestsExamples_TempleStag`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
 - **Name:** "Enchanted Stag" / "Cerf enchanté", the only entry of `OpenQuestsExamples_StagNames`,
-  so the nameplate tells players which stag it is. **Speaker:** none: his dialogues have no
-  `Speaker`, so the page shows no name and every line is the player's inner voice.
+  so the nameplate tells players which stag it is. **Speaker:** none: his dialogues name no
+  `Character`, so the page shows no name and every line is the player's inner voice.
 
 ## Personality and voice
 
@@ -58,7 +58,7 @@ pays a random amount of `Ingredient_Life_Essence` (3, 5 or 8 at weights 50, 35, 
 - `OpenDialogues/Characters/OpenQuestsExamples_TempleStag.json`
 - `OpenDialogues/CharacterDistributions/OpenQuestsExamples_TempleStag.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleStag.json`
-- `OpenDialogues/Names/OpenQuestsExamples_StagNames.json`
+- `OpenDialogues/TextLists/OpenQuestsExamples_StagNames.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Stag{Intro,Idle,Seeds,Moult,Content}.json`
 - `OpenQuests/Quests/OpenQuestsExamples_MeetStag.json`, `OpenQuestsExamples_Stag*.json`, listed in chapter `ForgottenTemple`
 - Lang keys `openquestsexamples.temple.stag.*` and `openquestsexamples.quest.stag*`

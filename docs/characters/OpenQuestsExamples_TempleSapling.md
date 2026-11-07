@@ -9,7 +9,7 @@
 - **Distribution:** `OpenQuestsExamples_TempleSapling`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
 - **Name:** drawn from `OpenQuestsExamples_KweebecNames`; epithet "Young Kweebec" / "Jeune
-  Kweebec". **Speaker:** `OpenQuestsExamples_KweebecVillager`.
+  Kweebec". The dialogues name `OpenQuestsExamples_KweebecVillager` with `UseSourceCharacter`.
 
 ## Personality and voice
 

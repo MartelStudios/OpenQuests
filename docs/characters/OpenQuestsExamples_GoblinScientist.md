@@ -11,8 +11,9 @@
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
 - **Name:** drawn from `OpenQuestsExamples_KweebecNames`, shared for now, since a nameplate holds a name, not a
   title. A new draw can change it when she comes back as a visitor. "Makinomagistra" / "Machinarque"
-  stays only the speaker's fallback name; quest texts call her by her epithet. **Speaker:** `OpenQuestsExamples_GoblinScientist`
-  (`AllowNPCOverride`, epithet "Lab foreman" / "Contremaîtresse du labo").
+  stays only the character's fixed name, shown when no name was drawn; quest texts call her by her epithet.
+  **Epithet:** "Lab foreman" / "Contremaîtresse du labo", on the character. Her dialogues name her with
+  `UseSourceCharacter`, so the drawn name shows.
 
 ## Personality and voice
 
@@ -65,7 +66,6 @@ hide (engine), Voidhearts (compressor, console).
 
 - `OpenDialogues/Characters/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/CharacterDistributions/OpenQuestsExamples_GoblinScientist.json`
-- `OpenDialogues/Speakers/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_GoblinScientist.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_ScientistRepairsLeft.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Scientist{NoPower,Gateway,Scold}.json`,
