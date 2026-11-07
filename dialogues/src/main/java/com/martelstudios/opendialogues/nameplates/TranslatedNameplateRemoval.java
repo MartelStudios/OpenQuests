@@ -7,13 +7,16 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefChangeSystem;
 import com.hypixel.hytale.protocol.ComponentUpdateType;
+import com.hypixel.hytale.protocol.NameplateUpdate;
+import com.hypixel.hytale.server.core.entity.nameplate.Nameplate;
 import com.hypixel.hytale.server.core.modules.entity.tracker.EntityTrackerSystems;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 
 /**
- * Clears the plate on every viewer's screen when the component goes, as the vanilla nameplate does.
+ * Clears the plate on every viewer's screen when the component goes, as the vanilla nameplate does,
+ * unless a vanilla plate is left to show.
  */
 public class TranslatedNameplateRemoval extends RefChangeSystem<EntityStore, TranslatedNameplate> {
 
@@ -54,8 +57,11 @@ public class TranslatedNameplateRemoval extends RefChangeSystem<EntityStore, Tra
     public void onComponentRemoved(@Nonnull Ref<EntityStore> ref, @Nonnull TranslatedNameplate component, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         EntityTrackerSystems.Visible visible = store.getComponent(ref, visibleType);
         if (visible == null) return;
+        // A vanilla plate left on the entity must stay on screen: resend its text rather than clear.
+        Nameplate vanilla = store.getComponent(ref, Nameplate.getComponentType());
         for (EntityTrackerSystems.EntityViewer viewer : visible.visibleTo.values()) {
-            viewer.queueRemove(ref, ComponentUpdateType.Nameplate);
+            if (vanilla != null) viewer.queueUpdate(ref, new NameplateUpdate(vanilla.getText()));
+            else viewer.queueRemove(ref, ComponentUpdateType.Nameplate);
         }
     }
 }
