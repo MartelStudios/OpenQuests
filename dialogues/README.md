@@ -105,12 +105,15 @@ the Asset Editor and inheriting through `Parent`.
 
 | Field | Meaning |
 | --- | --- |
+| `Name` | Translation key of its fixed name, shown on the nameplate and in dialogues. A `Name` trait draws one per NPC instead. |
+| `Epithet` | Translation key of its fixed epithet, also the title of quests aimed at it. An `Epithet` trait draws one per NPC instead. |
+| `Portrait` | Portrait image shown in dialogues, a path relative to `Common/` under `Icons/`. |
 | `Uniqueness` | `None` (default): any number of NPCs carry it. `Alive`: one at a time, free again when it dies. `Forever`: one, and once dead it is never drawn again. |
 | `Scope` | `World` (default): uniqueness counts per world. `Universe`: across every world and instance. |
 | `MapVisibility` | When its NPCs show on a player's map. `WhenMet` (default): once the player talked to it, or while a running quest leads to it. `Always`: as soon as an NPC carries it. `Never`: not even for a quest. |
 | `MapIcon` | The map image, a path under `UI/WorldMap/MapMarkers/` (`MyPack/Seer.png`). Default `Coordinate.png`. |
 | `CompassRange` | Within how many blocks a player also sees its NPCs on the compass, while they show on the map. Pair with `Always` to guide players to a key character. Default `0`: only a tracked quest puts it there. |
-| `Traits` | What the character does. `Dialogue` opens `Dialogue` (`{ "Dialogue": … }` or `{ "Router": … }`) on F, spoken by `Speaker`. `Name` draws a name from `Names`, a text list id or one written inline. |
+| `Traits` | What the character does. `Dialogue` opens `Dialogue` (`{ "Dialogue": … }` or `{ "Router": … }`) on F, spoken by `Speaker`. `Name` draws a name from `Names` and `Epithet` an epithet from `Epithets`, each a text list id or one written inline. |
 
 ```json
 {

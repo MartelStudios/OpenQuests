@@ -1,6 +1,7 @@
 package com.martelstudios.opendialogues.characters;
 
 import com.martelstudios.opendialogues.CodecJson;
+import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
 import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,39 @@ class CharacterAssetsTest {
 
         assertNotNull(character);
         assertEquals(CharacterScope.Universe, character.getScope());
+    }
+
+    @Test
+    void characterDecodesIdentityFields() {
+        OpenDialogueCharacterAsset character = CodecJson.decodeUnvalidated(OpenDialogueCharacterAsset.CODEC, "{ \"Name\": \"key.name\", \"Epithet\": \"key.epithet\", \"Portrait\": \"Icons/Portrait.png\" }");
+
+        assertEquals("key.name", character.getName());
+        assertEquals("key.epithet", character.getEpithet());
+        assertEquals("Icons/Portrait.png", character.getPortrait());
+    }
+
+    @Test
+    void displayNamePrefersDrawnName() {
+        OpenDialogueCharacterAsset fixed = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{ \"Name\": \"key.fixed\" }");
+        OpenDialogueCharacterAsset nameless = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{}");
+        OpenDialoguesNPCIdentity drawn = new OpenDialoguesNPCIdentity();
+        drawn.setName("key.drawn");
+
+        assertEquals("key.drawn", fixed.displayName(drawn));
+        assertEquals("key.fixed", fixed.displayName(new OpenDialoguesNPCIdentity()));
+        assertNull(nameless.displayName(new OpenDialoguesNPCIdentity()));
+    }
+
+    @Test
+    void displayEpithetPrefersDrawnEpithet() {
+        OpenDialogueCharacterAsset fixed = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{ \"Epithet\": \"key.fixed\" }");
+        OpenDialogueCharacterAsset plain = CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{}");
+        OpenDialoguesNPCIdentity drawn = new OpenDialoguesNPCIdentity();
+        drawn.setEpithet("key.drawn");
+
+        assertEquals("key.drawn", fixed.displayEpithet(drawn));
+        assertEquals("key.fixed", fixed.displayEpithet(new OpenDialoguesNPCIdentity()));
+        assertNull(plain.displayEpithet(new OpenDialoguesNPCIdentity()));
     }
 
     @Test

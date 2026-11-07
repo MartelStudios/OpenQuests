@@ -91,7 +91,7 @@ public class OpenDialoguesDialogueTrait extends CharacterTrait {
     @Override
     public boolean onUse(@Nonnull CharacterContext context, @Nonnull PlayerRef player) {
         String characterId = context.character().getId();
-        DialogueTriggers.openFor(player, dialogue, new DialogueSource(context.uuid(), characterId, context.identity().getName(), speaker), "Character '" + characterId + "'");
+        DialogueTriggers.openFor(player, dialogue, new DialogueSource(context.uuid(), characterId, context.character().displayName(context.identity()), speaker), "Character '" + characterId + "'");
         return true;
     }
 

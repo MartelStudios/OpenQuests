@@ -26,6 +26,8 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
                                                                                    .add()
                                                                                    .append(new KeyedCodec<>("Name", Codec.STRING), (identity, name) -> identity.name = name, identity -> identity.name)
                                                                                    .add()
+                                                                                   .append(new KeyedCodec<>("Epithet", Codec.STRING), (identity, epithet) -> identity.epithet = epithet, identity -> identity.epithet)
+                                                                                   .add()
                                                                                    .append(new KeyedCodec<>("Draws", new ArrayCodec<>(Codec.STRING, String[]::new)), (identity, draws) -> identity.draws.addAll(List.of(draws)), identity -> identity.draws.toArray(String[]::new))
                                                                                    .add()
                                                                                    .append(new KeyedCodec<>("UniverseGeneration", Codec.INTEGER), (identity, generation) -> identity.universeGeneration = generation, identity -> identity.universeGeneration)
@@ -44,6 +46,9 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
     @Nullable
     private String name;
 
+    @Nullable
+    private String epithet;
+
     private final Set<String> draws = new LinkedHashSet<>();
 
     /**
@@ -59,7 +64,7 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
     }
 
     /**
-     * @return the translation key of the name drawn, {@code null} for a nameless character.
+     * @return the translation key of the name drawn, {@code null} when no trait drew one.
      */
     @Nullable
     public String getName() {
@@ -68,6 +73,18 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
 
     public void setName(@Nullable String name) {
         this.name = name;
+    }
+
+    /**
+     * @return the translation key of the epithet drawn, {@code null} for none.
+     */
+    @Nullable
+    public String getEpithet() {
+        return epithet;
+    }
+
+    public void setEpithet(@Nullable String epithet) {
+        this.epithet = epithet;
     }
 
     /**
@@ -115,17 +132,17 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
     }
 
     /**
-     * @return whether the NPC carries nothing worth saving: no character, no name, no draw.
+     * @return whether the NPC carries nothing worth saving: no character, no drawn text, no draw.
      */
     public boolean isBlank() {
-        return character == null && name == null && draws.isEmpty();
+        return character == null && name == null && epithet == null && draws.isEmpty();
     }
 
     /**
      * @return whether the other identity saves the same, so an unchanged NPC is not written again.
      */
     public boolean sameAs(@Nonnull OpenDialoguesNPCIdentity other) {
-        return Objects.equals(character, other.character) && Objects.equals(name, other.name) && draws.equals(other.draws)
+        return Objects.equals(character, other.character) && Objects.equals(name, other.name) && Objects.equals(epithet, other.epithet) && draws.equals(other.draws)
                && universeGeneration == other.universeGeneration && worldGeneration == other.worldGeneration;
     }
 
@@ -135,6 +152,7 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
         OpenDialoguesNPCIdentity clone = new OpenDialoguesNPCIdentity();
         clone.character = character;
         clone.name = name;
+        clone.epithet = epithet;
         clone.draws.addAll(draws);
         clone.universeGeneration = universeGeneration;
         clone.worldGeneration = worldGeneration;

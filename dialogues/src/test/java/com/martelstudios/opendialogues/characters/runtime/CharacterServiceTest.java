@@ -65,6 +65,15 @@ class CharacterServiceTest {
     }
 
     @Test
+    void assignedEventCarriesFixedName() {
+        characters.put("Mira", CharacterFixtures.character("Mira", "{ \"Name\": \"key.fixed\" }"));
+
+        assertTrue(service().give(npc(), "Mira"));
+
+        assertEquals("key.fixed", ((CharacterEvent.Assigned) heard.getFirst()).getName());
+    }
+
+    @Test
     void releaseRunsInReverseOrder() {
         character("Mira", "None", AB);
         CharacterService service = service();

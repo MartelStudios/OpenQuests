@@ -24,8 +24,8 @@ public final class NothingToSay {
      * Opens "{name} has nothing to tell you." with a single goodbye, the NPC as source.
      */
     public static void open(@Nonnull CharacterContext context, @Nonnull PlayerRef player) {
-        String nameKey = context.identity().getName();
-        String epithet = context.character().getEpithet();
+        String nameKey = context.character().displayName(context.identity());
+        String epithet = context.character().displayEpithet(context.identity());
         String name = nameKey != null ? PlayerTexts.translate(player, nameKey, Map.of())
                       : epithet != null ? PlayerTexts.translate(player, epithet, Map.of())
                       : context.character().getId();

@@ -12,6 +12,7 @@ import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesUnob
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesWorldFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesZoneFilter;
 import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesEpithetTrait;
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
@@ -40,6 +41,7 @@ public final class CharacterFixtures {
         registry.registerFilter(ThrowingFilter.TYPE, ThrowingFilter.class, ThrowingFilter.CODEC);
         registry.registerTrait(OpenDialoguesDialogueTrait.TYPE, OpenDialoguesDialogueTrait.class, OpenDialoguesDialogueTrait.CODEC);
         registry.registerTrait(OpenDialoguesNameTrait.TYPE, OpenDialoguesNameTrait.class, OpenDialoguesNameTrait.CODEC);
+        registry.registerTrait(OpenDialoguesEpithetTrait.TYPE, OpenDialoguesEpithetTrait.class, OpenDialoguesEpithetTrait.CODEC);
         registry.registerTrait(RecordingTrait.TYPE, RecordingTrait.class, RecordingTrait.CODEC);
     }
 
