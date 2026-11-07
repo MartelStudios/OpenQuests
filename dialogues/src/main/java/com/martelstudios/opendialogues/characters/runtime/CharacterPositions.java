@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -76,6 +77,11 @@ public class CharacterPositions implements Resource<EntityStore> {
     /** Bumped by the world thread alone, its only writer, so the unatomic increment loses nothing. */
     private volatile int version;
 
+    /** The last view handed out, shared by every player until the version moves. */
+    private volatile View cached;
+
+    private record View(int version, @Nonnull Map<String, Collection<Spot>> spots) {}
+
     /**
      * Records where an NPC carrying a character stands, replacing what it carried before.
      */
@@ -121,13 +127,22 @@ public class CharacterPositions implements Resource<EntityStore> {
     }
 
     /**
-     * @return the NPCs of each character, a copy.
+     * Built once per version, so a hundred players following one NPC move copy the NPCs once.
+     *
+     * @return the NPCs of each character, unmodifiable; their positions must not be changed either.
      */
     @Nonnull
     public Map<String, Collection<Spot>> view() {
+        // Read before the NPCs, so a change in between only labels a newer view older
+        int now = version;
+        View known = cached;
+        if (known != null && known.version == now) return known.spots;
         Map<String, Collection<Spot>> view = new HashMap<>();
         npcs.values().forEach(placed -> view.computeIfAbsent(placed.character, id -> new ArrayList<>()).add(placed.spot));
-        return view;
+        view.replaceAll((id, spots) -> List.copyOf(spots));
+        Map<String, Collection<Spot>> spots = Map.copyOf(view);
+        cached = new View(now, spots);
+        return spots;
     }
 
     private void load(@Nonnull Saved[] saved) {

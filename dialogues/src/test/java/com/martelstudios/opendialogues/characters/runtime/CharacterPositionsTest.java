@@ -9,11 +9,24 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CharacterPositionsTest {
 
     private static final UUID NPC = UUID.fromString("00000000-0000-0000-0000-000000000001");
+
+    @Test
+    void viewIsSharedUntilTheVersionMoves() {
+        CharacterPositions positions = new CharacterPositions();
+        positions.record("farmer", NPC, new Vector3d(), null);
+        Map<String, java.util.Collection<CharacterPositions.Spot>> first = positions.view();
+
+        assertSame(first, positions.view());
+        positions.record("farmer", NPC, new Vector3d(5, 0, 0), null);
+        assertNotSame(first, positions.view());
+    }
 
     @Test
     void savedPositionsReloadWithTheirGenerations() {
