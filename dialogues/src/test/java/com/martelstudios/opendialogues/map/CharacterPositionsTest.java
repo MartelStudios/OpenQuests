@@ -38,12 +38,16 @@ class CharacterPositionsTest {
     @Test
     void catchUpClearsWhenBehind() {
         CharacterPositions positions = new CharacterPositions();
-        positions.catchUp(1);
+        positions.catchUp(1, 1);
         positions.record("farmer", NPC, new Vector3d(), null);
 
-        positions.catchUp(1);
+        positions.catchUp(1, 1);
         assertFalse(positions.view().isEmpty());
-        positions.catchUp(2);
+        positions.catchUp(1, 2);
+        assertTrue(positions.view().isEmpty());
+
+        positions.record("farmer", NPC, new Vector3d(), null);
+        positions.catchUp(2, 2);
         assertTrue(positions.view().isEmpty());
     }
 

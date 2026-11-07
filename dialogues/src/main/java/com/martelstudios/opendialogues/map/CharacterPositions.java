@@ -66,10 +66,13 @@ public class CharacterPositions implements Resource<EntityStore> {
                                                                              .add()
                                                                              .append(new KeyedCodec<>("UniverseGeneration", Codec.INTEGER), (positions, generation) -> positions.universeGeneration = generation, positions -> positions.universeGeneration)
                                                                              .add()
+                                                                             .append(new KeyedCodec<>("WorldGeneration", Codec.INTEGER), (positions, generation) -> positions.worldGeneration = generation, positions -> positions.worldGeneration)
+                                                                             .add()
                                                                              .build();
 
     private final Map<UUID, Placed> npcs = new ConcurrentHashMap<>();
     private volatile int universeGeneration;
+    private volatile int worldGeneration;
     private volatile int version;
 
     /**
@@ -99,11 +102,13 @@ public class CharacterPositions implements Resource<EntityStore> {
     }
 
     /**
-     * Forgets every NPC once the universe was reset since they were recorded.
+     * Forgets every NPC once the universe or the world was reset since they were recorded: their
+     * NPCs draw again.
      */
-    public void catchUp(int universeGeneration) {
-        if (universeGeneration <= this.universeGeneration) return;
-        this.universeGeneration = universeGeneration;
+    public void catchUp(int universeGeneration, int worldGeneration) {
+        if (universeGeneration <= this.universeGeneration && worldGeneration <= this.worldGeneration) return;
+        this.universeGeneration = Math.max(this.universeGeneration, universeGeneration);
+        this.worldGeneration = Math.max(this.worldGeneration, worldGeneration);
         clear();
     }
 
@@ -150,6 +155,7 @@ public class CharacterPositions implements Resource<EntityStore> {
         CharacterPositions clone = new CharacterPositions();
         clone.npcs.putAll(npcs);
         clone.universeGeneration = universeGeneration;
+        clone.worldGeneration = worldGeneration;
         return clone;
     }
 }
