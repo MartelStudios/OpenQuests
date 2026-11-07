@@ -1,0 +1,20 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Health",
+  "Icon": "Icons/ItemsGenerated/Potion_Health.png",
+  "Categories": ["Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "quest.health-adept.title",
+  "DescriptionKey": "quest.health-adept.description",
+  "ShortDescriptionKey": "quest.health-adept.short",
+  "TargetQuantity": 1000,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "HealthMaster"
+      ]
+    }
+  ]
+}

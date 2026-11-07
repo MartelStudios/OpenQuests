@@ -107,6 +107,7 @@ the chapter's file is written for you.
 | <code>TriggerVolume</code>                               | Entering trigger volumes, even in generated worlds                 |
 | <code>Walk</code>, <code>Run</code>, <code>Sprint</code> | Covering a distance, or a time, at that pace                       |
 | <code>Jump</code>                                        | Jumping a number of times                                          |
+| <code>LoseStat</code>                                    | Losing points of a stat: health, stamina, mana, oxygen             |
 | <code>Composite</code>                                   | Its children, combined with <code>AND</code> or <code>OR</code>    |
 | <code>QuestState</code>                                  | Another quest reaching a state: a prerequisite                     |
 | <code>NoOp</code>                                        | Nothing on its own: a command, a reward or your own plugin ends it |

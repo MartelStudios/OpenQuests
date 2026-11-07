@@ -1,0 +1,20 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Mana",
+  "Icon": "Icons/ItemsGenerated/Potion_Mana_Small.png",
+  "Categories": ["Achievement"],
+  "Visibility": "WhenCompleted",
+  "TitleKey": "quest.mana-novice.title",
+  "DescriptionKey": "quest.mana-novice.description",
+  "ShortDescriptionKey": "quest.mana-novice.short",
+  "TargetQuantity": 250,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "ManaAdept"
+      ]
+    }
+  ]
+}

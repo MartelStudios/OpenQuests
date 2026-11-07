@@ -1,0 +1,20 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Health",
+  "Icon": "Icons/ItemsGenerated/Potion_Health_Lesser.png",
+  "Categories": ["Achievement"],
+  "Visibility": "WhenCompleted",
+  "TitleKey": "quest.health-novice.title",
+  "DescriptionKey": "quest.health-novice.description",
+  "ShortDescriptionKey": "quest.health-novice.short",
+  "TargetQuantity": 100,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "HealthAdept"
+      ]
+    }
+  ]
+}

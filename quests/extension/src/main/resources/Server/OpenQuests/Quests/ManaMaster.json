@@ -1,0 +1,11 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Mana",
+  "Icon": "Icons/ItemsGenerated/Potion_Mana_Large.png",
+  "Categories": ["Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "quest.mana-master.title",
+  "DescriptionKey": "quest.mana-master.description",
+  "ShortDescriptionKey": "quest.mana-master.short",
+  "TargetQuantity": 25000
+}
