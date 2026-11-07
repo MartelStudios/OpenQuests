@@ -17,6 +17,7 @@ import com.hypixel.hytale.codec.validation.ValidatorCache;
 import com.hypixel.hytale.protocol.Color;
 import com.hypixel.hytale.server.core.codec.protocol.ColorCodec;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 
 import javax.annotation.Nonnull;
@@ -44,7 +45,9 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
                                                                                  .append(new KeyedCodec<>("Display", Codec.STRING), (dialogue, display) -> dialogue.display = display, dialogue -> dialogue.display)
                                                                                  .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DISPLAYS_DATA_SET)))
                                                                                  .add()
-                                                                                 .append(new KeyedCodec<>("Speaker", OpenDialogueSpeakerAsset.CONTAINED_CODEC), (dialogue, speaker) -> dialogue.speaker = speaker, dialogue -> dialogue.speaker)
+                                                                                 .append(new KeyedCodec<>("Character", OpenDialogueCharacterAsset.CONTAINED_CODEC), (dialogue, character) -> dialogue.character = character, dialogue -> dialogue.character)
+                                                                                 .add()
+                                                                                 .append(new KeyedCodec<>("UseSourceCharacter", Codec.BOOLEAN), (dialogue, use) -> dialogue.useSourceCharacter = use, dialogue -> dialogue.useSourceCharacter)
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Pages", new ArrayCodec<>(OpenDialoguesPage.CODEC, OpenDialoguesPage[]::new)), (dialogue, pages) -> dialogue.pages = pages, dialogue -> dialogue.pages)
                                                                                  .add()
@@ -78,7 +81,9 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     protected String display;
 
     @Nullable
-    protected String speaker;
+    protected String character;
+
+    protected boolean useSourceCharacter;
 
     protected OpenDialoguesPage[] pages = new OpenDialoguesPage[0];
     protected OpenDialoguesResponse[] responses = new OpenDialoguesResponse[0];
@@ -86,19 +91,15 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     protected OpenDialogueAsset() {}
 
     /**
-     * Speaker that shows the source NPC's drawn name and lent epithet, for dialogues built in code.
-     */
-    public static final String NPC_SPEAKER = "OpenDialogues_Npc";
-
-    /**
      * Builds a dialogue outside the asset store, for screens whose text is only known when shown.
      * Its texts are shown as given, a text that is no translation key reading as is.
      */
     @Nonnull
-    public static OpenDialogueAsset generated(@Nonnull String id, @Nullable String speakerId, @Nonnull String[] pageTexts, @Nonnull OpenDialoguesResponse[] responses) {
+    public static OpenDialogueAsset generated(@Nonnull String id, @Nullable String characterId, boolean useSourceCharacter, @Nonnull String[] pageTexts, @Nonnull OpenDialoguesResponse[] responses) {
         OpenDialogueAsset dialogue = new OpenDialogueAsset();
         dialogue.id = id;
-        dialogue.speaker = speakerId;
+        dialogue.character = characterId;
+        dialogue.useSourceCharacter = useSourceCharacter;
         dialogue.pages = new OpenDialoguesPage[pageTexts.length];
         for (int i = 0; i < pageTexts.length; i++) dialogue.pages[i] = new OpenDialoguesPage(pageTexts[i]);
         dialogue.responses = responses.clone();
@@ -156,19 +157,18 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     }
 
     /**
-     * @return who speaks, or {@code null} for a dialogue nobody voices or naming a speaker no pack declares.
+     * @return the id of the character who speaks, {@code null} for none.
      */
     @Nullable
-    public OpenDialogueSpeakerAsset getSpeaker() {
-        return speaker == null ? null : OpenDialogueSpeakerAsset.getSpeaker(speaker);
+    public String getCharacterId() {
+        return character;
     }
 
     /**
-     * @return the id of the speaker, {@code null} for none, for callers resolving it themselves.
+     * @return whether the character of the NPC the conversation came from speaks instead, when there is one.
      */
-    @Nullable
-    public String getSpeakerId() {
-        return speaker;
+    public boolean isUseSourceCharacter() {
+        return useSourceCharacter;
     }
 
     /**
@@ -193,6 +193,16 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
     @Nonnull
     public List<OpenDialoguesResponse> visibleResponses(@Nonnull ConditionContext context) {
         return Arrays.stream(responses).filter(response -> response.isShownTo(context)).toList();
+    }
+
+    /**
+     * Asked once every character is loaded, since a dialogue may name one another pack declares.
+     *
+     * @return why the character who speaks cannot be shown, {@code null} if it is fine.
+     */
+    @Nullable
+    public String findCharacterError(@Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
+        return character != null && characters.apply(character) == null ? "Character '" + character + "' is declared by no pack" : null;
     }
 
     /**

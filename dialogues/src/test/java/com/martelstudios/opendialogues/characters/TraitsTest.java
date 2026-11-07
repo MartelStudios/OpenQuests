@@ -24,8 +24,8 @@ class TraitsTest {
 
     @Test
     void nameTraitDrawsWithContextRandom() {
-        OpenDialogueNameListAsset list = CodecJson.decode(OpenDialogueNameListAsset.CODEC, "{ \"Names\": [\"npc.a\", \"npc.b\", \"npc.c\"] }");
-        CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of("List", list), Map.of(), id -> true);
+        OpenDialogueTextListAsset list = CodecJson.decode(OpenDialogueTextListAsset.CODEC, "{ \"Texts\": [\"npc.a\", \"npc.b\", \"npc.c\"] }");
+        CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of("List", list), id -> true);
         CharacterTrait name = CharacterFixtures.trait("{ \"Type\": \"Name\", \"Names\": \"List\" }");
         OpenDialoguesNPCIdentity identity = new OpenDialoguesNPCIdentity();
         RandomGenerator lastOfThree = new RandomGenerator() {
@@ -43,6 +43,29 @@ class TraitsTest {
         name.onAssigned(new CharacterContext(null, new Ref<>(null), UUID.randomUUID(), identity, CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{}"), assets, lastOfThree));
 
         assertEquals("npc.c", identity.getName());
+    }
+
+    @Test
+    void epithetTraitDrawsFromItsList() {
+        OpenDialogueTextListAsset list = CodecJson.decode(OpenDialogueTextListAsset.CODEC, "{ \"Texts\": [\"key.epithet\"] }");
+        CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of("Epithets", list), id -> true);
+        CharacterTrait epithet = CharacterFixtures.trait("{ \"Type\": \"Epithet\", \"Epithets\": \"Epithets\" }");
+        OpenDialoguesNPCIdentity identity = new OpenDialoguesNPCIdentity();
+
+        epithet.onAssigned(new CharacterContext(null, new Ref<>(null), UUID.randomUUID(), identity, CodecJson.decode(OpenDialogueCharacterAsset.CODEC, "{}"), assets, new java.util.SplittableRandom(1)));
+
+        assertEquals("key.epithet", identity.getEpithet());
+    }
+
+    @Test
+    void epithetTraitReportsUnknownList() {
+        CharacterAssets assets = CharacterFixtures.assets(Map.of(), List.of(), Map.of(), id -> true);
+        CharacterTrait epithet = CharacterFixtures.trait("{ \"Type\": \"Epithet\", \"Epithets\": \"Missing\" }");
+        List<String> problems = new java.util.ArrayList<>();
+
+        epithet.validate(assets, problems::add);
+
+        assertEquals(List.of("draws its epithet from an unknown or empty list 'Missing'"), problems);
     }
 
     @Test

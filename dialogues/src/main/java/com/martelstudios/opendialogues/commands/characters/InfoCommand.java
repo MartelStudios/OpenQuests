@@ -47,7 +47,8 @@ class InfoCommand extends AbstractTargetEntityCommand {
                 context.sendMessage(text("info.nobody"));
             } else {
                 describe(context, store, identity.getCharacter());
-                if (identity.getName() != null) context.sendMessage(text("info.name").param("name", Message.translation(identity.getName())));
+                String name = characters.displayName(identity);
+                if (name != null) context.sendMessage(text("info.name").param("name", Message.translation(name)));
             }
             if (identity != null && !identity.getDraws().isEmpty()) context.sendMessage(text("info.draws").param("draws", String.join(", ", identity.getDraws())));
         }

@@ -1,6 +1,7 @@
 {
   "Display": "Cinematic",
-  "Speaker": "OpenQuestsExamples_GoblinScientist",
+  "Character": "OpenQuestsExamples_GoblinScientist",
+  "UseSourceCharacter": true,
   "Pages": [
     {
       "Text": "openquestsexamples.goblin.scientist.report.gateway.page1"

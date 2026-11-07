@@ -9,7 +9,7 @@
 - **Distribution:** `OpenQuestsExamples_TempleSapling`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
 - **Name:** drawn from `OpenQuestsExamples_KweebecNames`; epithet "Young Kweebec" / "Jeune
-  Kweebec". **Speaker:** `OpenQuestsExamples_KweebecVillager`.
+  Kweebec". The dialogues name `OpenQuestsExamples_KweebecVillager` with `UseSourceCharacter`.
 
 ## Personality and voice
 
@@ -47,7 +47,7 @@ quests existed gets the same answer assigning `LabScrap` directly.
 ## Assets
 
 - `OpenDialogues/Characters/OpenQuestsExamples_TempleSapling.json`
-- `OpenDialogues/Distributions/OpenQuestsExamples_TempleSapling.json`
+- `OpenDialogues/CharacterDistributions/OpenQuestsExamples_TempleSapling.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleSapling.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Sapling{Worry,Generator,Waiting,Relieved,Through,Grateful}.json`
 - `OpenQuests/Quests/OpenQuestsExamples_MeetSapling.json`

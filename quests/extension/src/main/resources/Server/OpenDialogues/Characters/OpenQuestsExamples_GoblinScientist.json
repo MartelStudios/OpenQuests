@@ -1,4 +1,6 @@
 {
+  "Name": "openquestsexamples.goblin.scientist.name",
+  "Epithet": "openquestsexamples.goblin.scientist.epithet",
   "Uniqueness": "Forever",
   "Scope": "Universe",
   "MapVisibility": "Always",
@@ -7,8 +9,7 @@
       "Type": "Dialogue",
       "Dialogue": {
         "Router": "OpenQuestsExamples_GoblinScientist"
-      },
-      "Speaker": "OpenQuestsExamples_GoblinScientist"
+      }
     },
     {
       "Type": "Name",

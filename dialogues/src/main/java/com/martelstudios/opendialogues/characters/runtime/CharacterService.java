@@ -20,7 +20,6 @@ import com.martelstudios.opendialogues.characters.events.CharacterEvent;
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
 import com.martelstudios.opendialogues.nameplates.TranslatedNameplate;
 
 import javax.annotation.Nonnull;
@@ -167,7 +166,8 @@ public class CharacterService {
         CharacterContext context = context(npc, character);
         each(character, "onAssigned", trait -> trait.onAssigned(context));
         each(character, "onApplied", trait -> trait.onApplied(context));
-        events.dispatchFor(CharacterEvent.Assigned.class, characterId).dispatch(new CharacterEvent.Assigned(npc.ref(), npc.uuid(), characterId, npc.identity().getName()));
+        CharacterNameplate.apply(context);
+        events.dispatchFor(CharacterEvent.Assigned.class, characterId).dispatch(new CharacterEvent.Assigned(npc.ref(), npc.uuid(), characterId, character.displayName(npc.identity()), character.displayEpithet(npc.identity())));
         return true;
     }
 
@@ -329,6 +329,7 @@ public class CharacterService {
         }
         CharacterContext context = context(npc, character);
         each(character, "onApplied", trait -> trait.onApplied(context));
+        CharacterNameplate.apply(context);
         syncDemand(npc, character);
     }
 
@@ -347,7 +348,7 @@ public class CharacterService {
         OpenDialogueCharacterAsset character = characterOf(npc);
         if (character == null) return false;
         if (takeOver) {
-            CharacterEvent.Using using = events.dispatchFor(CharacterEvent.Using.class, character.getId()).dispatch(new CharacterEvent.Using(npc.ref(), npc.uuid(), character.getId(), npc.identity().getName(), player));
+            CharacterEvent.Using using = events.dispatchFor(CharacterEvent.Using.class, character.getId()).dispatch(new CharacterEvent.Using(npc.ref(), npc.uuid(), character.getId(), character.displayName(npc.identity()), character.displayEpithet(npc.identity()), player));
             if (using.isCancelled()) return true;
         }
         CharacterContext context = context(npc, character);
@@ -411,8 +412,8 @@ public class CharacterService {
         Interactions interactions = npc.accessor().getComponent(npc.ref(), Interactions.getComponentType());
         if (demanded(character.getId())) {
             npc.accessor().ensureAndGetComponent(npc.ref(), Interactable.getComponentType());
-            if (interactions != null && !OpenDialoguesDialogueTrait.DEFAULT_HINT.equals(interactions.getInteractionHint())) interactions.setInteractionHint(OpenDialoguesDialogueTrait.DEFAULT_HINT);
-        } else if (interactions != null && OpenDialoguesDialogueTrait.DEFAULT_HINT.equals(interactions.getInteractionHint())) {
+            if (interactions != null && !CharacterTrait.DEFAULT_HINT.equals(interactions.getInteractionHint())) interactions.setInteractionHint(CharacterTrait.DEFAULT_HINT);
+        } else if (interactions != null && CharacterTrait.DEFAULT_HINT.equals(interactions.getInteractionHint())) {
             interactions.setInteractionHint(null);
             npc.accessor().tryRemoveComponent(npc.ref(), Interactable.getComponentType());
         }
@@ -437,12 +438,16 @@ public class CharacterService {
                 CharacterTrait trait = traits[i];
                 run(trait, character, "onReleased", () -> trait.onReleased(context, reason));
             }
+            if (reason == ReleaseReason.Revoked) CharacterNameplate.remove(context);
         }
         List<String> lost = npc.unique().release(npc.uuid(), reason, this::knownCharacter);
-        String name = npc.identity().getName();
+        String name = character != null ? character.displayName(npc.identity()) : npc.identity().getName();
+        String epithet = character != null ? character.displayEpithet(npc.identity()) : npc.identity().getEpithet();
         npc.identity().setCharacter(null);
         npc.identity().setName(null);
-        events.dispatchFor(CharacterEvent.Released.class, characterId).dispatch(new CharacterEvent.Released(npc.ref(), npc.uuid(), characterId, name, reason));
+        npc.identity().setEpithet(null);
+        npc.identity().setNameplate(null);
+        events.dispatchFor(CharacterEvent.Released.class, characterId).dispatch(new CharacterEvent.Released(npc.ref(), npc.uuid(), characterId, name, epithet, reason));
         for (String id : lost) events.dispatchFor(CharacterEvent.Lost.class, id).dispatch(new CharacterEvent.Lost(id, CharacterEvent.Lost.Cause.Death));
     }
 
@@ -455,6 +460,15 @@ public class CharacterService {
     }
 
     /**
+     * @return the translation key of the NPC's display name, its drawn one when its character is gone.
+     */
+    @Nullable
+    public String displayName(@Nonnull OpenDialoguesNPCIdentity identity) {
+        OpenDialogueCharacterAsset character = identity.getCharacter() == null ? null : assets.character(identity.getCharacter());
+        return character != null ? character.displayName(identity) : identity.getName();
+    }
+
+    /**
      * @return the translation key of the F prompt the NPC shows, {@code null} for none.
      */
     @Nullable
@@ -462,7 +476,7 @@ public class CharacterService {
         OpenDialogueCharacterAsset character = identity.getCharacter() == null ? null : character(identity.getCharacter());
         if (character == null) return null;
         String hint = traitHint(character);
-        return hint != null || !demanded(character.getId()) ? hint : OpenDialoguesDialogueTrait.DEFAULT_HINT;
+        return hint != null || !demanded(character.getId()) ? hint : CharacterTrait.DEFAULT_HINT;
     }
 
     /**

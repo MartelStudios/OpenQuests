@@ -1,4 +1,5 @@
 {
+  "Epithet": "openquestsexamples.temple.seedling.epithet",
   "Uniqueness": "Forever",
   "Scope": "Universe",
   "Traits": [
@@ -6,9 +7,6 @@
       "Type": "Dialogue",
       "Dialogue": {
         "Router": "OpenQuestsExamples_TempleSeedling"
-      },
-      "Speaker": {
-        "Epithet": "openquestsexamples.temple.seedling.epithet"
       }
     },
     {

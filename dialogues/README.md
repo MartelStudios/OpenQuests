@@ -29,11 +29,14 @@ sits before the text. The colour tints the vanilla button, which already darkens
 tone, white leaves the button as it is. In the chat, `Color` colours the
 answer's text and icons are left out.
 
-Everything is edited in the Asset Editor, under the **OpenDialogueAsset** and
-**OpenDialogueSpeakerAsset** types. Fields naming another asset (`Speaker`, and `Dialogue` in an
-`Open` action) take either its id or a whole asset written inline, which becomes an
-asset of its own with a generated id. A speaker starts from another with `Parent`, then each field
-it sets overrides the parent's. Speakers live under `Server/OpenDialogues/Speakers/`.
+Everything is edited in the Asset Editor, under the **OpenDialogueAsset** type. A dialogue names
+who speaks with `Character`, a character id or one
+written inline (see [Characters](#characters)); with `UseSourceCharacter`, the character of the NPC
+the conversation came from speaks instead, falling back to `Character` field by field or when
+there is no such NPC. Fields naming another asset (`Character`, and `Dialogue` in an `Open` action)
+take either its id or a whole asset written inline, which becomes an asset of its own with a
+generated id. A dialogue with no character shows no name at all: handy for an animal, whose lines
+read as the player's own thoughts.
 
 | Action type | Does |
 | --- | --- |
@@ -105,36 +108,40 @@ the Asset Editor and inheriting through `Parent`.
 
 | Field | Meaning |
 | --- | --- |
+| `Name` | Translation key of its fixed name, shown on the nameplate and in dialogues, in each player's language. A `Name` trait draws one per NPC instead. |
+| `Epithet` | Translation key of its fixed epithet, also the title of quests aimed at it. An `Epithet` trait draws one per NPC instead. |
+| `Portrait` | Portrait image shown in dialogues, a path relative to `Common/` under `Icons/`. |
 | `Uniqueness` | `None` (default): any number of NPCs carry it. `Alive`: one at a time, free again when it dies. `Forever`: one, and once dead it is never drawn again. |
 | `Scope` | `World` (default): uniqueness counts per world. `Universe`: across every world and instance. |
 | `MapVisibility` | When its NPCs show on a player's map. `WhenMet` (default): once the player talked to it, or while a running quest leads to it. `Always`: as soon as an NPC carries it. `Never`: not even for a quest. |
 | `MapIcon` | The map image, a path under `UI/WorldMap/MapMarkers/` (`MyPack/Seer.png`). Default `Coordinate.png`. |
 | `CompassRange` | Within how many blocks a player also sees its NPCs on the compass, while they show on the map. Pair with `Always` to guide players to a key character. Default `0`: only a tracked quest puts it there. |
-| `Traits` | What the character does. `Dialogue` opens `Dialogue` (`{ "Dialogue": … }` or `{ "Router": … }`) on F, spoken by `Speaker`. `Name` draws a name from `Names`, a name list id or one written inline. |
+| `Traits` | What the character does. `Dialogue` opens `Dialogue` (`{ "Dialogue": … }` or `{ "Router": … }`) on F, with the NPC as source. `Name` draws a name from `Names` and `Epithet` an epithet from `Epithets`, each a text list id or one written inline. |
 
 ```json
 {
+  "Epithet": "mypack.seer.epithet",
   "Uniqueness": "Forever",
   "Scope": "Universe",
   "Traits": [
-    { "Type": "Dialogue", "Dialogue": { "Router": "MyPack_Seer" }, "Speaker": { "Epithet": "mypack.seer.epithet" } },
+    { "Type": "Dialogue", "Dialogue": { "Router": "MyPack_Seer" } },
     { "Type": "Name", "Names": "MyPack_ElfNames" }
   ]
 }
 ```
 
-A speaker with `AllowNPCOverride` takes the NPC's name and the fields of the speaker the trait lends,
-so one villager speaker serves many characters. A dialogue with no `Speaker` shows no name at all:
-handy for an animal, whose lines read as the player's own thoughts.
+A dialogue with `UseSourceCharacter` shows the character of the NPC it was opened from, with its
+drawn name, so one villager dialogue serves many characters. A character no distribution names is
+never drawn: it only speaks in dialogues that name it.
 
 A mod reveals characters on a player's map, sets their icon or puts them on the compass through
 `OpenDialoguesPlugin.get().getCharacterMarkers().addStatusProvider(...)`, and calls `invalidate(player)`
 when what it says changed.
 
-**`Names/`** (type **OpenDialogueNameListAsset**): `Names`, a list of translation keys, one drawn
-per NPC.
+**`TextLists/`** (type **OpenDialogueTextListAsset**): `Texts`, a list of translation keys a trait draws one of
+per NPC, such as a name.
 
-**`Distributions/`** (type **OpenDialogueDistributionAsset**): which NPCs draw what.
+**`CharacterDistributions/`** (type **OpenDialogueCharacterDistributionAsset**): which NPCs draw what.
 
 | Field | Meaning |
 | --- | --- |

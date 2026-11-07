@@ -11,18 +11,24 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
+import com.hypixel.hytale.server.core.asset.common.CommonAssetValidator;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
-import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
+import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Who an NPC becomes for good once a distribution draws it: how unique it is, and the traits that
- * make up its behaviour.
+ * Who an NPC becomes for good once a distribution draws it: its name, epithet and portrait, how
+ * unique it is, and the traits that make up its behaviour. A character no distribution draws only
+ * speaks in dialogues.
  */
 public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenDialogueCharacterAsset>> {
+
+    /**
+     * Checks a portrait or icon names a PNG under {@code Common/Icons}.
+     */
+    public static final CommonAssetValidator ICON_VALIDATOR = new CommonAssetValidator("png", true, "Icons");
 
     public static final AssetBuilderCodec<String, OpenDialogueCharacterAsset> CODEC = AssetBuilderCodec.builder(OpenDialogueCharacterAsset.class, OpenDialogueCharacterAsset::new, Codec.STRING, (character, id) -> character.id = id, character -> character.id, (character, data) -> character.data = data, character -> character.data)
                                                                                                         .appendInherited(new KeyedCodec<>("Uniqueness", new EnumCodec<>(Uniqueness.class)), (character, uniqueness) -> character.uniqueness = uniqueness, character -> character.uniqueness, (character, parent) -> character.uniqueness = parent.uniqueness)
@@ -36,6 +42,13 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
                                                                                                         .appendInherited(new KeyedCodec<>("MapIcon", Codec.STRING), (character, icon) -> character.mapIcon = icon, character -> character.mapIcon, (character, parent) -> character.mapIcon = parent.mapIcon)
                                                                                                         .add()
                                                                                                         .appendInherited(new KeyedCodec<>("CompassRange", Codec.DOUBLE), (character, range) -> character.compassRange = range, character -> character.compassRange, (character, parent) -> character.compassRange = parent.compassRange)
+                                                                                                        .add()
+                                                                                                        .appendInherited(new KeyedCodec<>("Name", Codec.STRING), (character, name) -> character.name = name, character -> character.name, (character, parent) -> character.name = parent.name)
+                                                                                                        .add()
+                                                                                                        .appendInherited(new KeyedCodec<>("Epithet", Codec.STRING), (character, epithet) -> character.epithet = epithet, character -> character.epithet, (character, parent) -> character.epithet = parent.epithet)
+                                                                                                        .add()
+                                                                                                        .appendInherited(new KeyedCodec<>("Portrait", Codec.STRING), (character, portrait) -> character.portrait = portrait, character -> character.portrait, (character, parent) -> character.portrait = parent.portrait)
+                                                                                                        .addValidator(ICON_VALIDATOR)
                                                                                                         .add()
                                                                                                         .build();
 
@@ -63,6 +76,15 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
     private String mapIcon;
 
     private double compassRange;
+
+    @Nullable
+    private String name;
+
+    @Nullable
+    private String epithet;
+
+    @Nullable
+    private String portrait;
 
     protected OpenDialogueCharacterAsset() {}
 
@@ -135,17 +157,48 @@ public class OpenDialogueCharacterAsset implements JsonAssetWithMap<String, Defa
     }
 
     /**
-     * Names the character where no drawn name fits, such as a quest title shared by every carrier.
+     * @return the translation key of the fixed name, {@code null} for none.
+     */
+    @Nullable
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Names the character where no drawn epithet fits, such as a quest title shared by every carrier.
      *
-     * @return the epithet translation key of its first dialogue trait's speaker, {@code null} for none.
+     * @return the translation key of the fixed epithet, {@code null} for none.
      */
     @Nullable
     public String getEpithet() {
-        for (CharacterTrait trait : traits) {
-            if (!(trait instanceof OpenDialoguesDialogueTrait dialogue) || dialogue.getSpeaker() == null) continue;
-            OpenDialogueSpeakerAsset speaker = OpenDialogueSpeakerAsset.getSpeaker(dialogue.getSpeaker());
-            return speaker == null ? null : speaker.getEpithet();
-        }
-        return null;
+        return epithet;
+    }
+
+    /**
+     * @return the portrait image, relative to {@code Common/}, or {@code null} to show the name's initial.
+     */
+    @Nullable
+    public String getPortrait() {
+        return portrait;
+    }
+
+    /**
+     * The one name every display of an NPC shows: a drawn name wins over the fixed one.
+     *
+     * @return the translation key of the name, {@code null} for a nameless NPC.
+     */
+    @Nullable
+    public String displayName(@Nonnull OpenDialoguesNPCIdentity identity) {
+        return identity.getName() != null ? identity.getName() : name;
+    }
+
+    /**
+     * The one epithet every display of an NPC shows: a drawn epithet wins over the fixed one.
+     *
+     * @return the translation key of the epithet, {@code null} for none.
+     */
+    @Nullable
+    public String displayEpithet(@Nonnull OpenDialoguesNPCIdentity identity) {
+        return identity.getEpithet() != null ? identity.getEpithet() : epithet;
     }
 }

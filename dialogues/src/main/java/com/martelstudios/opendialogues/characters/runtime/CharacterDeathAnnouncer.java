@@ -2,7 +2,6 @@ package com.martelstudios.opendialogues.characters.runtime;
 
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.ReleaseReason;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
 
@@ -36,13 +35,12 @@ public final class CharacterDeathAnnouncer {
      */
     @Nullable
     public static Message message(@Nonnull CharacterEvent.Released event) {
-        OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(event.getCharacter());
-        return message(event.getName(), character == null ? null : character.getEpithet());
+        return message(event.getName(), event.getEpithet());
     }
 
     /**
-     * @param name    the translation key of the drawn name, {@code null} for a nameless NPC.
-     * @param epithet the translation key of the character's epithet, {@code null} for none.
+     * @param name    the translation key of the display name, {@code null} for a nameless NPC.
+     * @param epithet the translation key of the display epithet, {@code null} for none.
      * @return the line for that death, {@code null} when there is neither.
      */
     @Nullable

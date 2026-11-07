@@ -9,7 +9,7 @@
 - **Distribution:** `OpenQuestsExamples_TempleGuard`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
 - **Name:** drawn from `OpenQuestsExamples_KweebecNames`; epithet "Dreaming guard" / "Garde
-  rêveur". **Speaker:** `OpenQuestsExamples_KweebecVillager`.
+  rêveur". The dialogues name `OpenQuestsExamples_KweebecVillager` with `UseSourceCharacter`.
 
 ## Personality and voice
 
@@ -49,7 +49,7 @@ need `goblin_lab_power`, which ties this line to the generator.
 ## Assets
 
 - `OpenDialogues/Characters/OpenQuestsExamples_TempleGuard.json`
-- `OpenDialogues/Distributions/OpenQuestsExamples_TempleGuard.json`
+- `OpenDialogues/CharacterDistributions/OpenQuestsExamples_TempleGuard.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleGuard.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Guard{Tale,Rune}{Revenant,Glutton,Voidtaken,Heart}.json`,
   `OpenQuestsExamples_GuardRuneSeen.json`, `OpenQuestsExamples_GuardDream.json`,

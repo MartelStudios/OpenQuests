@@ -1,6 +1,7 @@
 package com.martelstudios.opendialogues.dialogues;
 
 import com.martelstudios.opendialogues.CodecJson;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
 import org.junit.jupiter.api.Test;
 
@@ -10,63 +11,56 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class SpeakerViewTest {
 
-    private static final DialogueSource MIRA = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", "Lent");
+    private static final DialogueSource SOURCE = new DialogueSource(UUID.randomUUID(), "Source", "n.src", "e.src");
 
-    private final OpenDialogueSpeakerAsset villager = speaker("{ \"Name\": \"npc.villager\", \"Epithet\": \"npc.kweebec\", \"Portrait\": \"Icons/Villager.png\", \"AllowNPCOverride\": true }");
+    private final Function<String, OpenDialogueCharacterAsset> characters = Map.of(
+        "Dialogue", character("{ \"Name\": \"n.dlg\", \"Epithet\": \"e.dlg\", \"Portrait\": \"p.dlg\" }"),
+        "Source", character("{ \"Portrait\": \"p.src\" }"),
+        "Bare", character("{}"))::get;
 
     @Test
-    void speakerWithoutOverrideIgnoresNpc() {
-        OpenDialogueSpeakerAsset guard = speaker("{ \"Name\": \"npc.guard\" }");
-
-        assertEquals(new SpeakerView("npc.guard", null, null), SpeakerView.of(guard, MIRA, lent("{}")));
+    void useSourceTakesSourceIdentity() {
+        assertEquals(new SpeakerView("n.src", "e.src", "p.src"), SpeakerView.of("Dialogue", true, SOURCE, characters));
     }
 
     @Test
-    void overrideTakesNpcName() {
-        assertEquals(new SpeakerView("npc.mira", "npc.kweebec", "Icons/Villager.png"), SpeakerView.of(villager, MIRA, lent(null)));
+    void useSourceFallsBackFieldByField() {
+        DialogueSource bare = new DialogueSource(UUID.randomUUID(), "Bare", null, null);
+
+        assertEquals(new SpeakerView("n.dlg", "e.dlg", "p.dlg"), SpeakerView.of("Dialogue", true, bare, characters));
     }
 
     @Test
-    void overrideFallsBackFieldByField() {
-        SpeakerView view = SpeakerView.of(villager, MIRA, lent("{ \"Portrait\": \"Icons/Mira.png\" }"));
-
-        assertEquals(new SpeakerView("npc.mira", "npc.kweebec", "Icons/Mira.png"), view);
+    void useSourceWithoutSourceShowsCharacter() {
+        assertEquals(new SpeakerView("n.dlg", "e.dlg", "p.dlg"), SpeakerView.of("Dialogue", true, null, characters));
     }
 
     @Test
-    void overrideWithoutSourceKeepsSpeaker() {
-        assertEquals(new SpeakerView("npc.villager", "npc.kweebec", "Icons/Villager.png"), SpeakerView.of(villager, null, lent(null)));
+    void useSourceWithoutSourceOrCharacterShowsNobody() {
+        assertNull(SpeakerView.of(null, true, null, characters));
     }
 
     @Test
-    void overrideWithEmptyNameKeepsSpeakerName() {
-        DialogueSource nameless = new DialogueSource(UUID.randomUUID(), "Herbalist", null, "Lent");
-
-        assertEquals("npc.villager", SpeakerView.of(villager, nameless, lent(null)).name());
+    void useSourceWithoutCharacterShowsSource() {
+        assertEquals(new SpeakerView("n.src", "e.src", "p.src"), SpeakerView.of(null, true, SOURCE, characters));
     }
 
     @Test
-    void sourceWithoutLentSpeakerKeepsOwnFields() {
-        DialogueSource plain = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", null);
+    void fixedCharacterIgnoresSource() {
+        assertEquals(new SpeakerView("n.dlg", "e.dlg", "p.dlg"), SpeakerView.of("Dialogue", false, SOURCE, characters));
+    }
 
-        assertEquals(new SpeakerView("npc.mira", "npc.kweebec", "Icons/Villager.png"), SpeakerView.of(villager, plain, lent("{ \"Portrait\": \"Icons/Mira.png\" }")));
+    @Test
+    void unknownCharacterShowsNobody() {
+        assertNull(SpeakerView.of("Missing", false, SOURCE, characters));
     }
 
     @Nonnull
-    private static OpenDialogueSpeakerAsset speaker(@Nonnull String json) {
-        return CodecJson.decodeUnvalidated(OpenDialogueSpeakerAsset.CODEC, json);
-    }
-
-    /**
-     * @param speaker the speaker lending its fields, {@code null} for one no pack declares.
-     * @return a lookup giving the speaker the source lends, by id.
-     */
-    @Nonnull
-    private static Function<String, OpenDialogueSpeakerAsset> lent(String speaker) {
-        Map<String, OpenDialogueSpeakerAsset> speakers = speaker == null ? Map.of() : Map.of("Lent", speaker(speaker));
-        return speakers::get;
+    private static OpenDialogueCharacterAsset character(@Nonnull String json) {
+        return CodecJson.decodeUnvalidated(OpenDialogueCharacterAsset.CODEC, json);
     }
 }

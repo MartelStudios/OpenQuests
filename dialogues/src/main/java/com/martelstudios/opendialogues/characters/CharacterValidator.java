@@ -21,9 +21,9 @@ public final class CharacterValidator {
     @Nonnull
     public static List<String> validate(@Nonnull CharacterAssets assets) {
         List<String> problems = new ArrayList<>();
-        for (OpenDialogueDistributionAsset distribution : assets.distributions()) {
+        for (OpenDialogueCharacterDistributionAsset distribution : assets.distributions()) {
             if (distribution.getEntries().length == 0) problems.add("Distribution '" + distribution.getId() + "' lists no character.");
-            for (OpenDialogueDistributionAsset.Entry entry : distribution.getEntries()) {
+            for (OpenDialogueCharacterDistributionAsset.Entry entry : distribution.getEntries()) {
                 if (entry.getCharacter() != null && assets.character(entry.getCharacter()) == null) {
                     problems.add("Distribution '" + distribution.getId() + "' names an unknown character '" + entry.getCharacter() + "'.");
                 }

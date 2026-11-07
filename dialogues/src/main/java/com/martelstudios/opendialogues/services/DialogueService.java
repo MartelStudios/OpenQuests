@@ -12,7 +12,7 @@ import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
-import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.dialogues.SpeakerView;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
@@ -68,23 +68,23 @@ public class DialogueService {
     private final IEventBus events;
 
     @Nonnull
-    private final Function<String, OpenDialogueSpeakerAsset> speakers;
+    private final Function<String, OpenDialogueCharacterAsset> characters;
 
     /**
      * @param rules           read on each opening, since the config behind them can be reloaded.
      * @param fallbackDisplay drawing a dialogue when every display the rules name is missing.
      * @param contexts        what conditions are judged against for a player, read anew on each check.
      * @param events          where openings, answers and closings are announced.
-     * @param speakers        a speaker by id, {@code null} for one no pack declares.
+     * @param characters      a character by id, {@code null} for one no pack declares.
      */
-    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, ConditionContext> contexts, @Nonnull IEventBus events, @Nonnull Function<String, OpenDialogueSpeakerAsset> speakers) {
+    public DialogueService(@Nonnull DialogueRegistry registry, @Nonnull Supplier<DisplayRules> rules, @Nonnull String fallbackDisplay, @Nonnull DialogueResolver resolver, @Nonnull Function<PlayerRef, ConditionContext> contexts, @Nonnull IEventBus events, @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
         this.registry = registry;
         this.rules = rules;
         this.fallbackDisplay = fallbackDisplay;
         this.resolver = resolver;
         this.contexts = contexts;
         this.events = events;
-        this.speakers = speakers;
+        this.characters = characters;
     }
 
     /**
@@ -135,7 +135,7 @@ public class DialogueService {
      * as shown. Off the player's world thread, conditions see no history nor inventory.
      */
     public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
-        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue), source, SpeakerView.of(dialogue.getSpeakerId() == null ? null : speakers.apply(dialogue.getSpeakerId()), source, speakers));
+        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue), source, SpeakerView.of(dialogue.getCharacterId(), dialogue.isUseSourceCharacter(), source, characters));
         DialogueSession replaced = sessions.put(player.getUuid(), session);
         if (replaced != null) closed(player, replaced);
         session.display().show(player, session);

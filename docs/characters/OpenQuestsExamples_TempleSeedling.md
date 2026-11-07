@@ -9,7 +9,7 @@
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)` and `Unobstructed` (no tall grass
   hiding his hitbox), weight 1, no empty weight.
 - **Name:** drawn from `OpenQuestsExamples_KweebecNames`; epithet "Curious seedling" / "Petit curieux".
-- **Speaker:** `OpenQuestsExamples_KweebecVillager`, cinematic display.
+- **Dialogues:** name `OpenQuestsExamples_KweebecVillager` with `UseSourceCharacter`, cinematic display.
 
 ## Personality and voice
 
@@ -64,7 +64,7 @@ Hollows fragment 0/2/10/15.
 ## Assets
 
 - `OpenDialogues/Characters/OpenQuestsExamples_TempleSeedling.json`
-- `OpenDialogues/Distributions/OpenQuestsExamples_TempleSeedling.json`
+- `OpenDialogues/CharacterDistributions/OpenQuestsExamples_TempleSeedling.json`
 - `OpenDialogues/Routers/OpenQuestsExamples_TempleSeedling.json`
 - `OpenDialogues/Dialogues/OpenQuestsExamples_Seedling{Intro,Feathers,Shards,Gift,Rainbow,Thanks}.json`
 - `OpenQuests/Quests/OpenQuestsExamples_MeetSeedling.json`, `OpenQuestsExamples_Seedling*.json`, listed in chapter `ForgottenTemple`

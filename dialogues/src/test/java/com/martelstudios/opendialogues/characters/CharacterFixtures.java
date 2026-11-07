@@ -11,10 +11,10 @@ import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRole
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesUnobstructedFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesWorldFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesZoneFilter;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesEpithetTrait;
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
-import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,6 +40,7 @@ public final class CharacterFixtures {
         registry.registerFilter(ThrowingFilter.TYPE, ThrowingFilter.class, ThrowingFilter.CODEC);
         registry.registerTrait(OpenDialoguesDialogueTrait.TYPE, OpenDialoguesDialogueTrait.class, OpenDialoguesDialogueTrait.CODEC);
         registry.registerTrait(OpenDialoguesNameTrait.TYPE, OpenDialoguesNameTrait.class, OpenDialoguesNameTrait.CODEC);
+        registry.registerTrait(OpenDialoguesEpithetTrait.TYPE, OpenDialoguesEpithetTrait.class, OpenDialoguesEpithetTrait.CODEC);
         registry.registerTrait(RecordingTrait.TYPE, RecordingTrait.class, RecordingTrait.CODEC);
     }
 
@@ -66,8 +67,8 @@ public final class CharacterFixtures {
     }
 
     @Nonnull
-    public static OpenDialogueDistributionAsset distribution(@Nonnull String id, @Nonnull String json) {
-        OpenDialogueDistributionAsset distribution = CodecJson.decode(OpenDialogueDistributionAsset.CODEC, json);
+    public static OpenDialogueCharacterDistributionAsset distribution(@Nonnull String id, @Nonnull String json) {
+        OpenDialogueCharacterDistributionAsset distribution = CodecJson.decode(OpenDialogueCharacterDistributionAsset.CODEC, json);
         if (distribution == null) throw new IllegalArgumentException("Unreadable distribution " + json);
         distribution.id = id;
         return distribution;
@@ -83,11 +84,11 @@ public final class CharacterFixtures {
     /**
      * Assets as packs would declare them, without the asset stores.
      *
-     * @param leads whether a dialogue or router id leads somewhere.
+     * @param leads whether a dialogue, router or other asset id is declared.
      */
     @Nonnull
-    public static CharacterAssets assets(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull Map<String, OpenDialogueNameListAsset> nameLists, @Nonnull Map<String, OpenDialogueSpeakerAsset> speakers, @Nonnull Predicate<String> leads) {
-        return new CharacterAssets(characters::get, characters::values, () -> distributions, nameLists::get, speakers::get, target -> leads.test(target.getDialogue() != null ? target.getDialogue() : target.getRouter()));
+    public static CharacterAssets assets(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueCharacterDistributionAsset> distributions, @Nonnull Map<String, OpenDialogueTextListAsset> textLists, @Nonnull Predicate<String> leads) {
+        return new CharacterAssets(characters::get, characters::values, () -> distributions, textLists::get, (type, id) -> leads.test(id));
     }
 
     /**

@@ -5,11 +5,11 @@ import com.hypixel.hytale.event.EventBus;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.characters.CharacterFixtures;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
-import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterDistributionAsset;
 import com.martelstudios.opendialogues.characters.RecordingTrait;
 import com.martelstudios.opendialogues.characters.ReleaseReason;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +40,7 @@ class CharacterServiceTest {
     private final List<CharacterEvent> heard = new ArrayList<>();
     private final List<String> warnings = new ArrayList<>();
     private final Map<String, OpenDialogueCharacterAsset> characters = new HashMap<>();
-    private final List<OpenDialogueDistributionAsset> distributions = new ArrayList<>();
+    private final List<OpenDialogueCharacterDistributionAsset> distributions = new ArrayList<>();
     private final UniqueCharacters unique = new UniqueCharacters();
     private final UniverseCharacters universe = new UniverseCharacters();
     private final List<OpenDialoguesNPCIdentity> saved = new ArrayList<>();
@@ -62,6 +62,15 @@ class CharacterServiceTest {
         assertEquals(List.of("a:assigned", "b:assigned", "a:applied", "b:applied"), RecordingTrait.LOG);
         assertEquals(1, heard.size());
         assertEquals("Mira", ((CharacterEvent.Assigned) heard.getFirst()).getCharacter());
+    }
+
+    @Test
+    void assignedEventCarriesFixedName() {
+        characters.put("Mira", CharacterFixtures.character("Mira", "{ \"Name\": \"key.fixed\" }"));
+
+        assertTrue(service().give(npc(), "Mira"));
+
+        assertEquals("key.fixed", ((CharacterEvent.Assigned) heard.getFirst()).getName());
     }
 
     @Test
@@ -242,7 +251,7 @@ class CharacterServiceTest {
 
         assertNull(service.hint(oak.identity()));
         service.demandInteraction("Oak"::equals);
-        assertEquals(OpenDialoguesDialogueTrait.DEFAULT_HINT, service.hint(oak.identity()));
+        assertEquals(com.martelstudios.opendialogues.characters.traits.CharacterTrait.DEFAULT_HINT, service.hint(oak.identity()));
     }
 
     @Test
@@ -634,7 +643,7 @@ class CharacterServiceTest {
 
     @Nonnull
     private CharacterService service() {
-        return new CharacterService(CharacterFixtures.assets(characters, distributions, Map.of(), Map.of(), id -> true), (accessor, ref) -> eligible, bus, new SplittableRandom(1), (message, error) -> warnings.add(message), null, null, () -> universe);
+        return new CharacterService(CharacterFixtures.assets(characters, distributions, Map.of(), id -> true), (accessor, ref) -> eligible, bus, new SplittableRandom(1), (message, error) -> warnings.add(message), null, null, () -> universe);
     }
 
     @Nonnull

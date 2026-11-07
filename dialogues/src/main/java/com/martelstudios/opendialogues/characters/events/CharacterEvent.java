@@ -70,11 +70,15 @@ public abstract class CharacterEvent {
         @Nullable
         private final String name;
 
-        private OfCharacter(@Nonnull Ref<EntityStore> npc, @Nonnull UUID uuid, @Nonnull String character, @Nullable String name) {
+        @Nullable
+        private final String epithet;
+
+        private OfCharacter(@Nonnull Ref<EntityStore> npc, @Nonnull UUID uuid, @Nonnull String character, @Nullable String name, @Nullable String epithet) {
             this.npc = npc;
             this.uuid = uuid;
             this.character = character;
             this.name = name;
+            this.epithet = epithet;
         }
 
         /**
@@ -102,11 +106,19 @@ public abstract class CharacterEvent {
         }
 
         /**
-         * @return the translation key of the NPC's name, {@code null} for a nameless one.
+         * @return the translation key of the NPC's display name, {@code null} for a nameless one.
          */
         @Nullable
         public String getName() {
             return name;
+        }
+
+        /**
+         * @return the translation key of the NPC's display epithet, {@code null} for none.
+         */
+        @Nullable
+        public String getEpithet() {
+            return epithet;
         }
     }
 
@@ -124,8 +136,8 @@ public abstract class CharacterEvent {
         /**
          * @param player who pressed F.
          */
-        public Using(@Nonnull Ref<EntityStore> npc, @Nonnull UUID uuid, @Nonnull String character, @Nullable String name, @Nonnull PlayerRef player) {
-            super(npc, uuid, character, name);
+        public Using(@Nonnull Ref<EntityStore> npc, @Nonnull UUID uuid, @Nonnull String character, @Nullable String name, @Nullable String epithet, @Nonnull PlayerRef player) {
+            super(npc, uuid, character, name, epithet);
             this.player = player;
         }
 
@@ -152,8 +164,8 @@ public abstract class CharacterEvent {
      * Fired once an NPC received a character and its traits ran.
      */
     public static final class Assigned extends OfCharacter {
-        public Assigned(@Nonnull Ref<EntityStore> npc, @Nonnull UUID uuid, @Nonnull String character, @Nullable String name) {
-            super(npc, uuid, character, name);
+        public Assigned(@Nonnull Ref<EntityStore> npc, @Nonnull UUID uuid, @Nonnull String character, @Nullable String name, @Nullable String epithet) {
+            super(npc, uuid, character, name, epithet);
         }
     }
 
@@ -165,8 +177,8 @@ public abstract class CharacterEvent {
         @Nonnull
         private final ReleaseReason reason;
 
-        public Released(@Nonnull Ref<EntityStore> npc, @Nonnull UUID uuid, @Nonnull String character, @Nullable String name, @Nonnull ReleaseReason reason) {
-            super(npc, uuid, character, name);
+        public Released(@Nonnull Ref<EntityStore> npc, @Nonnull UUID uuid, @Nonnull String character, @Nullable String name, @Nullable String epithet, @Nonnull ReleaseReason reason) {
+            super(npc, uuid, character, name, epithet);
             this.reason = reason;
         }
 

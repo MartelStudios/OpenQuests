@@ -29,7 +29,7 @@
           "Dialogue": {
             "Title": "openquestsexamples.plush.speaker.name",
             "Display": "Default",
-            "Speaker": "OpenQuestsExamples_Plush",
+            "Character": "OpenQuestsExamples_Plush",
             "Tags": { "Series": ["OpenQuestsExamples_StrangePlush"] },
             "Pages": [
               { "Text": "openquestsexamples.plush.sniff.text" }

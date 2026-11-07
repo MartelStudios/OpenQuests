@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
  * Which NPCs may become which character: the NPCs its filters hold for draw once from its
  * weighted characters, an entry without a character standing for staying nobody.
  */
-public class OpenDialogueDistributionAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenDialogueDistributionAsset>> {
+public class OpenDialogueCharacterDistributionAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenDialogueCharacterDistributionAsset>> {
 
     /**
      * A character with its weight, or nobody when it names none.
@@ -59,7 +59,7 @@ public class OpenDialogueDistributionAsset implements JsonAssetWithMap<String, D
         }
     }
 
-    public static final AssetBuilderCodec<String, OpenDialogueDistributionAsset> CODEC = AssetBuilderCodec.builder(OpenDialogueDistributionAsset.class, OpenDialogueDistributionAsset::new, Codec.STRING, (distribution, id) -> distribution.id = id, distribution -> distribution.id, (distribution, data) -> distribution.data = data, distribution -> distribution.data)
+    public static final AssetBuilderCodec<String, OpenDialogueCharacterDistributionAsset> CODEC = AssetBuilderCodec.builder(OpenDialogueCharacterDistributionAsset.class, OpenDialogueCharacterDistributionAsset::new, Codec.STRING, (distribution, id) -> distribution.id = id, distribution -> distribution.id, (distribution, data) -> distribution.data = data, distribution -> distribution.data)
                                                                                                            .appendInherited(new KeyedCodec<>("Priority", Codec.INTEGER), (distribution, priority) -> distribution.priority = priority, distribution -> distribution.priority, (distribution, parent) -> distribution.priority = parent.priority)
                                                                                                            .add()
                                                                                                            .appendInherited(new KeyedCodec<>("Filters", new ArrayCodec<>(CharacterFilter.CODEC, CharacterFilter[]::new)), (distribution, filters) -> distribution.filters = filters, distribution -> distribution.filters, (distribution, parent) -> distribution.filters = parent.filters)
@@ -77,13 +77,13 @@ public class OpenDialogueDistributionAsset implements JsonAssetWithMap<String, D
 
     private Entry[] entries = new Entry[0];
 
-    protected OpenDialogueDistributionAsset() {}
+    protected OpenDialogueCharacterDistributionAsset() {}
 
     /**
      * @return the store every pack's distributions are loaded into.
      */
-    public static AssetStore<String, OpenDialogueDistributionAsset, DefaultAssetMap<String, OpenDialogueDistributionAsset>> getAssetStore() {
-        return AssetRegistry.getAssetStore(OpenDialogueDistributionAsset.class);
+    public static AssetStore<String, OpenDialogueCharacterDistributionAsset, DefaultAssetMap<String, OpenDialogueCharacterDistributionAsset>> getAssetStore() {
+        return AssetRegistry.getAssetStore(OpenDialogueCharacterDistributionAsset.class);
     }
 
     @Override

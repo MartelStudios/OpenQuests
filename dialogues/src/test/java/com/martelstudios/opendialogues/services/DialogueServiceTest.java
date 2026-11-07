@@ -10,7 +10,7 @@ import com.martelstudios.opendialogues.conditions.ConditionFixtures;
 import com.martelstudios.opendialogues.CodecJson;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
-import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
+import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.dialogues.SpeakerView;
 import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import com.martelstudios.opendialogues.displays.DisplayRules;
@@ -76,7 +76,7 @@ class DialogueServiceTest {
     private final ConditionContext context = ConditionFixtures.context(history);
     private final RecordingDisplay display = new RecordingDisplay();
     private final Map<String, OpenDialogueAsset> dialogues = new HashMap<>();
-    private final Map<String, OpenDialogueSpeakerAsset> speakers = new HashMap<>();
+    private final Map<String, OpenDialogueCharacterAsset> characters = new HashMap<>();
     private final EventBus bus = new EventBus(false);
     private final List<DialogueEvent> events = new ArrayList<>();
     private final DialogueService service;
@@ -97,7 +97,7 @@ class DialogueServiceTest {
         bus.registerGlobal(DialogueEvent.Opened.class, events::add);
         bus.registerGlobal(DialogueEvent.Answered.class, events::add);
         bus.registerGlobal(DialogueEvent.Closed.class, events::add);
-        service = new DialogueService(registry, () -> rules, DISPLAY, resolver, p -> context, bus, speakers::get);
+        service = new DialogueService(registry, () -> rules, DISPLAY, resolver, p -> context, bus, characters::get);
     }
 
     private List<String> eventNames() {
@@ -110,7 +110,7 @@ class DialogueServiceTest {
 
     @Test
     void openActionCarriesSource() {
-        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", null);
+        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", "npc.herbalist");
         dialogues.put("Herbs", dialogue("Herbs", "{ \"Responses\": [ { \"Text\": \"bye\" } ] }"));
         service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\", \"Actions\": [ { \"Type\": \"Open\", \"Dialogue\": \"Herbs\" } ] } ] }"), mira);
 
@@ -122,19 +122,30 @@ class DialogueServiceTest {
 
     @Test
     void sessionCarriesSpeakerViewBuiltAtOpen() {
-        speakers.put("Villager", CodecJson.decodeUnvalidated(OpenDialogueSpeakerAsset.CODEC, "{ \"Name\": \"npc.villager\", \"AllowNPCOverride\": true }"));
-        speakers.put("Lent", CodecJson.decodeUnvalidated(OpenDialogueSpeakerAsset.CODEC, "{ \"Epithet\": \"npc.herbalist\" }"));
-        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", "Lent");
+        characters.put("Villager", CodecJson.decodeUnvalidated(OpenDialogueCharacterAsset.CODEC, "{ \"Name\": \"npc.villager\" }"));
+        characters.put("Herbalist", CodecJson.decodeUnvalidated(OpenDialogueCharacterAsset.CODEC, "{ \"Portrait\": \"Icons/Mira.png\" }"));
+        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", "npc.herbalist");
 
-        service.open(player, dialogue("Elder", "{ \"Speaker\": \"Villager\", \"Responses\": [ { \"Text\": \"a\" } ] }"), mira);
+        service.open(player, dialogue("Elder", "{ \"Character\": \"Villager\", \"UseSourceCharacter\": true, \"Responses\": [ { \"Text\": \"a\" } ] }"), mira);
 
-        assertEquals(new SpeakerView("npc.mira", "npc.herbalist", null), display.shown.getLast().speaker());
+        assertEquals(new SpeakerView("npc.mira", "npc.herbalist", "Icons/Mira.png"), display.shown.getLast().speaker());
+    }
+
+    @Test
+    void chainKeepsSourceSpeaker() {
+        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", "npc.herbalist");
+        dialogues.put("Herbs", dialogue("Herbs", "{ \"UseSourceCharacter\": true, \"Responses\": [ { \"Text\": \"bye\" } ] }"));
+        service.open(player, dialogue("Elder", "{ \"UseSourceCharacter\": true, \"Responses\": [ { \"Text\": \"a\", \"Actions\": [ { \"Type\": \"Open\", \"Dialogue\": \"Herbs\" } ] } ] }"), mira);
+
+        service.answer(player, "Elder", 1);
+
+        assertEquals("npc.mira", display.shown.getLast().speaker().name());
     }
 
     @Test
     void plainOpenDropsSource() {
         dialogues.put("Herbs", dialogue("Herbs", "{ \"Responses\": [ { \"Text\": \"bye\" } ] }"));
-        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", null));
+        service.open(player, dialogue("Elder", "{ \"Responses\": [ { \"Text\": \"a\" } ] }"), new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", "npc.herbalist"));
 
         service.open(player, "Herbs", null);
 
@@ -243,7 +254,7 @@ class DialogueServiceTest {
 
     @Test
     void aGeneratedDialogueOpensAndAnswers() {
-        OpenDialogueAsset dialogue = OpenDialogueAsset.generated("Generated_Test", null, new String[]{"Hello there."},
+        OpenDialogueAsset dialogue = OpenDialogueAsset.generated("Generated_Test", null, false, new String[]{"Hello there."},
             new OpenDialoguesResponse[]{OpenDialoguesResponse.generated("Bye", "Goodbye.", new OpenDialoguesCloseAction())});
 
         service.open(player, dialogue, null);

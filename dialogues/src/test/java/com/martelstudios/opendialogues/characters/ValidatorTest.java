@@ -17,7 +17,7 @@ class ValidatorTest {
         CharacterFixtures.registerFilters();
     }
 
-    private static final OpenDialogueNameListAsset EMPTY_LIST = CodecJson.decode(OpenDialogueNameListAsset.CODEC, "{ \"Names\": [] }");
+    private static final OpenDialogueTextListAsset EMPTY_LIST = CodecJson.decode(OpenDialogueTextListAsset.CODEC, "{ \"Names\": [] }");
 
     @Test
     void distributionNamingUnknownCharacter() {
@@ -46,11 +46,6 @@ class ValidatorTest {
     }
 
     @Test
-    void dialogueNamingUnknownSpeaker() {
-        assertProblem(problems(Map.of("Mute", character("Mute", "{ \"Type\": \"Dialogue\", \"Dialogue\": { \"Dialogue\": \"Hello\" }, \"Speaker\": \"NoOne\" }")), List.of()), "Mute", "NoOne");
-    }
-
-    @Test
     void nameListUnknownOrEmpty() {
         assertProblem(problems(Map.of("Nameless", character("Nameless", "{ \"Type\": \"Name\", \"Names\": \"Missing\" }")), List.of()), "Nameless", "Missing");
         assertProblem(problems(Map.of("Blank", character("Blank", "{ \"Type\": \"Name\", \"Names\": \"Empty\" }")), List.of()), "Blank", "Empty");
@@ -72,8 +67,8 @@ class ValidatorTest {
     }
 
     @Nonnull
-    private static List<String> problems(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions) {
-        return CharacterValidator.validate(CharacterFixtures.assets(characters, distributions, Map.of("Empty", EMPTY_LIST), Map.of(), Set.of("Hello")::contains));
+    private static List<String> problems(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueCharacterDistributionAsset> distributions) {
+        return CharacterValidator.validate(CharacterFixtures.assets(characters, distributions, Map.of("Empty", EMPTY_LIST), Set.of("Hello")::contains));
     }
 
     private static void assertProblem(@Nonnull List<String> problems, @Nonnull String... words) {
@@ -94,8 +89,8 @@ class ValidatorTest {
     }
 
     @Nonnull
-    private static OpenDialogueDistributionAsset distribution(@Nonnull String id, @Nonnull String entries) {
-        OpenDialogueDistributionAsset distribution = CodecJson.decode(OpenDialogueDistributionAsset.CODEC, "{ \"Characters\": [ " + entries + " ] }");
+    private static OpenDialogueCharacterDistributionAsset distribution(@Nonnull String id, @Nonnull String entries) {
+        OpenDialogueCharacterDistributionAsset distribution = CodecJson.decode(OpenDialogueCharacterDistributionAsset.CODEC, "{ \"Characters\": [ " + entries + " ] }");
         if (distribution == null) throw new IllegalArgumentException("Unreadable distribution " + entries);
         distribution.id = id;
         return distribution;

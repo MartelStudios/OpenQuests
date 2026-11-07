@@ -99,7 +99,7 @@ public class CharacterScanSystem extends DelayedSystem<EntityStore> {
         String characterId = npc.identity().getCharacter();
         TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
         if (characterId == null || transform == null) return;
-        positions.apply(store).record(characterId, npc.uuid(), transform.getPosition(), npc.identity().getName());
+        positions.apply(store).record(characterId, npc.uuid(), transform.getPosition(), service.displayName(npc.identity()));
     }
 
     @Nonnull

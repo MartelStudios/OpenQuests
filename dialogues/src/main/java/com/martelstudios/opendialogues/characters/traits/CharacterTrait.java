@@ -19,6 +19,11 @@ import java.util.function.Consumer;
 public abstract class CharacterTrait {
 
     /**
+     * The F prompt of a trait naming no hint of its own, and of a character only another mod answers.
+     */
+    public static final String DEFAULT_HINT = "server.interactionHints.generic";
+
+    /**
      * Polymorphic dispatcher over every registered kind.
      */
     public static final CodecMapCodec<CharacterTrait> CODEC = new CodecMapCodec<>("Type");
