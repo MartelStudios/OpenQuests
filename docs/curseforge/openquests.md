@@ -123,6 +123,7 @@ the same item thrown and picked up, or the same block placed and broken, from co
 | <code>Command</code>    | Runs a server command, as the console or as the player    |
 | <code>Random</code>     | Draws one of its rewards, each with its own weight        |
 | <code>Choice</code>     | Opens a popup where the player picks what they get        |
+| <code>Effect</code>     | Puts an effect on the player, a food buff or a potion     |
 
 ![In the Rewards tab, Claim on The veilbound coffer opens a Choose your reward popup, and picking Greater Health Potion closes it](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-reward-choice.gif?raw=true)
 

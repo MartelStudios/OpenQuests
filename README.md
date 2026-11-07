@@ -713,6 +713,12 @@ same words for everyone's defaults, granted to `hytale:WorldEditor`.
 }
 ```
 
+- `Effect`: puts one of the game's entity effects on the player (`"Effect":
+  "Food_Stamina_Boost_Medium"`), for the effect's own duration unless `DurationSeconds` replaces
+  it. `OverlapBehavior` (`Extend`, `Overwrite` or `Ignore`) overrides what the effect does when the
+  player already has it. A player who is not in a world, or whom the effect refuses, is still owed
+  it and gets it on the next attempt.
+
 ## Constraints
 
 An asset can lay rules on the quests made from it, on top of what its type asks for, under
