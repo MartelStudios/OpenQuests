@@ -719,8 +719,10 @@ same words for everyone's defaults, granted to `hytale:WorldEditor`.
   player already has it. A player who is not in a world, or whom the effect refuses, is still owed
   it and gets it on the next attempt.
 - `Droplist`: rolls one of the game's drop lists (`"Droplist": "Portals_Goblin_Chest_Tier1"`)
-  `Rolls` times (1 by default) and gives what comes out, hotbar first, all or nothing. A full
-  inventory leaves it owed, and the next attempt rolls again.
+  `Rolls` times (1 by default), each roll drawn on its own, and gives what comes out, hotbar
+  first, all or nothing. A full inventory leaves it owed, and the next attempt rolls again. With
+  `"DropOnGround": true` the loot lands on the ground instead, at the player's feet as it is
+  granted, or at `Position` (`{ "X": 0, "Y": 64, "Z": 0 }`) in the world the player is in.
 
 ## Constraints
 
