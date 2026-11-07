@@ -15,7 +15,6 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -38,13 +37,11 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
      * A player's markers as computed for one world, told by UUID so one recreated under the same
      * name is not mistaken for it.
      */
-    private record Built(@Nonnull UUID world,@Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass) {}
+    record Built(@Nonnull UUID world, @Nonnull List<MapMarker> all, @Nonnull List<MapMarker> compass) {}
 
     private final QuestTargets targets;
     private final Function<UUID, QuestStoreComponent> stores;
-    private final Map<UUID, Built> built = new ConcurrentHashMap<>();
-    private final Set<UUID> stale = ConcurrentHashMap.newKeySet();
-    private final Set<UUID> mapOpen = ConcurrentHashMap.newKeySet();
+    private final Map<UUID, PlayerMarkers> players = new ConcurrentHashMap<>();
 
     /**
      * @param stores a hosted player's quest store, safe from any thread, {@code null} for another.
@@ -55,10 +52,14 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
     }
 
     /**
-     * Has the player's markers computed again on the next call. Any thread.
+     * Has the player's markers computed again on the next call. Any thread; a player the provider
+     * was never called for is left alone, as an event may name one offline.
      */
     public void invalidate(@Nonnull UUID playerId) {
-        stale.add(playerId);
+        players.computeIfPresent(playerId, (id, markers) -> {
+            markers.stale = true;
+            return markers;
+        });
     }
 
     /**
@@ -66,20 +67,30 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
      */
     public void setMapOpen(@Nonnull UUID playerId, boolean open) {
         if (!open) {
-            mapOpen.remove(playerId);
+            players.computeIfPresent(playerId, (id, markers) -> {
+                markers.mapOpen = false;
+                return markers;
+            });
             return;
         }
-        mapOpen.add(playerId);
-        invalidate(playerId);
+        // The client only sends it while connected, so the entry may be created here
+        PlayerMarkers markers = players.computeIfAbsent(playerId, id -> new PlayerMarkers());
+        markers.mapOpen = true;
+        markers.stale = true;
     }
 
     /**
      * Drops what is kept of a player who left.
      */
     public void forget(@Nonnull UUID playerId) {
-        built.remove(playerId);
-        stale.remove(playerId);
-        mapOpen.remove(playerId);
+        players.remove(playerId);
+    }
+
+    /**
+     * @return whether anything is kept of the player.
+     */
+    boolean knows(@Nonnull UUID playerId) {
+        return players.containsKey(playerId);
     }
 
     /**
@@ -90,12 +101,19 @@ public final class QuestTargetMarkerProvider implements WorldMapManager.MarkerPr
     @Override
     public void update(@Nonnull World world, @Nonnull Player player, @Nonnull MarkersCollector collector) {
         UUID playerId = player.getPlayerRef().getUuid();
-        Built current = built.get(playerId);
-        if (current == null || !current.world.equals(world.getWorldConfig().getUuid()) || stale.remove(playerId)) {
-            current = build(playerId, world);
-            built.put(playerId, current);
+        PlayerMarkers markers = players.get(playerId);
+        if (markers == null) {
+            // A call that comes after the player left must not keep them
+            if (stores.apply(playerId) == null) return;
+            markers = players.computeIfAbsent(playerId, id -> new PlayerMarkers());
         }
-        for (MapMarker marker : mapOpen.contains(playerId) ? current.all : current.compass) collector.addIgnoreViewDistance(marker);
+        Built current = markers.built;
+        if (current == null || !current.world.equals(world.getWorldConfig().getUuid()) || markers.stale) {
+            markers.stale = false;
+            current = build(playerId, world);
+            markers.built = current;
+        }
+        for (MapMarker marker : markers.mapOpen ? current.all : current.compass) collector.addIgnoreViewDistance(marker);
     }
 
     /**

@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -60,10 +59,7 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     private final Function<PlayerRef, DialogueHistory> histories;
     private final Function<String, OpenDialogueCharacterAsset> assets;
     private final List<CharacterStatusProvider> statusProviders = new CopyOnWriteArrayList<>();
-    private final Map<UUID, Built> built = new ConcurrentHashMap<>();
-    private final Set<UUID> stale = ConcurrentHashMap.newKeySet();
-    private final Set<UUID> pending = ConcurrentHashMap.newKeySet();
-    private final Set<UUID> mapOpen = ConcurrentHashMap.newKeySet();
+    private final Map<UUID, PlayerMarkers> players = new ConcurrentHashMap<>();
 
     /**
      * @param positions only read here: the scan and releases write them.
@@ -84,10 +80,14 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     }
 
     /**
-     * Has the player's markers computed again, as what decides them changed. Any thread.
+     * Has the player's markers computed again, as what decides them changed. Any thread; a player
+     * the provider was never called for is left alone, as an event may name one offline.
      */
     public void invalidate(@Nonnull UUID playerId) {
-        stale.add(playerId);
+        players.computeIfPresent(playerId, (id, markers) -> {
+            markers.stale = true;
+            return markers;
+        });
     }
 
     /**
@@ -95,21 +95,30 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
      */
     public void setMapOpen(@Nonnull UUID playerId, boolean open) {
         if (!open) {
-            mapOpen.remove(playerId);
+            players.computeIfPresent(playerId, (id, markers) -> {
+                markers.mapOpen = false;
+                return markers;
+            });
             return;
         }
-        mapOpen.add(playerId);
-        invalidate(playerId);
+        // The client only sends it while connected, so the entry may be created here
+        PlayerMarkers markers = players.computeIfAbsent(playerId, id -> new PlayerMarkers());
+        markers.mapOpen = true;
+        markers.stale = true;
     }
 
     /**
      * Drops what is kept of a player who left.
      */
     public void forget(@Nonnull UUID playerId) {
-        built.remove(playerId);
-        stale.remove(playerId);
-        pending.remove(playerId);
-        mapOpen.remove(playerId);
+        players.remove(playerId);
+    }
+
+    /**
+     * @return whether anything is kept of the player.
+     */
+    boolean knows(@Nonnull UUID playerId) {
+        return players.containsKey(playerId);
     }
 
     /**
@@ -120,34 +129,40 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     @Override
     public void update(@Nonnull World world, @Nonnull Player player, @Nonnull MarkersCollector collector) {
         UUID playerId = player.getPlayerRef().getUuid();
-        Built current = built.get(playerId);
+        PlayerMarkers markers = players.computeIfAbsent(playerId, id -> new PlayerMarkers());
+        Built current = markers.built;
         boolean here = current != null && current.world.equals(world.getWorldConfig().getUuid());
-        boolean fresh = here && current.positions != null && current.version == current.positions.version() && !stale.contains(playerId);
-        if (!fresh && pending.add(playerId)) world.execute(() -> recompute(world, playerId));
-        if (here) current.replay(mapOpen.contains(playerId), collector);
+        boolean fresh = here && current.positions != null && current.version == current.positions.version() && !markers.stale;
+        if (!fresh && markers.pending.compareAndSet(false, true)) world.execute(() -> recompute(world, playerId, markers));
+        if (here) current.replay(markers.mapOpen, collector);
     }
 
     /**
      * A failure leaves an empty list for the current positions, so it is not retried ten times a
      * second until something changes.
      */
-    private void recompute(@Nonnull World world, @Nonnull UUID playerId) {
+    private void recompute(@Nonnull World world, @Nonnull UUID playerId, @Nonnull PlayerMarkers markers) {
         UUID worldId = world.getWorldConfig().getUuid();
         CharacterPositions positions = null;
         int version = -1;
         try {
             PlayerRef playerRef = Universe.get().getPlayer(playerId);
-            if (playerRef == null) return;
+            if (playerRef == null) {
+                // A call that came after the player left must not keep them
+                players.remove(playerId, markers);
+                return;
+            }
             if (!worldId.equals(playerRef.getWorldUuid())) return;
-            stale.remove(playerId);
+            markers.stale = false;
             positions = this.positions.positions(world.getEntityStore().getStore());
             version = positions.version();
-            built.put(playerId, build(worldId, positions, version, positions.view(), histories.apply(playerRef), statuses(playerId)));
+            Built built = build(worldId, positions, version, positions.view(), histories.apply(playerRef), statuses(playerId));
+            if (players.get(playerId) == markers) markers.built = built;
         } catch (RuntimeException e) {
             LOGGER.atWarning().withCause(e).log("Could not compute the character markers of player %s.", playerId);
-            built.put(playerId, new Built(worldId, positions, version, List.of(), List.of()));
+            markers.built = new Built(worldId, positions, version, List.of(), List.of());
         } finally {
-            pending.remove(playerId);
+            markers.pending.set(false);
         }
     }
 
