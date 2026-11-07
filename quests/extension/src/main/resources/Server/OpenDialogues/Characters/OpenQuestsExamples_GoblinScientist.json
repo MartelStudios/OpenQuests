@@ -1,6 +1,7 @@
 {
   "Uniqueness": "Forever",
   "Scope": "Universe",
+  "MapVisibility": "Always",
   "Traits": [
     {
       "Type": "Dialogue",
