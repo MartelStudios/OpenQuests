@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Puts the NPCs carrying a character on each player's map, and on their compass when another mod
@@ -134,10 +135,11 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     }
 
     /**
-     * @return whether anything is kept of the player.
+     * @return the player's entry, {@code null} for one never called for or forgotten.
      */
-    boolean knows(@Nonnull UUID playerId) {
-        return players.containsKey(playerId);
+    @Nullable
+    PlayerMarkers entry(@Nonnull UUID playerId) {
+        return players.get(playerId);
     }
 
     /**
@@ -148,12 +150,32 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
     @SuppressWarnings("removal")
     @Override
     public void update(@Nonnull World world, @Nonnull Player player, @Nonnull MarkersCollector collector) {
-        UUID playerId = player.getPlayerRef().getUuid();
-        PlayerMarkers markers = players.computeIfAbsent(playerId, id -> new PlayerMarkers());
+        PlayerRef playerRef = player.getPlayerRef();
+        UUID playerId = playerRef.getUuid();
+        PlayerMarkers markers = players.get(playerId);
+        if (markers == null) {
+            // A call that comes after the player left must not keep them
+            if (!playerRef.isValid()) return;
+            markers = players.computeIfAbsent(playerId, id -> new PlayerMarkers());
+        }
+        PlayerMarkers entry = markers;
+        Built built = follow(entry, world.getWorldConfig().getUuid(), () -> world.execute(() -> settle(playerId, entry, world.getWorldConfig().getUuid(), () -> decide(world, playerId, entry))));
+        if (built != null) built.replay(entry.mapOpen, collector);
+    }
+
+    /**
+     * Asks for a recompute when the player changed world or something they did changed, at most one
+     * waiting at a time, then joins what was decided with the current positions.
+     *
+     * @param recompute queues {@link #settle} on the world thread.
+     * @return the markers to show, {@code null} while nothing is decided for this world or it failed.
+     */
+    @Nullable
+    Built follow(@Nonnull PlayerMarkers markers, @Nonnull UUID worldId, @Nonnull Runnable recompute) {
         Seen seen = markers.seen;
-        boolean here = seen != null && seen.world.equals(world.getWorldConfig().getUuid());
-        if ((!here || markers.stale) && markers.pending.compareAndSet(false, true)) world.execute(() -> recompute(world, playerId, markers));
-        if (!here || seen.positions == null) return;
+        boolean here = seen != null && seen.world.equals(worldId);
+        if ((!here || markers.stale) && markers.pending.compareAndSet(false, true)) recompute.run();
+        if (!here || seen.positions == null) return null;
 
         // Read before the view, so a change in between only makes the next call join again
         int version = seen.positions.version();
@@ -163,32 +185,51 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
             markers.built = built;
             if (built.undecided) markers.stale = true;
         }
-        built.replay(markers.mapOpen, collector);
+        return built;
     }
 
-    private void recompute(@Nonnull World world, @Nonnull UUID playerId, @Nonnull PlayerMarkers markers) {
-        UUID worldId = world.getWorldConfig().getUuid();
+    /**
+     * Keeps what {@code decide} returns, unless the player was forgotten meanwhile. A failure keeps
+     * an empty decision until the next invalidation rather than retrying at every call.
+     *
+     * @param decide {@code null} when the player is gone or elsewhere, which decides nothing.
+     */
+    void settle(@Nonnull UUID playerId, @Nonnull PlayerMarkers markers, @Nonnull UUID worldId, @Nonnull Supplier<Seen> decide) {
+        boolean wasStale = markers.stale;
         try {
-            PlayerRef playerRef = Universe.get().getPlayer(playerId);
-            if (playerRef == null) {
-                // A call that came after the player left must not keep them
-                players.remove(playerId, markers);
+            markers.stale = false;
+            Seen seen = decide.get();
+            if (seen == null) {
+                if (wasStale) markers.stale = true;
                 return;
             }
-            if (!worldId.equals(playerRef.getWorldUuid())) return;
-            markers.stale = false;
-            CharacterPositions positions = this.positions.positions(world.getEntityStore().getStore());
-            Set<String> decided = Set.copyOf(positions.view().keySet());
-            DialogueHistory history = histories.apply(playerRef);
-            Seen seen = new Seen(worldId, positions, decided, looks(decided, id -> history != null && history.count(id, null, null) > 0, statuses(playerId)));
             if (players.get(playerId) == markers) markers.seen = seen;
         } catch (RuntimeException e) {
             LOGGER.atWarning().withCause(e).log("Could not compute the character markers of player %s.", playerId);
-            markers.seen = new Seen(worldId, null, Set.of(), Map.of());
+            if (players.get(playerId) == markers) markers.seen = new Seen(worldId, null, Set.of(), Map.of());
         } finally {
             markers.pending.set(false);
         }
     }
+
+    /**
+     * On the world thread, where the history and the positions' reset check may be read.
+     */
+    @Nullable
+    private Seen decide(@Nonnull World world, @Nonnull UUID playerId, @Nonnull PlayerMarkers markers) {
+        UUID worldId = world.getWorldConfig().getUuid();
+        PlayerRef playerRef = Universe.get().getPlayer(playerId);
+        if (playerRef == null) {
+            players.remove(playerId, markers);
+            return null;
+        }
+        if (!worldId.equals(playerRef.getWorldUuid())) return null;
+        CharacterPositions positions = this.positions.positions(world.getEntityStore().getStore());
+        Set<String> decided = Set.copyOf(positions.view().keySet());
+        DialogueHistory history = histories.apply(playerRef);
+        return new Seen(worldId, positions, decided, looks(decided, id -> history != null && history.count(id, null, null) > 0, statuses(playerId)));
+    }
+
 
     /**
      * A failing provider, often another mod's, must not take every marker away.
