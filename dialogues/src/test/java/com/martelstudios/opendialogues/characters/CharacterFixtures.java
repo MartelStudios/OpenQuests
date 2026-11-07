@@ -11,7 +11,7 @@ import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRole
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesUnobstructedFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesWorldFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesZoneFilter;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
@@ -83,11 +83,11 @@ public final class CharacterFixtures {
     /**
      * Assets as packs would declare them, without the asset stores.
      *
-     * @param leads whether a dialogue or router id leads somewhere.
+     * @param leads whether a dialogue, router or other asset id is declared.
      */
     @Nonnull
     public static CharacterAssets assets(@Nonnull Map<String, OpenDialogueCharacterAsset> characters, @Nonnull List<OpenDialogueDistributionAsset> distributions, @Nonnull Map<String, OpenDialogueNameListAsset> nameLists, @Nonnull Map<String, OpenDialogueSpeakerAsset> speakers, @Nonnull Predicate<String> leads) {
-        return new CharacterAssets(characters::get, characters::values, () -> distributions, nameLists::get, speakers::get, target -> leads.test(target.getDialogue() != null ? target.getDialogue() : target.getRouter()));
+        return new CharacterAssets(characters::get, characters::values, () -> distributions, nameLists::get, speakers::get, (type, id) -> leads.test(id));
     }
 
     /**

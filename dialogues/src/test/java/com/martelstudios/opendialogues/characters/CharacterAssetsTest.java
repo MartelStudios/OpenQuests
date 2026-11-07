@@ -1,7 +1,7 @@
 package com.martelstudios.opendialogues.characters;
 
 import com.martelstudios.opendialogues.CodecJson;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import org.junit.jupiter.api.Test;
 

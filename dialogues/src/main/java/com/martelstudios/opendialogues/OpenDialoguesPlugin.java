@@ -48,7 +48,7 @@ import com.martelstudios.opendialogues.characters.runtime.CharacterScanSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterService;
 import com.martelstudios.opendialogues.characters.runtime.NpcEligibility;
 import com.martelstudios.opendialogues.characters.runtime.CharacterSettings;
-import com.martelstudios.opendialogues.characters.runtime.NothingToSay;
+import com.martelstudios.opendialogues.dialogues.NothingToSay;
 import com.martelstudios.opendialogues.characters.runtime.CharacterTalkSystem;
 import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
 import com.martelstudios.opendialogues.characters.runtime.UniqueCharacters;
@@ -59,7 +59,7 @@ import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRole
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesUnobstructedFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesWorldFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesZoneFilter;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
 import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesNameTrait;
 import com.martelstudios.opendialogues.commands.AnswerCommand;
 import com.martelstudios.opendialogues.commands.DialogueCommand;

@@ -12,7 +12,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueSpeakerAsset;
 
 import javax.annotation.Nonnull;

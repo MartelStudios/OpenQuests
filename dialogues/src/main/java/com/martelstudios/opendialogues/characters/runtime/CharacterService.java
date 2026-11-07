@@ -20,7 +20,6 @@ import com.martelstudios.opendialogues.characters.events.CharacterEvent;
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterContext;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
 import com.martelstudios.opendialogues.nameplates.TranslatedNameplate;
 
 import javax.annotation.Nonnull;
@@ -411,8 +410,8 @@ public class CharacterService {
         Interactions interactions = npc.accessor().getComponent(npc.ref(), Interactions.getComponentType());
         if (demanded(character.getId())) {
             npc.accessor().ensureAndGetComponent(npc.ref(), Interactable.getComponentType());
-            if (interactions != null && !OpenDialoguesDialogueTrait.DEFAULT_HINT.equals(interactions.getInteractionHint())) interactions.setInteractionHint(OpenDialoguesDialogueTrait.DEFAULT_HINT);
-        } else if (interactions != null && OpenDialoguesDialogueTrait.DEFAULT_HINT.equals(interactions.getInteractionHint())) {
+            if (interactions != null && !CharacterTrait.DEFAULT_HINT.equals(interactions.getInteractionHint())) interactions.setInteractionHint(CharacterTrait.DEFAULT_HINT);
+        } else if (interactions != null && CharacterTrait.DEFAULT_HINT.equals(interactions.getInteractionHint())) {
             interactions.setInteractionHint(null);
             npc.accessor().tryRemoveComponent(npc.ref(), Interactable.getComponentType());
         }
@@ -462,7 +461,7 @@ public class CharacterService {
         OpenDialogueCharacterAsset character = identity.getCharacter() == null ? null : character(identity.getCharacter());
         if (character == null) return null;
         String hint = traitHint(character);
-        return hint != null || !demanded(character.getId()) ? hint : OpenDialoguesDialogueTrait.DEFAULT_HINT;
+        return hint != null || !demanded(character.getId()) ? hint : CharacterTrait.DEFAULT_HINT;
     }
 
     /**

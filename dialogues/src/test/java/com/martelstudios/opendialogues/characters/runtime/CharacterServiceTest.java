@@ -9,7 +9,7 @@ import com.martelstudios.opendialogues.characters.OpenDialogueDistributionAsset;
 import com.martelstudios.opendialogues.characters.RecordingTrait;
 import com.martelstudios.opendialogues.characters.ReleaseReason;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -242,7 +242,7 @@ class CharacterServiceTest {
 
         assertNull(service.hint(oak.identity()));
         service.demandInteraction("Oak"::equals);
-        assertEquals(OpenDialoguesDialogueTrait.DEFAULT_HINT, service.hint(oak.identity()));
+        assertEquals(com.martelstudios.opendialogues.characters.traits.CharacterTrait.DEFAULT_HINT, service.hint(oak.identity()));
     }
 
     @Test

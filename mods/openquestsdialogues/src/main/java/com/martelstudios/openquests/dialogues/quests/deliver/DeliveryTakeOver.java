@@ -6,7 +6,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.characters.events.CharacterEvent;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
-import com.martelstudios.opendialogues.characters.traits.impl.OpenDialoguesDialogueTrait;
+import com.martelstudios.opendialogues.dialogues.traits.OpenDialoguesDialogueTrait;
 import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
 import com.martelstudios.opendialogues.triggers.DialogueTriggers;

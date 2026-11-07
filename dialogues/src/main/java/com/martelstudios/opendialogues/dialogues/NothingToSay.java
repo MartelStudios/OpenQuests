@@ -1,11 +1,9 @@
-package com.martelstudios.opendialogues.characters.runtime;
+package com.martelstudios.opendialogues.dialogues;
 
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
 import com.martelstudios.opendialogues.api.PlayerTexts;
 import com.martelstudios.opendialogues.characters.traits.CharacterContext;
-import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
-import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
 import com.martelstudios.opendialogues.triggers.DialogueTriggers;
 
