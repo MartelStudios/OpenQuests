@@ -9,7 +9,8 @@
   "ShortDescriptionKey": "adventurequests.quest.guardruneheart.short",
   "QuestAssetIds": [
     "AdventureQuests_GuardRuneHeartCraft",
-    "AdventureQuests_GuardRuneHeartShow"
+    "AdventureQuests_GuardRuneHeartShow",
+    "AdventureQuests_GuardRuneHeartCast"
   ],
   "SuccessfulRewards": [
     {

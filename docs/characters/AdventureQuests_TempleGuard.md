@@ -39,12 +39,14 @@ intro, which grants one tale per boss quest of the GoblinBreach chapter (`Revena
 | Quest | Made of | Reward |
 |---|---|---|
 | `AdventureQuests_GuardTale<Boss>` | `GuardTale<Boss>Boss` (`QuestState`, boss quest successful, earlier kills count), `GuardTale<Boss>Tell` (`Dialogue` on `GuardTale<Boss>`) | 2 `Ingredient_Rune_Shard`, grants the rune quest |
-| `AdventureQuests_GuardRune<Boss>` | `GuardRune<Boss>Craft` (`Craft`, any rune), `GuardRune<Boss>Show` (`Dialogue`, answer `ShowRune`) | 1 `PortalKey_Goblin_Breach` |
+| `AdventureQuests_GuardRune<Boss>` | `GuardRune<Boss>Craft` (`Craft`, any rune), `GuardRune<Boss>Show` (`Dialogue`, answer `ShowRune`), `GuardRune<Boss>Cast` (`CastSpell`, any spell, counted once `Show` succeeded) | 1 `PortalKey_Goblin_Breach` |
 
 The router opens his intro first, then the first tale whose boss is beaten, then the first rune
-quest in progress, otherwise his dreaming line. `ShowRune` asks for a rune in hand (`Holding`,
-`Category` `GoblinLab_Runes`) and for the craft step done, so the steps run in order. Rune recipes
-need `goblin_lab_power`, which ties this line to the generator.
+quest whose show step is in progress, otherwise his dreaming line. `ShowRune` asks for a rune in
+hand (`Holding`, `Category` `GoblinLab_Runes`) and for the craft step done; the cast step requires
+the show step done, so the steps run in order. Rune recipes need `goblin_lab_power`, which ties
+this line to the generator. After the rune is shown, `GuardRuneSeen` asks to cast it and promises
+the fragment.
 
 ## Assets
 
@@ -66,3 +68,7 @@ need `goblin_lab_power`, which ties this line to the generator.
 - 2026-11-03: one roleplay dialogue per boss, so one conversation validates one boss (user).
 - 2026-11-04: a meeting quest grants the tales, so his line is one tree in the journal and the boss quests stay untouched (user).
 - 2026-11-04: rune quests are composites, craft then show, any rune, so the player keeps the choice (user).
+- 2026-11-08: a third step casts any spell after the rune is shown; the fragment comes with the
+  cast (user).
+- 2026-11-08: no generator mention in the rune quests: the breach, hence any boss, needs the lab
+  repaired first (user).
