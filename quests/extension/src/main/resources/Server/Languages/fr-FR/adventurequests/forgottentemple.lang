@@ -43,7 +43,6 @@ quest.temple-trial.hold.title=Restez une minute à explorer le temple
 quest.temple-trial.hold.description=Passez au moins une minute dans le temple à le parcourir.
 quest.temple-trial.pillars.title=Gravir les colonnes du temple
 quest.temple-trial.pillars.description=Sautez de colonne en colonne dans la colonnade en ruine, en suivant la lumière verte.
-quest.temple-trial.pillars.reset=Le temple exige l'ordre : recommencez depuis la première colonne.
 
 # Lab
 character.goblin-scientist.name=Machinarque

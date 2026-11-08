@@ -14,6 +14,9 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 
 import javax.annotation.Nonnull;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -48,7 +51,7 @@ public class ReachLocationTickingSystem extends EntityTickingSystem<EntityStore>
         var movementStates = archetypeChunk.getComponent(index, MovementStatesComponent.getComponentType());
         MovementStates states = movementStates == null ? null : movementStates.getMovementStates();
 
-        progression.progress(new ReachLocationQuestVisitor(playerRef.getUuid(), transform.getPosition()), listener.getQuestIds());
+        progression.progress(new ReachLocationQuestVisitor(playerRef, transform.getPosition()), listener.getQuestIds());
         progression.progress(new ReachPathQuestVisitor(playerRef, transform.getPosition(), states != null && states.onGround), listener.getQuestIds());
 
         for (UUID questId : listener.getQuestIds()) {
@@ -62,11 +65,16 @@ public class ReachLocationTickingSystem extends EntityTickingSystem<EntityStore>
     private void showMarker(@Nonnull PlayerRef playerRef, AbstractQuestProgression<?> quest) {
         if (quest == null || quest.isOver()) return;
 
+        Set<QuestMarkers.Marker> wanted = new HashSet<>();
         if (quest instanceof ReachLocationQuestProgression reach && reach.getAsset() != null) {
-            markers.show(playerRef, quest.getId(), reach.getAsset().getMarker(), reach.getAsset().getPosition());
+            wanted.add(QuestMarkers.Marker.of(reach.getAsset()));
         } else if (quest instanceof ReachPathQuestProgression path && path.getAsset() != null) {
-            int next = path.getCurrentQuantity();
-            markers.show(playerRef, quest.getId(), path.getAsset().markerFor(next), path.getAsset().getPosition(next));
+            var spots = path.getAsset().getLocations();
+            for (int i = 0; i < spots.size(); i++) {
+                if (path.isAwaited(i)) wanted.add(QuestMarkers.Marker.of(spots.get(i)));
+            }
         }
+        wanted.removeIf(Objects::isNull);
+        markers.show(playerRef, quest.getId(), wanted);
     }
 }

@@ -10,50 +10,51 @@ import org.joml.Vector3d;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The particle markers each player is shown, one per quest, sent to that player alone. A marker is
- * only sent again when it moves, or when the player changed world, which clears what their client
- * drew.
+ * The particle markers each player is shown for their quests, sent to that player alone. A marker
+ * is only sent again when it appears, or when the player changed world, which clears what their
+ * client drew.
  */
 public final class QuestMarkers {
 
-    private final Map<UUID, Map<UUID, Shown>> shown = new ConcurrentHashMap<>();
+    private final Map<UUID, Map<UUID, Set<Marker>>> shown = new ConcurrentHashMap<>();
 
     /**
-     * Shows a quest's marker to a player, moving it if it stood elsewhere.
-     *
-     * @param particle the particle system to show, or {@code null} to show nothing for that quest.
+     * Shows a quest's markers to a player, taking away those it no longer has.
      */
-    public void show(@Nonnull PlayerRef player, @Nonnull UUID questId, @Nullable String particle, @Nullable Vector3d position) {
-        Map<UUID, Shown> markers = shown.computeIfAbsent(player.getUuid(), id -> new ConcurrentHashMap<>());
-        Shown before = markers.get(questId);
+    public void show(@Nonnull PlayerRef player, @Nonnull UUID questId, @Nonnull Set<Marker> wanted) {
+        Map<UUID, Set<Marker>> quests = shown.computeIfAbsent(player.getUuid(), id -> new ConcurrentHashMap<>());
+        UUID world = player.getWorldUuid();
+        Set<Marker> next = new HashSet<>();
+        for (Marker marker : wanted) next.add(marker.in(world));
 
-        if (particle == null || position == null) {
-            if (before != null) cancel(player, markers.remove(questId));
-            return;
-        }
-
-        Shown next = new Shown(particle, new Vector3d(position), player.getWorldUuid());
+        Set<Marker> before = quests.getOrDefault(questId, Set.of());
         if (next.equals(before)) return;
 
-        // A marker left in another world went with that world's particles
-        if (before != null && before.world().equals(next.world())) cancel(player, before);
-        markers.put(questId, next);
-        player.getPacketHandler().write(new SpawnParticleSystem(particle, new Position(position.x, position.y, position.z), new Direction(0, 0, 0), 1, null, 0));
+        for (Marker marker : before) {
+            // A marker left in another world went with that world's particles
+            if (!next.contains(marker) && marker.world() != null && marker.world().equals(world)) cancel(player, marker);
+        }
+        for (Marker marker : next) {
+            if (!before.contains(marker)) spawn(player, marker);
+        }
+        if (next.isEmpty()) quests.remove(questId); else quests.put(questId, next);
     }
 
     /**
-     * Takes a quest's marker away from everyone shown it, for a quest that is over.
+     * Takes a quest's markers away from everyone shown them, for a quest that is over.
      */
     public void hide(@Nonnull UUID questId) {
-        shown.forEach((playerId, markers) -> {
-            Shown marker = markers.remove(questId);
-            PlayerRef player = marker == null ? null : Universe.get().getPlayer(playerId);
-            if (player != null) cancel(player, marker);
+        shown.forEach((playerId, quests) -> {
+            Set<Marker> markers = quests.remove(questId);
+            PlayerRef player = markers == null ? null : Universe.get().getPlayer(playerId);
+            if (player != null) markers.forEach(marker -> cancel(player, marker));
         });
     }
 
@@ -64,10 +65,31 @@ public final class QuestMarkers {
         shown.remove(playerId);
     }
 
-    private static void cancel(@Nonnull PlayerRef player, @Nonnull Shown marker) {
+    private static void spawn(@Nonnull PlayerRef player, @Nonnull Marker marker) {
+        Vector3d at = marker.position();
+        player.getPacketHandler().write(new SpawnParticleSystem(marker.particle(), new Position(at.x, at.y, at.z), new Direction(0, 0, 0), 1, null, 0));
+    }
+
+    private static void cancel(@Nonnull PlayerRef player, @Nonnull Marker marker) {
         Vector3d at = marker.position();
         player.getPacketHandler().write(new CancelParticleSystems(new Position(at.x - 0.5, at.y - 0.5, at.z - 0.5), new Position(at.x + 0.5, at.y + 0.5, at.z + 0.5), new String[]{marker.particle()}, false));
     }
 
-    private record Shown(@Nonnull String particle, @Nonnull Vector3d position, @Nullable UUID world) {}
+    /**
+     * A particle system shown at a position, in the world it was sent to.
+     */
+    public record Marker(@Nonnull String particle, @Nonnull Vector3d position, @Nullable UUID world) {
+
+        /**
+         * @return a marker for that spot, or {@code null} for a spot that has none.
+         */
+        @Nullable
+        public static Marker of(@Nonnull ReachLocationQuestAsset spot) {
+            return spot.getMarker() == null || spot.getPosition() == null ? null : new Marker(spot.getMarker(), new Vector3d(spot.getPosition()), null);
+        }
+
+        private Marker in(@Nullable UUID world) {
+            return new Marker(particle, position, world);
+        }
+    }
 }

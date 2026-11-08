@@ -43,7 +43,6 @@ quest.temple-trial.hold.title=Explore the temple for a minute
 quest.temple-trial.hold.description=Spend at least one minute inside the temple, looking around.
 quest.temple-trial.pillars.title=Climb the temple pillars
 quest.temple-trial.pillars.description=Jump from pillar to pillar in the ruined colonnade, following the green light.
-quest.temple-trial.pillars.reset=The temple demands order: start again from the first pillar.
 
 # Lab
 character.goblin-scientist.name=Makinomagistra

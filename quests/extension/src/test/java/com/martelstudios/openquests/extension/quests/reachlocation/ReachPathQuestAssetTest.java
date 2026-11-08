@@ -5,11 +5,14 @@ import org.junit.jupiter.api.Test;
 
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.decode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReachPathQuestAssetTest {
 
     private static final ReachPathQuestAsset PATH = decode(ReachPathQuestAsset.CODEC,
-        "{\"Positions\": [{\"X\": 0.5, \"Y\": 10, \"Z\": 0.5}, {\"X\": 2.5, \"Y\": 11, \"Z\": 0.5}], \"TargetQuantity\": 5}");
+        "{\"Locations\": [{\"Position\": {\"X\": 0.5, \"Y\": 10, \"Z\": 0.5}, \"Radius\": 1.2},"
+            + " {\"Position\": {\"X\": 2.5, \"Y\": 11, \"Z\": 0.5}, \"Radius\": 1.2}],"
+            + " \"ResetOn\": [\"Landing\"], \"TargetQuantity\": 5}");
 
     @Test
     void theCountIsTheNumberOfSpots() {
@@ -17,14 +20,16 @@ class ReachPathQuestAssetTest {
     }
 
     @Test
-    void aSpotIsStoodOnAnywhereOnItsTop() {
-        assertEquals(0, PATH.spotAt(new Vector3d(1.4, 10, 1.2)));
+    void aSpotIsWhereverItsRadiusReaches() {
+        assertEquals(0, PATH.spotAt(new Vector3d(1.3, 10, 1.2)));
         assertEquals(1, PATH.spotAt(new Vector3d(2.5, 11, 0.5)));
+        assertEquals(-1, PATH.spotAt(new Vector3d(0.5, 10, 2.5)));
     }
 
     @Test
-    void theGroundBelowOrBesideASpotIsNone() {
-        assertEquals(-1, PATH.spotAt(new Vector3d(0.5, 9, 0.5)));
-        assertEquals(-1, PATH.spotAt(new Vector3d(0.5, 10, 2.5)));
+    void theOrderAndResetsComeFromTheAsset() {
+        assertTrue(PATH.isOrdered());
+        assertTrue(PATH.resetsOn(ReachPathQuestAsset.Reset.Landing));
+        assertEquals(false, PATH.resetsOn(ReachPathQuestAsset.Reset.Skip));
     }
 }
