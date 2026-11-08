@@ -19,8 +19,10 @@ import javax.annotation.Nullable;
  */
 public enum NpcEligibility {
 
-    /** Not an NPC, or its F belongs to another mod. */
+    /** Not an NPC. */
     None,
+    /** Its F belongs to another mod. */
+    ModInteraction,
     /** Its role answers F itself, such as a merchant. */
     OwnInteraction,
     /** A plain NPC. */
@@ -35,7 +37,7 @@ public enum NpcEligibility {
         NPCEntity entity = accessor.getComponent(ref, NPCEntity.getComponentType());
         if (entity == null) return None;
         Interactions interactions = accessor.getComponent(ref, Interactions.getComponentType());
-        if (interactions == null || !UseNPCInteraction.DEFAULT_ID.equals(interactions.getInteractionId(InteractionType.Use))) return None;
+        if (interactions == null || !UseNPCInteraction.DEFAULT_ID.equals(interactions.getInteractionId(InteractionType.Use))) return ModInteraction;
         Role role = entity.getRole();
         Instruction instruction = role == null ? null : role.getInteractionInstruction();
         return instruction != null && instruction.componentCount() > 1 ? OwnInteraction : Plain;

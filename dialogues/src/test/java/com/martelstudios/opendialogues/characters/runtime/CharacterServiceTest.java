@@ -201,6 +201,17 @@ class CharacterServiceTest {
     }
 
     @Test
+    void npcWithModInteractionNeverDraws() {
+        character("Oak", "None", AB);
+        distributions.add(CharacterFixtures.distribution("B", "{ \"OverrideInteraction\": true, \"Characters\": [ { \"Character\": \"Oak\" } ] }"));
+        eligible = NpcEligibility.ModInteraction;
+        CharacterNpc npc = npc();
+
+        assertNull(service().draw(npc, kweebec("Zone1")));
+        assertEquals(Set.of(), npc.identity().getDraws());
+    }
+
+    @Test
     void cancelledUsingKeepsTraitsQuiet() {
         character("Mira", "None", "{ \"Type\": \"TestRecording\", \"Label\": \"a\", \"Consumes\": true }");
         CharacterService service = service();

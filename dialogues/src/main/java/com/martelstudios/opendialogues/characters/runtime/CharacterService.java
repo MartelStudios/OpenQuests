@@ -140,7 +140,7 @@ public class CharacterService {
     @Nullable
     String draw(@Nonnull CharacterNpc npc, @Nonnull FilterContext context) {
         NpcEligibility eligible = eligibility.apply(npc.accessor(), npc.ref());
-        if (npc.identity().getCharacter() != null || eligible == NpcEligibility.None) return null;
+        if (npc.identity().getCharacter() != null || !eligible.allows(true)) return null;
         CharacterEvent.Drawing drawing = events.dispatchFor(CharacterEvent.Drawing.class, null).dispatch(new CharacterEvent.Drawing(context));
         if (drawing.isCancelled()) return null;
 
