@@ -16,7 +16,7 @@
       "Text": "adventurequests.temple.merchant.intro.yes",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "TalkToRootlingMerchant",
+        "QuestAssetId": "AdventureQuests_TalkToRootlingMerchant",
         "States": [
           "InProgress"
         ]
@@ -31,7 +31,7 @@
       "Text": "adventurequests.temple.merchant.intro.yes",
       "When": {
         "Type": "RequiresQuest",
-        "QuestAssetId": "TalkToRootlingMerchant",
+        "QuestAssetId": "AdventureQuests_TalkToRootlingMerchant",
         "States": [
           "InProgress"
         ],
@@ -41,7 +41,7 @@
       "Actions": [
         {
           "Type": "AssignQuest",
-          "Quest": "TempleTrial"
+          "Quest": "AdventureQuests_TempleTrial"
         },
         {
           "Type": "Close"

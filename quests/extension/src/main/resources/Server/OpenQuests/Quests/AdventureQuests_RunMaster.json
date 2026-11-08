@@ -1,0 +1,10 @@
+{
+  "Type": "Run",
+  "Icon": "Icons/ItemsGenerated/Armor_Mithril_Legs.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "quest.run-master.title",
+  "DescriptionKey": "quest.run-master.description",
+  "ShortDescriptionKey": "quest.run-master.short",
+  "TargetQuantity": 10000
+}

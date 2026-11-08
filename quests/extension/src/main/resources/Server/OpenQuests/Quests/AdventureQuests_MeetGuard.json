@@ -2,7 +2,7 @@
   "Type": "Dialogue",
   "Icon": "Icons/ModelsGenerated/Kweebec_Sapling.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.meetguard.title",
   "DescriptionKey": "adventurequests.quest.meetguard.description",

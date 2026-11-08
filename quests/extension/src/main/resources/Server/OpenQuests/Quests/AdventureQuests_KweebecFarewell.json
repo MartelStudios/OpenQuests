@@ -1,7 +1,7 @@
 {
   "Type": "Dialogue",
   "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
-  "Categories": ["SideQuest"],
+  "Categories": ["AdventureQuests_SideQuest"],
   "TitleKey": "adventurequests.quest.kweebecfarewell.title",
   "DescriptionKey": "adventurequests.quest.kweebecfarewell.description",
   "ShortDescriptionKey": "adventurequests.quest.kweebecfarewell.short",

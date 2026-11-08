@@ -2,7 +2,7 @@
   "Type": "Dialogue",
   "Icon": "Icons/ItemsGenerated/PortalKey_The_Deepworks.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.seedlingrainbow.title",
   "DescriptionKey": "adventurequests.quest.seedlingrainbow.description",

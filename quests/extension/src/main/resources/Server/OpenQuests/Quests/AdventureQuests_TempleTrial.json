@@ -1,0 +1,104 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Furniture_Temple_Emerald_Statue.png",
+  "Categories": ["AdventureQuests_Temple", "AdventureQuests_Timed"],
+  "TitleKey": "quest.temple-trial.title",
+  "DescriptionKey": "quest.temple-trial.description",
+  "ShortDescriptionKey": "quest.temple-trial.short",
+  "CanBeAbandoned": false,
+  "AutoTrack": true,
+  "QuestAssetIds": [
+    {
+      "Type": "ReachLocation",
+      "TitleKey": "quest.temple-race.title",
+      "DescriptionKey": "quest.temple-race.description",
+      "AnnounceOutcome": false,
+      "Position": {
+        "X": 4976,
+        "Y": 158,
+        "Z": 4983
+      },
+      "Radius": 6
+    },
+    {
+      "Type": "Jump",
+      "TitleKey": "quest.temple-warmup.title",
+      "DescriptionKey": "quest.temple-warmup.description",
+      "TargetQuantity": 10,
+      "AnnounceOutcome": false,
+      "Constraints": [
+        {
+          "Type": "EntityCondition",
+          "DescriptionKey": "quest.temple-warmup.sprinting",
+          "Conditions": [
+            {
+              "Id": "Sprinting"
+            }
+          ]
+        },
+        {
+          "Type": "NearPosition",
+          "DescriptionKey": "quest.temple-warmup.near-altar",
+          "Position": {
+            "X": 4976,
+            "Y": 158,
+            "Z": 4983
+          },
+          "Radius": 12
+        }
+      ]
+    },
+    {
+      "Type": "Run",
+      "TitleKey": "quest.temple-run.title",
+      "DescriptionKey": "quest.temple-run.description",
+      "Measure": "Seconds",
+      "TargetQuantity": 20,
+      "AnnounceOutcome": false
+    },
+    {
+      "Type": "NoOp",
+      "TitleKey": "quest.temple-hold.title",
+      "DescriptionKey": "quest.temple-hold.description",
+      "AnnounceOutcome": false,
+      "PersistProgression": false,
+      "Constraints": [
+        {
+          "Type": "TimeLimit",
+          "Seconds": 60,
+          "OnExpire": "Successful"
+        }
+      ]
+    }
+  ],
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.temple-trial.in-temple",
+      "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)",
+      "OnLeave": "Fail"
+    },
+    {
+      "Type": "FailOnDeath"
+    },
+    {
+      "Type": "TimeLimit",
+      "Seconds": 180
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 50,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_TempleOffering"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

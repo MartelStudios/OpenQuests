@@ -2,7 +2,7 @@
   "Type": "Dialogue",
   "Icon": "Icons/ModelsGenerated/Kweebec_Seedling.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.meetseedling.title",
   "DescriptionKey": "adventurequests.quest.meetseedling.description",

@@ -1,0 +1,29 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Skeleton_Fighter.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-skeletons.title",
+  "DescriptionKey": "quest.goblin-breach-skeletons.description",
+  "ShortDescriptionKey": "quest.goblin-breach-skeletons.short",
+  "TargetQuantity": 8,
+  "NpcGroupId": "Skeleton",
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GoblinBreachKnights",
+        "AdventureQuests_GoblinBreachCryptTowerFloors"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

@@ -43,7 +43,7 @@ what she can no longer hear, and the chain goes on without her.
 `Visibility: WhenSuccessful` and `AnnounceOutcome: false`, so it shows only once it won; its flags stay `Never`).
 Each repair below is a composite: `Lab<Device>Repair` (`GameFlag`), then an `Or` of
 `Lab<Device>Talk` (`Dialogue` on `ScientistReport<Device>`, opened by her router once the repair is
-done) and `LabAllRepaired`. In chapter `ForgottenTemple`.
+done) and `LabAllRepaired`. In chapter `AdventureQuests_ForgottenTemple`.
 
 | Quest | Flag | Reward | Grants |
 |---|---|---|---|

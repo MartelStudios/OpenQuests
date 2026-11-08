@@ -15,7 +15,7 @@
   ],
   "Icon": "Icons/ItemsGenerated/Ingredient_Scraps.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.labscrap.title",
   "DescriptionKey": "adventurequests.quest.labscrap.description",

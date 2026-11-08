@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Plant_Seeds_Carrot.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.stagcarrotcorn.title",
   "DescriptionKey": "adventurequests.quest.stagcarrotcorn.description",

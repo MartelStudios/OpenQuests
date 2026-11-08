@@ -2,7 +2,7 @@
   "Type": "Dialogue",
   "Icon": "Icons/ModelsGenerated/Deer_Stag.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.meetstag.title",
   "DescriptionKey": "adventurequests.quest.meetstag.description",

@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Ingredient_Crystal_Pink.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.seedlingshardspink.title",
   "DescriptionKey": "adventurequests.quest.seedlingshardspink.description",

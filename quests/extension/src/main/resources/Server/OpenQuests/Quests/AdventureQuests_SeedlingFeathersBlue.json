@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Ingredient_Feathers_Blue.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.seedlingfeathersblue.title",
   "DescriptionKey": "adventurequests.quest.seedlingfeathersblue.description",

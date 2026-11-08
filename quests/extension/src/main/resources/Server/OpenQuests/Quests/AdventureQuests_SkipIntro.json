@@ -1,0 +1,12 @@
+{
+  "Type": "QuestState",
+  "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
+  "Categories": ["AdventureQuests_Tutorial"],
+  "TitleKey": "quest.skip-intro.title",
+  "DescriptionKey": "quest.skip-intro.description",
+  "ShortDescriptionKey": "quest.skip-intro.short",
+  "QuestAssetId": "AdventureQuests_Intro",
+  "States": ["Abandoned"],
+  "AnnounceOutcome": false,
+  "AutoTrack": true
+}

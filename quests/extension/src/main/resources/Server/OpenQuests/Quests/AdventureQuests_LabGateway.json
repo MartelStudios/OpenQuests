@@ -2,7 +2,7 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Portal_Device.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.labgateway.title",
   "DescriptionKey": "adventurequests.quest.labgateway.description",

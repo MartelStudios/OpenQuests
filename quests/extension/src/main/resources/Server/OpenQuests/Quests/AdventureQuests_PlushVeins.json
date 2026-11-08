@@ -2,7 +2,7 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Ore_Copper.png",
   "Categories": [
-    "SideQuest"
+    "AdventureQuests_SideQuest"
   ],
   "TitleKey": "adventurequests.quest.veins.title",
   "DescriptionKey": "adventurequests.quest.veins.description",

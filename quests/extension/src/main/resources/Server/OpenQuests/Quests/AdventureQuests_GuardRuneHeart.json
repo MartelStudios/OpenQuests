@@ -2,7 +2,7 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.guardruneheart.title",
   "DescriptionKey": "adventurequests.quest.guardruneheart.description",

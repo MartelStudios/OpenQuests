@@ -1,7 +1,7 @@
 {
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Ingredient_Fibre.png",
-  "Categories": ["SideQuest"],
+  "Categories": ["AdventureQuests_SideQuest"],
   "TitleKey": "adventurequests.quest.kweebecfibres.title",
   "DescriptionKey": "adventurequests.quest.kweebecfibres.description",
   "ShortDescriptionKey": "adventurequests.quest.kweebecfibres.short",

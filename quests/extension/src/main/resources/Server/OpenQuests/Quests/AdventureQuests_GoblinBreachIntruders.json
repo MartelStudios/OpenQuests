@@ -1,0 +1,41 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Goblin_Scrapper.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-intruders.title",
+  "DescriptionKey": "quest.goblin-breach-intruders.description",
+  "ShortDescriptionKey": "quest.goblin-breach-intruders.short",
+  "TargetQuantity": 10,
+  "NpcGroupId": "Goblin",
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    },
+    {
+      "Type": "MaxQuests",
+      "Count": 1,
+      "States": [
+        "InProgress",
+        "Successful"
+      ]
+    }
+  ],
+  "AutoTrack": true,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GoblinBreachScrap",
+        "AdventureQuests_GoblinBreachSkeletons",
+        "AdventureQuests_GoblinBreachMiners",
+        "AdventureQuests_GoblinBreachSpiders",
+        "AdventureQuests_GoblinBreachVoidSpawn"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

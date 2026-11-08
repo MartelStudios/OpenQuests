@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Plant_Seeds_Rice.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.stagricecotton.title",
   "DescriptionKey": "adventurequests.quest.stagricecotton.description",

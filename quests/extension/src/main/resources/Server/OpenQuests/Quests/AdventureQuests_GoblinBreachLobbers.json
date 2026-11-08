@@ -1,0 +1,32 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Goblin_Lobber.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-lobbers.title",
+  "DescriptionKey": "quest.goblin-breach-lobbers.description",
+  "ShortDescriptionKey": "quest.goblin-breach-lobbers.short",
+  "TargetQuantity": 4,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "*Goblin_Lobber*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GoblinBreachBoomPowder"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

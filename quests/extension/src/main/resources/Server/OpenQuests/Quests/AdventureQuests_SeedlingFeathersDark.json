@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Ingredient_Feathers_Dark.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.seedlingfeathersdark.title",
   "DescriptionKey": "adventurequests.quest.seedlingfeathersdark.description",

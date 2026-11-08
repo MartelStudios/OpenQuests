@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Ingredient_Crystal_Fragments_Red.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.seedlingshardsred.title",
   "DescriptionKey": "adventurequests.quest.seedlingshardsred.description",

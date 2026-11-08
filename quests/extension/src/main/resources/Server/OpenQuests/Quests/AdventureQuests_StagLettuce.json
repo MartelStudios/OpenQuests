@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Plant_Seeds_Lettuce.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.staglettuce.title",
   "DescriptionKey": "adventurequests.quest.staglettuce.description",

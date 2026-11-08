@@ -3,7 +3,7 @@
   "Operator": "Or",
   "Icon": "Icons/ModelsGenerated/Goblin_Scientist.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.meetscientist.title",
   "DescriptionKey": "adventurequests.quest.meetscientist.description",

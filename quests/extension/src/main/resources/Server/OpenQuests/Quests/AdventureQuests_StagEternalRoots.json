@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Plant_Seeds_Potato_Eternal.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.stageternalroots.title",
   "DescriptionKey": "adventurequests.quest.stageternalroots.description",

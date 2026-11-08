@@ -2,7 +2,7 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/PortalKey_Goblin_Breach.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.labthrough.title",
   "DescriptionKey": "adventurequests.quest.labthrough.description",

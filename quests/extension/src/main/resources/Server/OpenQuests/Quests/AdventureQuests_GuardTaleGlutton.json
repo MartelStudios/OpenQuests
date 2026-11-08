@@ -2,7 +2,7 @@
   "Type": "Composite",
   "Icon": "Icons/ModelsGenerated/Goblin_Glutton.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.guardtaleglutton.title",
   "DescriptionKey": "adventurequests.quest.guardtaleglutton.description",

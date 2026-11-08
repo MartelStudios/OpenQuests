@@ -1,0 +1,18 @@
+{
+  "NameKey": "quest.chapter.athletics",
+  "Group": "AdventureQuests_Feats",
+  "Order": 0,
+  "Icon": "Icons/ItemCategories/Items-Clothes.png",
+  "Quests": [
+    { "Quest": "AdventureQuests_RunNovice" },
+    { "Quest": "AdventureQuests_RunAdept" },
+    { "Quest": "AdventureQuests_RunMaster" },
+    { "Quest": "AdventureQuests_SprintNovice" },
+    { "Quest": "AdventureQuests_SprintAdept" },
+    { "Quest": "AdventureQuests_SprintMaster" },
+    { "Quest": "AdventureQuests_JumpNovice" },
+    { "Quest": "AdventureQuests_JumpAdept" },
+    { "Quest": "AdventureQuests_JumpMaster" },
+    { "Quest": "AdventureQuests_SilentStep" }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "Type": "TriggerVolume",
+  "Icon": "Icons/ModelsGenerated/Void_Tentacle.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "quest.goblin-breach-void-tower-top.title",
+  "DescriptionKey": "quest.goblin-breach-void-tower-top.description",
+  "ShortDescriptionKey": "quest.goblin-breach-void-tower-top.short",
+  "TargetQuantity": 1,
+  "VolumeNamePattern": "(void_tower_trigger\\d)( \\(\\d+\\))?",
+  "TriggerEventType": "ENTER",
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Void_Essence",
+      "Quantity": 10,
+      "AutoClaim": false
+    }
+  ]
+}

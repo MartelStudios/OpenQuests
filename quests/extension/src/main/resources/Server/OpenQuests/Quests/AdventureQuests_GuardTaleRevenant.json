@@ -2,7 +2,7 @@
   "Type": "Composite",
   "Icon": "Icons/ModelsGenerated/Skeleton_Elite.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.guardtalerevenant.title",
   "DescriptionKey": "adventurequests.quest.guardtalerevenant.description",

@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Plant_Seeds_Wheat.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.stagwheat.title",
   "DescriptionKey": "adventurequests.quest.stagwheat.description",

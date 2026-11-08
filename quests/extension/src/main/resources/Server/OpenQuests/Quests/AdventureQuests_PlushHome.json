@@ -1,7 +1,7 @@
 {
   "Type": "Dialogue",
   "Icon": "Icons/ItemsGenerated/Deco_Goblin_Plush.png",
-  "Categories": ["SideQuest"],
+  "Categories": ["AdventureQuests_SideQuest"],
   "TitleKey": "adventurequests.quest.home.title",
   "DescriptionKey": "adventurequests.quest.home.description",
   "ShortDescriptionKey": "adventurequests.quest.home.short",

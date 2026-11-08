@@ -1,0 +1,9 @@
+{
+  "NameKey": "quest.chapter.daily-life",
+  "Group": "AdventureQuests_Survival",
+  "Order": 2,
+  "Icon": "Icons/ItemCategories/Furniture.png",
+  "Quests": [
+    { "Quest": "AdventureQuests_DailyChores" }
+  ]
+}

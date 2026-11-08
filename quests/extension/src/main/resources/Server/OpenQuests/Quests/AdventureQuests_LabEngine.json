@@ -2,7 +2,7 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/GoblinLab_Tinkering_Bench_Recipeset_B.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.labengine.title",
   "DescriptionKey": "adventurequests.quest.labengine.description",

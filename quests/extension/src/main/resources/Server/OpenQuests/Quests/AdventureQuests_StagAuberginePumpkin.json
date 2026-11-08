@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Plant_Seeds_Aubergine.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.stagauberginepumpkin.title",
   "DescriptionKey": "adventurequests.quest.stagauberginepumpkin.description",

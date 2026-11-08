@@ -2,7 +2,7 @@
   "Type": "Composite",
   "Icon": "Icons/ModelsGenerated/Void_Anomaly_Crystal.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.guardtaleheart.title",
   "DescriptionKey": "adventurequests.quest.guardtaleheart.description",

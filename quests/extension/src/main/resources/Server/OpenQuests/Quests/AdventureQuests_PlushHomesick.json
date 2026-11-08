@@ -1,7 +1,7 @@
 {
   "Type": "EnterWorld",
   "Icon": "Icons/ItemsGenerated/PortalKey_Goblin_Breach.png",
-  "Categories": ["SideQuest"],
+  "Categories": ["AdventureQuests_SideQuest"],
   "TitleKey": "adventurequests.quest.homesick.title",
   "DescriptionKey": "adventurequests.quest.homesick.description",
   "ShortDescriptionKey": "adventurequests.quest.homesick.short",

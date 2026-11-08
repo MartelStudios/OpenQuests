@@ -18,7 +18,7 @@
   ],
   "Icon": "Icons/ItemsGenerated/GoblinLab_Console.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.labconsole.title",
   "DescriptionKey": "adventurequests.quest.labconsole.description",

@@ -1,7 +1,7 @@
 {
   "Type": "QuestState",
   "TitleKey": "adventurequests.quest.guardtaleglutton.boss.title",
-  "QuestAssetId": "GoblinBreachGlutton",
+  "QuestAssetId": "AdventureQuests_GoblinBreachGlutton",
   "States": [
     "Successful"
   ]

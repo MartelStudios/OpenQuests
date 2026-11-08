@@ -1,0 +1,25 @@
+{
+  "Type": "EnterWorld",
+  "Icon": "Icons/ItemsGenerated/Portal_Return.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "quest.enter-forgotten-temple.title",
+  "DescriptionKey": "quest.enter-forgotten-temple.description",
+  "ShortDescriptionKey": "quest.enter-forgotten-temple.short",
+  "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)",
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_TalkToRootlingMerchant",
+        "AdventureQuests_MeetSapling",
+        "AdventureQuests_MeetSeedling",
+        "AdventureQuests_MeetStag",
+        "AdventureQuests_MeetGuard"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

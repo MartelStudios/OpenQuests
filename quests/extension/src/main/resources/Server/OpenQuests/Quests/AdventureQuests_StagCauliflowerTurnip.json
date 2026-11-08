@@ -2,7 +2,7 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Plant_Seeds_Cauliflower.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.stagcauliflowerturnip.title",
   "DescriptionKey": "adventurequests.quest.stagcauliflowerturnip.description",

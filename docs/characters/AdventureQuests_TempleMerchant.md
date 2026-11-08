@@ -32,11 +32,11 @@ tourists, and fronts life essence to those who accept it.
 
 ## Quests and rewards
 
-`EnterForgottenTemple` grants `TalkToRootlingMerchant` (`Dialogue` on `AdventureQuests_MerchantIntro`,
-answer `Accept`), which rewards 100 `Ingredient_Life_Essence` and grants `TempleTrial`. A player
-without the talk quest gets the same answer assigning `TempleTrial` directly.
+`AdventureQuests_EnterForgottenTemple` grants `AdventureQuests_TalkToRootlingMerchant` (`Dialogue` on `AdventureQuests_MerchantIntro`,
+answer `Accept`), which rewards 100 `Ingredient_Life_Essence` and grants `AdventureQuests_TempleTrial`. A player
+without the talk quest gets the same answer assigning `AdventureQuests_TempleTrial` directly.
 
-The router opens his intro while `TempleTrial` was never assigned, otherwise his greeting. Every
+The router opens his intro while `AdventureQuests_TempleTrial` was never assigned, otherwise his greeting. Every
 dialogue keeps a `Trade` answer opening the native barter shop `Kweebec_Merchant` (`OpenBarterShop`),
 so his stock stays as vanilla.
 
@@ -46,11 +46,11 @@ so his stock stays as vanilla.
 - `OpenDialogues/CharacterDistributions/AdventureQuests_TempleMerchant.json`
 - `OpenDialogues/Routers/AdventureQuests_TempleMerchant.json`
 - `OpenDialogues/Dialogues/AdventureQuests_MerchantIntro.json`, `AdventureQuests_MerchantGreeting.json`
-- `OpenQuests/Quests/TalkToRootlingMerchant.json`, chapter `ForgottenTemple`
+- `OpenQuests/Quests/TalkToRootlingMerchant.json`, chapter `AdventureQuests_ForgottenTemple`
 - Lang keys `adventurequests.temple.merchant.*`, `quest.talk-merchant.*`
 
 ## Decision log
 
 - 2026-11-08: the merchant takes over the native F to give the temple trial; a `Trade` answer is
   always there to open his native barter shop (user).
-- 2026-11-08: he gives only `TempleTrial`, the quest that follows talking to him (user).
+- 2026-11-08: he gives only `AdventureQuests_TempleTrial`, the quest that follows talking to him (user).

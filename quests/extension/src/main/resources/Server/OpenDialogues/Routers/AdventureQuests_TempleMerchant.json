@@ -5,7 +5,7 @@
       {
         "When": {
           "Type": "RequiresQuest",
-          "QuestAssetId": "TempleTrial",
+          "QuestAssetId": "AdventureQuests_TempleTrial",
           "States": [
             "InProgress",
             "Successful",

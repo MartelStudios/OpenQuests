@@ -2,7 +2,7 @@
   "Type": "Composite",
   "Icon": "Icons/ModelsGenerated/Bear_Voidtaken.png",
   "Categories": [
-    "Temple"
+    "AdventureQuests_Temple"
   ],
   "TitleKey": "adventurequests.quest.guardtalevoidtaken.title",
   "DescriptionKey": "adventurequests.quest.guardtalevoidtaken.description",

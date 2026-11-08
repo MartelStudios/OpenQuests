@@ -34,7 +34,7 @@ fragment he gives last).
 
 ## Quests and rewards
 
-`EnterForgottenTemple` grants `AdventureQuests_MeetSeedling`, completed by the `Accept` answer of
+`AdventureQuests_EnterForgottenTemple` grants `AdventureQuests_MeetSeedling`, completed by the `Accept` answer of
 his intro, which grants the first step (assigned directly for a player without the meeting quest).
 Each step is a `Deliver` aimed at him, chained by `GrantQuest`. Every delivery goes through `AdventureQuests_SeedlingGift` and pays one `Random` draw
 of its tier.
@@ -67,7 +67,7 @@ Hollows fragment 0/2/10/15.
 - `OpenDialogues/CharacterDistributions/AdventureQuests_TempleSeedling.json`
 - `OpenDialogues/Routers/AdventureQuests_TempleSeedling.json`
 - `OpenDialogues/Dialogues/AdventureQuests_Seedling{Intro,Feathers,Shards,Gift,Rainbow,Thanks}.json`
-- `OpenQuests/Quests/AdventureQuests_MeetSeedling.json`, `AdventureQuests_Seedling*.json`, listed in chapter `ForgottenTemple`
+- `OpenQuests/Quests/AdventureQuests_MeetSeedling.json`, `AdventureQuests_Seedling*.json`, listed in chapter `AdventureQuests_ForgottenTemple`
 - Lang keys `adventurequests.temple.seedling.*` and `adventurequests.quest.seedling*`
 
 ## Decision log
@@ -82,5 +82,5 @@ Hollows fragment 0/2/10/15.
   instead of one dialogue per quest.
 - 2026-11-04: `Unobstructed` filter, so the draw skips a seedling buried in tall grass, whose
   hitbox takes F away from him (user).
-- 2026-11-04: a meeting quest from `EnterForgottenTemple` leads to him, not auto tracked (user).
+- 2026-11-04: a meeting quest from `AdventureQuests_EnterForgottenTemple` leads to him, not auto tracked (user).
 - 2026-11-05: his quests name items and birds as the game's lang files do: "fragments de cristal", "plumes blanches", "merlebleus" (user).

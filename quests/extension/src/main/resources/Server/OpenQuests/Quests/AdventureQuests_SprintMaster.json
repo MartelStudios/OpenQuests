@@ -1,0 +1,10 @@
+{
+  "Type": "Sprint",
+  "Icon": "Icons/ItemsGenerated/Potion_Stamina_Greater.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "quest.sprint-master.title",
+  "DescriptionKey": "quest.sprint-master.description",
+  "ShortDescriptionKey": "quest.sprint-master.short",
+  "TargetQuantity": 5000
+}

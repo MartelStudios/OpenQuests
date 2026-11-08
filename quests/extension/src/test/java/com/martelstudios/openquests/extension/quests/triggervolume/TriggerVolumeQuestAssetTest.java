@@ -21,11 +21,11 @@ class TriggerVolumeQuestAssetTest {
     @Test
     void eachTowerTopQuestMatchesOnlyItsOwnTopVolumes() throws IOException {
         // Volume names as the breach watchtower prefabs ship them; enkindled_trigger_d2 is a middle floor
-        assertMatches("GoblinBreachMineTowerTop", new String[] {"trash_pile_trigger", "trash_pile_trigger_b", "trash_pile_trigger4", "trash_pile_trigger (2)"},
+        assertMatches("AdventureQuests_GoblinBreachMineTowerTop", new String[] {"trash_pile_trigger", "trash_pile_trigger_b", "trash_pile_trigger4", "trash_pile_trigger (2)"},
                       new String[] {"my_trash_pile_trigger", "enkindled_trigger_3"});
-        assertMatches("GoblinBreachCryptTowerTop", new String[] {"enkindled_trigger_1", "enkindled_trigger_5"},
+        assertMatches("AdventureQuests_GoblinBreachCryptTowerTop", new String[] {"enkindled_trigger_1", "enkindled_trigger_5"},
                       new String[] {"enkindled_trigger_d2", "enkindled_trigger", "void_tower_trigger1"});
-        assertMatches("GoblinBreachVoidTowerTop", new String[] {"void_tower_trigger1", "void_tower_trigger4"},
+        assertMatches("AdventureQuests_GoblinBreachVoidTowerTop", new String[] {"void_tower_trigger1", "void_tower_trigger4"},
                       new String[] {"void_tower_trigger", "trash_pile_trigger"});
     }
 

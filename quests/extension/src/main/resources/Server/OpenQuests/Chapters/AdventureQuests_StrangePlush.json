@@ -1,6 +1,6 @@
 {
   "NameKey": "adventurequests.quest.chapter.strange-plush",
-  "Group": "Adventure",
+  "Group": "AdventureQuests_Adventure",
   "Order": 4,
   "Icon": "Icons/ItemsGenerated/Deco_Goblin_Plush.png",
   "Quests": [
