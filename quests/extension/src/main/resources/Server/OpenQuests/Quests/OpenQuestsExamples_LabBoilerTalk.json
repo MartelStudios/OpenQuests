@@ -1,7 +1,0 @@
-{
-  "Type": "Dialogue",
-  "TitleKey": "openquestsexamples.quest.labreport.talk.title",
-  "TargetQuantity": 1,
-  "Character": "OpenQuestsExamples_GoblinScientist",
-  "Dialogue": "OpenQuestsExamples_ScientistReportBoiler"
-}

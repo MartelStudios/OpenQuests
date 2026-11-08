@@ -1,0 +1,20 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_GoblinScientist",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.goblin.scientist.nopower.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.goblin.scientist.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

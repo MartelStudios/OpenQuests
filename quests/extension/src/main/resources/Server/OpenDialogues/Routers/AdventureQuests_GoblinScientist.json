@@ -1,0 +1,184 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabGateway",
+              "States": [
+                "InProgress",
+                "Successful",
+                "Failed",
+                "Abandoned"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabGenerator",
+              "States": [
+                "Successful"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistGateway"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_LabGateway",
+          "States": [
+            "InProgress",
+            "Successful",
+            "Failed",
+            "Abandoned"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistNoPower"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabGatewayRepair",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabGatewayTalk",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistReportGateway"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabTeleporterRepair",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabTeleporterTalk",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistReportTeleporter"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabBoilerRepair",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabBoilerTalk",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistReportBoiler"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabEngineRepair",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabEngineTalk",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistReportEngine"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabCompressorRepair",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabCompressorTalk",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistReportCompressor"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistScold"
+        }
+      }
+    ]
+  }
+}

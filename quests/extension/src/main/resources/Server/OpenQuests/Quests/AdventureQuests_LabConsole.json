@@ -1,0 +1,54 @@
+{
+  "Type": "GameFlag",
+  "Flag": "goblin_breach_duration",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Crystal_Void",
+      "Quantity": 3,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_LabThrough"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "Icon": "Icons/ItemsGenerated/GoblinLab_Console.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.labconsole.title",
+  "DescriptionKey": "adventurequests.quest.labconsole.description",
+  "ShortDescriptionKey": "adventurequests.quest.labconsole.short",
+  "AutoTrack": true,
+  "Constraints": [
+    {
+      "Type": "MaxQuests",
+      "Count": 1
+    },
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "AdventureQuests_LabBoiler",
+      "States": [
+        "Successful"
+      ]
+    },
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "AdventureQuests_LabEngine",
+      "States": [
+        "Successful"
+      ]
+    },
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "AdventureQuests_LabCompressor",
+      "States": [
+        "Successful"
+      ]
+    }
+  ]
+}

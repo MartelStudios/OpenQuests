@@ -1,0 +1,84 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Crystal_Fragments_Cyan.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.seedlingshardscyan.title",
+  "DescriptionKey": "adventurequests.quest.seedlingshardscyan.description",
+  "ShortDescriptionKey": "adventurequests.quest.seedlingshardscyan.short",
+  "Character": "AdventureQuests_TempleSeedling",
+  "Dialogue": "AdventureQuests_SeedlingGift",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Crystal_Cyan"
+      },
+      "Quantity": 2
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 25,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Popcorn",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 25,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Candy_Cane",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 25,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Pie_Pumpkin",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence_Concentrated",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 6,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Gadget_Assembly",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 2,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "PortalKey_Goblin_Breach",
+            "Quantity": 1
+          }
+        }
+      ]
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_SeedlingShardsPink"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

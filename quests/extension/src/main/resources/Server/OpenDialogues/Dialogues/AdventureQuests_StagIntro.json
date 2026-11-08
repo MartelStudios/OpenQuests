@@ -1,0 +1,58 @@
+{
+  "Display": "Cinematic",
+  "Pages": [
+    {
+      "Text": "adventurequests.temple.stag.intro.page1"
+    },
+    {
+      "Text": "adventurequests.temple.stag.intro.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Id": "Accept",
+      "Text": "adventurequests.temple.stag.intro.search",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_MeetStag",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.stag.intro.search",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_MeetStag",
+        "States": [
+          "InProgress"
+        ],
+        "Min": 0,
+        "Max": 0
+      },
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_StagWheat"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.stag.leave",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

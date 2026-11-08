@@ -1,0 +1,29 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ModelsGenerated/Skeleton_Elite.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.guardtalerevenant.title",
+  "DescriptionKey": "adventurequests.quest.guardtalerevenant.description",
+  "ShortDescriptionKey": "adventurequests.quest.guardtalerevenant.short",
+  "QuestAssetIds": [
+    "AdventureQuests_GuardTaleRevenantBoss",
+    "AdventureQuests_GuardTaleRevenantTell"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Rune_Shard",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GuardRuneRevenant"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "NameKey": "adventurequests.quest.chapter.strange-plush",
+  "Group": "Adventure",
+  "Order": 4,
+  "Icon": "Icons/ItemsGenerated/Deco_Goblin_Plush.png",
+  "Quests": [
+    { "Quest": "AdventureQuests_PlushVeins", "Position": { "X": 0, "Y": 0 } },
+    { "Quest": "AdventureQuests_PlushVoice", "Position": { "X": 1, "Y": 0 } },
+    { "Quest": "AdventureQuests_PlushAppetite", "Position": { "X": 2, "Y": 0 } },
+    { "Quest": "AdventureQuests_PlushHomesick", "Position": { "X": 3, "Y": 0 } },
+    { "Quest": "AdventureQuests_PlushHome", "Position": { "X": 4, "Y": 0 } }
+  ]
+}

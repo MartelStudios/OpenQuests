@@ -1,0 +1,286 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.temple.seedling.gift.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingFeathersLight",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingFeathersLight"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingFeathersDark",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingFeathersDark"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingFeathersRed",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingFeathersRed"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingShell",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingShell"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingShardsGreen",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingShardsGreen"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingShardsCyan",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingShardsCyan"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingShardsPink",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingShardsPink"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingShardsWhite",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingShardsWhite"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingFeatherBlue",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingFeatherBlue"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingShardsBlue",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingShardsBlue"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingFeathersBlue",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingFeathersBlue"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingShardsPurple",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingShardsPurple"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingShardsYellow",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingShardsYellow"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_SeedlingShardsRed",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_SeedlingShardsRed"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.seedling.gift.later",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

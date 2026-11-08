@@ -1,0 +1,18 @@
+{
+  "Display": "Cinematic",
+  "Pages": [
+    {
+      "Text": "adventurequests.temple.stag.content.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.temple.stag.leave",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

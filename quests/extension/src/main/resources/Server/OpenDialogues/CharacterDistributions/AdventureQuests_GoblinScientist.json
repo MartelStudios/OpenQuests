@@ -1,0 +1,22 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Goblin_Scientist"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-(forgotten-temple-goblins|Forgotten_Temple-.*)"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_GoblinScientist",
+      "Weight": 1
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.guardruneglutton.title",
+  "DescriptionKey": "adventurequests.quest.guardruneglutton.description",
+  "ShortDescriptionKey": "adventurequests.quest.guardruneglutton.short",
+  "QuestAssetIds": [
+    "AdventureQuests_GuardRuneGluttonCraft",
+    "AdventureQuests_GuardRuneGluttonShow"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "PortalKey_Goblin_Breach",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

@@ -13,7 +13,7 @@ _A character with a name, a title and a portrait, answers with icons and colours
 said last time._
 
 > 📦 **Want to see it in action ?** Install
-> **[OpenQuests Examples](https://www.curseforge.com/hytale/mods/openquests-examples)**: *The strange plush* chapter hands
+> **[Hytale Adventure Quests](https://www.curseforge.com/hytale/mods/hytale-adventure-quests)**: *The strange plush* chapter hands
 > you a hungry goblin plush that talks, begs for ore and changes its tune once fed.
 
 ***

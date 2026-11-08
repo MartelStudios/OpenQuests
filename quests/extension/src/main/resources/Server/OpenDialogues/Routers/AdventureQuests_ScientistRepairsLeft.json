@@ -1,0 +1,115 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabBoiler",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabEngine",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabCompressor",
+              "States": [
+                "Successful"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistLeftNone"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "Or",
+          "Conditions": [
+            {
+              "Type": "Composite",
+              "Operator": "And",
+              "Conditions": [
+                {
+                  "Type": "RequiresQuest",
+                  "QuestAssetId": "AdventureQuests_LabBoiler",
+                  "States": [
+                    "Successful"
+                  ]
+                },
+                {
+                  "Type": "RequiresQuest",
+                  "QuestAssetId": "AdventureQuests_LabEngine",
+                  "States": [
+                    "Successful"
+                  ]
+                }
+              ]
+            },
+            {
+              "Type": "Composite",
+              "Operator": "And",
+              "Conditions": [
+                {
+                  "Type": "RequiresQuest",
+                  "QuestAssetId": "AdventureQuests_LabBoiler",
+                  "States": [
+                    "Successful"
+                  ]
+                },
+                {
+                  "Type": "RequiresQuest",
+                  "QuestAssetId": "AdventureQuests_LabCompressor",
+                  "States": [
+                    "Successful"
+                  ]
+                }
+              ]
+            },
+            {
+              "Type": "Composite",
+              "Operator": "And",
+              "Conditions": [
+                {
+                  "Type": "RequiresQuest",
+                  "QuestAssetId": "AdventureQuests_LabEngine",
+                  "States": [
+                    "Successful"
+                  ]
+                },
+                {
+                  "Type": "RequiresQuest",
+                  "QuestAssetId": "AdventureQuests_LabCompressor",
+                  "States": [
+                    "Successful"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistLeftOne"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_ScientistLeftTwo"
+        }
+      }
+    ]
+  }
+}

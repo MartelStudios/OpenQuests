@@ -1,0 +1,38 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/GoblinLab_Tinkering_Bench_Recipeset_C.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.labcompressor.title",
+  "DescriptionKey": "adventurequests.quest.labcompressor.description",
+  "ShortDescriptionKey": "adventurequests.quest.labcompressor.short",
+  "QuestAssetIds": [
+    "AdventureQuests_LabCompressorRepair",
+    {
+      "Type": "Composite",
+      "Operator": "Or",
+      "TitleKey": "adventurequests.quest.labreport.title",
+      "QuestAssetIds": [
+        "AdventureQuests_LabCompressorTalk",
+        "AdventureQuests_LabAllRepaired"
+      ]
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Gadget_Assembly",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_LabConsole"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

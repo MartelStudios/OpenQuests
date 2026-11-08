@@ -1,0 +1,23 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.guardruneheart.title",
+  "DescriptionKey": "adventurequests.quest.guardruneheart.description",
+  "ShortDescriptionKey": "adventurequests.quest.guardruneheart.short",
+  "QuestAssetIds": [
+    "AdventureQuests_GuardRuneHeartCraft",
+    "AdventureQuests_GuardRuneHeartShow"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "PortalKey_Goblin_Breach",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

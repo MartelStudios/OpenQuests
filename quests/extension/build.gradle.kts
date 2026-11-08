@@ -65,7 +65,7 @@ tasks.named<Jar>("jar") {
 
 // The ship quests as content. They leave the jar and travel as an asset pack of
 // their own, so a server owner keeps the quest types and drops the example chain by deleting one file.
-val questExamples = listOf("Server/OpenQuests/**", "Server/OpenDialogues/**", "Server/Item/**", "Common/Icons/OpenQuestsExamples/**", "Server/Languages/*/quest.lang", "Server/Languages/*/openquestsexamples.lang")
+val questExamples = listOf("Server/OpenQuests/**", "Server/OpenDialogues/**", "Server/Item/**", "Common/Icons/AdventureQuests/**", "Server/Languages/*/quest.lang", "Server/Languages/*/adventurequests.lang")
 
 // Only the published jar loses them: stageAllModAssets and prepareRunServer link the dev run
 // against src/main/resources rather than this output, so runAllMods keeps the quests, and keeps
@@ -91,9 +91,9 @@ val questExamplesManifest by tasks.registering {
             """
             {
                 "Group": "$group",
-                "Name": "OpenQuestsExamples",
+                "Name": "HytaleAdventureQuests",
                 "Version": "$modVersion",
-                "Description": "The quest line shipped with OpenQuests. Delete to start from an empty quest list.",
+                "Description": "Quests, characters and dialogues that bring vanilla Hytale to life. Delete to start from an empty quest list.",
                 "Authors": [
                     {
                         "Name": "$author"
@@ -114,7 +114,7 @@ val questExamplesManifest by tasks.registering {
 }
 
 val questExamplesZip by tasks.registering(Zip::class) {
-    archiveBaseName.set("OpenQuestsExamples")
+    archiveBaseName.set("HytaleAdventureQuests")
     archiveVersion.set(project.property("examples_version").toString())
 
     // Manifest at the root, the rest keeping the paths it has under src/main/resources

@@ -1,0 +1,23 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.guardrunerevenant.title",
+  "DescriptionKey": "adventurequests.quest.guardrunerevenant.description",
+  "ShortDescriptionKey": "adventurequests.quest.guardrunerevenant.short",
+  "QuestAssetIds": [
+    "AdventureQuests_GuardRuneRevenantCraft",
+    "AdventureQuests_GuardRuneRevenantShow"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "PortalKey_Goblin_Breach",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

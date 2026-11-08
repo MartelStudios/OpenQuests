@@ -1,0 +1,26 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ModelsGenerated/Kweebec_Sapling.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.meetguard.title",
+  "DescriptionKey": "adventurequests.quest.meetguard.description",
+  "ShortDescriptionKey": "adventurequests.quest.meetguard.short",
+  "TargetQuantity": 1,
+  "Character": "AdventureQuests_TempleGuard",
+  "Dialogue": "AdventureQuests_GuardIntro",
+  "Answer": "Accept",
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GuardTaleRevenant",
+        "AdventureQuests_GuardTaleGlutton",
+        "AdventureQuests_GuardTaleVoidtaken",
+        "AdventureQuests_GuardTaleHeart"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

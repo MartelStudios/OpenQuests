@@ -1,0 +1,13 @@
+{
+  "Type": "EnterWorld",
+  "Icon": "Icons/ItemsGenerated/PortalKey_Goblin_Breach.png",
+  "Categories": ["SideQuest"],
+  "TitleKey": "adventurequests.quest.homesick.title",
+  "DescriptionKey": "adventurequests.quest.homesick.description",
+  "ShortDescriptionKey": "adventurequests.quest.homesick.short",
+  "WorldNamePattern": "instance-Portals-Portals_Goblins-.*",
+  "SuccessfulRewards": [
+    { "Type": "GrantQuest", "QuestAssetIds": ["AdventureQuests_PlushHome"], "AutoClaim": true }
+  ],
+  "AutoTrack": true
+}

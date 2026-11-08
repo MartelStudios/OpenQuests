@@ -1,0 +1,78 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_LabScrap",
+          "States": [
+            "InProgress",
+            "Successful",
+            "Failed",
+            "Abandoned"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_SaplingWorry"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabThroughEnter",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_LabThroughTell",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_SaplingThrough"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_LabThrough",
+          "States": [
+            "Successful"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_SaplingGrateful"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_LabGenerator",
+          "States": [
+            "Successful"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_SaplingRelieved"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_SaplingWaiting"
+        }
+      }
+    ]
+  }
+}

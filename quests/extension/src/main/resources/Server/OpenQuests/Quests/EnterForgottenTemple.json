@@ -13,10 +13,10 @@
       "Type": "GrantQuest",
       "QuestAssetIds": [
         "TalkToRootlingMerchant",
-        "OpenQuestsExamples_MeetSapling",
-        "OpenQuestsExamples_MeetSeedling",
-        "OpenQuestsExamples_MeetStag",
-        "OpenQuestsExamples_MeetGuard"
+        "AdventureQuests_MeetSapling",
+        "AdventureQuests_MeetSeedling",
+        "AdventureQuests_MeetStag",
+        "AdventureQuests_MeetGuard"
       ],
       "AutoClaim": true
     }

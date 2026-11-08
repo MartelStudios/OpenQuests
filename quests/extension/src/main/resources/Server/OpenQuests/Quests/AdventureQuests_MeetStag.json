@@ -1,0 +1,23 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ModelsGenerated/Deer_Stag.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.meetstag.title",
+  "DescriptionKey": "adventurequests.quest.meetstag.description",
+  "ShortDescriptionKey": "adventurequests.quest.meetstag.short",
+  "TargetQuantity": 1,
+  "Character": "AdventureQuests_TempleStag",
+  "Dialogue": "AdventureQuests_StagIntro",
+  "Answer": "Accept",
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_StagWheat"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}
