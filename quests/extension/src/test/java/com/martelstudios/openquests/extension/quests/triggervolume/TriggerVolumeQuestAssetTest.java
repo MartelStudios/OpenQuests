@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -75,7 +77,12 @@ class TriggerVolumeQuestAssetTest {
      * off the sources, since example quests are kept out of the jar and its resources.
      */
     private static TriggerVolumeQuestAsset decodeShipped(String id) throws IOException {
-        String json = Files.readString(Path.of("src/main/resources/Server/OpenQuests/Quests/" + id + ".json"));
+        List<Path> found;
+        try (Stream<Path> files = Files.walk(Path.of("src/main/resources/Server/OpenQuests/Quests"))) {
+            found = files.filter(file -> file.getFileName().toString().equals(id + ".json")).toList();
+        }
+        assertEquals(1, found.size(), id);
+        String json = Files.readString(found.getFirst());
         Matcher pattern = Pattern.compile("\"VolumeNamePattern\": \"[^\"]*\"").matcher(json);
         Matcher eventType = Pattern.compile("\"TriggerEventType\": \"[^\"]*\"").matcher(json);
         assertTrue(pattern.find(), id);
