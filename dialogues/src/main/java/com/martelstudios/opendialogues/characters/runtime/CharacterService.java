@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.BiPredicate;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -45,7 +45,7 @@ import java.util.random.RandomGenerator;
 public class CharacterService {
 
     private final CharacterAssets assets;
-    private final BiPredicate<ComponentAccessor<EntityStore>, Ref<EntityStore>> eligible;
+    private final BiFunction<ComponentAccessor<EntityStore>, Ref<EntityStore>, NpcEligibility> eligibility;
     private final IEventBus events;
     private final RandomGenerator random;
     private final BiConsumer<String, Throwable> warnings;
@@ -58,13 +58,13 @@ public class CharacterService {
     private volatile BiConsumer<CharacterContext, PlayerRef> unanswered = (context, player) -> {};
 
     /**
-     * @param eligible whether an NPC may receive a character at all, so no mod's NPC is taken over.
+     * @param eligibility how far an NPC may receive a character, so no mod's NPC is taken over.
      * @param warnings where a failing trait is reported, with its exception.
      * @param universe the registry of characters scoped to the universe, read once the universe is up.
      */
-    public CharacterService(@Nonnull CharacterAssets assets, @Nonnull BiPredicate<ComponentAccessor<EntityStore>, Ref<EntityStore>> eligible, @Nonnull IEventBus events, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings, ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, ResourceType<EntityStore, UniqueCharacters> uniqueType, @Nonnull Supplier<UniverseCharacters> universe) {
+    public CharacterService(@Nonnull CharacterAssets assets, @Nonnull BiFunction<ComponentAccessor<EntityStore>, Ref<EntityStore>, NpcEligibility> eligibility, @Nonnull IEventBus events, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings, ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, ResourceType<EntityStore, UniqueCharacters> uniqueType, @Nonnull Supplier<UniverseCharacters> universe) {
         this.assets = assets;
-        this.eligible = eligible;
+        this.eligibility = eligibility;
         this.events = events;
         this.random = random;
         this.warnings = warnings;
@@ -139,14 +139,15 @@ public class CharacterService {
      */
     @Nullable
     String draw(@Nonnull CharacterNpc npc, @Nonnull FilterContext context) {
-        if (npc.identity().getCharacter() != null || !eligible.test(npc.accessor(), npc.ref())) return null;
+        NpcEligibility eligible = eligibility.apply(npc.accessor(), npc.ref());
+        if (npc.identity().getCharacter() != null || !eligible.allows(true)) return null;
         CharacterEvent.Drawing drawing = events.dispatchFor(CharacterEvent.Drawing.class, null).dispatch(new CharacterEvent.Drawing(context));
         if (drawing.isCancelled()) return null;
 
-        CharacterAssigner.Draw draw = CharacterAssigner.assign(npc.identity().getDraws(), List.copyOf(assets.distributions()), context, id -> npc.unique().isAvailable(id, assets::character), random, this::warnOnce);
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(npc.identity().getDraws(), List.copyOf(assets.distributions()), context, eligible == NpcEligibility.OwnInteraction, id -> npc.unique().isAvailable(id, assets::character), random, this::warnOnce);
         draw.drawn().forEach(npc.identity()::recordDraw);
         if (!draw.drawn().isEmpty()) stamp(npc, universe.get().generation());
-        return draw.character() != null && give(npc, draw.character()) ? draw.character() : null;
+        return draw.character() != null && give(npc, draw.character(), true) ? draw.character() : null;
     }
 
     /**
@@ -156,7 +157,14 @@ public class CharacterService {
      * @return whether the NPC now carries the character.
      */
     boolean give(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
-        if (npc.identity().getCharacter() != null || !eligible.test(npc.accessor(), npc.ref())) return false;
+        return give(npc, characterId, false);
+    }
+
+    /**
+     * @param overrideInteraction whether the character may replace the role's own F, for a distribution asking to.
+     */
+    boolean give(@Nonnull CharacterNpc npc, @Nonnull String characterId, boolean overrideInteraction) {
+        if (npc.identity().getCharacter() != null || !eligibility.apply(npc.accessor(), npc.ref()).allows(overrideInteraction)) return false;
         OpenDialogueCharacterAsset character = character(characterId);
         int generation = universe.get().generation();
         if (character == null || !npc.unique().claimIfAvailable(characterId, npc.uuid(), assets::character)) return false;
@@ -196,7 +204,7 @@ public class CharacterService {
     @Nonnull
     AssignResult assign(@Nonnull CharacterNpc npc, @Nonnull String characterId) {
         if (character(characterId) == null) return AssignResult.UnknownCharacter;
-        if (!eligible.test(npc.accessor(), npc.ref())) return AssignResult.Ineligible;
+        if (!eligibility.apply(npc.accessor(), npc.ref()).allows(false)) return AssignResult.Ineligible;
         if (!characterId.equals(npc.identity().getCharacter()) && !npc.unique().isAvailable(characterId, assets::character)) return AssignResult.Taken;
         release(npc, ReleaseReason.Revoked);
         return give(npc, characterId) ? AssignResult.Assigned : AssignResult.Taken;

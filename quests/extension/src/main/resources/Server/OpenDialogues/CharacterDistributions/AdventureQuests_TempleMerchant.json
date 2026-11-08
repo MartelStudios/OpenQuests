@@ -1,0 +1,23 @@
+{
+  "OverrideInteraction": true,
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Temple_Kweebec_Merchant"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-(forgotten-temple-goblins|Forgotten_Temple-.*)"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_TempleMerchant",
+      "Weight": 1
+    }
+  ]
+}

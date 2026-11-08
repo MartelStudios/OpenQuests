@@ -43,6 +43,7 @@ read as the player's own thoughts.
 | `Close` | Ends the dialogue answered. |
 | `Open` | Closes the dialogue answered and opens `Dialogue`, or what `Router` picks, each an id or written inline. |
 | `Command` | Runs `Command` as the player. The dialogue stays open. |
+| `OpenBarterShop` | Ends the dialogue and opens the barter shop `Shop` (a `Server/BarterShops/` id such as `Kweebec_Merchant`), sharing its stock with the merchant NPC. |
 
 ## Routers
 
@@ -148,6 +149,7 @@ per NPC, such as a name.
 | `Filters` | Every filter must hold for the NPC. |
 | `Characters` | Entries with a `Weight` and a `Character`; an entry without a character is the chance to draw nobody, kept for good. |
 | `Priority` | Higher first when several distributions hold for one NPC, ties by id. |
+| `OverrideInteraction` | `false` by default: NPCs whose role answers F itself (a merchant) never draw. When `true`, they draw from this distribution and their character answers F instead. |
 
 | Filter type | Holds when |
 | --- | --- |
@@ -158,7 +160,7 @@ per NPC, such as a name.
 | `Biome` | The scanning player stands in one of `Biomes`. |
 | `Unobstructed` | No block hitbox (tall grass, a bush) overlaps the upper half of the NPC's hitbox, where it stands at the draw, so players can aim F at it. Suited to NPCs that do not move. |
 
-Every filter also takes `Not`. NPCs that already react to F (merchants, quest givers) are skipped.
+Every filter also takes `Not`. NPCs that already react to F (merchants, quest givers) are skipped, unless the distribution sets `OverrideInteraction`.
 
 A world closing for good frees its `Alive` characters and loses its `Forever` + `Universe` ones:
 keep such characters in worlds that stay, the overworld or a persistent instance.

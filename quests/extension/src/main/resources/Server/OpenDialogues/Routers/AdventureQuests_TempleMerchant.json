@@ -1,0 +1,29 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "TempleTrial",
+          "States": [
+            "InProgress",
+            "Successful",
+            "Failed",
+            "Abandoned"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_MerchantIntro"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_MerchantGreeting"
+        }
+      }
+    ]
+  }
+}

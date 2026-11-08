@@ -31,6 +31,7 @@ import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
 import com.martelstudios.opendialogues.actions.impl.character.OpenDialoguesUseCharacterAction;
 import com.martelstudios.opendialogues.actions.impl.command.OpenDialoguesCommandAction;
+import com.martelstudios.opendialogues.actions.impl.shop.OpenDialoguesOpenBarterShopAction;
 import com.martelstudios.opendialogues.actions.impl.inventory.OpenDialoguesConsumeInventoryAction;
 import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
@@ -175,6 +176,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerAction(OpenDialoguesCommandAction.TYPE, OpenDialoguesCommandAction.class, OpenDialoguesCommandAction.CODEC);
         registry.registerAction(OpenDialoguesConsumeInventoryAction.TYPE, OpenDialoguesConsumeInventoryAction.class, OpenDialoguesConsumeInventoryAction.CODEC);
         registry.registerAction(OpenDialoguesUseCharacterAction.TYPE, OpenDialoguesUseCharacterAction.class, OpenDialoguesUseCharacterAction.CODEC);
+        registry.registerAction(OpenDialoguesOpenBarterShopAction.TYPE, OpenDialoguesOpenBarterShopAction.class, OpenDialoguesOpenBarterShopAction.CODEC);
 
         registry.registerCondition(OpenDialoguesCompositeCondition.TYPE, OpenDialoguesCompositeCondition.class, OpenDialoguesCompositeCondition.CODEC);
         registry.registerCondition(OpenDialoguesOpenedCondition.TYPE, OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition.CODEC);
@@ -206,7 +208,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         universeCharactersType = Universe.registerResource(UniverseCharacters.class, "OpenDialoguesUniqueCharacters", UniverseCharacters.CODEC);
         CharacterAssets characterAssets = CharacterAssets.live();
-        characterService = new CharacterService(characterAssets, NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
+        characterService = new CharacterService(characterAssets, NpcEligibility::of, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
         ResourceType<EntityStore, CharacterPositions> positionsType = getEntityStoreRegistry().registerResource(CharacterPositions.class, "OpenDialoguesCharacterPositions", CharacterPositions.CODEC);
         CharacterPositionsAccess positions = new CharacterPositionsAccess(positionsType, characterService);
         characterMarkers = new CharacterMarkerProvider(positions, player -> historyRecorder.history(player), characterAssets::character);

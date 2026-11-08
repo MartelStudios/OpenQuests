@@ -14,24 +14,40 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Which NPCs may carry a character: an NPC whose role answers F itself, or whose F another mod
- * took, is not ours to change. Mods veto more through the drawing event.
+ * Which NPCs may carry a character: an NPC whose F another mod took is never ours, one whose role
+ * answers F itself only when a distribution asks to override it. Mods veto more through the drawing event.
  */
-public final class NpcEligibility {
+public enum NpcEligibility {
 
-    private NpcEligibility() {}
+    /** Not an NPC. */
+    None,
+    /** Its F belongs to another mod. */
+    ModInteraction,
+    /** Its role answers F itself, such as a merchant. */
+    OwnInteraction,
+    /** A plain NPC. */
+    Plain;
 
     /**
-     * @return whether the NPC is a plain one the mod may give a character to.
+     * @return how far the mod may give the NPC a character.
      */
-    public static boolean test(@Nullable ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref) {
-        if (accessor == null) return false;
+    @Nonnull
+    public static NpcEligibility of(@Nullable ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref) {
+        if (accessor == null) return None;
         NPCEntity entity = accessor.getComponent(ref, NPCEntity.getComponentType());
-        if (entity == null) return false;
+        if (entity == null) return None;
+        Interactions interactions = accessor.getComponent(ref, Interactions.getComponentType());
+        if (interactions == null || !UseNPCInteraction.DEFAULT_ID.equals(interactions.getInteractionId(InteractionType.Use))) return ModInteraction;
         Role role = entity.getRole();
         Instruction instruction = role == null ? null : role.getInteractionInstruction();
-        if (instruction != null && instruction.componentCount() > 1) return false;
-        Interactions interactions = accessor.getComponent(ref, Interactions.getComponentType());
-        return interactions != null && UseNPCInteraction.DEFAULT_ID.equals(interactions.getInteractionId(InteractionType.Use));
+        return instruction != null && instruction.componentCount() > 1 ? OwnInteraction : Plain;
+    }
+
+    /**
+     * @param overrideInteraction whether the character may replace the role's own F.
+     * @return whether the NPC may receive a character.
+     */
+    public boolean allows(boolean overrideInteraction) {
+        return this == Plain || this == OwnInteraction && overrideInteraction;
     }
 }
