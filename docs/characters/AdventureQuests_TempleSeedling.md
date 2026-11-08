@@ -63,12 +63,12 @@ Hollows fragment 0/2/10/15.
 
 ## Assets
 
-- `OpenDialogues/Characters/AdventureQuests_TempleSeedling.json`
-- `OpenDialogues/CharacterDistributions/AdventureQuests_TempleSeedling.json`
-- `OpenDialogues/Routers/AdventureQuests_TempleSeedling.json`
-- `OpenDialogues/Dialogues/AdventureQuests_Seedling{Intro,Feathers,Shards,Gift,Rainbow,Thanks}.json`
-- `OpenQuests/Quests/AdventureQuests_MeetSeedling.json`, `AdventureQuests_Seedling*.json`, listed in chapter `AdventureQuests_ForgottenTemple`
-- Lang keys `adventurequests.temple.seedling.*` and `adventurequests.quest.seedling*`
+- `OpenDialogues/Characters/AdventureQuests/ForgottenTemple/Seedling/AdventureQuests_TempleSeedling.json`
+- `OpenDialogues/CharacterDistributions/AdventureQuests/ForgottenTemple/Seedling/AdventureQuests_TempleSeedling.json`
+- `OpenDialogues/Routers/AdventureQuests/ForgottenTemple/Seedling/AdventureQuests_TempleSeedling.json`
+- `OpenDialogues/Dialogues/AdventureQuests/ForgottenTemple/Seedling/AdventureQuests_Seedling{Intro,Feathers,Shards,Gift,Rainbow,Thanks}.json`
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Seedling/AdventureQuests_MeetSeedling.json`, `AdventureQuests_Seedling*.json`, listed in chapter `AdventureQuests_ForgottenTemple`
+- Lang keys in `Languages/*/adventurequests/forgottentemple.lang`, section `# Seedling`
 
 ## Decision log
 

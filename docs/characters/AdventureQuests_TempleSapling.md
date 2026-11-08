@@ -46,13 +46,13 @@ quests existed gets the same answer assigning `LabScrap` directly.
 
 ## Assets
 
-- `OpenDialogues/Characters/AdventureQuests_TempleSapling.json`
-- `OpenDialogues/CharacterDistributions/AdventureQuests_TempleSapling.json`
-- `OpenDialogues/Routers/AdventureQuests_TempleSapling.json`
-- `OpenDialogues/Dialogues/AdventureQuests_Sapling{Worry,Generator,Waiting,Relieved,Through,Grateful}.json`
-- `OpenQuests/Quests/AdventureQuests_MeetSapling.json`
-- `OpenQuests/Quests/AdventureQuests_Lab{Scrap,Generator}.json`, `AdventureQuests_LabThrough{,Enter,Tell}.json`, chapter `AdventureQuests_ForgottenTemple`
-- Lang keys `adventurequests.temple.sapling.*`, `adventurequests.quest.lab{scrap,generator}.*`
+- `OpenDialogues/Characters/AdventureQuests/ForgottenTemple/Sapling/AdventureQuests_TempleSapling.json`
+- `OpenDialogues/CharacterDistributions/AdventureQuests/ForgottenTemple/Sapling/AdventureQuests_TempleSapling.json`
+- `OpenDialogues/Routers/AdventureQuests/ForgottenTemple/Sapling/AdventureQuests_TempleSapling.json`
+- `OpenDialogues/Dialogues/AdventureQuests/ForgottenTemple/Sapling/AdventureQuests_Sapling{Worry,Generator,Waiting,Relieved,Through,Grateful}.json`
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Sapling/AdventureQuests_MeetSapling.json`
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Lab/AdventureQuests_Lab{Scrap,Generator}.json`, `AdventureQuests_LabThrough{,Enter,Tell}.json`, chapter `AdventureQuests_ForgottenTemple`
+- Lang keys in `Languages/*/adventurequests/forgottentemple.lang`, sections `# Sapling` and `# Lab`
 
 ## Decision log
 

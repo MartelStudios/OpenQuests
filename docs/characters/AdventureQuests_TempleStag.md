@@ -55,13 +55,13 @@ pays a random amount of `Ingredient_Life_Essence` (3, 5 or 8 at weights 50, 35, 
 
 ## Assets
 
-- `OpenDialogues/Characters/AdventureQuests_TempleStag.json`
-- `OpenDialogues/CharacterDistributions/AdventureQuests_TempleStag.json`
-- `OpenDialogues/Routers/AdventureQuests_TempleStag.json`
-- `OpenDialogues/TextLists/AdventureQuests_StagNames.json`
-- `OpenDialogues/Dialogues/AdventureQuests_Stag{Intro,Idle,Seeds,Moult,Content}.json`
-- `OpenQuests/Quests/AdventureQuests_MeetStag.json`, `AdventureQuests_Stag*.json`, listed in chapter `AdventureQuests_ForgottenTemple`
-- Lang keys `adventurequests.temple.stag.*` and `adventurequests.quest.stag*`
+- `OpenDialogues/Characters/AdventureQuests/ForgottenTemple/Stag/AdventureQuests_TempleStag.json`
+- `OpenDialogues/CharacterDistributions/AdventureQuests/ForgottenTemple/Stag/AdventureQuests_TempleStag.json`
+- `OpenDialogues/Routers/AdventureQuests/ForgottenTemple/Stag/AdventureQuests_TempleStag.json`
+- `OpenDialogues/TextLists/AdventureQuests/ForgottenTemple/Stag/AdventureQuests_StagNames.json`
+- `OpenDialogues/Dialogues/AdventureQuests/ForgottenTemple/Stag/AdventureQuests_Stag{Intro,Idle,Seeds,Moult,Content}.json`
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Stag/AdventureQuests_MeetStag.json`, `AdventureQuests_Stag*.json`, listed in chapter `AdventureQuests_ForgottenTemple`
+- Lang keys in `Languages/*/adventurequests/forgottentemple.lang`, section `# Stag`
 
 ## Decision log
 

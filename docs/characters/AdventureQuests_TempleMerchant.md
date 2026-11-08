@@ -42,12 +42,12 @@ so his stock stays as vanilla.
 
 ## Assets
 
-- `OpenDialogues/Characters/AdventureQuests_TempleMerchant.json`
-- `OpenDialogues/CharacterDistributions/AdventureQuests_TempleMerchant.json`
-- `OpenDialogues/Routers/AdventureQuests_TempleMerchant.json`
-- `OpenDialogues/Dialogues/AdventureQuests_MerchantIntro.json`, `AdventureQuests_MerchantGreeting.json`
-- `OpenQuests/Quests/TalkToRootlingMerchant.json`, chapter `AdventureQuests_ForgottenTemple`
-- Lang keys `adventurequests.temple.merchant.*`, `quest.talk-merchant.*`
+- `OpenDialogues/Characters/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_TempleMerchant.json`
+- `OpenDialogues/CharacterDistributions/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_TempleMerchant.json`
+- `OpenDialogues/Routers/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_TempleMerchant.json`
+- `OpenDialogues/Dialogues/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_MerchantIntro.json`, `AdventureQuests_MerchantGreeting.json`
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_TalkToRootlingMerchant.json`, chapter `AdventureQuests_ForgottenTemple`
+- Lang keys in `Languages/*/adventurequests/forgottentemple.lang`, section `# Temple`
 
 ## Decision log
 

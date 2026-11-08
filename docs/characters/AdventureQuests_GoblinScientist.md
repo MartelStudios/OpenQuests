@@ -64,17 +64,17 @@ hide (engine), Voidhearts (compressor, console).
 
 ## Assets
 
-- `OpenDialogues/Characters/AdventureQuests_GoblinScientist.json`
-- `OpenDialogues/CharacterDistributions/AdventureQuests_GoblinScientist.json`
-- `OpenDialogues/Routers/AdventureQuests_GoblinScientist.json`
-- `OpenDialogues/Routers/AdventureQuests_ScientistRepairsLeft.json`
-- `OpenDialogues/Dialogues/AdventureQuests_Scientist{NoPower,Gateway,Scold}.json`,
+- `OpenDialogues/Characters/AdventureQuests/ForgottenTemple/Lab/AdventureQuests_GoblinScientist.json`
+- `OpenDialogues/CharacterDistributions/AdventureQuests/ForgottenTemple/Lab/AdventureQuests_GoblinScientist.json`
+- `OpenDialogues/Routers/AdventureQuests/ForgottenTemple/Lab/AdventureQuests_GoblinScientist.json`
+- `OpenDialogues/Routers/AdventureQuests/ForgottenTemple/Lab/AdventureQuests_ScientistRepairsLeft.json`
+- `OpenDialogues/Dialogues/AdventureQuests/ForgottenTemple/Lab/AdventureQuests_Scientist{NoPower,Gateway,Scold}.json`,
   `AdventureQuests_ScientistReport{Gateway,Teleporter,Boiler,Engine,Compressor}.json`,
   `AdventureQuests_ScientistLeft{Two,One,None}.json`
-- `OpenQuests/Quests/AdventureQuests_MeetScientist{,Talk}.json`, `AdventureQuests_LabAllRepaired.json`
-- `OpenQuests/Quests/AdventureQuests_Lab{Gateway,Teleporter,Boiler,Engine,Compressor}{,Repair,Talk}.json`,
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Lab/AdventureQuests_MeetScientist{,Talk}.json`, `AdventureQuests_LabAllRepaired.json`
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Lab/AdventureQuests_Lab{Gateway,Teleporter,Boiler,Engine,Compressor}{,Repair,Talk}.json`,
   `AdventureQuests_LabConsole.json`
-- Lang keys `adventurequests.goblin.scientist.*`, `adventurequests.quest.lab*`
+- Lang keys in `Languages/*/adventurequests/forgottentemple.lang`, section `# Lab`
 
 ## Decision log
 
