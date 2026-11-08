@@ -19,7 +19,7 @@ idle visitors, generous once he has decided someone is worth it.
 
 - "I do not trade with tourists."
 - "Here, some essence on credit, so you know I am serious."
-- "Business is slow under these stones, so do not make me wait."
+- "Back again, customer! Care to take a look?"
 
 ## Wants
 
