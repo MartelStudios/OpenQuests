@@ -43,6 +43,7 @@ read as the player's own thoughts.
 | `Close` | Ends the dialogue answered. |
 | `Open` | Closes the dialogue answered and opens `Dialogue`, or what `Router` picks, each an id or written inline. |
 | `Command` | Runs `Command` as the player. The dialogue stays open. |
+| `OpenBarterShop` | Ends the dialogue and opens the barter shop `Shop` (a `Server/BarterShops/` id such as `Kweebec_Merchant`), sharing its stock with the merchant NPC. |
 
 ## Routers
 

@@ -31,6 +31,7 @@ import com.hypixel.hytale.server.core.util.Config;
 import com.martelstudios.opendialogues.actions.impl.close.OpenDialoguesCloseAction;
 import com.martelstudios.opendialogues.actions.impl.character.OpenDialoguesUseCharacterAction;
 import com.martelstudios.opendialogues.actions.impl.command.OpenDialoguesCommandAction;
+import com.martelstudios.opendialogues.actions.impl.shop.OpenDialoguesOpenBarterShopAction;
 import com.martelstudios.opendialogues.actions.impl.inventory.OpenDialoguesConsumeInventoryAction;
 import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
@@ -175,6 +176,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerAction(OpenDialoguesCommandAction.TYPE, OpenDialoguesCommandAction.class, OpenDialoguesCommandAction.CODEC);
         registry.registerAction(OpenDialoguesConsumeInventoryAction.TYPE, OpenDialoguesConsumeInventoryAction.class, OpenDialoguesConsumeInventoryAction.CODEC);
         registry.registerAction(OpenDialoguesUseCharacterAction.TYPE, OpenDialoguesUseCharacterAction.class, OpenDialoguesUseCharacterAction.CODEC);
+        registry.registerAction(OpenDialoguesOpenBarterShopAction.TYPE, OpenDialoguesOpenBarterShopAction.class, OpenDialoguesOpenBarterShopAction.CODEC);
 
         registry.registerCondition(OpenDialoguesCompositeCondition.TYPE, OpenDialoguesCompositeCondition.class, OpenDialoguesCompositeCondition.CODEC);
         registry.registerCondition(OpenDialoguesOpenedCondition.TYPE, OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition.CODEC);
