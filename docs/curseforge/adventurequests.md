@@ -30,7 +30,7 @@ Over sixty quests in eight chapters, in English and French. A whole campaign thr
 
 ### 🏛️ The Forgotten Temple
 
-💀 **Defeat the Guardian** fails the moment you die, and hands itself straight back: try again. Then enter the temple and **talk to the merchant**, which only counts inside.
+💀 **Defeat the Guardian** fails the moment you die, and hands itself straight back: try again. Then enter the temple and **talk to the merchant**: he sets you the temple's trial, and still opens his stall on request.
 
 ⏱️ **The Temple's trial** gives you three minutes to run to the rune altar, sprint-jump ten times there, run for 20 seconds and explore for a minute. Leaving the temple or dying fails the whole trial.
 

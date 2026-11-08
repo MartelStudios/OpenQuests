@@ -1,18 +1,14 @@
 {
-  "Type": "UseEntity",
+  "Type": "Dialogue",
   "Icon": "Icons/ModelsGenerated/Kweebec_Rootling.png",
   "Categories": ["Temple"],
   "TitleKey": "quest.talk-merchant.title",
   "DescriptionKey": "quest.talk-merchant.description",
   "ShortDescriptionKey": "quest.talk-merchant.short",
   "TargetQuantity": 1,
-  "Constraints": [
-    {
-      "Type": "InWorld",
-      "DescriptionKey": "quest.talk-merchant.in-temple",
-      "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)"
-    }
-  ],
+  "Character": "AdventureQuests_TempleMerchant",
+  "Dialogue": "AdventureQuests_MerchantIntro",
+  "Answer": "Accept",
   "SuccessfulRewards": [
     {
       "Type": "Item",
@@ -28,10 +24,5 @@
       "AutoClaim": true
     }
   ],
-  "NpcGroupId": {
-    "IncludeRoles": [
-      "Temple_Kweebec_Merchant"
-    ]
-  },
   "AutoTrack": true
 }

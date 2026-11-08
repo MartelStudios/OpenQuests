@@ -1,0 +1,29 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.temple.merchant.greeting.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.temple.merchant.trade",
+      "Actions": [
+        {
+          "Type": "OpenBarterShop",
+          "Shop": "Kweebec_Merchant"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.merchant.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}
