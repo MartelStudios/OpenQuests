@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-bangstick.title",
-  "DescriptionKey": "quest.goblin-breach-bangstick.description",
-  "ShortDescriptionKey": "quest.goblin-breach-bangstick.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-bangstick.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-bangstick.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-bangstick.short",
   "TargetQuantity": 2,
   "ItemToCraft": {
     "ItemId": "Weapon_Bangstick"

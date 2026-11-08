@@ -2,9 +2,9 @@
   "Type": "Consume",
   "Icon": "Icons/ItemsGenerated/Food_Skewer_Meat.png",
   "Categories": ["AdventureQuests_Survival"],
-  "TitleKey": "quest.eat-meat.title",
-  "DescriptionKey": "quest.eat-meat.description",
-  "ShortDescriptionKey": "quest.eat-meat.short",
+  "TitleKey": "adventurequests.hunting.quest.eat-meat.title",
+  "DescriptionKey": "adventurequests.hunting.quest.eat-meat.description",
+  "ShortDescriptionKey": "adventurequests.hunting.quest.eat-meat.short",
   "TargetQuantity": 1,
   "ItemToConsume": {
     "ItemId": "Food_Wildmeat_Cooked"

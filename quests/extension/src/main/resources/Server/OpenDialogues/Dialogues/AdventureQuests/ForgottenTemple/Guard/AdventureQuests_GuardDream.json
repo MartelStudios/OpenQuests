@@ -4,12 +4,12 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.guard.dream.text"
+      "Text": "adventurequests.forgottentemple.dialogue.guard-dream.text"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.guard.bye",
+      "Text": "adventurequests.forgottentemple.dialogue.guard.bye",
       "Actions": [
         {
           "Type": "Close"

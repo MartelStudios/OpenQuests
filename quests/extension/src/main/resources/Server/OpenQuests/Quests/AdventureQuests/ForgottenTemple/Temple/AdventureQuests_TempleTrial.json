@@ -2,16 +2,16 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Furniture_Temple_Emerald_Statue.png",
   "Categories": ["AdventureQuests_Temple", "AdventureQuests_Timed"],
-  "TitleKey": "quest.temple-trial.title",
-  "DescriptionKey": "quest.temple-trial.description",
-  "ShortDescriptionKey": "quest.temple-trial.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.short",
   "CanBeAbandoned": false,
   "AutoTrack": true,
   "QuestAssetIds": [
     {
       "Type": "ReachLocation",
-      "TitleKey": "quest.temple-race.title",
-      "DescriptionKey": "quest.temple-race.description",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.race.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.race.description",
       "AnnounceOutcome": false,
       "Position": {
         "X": 4976,
@@ -22,14 +22,14 @@
     },
     {
       "Type": "Jump",
-      "TitleKey": "quest.temple-warmup.title",
-      "DescriptionKey": "quest.temple-warmup.description",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.description",
       "TargetQuantity": 10,
       "AnnounceOutcome": false,
       "Constraints": [
         {
           "Type": "EntityCondition",
-          "DescriptionKey": "quest.temple-warmup.sprinting",
+          "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.sprinting",
           "Conditions": [
             {
               "Id": "Sprinting"
@@ -38,7 +38,7 @@
         },
         {
           "Type": "NearPosition",
-          "DescriptionKey": "quest.temple-warmup.near-altar",
+          "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.near-altar",
           "Position": {
             "X": 4976,
             "Y": 158,
@@ -50,16 +50,16 @@
     },
     {
       "Type": "Run",
-      "TitleKey": "quest.temple-run.title",
-      "DescriptionKey": "quest.temple-run.description",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.run.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.run.description",
       "Measure": "Seconds",
       "TargetQuantity": 20,
       "AnnounceOutcome": false
     },
     {
       "Type": "NoOp",
-      "TitleKey": "quest.temple-hold.title",
-      "DescriptionKey": "quest.temple-hold.description",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.hold.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.hold.description",
       "AnnounceOutcome": false,
       "PersistProgression": false,
       "Constraints": [
@@ -74,7 +74,7 @@
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.temple-trial.in-temple",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.in-temple",
       "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)",
       "OnLeave": "Fail"
     },

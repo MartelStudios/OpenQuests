@@ -2,55 +2,55 @@
   "Type": "Composite",
   "Visibility": "WhenSuccessful",
   "AnnounceOutcome": false,
-  "TitleKey": "adventurequests.quest.laballrepaired.title",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-all-repaired.title",
   "QuestAssetIds": [
     {
       "Type": "GameFlag",
       "Visibility": "Never",
       "AnnounceOutcome": false,
-      "TitleKey": "adventurequests.quest.laballrepaired.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-all-repaired.title",
       "Flag": "goblin_lab_power"
     },
     {
       "Type": "GameFlag",
       "Visibility": "Never",
       "AnnounceOutcome": false,
-      "TitleKey": "adventurequests.quest.laballrepaired.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-all-repaired.title",
       "Flag": "goblin_lab_gate"
     },
     {
       "Type": "GameFlag",
       "Visibility": "Never",
       "AnnounceOutcome": false,
-      "TitleKey": "adventurequests.quest.laballrepaired.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-all-repaired.title",
       "Flag": "goblin_lab_teleporter"
     },
     {
       "Type": "GameFlag",
       "Visibility": "Never",
       "AnnounceOutcome": false,
-      "TitleKey": "adventurequests.quest.laballrepaired.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-all-repaired.title",
       "Flag": "goblin_lab_recipe_a"
     },
     {
       "Type": "GameFlag",
       "Visibility": "Never",
       "AnnounceOutcome": false,
-      "TitleKey": "adventurequests.quest.laballrepaired.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-all-repaired.title",
       "Flag": "goblin_lab_recipe_b"
     },
     {
       "Type": "GameFlag",
       "Visibility": "Never",
       "AnnounceOutcome": false,
-      "TitleKey": "adventurequests.quest.laballrepaired.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-all-repaired.title",
       "Flag": "goblin_lab_recipe_c"
     },
     {
       "Type": "GameFlag",
       "Visibility": "Never",
       "AnnounceOutcome": false,
-      "TitleKey": "adventurequests.quest.laballrepaired.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-all-repaired.title",
       "Flag": "goblin_breach_duration"
     }
   ]

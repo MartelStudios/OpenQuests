@@ -1,16 +1,16 @@
 {
-  "Title": "adventurequests.plush.speaker.name",
+  "Title": "adventurequests.strangeplush.character.plush.name",
   "Display": "Default",
   "Character": "AdventureQuests_PlushFed",
   "Tags": { "Series": ["AdventureQuests_StrangePlush"] },
   "Pages": [
-    { "Text": "adventurequests.plush.story.page1" },
-    { "Text": "adventurequests.plush.story.page2" },
-    { "Text": "adventurequests.plush.story.page3" }
+    { "Text": "adventurequests.strangeplush.dialogue.plush-story.page1" },
+    { "Text": "adventurequests.strangeplush.dialogue.plush-story.page2" },
+    { "Text": "adventurequests.strangeplush.dialogue.plush-story.page3" }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.plush.story.answer",
+      "Text": "adventurequests.strangeplush.dialogue.plush-story.answer",
       "Actions": [
         { "Type": "Open", "Dialogue": "AdventureQuests_PlushFed" }
       ]

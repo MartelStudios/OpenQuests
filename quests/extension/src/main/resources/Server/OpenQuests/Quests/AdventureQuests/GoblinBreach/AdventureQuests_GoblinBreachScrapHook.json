@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-scrap-hook.title",
-  "DescriptionKey": "quest.goblin-breach-scrap-hook.description",
-  "ShortDescriptionKey": "quest.goblin-breach-scrap-hook.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-scrap-hook.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-scrap-hook.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-scrap-hook.short",
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Scrap_Hook"

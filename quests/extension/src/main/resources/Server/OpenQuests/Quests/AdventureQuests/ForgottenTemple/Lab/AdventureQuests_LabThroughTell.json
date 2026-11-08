@@ -1,6 +1,6 @@
 {
   "Type": "Dialogue",
-  "TitleKey": "adventurequests.quest.labthrough.tell.title",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-through-tell.title",
   "TargetQuantity": 1,
   "Character": "AdventureQuests_TempleSapling",
   "Dialogue": "AdventureQuests_SaplingThrough"

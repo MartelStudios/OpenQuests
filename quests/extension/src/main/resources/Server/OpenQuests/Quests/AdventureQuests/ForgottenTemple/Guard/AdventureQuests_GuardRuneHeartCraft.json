@@ -1,6 +1,6 @@
 {
   "Type": "Craft",
-  "TitleKey": "adventurequests.quest.guardrune.craft.title",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-rune-craft.title",
   "TargetQuantity": 1,
   "ItemToCraft": {
     "Category": "GoblinLab_Runes"

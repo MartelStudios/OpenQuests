@@ -2,9 +2,9 @@
   "Type": "DropItem",
   "Icon": "Icons/ItemsGenerated/Ingredient_Life_Essence.png",
   "Categories": ["AdventureQuests_Temple"],
-  "TitleKey": "quest.temple-offering.title",
-  "DescriptionKey": "quest.temple-offering.description",
-  "ShortDescriptionKey": "quest.temple-offering.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.temple-offering.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.temple-offering.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.temple-offering.short",
   "TargetQuantity": 10,
   "AutoTrack": true,
   "AntiAbuse": true,
@@ -14,12 +14,12 @@
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.temple-offering.in-temple",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-offering.in-temple",
       "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)"
     },
     {
       "Type": "NearPosition",
-      "DescriptionKey": "quest.temple-offering.near-altar",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-offering.near-altar",
       "Position": {
         "X": 4976,
         "Y": 158,

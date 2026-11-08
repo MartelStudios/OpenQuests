@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.guardrunerevenant.title",
-  "DescriptionKey": "adventurequests.quest.guardrunerevenant.description",
-  "ShortDescriptionKey": "adventurequests.quest.guardrunerevenant.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-rune-revenant.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-revenant.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-revenant.short",
   "QuestAssetIds": [
     "AdventureQuests_GuardRuneRevenantCraft",
     "AdventureQuests_GuardRuneRevenantShow",

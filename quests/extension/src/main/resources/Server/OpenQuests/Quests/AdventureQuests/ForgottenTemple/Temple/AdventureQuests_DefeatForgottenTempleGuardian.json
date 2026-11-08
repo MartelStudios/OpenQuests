@@ -7,9 +7,9 @@
       "Golem_Crystal_Earth"
     ]
   },
-  "TitleKey": "quest.defeat-guardian.title",
-  "DescriptionKey": "quest.defeat-guardian.description",
-  "ShortDescriptionKey": "quest.defeat-guardian.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.defeat-forgotten-temple-guardian.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.defeat-forgotten-temple-guardian.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.defeat-forgotten-temple-guardian.short",
   "TargetQuantity": 1,
   "Constraints": [
     {

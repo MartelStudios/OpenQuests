@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-guardians.title",
-  "DescriptionKey": "quest.goblin-breach-guardians.description",
-  "ShortDescriptionKey": "quest.goblin-breach-guardians.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-guardians.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-guardians.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-guardians.short",
   "TargetQuantity": 3,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -16,7 +16,7 @@
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     }
   ],

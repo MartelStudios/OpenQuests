@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.seedlingshell.title",
-  "DescriptionKey": "adventurequests.quest.seedlingshell.description",
-  "ShortDescriptionKey": "adventurequests.quest.seedlingshell.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.seedling-shell.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.seedling-shell.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.seedling-shell.short",
   "Character": "AdventureQuests_TempleSeedling",
   "Dialogue": "AdventureQuests_SeedlingGift",
   "Items": [

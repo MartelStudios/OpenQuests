@@ -4,15 +4,15 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.guard.runeseen.page1"
+      "Text": "adventurequests.forgottentemple.dialogue.guard-rune-seen.page1"
     },
     {
-      "Text": "adventurequests.temple.guard.runeseen.page2"
+      "Text": "adventurequests.forgottentemple.dialogue.guard-rune-seen.page2"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.guard.runeseen.thanks",
+      "Text": "adventurequests.forgottentemple.dialogue.guard-rune-seen.thanks",
       "Actions": [
         {
           "Type": "Close"

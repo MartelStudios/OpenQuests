@@ -4,15 +4,15 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.goblin.scientist.gateway.page1"
+      "Text": "adventurequests.forgottentemple.dialogue.scientist-gateway.page1"
     },
     {
-      "Text": "adventurequests.goblin.scientist.gateway.page2"
+      "Text": "adventurequests.forgottentemple.dialogue.scientist-gateway.page2"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.goblin.scientist.gateway.yes",
+      "Text": "adventurequests.forgottentemple.dialogue.scientist-gateway.yes",
       "Actions": [
         {
           "Type": "Close"
@@ -21,7 +21,7 @@
       "Id": "Accept"
     },
     {
-      "Text": "adventurequests.goblin.scientist.bye",
+      "Text": "adventurequests.forgottentemple.dialogue.scientist.bye",
       "Actions": [
         {
           "Type": "Close"

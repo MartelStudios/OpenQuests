@@ -4,15 +4,15 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.labboiler.title",
-  "DescriptionKey": "adventurequests.quest.labboiler.description",
-  "ShortDescriptionKey": "adventurequests.quest.labboiler.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-boiler.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-boiler.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-boiler.short",
   "QuestAssetIds": [
     "AdventureQuests_LabBoilerRepair",
     {
       "Type": "Composite",
       "Operator": "Or",
-      "TitleKey": "adventurequests.quest.labreport.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-report.title",
       "QuestAssetIds": [
         "AdventureQuests_LabBoilerTalk",
         "AdventureQuests_LabAllRepaired"

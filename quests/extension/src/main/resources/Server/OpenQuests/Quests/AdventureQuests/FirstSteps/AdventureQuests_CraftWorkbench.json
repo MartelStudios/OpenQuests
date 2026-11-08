@@ -2,14 +2,14 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Bench_WorkBench.png",
   "Categories": ["AdventureQuests_Tutorial"],
-  "TitleKey": "quest.craft-workbench.title",
-  "DescriptionKey": "quest.craft-workbench.description",
-  "ShortDescriptionKey": "quest.craft-workbench.short",
+  "TitleKey": "adventurequests.firststeps.quest.craft-workbench.title",
+  "DescriptionKey": "adventurequests.firststeps.quest.craft-workbench.description",
+  "ShortDescriptionKey": "adventurequests.firststeps.quest.craft-workbench.short",
   "QuestAssetIds": [
     {
       "Type": "BreakBlock",
-      "TitleKey": "quest.break-wood.title",
-      "DescriptionKey": "quest.break-wood.description",
+      "TitleKey": "adventurequests.firststeps.quest.craft-workbench.break-wood.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.craft-workbench.break-wood.description",
       "TargetQuantity": 1,
       "BlockToBreak": {
         "BlockTag": "Trunk"
@@ -17,8 +17,8 @@
     },
     {
       "Type": "BreakBlock",
-      "TitleKey": "quest.break-stone.title",
-      "DescriptionKey": "quest.break-stone.description",
+      "TitleKey": "adventurequests.firststeps.quest.craft-workbench.break-stone.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.craft-workbench.break-stone.description",
       "TargetQuantity": 1,
       "BlockToBreak": {
         "BlockTag": "Rock"
@@ -26,8 +26,8 @@
     },
     {
       "Type": "Gather",
-      "TitleKey": "quest.gather-wood.title",
-      "DescriptionKey": "quest.gather-wood.description",
+      "TitleKey": "adventurequests.firststeps.quest.craft-workbench.gather-wood.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.craft-workbench.gather-wood.description",
       "TargetQuantity": 4,
       "ItemToGather": {
         "BlockTag": "Trunk"
@@ -35,8 +35,8 @@
     },
     {
       "Type": "Gather",
-      "TitleKey": "quest.gather-stone.title",
-      "DescriptionKey": "quest.gather-stone.description",
+      "TitleKey": "adventurequests.firststeps.quest.craft-workbench.gather-stone.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.craft-workbench.gather-stone.description",
       "TargetQuantity": 3,
       "ItemToGather": {
         "BlockTag": "Rock"
@@ -44,8 +44,8 @@
     },
     {
       "Type": "Craft",
-      "TitleKey": "quest.craft-bench.title",
-      "DescriptionKey": "quest.craft-bench.description",
+      "TitleKey": "adventurequests.firststeps.quest.craft-workbench.bench.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.craft-workbench.bench.description",
       "TargetQuantity": 1,
       "ItemToCraft": {
         "ItemId": "Bench_WorkBench"
@@ -53,8 +53,8 @@
     },
     {
       "Type": "PlaceBlock",
-      "TitleKey": "quest.place-bench.title",
-      "DescriptionKey": "quest.place-bench.description",
+      "TitleKey": "adventurequests.firststeps.quest.craft-workbench.place-bench.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.craft-workbench.place-bench.description",
       "TargetQuantity": 1,
       "BlockToPlace": {
         "ItemId": "Bench_WorkBench"

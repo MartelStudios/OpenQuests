@@ -1,15 +1,15 @@
 {
-  "Title": "adventurequests.plush.speaker.name",
+  "Title": "adventurequests.strangeplush.character.plush.name",
   "Display": "Default",
   "Character": "AdventureQuests_PlushFed",
   "Tags": { "Series": ["AdventureQuests_StrangePlush"] },
   "Pages": [
-    { "Text": "adventurequests.plush.fed.text" }
+    { "Text": "adventurequests.strangeplush.dialogue.plush-fed.text" }
   ],
   "Responses": [
     {
       "Id": "Up",
-      "Text": "adventurequests.plush.fed.up",
+      "Text": "adventurequests.strangeplush.dialogue.plush-fed.up",
       "Color": "#9fd8ff",
       "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Iron.png",
       "When": { "Type": "HasPermission", "Permission": "hytale.command.teleport.top" },
@@ -20,7 +20,7 @@
     },
     {
       "Id": "UpRefused",
-      "Text": "adventurequests.plush.fed.up",
+      "Text": "adventurequests.strangeplush.dialogue.plush-fed.up",
       "Color": "#9fd8ff",
       "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Iron.png",
       "When": { "Type": "HasPermission", "Permission": "hytale.command.teleport.top", "Not": true },
@@ -28,16 +28,16 @@
         {
           "Type": "Open",
           "Dialogue": {
-            "Title": "adventurequests.plush.speaker.name",
+            "Title": "adventurequests.strangeplush.character.plush.name",
             "Display": "Default",
             "Character": "AdventureQuests_PlushFed",
             "Tags": { "Series": ["AdventureQuests_StrangePlush"] },
             "Pages": [
-              { "Text": "adventurequests.plush.refused.text" }
+              { "Text": "adventurequests.strangeplush.dialogue.plush-fed.refused.text" }
             ],
             "Responses": [
               {
-                "Text": "adventurequests.plush.refused.answer",
+                "Text": "adventurequests.strangeplush.dialogue.plush-fed.refused.answer",
                 "Actions": [
                   { "Type": "Close" }
                 ]
@@ -49,7 +49,7 @@
     },
     {
       "Id": "Sad",
-      "Text": "adventurequests.plush.fed.sad",
+      "Text": "adventurequests.strangeplush.dialogue.plush-fed.sad",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_PlushHomesick",
@@ -64,7 +64,7 @@
     },
     {
       "Id": "Home",
-      "Text": "adventurequests.plush.fed.home",
+      "Text": "adventurequests.strangeplush.dialogue.plush-fed.home",
       "Color": "#8fd18a",
       "When": {
         "Type": "Composite",
@@ -80,7 +80,7 @@
     },
     {
       "Id": "Story",
-      "Text": "adventurequests.plush.fed.story",
+      "Text": "adventurequests.strangeplush.dialogue.plush-fed.story",
       "When": { "Type": "Answered", "Dialogue": "AdventureQuests_PlushFed", "Answer": "Story", "Min": 0, "Max": 0 },
       "Actions": [
         { "Type": "Open", "Dialogue": "AdventureQuests_PlushStory" }
@@ -88,7 +88,7 @@
     },
     {
       "Id": "StoryAgain",
-      "Text": "adventurequests.plush.fed.story-again",
+      "Text": "adventurequests.strangeplush.dialogue.plush-fed.story-again",
       "When": { "Type": "Answered", "Dialogue": "AdventureQuests_PlushFed", "Answer": "Story", "Min": 0, "Max": 0, "Not": true },
       "Actions": [
         { "Type": "Open", "Dialogue": "AdventureQuests_PlushStory" }
@@ -96,7 +96,7 @@
     },
     {
       "Id": "Bye",
-      "Text": "adventurequests.plush.fed.bye",
+      "Text": "adventurequests.strangeplush.dialogue.plush-fed.bye",
       "Actions": [
         { "Type": "Close" }
       ]

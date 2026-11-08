@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-burners.title",
-  "DescriptionKey": "quest.goblin-breach-burners.description",
-  "ShortDescriptionKey": "quest.goblin-breach-burners.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-burners.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-burners.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-burners.short",
   "TargetQuantity": 2,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -16,7 +16,7 @@
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     }
   ],

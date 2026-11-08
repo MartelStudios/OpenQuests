@@ -4,15 +4,15 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.guard.tale.voidtaken.page1"
+      "Text": "adventurequests.forgottentemple.dialogue.guard-tale-voidtaken.page1"
     },
     {
-      "Text": "adventurequests.temple.guard.tale.voidtaken.page2"
+      "Text": "adventurequests.forgottentemple.dialogue.guard-tale-voidtaken.page2"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.guard.tale.done",
+      "Text": "adventurequests.forgottentemple.dialogue.guard-tale.done",
       "Actions": [
         {
           "Type": "Close"

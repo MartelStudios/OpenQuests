@@ -2,14 +2,14 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Crude.png",
   "Categories": ["AdventureQuests_Tutorial"],
-  "TitleKey": "quest.craft-tools.title",
-  "DescriptionKey": "quest.craft-tools.description",
-  "ShortDescriptionKey": "quest.craft-tools.short",
+  "TitleKey": "adventurequests.firststeps.quest.craft-tools.title",
+  "DescriptionKey": "adventurequests.firststeps.quest.craft-tools.description",
+  "ShortDescriptionKey": "adventurequests.firststeps.quest.craft-tools.short",
   "QuestAssetIds": [
     {
       "Type": "Craft",
-      "TitleKey": "quest.craft-hatchet.title",
-      "DescriptionKey": "quest.craft-hatchet.description",
+      "TitleKey": "adventurequests.firststeps.quest.craft-tools.hatchet.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.craft-tools.hatchet.description",
       "TargetQuantity": 1,
       "ItemToCraft": {
         "ItemId": "Tool_Hatchet_Crude"
@@ -17,8 +17,8 @@
     },
     {
       "Type": "Craft",
-      "TitleKey": "quest.craft-pickaxe.title",
-      "DescriptionKey": "quest.craft-pickaxe.description",
+      "TitleKey": "adventurequests.firststeps.quest.craft-tools.pickaxe.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.craft-tools.pickaxe.description",
       "TargetQuantity": 1,
       "ItemToCraft": {
         "ItemId": "Tool_Pickaxe_Crude"

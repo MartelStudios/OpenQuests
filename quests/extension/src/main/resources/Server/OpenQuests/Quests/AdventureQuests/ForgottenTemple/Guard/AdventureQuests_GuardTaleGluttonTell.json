@@ -1,6 +1,6 @@
 {
   "Type": "Dialogue",
-  "TitleKey": "adventurequests.quest.guardtale.tell.title",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-tale-tell.title",
   "TargetQuantity": 1,
   "Character": "AdventureQuests_TempleGuard",
   "Dialogue": "AdventureQuests_GuardTaleGlutton"

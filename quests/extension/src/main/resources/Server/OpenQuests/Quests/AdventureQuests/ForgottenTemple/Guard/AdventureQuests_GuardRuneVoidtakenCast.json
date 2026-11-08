@@ -1,6 +1,6 @@
 {
   "Type": "CastSpell",
-  "TitleKey": "adventurequests.quest.guardrune.cast.title",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-rune-cast.title",
   "TargetQuantity": 1,
   "Constraints": [
     {

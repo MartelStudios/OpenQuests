@@ -4,9 +4,9 @@
   "Icon": "Icons/ItemsGenerated/Potion_Health.png",
   "Categories": ["AdventureQuests_Achievement"],
   "Visibility": "WhenStarted",
-  "TitleKey": "quest.health-adept.title",
-  "DescriptionKey": "quest.health-adept.description",
-  "ShortDescriptionKey": "quest.health-adept.short",
+  "TitleKey": "adventurequests.endurance.quest.health-adept.title",
+  "DescriptionKey": "adventurequests.endurance.quest.health-adept.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.health-adept.short",
   "TargetQuantity": 1000,
   "SuccessfulRewards": [
     {

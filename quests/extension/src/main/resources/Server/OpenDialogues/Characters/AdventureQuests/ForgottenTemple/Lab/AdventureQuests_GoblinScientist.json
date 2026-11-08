@@ -1,6 +1,6 @@
 {
-  "Name": "adventurequests.goblin.scientist.name",
-  "Epithet": "adventurequests.goblin.scientist.epithet",
+  "Name": "adventurequests.forgottentemple.character.goblin-scientist.name",
+  "Epithet": "adventurequests.forgottentemple.character.goblin-scientist.epithet",
   "Uniqueness": "Forever",
   "Scope": "Universe",
   "MapVisibility": "Always",

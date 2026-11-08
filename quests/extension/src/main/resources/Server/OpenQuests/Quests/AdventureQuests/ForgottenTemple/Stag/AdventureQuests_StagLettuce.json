@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.staglettuce.title",
-  "DescriptionKey": "adventurequests.quest.staglettuce.description",
-  "ShortDescriptionKey": "adventurequests.quest.staglettuce.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-lettuce.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-lettuce.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-lettuce.short",
   "Character": "AdventureQuests_TempleStag",
   "Dialogue": "AdventureQuests_StagSeeds",
   "Items": [

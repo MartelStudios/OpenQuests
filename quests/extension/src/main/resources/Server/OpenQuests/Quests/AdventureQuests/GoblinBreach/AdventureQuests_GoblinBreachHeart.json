@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-heart.title",
-  "DescriptionKey": "quest.goblin-breach-heart.description",
-  "ShortDescriptionKey": "quest.goblin-breach-heart.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-heart.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-heart.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-heart.short",
   "TargetQuantity": 1,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -16,7 +16,7 @@
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     }
   ],

@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-scrap.title",
-  "DescriptionKey": "quest.goblin-breach-scrap.description",
-  "ShortDescriptionKey": "quest.goblin-breach-scrap.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-scrap.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-scrap.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-scrap.short",
   "TargetQuantity": 30,
   "ItemToGather": {
     "ItemId": "Ingredient_Scraps"

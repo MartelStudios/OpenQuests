@@ -2,12 +2,12 @@
   "Display": "Cinematic",
   "Pages": [
     {
-      "Text": "adventurequests.temple.stag.seeds.text"
+      "Text": "adventurequests.forgottentemple.dialogue.stag-seeds.text"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.stag.give",
+      "Text": "adventurequests.forgottentemple.dialogue.stag.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_StagWheat",
@@ -26,7 +26,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.stag.give",
+      "Text": "adventurequests.forgottentemple.dialogue.stag.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_StagLettuce",
@@ -45,7 +45,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.stag.leave",
+      "Text": "adventurequests.forgottentemple.dialogue.stag.leave",
       "Actions": [
         {
           "Type": "Close"

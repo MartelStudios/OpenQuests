@@ -1,5 +1,5 @@
 {
-  "NameKey": "quest.chapter.hunting",
+  "NameKey": "adventurequests.hunting.chapter.name",
   "Group": "AdventureQuests_Survival",
   "Order": 0,
   "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Raw.png",

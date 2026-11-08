@@ -17,8 +17,8 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.labscrap.title",
-  "DescriptionKey": "adventurequests.quest.labscrap.description",
-  "ShortDescriptionKey": "adventurequests.quest.labscrap.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-scrap.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-scrap.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-scrap.short",
   "AutoTrack": true
 }

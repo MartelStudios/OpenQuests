@@ -1,6 +1,6 @@
 {
   "Type": "QuestState",
-  "TitleKey": "adventurequests.quest.guardtaleheart.boss.title",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-tale-heart-boss.title",
   "QuestAssetId": "AdventureQuests_GoblinBreachHeart",
   "States": [
     "Successful"

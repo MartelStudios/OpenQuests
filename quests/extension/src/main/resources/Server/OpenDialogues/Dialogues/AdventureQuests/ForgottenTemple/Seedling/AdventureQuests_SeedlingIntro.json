@@ -4,16 +4,16 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.seedling.intro.page1"
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-intro.page1"
     },
     {
-      "Text": "adventurequests.temple.seedling.intro.page2"
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-intro.page2"
     }
   ],
   "Responses": [
     {
       "Id": "Accept",
-      "Text": "adventurequests.temple.seedling.intro.yes",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-intro.yes",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_MeetSeedling",
@@ -28,7 +28,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.intro.yes",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-intro.yes",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_MeetSeedling",
@@ -49,7 +49,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.bye",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling.bye",
       "Actions": [
         {
           "Type": "Close"

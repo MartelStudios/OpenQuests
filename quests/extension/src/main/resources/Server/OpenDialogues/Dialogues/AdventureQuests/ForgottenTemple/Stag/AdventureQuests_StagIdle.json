@@ -2,12 +2,12 @@
   "Display": "Cinematic",
   "Pages": [
     {
-      "Text": "adventurequests.temple.stag.idle.text"
+      "Text": "adventurequests.forgottentemple.dialogue.stag-idle.text"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.stag.leave",
+      "Text": "adventurequests.forgottentemple.dialogue.stag.leave",
       "Actions": [
         {
           "Type": "Close"

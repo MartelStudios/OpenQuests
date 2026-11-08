@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-coffer.title",
-  "DescriptionKey": "quest.goblin-breach-coffer.description",
-  "ShortDescriptionKey": "quest.goblin-breach-coffer.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-coffer.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-coffer.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-coffer.short",
   "TargetQuantity": 12,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -16,7 +16,7 @@
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     }
   ],

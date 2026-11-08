@@ -4,12 +4,12 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.goblin.scientist.report.compressor.text"
+      "Text": "adventurequests.forgottentemple.dialogue.scientist-report-compressor.text"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.goblin.scientist.report.next",
+      "Text": "adventurequests.forgottentemple.dialogue.scientist-report.next",
       "Actions": [
         {
           "Type": "Open",

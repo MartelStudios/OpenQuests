@@ -3,9 +3,9 @@
   "Icon": "Icons/ItemsGenerated/Potion_Stamina.png",
   "Categories": ["AdventureQuests_Achievement"],
   "Visibility": "WhenStarted",
-  "TitleKey": "quest.sprint-adept.title",
-  "DescriptionKey": "quest.sprint-adept.description",
-  "ShortDescriptionKey": "quest.sprint-adept.short",
+  "TitleKey": "adventurequests.athletics.quest.sprint-adept.title",
+  "DescriptionKey": "adventurequests.athletics.quest.sprint-adept.description",
+  "ShortDescriptionKey": "adventurequests.athletics.quest.sprint-adept.short",
   "TargetQuantity": 500,
   "SuccessfulRewards": [
     {

@@ -4,13 +4,13 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.guard.rune.text"
+      "Text": "adventurequests.forgottentemple.dialogue.guard-rune.text"
     }
   ],
   "Responses": [
     {
       "Id": "ShowRune",
-      "Text": "adventurequests.temple.guard.rune.show",
+      "Text": "adventurequests.forgottentemple.dialogue.guard-rune.show",
       "When": {
         "Type": "Composite",
         "Operator": "And",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.guard.rune.later",
+      "Text": "adventurequests.forgottentemple.dialogue.guard-rune.later",
       "Actions": [
         {
           "Type": "Close"

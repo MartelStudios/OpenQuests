@@ -4,12 +4,12 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.goblin.scientist.report.leftnone.text"
+      "Text": "adventurequests.forgottentemple.dialogue.scientist-left-none.report.text"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.goblin.scientist.bye",
+      "Text": "adventurequests.forgottentemple.dialogue.scientist.bye",
       "Actions": [
         {
           "Type": "Close"

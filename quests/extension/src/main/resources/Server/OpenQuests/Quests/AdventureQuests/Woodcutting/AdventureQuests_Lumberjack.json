@@ -2,9 +2,9 @@
   "Type": "PickupItem",
   "Icon": "Icons/ResourceTypes/Wood_Trunk.png",
   "Categories": ["AdventureQuests_Survival"],
-  "TitleKey": "quest.lumberjack.title",
-  "DescriptionKey": "quest.lumberjack.description",
-  "ShortDescriptionKey": "quest.lumberjack.short",
+  "TitleKey": "adventurequests.woodcutting.quest.lumberjack.title",
+  "DescriptionKey": "adventurequests.woodcutting.quest.lumberjack.description",
+  "ShortDescriptionKey": "adventurequests.woodcutting.quest.lumberjack.short",
   "TargetQuantity": 20,
   "AntiAbuse": true,
   "ItemToPickup": {

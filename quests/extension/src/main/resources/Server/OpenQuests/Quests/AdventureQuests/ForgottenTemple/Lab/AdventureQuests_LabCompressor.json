@@ -4,15 +4,15 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.labcompressor.title",
-  "DescriptionKey": "adventurequests.quest.labcompressor.description",
-  "ShortDescriptionKey": "adventurequests.quest.labcompressor.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-compressor.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-compressor.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-compressor.short",
   "QuestAssetIds": [
     "AdventureQuests_LabCompressorRepair",
     {
       "Type": "Composite",
       "Operator": "Or",
-      "TitleKey": "adventurequests.quest.labreport.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-report.title",
       "QuestAssetIds": [
         "AdventureQuests_LabCompressorTalk",
         "AdventureQuests_LabAllRepaired"

@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.stageternal.title",
-  "DescriptionKey": "adventurequests.quest.stageternal.description",
-  "ShortDescriptionKey": "adventurequests.quest.stageternal.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-eternal.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-eternal.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-eternal.short",
   "Character": "AdventureQuests_TempleStag",
   "Dialogue": "AdventureQuests_StagMoult",
   "Items": [

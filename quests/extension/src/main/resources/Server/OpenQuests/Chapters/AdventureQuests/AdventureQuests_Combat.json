@@ -1,5 +1,5 @@
 {
-  "NameKey": "quest.chapter.combat",
+  "NameKey": "adventurequests.combat.chapter.name",
   "Group": "AdventureQuests_Feats",
   "Order": 1,
   "Icon": "Icons/ItemsGenerated/Weapon_Club_Crude.png",

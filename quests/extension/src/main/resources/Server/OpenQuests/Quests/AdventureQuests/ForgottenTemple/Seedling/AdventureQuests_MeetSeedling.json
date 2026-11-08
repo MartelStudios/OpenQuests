@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.meetseedling.title",
-  "DescriptionKey": "adventurequests.quest.meetseedling.description",
-  "ShortDescriptionKey": "adventurequests.quest.meetseedling.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.meet-seedling.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.meet-seedling.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.meet-seedling.short",
   "TargetQuantity": 1,
   "Character": "AdventureQuests_TempleSeedling",
   "Dialogue": "AdventureQuests_SeedlingIntro",

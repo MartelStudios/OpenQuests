@@ -20,9 +20,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.labconsole.title",
-  "DescriptionKey": "adventurequests.quest.labconsole.description",
-  "ShortDescriptionKey": "adventurequests.quest.labconsole.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-console.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-console.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-console.short",
   "AutoTrack": true,
   "Constraints": [
     {

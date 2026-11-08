@@ -2,9 +2,9 @@
   "Type": "Deliver",
   "Icon": "Icons/ItemsGenerated/Ingredient_Fibre.png",
   "Categories": ["AdventureQuests_SideQuest"],
-  "TitleKey": "adventurequests.quest.kweebecfibres.title",
-  "DescriptionKey": "adventurequests.quest.kweebecfibres.description",
-  "ShortDescriptionKey": "adventurequests.quest.kweebecfibres.short",
+  "TitleKey": "adventurequests.kweebecvillage.quest.kweebec-fibres.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.kweebec-fibres.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.kweebec-fibres.short",
   "Character": "AdventureQuests_KweebecFarmer",
   "Items": [
     { "Item": { "ItemId": "Ingredient_Fibre" }, "Quantity": 10 },

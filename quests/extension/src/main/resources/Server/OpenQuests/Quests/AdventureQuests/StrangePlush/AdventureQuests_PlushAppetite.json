@@ -2,35 +2,35 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Ore_Gold.png",
   "Categories": ["AdventureQuests_SideQuest"],
-  "TitleKey": "adventurequests.quest.appetite.title",
-  "DescriptionKey": "adventurequests.quest.appetite.description",
-  "ShortDescriptionKey": "adventurequests.quest.appetite.short",
+  "TitleKey": "adventurequests.strangeplush.quest.plush-appetite.title",
+  "DescriptionKey": "adventurequests.strangeplush.quest.plush-appetite.description",
+  "ShortDescriptionKey": "adventurequests.strangeplush.quest.plush-appetite.short",
   "QuestAssetIds": [
     {
       "Type": "Gather",
-      "TitleKey": "adventurequests.quest.appetite-copper.title",
-      "DescriptionKey": "adventurequests.quest.appetite-copper.description",
+      "TitleKey": "adventurequests.strangeplush.quest.plush-appetite.copper.title",
+      "DescriptionKey": "adventurequests.strangeplush.quest.plush-appetite.copper.description",
       "TargetQuantity": 10,
       "ItemToGather": { "ItemId": "Ore_Copper" }
     },
     {
       "Type": "Gather",
-      "TitleKey": "adventurequests.quest.appetite-iron.title",
-      "DescriptionKey": "adventurequests.quest.appetite-iron.description",
+      "TitleKey": "adventurequests.strangeplush.quest.plush-appetite.iron.title",
+      "DescriptionKey": "adventurequests.strangeplush.quest.plush-appetite.iron.description",
       "TargetQuantity": 10,
       "ItemToGather": { "ItemId": "Ore_Iron" }
     },
     {
       "Type": "Gather",
-      "TitleKey": "adventurequests.quest.appetite-gold.title",
-      "DescriptionKey": "adventurequests.quest.appetite-gold.description",
+      "TitleKey": "adventurequests.strangeplush.quest.plush-appetite.gold.title",
+      "DescriptionKey": "adventurequests.strangeplush.quest.plush-appetite.gold.description",
       "TargetQuantity": 10,
       "ItemToGather": { "ItemId": "Ore_Gold" }
     },
     {
       "Type": "Dialogue",
-      "TitleKey": "adventurequests.quest.appetite-feed.title",
-      "DescriptionKey": "adventurequests.quest.appetite-feed.description",
+      "TitleKey": "adventurequests.strangeplush.quest.plush-appetite.feed.title",
+      "DescriptionKey": "adventurequests.strangeplush.quest.plush-appetite.feed.description",
       "TargetQuantity": 1,
       "Dialogue": "AdventureQuests_PlushHungry",
       "Answer": "Feed"

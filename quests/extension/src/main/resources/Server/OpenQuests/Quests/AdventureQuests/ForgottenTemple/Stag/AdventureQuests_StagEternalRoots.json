@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.stageternalroots.title",
-  "DescriptionKey": "adventurequests.quest.stageternalroots.description",
-  "ShortDescriptionKey": "adventurequests.quest.stageternalroots.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-eternal-roots.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-eternal-roots.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-eternal-roots.short",
   "Character": "AdventureQuests_TempleStag",
   "Dialogue": "AdventureQuests_StagMoult",
   "Items": [

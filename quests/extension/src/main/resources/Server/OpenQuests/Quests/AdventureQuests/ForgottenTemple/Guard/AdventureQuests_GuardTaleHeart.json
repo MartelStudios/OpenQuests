@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.guardtaleheart.title",
-  "DescriptionKey": "adventurequests.quest.guardtaleheart.description",
-  "ShortDescriptionKey": "adventurequests.quest.guardtaleheart.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-tale-heart.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-tale-heart.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-tale-heart.short",
   "QuestAssetIds": [
     "AdventureQuests_GuardTaleHeartBoss",
     "AdventureQuests_GuardTaleHeartTell"

@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-glider.title",
-  "DescriptionKey": "quest.goblin-breach-glider.description",
-  "ShortDescriptionKey": "quest.goblin-breach-glider.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-glider.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-glider.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-glider.short",
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Glider_Scrap"

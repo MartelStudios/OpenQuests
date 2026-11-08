@@ -4,13 +4,13 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.sapling.generator.text"
+      "Text": "adventurequests.forgottentemple.dialogue.sapling-generator.text"
     }
   ],
   "Responses": [
     {
       "Id": "Accept",
-      "Text": "adventurequests.temple.sapling.generator.thanks",
+      "Text": "adventurequests.forgottentemple.dialogue.sapling-generator.thanks",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_MeetSapling",
@@ -25,7 +25,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.sapling.generator.thanks",
+      "Text": "adventurequests.forgottentemple.dialogue.sapling-generator.thanks",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_MeetSapling",

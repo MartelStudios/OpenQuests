@@ -4,12 +4,12 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.merchant.greeting.text"
+      "Text": "adventurequests.forgottentemple.dialogue.merchant-greeting.text"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.merchant.trade",
+      "Text": "adventurequests.forgottentemple.dialogue.merchant.trade",
       "Actions": [
         {
           "Type": "OpenBarterShop",
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.merchant.bye",
+      "Text": "adventurequests.forgottentemple.dialogue.merchant.bye",
       "Actions": [
         {
           "Type": "Close"

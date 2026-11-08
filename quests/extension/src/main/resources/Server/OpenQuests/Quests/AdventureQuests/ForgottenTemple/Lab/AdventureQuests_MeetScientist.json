@@ -5,9 +5,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.meetscientist.title",
-  "DescriptionKey": "adventurequests.quest.meetscientist.description",
-  "ShortDescriptionKey": "adventurequests.quest.meetscientist.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.meet-scientist.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.meet-scientist.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.meet-scientist.short",
   "QuestAssetIds": [
     "AdventureQuests_MeetScientistTalk",
     "AdventureQuests_LabAllRepaired"

@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-coffer-key.title",
-  "DescriptionKey": "quest.goblin-breach-coffer-key.description",
-  "ShortDescriptionKey": "quest.goblin-breach-coffer-key.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-coffer-key.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-coffer-key.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-coffer-key.short",
   "TargetQuantity": 1,
   "ItemToGather": {
     "ItemId": "Coffer_Key"

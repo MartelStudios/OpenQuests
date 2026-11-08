@@ -2,21 +2,21 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Rock_Gem_Diamond.png",
   "Categories": ["AdventureQuests_Achievement", "AdventureQuests_Temple"],
-  "TitleKey": "quest.flawless.title",
-  "DescriptionKey": "quest.flawless.description",
-  "ShortDescriptionKey": "quest.flawless.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.flawless.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.flawless.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.flawless.short",
   "Visibility": "WhenCompleted",
   "QuestAssetIds": [
     {
       "Type": "QuestState",
-      "TitleKey": "quest.flawless-passed.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.flawless.passed.title",
       "QuestAssetId": "AdventureQuests_TempleTrial",
       "States": ["Successful"],
       "AnnounceOutcome": false
     },
     {
       "Type": "QuestState",
-      "TitleKey": "quest.flawless-never-failed.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.flawless.never-failed.title",
       "QuestAssetId": "AdventureQuests_TempleTrial",
       "States": ["Failed"],
       "Min": 0,

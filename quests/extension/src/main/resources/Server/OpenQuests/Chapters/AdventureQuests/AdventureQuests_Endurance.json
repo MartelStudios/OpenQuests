@@ -1,5 +1,5 @@
 {
-  "NameKey": "quest.chapter.endurance",
+  "NameKey": "adventurequests.endurance.chapter.name",
   "Group": "AdventureQuests_Feats",
   "Order": 2,
   "Icon": "Icons/ItemsGenerated/Potion_Stamina.png",

@@ -4,15 +4,15 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.seedling.rainbow.page1"
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-rainbow.page1"
     },
     {
-      "Text": "adventurequests.temple.seedling.rainbow.page2"
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-rainbow.page2"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.seedling.rainbow.thanks",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-rainbow.thanks",
       "Actions": [
         {
           "Type": "Close"

@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.seedlingfeatherslight.title",
-  "DescriptionKey": "adventurequests.quest.seedlingfeatherslight.description",
-  "ShortDescriptionKey": "adventurequests.quest.seedlingfeatherslight.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.seedling-feathers-light.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.seedling-feathers-light.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.seedling-feathers-light.short",
   "Character": "AdventureQuests_TempleSeedling",
   "Dialogue": "AdventureQuests_SeedlingGift",
   "Items": [

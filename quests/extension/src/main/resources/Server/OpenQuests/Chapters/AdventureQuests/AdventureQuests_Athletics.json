@@ -1,5 +1,5 @@
 {
-  "NameKey": "quest.chapter.athletics",
+  "NameKey": "adventurequests.athletics.chapter.name",
   "Group": "AdventureQuests_Feats",
   "Order": 0,
   "Icon": "Icons/ItemCategories/Items-Clothes.png",

@@ -3,14 +3,14 @@
   "Icon": "Icons/ItemsGenerated/Weapon_Sword_Crude.png",
   "Categories": ["AdventureQuests_Tutorial"],
   "Operator": "Or",
-  "TitleKey": "quest.choose-weapon.title",
-  "DescriptionKey": "quest.choose-weapon.description",
-  "ShortDescriptionKey": "quest.choose-weapon.short",
+  "TitleKey": "adventurequests.firststeps.quest.choose-your-weapon.title",
+  "DescriptionKey": "adventurequests.firststeps.quest.choose-your-weapon.description",
+  "ShortDescriptionKey": "adventurequests.firststeps.quest.choose-your-weapon.short",
   "QuestAssetIds": [
     {
       "Type": "Craft",
-      "TitleKey": "quest.craft-sword.title",
-      "DescriptionKey": "quest.craft-sword.description",
+      "TitleKey": "adventurequests.firststeps.quest.choose-your-weapon.craft-sword.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.choose-your-weapon.craft-sword.description",
       "TargetQuantity": 1,
       "ItemToCraft": {
         "ItemId": "Weapon_Sword_Crude"
@@ -18,8 +18,8 @@
     },
     {
       "Type": "Craft",
-      "TitleKey": "quest.craft-daggers.title",
-      "DescriptionKey": "quest.craft-daggers.description",
+      "TitleKey": "adventurequests.firststeps.quest.choose-your-weapon.craft-daggers.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.choose-your-weapon.craft-daggers.description",
       "TargetQuantity": 1,
       "ItemToCraft": {
         "ItemId": "Weapon_Daggers_Crude"
@@ -27,8 +27,8 @@
     },
     {
       "Type": "Craft",
-      "TitleKey": "quest.craft-mace.title",
-      "DescriptionKey": "quest.craft-mace.description",
+      "TitleKey": "adventurequests.firststeps.quest.choose-your-weapon.craft-mace.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.choose-your-weapon.craft-mace.description",
       "TargetQuantity": 1,
       "ItemToCraft": {
         "ItemId": "Weapon_Mace_Crude"
@@ -36,8 +36,8 @@
     },
     {
       "Type": "Craft",
-      "TitleKey": "quest.craft-battleaxe.title",
-      "DescriptionKey": "quest.craft-battleaxe.description",
+      "TitleKey": "adventurequests.firststeps.quest.choose-your-weapon.craft-battleaxe.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.choose-your-weapon.craft-battleaxe.description",
       "TargetQuantity": 1,
       "ItemToCraft": {
         "ItemId": "Weapon_Battleaxe_Crude"

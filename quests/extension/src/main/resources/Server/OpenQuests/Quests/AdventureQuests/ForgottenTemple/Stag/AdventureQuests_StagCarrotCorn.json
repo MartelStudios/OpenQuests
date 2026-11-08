@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.stagcarrotcorn.title",
-  "DescriptionKey": "adventurequests.quest.stagcarrotcorn.description",
-  "ShortDescriptionKey": "adventurequests.quest.stagcarrotcorn.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-carrot-corn.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-carrot-corn.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-carrot-corn.short",
   "Character": "AdventureQuests_TempleStag",
   "Dialogue": "AdventureQuests_StagMoult",
   "Items": [

@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-nest.title",
-  "DescriptionKey": "quest.goblin-breach-nest.description",
-  "ShortDescriptionKey": "quest.goblin-breach-nest.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-nest.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-nest.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-nest.short",
   "TargetQuantity": 25,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -16,7 +16,7 @@
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*",
       "OnLeave": "Fail"
     }

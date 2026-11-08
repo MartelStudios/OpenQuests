@@ -3,9 +3,9 @@
   "Icon": "Icons/ItemsGenerated/Ingredient_Feathers_Blue.png",
   "Categories": ["AdventureQuests_Achievement"],
   "Visibility": "WhenStarted",
-  "TitleKey": "quest.jump-adept.title",
-  "DescriptionKey": "quest.jump-adept.description",
-  "ShortDescriptionKey": "quest.jump-adept.short",
+  "TitleKey": "adventurequests.athletics.quest.jump-adept.title",
+  "DescriptionKey": "adventurequests.athletics.quest.jump-adept.description",
+  "ShortDescriptionKey": "adventurequests.athletics.quest.jump-adept.short",
   "TargetQuantity": 250,
   "SuccessfulRewards": [
     {

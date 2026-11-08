@@ -2,9 +2,9 @@
   "Type": "Run",
   "Icon": "Icons/ItemsGenerated/Armor_Leather_Light_Legs.png",
   "Categories": ["AdventureQuests_Achievement"],
-  "TitleKey": "quest.run-novice.title",
-  "DescriptionKey": "quest.run-novice.description",
-  "ShortDescriptionKey": "quest.run-novice.short",
+  "TitleKey": "adventurequests.athletics.quest.run-novice.title",
+  "DescriptionKey": "adventurequests.athletics.quest.run-novice.description",
+  "ShortDescriptionKey": "adventurequests.athletics.quest.run-novice.short",
   "TargetQuantity": 100,
   "Visibility": "WhenCompleted",
   "SuccessfulRewards": [

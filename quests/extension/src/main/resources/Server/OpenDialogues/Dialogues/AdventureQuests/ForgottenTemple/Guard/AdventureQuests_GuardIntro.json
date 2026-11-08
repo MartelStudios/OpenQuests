@@ -4,13 +4,13 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.guard.intro.text"
+      "Text": "adventurequests.forgottentemple.dialogue.guard-intro.text"
     }
   ],
   "Responses": [
     {
       "Id": "Accept",
-      "Text": "adventurequests.temple.guard.intro.yes",
+      "Text": "adventurequests.forgottentemple.dialogue.guard-intro.yes",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_MeetGuard",
@@ -25,7 +25,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.guard.intro.yes",
+      "Text": "adventurequests.forgottentemple.dialogue.guard-intro.yes",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_MeetGuard",
@@ -58,7 +58,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.guard.bye",
+      "Text": "adventurequests.forgottentemple.dialogue.guard.bye",
       "Actions": [
         {
           "Type": "Close"

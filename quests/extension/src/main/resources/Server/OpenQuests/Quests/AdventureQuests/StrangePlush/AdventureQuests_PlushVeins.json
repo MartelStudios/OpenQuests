@@ -4,14 +4,14 @@
   "Categories": [
     "AdventureQuests_SideQuest"
   ],
-  "TitleKey": "adventurequests.quest.veins.title",
-  "DescriptionKey": "adventurequests.quest.veins.description",
-  "ShortDescriptionKey": "adventurequests.quest.veins.short",
+  "TitleKey": "adventurequests.strangeplush.quest.plush-veins.title",
+  "DescriptionKey": "adventurequests.strangeplush.quest.plush-veins.description",
+  "ShortDescriptionKey": "adventurequests.strangeplush.quest.plush-veins.short",
   "QuestAssetIds": [
     {
       "Type": "BreakBlock",
-      "TitleKey": "adventurequests.quest.veins-copper.title",
-      "DescriptionKey": "adventurequests.quest.veins-copper.description",
+      "TitleKey": "adventurequests.strangeplush.quest.plush-veins.copper.title",
+      "DescriptionKey": "adventurequests.strangeplush.quest.plush-veins.copper.description",
       "TargetQuantity": 1,
       "BlockToBreak": {
         "BlockTag": "Copper"
@@ -19,8 +19,8 @@
     },
     {
       "Type": "BreakBlock",
-      "TitleKey": "adventurequests.quest.veins-iron.title",
-      "DescriptionKey": "adventurequests.quest.veins-iron.description",
+      "TitleKey": "adventurequests.strangeplush.quest.plush-veins.iron.title",
+      "DescriptionKey": "adventurequests.strangeplush.quest.plush-veins.iron.description",
       "TargetQuantity": 1,
       "BlockToBreak": {
         "BlockTag": "Iron"
@@ -28,8 +28,8 @@
     },
     {
       "Type": "BreakBlock",
-      "TitleKey": "adventurequests.quest.veins-gold.title",
-      "DescriptionKey": "adventurequests.quest.veins-gold.description",
+      "TitleKey": "adventurequests.strangeplush.quest.plush-veins.gold.title",
+      "DescriptionKey": "adventurequests.strangeplush.quest.plush-veins.gold.description",
       "TargetQuantity": 1,
       "BlockToBreak": {
         "BlockTag": "Gold"

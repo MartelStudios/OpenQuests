@@ -2,9 +2,9 @@
   "Type": "Sprint",
   "Icon": "Icons/ItemsGenerated/Potion_Stamina_Lesser.png",
   "Categories": ["AdventureQuests_Achievement"],
-  "TitleKey": "quest.sprint-novice.title",
-  "DescriptionKey": "quest.sprint-novice.description",
-  "ShortDescriptionKey": "quest.sprint-novice.short",
+  "TitleKey": "adventurequests.athletics.quest.sprint-novice.title",
+  "DescriptionKey": "adventurequests.athletics.quest.sprint-novice.description",
+  "ShortDescriptionKey": "adventurequests.athletics.quest.sprint-novice.short",
   "TargetQuantity": 50,
   "Visibility": "WhenCompleted",
   "SuccessfulRewards": [

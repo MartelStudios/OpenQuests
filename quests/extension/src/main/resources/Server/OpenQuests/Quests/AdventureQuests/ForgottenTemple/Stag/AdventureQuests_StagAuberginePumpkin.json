@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.stagauberginepumpkin.title",
-  "DescriptionKey": "adventurequests.quest.stagauberginepumpkin.description",
-  "ShortDescriptionKey": "adventurequests.quest.stagauberginepumpkin.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-aubergine-pumpkin.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-aubergine-pumpkin.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-aubergine-pumpkin.short",
   "Character": "AdventureQuests_TempleStag",
   "Dialogue": "AdventureQuests_StagMoult",
   "Items": [

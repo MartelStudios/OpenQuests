@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.guardruneheart.title",
-  "DescriptionKey": "adventurequests.quest.guardruneheart.description",
-  "ShortDescriptionKey": "adventurequests.quest.guardruneheart.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-rune-heart.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-heart.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-heart.short",
   "QuestAssetIds": [
     "AdventureQuests_GuardRuneHeartCraft",
     "AdventureQuests_GuardRuneHeartShow",

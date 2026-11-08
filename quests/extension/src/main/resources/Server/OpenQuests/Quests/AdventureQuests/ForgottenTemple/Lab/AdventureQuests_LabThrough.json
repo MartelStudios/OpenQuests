@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.labthrough.title",
-  "DescriptionKey": "adventurequests.quest.labthrough.description",
-  "ShortDescriptionKey": "adventurequests.quest.labthrough.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-through.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-through.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-through.short",
   "QuestAssetIds": [
     "AdventureQuests_LabThroughEnter",
     "AdventureQuests_LabThroughTell"

@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.guardtaleglutton.title",
-  "DescriptionKey": "adventurequests.quest.guardtaleglutton.description",
-  "ShortDescriptionKey": "adventurequests.quest.guardtaleglutton.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-tale-glutton.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-tale-glutton.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-tale-glutton.short",
   "QuestAssetIds": [
     "AdventureQuests_GuardTaleGluttonBoss",
     "AdventureQuests_GuardTaleGluttonTell"

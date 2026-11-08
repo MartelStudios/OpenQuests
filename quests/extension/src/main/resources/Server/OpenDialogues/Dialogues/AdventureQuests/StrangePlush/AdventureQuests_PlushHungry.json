@@ -1,5 +1,5 @@
 {
-  "Title": "adventurequests.plush.speaker.name",
+  "Title": "adventurequests.strangeplush.character.plush.name",
   "Display": "Default",
   "Character": "AdventureQuests_Plush",
   "Tags": {
@@ -9,13 +9,13 @@
   },
   "Pages": [
     {
-      "Text": "adventurequests.plush.hungry.text"
+      "Text": "adventurequests.strangeplush.dialogue.plush-hungry.text"
     }
   ],
   "Responses": [
     {
       "Id": "Feed",
-      "Text": "adventurequests.plush.hungry.feed",
+      "Text": "adventurequests.strangeplush.dialogue.plush-hungry.feed",
       "Color": "#7aff81",
       "Icon": "Icons/ItemsGenerated/Ore_Gold.png",
       "When": {
@@ -76,7 +76,7 @@
     },
     {
       "Id": "GiveUp",
-      "Text": "adventurequests.plush.hungry.give-up",
+      "Text": "adventurequests.strangeplush.dialogue.plush-hungry.give-up",
       "Color": "#e08a8a",
       "When": {
         "Type": "RequiresQuest",
@@ -98,7 +98,7 @@
     },
     {
       "Id": "Later",
-      "Text": "adventurequests.plush.hungry.later",
+      "Text": "adventurequests.strangeplush.dialogue.plush-hungry.later",
       "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Crude.png",
       "Actions": [
         {

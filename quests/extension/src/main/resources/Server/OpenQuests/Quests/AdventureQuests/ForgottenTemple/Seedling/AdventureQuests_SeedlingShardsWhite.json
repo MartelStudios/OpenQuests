@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.seedlingshardswhite.title",
-  "DescriptionKey": "adventurequests.quest.seedlingshardswhite.description",
-  "ShortDescriptionKey": "adventurequests.quest.seedlingshardswhite.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.seedling-shards-white.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.seedling-shards-white.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.seedling-shards-white.short",
   "Character": "AdventureQuests_TempleSeedling",
   "Dialogue": "AdventureQuests_SeedlingGift",
   "Items": [

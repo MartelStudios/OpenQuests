@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.stagwheat.title",
-  "DescriptionKey": "adventurequests.quest.stagwheat.description",
-  "ShortDescriptionKey": "adventurequests.quest.stagwheat.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-wheat.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-wheat.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-wheat.short",
   "Character": "AdventureQuests_TempleStag",
   "Dialogue": "AdventureQuests_StagSeeds",
   "Items": [

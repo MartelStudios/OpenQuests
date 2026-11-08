@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.meetguard.title",
-  "DescriptionKey": "adventurequests.quest.meetguard.description",
-  "ShortDescriptionKey": "adventurequests.quest.meetguard.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.meet-guard.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.meet-guard.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.meet-guard.short",
   "TargetQuantity": 1,
   "Character": "AdventureQuests_TempleGuard",
   "Dialogue": "AdventureQuests_GuardIntro",

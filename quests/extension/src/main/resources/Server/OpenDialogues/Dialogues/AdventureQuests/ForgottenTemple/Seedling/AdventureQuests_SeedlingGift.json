@@ -4,12 +4,12 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.seedling.gift.text"
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.text"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingFeathersLight",
@@ -28,7 +28,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingFeathersDark",
@@ -47,7 +47,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingFeathersRed",
@@ -66,7 +66,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingShell",
@@ -85,7 +85,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingShardsGreen",
@@ -104,7 +104,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingShardsCyan",
@@ -123,7 +123,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingShardsPink",
@@ -142,7 +142,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingShardsWhite",
@@ -161,7 +161,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingFeatherBlue",
@@ -180,7 +180,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingShardsBlue",
@@ -199,7 +199,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingFeathersBlue",
@@ -218,7 +218,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingShardsPurple",
@@ -237,7 +237,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingShardsYellow",
@@ -256,7 +256,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.give",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.give",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_SeedlingShardsRed",
@@ -275,7 +275,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.seedling.gift.later",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-gift.later",
       "Actions": [
         {
           "Type": "Close"

@@ -1,6 +1,6 @@
 {
   "Type": "QuestState",
-  "TitleKey": "adventurequests.quest.guardtaleglutton.boss.title",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-tale-glutton-boss.title",
   "QuestAssetId": "AdventureQuests_GoblinBreachGlutton",
   "States": [
     "Successful"

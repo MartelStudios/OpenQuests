@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-void-crystals.title",
-  "DescriptionKey": "quest.goblin-breach-void-crystals.description",
-  "ShortDescriptionKey": "quest.goblin-breach-void-crystals.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-void-crystals.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-void-crystals.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-void-crystals.short",
   "TargetQuantity": 6,
   "ItemToGather": {
     "ItemId": "Ingredient_Crystal_Void"

@@ -4,15 +4,15 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.labteleporter.title",
-  "DescriptionKey": "adventurequests.quest.labteleporter.description",
-  "ShortDescriptionKey": "adventurequests.quest.labteleporter.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-teleporter.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-teleporter.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-teleporter.short",
   "QuestAssetIds": [
     "AdventureQuests_LabTeleporterRepair",
     {
       "Type": "Composite",
       "Operator": "Or",
-      "TitleKey": "adventurequests.quest.labreport.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-report.title",
       "QuestAssetIds": [
         "AdventureQuests_LabTeleporterTalk",
         "AdventureQuests_LabAllRepaired"

@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.guardrunevoidtaken.title",
-  "DescriptionKey": "adventurequests.quest.guardrunevoidtaken.description",
-  "ShortDescriptionKey": "adventurequests.quest.guardrunevoidtaken.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-rune-voidtaken.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-voidtaken.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-voidtaken.short",
   "QuestAssetIds": [
     "AdventureQuests_GuardRuneVoidtakenCraft",
     "AdventureQuests_GuardRuneVoidtakenShow",

@@ -4,16 +4,16 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-crypt-tower-top.title",
-  "DescriptionKey": "quest.goblin-breach-crypt-tower-top.description",
-  "ShortDescriptionKey": "quest.goblin-breach-crypt-tower-top.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-crypt-tower-top.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-crypt-tower-top.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-crypt-tower-top.short",
   "TargetQuantity": 1,
   "VolumeNamePattern": "(enkindled_trigger_\\d)( \\(\\d+\\))?",
   "TriggerEventType": "ENTER",
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     }
   ],

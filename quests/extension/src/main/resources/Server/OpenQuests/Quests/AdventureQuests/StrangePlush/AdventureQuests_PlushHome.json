@@ -2,16 +2,16 @@
   "Type": "Dialogue",
   "Icon": "Icons/ItemsGenerated/Deco_Goblin_Plush.png",
   "Categories": ["AdventureQuests_SideQuest"],
-  "TitleKey": "adventurequests.quest.home.title",
-  "DescriptionKey": "adventurequests.quest.home.description",
-  "ShortDescriptionKey": "adventurequests.quest.home.short",
+  "TitleKey": "adventurequests.strangeplush.quest.plush-home.title",
+  "DescriptionKey": "adventurequests.strangeplush.quest.plush-home.description",
+  "ShortDescriptionKey": "adventurequests.strangeplush.quest.plush-home.short",
   "TargetQuantity": 1,
   "Dialogue": "AdventureQuests_PlushFed",
   "Answer": "Home",
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     }
   ],

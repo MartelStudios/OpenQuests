@@ -4,15 +4,15 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.labengine.title",
-  "DescriptionKey": "adventurequests.quest.labengine.description",
-  "ShortDescriptionKey": "adventurequests.quest.labengine.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-engine.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-engine.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-engine.short",
   "QuestAssetIds": [
     "AdventureQuests_LabEngineRepair",
     {
       "Type": "Composite",
       "Operator": "Or",
-      "TitleKey": "adventurequests.quest.labreport.title",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-report.title",
       "QuestAssetIds": [
         "AdventureQuests_LabEngineTalk",
         "AdventureQuests_LabAllRepaired"

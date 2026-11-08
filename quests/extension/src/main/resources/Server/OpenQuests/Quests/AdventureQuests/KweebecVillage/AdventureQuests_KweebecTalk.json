@@ -2,9 +2,9 @@
   "Type": "Dialogue",
   "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
   "Categories": ["AdventureQuests_SideQuest"],
-  "TitleKey": "adventurequests.quest.kweebectalk.title",
-  "DescriptionKey": "adventurequests.quest.kweebectalk.description",
-  "ShortDescriptionKey": "adventurequests.quest.kweebectalk.short",
+  "TitleKey": "adventurequests.kweebecvillage.quest.kweebec-talk.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.kweebec-talk.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.kweebec-talk.short",
   "TargetQuantity": 1,
   "Character": "AdventureQuests_KweebecFarmer",
   "AutoTrack": true

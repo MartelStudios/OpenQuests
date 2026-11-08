@@ -4,16 +4,16 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-crypt-tower-floors.title",
-  "DescriptionKey": "quest.goblin-breach-crypt-tower-floors.description",
-  "ShortDescriptionKey": "quest.goblin-breach-crypt-tower-floors.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-crypt-tower-floors.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-crypt-tower-floors.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-crypt-tower-floors.short",
   "QuestAssetIds": [
     {
       "Type": "TriggerVolume",
       "TargetQuantity": 1,
       "VolumeNamePattern": "(enkindled_signal_[a-e]1)( \\(\\d+\\))?",
       "TriggerEventType": "ENTER",
-      "TitleKey": "quest.goblin-breach-crypt-tower-floors-floor-1.title",
+      "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-crypt-tower-floors.floor-1.title",
       "AnnounceOutcome": false,
       "SuccessfulRewards": [
         {
@@ -29,7 +29,7 @@
       "TargetQuantity": 1,
       "VolumeNamePattern": "(enkindled_signal_[a-e]2|enkindled_trigger_d2)( \\(\\d+\\))?",
       "TriggerEventType": "ENTER",
-      "TitleKey": "quest.goblin-breach-crypt-tower-floors-floor-2.title",
+      "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-crypt-tower-floors.floor-2.title",
       "AnnounceOutcome": false,
       "SuccessfulRewards": [
         {
@@ -45,7 +45,7 @@
       "TargetQuantity": 1,
       "VolumeNamePattern": "(enkindled_signal_[a-e]3)( \\(\\d+\\))?",
       "TriggerEventType": "ENTER",
-      "TitleKey": "quest.goblin-breach-crypt-tower-floors-floor-3.title",
+      "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-crypt-tower-floors.floor-3.title",
       "AnnounceOutcome": false,
       "SuccessfulRewards": [
         {
@@ -60,7 +60,7 @@
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     }
   ],

@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.guardtalerevenant.title",
-  "DescriptionKey": "adventurequests.quest.guardtalerevenant.description",
-  "ShortDescriptionKey": "adventurequests.quest.guardtalerevenant.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-tale-revenant.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-tale-revenant.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-tale-revenant.short",
   "QuestAssetIds": [
     "AdventureQuests_GuardTaleRevenantBoss",
     "AdventureQuests_GuardTaleRevenantTell"

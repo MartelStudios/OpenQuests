@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-gadgets.title",
-  "DescriptionKey": "quest.goblin-breach-gadgets.description",
-  "ShortDescriptionKey": "quest.goblin-breach-gadgets.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-gadgets.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-gadgets.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-gadgets.short",
   "TargetQuantity": 3,
   "ItemToCraft": {
     "ItemId": "Ingredient_Gadget_Assembly"

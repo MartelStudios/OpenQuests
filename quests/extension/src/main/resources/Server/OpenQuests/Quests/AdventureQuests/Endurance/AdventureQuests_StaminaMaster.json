@@ -4,8 +4,8 @@
   "Icon": "Icons/ItemsGenerated/Potion_Stamina_Greater.png",
   "Categories": ["AdventureQuests_Achievement"],
   "Visibility": "WhenStarted",
-  "TitleKey": "quest.stamina-master.title",
-  "DescriptionKey": "quest.stamina-master.description",
-  "ShortDescriptionKey": "quest.stamina-master.short",
+  "TitleKey": "adventurequests.endurance.quest.stamina-master.title",
+  "DescriptionKey": "adventurequests.endurance.quest.stamina-master.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.stamina-master.short",
   "TargetQuantity": 10000
 }

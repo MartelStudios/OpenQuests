@@ -1,15 +1,15 @@
 {
-  "Title": "adventurequests.plush.speaker.name",
+  "Title": "adventurequests.strangeplush.character.plush.name",
   "Display": "Chat",
   "Color": "#b9a7e0",
   "Character": "AdventureQuests_PlushFed",
   "Tags": { "Series": ["AdventureQuests_StrangePlush"] },
   "Pages": [
-    { "Text": "adventurequests.plush.mumble.text" }
+    { "Text": "adventurequests.strangeplush.dialogue.plush-mumble.text" }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.plush.mumble.wake",
+      "Text": "adventurequests.strangeplush.dialogue.plush-mumble.wake",
       "Actions": [
         { "Type": "Open", "Dialogue": "AdventureQuests_PlushFed" }
       ]

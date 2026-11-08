@@ -20,8 +20,8 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.labgenerator.title",
-  "DescriptionKey": "adventurequests.quest.labgenerator.description",
-  "ShortDescriptionKey": "adventurequests.quest.labgenerator.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-generator.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-generator.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-generator.short",
   "AutoTrack": true
 }

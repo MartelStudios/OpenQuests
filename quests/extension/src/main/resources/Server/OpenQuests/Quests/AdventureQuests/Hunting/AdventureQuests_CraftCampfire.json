@@ -2,9 +2,9 @@
   "Type": "Craft",
   "Icon": "Icons/ItemsGenerated/Bench_Campfire.png",
   "Categories": ["AdventureQuests_Survival"],
-  "TitleKey": "quest.craft-campfire.title",
-  "DescriptionKey": "quest.craft-campfire.description",
-  "ShortDescriptionKey": "quest.craft-campfire.short",
+  "TitleKey": "adventurequests.hunting.quest.craft-campfire.title",
+  "DescriptionKey": "adventurequests.hunting.quest.craft-campfire.description",
+  "ShortDescriptionKey": "adventurequests.hunting.quest.craft-campfire.short",
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Bench_Campfire"

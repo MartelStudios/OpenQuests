@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.stagonionpotato.title",
-  "DescriptionKey": "adventurequests.quest.stagonionpotato.description",
-  "ShortDescriptionKey": "adventurequests.quest.stagonionpotato.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-onion-potato.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-onion-potato.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-onion-potato.short",
   "Character": "AdventureQuests_TempleStag",
   "Dialogue": "AdventureQuests_StagMoult",
   "Items": [

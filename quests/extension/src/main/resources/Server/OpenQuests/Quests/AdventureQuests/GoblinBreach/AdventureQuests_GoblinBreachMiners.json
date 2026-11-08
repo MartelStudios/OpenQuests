@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-miners.title",
-  "DescriptionKey": "quest.goblin-breach-miners.description",
-  "ShortDescriptionKey": "quest.goblin-breach-miners.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-miners.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-miners.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-miners.short",
   "TargetQuantity": 5,
   "NpcGroupId": {
     "IncludeRoles": [
@@ -16,7 +16,7 @@
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     }
   ],

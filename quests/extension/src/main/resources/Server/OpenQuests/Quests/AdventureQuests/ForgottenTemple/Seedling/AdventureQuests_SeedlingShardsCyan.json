@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.seedlingshardscyan.title",
-  "DescriptionKey": "adventurequests.quest.seedlingshardscyan.description",
-  "ShortDescriptionKey": "adventurequests.quest.seedlingshardscyan.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.seedling-shards-cyan.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.seedling-shards-cyan.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.seedling-shards-cyan.short",
   "Character": "AdventureQuests_TempleSeedling",
   "Dialogue": "AdventureQuests_SeedlingGift",
   "Items": [

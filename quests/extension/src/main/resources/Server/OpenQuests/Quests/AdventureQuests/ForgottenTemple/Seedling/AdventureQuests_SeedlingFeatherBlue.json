@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.seedlingfeatherblue.title",
-  "DescriptionKey": "adventurequests.quest.seedlingfeatherblue.description",
-  "ShortDescriptionKey": "adventurequests.quest.seedlingfeatherblue.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.seedling-feather-blue.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.seedling-feather-blue.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.seedling-feather-blue.short",
   "Character": "AdventureQuests_TempleSeedling",
   "Dialogue": "AdventureQuests_SeedlingGift",
   "Items": [

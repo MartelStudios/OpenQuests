@@ -2,9 +2,9 @@
   "Type": "Gather",
   "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Raw.png",
   "Categories": ["AdventureQuests_Survival"],
-  "TitleKey": "quest.gather-meat.title",
-  "DescriptionKey": "quest.gather-meat.description",
-  "ShortDescriptionKey": "quest.gather-meat.short",
+  "TitleKey": "adventurequests.hunting.quest.gather-meat.title",
+  "DescriptionKey": "adventurequests.hunting.quest.gather-meat.description",
+  "ShortDescriptionKey": "adventurequests.hunting.quest.gather-meat.short",
   "TargetQuantity": 1,
   "ItemToGather": {
     "ResourceTypeId": "Meats"

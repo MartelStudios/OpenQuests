@@ -4,12 +4,12 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.sapling.through.text"
+      "Text": "adventurequests.forgottentemple.dialogue.sapling-through.text"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.sapling.bye",
+      "Text": "adventurequests.forgottentemple.dialogue.sapling.bye",
       "Actions": [
         {
           "Type": "Close"

@@ -4,9 +4,9 @@
   "Icon": "Icons/ItemsGenerated/Potion_Mana_Small.png",
   "Categories": ["AdventureQuests_Achievement"],
   "Visibility": "WhenCompleted",
-  "TitleKey": "quest.mana-novice.title",
-  "DescriptionKey": "quest.mana-novice.description",
-  "ShortDescriptionKey": "quest.mana-novice.short",
+  "TitleKey": "adventurequests.endurance.quest.mana-novice.title",
+  "DescriptionKey": "adventurequests.endurance.quest.mana-novice.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.mana-novice.short",
   "TargetQuantity": 250,
   "SuccessfulRewards": [
     {

@@ -4,12 +4,12 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.sapling.worry.text"
+      "Text": "adventurequests.forgottentemple.dialogue.sapling-worry.text"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.sapling.worry.which",
+      "Text": "adventurequests.forgottentemple.dialogue.sapling-worry.which",
       "Actions": [
         {
           "Type": "Open",
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.sapling.bye",
+      "Text": "adventurequests.forgottentemple.dialogue.sapling.bye",
       "Actions": [
         {
           "Type": "Close"

@@ -3,14 +3,14 @@
   "Icon": "Icons/ItemsGenerated/Ingredient_Stick.png",
   "Categories": ["AdventureQuests_Tutorial"],
   "PersistChildrenHistory": true,
-  "TitleKey": "quest.intro.title",
-  "DescriptionKey": "quest.intro.description",
-  "ShortDescriptionKey": "quest.intro.short",
+  "TitleKey": "adventurequests.firststeps.quest.intro.title",
+  "DescriptionKey": "adventurequests.firststeps.quest.intro.description",
+  "ShortDescriptionKey": "adventurequests.firststeps.quest.intro.short",
   "QuestAssetIds": [
     {
       "Type": "Gather",
-      "TitleKey": "quest.gather-rubble.title",
-      "DescriptionKey": "quest.gather-rubble.description",
+      "TitleKey": "adventurequests.firststeps.quest.intro.gather-rubble.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.intro.gather-rubble.description",
       "TargetQuantity": 4,
       "ItemToGather": {
         "ItemId": "Rubble_Stone"
@@ -18,8 +18,8 @@
     },
     {
       "Type": "Gather",
-      "TitleKey": "quest.gather-fibre.title",
-      "DescriptionKey": "quest.gather-fibre.description",
+      "TitleKey": "adventurequests.firststeps.quest.intro.gather-fibre.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.intro.gather-fibre.description",
       "TargetQuantity": 4,
       "ItemToGather": {
         "ItemId": "Ingredient_Fibre"
@@ -27,8 +27,8 @@
     },
     {
       "Type": "Gather",
-      "TitleKey": "quest.gather-stick.title",
-      "DescriptionKey": "quest.gather-stick.description",
+      "TitleKey": "adventurequests.firststeps.quest.intro.gather-stick.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.intro.gather-stick.description",
       "TargetQuantity": 4,
       "ItemToGather": {
         "ItemId": "Ingredient_Stick"

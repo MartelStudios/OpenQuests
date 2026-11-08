@@ -4,16 +4,16 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.merchant.intro.page1"
+      "Text": "adventurequests.forgottentemple.dialogue.merchant-intro.page1"
     },
     {
-      "Text": "adventurequests.temple.merchant.intro.page2"
+      "Text": "adventurequests.forgottentemple.dialogue.merchant-intro.page2"
     }
   ],
   "Responses": [
     {
       "Id": "Accept",
-      "Text": "adventurequests.temple.merchant.intro.yes",
+      "Text": "adventurequests.forgottentemple.dialogue.merchant-intro.yes",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_TalkToRootlingMerchant",
@@ -28,7 +28,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.merchant.intro.yes",
+      "Text": "adventurequests.forgottentemple.dialogue.merchant-intro.yes",
       "When": {
         "Type": "RequiresQuest",
         "QuestAssetId": "AdventureQuests_TalkToRootlingMerchant",
@@ -49,7 +49,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.merchant.trade",
+      "Text": "adventurequests.forgottentemple.dialogue.merchant.trade",
       "Actions": [
         {
           "Type": "OpenBarterShop",
@@ -58,7 +58,7 @@
       ]
     },
     {
-      "Text": "adventurequests.temple.merchant.bye",
+      "Text": "adventurequests.forgottentemple.dialogue.merchant.bye",
       "Actions": [
         {
           "Type": "Close"

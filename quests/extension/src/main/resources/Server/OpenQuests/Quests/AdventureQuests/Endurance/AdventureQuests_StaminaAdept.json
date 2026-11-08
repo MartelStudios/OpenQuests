@@ -4,9 +4,9 @@
   "Icon": "Icons/ItemsGenerated/Potion_Stamina_Large.png",
   "Categories": ["AdventureQuests_Achievement"],
   "Visibility": "WhenStarted",
-  "TitleKey": "quest.stamina-adept.title",
-  "DescriptionKey": "quest.stamina-adept.description",
-  "ShortDescriptionKey": "quest.stamina-adept.short",
+  "TitleKey": "adventurequests.endurance.quest.stamina-adept.title",
+  "DescriptionKey": "adventurequests.endurance.quest.stamina-adept.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.stamina-adept.short",
   "TargetQuantity": 1000,
   "SuccessfulRewards": [
     {

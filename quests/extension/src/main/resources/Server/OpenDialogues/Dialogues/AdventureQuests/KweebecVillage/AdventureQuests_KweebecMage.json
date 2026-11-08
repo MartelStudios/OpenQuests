@@ -3,9 +3,9 @@
   "Character": "AdventureQuests_KweebecVillager",
   "UseSourceCharacter": true,
   "Pages": [
-    { "Text": "adventurequests.kweebec.mage.text" }
+    { "Text": "adventurequests.kweebecvillage.dialogue.kweebec-mage.text" }
   ],
   "Responses": [
-    { "Text": "adventurequests.kweebec.mage.bye", "Actions": [ { "Type": "Close" } ] }
+    { "Text": "adventurequests.kweebecvillage.dialogue.kweebec-mage.bye", "Actions": [ { "Type": "Close" } ] }
   ]
 }

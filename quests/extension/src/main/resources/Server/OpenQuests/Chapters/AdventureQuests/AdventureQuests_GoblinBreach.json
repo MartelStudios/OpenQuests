@@ -1,5 +1,5 @@
 {
-  "NameKey": "quest.chapter.goblin-breach",
+  "NameKey": "adventurequests.goblinbreach.chapter.name",
   "Group": "AdventureQuests_Adventure",
   "Order": 2,
   "Icon": "Icons/ItemsGenerated/PortalKey_Goblin_Breach.png",

@@ -4,15 +4,15 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-intruders.title",
-  "DescriptionKey": "quest.goblin-breach-intruders.description",
-  "ShortDescriptionKey": "quest.goblin-breach-intruders.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-intruders.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-intruders.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-intruders.short",
   "TargetQuantity": 10,
   "NpcGroupId": "Goblin",
   "Constraints": [
     {
       "Type": "InWorld",
-      "DescriptionKey": "quest.goblin-breach.in-breach",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
       "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
     },
     {

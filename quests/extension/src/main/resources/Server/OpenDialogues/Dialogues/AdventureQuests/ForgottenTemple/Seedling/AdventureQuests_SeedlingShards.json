@@ -4,12 +4,12 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.temple.seedling.shards.text"
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-shards.text"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.temple.seedling.bye",
+      "Text": "adventurequests.forgottentemple.dialogue.seedling.bye",
       "Actions": [
         {
           "Type": "Close"

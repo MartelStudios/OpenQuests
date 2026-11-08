@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.seedlingshardspink.title",
-  "DescriptionKey": "adventurequests.quest.seedlingshardspink.description",
-  "ShortDescriptionKey": "adventurequests.quest.seedlingshardspink.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.seedling-shards-pink.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.seedling-shards-pink.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.seedling-shards-pink.short",
   "Character": "AdventureQuests_TempleSeedling",
   "Dialogue": "AdventureQuests_SeedlingGift",
   "Items": [

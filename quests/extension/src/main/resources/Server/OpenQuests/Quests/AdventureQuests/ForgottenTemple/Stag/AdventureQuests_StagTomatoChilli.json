@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.stagtomatochilli.title",
-  "DescriptionKey": "adventurequests.quest.stagtomatochilli.description",
-  "ShortDescriptionKey": "adventurequests.quest.stagtomatochilli.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-tomato-chilli.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-tomato-chilli.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-tomato-chilli.short",
   "Character": "AdventureQuests_TempleStag",
   "Dialogue": "AdventureQuests_StagMoult",
   "Items": [

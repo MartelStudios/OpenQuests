@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.meetsapling.title",
-  "DescriptionKey": "adventurequests.quest.meetsapling.description",
-  "ShortDescriptionKey": "adventurequests.quest.meetsapling.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.meet-sapling.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.meet-sapling.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.meet-sapling.short",
   "TargetQuantity": 1,
   "Character": "AdventureQuests_TempleSapling",
   "Dialogue": "AdventureQuests_SaplingGenerator",

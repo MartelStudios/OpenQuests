@@ -4,9 +4,9 @@
   "Icon": "Icons/ItemsGenerated/Potion_Mana.png",
   "Categories": ["AdventureQuests_Achievement"],
   "Visibility": "WhenStarted",
-  "TitleKey": "quest.mana-adept.title",
-  "DescriptionKey": "quest.mana-adept.description",
-  "ShortDescriptionKey": "quest.mana-adept.short",
+  "TitleKey": "adventurequests.endurance.quest.mana-adept.title",
+  "DescriptionKey": "adventurequests.endurance.quest.mana-adept.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.mana-adept.short",
   "TargetQuantity": 2500,
   "SuccessfulRewards": [
     {

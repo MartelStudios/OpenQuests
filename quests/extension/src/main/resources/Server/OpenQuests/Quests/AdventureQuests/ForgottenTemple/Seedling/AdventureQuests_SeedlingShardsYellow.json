@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.seedlingshardsyellow.title",
-  "DescriptionKey": "adventurequests.quest.seedlingshardsyellow.description",
-  "ShortDescriptionKey": "adventurequests.quest.seedlingshardsyellow.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.seedling-shards-yellow.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.seedling-shards-yellow.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.seedling-shards-yellow.short",
   "Character": "AdventureQuests_TempleSeedling",
   "Dialogue": "AdventureQuests_SeedlingGift",
   "Items": [

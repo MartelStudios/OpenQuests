@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-rocket-boots.title",
-  "DescriptionKey": "quest.goblin-breach-rocket-boots.description",
-  "ShortDescriptionKey": "quest.goblin-breach-rocket-boots.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-rocket-boots.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-rocket-boots.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-rocket-boots.short",
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "Rocket_Boots"

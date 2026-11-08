@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Dungeon"
   ],
-  "TitleKey": "quest.goblin-breach-fragment.title",
-  "DescriptionKey": "quest.goblin-breach-fragment.description",
-  "ShortDescriptionKey": "quest.goblin-breach-fragment.short",
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-fragment.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-fragment.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-fragment.short",
   "TargetQuantity": 1,
   "ItemToCraft": {
     "ItemId": "PortalKey_Goblin_Breach"

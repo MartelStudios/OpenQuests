@@ -27,16 +27,16 @@
         },
         "Then": {
           "Dialogue": {
-            "Title": "adventurequests.plush.speaker.name",
+            "Title": "adventurequests.strangeplush.character.plush.name",
             "Display": "Default",
             "Character": "AdventureQuests_Plush",
             "Tags": { "Series": ["AdventureQuests_StrangePlush"] },
             "Pages": [
-              { "Text": "adventurequests.plush.sniff.text" }
+              { "Text": "adventurequests.strangeplush.router.plush.sniff.text" }
             ],
             "Responses": [
               {
-                "Text": "adventurequests.plush.sniff.answer",
+                "Text": "adventurequests.strangeplush.router.plush.sniff.answer",
                 "Icon": "Icons/ItemsGenerated/Ore_Gold.png",
                 "Actions": [
                   { "Type": "Open", "Dialogue": "AdventureQuests_PlushHungry" }

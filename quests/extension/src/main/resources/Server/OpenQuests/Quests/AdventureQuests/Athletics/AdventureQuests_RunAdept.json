@@ -3,9 +3,9 @@
   "Icon": "Icons/ItemsGenerated/Armor_Iron_Legs.png",
   "Categories": ["AdventureQuests_Achievement"],
   "Visibility": "WhenStarted",
-  "TitleKey": "quest.run-adept.title",
-  "DescriptionKey": "quest.run-adept.description",
-  "ShortDescriptionKey": "quest.run-adept.short",
+  "TitleKey": "adventurequests.athletics.quest.run-adept.title",
+  "DescriptionKey": "adventurequests.athletics.quest.run-adept.description",
+  "ShortDescriptionKey": "adventurequests.athletics.quest.run-adept.short",
   "TargetQuantity": 1000,
   "SuccessfulRewards": [
     {

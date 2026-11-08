@@ -2,15 +2,15 @@
   "Type": "Composite",
   "Icon": "Icons/ItemsGenerated/Plant_Fruit_Berries_Red.png",
   "Categories": ["AdventureQuests_Chores"],
-  "TitleKey": "quest.daily-chores.title",
-  "DescriptionKey": "quest.daily-chores.description",
-  "ShortDescriptionKey": "quest.daily-chores.short",
+  "TitleKey": "adventurequests.dailylife.quest.daily-chores.title",
+  "DescriptionKey": "adventurequests.dailylife.quest.daily-chores.description",
+  "ShortDescriptionKey": "adventurequests.dailylife.quest.daily-chores.short",
   "AbandonedSound": "",
   "QuestAssetIds": [
     {
       "Type": "InteractivelyPickup",
-      "TitleKey": "quest.chores-berries.title",
-      "DescriptionKey": "quest.chores-berries.description",
+      "TitleKey": "adventurequests.dailylife.quest.daily-chores.berries.title",
+      "DescriptionKey": "adventurequests.dailylife.quest.daily-chores.berries.description",
       "TargetQuantity": 8,
       "ItemToPickup": {
         "ItemId": "Plant_Fruit_Berries_Red"
@@ -18,8 +18,8 @@
     },
     {
       "Type": "Gather",
-      "TitleKey": "quest.chores-flowers.title",
-      "DescriptionKey": "quest.chores-flowers.description",
+      "TitleKey": "adventurequests.dailylife.quest.daily-chores.flowers.title",
+      "DescriptionKey": "adventurequests.dailylife.quest.daily-chores.flowers.description",
       "TargetQuantity": 5,
       "ItemToGather": {
         "ResourceTypeId": "Flowers"
@@ -27,8 +27,8 @@
     },
     {
       "Type": "UseBlock",
-      "TitleKey": "quest.chores-chest.title",
-      "DescriptionKey": "quest.chores-chest.description",
+      "TitleKey": "adventurequests.dailylife.quest.daily-chores.chest.title",
+      "DescriptionKey": "adventurequests.dailylife.quest.daily-chores.chest.description",
       "TargetQuantity": 1,
       "BlockToUse": {
         "ItemId": "Furniture_Crude_Chest_Small"

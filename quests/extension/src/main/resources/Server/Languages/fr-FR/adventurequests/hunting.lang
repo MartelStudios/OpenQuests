@@ -1,0 +1,13 @@
+chapter.name=La chasse
+quest.cook-meat.title=Faites cuire votre viande
+quest.cook-meat.description=L'odeur seule vaut l'attente.
+quest.cook-meat.short=Faites cuire de la viande crue dans le feu de camp et récupérez-la
+quest.craft-campfire.title=Fabriquez un feu de camp
+quest.craft-campfire.description=La viande crue ne fait pas un repas.
+quest.craft-campfire.short=Fabriquez un feu de camp avec des bâtons et des gravats
+quest.eat-meat.title=Mangez votre viande
+quest.eat-meat.description=Le feu a fait sa part.
+quest.eat-meat.short=Mangez la viande cuite
+quest.gather-meat.title=Récupérez de la viande
+quest.gather-meat.description=Quoi que vous abattiez, rapportez-en un morceau.
+quest.gather-meat.short=Chassez un animal et ramassez sa viande

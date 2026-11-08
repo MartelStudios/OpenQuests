@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.guardruneglutton.title",
-  "DescriptionKey": "adventurequests.quest.guardruneglutton.description",
-  "ShortDescriptionKey": "adventurequests.quest.guardruneglutton.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-rune-glutton.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-glutton.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-glutton.short",
   "QuestAssetIds": [
     "AdventureQuests_GuardRuneGluttonCraft",
     "AdventureQuests_GuardRuneGluttonShow",

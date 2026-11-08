@@ -4,9 +4,9 @@
   "Icon": "Icons/ItemsGenerated/Potion_Stamina_Small.png",
   "Categories": ["AdventureQuests_Achievement"],
   "Visibility": "WhenCompleted",
-  "TitleKey": "quest.stamina-novice.title",
-  "DescriptionKey": "quest.stamina-novice.description",
-  "ShortDescriptionKey": "quest.stamina-novice.short",
+  "TitleKey": "adventurequests.endurance.quest.stamina-novice.title",
+  "DescriptionKey": "adventurequests.endurance.quest.stamina-novice.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.stamina-novice.short",
   "TargetQuantity": 100,
   "SuccessfulRewards": [
     {

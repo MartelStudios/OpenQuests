@@ -4,9 +4,9 @@
   "Categories": [
     "AdventureQuests_Temple"
   ],
-  "TitleKey": "adventurequests.quest.stagricecotton.title",
-  "DescriptionKey": "adventurequests.quest.stagricecotton.description",
-  "ShortDescriptionKey": "adventurequests.quest.stagricecotton.short",
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-rice-cotton.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-rice-cotton.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-rice-cotton.short",
   "Character": "AdventureQuests_TempleStag",
   "Dialogue": "AdventureQuests_StagMoult",
   "Items": [
