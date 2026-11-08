@@ -1,0 +1,23 @@
+{
+  "Type": "Gather",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Scraps.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-scrap.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-scrap.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-scrap.short",
+  "TargetQuantity": 30,
+  "ItemToGather": {
+    "ItemId": "Ingredient_Scraps"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GoblinBreachFragment"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

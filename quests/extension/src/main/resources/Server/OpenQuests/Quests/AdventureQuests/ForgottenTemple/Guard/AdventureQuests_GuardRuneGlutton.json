@@ -1,0 +1,24 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-rune-glutton.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-glutton.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-glutton.short",
+  "QuestAssetIds": [
+    "AdventureQuests_GuardRuneGluttonCraft",
+    "AdventureQuests_GuardRuneGluttonShow",
+    "AdventureQuests_GuardRuneGluttonCast"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "PortalKey_Goblin_Breach",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

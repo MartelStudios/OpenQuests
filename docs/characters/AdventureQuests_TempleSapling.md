@@ -39,20 +39,20 @@ quests lead to the generator, then to the goblin scientist (`AdventureQuests_Gob
 | `AdventureQuests_LabGenerator` | `GameFlag` `goblin_lab_power` | 5 scraps, grants `MeetScientist` |
 | `AdventureQuests_LabThrough` | granted by `LabConsole`: `LabThroughEnter` (`EnterWorld` the breach), then `LabThroughTell` (`Dialogue` on `SaplingThrough`) | 1 `PortalKey_The_Deepworks` |
 
-`EnterForgottenTemple` grants `MeetSapling`. The "Thank you" answer of
+`AdventureQuests_EnterForgottenTemple` grants `MeetSapling`. The "Thank you" answer of
 `AdventureQuests_SaplingGenerator`, reached through "Which generator?" in
 `AdventureQuests_SaplingWorry`, completes it; a player who entered the temple before meeting
 quests existed gets the same answer assigning `LabScrap` directly.
 
 ## Assets
 
-- `OpenDialogues/Characters/AdventureQuests_TempleSapling.json`
-- `OpenDialogues/CharacterDistributions/AdventureQuests_TempleSapling.json`
-- `OpenDialogues/Routers/AdventureQuests_TempleSapling.json`
-- `OpenDialogues/Dialogues/AdventureQuests_Sapling{Worry,Generator,Waiting,Relieved,Through,Grateful}.json`
-- `OpenQuests/Quests/AdventureQuests_MeetSapling.json`
-- `OpenQuests/Quests/AdventureQuests_Lab{Scrap,Generator}.json`, `AdventureQuests_LabThrough{,Enter,Tell}.json`, chapter `ForgottenTemple`
-- Lang keys `adventurequests.temple.sapling.*`, `adventurequests.quest.lab{scrap,generator}.*`
+- `OpenDialogues/Characters/AdventureQuests/ForgottenTemple/Sapling/AdventureQuests_TempleSapling.json`
+- `OpenDialogues/CharacterDistributions/AdventureQuests/ForgottenTemple/Sapling/AdventureQuests_TempleSapling.json`
+- `OpenDialogues/Routers/AdventureQuests/ForgottenTemple/Sapling/AdventureQuests_TempleSapling.json`
+- `OpenDialogues/Dialogues/AdventureQuests/ForgottenTemple/Sapling/AdventureQuests_Sapling{Worry,Generator,Waiting,Relieved,Through,Grateful}.json`
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Sapling/AdventureQuests_MeetSapling.json`
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Lab/AdventureQuests_Lab{Scrap,Generator}.json`, `AdventureQuests_LabThrough{,Enter,Tell}.json`, chapter `AdventureQuests_ForgottenTemple`
+- Lang keys in `Languages/*/adventurequests/forgottentemple.lang`, sections `# Sapling` and `# Lab`
 
 ## Decision log
 
@@ -61,5 +61,5 @@ quests existed gets the same answer assigning `LabScrap` directly.
 - 2026-11-03: the generator quest completes on the universe game flag, so one repair completes it
   for every player holding it (user).
 - 2026-11-04: epithet "Young Kweebec" / "Jeune Kweebec", "Bourgeon" read too childish (user).
-- 2026-11-04: a meeting quest from `EnterForgottenTemple` leads to him, not auto tracked; its description says who to look for, since where he stands is drawn by the scan (user).
+- 2026-11-04: a meeting quest from `AdventureQuests_EnterForgottenTemple` leads to him, not auto tracked; its description says who to look for, since where he stands is drawn by the scan (user).
 - 2026-11-04: the lab line ends with him: going through the gate in his parents' place, then telling him, which pays a Deepworks fragment taken from their things (user).

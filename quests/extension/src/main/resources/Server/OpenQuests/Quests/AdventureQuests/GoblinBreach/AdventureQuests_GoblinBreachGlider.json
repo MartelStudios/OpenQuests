@@ -1,0 +1,24 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Glider_Scrap.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-glider.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-glider.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-glider.short",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Glider_Scrap"
+  },
+  "Constraints": [
+    {
+      "Type": "MaxQuests",
+      "Count": 1,
+      "States": [
+        "InProgress",
+        "Successful"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ModelsGenerated/Deer_Stag.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.meet-stag.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.meet-stag.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.meet-stag.short",
+  "TargetQuantity": 1,
+  "Character": "AdventureQuests_TempleStag",
+  "Dialogue": "AdventureQuests_StagIntro",
+  "Answer": "Accept",
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_StagWheat"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

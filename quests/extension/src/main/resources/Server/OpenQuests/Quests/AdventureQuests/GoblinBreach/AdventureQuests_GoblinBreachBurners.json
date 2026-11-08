@@ -1,0 +1,32 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Goblin_Burner.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-burners.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-burners.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-burners.short",
+  "TargetQuantity": 2,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "*Goblin_Burner*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GoblinBreachNest"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

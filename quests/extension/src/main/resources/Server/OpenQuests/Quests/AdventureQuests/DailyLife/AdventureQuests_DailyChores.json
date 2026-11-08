@@ -1,0 +1,57 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Plant_Fruit_Berries_Red.png",
+  "Categories": ["AdventureQuests_Chores"],
+  "TitleKey": "adventurequests.dailylife.quest.daily-chores.title",
+  "DescriptionKey": "adventurequests.dailylife.quest.daily-chores.description",
+  "ShortDescriptionKey": "adventurequests.dailylife.quest.daily-chores.short",
+  "AbandonedSound": "",
+  "QuestAssetIds": [
+    {
+      "Type": "InteractivelyPickup",
+      "TitleKey": "adventurequests.dailylife.quest.daily-chores.berries.title",
+      "DescriptionKey": "adventurequests.dailylife.quest.daily-chores.berries.description",
+      "TargetQuantity": 8,
+      "ItemToPickup": {
+        "ItemId": "Plant_Fruit_Berries_Red"
+      }
+    },
+    {
+      "Type": "Gather",
+      "TitleKey": "adventurequests.dailylife.quest.daily-chores.flowers.title",
+      "DescriptionKey": "adventurequests.dailylife.quest.daily-chores.flowers.description",
+      "TargetQuantity": 5,
+      "ItemToGather": {
+        "ResourceTypeId": "Flowers"
+      }
+    },
+    {
+      "Type": "UseBlock",
+      "TitleKey": "adventurequests.dailylife.quest.daily-chores.chest.title",
+      "DescriptionKey": "adventurequests.dailylife.quest.daily-chores.chest.description",
+      "TargetQuantity": 1,
+      "BlockToUse": {
+        "ItemId": "Furniture_Crude_Chest_Small"
+      }
+    }
+  ],
+  "Constraints": [
+    {
+      "Type": "Cooldown",
+      "Seconds": 72000
+    },
+    {
+      "Type": "MaxQuests",
+      "Count": 7,
+      "States": ["Successful"]
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Food_Bread",
+      "Quantity": 3,
+      "AutoClaim": false
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Portal_Device.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-gateway.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-gateway.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-gateway.short",
+  "QuestAssetIds": [
+    "AdventureQuests_LabGatewayRepair",
+    {
+      "Type": "Composite",
+      "Operator": "Or",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-report.title",
+      "QuestAssetIds": [
+        "AdventureQuests_LabGatewayTalk",
+        "AdventureQuests_LabAllRepaired"
+      ]
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Gadget_Assembly",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_LabTeleporter"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

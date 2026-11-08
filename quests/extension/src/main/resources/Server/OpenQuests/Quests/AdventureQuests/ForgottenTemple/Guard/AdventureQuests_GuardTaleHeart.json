@@ -1,0 +1,29 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ModelsGenerated/Void_Anomaly_Crystal.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-tale-heart.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-tale-heart.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-tale-heart.short",
+  "QuestAssetIds": [
+    "AdventureQuests_GuardTaleHeartBoss",
+    "AdventureQuests_GuardTaleHeartTell"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Rune_Shard",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GuardRuneHeart"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

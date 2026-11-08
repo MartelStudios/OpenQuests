@@ -1,0 +1,13 @@
+chapter.name=Hunting
+quest.cook-meat.title=Cook your meat
+quest.cook-meat.description=The smell alone is worth the wait.
+quest.cook-meat.short=Cook raw meat in the campfire and take it back out
+quest.craft-campfire.title=Craft a campfire
+quest.craft-campfire.description=Raw meat makes no dinner.
+quest.craft-campfire.short=Craft a campfire from sticks and rubble
+quest.eat-meat.title=Eat your meat
+quest.eat-meat.description=The fire did its part.
+quest.eat-meat.short=Eat the cooked meat
+quest.gather-meat.title=Gather meat
+quest.gather-meat.description=Whatever you bring down, carry a cut of it home.
+quest.gather-meat.short=Hunt an animal and pick up its meat

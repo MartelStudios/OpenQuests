@@ -1,0 +1,21 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_GoblinScientist",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.scientist-report-boiler.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.scientist-report.next",
+      "Actions": [
+        {
+          "Type": "Open",
+          "Router": "AdventureQuests_ScientistRepairsLeft"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.sapling-relieved.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.sapling.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

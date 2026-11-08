@@ -1,0 +1,40 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Teleporter.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-teleporter.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-teleporter.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-teleporter.short",
+  "QuestAssetIds": [
+    "AdventureQuests_LabTeleporterRepair",
+    {
+      "Type": "Composite",
+      "Operator": "Or",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-report.title",
+      "QuestAssetIds": [
+        "AdventureQuests_LabTeleporterTalk",
+        "AdventureQuests_LabAllRepaired"
+      ]
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Scraps",
+      "Quantity": 10,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_LabBoiler",
+        "AdventureQuests_LabEngine",
+        "AdventureQuests_LabCompressor"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

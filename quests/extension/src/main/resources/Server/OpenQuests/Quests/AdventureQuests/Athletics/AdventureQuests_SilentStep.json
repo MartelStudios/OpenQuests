@@ -1,0 +1,10 @@
+{
+  "Type": "Walk",
+  "Icon": "Icons/CraftingCategories/Armory/LeatherFeet.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "TitleKey": "adventurequests.athletics.quest.silent-step.title",
+  "DescriptionKey": "adventurequests.athletics.quest.silent-step.description",
+  "ShortDescriptionKey": "adventurequests.athletics.quest.silent-step.short",
+  "TargetQuantity": 500,
+  "Visibility": "WhenProgressed"
+}

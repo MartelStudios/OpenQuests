@@ -1,0 +1,7 @@
+{
+  "Type": "Dialogue",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-report-talk.title",
+  "TargetQuantity": 1,
+  "Character": "AdventureQuests_GoblinScientist",
+  "Dialogue": "AdventureQuests_ScientistReportGateway"
+}

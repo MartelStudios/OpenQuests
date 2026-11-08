@@ -1,0 +1,72 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Cauliflower.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-cauliflower-turnip.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-cauliflower-turnip.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-cauliflower-turnip.short",
+  "Character": "AdventureQuests_TempleStag",
+  "Dialogue": "AdventureQuests_StagMoult",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Cauliflower"
+      },
+      "Quantity": 2
+    },
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Turnip"
+      },
+      "Quantity": 2
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 5
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 8
+          }
+        }
+      ]
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Leather_Light",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_StagAuberginePumpkin"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

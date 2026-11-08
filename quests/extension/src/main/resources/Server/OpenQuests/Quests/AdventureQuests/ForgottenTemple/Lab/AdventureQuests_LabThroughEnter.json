@@ -1,0 +1,5 @@
+{
+  "Type": "EnterWorld",
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-through-enter.title",
+  "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+}

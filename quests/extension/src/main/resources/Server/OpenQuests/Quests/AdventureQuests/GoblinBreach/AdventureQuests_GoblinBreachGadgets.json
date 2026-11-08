@@ -1,0 +1,14 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Gadget_Assembly.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-gadgets.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-gadgets.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-gadgets.short",
+  "TargetQuantity": 3,
+  "ItemToCraft": {
+    "ItemId": "Ingredient_Gadget_Assembly"
+  }
+}

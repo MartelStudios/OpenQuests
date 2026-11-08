@@ -1,0 +1,23 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-rainbow.page1"
+    },
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-rainbow.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.seedling-rainbow.thanks",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Crystal_Fragments_Green.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.seedling-shards-green.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.seedling-shards-green.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.seedling-shards-green.short",
+  "Character": "AdventureQuests_TempleSeedling",
+  "Dialogue": "AdventureQuests_SeedlingGift",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Crystal_Green"
+      },
+      "Quantity": 2
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 25,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Popcorn",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 25,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Candy_Cane",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 25,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Pie_Pumpkin",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence_Concentrated",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 6,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Gadget_Assembly",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 2,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "PortalKey_Goblin_Breach",
+            "Quantity": 1
+          }
+        }
+      ]
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_SeedlingShardsCyan"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

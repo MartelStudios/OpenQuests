@@ -1,0 +1,25 @@
+{
+  "Type": "Composite",
+  "Operator": "Or",
+  "Icon": "Icons/ModelsGenerated/Goblin_Scientist.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.meet-scientist.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.meet-scientist.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.meet-scientist.short",
+  "QuestAssetIds": [
+    "AdventureQuests_MeetScientistTalk",
+    "AdventureQuests_LabAllRepaired"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_LabGateway"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

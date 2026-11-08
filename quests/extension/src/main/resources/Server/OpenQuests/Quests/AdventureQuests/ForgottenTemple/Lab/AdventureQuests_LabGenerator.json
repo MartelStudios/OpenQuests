@@ -1,0 +1,27 @@
+{
+  "Type": "GameFlag",
+  "Flag": "goblin_lab_power",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Scraps",
+      "Quantity": 5,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_MeetScientist"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "Icon": "Icons/ItemsGenerated/GoblinLab_Generator.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-generator.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-generator.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-generator.short",
+  "AutoTrack": true
+}

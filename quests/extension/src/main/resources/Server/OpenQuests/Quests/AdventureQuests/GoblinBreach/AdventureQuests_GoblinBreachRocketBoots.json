@@ -1,0 +1,24 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Rocket_Boots.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-rocket-boots.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-rocket-boots.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-rocket-boots.short",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Rocket_Boots"
+  },
+  "Constraints": [
+    {
+      "Type": "MaxQuests",
+      "Count": 1,
+      "States": [
+        "InProgress",
+        "Successful"
+      ]
+    }
+  ]
+}

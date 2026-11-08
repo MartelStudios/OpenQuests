@@ -1,0 +1,76 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Feathers_Dark.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.seedling-feathers-dark.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.seedling-feathers-dark.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.seedling-feathers-dark.short",
+  "Character": "AdventureQuests_TempleSeedling",
+  "Dialogue": "AdventureQuests_SeedlingGift",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Feathers_Dark"
+      },
+      "Quantity": 3
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Popcorn",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Candy_Cane",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 25,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Pie_Pumpkin",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 4,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence_Concentrated",
+            "Quantity": 1
+          }
+        },
+        {
+          "Weight": 1,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Gadget_Assembly",
+            "Quantity": 1
+          }
+        }
+      ]
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_SeedlingFeathersRed"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

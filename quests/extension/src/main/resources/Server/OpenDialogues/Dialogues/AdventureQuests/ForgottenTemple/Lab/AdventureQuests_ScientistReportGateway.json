@@ -1,0 +1,23 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_GoblinScientist",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.scientist-report-gateway.page1"
+    },
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.scientist-report-gateway.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.scientist.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "Type": "QuestState",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-tale-revenant-boss.title",
+  "QuestAssetId": "AdventureQuests_GoblinBreachRevenant",
+  "States": [
+    "Successful"
+  ]
+}

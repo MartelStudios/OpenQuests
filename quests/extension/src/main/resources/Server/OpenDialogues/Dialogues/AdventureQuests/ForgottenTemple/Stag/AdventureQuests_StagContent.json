@@ -1,0 +1,18 @@
+{
+  "Display": "Cinematic",
+  "Pages": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.stag-content.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.stag.leave",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

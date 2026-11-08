@@ -1,0 +1,14 @@
+{
+  "Type": "CastSpell",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-rune-cast.title",
+  "TargetQuantity": 1,
+  "Constraints": [
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "AdventureQuests_GuardRuneHeartShow",
+      "States": [
+        "Successful"
+      ]
+    }
+  ]
+}

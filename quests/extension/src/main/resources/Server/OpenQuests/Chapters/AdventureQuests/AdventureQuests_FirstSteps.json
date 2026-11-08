@@ -1,0 +1,12 @@
+{
+  "NameKey": "adventurequests.firststeps.chapter.name",
+  "Group": "AdventureQuests_Adventure",
+  "Order": 0,
+  "Icon": "Icons/ItemsGenerated/Tool_Hatchet_Crude.png",
+  "Quests": [
+    { "Quest": "AdventureQuests_Intro" },
+    { "Quest": "AdventureQuests_CraftTools" },
+    { "Quest": "AdventureQuests_CraftWorkbench" },
+    { "Quest": "AdventureQuests_ChooseYourWeapon" }
+  ]
+}

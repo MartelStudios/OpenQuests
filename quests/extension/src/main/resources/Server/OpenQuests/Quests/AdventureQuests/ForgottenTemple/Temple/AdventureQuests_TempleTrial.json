@@ -1,0 +1,104 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Furniture_Temple_Emerald_Statue.png",
+  "Categories": ["AdventureQuests_Temple", "AdventureQuests_Timed"],
+  "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.short",
+  "CanBeAbandoned": false,
+  "AutoTrack": true,
+  "QuestAssetIds": [
+    {
+      "Type": "ReachLocation",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.race.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.race.description",
+      "AnnounceOutcome": false,
+      "Position": {
+        "X": 4976,
+        "Y": 158,
+        "Z": 4983
+      },
+      "Radius": 6
+    },
+    {
+      "Type": "Jump",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.description",
+      "TargetQuantity": 10,
+      "AnnounceOutcome": false,
+      "Constraints": [
+        {
+          "Type": "EntityCondition",
+          "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.sprinting",
+          "Conditions": [
+            {
+              "Id": "Sprinting"
+            }
+          ]
+        },
+        {
+          "Type": "NearPosition",
+          "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.near-altar",
+          "Position": {
+            "X": 4976,
+            "Y": 158,
+            "Z": 4983
+          },
+          "Radius": 12
+        }
+      ]
+    },
+    {
+      "Type": "Run",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.run.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.run.description",
+      "Measure": "Seconds",
+      "TargetQuantity": 20,
+      "AnnounceOutcome": false
+    },
+    {
+      "Type": "NoOp",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.hold.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.hold.description",
+      "AnnounceOutcome": false,
+      "PersistProgression": false,
+      "Constraints": [
+        {
+          "Type": "TimeLimit",
+          "Seconds": 60,
+          "OnExpire": "Successful"
+        }
+      ]
+    }
+  ],
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.in-temple",
+      "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)",
+      "OnLeave": "Fail"
+    },
+    {
+      "Type": "FailOnDeath"
+    },
+    {
+      "Type": "TimeLimit",
+      "Seconds": 180
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 50,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_TempleOffering"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

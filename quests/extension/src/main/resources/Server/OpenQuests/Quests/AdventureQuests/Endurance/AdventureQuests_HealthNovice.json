@@ -1,0 +1,20 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Health",
+  "Icon": "Icons/ItemsGenerated/Potion_Health_Lesser.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenCompleted",
+  "TitleKey": "adventurequests.endurance.quest.health-novice.title",
+  "DescriptionKey": "adventurequests.endurance.quest.health-novice.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.health-novice.short",
+  "TargetQuantity": 100,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "AdventureQuests_HealthAdept"
+      ]
+    }
+  ]
+}

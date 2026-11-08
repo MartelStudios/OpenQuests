@@ -1,0 +1,38 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Golem_Crystal_Earth.png",
+  "Categories": ["AdventureQuests_Temple"],
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Golem_Crystal_Earth"
+    ]
+  },
+  "TitleKey": "adventurequests.forgottentemple.quest.defeat-forgotten-temple-guardian.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.defeat-forgotten-temple-guardian.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.defeat-forgotten-temple-guardian.short",
+  "TargetQuantity": 1,
+  "Constraints": [
+    {
+      "Type": "FailOnDeath"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_EnterForgottenTemple"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "FailedRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_DefeatForgottenTempleGuardian"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

@@ -1,0 +1,60 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Lettuce.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-lettuce.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-lettuce.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-lettuce.short",
+  "Character": "AdventureQuests_TempleStag",
+  "Dialogue": "AdventureQuests_StagSeeds",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Lettuce"
+      },
+      "Quantity": 5
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 5
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 8
+          }
+        }
+      ]
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_StagCarrotCorn"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

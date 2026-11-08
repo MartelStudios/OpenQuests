@@ -1,0 +1,16 @@
+{
+  "Title": "adventurequests.strangeplush.dialogue.plush-rustle.title",
+  "Display": "Default",
+  "Tags": { "Series": ["AdventureQuests_StrangePlush"] },
+  "Pages": [
+    { "Text": "adventurequests.strangeplush.dialogue.plush-rustle.text" }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.strangeplush.dialogue.plush-rustle.what",
+      "Actions": [
+        { "Type": "Open", "Dialogue": "AdventureQuests_PlushIntro" }
+      ]
+    }
+  ]
+}

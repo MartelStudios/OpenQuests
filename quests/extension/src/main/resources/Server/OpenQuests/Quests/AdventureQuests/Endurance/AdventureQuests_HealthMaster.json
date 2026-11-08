@@ -1,0 +1,11 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Health",
+  "Icon": "Icons/ItemsGenerated/Potion_Health_Greater.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "adventurequests.endurance.quest.health-master.title",
+  "DescriptionKey": "adventurequests.endurance.quest.health-master.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.health-master.short",
+  "TargetQuantity": 10000
+}

@@ -1,0 +1,12 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ItemsGenerated/Deco_Goblin_Plush.png",
+  "Categories": ["AdventureQuests_SideQuest"],
+  "TitleKey": "adventurequests.strangeplush.quest.plush-voice.title",
+  "DescriptionKey": "adventurequests.strangeplush.quest.plush-voice.description",
+  "ShortDescriptionKey": "adventurequests.strangeplush.quest.plush-voice.short",
+  "TargetQuantity": 1,
+  "Dialogue": "AdventureQuests_PlushIntro",
+  "UseHistory": true,
+  "AutoTrack": true
+}

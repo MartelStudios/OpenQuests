@@ -1,8 +1,8 @@
 {
   "Parent": "Deco_Goblin_Plush",
   "TranslationProperties": {
-    "Name": "adventurequests.plush.item.name",
-    "Description": "adventurequests.plush.item.description"
+    "Name": "adventurequests.strangeplush.item.miner-plush.name",
+    "Description": "adventurequests.strangeplush.item.miner-plush.description"
   },
   "MaxStack": 1,
   "Interactions": {

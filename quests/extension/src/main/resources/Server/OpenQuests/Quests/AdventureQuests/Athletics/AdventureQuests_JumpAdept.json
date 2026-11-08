@@ -1,0 +1,19 @@
+{
+  "Type": "Jump",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Feathers_Blue.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "adventurequests.athletics.quest.jump-adept.title",
+  "DescriptionKey": "adventurequests.athletics.quest.jump-adept.description",
+  "ShortDescriptionKey": "adventurequests.athletics.quest.jump-adept.short",
+  "TargetQuantity": 250,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "AdventureQuests_JumpMaster"
+      ]
+    }
+  ]
+}

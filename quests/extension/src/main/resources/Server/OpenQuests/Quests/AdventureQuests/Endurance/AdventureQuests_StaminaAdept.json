@@ -1,0 +1,20 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Stamina",
+  "Icon": "Icons/ItemsGenerated/Potion_Stamina_Large.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "adventurequests.endurance.quest.stamina-adept.title",
+  "DescriptionKey": "adventurequests.endurance.quest.stamina-adept.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.stamina-adept.short",
+  "TargetQuantity": 1000,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "AdventureQuests_StaminaMaster"
+      ]
+    }
+  ]
+}

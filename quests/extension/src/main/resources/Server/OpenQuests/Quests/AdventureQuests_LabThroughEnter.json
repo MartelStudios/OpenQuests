@@ -1,5 +1,0 @@
-{
-  "Type": "EnterWorld",
-  "TitleKey": "adventurequests.quest.labthrough.enter.title",
-  "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
-}

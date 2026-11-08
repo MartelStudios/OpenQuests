@@ -1,0 +1,19 @@
+{
+  "Name": "adventurequests.forgottentemple.character.goblin-scientist.name",
+  "Epithet": "adventurequests.forgottentemple.character.goblin-scientist.epithet",
+  "Uniqueness": "Forever",
+  "Scope": "Universe",
+  "MapVisibility": "Always",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_GoblinScientist"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}

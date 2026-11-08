@@ -32,7 +32,7 @@ loop back into the breach.
 
 ## Quests and rewards
 
-`EnterForgottenTemple` grants `AdventureQuests_MeetGuard`, completed by the `Accept` answer of his
+`AdventureQuests_EnterForgottenTemple` grants `AdventureQuests_MeetGuard`, completed by the `Accept` answer of his
 intro, which grants one tale per boss quest of the GoblinBreach chapter (`Revenant`, `Glutton`,
 `Voidtaken`, `Heart`). A player without the meeting quest gets the same answer assigning the tales.
 
@@ -50,14 +50,14 @@ the fragment.
 
 ## Assets
 
-- `OpenDialogues/Characters/AdventureQuests_TempleGuard.json`
-- `OpenDialogues/CharacterDistributions/AdventureQuests_TempleGuard.json`
-- `OpenDialogues/Routers/AdventureQuests_TempleGuard.json`
-- `OpenDialogues/Dialogues/AdventureQuests_Guard{Tale,Rune}{Revenant,Glutton,Voidtaken,Heart}.json`,
+- `OpenDialogues/Characters/AdventureQuests/ForgottenTemple/Guard/AdventureQuests_TempleGuard.json`
+- `OpenDialogues/CharacterDistributions/AdventureQuests/ForgottenTemple/Guard/AdventureQuests_TempleGuard.json`
+- `OpenDialogues/Routers/AdventureQuests/ForgottenTemple/Guard/AdventureQuests_TempleGuard.json`
+- `OpenDialogues/Dialogues/AdventureQuests/ForgottenTemple/Guard/AdventureQuests_Guard{Tale,Rune}{Revenant,Glutton,Voidtaken,Heart}.json`,
   `AdventureQuests_GuardRuneSeen.json`, `AdventureQuests_GuardDream.json`,
   `AdventureQuests_GuardIntro.json`
-- `OpenQuests/Quests/AdventureQuests_Guard*.json`, chapter `ForgottenTemple`
-- Lang keys `adventurequests.temple.guard.*`, `adventurequests.quest.guard*`
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Guard/AdventureQuests_Guard*.json`, chapter `AdventureQuests_ForgottenTemple`
+- Lang keys in `Languages/*/adventurequests/forgottentemple.lang`, section `# Guard`
 
 ## Decision log
 

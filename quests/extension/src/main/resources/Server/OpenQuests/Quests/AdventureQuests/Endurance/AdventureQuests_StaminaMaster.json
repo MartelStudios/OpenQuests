@@ -1,0 +1,11 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Stamina",
+  "Icon": "Icons/ItemsGenerated/Potion_Stamina_Greater.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "adventurequests.endurance.quest.stamina-master.title",
+  "DescriptionKey": "adventurequests.endurance.quest.stamina-master.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.stamina-master.short",
+  "TargetQuantity": 10000
+}

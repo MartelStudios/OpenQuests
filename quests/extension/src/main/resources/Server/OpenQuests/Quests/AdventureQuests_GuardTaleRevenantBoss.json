@@ -1,8 +1,0 @@
-{
-  "Type": "QuestState",
-  "TitleKey": "adventurequests.quest.guardtalerevenant.boss.title",
-  "QuestAssetId": "GoblinBreachRevenant",
-  "States": [
-    "Successful"
-  ]
-}

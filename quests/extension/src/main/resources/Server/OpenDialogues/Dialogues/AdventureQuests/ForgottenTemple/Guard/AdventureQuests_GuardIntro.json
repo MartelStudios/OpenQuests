@@ -1,0 +1,69 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.guard-intro.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Id": "Accept",
+      "Text": "adventurequests.forgottentemple.dialogue.guard-intro.yes",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_MeetGuard",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.guard-intro.yes",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_MeetGuard",
+        "States": [
+          "InProgress"
+        ],
+        "Min": 0,
+        "Max": 0
+      },
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_GuardTaleRevenant"
+        },
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_GuardTaleGlutton"
+        },
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_GuardTaleVoidtaken"
+        },
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_GuardTaleHeart"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.guard.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

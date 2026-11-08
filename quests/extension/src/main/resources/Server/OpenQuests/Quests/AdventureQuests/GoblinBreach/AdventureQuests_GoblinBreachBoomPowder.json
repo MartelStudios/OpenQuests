@@ -1,0 +1,23 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Powder_Boom.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-boom-powder.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-boom-powder.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-boom-powder.short",
+  "TargetQuantity": 4,
+  "ItemToCraft": {
+    "ItemId": "Ingredient_Powder_Boom"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GoblinBreachBangstick"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

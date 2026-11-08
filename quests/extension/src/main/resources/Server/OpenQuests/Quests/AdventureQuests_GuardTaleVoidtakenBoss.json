@@ -1,8 +1,0 @@
-{
-  "Type": "QuestState",
-  "TitleKey": "adventurequests.quest.guardtalevoidtaken.boss.title",
-  "QuestAssetId": "GoblinBreachVoidtaken",
-  "States": [
-    "Successful"
-  ]
-}

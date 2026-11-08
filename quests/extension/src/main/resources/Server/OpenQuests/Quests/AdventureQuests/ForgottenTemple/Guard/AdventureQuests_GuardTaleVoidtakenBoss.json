@@ -1,0 +1,8 @@
+{
+  "Type": "QuestState",
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-tale-voidtaken-boss.title",
+  "QuestAssetId": "AdventureQuests_GoblinBreachVoidtaken",
+  "States": [
+    "Successful"
+  ]
+}

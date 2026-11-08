@@ -1,0 +1,38 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/GoblinLab_Tinkering_Bench_Recipeset_A.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.lab-boiler.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.lab-boiler.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.lab-boiler.short",
+  "QuestAssetIds": [
+    "AdventureQuests_LabBoilerRepair",
+    {
+      "Type": "Composite",
+      "Operator": "Or",
+      "TitleKey": "adventurequests.forgottentemple.quest.lab-report.title",
+      "QuestAssetIds": [
+        "AdventureQuests_LabBoilerTalk",
+        "AdventureQuests_LabAllRepaired"
+      ]
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Gadget_Assembly",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_LabConsole"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

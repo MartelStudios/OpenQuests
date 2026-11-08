@@ -1,0 +1,10 @@
+{
+  "Type": "KillPlayer",
+  "Icon": "Icons/ItemsGenerated/Weapon_Sword_Iron.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "TitleKey": "adventurequests.combat.quest.first-blood.title",
+  "DescriptionKey": "adventurequests.combat.quest.first-blood.description",
+  "ShortDescriptionKey": "adventurequests.combat.quest.first-blood.short",
+  "TargetQuantity": 1,
+  "Visibility": "WhenCompleted"
+}

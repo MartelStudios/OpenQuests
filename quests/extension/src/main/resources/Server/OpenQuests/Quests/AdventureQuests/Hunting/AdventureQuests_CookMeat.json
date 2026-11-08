@@ -1,0 +1,22 @@
+{
+  "Type": "Gather",
+  "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Cooked.png",
+  "Categories": ["AdventureQuests_Survival"],
+  "TitleKey": "adventurequests.hunting.quest.cook-meat.title",
+  "DescriptionKey": "adventurequests.hunting.quest.cook-meat.description",
+  "ShortDescriptionKey": "adventurequests.hunting.quest.cook-meat.short",
+  "TargetQuantity": 1,
+  "ItemToGather": {
+    "ItemId": "Food_Wildmeat_Cooked"
+  },
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_EatMeat"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

@@ -1,0 +1,22 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ItemsGenerated/PortalKey_The_Deepworks.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.seedling-rainbow.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.seedling-rainbow.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.seedling-rainbow.short",
+  "TargetQuantity": 1,
+  "Character": "AdventureQuests_TempleSeedling",
+  "Dialogue": "AdventureQuests_SeedlingRainbow",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "PortalKey_The_Deepworks",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

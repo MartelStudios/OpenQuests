@@ -1,0 +1,10 @@
+{
+  "Type": "Jump",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Feathers_Red.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "adventurequests.athletics.quest.jump-master.title",
+  "DescriptionKey": "adventurequests.athletics.quest.jump-master.description",
+  "ShortDescriptionKey": "adventurequests.athletics.quest.jump-master.short",
+  "TargetQuantity": 2500
+}

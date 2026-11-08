@@ -1,0 +1,49 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.guard-rune.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Id": "ShowRune",
+      "Text": "adventurequests.forgottentemple.dialogue.guard-rune.show",
+      "When": {
+        "Type": "Composite",
+        "Operator": "And",
+        "Conditions": [
+          {
+            "Type": "Holding",
+            "Item": {
+              "Category": "GoblinLab_Runes"
+            }
+          },
+          {
+            "Type": "RequiresQuest",
+            "QuestAssetId": "AdventureQuests_GuardRuneGluttonCraft",
+            "States": [
+              "Successful"
+            ]
+          }
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Open",
+          "Dialogue": "AdventureQuests_GuardRuneSeen"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.guard-rune.later",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

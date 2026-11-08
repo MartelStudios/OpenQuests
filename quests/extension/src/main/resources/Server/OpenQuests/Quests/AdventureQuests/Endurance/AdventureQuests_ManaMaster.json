@@ -1,0 +1,11 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Mana",
+  "Icon": "Icons/ItemsGenerated/Potion_Mana_Large.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "adventurequests.endurance.quest.mana-master.title",
+  "DescriptionKey": "adventurequests.endurance.quest.mana-master.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.mana-master.short",
+  "TargetQuantity": 25000
+}

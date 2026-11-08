@@ -1,0 +1,17 @@
+{
+  "Epithet": "adventurequests.kweebecvillage.character.kweebec-mage.epithet",
+  "Uniqueness": "Forever",
+  "Scope": "Universe",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Dialogue": "AdventureQuests_KweebecMage"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}

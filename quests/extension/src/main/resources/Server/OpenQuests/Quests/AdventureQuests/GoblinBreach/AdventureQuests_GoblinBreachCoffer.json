@@ -1,0 +1,33 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ItemsGenerated/Furniture_Goblin_Coffer.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-coffer.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-coffer.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-coffer.short",
+  "TargetQuantity": 12,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Coffer_Goblin_*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Choice",
+      "Rewards": [
+        { "Reward": { "Type": "Item", "ItemId": "Ingredient_Gadget_Assembly", "Quantity": 2 } },
+        { "Reward": { "Type": "Item", "ItemId": "Ingredient_Crystal_Void", "Quantity": 6 } },
+        { "Reward": { "Type": "Item", "ItemId": "Potion_Health_Greater", "Quantity": 3 } }
+      ]
+    }
+  ]
+}

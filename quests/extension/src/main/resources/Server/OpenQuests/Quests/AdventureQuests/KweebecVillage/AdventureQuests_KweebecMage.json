@@ -1,0 +1,11 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
+  "Categories": ["AdventureQuests_SideQuest"],
+  "TitleKey": "adventurequests.kweebecvillage.quest.kweebec-mage.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.kweebec-mage.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.kweebec-mage.short",
+  "TargetQuantity": 1,
+  "Character": "AdventureQuests_KweebecMage",
+  "AutoTrack": true
+}

@@ -1,0 +1,19 @@
+{
+  "Type": "Sprint",
+  "Icon": "Icons/ItemsGenerated/Potion_Stamina.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "adventurequests.athletics.quest.sprint-adept.title",
+  "DescriptionKey": "adventurequests.athletics.quest.sprint-adept.description",
+  "ShortDescriptionKey": "adventurequests.athletics.quest.sprint-adept.short",
+  "TargetQuantity": 500,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "AdventureQuests_SprintMaster"
+      ]
+    }
+  ]
+}

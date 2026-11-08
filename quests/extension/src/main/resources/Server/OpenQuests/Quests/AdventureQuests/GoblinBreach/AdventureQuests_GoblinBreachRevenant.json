@@ -1,0 +1,44 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Skeleton_Elite.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-revenant.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-revenant.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-revenant.short",
+  "TargetQuantity": 1,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Skeleton_Elite*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    },
+    {
+      "Type": "FailOnDeath"
+    }
+  ],
+  "FailedRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GoblinBreachRevenant"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GoblinBreachRune"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

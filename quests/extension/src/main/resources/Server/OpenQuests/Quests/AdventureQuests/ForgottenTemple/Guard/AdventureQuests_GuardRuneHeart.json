@@ -1,0 +1,24 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-rune-heart.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-heart.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-rune-heart.short",
+  "QuestAssetIds": [
+    "AdventureQuests_GuardRuneHeartCraft",
+    "AdventureQuests_GuardRuneHeartShow",
+    "AdventureQuests_GuardRuneHeartCast"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "PortalKey_Goblin_Breach",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

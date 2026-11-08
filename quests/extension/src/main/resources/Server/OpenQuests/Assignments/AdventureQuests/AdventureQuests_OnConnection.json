@@ -1,0 +1,21 @@
+{
+  "Trigger": {
+    "Type": "PlayerConnect"
+  },
+  "QuestAssetIds": [
+    "AdventureQuests_Intro",
+    "AdventureQuests_SkipIntro",
+    "AdventureQuests_GatherMeat",
+    "AdventureQuests_RunNovice",
+    "AdventureQuests_SprintNovice",
+    "AdventureQuests_JumpNovice",
+    "AdventureQuests_StaminaNovice",
+    "AdventureQuests_ManaNovice",
+    "AdventureQuests_HealthNovice",
+    "AdventureQuests_SilentStep",
+    "AdventureQuests_Lumberjack",
+    "AdventureQuests_FirstBlood",
+    "AdventureQuests_Flawless",
+    "AdventureQuests_PlushVeins"
+  ]
+}

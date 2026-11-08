@@ -1,0 +1,17 @@
+{
+  "Epithet": "adventurequests.forgottentemple.character.temple-guard.epithet",
+  "Uniqueness": "Forever",
+  "Scope": "Universe",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_TempleGuard"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}

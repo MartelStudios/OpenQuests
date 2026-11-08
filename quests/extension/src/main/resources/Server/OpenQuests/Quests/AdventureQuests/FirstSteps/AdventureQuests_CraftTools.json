@@ -1,0 +1,38 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Tool_Pickaxe_Crude.png",
+  "Categories": ["AdventureQuests_Tutorial"],
+  "TitleKey": "adventurequests.firststeps.quest.craft-tools.title",
+  "DescriptionKey": "adventurequests.firststeps.quest.craft-tools.description",
+  "ShortDescriptionKey": "adventurequests.firststeps.quest.craft-tools.short",
+  "QuestAssetIds": [
+    {
+      "Type": "Craft",
+      "TitleKey": "adventurequests.firststeps.quest.craft-tools.hatchet.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.craft-tools.hatchet.description",
+      "TargetQuantity": 1,
+      "ItemToCraft": {
+        "ItemId": "Tool_Hatchet_Crude"
+      }
+    },
+    {
+      "Type": "Craft",
+      "TitleKey": "adventurequests.firststeps.quest.craft-tools.pickaxe.title",
+      "DescriptionKey": "adventurequests.firststeps.quest.craft-tools.pickaxe.description",
+      "TargetQuantity": 1,
+      "ItemToCraft": {
+        "ItemId": "Tool_Pickaxe_Crude"
+      }
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "AdventureQuests_CraftWorkbench"
+      ]
+    }
+  ],
+  "AutoTrack": true
+}

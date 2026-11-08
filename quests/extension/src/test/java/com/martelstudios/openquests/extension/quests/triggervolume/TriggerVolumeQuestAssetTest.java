@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,11 +23,11 @@ class TriggerVolumeQuestAssetTest {
     @Test
     void eachTowerTopQuestMatchesOnlyItsOwnTopVolumes() throws IOException {
         // Volume names as the breach watchtower prefabs ship them; enkindled_trigger_d2 is a middle floor
-        assertMatches("GoblinBreachMineTowerTop", new String[] {"trash_pile_trigger", "trash_pile_trigger_b", "trash_pile_trigger4", "trash_pile_trigger (2)"},
+        assertMatches("AdventureQuests_GoblinBreachMineTowerTop", new String[] {"trash_pile_trigger", "trash_pile_trigger_b", "trash_pile_trigger4", "trash_pile_trigger (2)"},
                       new String[] {"my_trash_pile_trigger", "enkindled_trigger_3"});
-        assertMatches("GoblinBreachCryptTowerTop", new String[] {"enkindled_trigger_1", "enkindled_trigger_5"},
+        assertMatches("AdventureQuests_GoblinBreachCryptTowerTop", new String[] {"enkindled_trigger_1", "enkindled_trigger_5"},
                       new String[] {"enkindled_trigger_d2", "enkindled_trigger", "void_tower_trigger1"});
-        assertMatches("GoblinBreachVoidTowerTop", new String[] {"void_tower_trigger1", "void_tower_trigger4"},
+        assertMatches("AdventureQuests_GoblinBreachVoidTowerTop", new String[] {"void_tower_trigger1", "void_tower_trigger4"},
                       new String[] {"void_tower_trigger", "trash_pile_trigger"});
     }
 
@@ -75,7 +77,12 @@ class TriggerVolumeQuestAssetTest {
      * off the sources, since example quests are kept out of the jar and its resources.
      */
     private static TriggerVolumeQuestAsset decodeShipped(String id) throws IOException {
-        String json = Files.readString(Path.of("src/main/resources/Server/OpenQuests/Quests/" + id + ".json"));
+        List<Path> found;
+        try (Stream<Path> files = Files.walk(Path.of("src/main/resources/Server/OpenQuests/Quests"))) {
+            found = files.filter(file -> file.getFileName().toString().equals(id + ".json")).toList();
+        }
+        assertEquals(1, found.size(), id);
+        String json = Files.readString(found.getFirst());
         Matcher pattern = Pattern.compile("\"VolumeNamePattern\": \"[^\"]*\"").matcher(json);
         Matcher eventType = Pattern.compile("\"TriggerEventType\": \"[^\"]*\"").matcher(json);
         assertTrue(pattern.find(), id);

@@ -1,0 +1,28 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ModelsGenerated/Kweebec_Rootling.png",
+  "Categories": ["AdventureQuests_Temple"],
+  "TitleKey": "adventurequests.forgottentemple.quest.talk-to-rootling-merchant.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.talk-to-rootling-merchant.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.talk-to-rootling-merchant.short",
+  "TargetQuantity": 1,
+  "Character": "AdventureQuests_TempleMerchant",
+  "Dialogue": "AdventureQuests_MerchantIntro",
+  "Answer": "Accept",
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 100,
+      "AutoClaim": false
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_TempleTrial"
+      ],
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

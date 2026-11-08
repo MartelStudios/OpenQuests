@@ -1,0 +1,12 @@
+{
+  "NameKey": "adventurequests.hunting.chapter.name",
+  "Group": "AdventureQuests_Survival",
+  "Order": 0,
+  "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Raw.png",
+  "Quests": [
+    { "Quest": "AdventureQuests_GatherMeat", "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Raw.png" },
+    { "Quest": "AdventureQuests_CraftCampfire", "Icon": "Icons/ItemsGenerated/Bench_Campfire.png" },
+    { "Quest": "AdventureQuests_CookMeat", "Icon": "Icons/ItemsGenerated/Food_Wildmeat_Cooked.png" },
+    { "Quest": "AdventureQuests_EatMeat", "Icon": "Icons/ItemsGenerated/Food_Skewer_Meat.png" }
+  ]
+}

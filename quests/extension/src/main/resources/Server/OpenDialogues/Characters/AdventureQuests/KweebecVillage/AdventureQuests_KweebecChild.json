@@ -1,0 +1,16 @@
+{
+  "Epithet": "adventurequests.kweebecvillage.character.kweebec-child.epithet",
+  "Uniqueness": "Alive",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Dialogue": "AdventureQuests_KweebecChild"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}

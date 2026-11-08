@@ -1,0 +1,17 @@
+{
+  "NameKey": "adventurequests.endurance.chapter.name",
+  "Group": "AdventureQuests_Feats",
+  "Order": 2,
+  "Icon": "Icons/ItemsGenerated/Potion_Stamina.png",
+  "Quests": [
+    { "Quest": "AdventureQuests_StaminaNovice" },
+    { "Quest": "AdventureQuests_StaminaAdept" },
+    { "Quest": "AdventureQuests_StaminaMaster" },
+    { "Quest": "AdventureQuests_ManaNovice" },
+    { "Quest": "AdventureQuests_ManaAdept" },
+    { "Quest": "AdventureQuests_ManaMaster" },
+    { "Quest": "AdventureQuests_HealthNovice" },
+    { "Quest": "AdventureQuests_HealthAdept" },
+    { "Quest": "AdventureQuests_HealthMaster" }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "Type": "LoseStat",
+  "Stat": "Mana",
+  "Icon": "Icons/ItemsGenerated/Potion_Mana.png",
+  "Categories": ["AdventureQuests_Achievement"],
+  "Visibility": "WhenStarted",
+  "TitleKey": "adventurequests.endurance.quest.mana-adept.title",
+  "DescriptionKey": "adventurequests.endurance.quest.mana-adept.description",
+  "ShortDescriptionKey": "adventurequests.endurance.quest.mana-adept.short",
+  "TargetQuantity": 2500,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "AutoClaim": true,
+      "QuestAssetIds": [
+        "AdventureQuests_ManaMaster"
+      ]
+    }
+  ]
+}

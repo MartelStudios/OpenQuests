@@ -1,0 +1,29 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ModelsGenerated/Skeleton_Elite.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.guard-tale-revenant.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.guard-tale-revenant.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.guard-tale-revenant.short",
+  "QuestAssetIds": [
+    "AdventureQuests_GuardTaleRevenantBoss",
+    "AdventureQuests_GuardTaleRevenantTell"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Rune_Shard",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GuardRuneRevenant"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

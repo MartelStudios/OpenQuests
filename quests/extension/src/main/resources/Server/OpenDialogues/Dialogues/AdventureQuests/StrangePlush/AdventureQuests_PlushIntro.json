@@ -1,0 +1,28 @@
+{
+  "Title": "adventurequests.strangeplush.character.plush.name",
+  "Display": "Default",
+  "Character": "AdventureQuests_Plush",
+  "Tags": { "Series": ["AdventureQuests_StrangePlush"] },
+  "Pages": [
+    { "Text": "adventurequests.strangeplush.dialogue.plush-intro.page1" },
+    { "Text": "adventurequests.strangeplush.dialogue.plush-intro.page2" },
+    { "Text": "adventurequests.strangeplush.dialogue.plush-intro.page3" }
+  ],
+  "Responses": [
+    {
+      "Id": "Want",
+      "Text": "adventurequests.strangeplush.dialogue.plush-intro.want",
+      "Actions": [
+        { "Type": "AssignQuest", "Quest": "AdventureQuests_PlushAppetite" },
+        { "Type": "Close" }
+      ]
+    },
+    {
+      "Id": "Hush",
+      "Text": "adventurequests.strangeplush.dialogue.plush-intro.hush",
+      "Actions": [
+        { "Type": "Close" }
+      ]
+    }
+  ]
+}

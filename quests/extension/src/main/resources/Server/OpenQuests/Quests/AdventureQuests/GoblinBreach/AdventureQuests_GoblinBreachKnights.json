@@ -1,0 +1,32 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ModelsGenerated/Skeleton_Knight.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-knights.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-knights.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-knights.short",
+  "TargetQuantity": 3,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Skeleton_Knight*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "InWorld",
+      "DescriptionKey": "adventurequests.common.quest.goblin-breach.in-breach",
+      "WorldNamePattern": "instance-Portals-Portals_Goblins-.*"
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_GoblinBreachRevenant"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

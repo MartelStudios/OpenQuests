@@ -1,0 +1,14 @@
+{
+  "Type": "Craft",
+  "Icon": "Icons/ItemsGenerated/Rune_Fireball.png",
+  "Categories": [
+    "AdventureQuests_Dungeon"
+  ],
+  "TitleKey": "adventurequests.goblinbreach.quest.goblin-breach-rune.title",
+  "DescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-rune.description",
+  "ShortDescriptionKey": "adventurequests.goblinbreach.quest.goblin-breach-rune.short",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Rune_Fireball"
+  }
+}

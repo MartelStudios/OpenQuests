@@ -1,0 +1,59 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Potato_Eternal.png",
+  "Categories": [
+    "AdventureQuests_Temple"
+  ],
+  "TitleKey": "adventurequests.forgottentemple.quest.stag-eternal-roots.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.stag-eternal-roots.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.stag-eternal-roots.short",
+  "Character": "AdventureQuests_TempleStag",
+  "Dialogue": "AdventureQuests_StagMoult",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Seeds_Potato_Eternal"
+      },
+      "Quantity": 1
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 5
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 8
+          }
+        },
+        {
+          "Weight": 15,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 12
+          }
+        }
+      ]
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Leather_Prismic",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}
