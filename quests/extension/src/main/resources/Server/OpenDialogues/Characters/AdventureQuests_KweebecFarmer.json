@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.kweebec.farmer.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Dialogue": "AdventureQuests_KweebecFarmer"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}

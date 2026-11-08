@@ -65,7 +65,7 @@ tasks.named<Jar>("jar") {
 
 // The ship quests as content. They leave the jar and travel as an asset pack of
 // their own, so a server owner keeps the quest types and drops the example chain by deleting one file.
-val questExamples = listOf("Server/OpenQuests/**", "Server/OpenDialogues/**", "Server/Item/**", "Common/Icons/OpenQuestsExamples/**", "Server/Languages/*/quest.lang", "Server/Languages/*/openquestsexamples.lang")
+val questExamples = listOf("Server/OpenQuests/**", "Server/OpenDialogues/**", "Server/Item/**", "Common/Icons/AdventureQuests/**", "Server/Languages/*/quest.lang", "Server/Languages/*/adventurequests.lang")
 
 // Only the published jar loses them: stageAllModAssets and prepareRunServer link the dev run
 // against src/main/resources rather than this output, so runAllMods keeps the quests, and keeps
@@ -79,7 +79,7 @@ val questExamplesManifest by tasks.registering {
     outputs.file(manifest)
 
     val group = project.property("manifest_group").toString()
-    val modVersion = project.property("examples_version").toString()
+    val modVersion = project.property("adventurequests_version").toString()
     val author = project.property("mod_author").toString()
     val url = project.property("mod_url").toString()
     val serverVersion = project.property("manifestServerVersion").toString()
@@ -91,9 +91,9 @@ val questExamplesManifest by tasks.registering {
             """
             {
                 "Group": "$group",
-                "Name": "OpenQuestsExamples",
+                "Name": "HytaleAdventureQuests",
                 "Version": "$modVersion",
-                "Description": "The quest line shipped with OpenQuests. Delete to start from an empty quest list.",
+                "Description": "Quests, characters and dialogues that bring vanilla Hytale to life. Delete to start from an empty quest list.",
                 "Authors": [
                     {
                         "Name": "$author"
@@ -114,8 +114,8 @@ val questExamplesManifest by tasks.registering {
 }
 
 val questExamplesZip by tasks.registering(Zip::class) {
-    archiveBaseName.set("OpenQuestsExamples")
-    archiveVersion.set(project.property("examples_version").toString())
+    archiveBaseName.set("HytaleAdventureQuests")
+    archiveVersion.set(project.property("adventurequests_version").toString())
 
     // Manifest at the root, the rest keeping the paths it has under src/main/resources
     from(questExamplesManifest)
@@ -139,7 +139,7 @@ val verifyReleaseArtifacts by tasks.registering {
     dependsOn(":quests:core:jar", tasks.named("jar"), questExamplesZip, ":mods:mmoskilltree:jar")
 
     val modVersion = project.property("version").toString()
-    val examplesVersion = project.property("examples_version").toString()
+    val adventureQuestsVersion = project.property("adventurequests_version").toString()
     // Read late: the pack is configured after this project and carries a version of its own
     val packVersion = provider { project(":mods:mmoskilltree").version.toString() }
     val coreJars = fileTree(project(":quests:core").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
@@ -149,7 +149,7 @@ val verifyReleaseArtifacts by tasks.registering {
     val published = mapOf(
         "quests/core/build/libs/*.jar" to (coreJars to provider { modVersion }),
         "quests/extension/build/libs/*.jar" to (extensionJars to provider { modVersion }),
-        "quests/extension/build/distributions/*.zip" to (contentPacks to provider { examplesVersion }),
+        "quests/extension/build/distributions/*.zip" to (contentPacks to provider { adventureQuestsVersion }),
         "mods/mmoskilltree/build/libs/*.jar" to (packJars to packVersion)
     )
 

@@ -1,0 +1,12 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
+  "Categories": ["SideQuest"],
+  "TitleKey": "adventurequests.quest.kweebecfarewell.title",
+  "DescriptionKey": "adventurequests.quest.kweebecfarewell.description",
+  "ShortDescriptionKey": "adventurequests.quest.kweebecfarewell.short",
+  "TargetQuantity": 1,
+  "Character": "AdventureQuests_KweebecFarmer",
+  "Answer": "Bye",
+  "AutoTrack": true
+}

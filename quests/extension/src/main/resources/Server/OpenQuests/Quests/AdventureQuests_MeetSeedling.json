@@ -1,0 +1,23 @@
+{
+  "Type": "Dialogue",
+  "Icon": "Icons/ModelsGenerated/Kweebec_Seedling.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.meetseedling.title",
+  "DescriptionKey": "adventurequests.quest.meetseedling.description",
+  "ShortDescriptionKey": "adventurequests.quest.meetseedling.short",
+  "TargetQuantity": 1,
+  "Character": "AdventureQuests_TempleSeedling",
+  "Dialogue": "AdventureQuests_SeedlingIntro",
+  "Answer": "Accept",
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_SeedlingFeathersLight"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

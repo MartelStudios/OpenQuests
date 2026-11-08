@@ -1,0 +1,56 @@
+{
+  "Display": "Cinematic",
+  "Pages": [
+    {
+      "Text": "adventurequests.temple.stag.seeds.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.temple.stag.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_StagWheat",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_StagWheat"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.stag.give",
+      "When": {
+        "Type": "RequiresQuest",
+        "QuestAssetId": "AdventureQuests_StagLettuce",
+        "States": [
+          "InProgress"
+        ]
+      },
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_StagLettuce"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.temple.stag.leave",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

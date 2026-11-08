@@ -1,0 +1,70 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_SeedlingFeathersLight",
+          "States": [
+            "InProgress",
+            "Successful",
+            "Failed",
+            "Abandoned"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_SeedlingIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_SeedlingRainbow",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_SeedlingRainbow"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_SeedlingRainbow",
+          "States": [
+            "Successful"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_SeedlingThanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_SeedlingShardsGreen",
+          "States": [
+            "InProgress",
+            "Successful",
+            "Failed",
+            "Abandoned"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_SeedlingFeathers"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_SeedlingShards"
+        }
+      }
+    ]
+  }
+}

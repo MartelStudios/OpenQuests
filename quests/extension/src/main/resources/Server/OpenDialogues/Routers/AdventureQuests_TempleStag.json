@@ -1,0 +1,41 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_StagWheat",
+          "States": [
+            "InProgress",
+            "Successful",
+            "Failed",
+            "Abandoned"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_StagIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_StagEternalRoots",
+          "States": [
+            "Successful"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_StagContent"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_StagIdle"
+        }
+      }
+    ]
+  }
+}

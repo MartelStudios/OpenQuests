@@ -50,7 +50,7 @@ A router picks a dialogue from what the player did: a welcome the first time, so
 it was read. Routers live under `Server/OpenDialogues/Routers/` (type **OpenDialogueRouterAsset**)
 and hold a `Selector`. A target (`Then`, `Default`) is `{ "Dialogue": … }` or `{ "Router": … }`,
 each an id or written inline, so routers nest. A target leading to no dialogue counts as a route
-that does not hold, and the selector moves on. See `OpenQuestsExamples_Plush` in the OpenQuests Examples pack.
+that does not hold, and the selector moves on. See `AdventureQuests_Plush` in the Hytale Adventure Quests pack.
 
 | Selector type | Picks |
 | --- | --- |
@@ -180,7 +180,7 @@ The plugin's `Characters.json` holds `ScanRadius` (blocks around each player, 24
 With OpenQuests and the OpenQuestsDialogues bridge, quests aim at a character: `Dialogue` (talk to
 it, or pick an answer) and `Deliver` (bring it items, which takes over F while the quest runs). A
 quest aimed at a `Forever` + `Universe` character fails once that character is lost. See the
-Forgotten Temple and Kweebec village characters in the OpenQuests Examples pack.
+Forgotten Temple and Kweebec village characters in the Hytale Adventure Quests pack.
 
 ## Extending
 

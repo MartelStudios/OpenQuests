@@ -1,0 +1,17 @@
+{
+  "Uniqueness": "Forever",
+  "Scope": "Universe",
+  "MapVisibility": "Never",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_TempleStag"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_StagNames"
+    }
+  ]
+}

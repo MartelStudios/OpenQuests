@@ -18,8 +18,8 @@ on:
         description: 'Version of the OpenQuests Dialogues bridge to publish, or empty to leave it out'
         required: false
         default: ''
-      examples_version:
-        description: 'Version of the OpenQuests Examples pack to publish, or empty to leave it out'
+      adventurequests_version:
+        description: 'Version of the Hytale Adventure Quests pack to publish, or empty to leave it out'
         required: false
         default: ''
       mmoskilltree_version:
@@ -46,7 +46,7 @@ jobs:
           VERSION: ${{ inputs.version }}
           DIALOGUES_VERSION: ${{ inputs.dialogues_version }}
           BRIDGE_VERSION: ${{ inputs.openquestsdialogues_version }}
-          EXAMPLES_VERSION: ${{ inputs.examples_version }}
+          ADVENTUREQUESTS_VERSION: ${{ inputs.adventurequests_version }}
           PACK_VERSION: ${{ inputs.mmoskilltree_version }}
         run: |
           FILES=""
@@ -63,8 +63,8 @@ jobs:
             TAGS+=("openquestsdialogues-v$BRIDGE_VERSION")
             FILES+=$'mods/openquestsdialogues/build/libs/*.jar\n'
           fi
-          if [[ -n "$EXAMPLES_VERSION" ]]; then
-            TAGS+=("examples-v$EXAMPLES_VERSION")
+          if [[ -n "$ADVENTUREQUESTS_VERSION" ]]; then
+            TAGS+=("adventurequests-v$ADVENTUREQUESTS_VERSION")
             FILES+=$'quests/extension/build/distributions/*.zip\n'
           fi
           if [[ -n "$PACK_VERSION" ]]; then
@@ -107,7 +107,7 @@ jobs:
           VERSION: ${{ inputs.version }}
           DIALOGUES_VERSION: ${{ inputs.dialogues_version }}
           BRIDGE_VERSION: ${{ inputs.openquestsdialogues_version }}
-          EXAMPLES_VERSION: ${{ inputs.examples_version }}
+          ADVENTUREQUESTS_VERSION: ${{ inputs.adventurequests_version }}
           PACK_VERSION: ${{ inputs.mmoskilltree_version }}
         run: |
           if [[ -n "$VERSION" ]]; then
@@ -119,8 +119,8 @@ jobs:
           if [[ -n "$BRIDGE_VERSION" ]]; then
             sed -i "s/^openquestsdialogues_version = .*/openquestsdialogues_version = $BRIDGE_VERSION/" mods/openquestsdialogues/gradle.properties
           fi
-          if [[ -n "$EXAMPLES_VERSION" ]]; then
-            sed -i "s/^examples_version = .*/examples_version = $EXAMPLES_VERSION/" quests/extension/gradle.properties
+          if [[ -n "$ADVENTUREQUESTS_VERSION" ]]; then
+            sed -i "s/^adventurequests_version = .*/adventurequests_version = $ADVENTUREQUESTS_VERSION/" quests/extension/gradle.properties
           fi
           if [[ -n "$PACK_VERSION" ]]; then
             sed -i "s/^mmoskilltree_version = .*/mmoskilltree_version = $PACK_VERSION/" mods/mmoskilltree/gradle.properties
@@ -172,18 +172,18 @@ jobs:
       matrix:
         include:
           - name: OpenQuests
-            relations: openquests-core:requiredDependency,opennavigation:requiredDependency,openquests-examples:optionalDependency
+            relations: openquests-core:requiredDependency,opennavigation:requiredDependency,hytale-adventure-quests:optionalDependency
             project_id: '1678106'
             file: quests/extension/build/libs/OpenQuests-*.jar
           - name: OpenQuests Core
             relations: ''
             project_id: '1678101'
             file: quests/core/build/libs/OpenQuestsCore-*.jar
-          - name: OpenQuests Examples
+          - name: Hytale Adventure Quests
             relations: openquests:requiredDependency,openquests-dialogues:requiredDependency
             project_id: '1680200'
-            file: quests/extension/build/distributions/OpenQuestsExamples-*.zip
-            version_input: examples_version
+            file: quests/extension/build/distributions/HytaleAdventureQuests-*.zip
+            version_input: adventurequests_version
           - name: OpenDialogues
             relations: ''
             project_id: '1775215'

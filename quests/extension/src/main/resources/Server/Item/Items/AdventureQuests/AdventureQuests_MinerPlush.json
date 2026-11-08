@@ -1,0 +1,18 @@
+{
+  "Parent": "Deco_Goblin_Plush",
+  "TranslationProperties": {
+    "Name": "adventurequests.plush.item.name",
+    "Description": "adventurequests.plush.item.description"
+  },
+  "MaxStack": 1,
+  "Interactions": {
+    "Secondary": {
+      "Interactions": [
+        {
+          "Type": "OpenDialoguesOpen",
+          "Dialogue": "AdventureQuests_Plush"
+        }
+      ]
+    }
+  }
+}

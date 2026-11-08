@@ -1,0 +1,23 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/PortalKey_Goblin_Breach.png",
+  "Categories": [
+    "Temple"
+  ],
+  "TitleKey": "adventurequests.quest.labthrough.title",
+  "DescriptionKey": "adventurequests.quest.labthrough.description",
+  "ShortDescriptionKey": "adventurequests.quest.labthrough.short",
+  "QuestAssetIds": [
+    "AdventureQuests_LabThroughEnter",
+    "AdventureQuests_LabThroughTell"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "PortalKey_The_Deepworks",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

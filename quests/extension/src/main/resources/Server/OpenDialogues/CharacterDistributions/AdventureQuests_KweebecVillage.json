@@ -1,0 +1,9 @@
+{
+  "Filters": [ { "Type": "Group", "Groups": ["Kweebec_Civilian"] } ],
+  "Characters": [
+    { "Character": "AdventureQuests_KweebecFarmer", "Weight": 3 },
+    { "Character": "AdventureQuests_KweebecMage", "Weight": 1 },
+    { "Character": "AdventureQuests_KweebecChild", "Weight": 1 },
+    { "Weight": 5 }
+  ]
+}

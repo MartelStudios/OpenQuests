@@ -1,0 +1,177 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_GuardTaleRevenant",
+          "States": [
+            "InProgress",
+            "Successful",
+            "Failed",
+            "Abandoned"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_GuardIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_GuardTaleRevenantBoss",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_GuardTaleRevenantTell",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_GuardTaleRevenant"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_GuardTaleGluttonBoss",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_GuardTaleGluttonTell",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_GuardTaleGlutton"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_GuardTaleVoidtakenBoss",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_GuardTaleVoidtakenTell",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_GuardTaleVoidtaken"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_GuardTaleHeartBoss",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_GuardTaleHeartTell",
+              "States": [
+                "InProgress"
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_GuardTaleHeart"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_GuardRuneRevenantShow",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_GuardRuneRevenant"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_GuardRuneGluttonShow",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_GuardRuneGlutton"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_GuardRuneVoidtakenShow",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_GuardRuneVoidtaken"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_GuardRuneHeartShow",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_GuardRuneHeart"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_GuardDream"
+        }
+      }
+    ]
+  }
+}

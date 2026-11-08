@@ -1,0 +1,22 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Temple_Deer_Stag"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-(forgotten-temple-goblins|Forgotten_Temple-.*)"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_TempleStag",
+      "Weight": 1
+    }
+  ]
+}
