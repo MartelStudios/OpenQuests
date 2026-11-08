@@ -66,6 +66,8 @@ public class OpenDialogueCharacterDistributionAsset implements JsonAssetWithMap<
                                                                                                            .add()
                                                                                                            .appendInherited(new KeyedCodec<>("Characters", new ArrayCodec<>(Entry.CODEC, Entry[]::new)), (distribution, entries) -> distribution.entries = entries, distribution -> distribution.entries, (distribution, parent) -> distribution.entries = parent.entries)
                                                                                                            .add()
+                                                                                                           .appendInherited(new KeyedCodec<>("OverrideInteraction", Codec.BOOLEAN), (distribution, override) -> distribution.overrideInteraction = override, distribution -> distribution.overrideInteraction, (distribution, parent) -> distribution.overrideInteraction = parent.overrideInteraction)
+                                                                                                           .add()
                                                                                                            .build();
 
     protected String id;
@@ -76,6 +78,8 @@ public class OpenDialogueCharacterDistributionAsset implements JsonAssetWithMap<
     private CharacterFilter[] filters = new CharacterFilter[0];
 
     private Entry[] entries = new Entry[0];
+
+    private boolean overrideInteraction;
 
     protected OpenDialogueCharacterDistributionAsset() {}
 
@@ -112,5 +116,12 @@ public class OpenDialogueCharacterDistributionAsset implements JsonAssetWithMap<
     @Nonnull
     public Entry[] getEntries() {
         return entries;
+    }
+
+    /**
+     * @return whether it also draws for NPCs whose role answers F itself, its character then answering instead.
+     */
+    public boolean overridesInteraction() {
+        return overrideInteraction;
     }
 }

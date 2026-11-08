@@ -44,7 +44,7 @@ class CharacterServiceTest {
     private final UniqueCharacters unique = new UniqueCharacters();
     private final UniverseCharacters universe = new UniverseCharacters();
     private final List<OpenDialoguesNPCIdentity> saved = new ArrayList<>();
-    private boolean eligible = true;
+    private NpcEligibility eligible = NpcEligibility.Plain;
 
     @BeforeEach
     void listen() {
@@ -122,7 +122,7 @@ class CharacterServiceTest {
     @Test
     void giveRefusesIneligibleNpc() {
         character("Mira", "None", AB);
-        eligible = false;
+        eligible = NpcEligibility.None;
 
         assertRefused(service(), npc(), "Mira");
     }
@@ -183,6 +183,21 @@ class CharacterServiceTest {
 
         assertEquals("Mira", npc.identity().getCharacter());
         assertEquals(Set.of("Village"), npc.identity().getDraws());
+    }
+
+    @Test
+    void npcWithOwnInteractionDrawsOnlyFromOverridingDistributions() {
+        character("Mira", "None", AB);
+        character("Oak", "None", AB);
+        distributions.add(CharacterFixtures.distribution("A", "{ \"Priority\": 5, \"Characters\": [ { \"Character\": \"Mira\" } ] }"));
+        distributions.add(CharacterFixtures.distribution("B", "{ \"OverrideInteraction\": true, \"Characters\": [ { \"Character\": \"Oak\" } ] }"));
+        eligible = NpcEligibility.OwnInteraction;
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+
+        assertFalse(service.give(npc, "Mira"));
+        assertEquals("Oak", service.draw(npc, kweebec("Zone1")));
+        assertEquals(Set.of("B"), npc.identity().getDraws());
     }
 
     @Test
@@ -610,7 +625,7 @@ class CharacterServiceTest {
     @Test
     void assignToIneligibleNpc() {
         character("Mira", "None", AB);
-        eligible = false;
+        eligible = NpcEligibility.None;
 
         assertEquals(CharacterService.AssignResult.Ineligible, service().assign(npc(), "Mira"));
     }

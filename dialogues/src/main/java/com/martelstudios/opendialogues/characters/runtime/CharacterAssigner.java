@@ -35,13 +35,15 @@ public final class CharacterAssigner {
      * Distributions draw by priority then id, once each. One whose filters fail, or with no entry left
      * to give, draws nothing yet, so the NPC may still draw from it later or elsewhere.
      *
-     * @param alreadyDrawn the distributions that drew for the NPC before, left untouched.
-     * @param warnings     where a filter that throws is reported; its distribution then does not hold.
+     * @param alreadyDrawn   the distributions that drew for the NPC before, left untouched.
+     * @param ownInteraction whether the NPC's role answers F itself: only distributions overriding it draw.
+     * @param warnings       where a filter that throws is reported; its distribution then does not hold.
      */
     @Nonnull
-    public static Draw assign(@Nonnull Set<String> alreadyDrawn, @Nonnull List<OpenDialogueCharacterDistributionAsset> distributions, @Nonnull FilterContext context, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings) {
+    public static Draw assign(@Nonnull Set<String> alreadyDrawn, @Nonnull List<OpenDialogueCharacterDistributionAsset> distributions, @Nonnull FilterContext context, boolean ownInteraction, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings) {
         List<String> drawn = new ArrayList<>();
         for (OpenDialogueCharacterDistributionAsset distribution : distributions.stream().sorted(ORDER).toList()) {
+            if (ownInteraction && !distribution.overridesInteraction()) continue;
             if (alreadyDrawn.contains(distribution.getId()) || !holds(distribution, context, warnings)) continue;
 
             OpenDialogueCharacterDistributionAsset.Entry entry = CharacterDraw.draw(List.of(distribution.getEntries()), available, random);

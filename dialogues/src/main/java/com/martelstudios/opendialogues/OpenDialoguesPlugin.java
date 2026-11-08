@@ -206,7 +206,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         universeCharactersType = Universe.registerResource(UniverseCharacters.class, "OpenDialoguesUniqueCharacters", UniverseCharacters.CODEC);
         CharacterAssets characterAssets = CharacterAssets.live();
-        characterService = new CharacterService(characterAssets, NpcEligibility::test, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
+        characterService = new CharacterService(characterAssets, NpcEligibility::of, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
         ResourceType<EntityStore, CharacterPositions> positionsType = getEntityStoreRegistry().registerResource(CharacterPositions.class, "OpenDialoguesCharacterPositions", CharacterPositions.CODEC);
         CharacterPositionsAccess positions = new CharacterPositionsAccess(positionsType, characterService);
         characterMarkers = new CharacterMarkerProvider(positions, player -> historyRecorder.history(player), characterAssets::character);
