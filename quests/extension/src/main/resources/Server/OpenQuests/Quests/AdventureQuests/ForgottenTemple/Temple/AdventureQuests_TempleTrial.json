@@ -57,6 +57,32 @@
       "AnnounceOutcome": false
     },
     {
+      "Type": "ReachPath",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.pillars.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.pillars.description",
+      "AnnounceOutcome": false,
+      "Positions": [
+        { "X": 5013.5, "Y": 161, "Z": 5022.5 },
+        { "X": 5011.5, "Y": 162, "Z": 5022.5 },
+        { "X": 5009.5, "Y": 162, "Z": 5023.5 },
+        { "X": 5008.5, "Y": 163, "Z": 5025.5 },
+        { "X": 5008.5, "Y": 164, "Z": 5027.5 },
+        { "X": 5009.5, "Y": 164, "Z": 5029.5 },
+        { "X": 5011.5, "Y": 164, "Z": 5030.5 },
+        { "X": 5013.5, "Y": 164, "Z": 5030.5 },
+        { "X": 5015.5, "Y": 163, "Z": 5029.5 },
+        { "X": 5016.5, "Y": 162, "Z": 5027.5 },
+        { "X": 5016.5, "Y": 162, "Z": 5025.5 }
+      ],
+      "Radius": 1.2,
+      "ResetOnFall": true,
+      "Marker": "Drop_Uncommon",
+      "FinalMarker": "Drop_Legendary",
+      "StepSound": "SFX_Drop_Items_Gems",
+      "ResetSound": "SFX_Incorrect_Tool",
+      "ResetMessageKey": "adventurequests.forgottentemple.quest.temple-trial.pillars.reset"
+    },
+    {
       "Type": "NoOp",
       "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.hold.title",
       "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.hold.description",
@@ -83,7 +109,7 @@
     },
     {
       "Type": "TimeLimit",
-      "Seconds": 180
+      "Seconds": 300
     }
   ],
   "SuccessfulRewards": [

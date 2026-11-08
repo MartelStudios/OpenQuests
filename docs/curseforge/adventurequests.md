@@ -32,7 +32,7 @@ Over sixty quests in eight chapters, in English and French. A whole campaign thr
 
 💀 **Defeat the Guardian** fails the moment you die, and hands itself straight back: try again. Then enter the temple and **talk to the merchant**: he sets you the temple's trial, and still opens his stall on request.
 
-⏱️ **The Temple's trial** gives you three minutes to run to the rune altar, sprint-jump ten times there, run for 20 seconds and explore for a minute. Leaving the temple or dying fails the whole trial.
+⏱️ **The Temple's trial** gives you five minutes to run to the rune altar, sprint-jump ten times there, climb the colonnade pillar to pillar following a green light, run for 20 seconds and explore for a minute. Leaving the temple or dying fails the whole trial.
 
 🏅 **Flawless** stays a secret until you pass the trial without ever having failed it.
 
