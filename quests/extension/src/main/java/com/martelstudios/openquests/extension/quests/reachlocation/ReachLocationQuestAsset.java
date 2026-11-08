@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.math.vector.Vector3dUtil;
+import com.hypixel.hytale.server.core.asset.type.particle.config.ParticleSystem;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.targets.QuestTarget;
@@ -14,7 +15,7 @@ import javax.annotation.Nullable;
 
 /**
  * Reach a spot within a radius. Shown on the map, and on the compass once tracked, unless the asset
- * says {@code ShowOnMap: false}.
+ * says {@code ShowOnMap: false}. {@code Marker} names a particle system shown on the spot.
  */
 public class ReachLocationQuestAsset extends OpenQuestAsset implements TargetedQuest {
 
@@ -26,11 +27,16 @@ public class ReachLocationQuestAsset extends OpenQuestAsset implements TargetedQ
             .add()
             .append(new KeyedCodec<>("ShowOnMap", Codec.BOOLEAN), (asset, show) -> asset.showOnMap = show, asset -> asset.showOnMap)
             .add()
+            .append(new KeyedCodec<>("Marker", Codec.STRING), (asset, marker) -> asset.marker = marker, asset -> asset.marker)
+            .addValidator(ParticleSystem.VALIDATOR_CACHE.getValidator())
+            .add()
             .build();
 
     protected Vector3d position;
     protected double radius;
     protected boolean showOnMap = true;
+    @Nullable
+    protected String marker;
 
     private ReachLocationQuestAsset() {}
 
@@ -51,5 +57,13 @@ public class ReachLocationQuestAsset extends OpenQuestAsset implements TargetedQ
 
     public double getRadius() {
         return radius;
+    }
+
+    /**
+     * @return the particle system shown on the spot to its players while they run the quest, if any.
+     */
+    @Nullable
+    public String getMarker() {
+        return marker;
     }
 }
