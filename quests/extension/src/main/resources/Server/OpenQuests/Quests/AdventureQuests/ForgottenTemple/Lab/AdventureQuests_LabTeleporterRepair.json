@@ -1,5 +1,5 @@
 {
-  "Type": "GameFlag",
+  "Type": "ReachValue",
   "TitleKey": "adventurequests.forgottentemple.quest.lab-teleporter.short",
-  "Flag": "goblin_lab_teleporter"
+  "Source": { "Type": "GameFlag", "Flag": "goblin_lab_teleporter" }
 }

@@ -41,7 +41,7 @@ what she can no longer hear, and the chain goes on without her.
 `LabGenerator` grants `AdventureQuests_MeetScientist`, an `Or` of the `Accept` answer of
 `ScientistGateway` and `AdventureQuests_LabAllRepaired` (`And` of all seven lab flags, with
 `Visibility: WhenSuccessful` and `AnnounceOutcome: false`, so it shows only once it won; its flags stay `Never`).
-Each repair below is a composite: `Lab<Device>Repair` (`GameFlag`), then an `Or` of
+Each repair below is a composite: `Lab<Device>Repair` (`ReachValue` on a `GameFlag` source), then an `Or` of
 `Lab<Device>Talk` (`Dialogue` on `ScientistReport<Device>`, opened by her router once the repair is
 done) and `LabAllRepaired`. In chapter `AdventureQuests_ForgottenTemple`.
 
@@ -54,7 +54,7 @@ done) and `LabAllRepaired`. In chapter `AdventureQuests_ForgottenTemple`.
 | `AdventureQuests_LabCompressor` | `goblin_lab_recipe_c` | 2 dubious assemblies | `LabConsole` |
 | `AdventureQuests_LabConsole` | `goblin_breach_duration` | 3 void crystals | `LabThrough`, back to the young Kweebec |
 
-The three machines run in parallel. `LabConsole` is a plain `GameFlag`, without a report: `MaxQuests`
+The three machines run in parallel. `LabConsole` is a plain `ReachValue` on a game flag, without a report: `MaxQuests`
 1 keeps the three grants to one quest, and `RequiresQuest` on each machine holds its progress back
 until all three are done. Each machine's report answers "What now?" with what
 `ScientistRepairsLeft` picks from how many are done.
@@ -79,7 +79,7 @@ hide (engine), Voidhearts (compressor, console).
 ## Decision log
 
 - 2026-11-03: carried by the vanilla scientist, quests around the lab repairs through a new
-  `GameFlag` objective, since a repair fires no event (user).
+  `ReachValue` objective on a game flag, since a repair fires no event (user).
 - 2026-11-03: the lab quests sit in the ForgottenTemple chapter (the lab is in the temple, and the
   GoblinBreach chapter is a positioned graph built from `GrantQuest` links).
 - 2026-11-04: name tag "Machinarque", kept over an invented name (user).

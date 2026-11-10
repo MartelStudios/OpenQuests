@@ -1,5 +1,5 @@
 {
-  "Type": "GameFlag",
+  "Type": "ReachValue",
   "TitleKey": "adventurequests.forgottentemple.quest.lab-engine.short",
-  "Flag": "goblin_lab_recipe_b"
+  "Source": { "Type": "GameFlag", "Flag": "goblin_lab_recipe_b" }
 }
