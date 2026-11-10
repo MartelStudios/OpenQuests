@@ -12,6 +12,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import org.joml.Vector3d;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;
@@ -55,14 +56,14 @@ public class ReachLocationTickingSystem extends EntityTickingSystem<EntityStore>
         progression.progress(new ReachPathQuestVisitor(playerRef, transform.getPosition(), states != null && states.onGround), listener.getQuestIds());
 
         for (UUID questId : listener.getQuestIds()) {
-            showMarker(playerRef, progression.getLiveQuest(questId));
+            showMarker(playerRef, transform.getPosition(), progression.getLiveQuest(questId));
         }
     }
 
     /**
      * Quests that ended are hidden by {@link QuestMarkers#hide}, called as they end.
      */
-    private void showMarker(@Nonnull PlayerRef playerRef, AbstractQuestProgression<?> quest) {
+    private void showMarker(@Nonnull PlayerRef playerRef, @Nonnull Vector3d at, AbstractQuestProgression<?> quest) {
         if (quest == null || quest.isOver()) return;
 
         Set<QuestMarkers.Marker> wanted = new HashSet<>();
@@ -75,6 +76,6 @@ public class ReachLocationTickingSystem extends EntityTickingSystem<EntityStore>
             }
         }
         wanted.removeIf(Objects::isNull);
-        markers.show(playerRef, quest.getId(), wanted);
+        markers.show(playerRef, at, quest.getId(), wanted);
     }
 }

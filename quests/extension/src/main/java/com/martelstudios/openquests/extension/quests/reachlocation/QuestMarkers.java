@@ -18,21 +18,26 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The particle markers each player is shown for their quests, sent to that player alone. A marker
- * is only sent again when it appears, or when the player changed world, which clears what their
- * client drew.
+ * is only sent again when it appears, when the player changed world, which clears what their
+ * client drew, or when the player comes back within {@link #RANGE} of it.
  */
 public final class QuestMarkers {
+
+    /** The client drops a particle system spawned farther away than this (seen between 30 and 40 blocks). */
+    private static final double RANGE = 30;
 
     private final Map<UUID, Map<UUID, Set<Marker>>> shown = new ConcurrentHashMap<>();
 
     /**
-     * Shows a quest's markers to a player, taking away those it no longer has.
+     * Shows a player standing at {@code at} the quest's markers near them, taking away the others.
      */
-    public void show(@Nonnull PlayerRef player, @Nonnull UUID questId, @Nonnull Set<Marker> wanted) {
+    public void show(@Nonnull PlayerRef player, @Nonnull Vector3d at, @Nonnull UUID questId, @Nonnull Set<Marker> wanted) {
         Map<UUID, Set<Marker>> quests = shown.computeIfAbsent(player.getUuid(), id -> new ConcurrentHashMap<>());
         UUID world = player.getWorldUuid();
         Set<Marker> next = new HashSet<>();
-        for (Marker marker : wanted) next.add(marker.in(world));
+        for (Marker marker : wanted) {
+            if (marker.position().distanceSquared(at) <= RANGE * RANGE) next.add(marker.in(world));
+        }
 
         Set<Marker> before = quests.getOrDefault(questId, Set.of());
         if (next.equals(before)) return;
