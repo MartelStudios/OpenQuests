@@ -4,6 +4,30 @@
     "Routes": [
       {
         "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_TalkToRootlingMerchant",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_MerchantIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_ReturnToMerchant",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_MerchantTrial"
+        }
+      },
+      {
+        "When": {
           "Type": "Composite",
           "Operator": "And",
           "Conditions": [

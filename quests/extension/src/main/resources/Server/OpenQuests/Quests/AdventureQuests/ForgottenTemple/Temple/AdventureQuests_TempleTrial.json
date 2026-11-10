@@ -26,11 +26,11 @@
         },
         {
           "Type": "NearPosition",
-          "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.near-altar",
+          "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.near-merchant",
           "Position": {
-            "X": 4976,
-            "Y": 158,
-            "Z": 4983
+            "X": 4992.5,
+            "Y": 157,
+            "Z": 4987.5
           },
           "Radius": 12
         }

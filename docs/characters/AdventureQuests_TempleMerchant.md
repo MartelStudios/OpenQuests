@@ -43,10 +43,11 @@ tourists, and fronts life essence to those who accept it.
   `Found`, `Relative`, anywhere) and explore the temple for a minute (`NoOp`, `InWorld` paused outside).
   Grants `AdventureQuests_ReturnToMerchant`.
 - `AdventureQuests_ReturnToMerchant`: `Dialogue` on `AdventureQuests_MerchantTrial`, answer `Accept`, where he
-  describes each trial. Grants `AdventureQuests_TempleTrial` (sprint jumps around him, the pillar course, a
-  20 second run); the same answer assigns it directly to a player without the return quest.
+  describes each trial. Grants `AdventureQuests_TempleTrial` (sprint jumps within 12 blocks of his stall at
+  4992.5 157 4987.5, the pillar course, a 20 second run); the same answer assigns it directly to a player without the return quest.
 
-The router opens his intro while neither `AdventureQuests_TempleStatue` nor `AdventureQuests_TempleTrial` was
+The router opens the dialogue of a running `AdventureQuests_TalkToRootlingMerchant` or
+`AdventureQuests_ReturnToMerchant` first, so a holder is never stuck on his greeting. Otherwise it opens his intro while neither `AdventureQuests_TempleStatue` nor `AdventureQuests_TempleTrial` was
 ever assigned, his trial dialogue once `AdventureQuests_TempleMemories` succeeded and the trial was never
 assigned, otherwise his greeting. Every dialogue keeps a `Trade` answer opening the native barter shop
 `Kweebec_Merchant` (`OpenBarterShop`), so his stock stays as vanilla.
@@ -68,3 +69,5 @@ assigned, otherwise his greeting. Every dialogue keeps a `Trade` answer opening 
 - 2026-11-10: before the trial, he sends the player to the memories statue, then to find at least 5
   memories while exploring the temple; back at his stall he describes each trial. The race to the altar
   and the minute of exploring moved out of the trial into these quests (user).
+- 2026-11-10: the sprint jumps count within 12 blocks of his stall, measured in game, not of the rune altar
+  17 blocks away; a running talk or return quest always gets its dialogue (tested in game).
