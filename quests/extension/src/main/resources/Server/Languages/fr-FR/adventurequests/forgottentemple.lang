@@ -6,7 +6,7 @@ dialogue.merchant-greeting.text=Te revoilà, client ! J'ai de l'essence, des gra
 dialogue.merchant.trade=Montre-moi tes marchandises.
 dialogue.merchant.bye=Une autre fois.
 dialogue.merchant-intro.page1=Une nouvelle tête ! Bienvenue à mon étal, le seul de ce côté du portail. Essence, graines, un peu de tout, pour qui peut payer.
-dialogue.merchant-intro.page2=Mais je ne commerce pas avec les touristes. Le temple a son épreuve : courir jusqu'à l'autel des runes, sauter, courir, tenir, le tout en trois minutes. Réussis-la et tu deviens client. Tiens, un peu d'essence à crédit, que tu saches que je suis sérieux.
+dialogue.merchant-intro.page2=Mais je ne commerce pas avec les touristes. Le temple a son épreuve : courir jusqu'à l'autel des runes, sauter, gravir les colonnes, courir, tenir, le tout en cinq minutes. Réussis-la et tu deviens client. Tiens, un peu d'essence à crédit, que tu saches que je suis sérieux.
 dialogue.merchant-intro.yes=Je relève ton épreuve.
 quest.defeat-forgotten-temple-guardian.title=Vaincre le Gardien
 quest.defeat-forgotten-temple-guardian.description=Le golem veille sur le temple depuis plus longtemps que quiconque s'en souvienne.
@@ -29,7 +29,7 @@ quest.temple-offering.in-temple=Dans le Temple de l'Oubli
 quest.temple-offering.near-altar=À moins de 6 blocs de l'autel des runes
 quest.temple-trial.title=L'épreuve du Temple
 quest.temple-trial.description=Le temple jauge ceux qui y entrent. Rares sont ceux qu'il juge dignes.
-quest.temple-trial.short=Réussissez les épreuves du temple en moins de trois minutes
+quest.temple-trial.short=Réussissez les épreuves du temple en moins de cinq minutes
 quest.temple-trial.in-temple=Rester dans le Temple de l'Oubli : en sortir fait échouer l'épreuve
 quest.temple-trial.warmup.title=Sauter en sprint près de l'autel
 quest.temple-trial.warmup.description=Sautez dix fois en sprintant, près de l'autel des runes sous la porte centrale du temple.
@@ -41,6 +41,8 @@ quest.temple-trial.run.title=Courez 20 secondes dans le temple
 quest.temple-trial.run.description=Courez 20 secondes en explorant les alentours du temple.
 quest.temple-trial.hold.title=Restez une minute à explorer le temple
 quest.temple-trial.hold.description=Passez au moins une minute dans le temple à le parcourir.
+quest.temple-trial.pillars.title=Gravir les colonnes du temple
+quest.temple-trial.pillars.description=Sautez de colonne en colonne dans la colonnade en ruine, en suivant la lumière verte.
 
 # Lab
 character.goblin-scientist.name=Machinarque

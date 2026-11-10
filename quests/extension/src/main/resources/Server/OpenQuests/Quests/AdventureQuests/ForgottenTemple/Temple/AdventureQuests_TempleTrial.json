@@ -57,6 +57,27 @@
       "AnnounceOutcome": false
     },
     {
+      "Type": "ReachPath",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.pillars.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.pillars.description",
+      "AnnounceOutcome": false,
+      "Locations": [
+        { "Position": { "X": 5013.5, "Y": 161, "Z": 5022.5 }, "Radius": 1.2, "Marker": "Drop_Legendary", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.00 },
+        { "Position": { "X": 5011.5, "Y": 162, "Z": 5022.5 }, "Radius": 1.2, "Marker": "Drop_Legendary", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.06 },
+        { "Position": { "X": 5009.5, "Y": 162, "Z": 5023.5 }, "Radius": 1.2, "Marker": "Drop_Legendary", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.12 },
+        { "Position": { "X": 5008.5, "Y": 163, "Z": 5025.5 }, "Radius": 1.2, "Marker": "Drop_Legendary", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.18 },
+        { "Position": { "X": 5008.5, "Y": 164, "Z": 5027.5 }, "Radius": 1.2, "Marker": "Drop_Legendary", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.24 },
+        { "Position": { "X": 5009.5, "Y": 164, "Z": 5029.5 }, "Radius": 1.2, "Marker": "Drop_Legendary", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.30 },
+        { "Position": { "X": 5011.5, "Y": 164, "Z": 5030.5 }, "Radius": 1.2, "Marker": "Drop_Legendary", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.36 },
+        { "Position": { "X": 5013.5, "Y": 164, "Z": 5030.5 }, "Radius": 1.2, "Marker": "Drop_Legendary", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.42 },
+        { "Position": { "X": 5015.5, "Y": 163, "Z": 5029.5 }, "Radius": 1.2, "Marker": "Drop_Legendary", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.48 },
+        { "Position": { "X": 5016.5, "Y": 162, "Z": 5027.5 }, "Radius": 1.2, "Marker": "Drop_Legendary", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.54 },
+        { "Position": { "X": 5016.5, "Y": 162, "Z": 5025.5 }, "Radius": 1.2, "Marker": "Drop_Uncommon", "Sound": "SFX_Drop_Items_Gems", "SoundPitch": 1.60 }
+      ],
+      "ResetOn": ["Skip", "Landing"],
+      "ResetSound": "SFX_Incorrect_Tool"
+    },
+    {
       "Type": "NoOp",
       "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.hold.title",
       "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.hold.description",
@@ -83,7 +104,7 @@
     },
     {
       "Type": "TimeLimit",
-      "Seconds": 180
+      "Seconds": 300
     }
   ],
   "SuccessfulRewards": [

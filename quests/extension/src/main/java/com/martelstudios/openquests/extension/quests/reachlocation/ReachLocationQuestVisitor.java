@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.quests.reachlocation;
 
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
@@ -13,24 +14,23 @@ import java.util.UUID;
  * asset's target position and radius.
  */
 public class ReachLocationQuestVisitor implements QuestVisitor<ReachLocationQuestProgression> {
-    private final UUID playerId;
+    private final PlayerRef player;
     private final Vector3d position;
 
-    public ReachLocationQuestVisitor(UUID playerId, Vector3d position) {
-        this.playerId = playerId;
+    public ReachLocationQuestVisitor(@Nonnull PlayerRef player, @Nonnull Vector3d position) {
+        this.player = player;
         this.position = position;
     }
 
     @Override
     public void progress(ReachLocationQuestProgression quest) {
-        if (!quest.getPlayers().contains(playerId)) return;
+        if (!quest.getPlayers().contains(player.getUuid())) return;
         if (quest.isOver()) return;
 
         var asset = quest.getAsset();
-        double radius = asset.getRadius();
-        if (position.distanceSquared(asset.getPosition()) > radius * radius) return;
+        if (!asset.contains(position)) return;
 
-        quest.apply(new AbstractQuestProgression.SetState(QuestState.SUCCESSFUL));
+        if (quest.apply(new AbstractQuestProgression.SetState(QuestState.SUCCESSFUL))) asset.playSound(player);
     }
 
     @Override
@@ -41,6 +41,6 @@ public class ReachLocationQuestVisitor implements QuestVisitor<ReachLocationQues
     @Nonnull
     @Override
     public UUID getActorId() {
-        return playerId;
+        return player.getUuid();
     }
 }

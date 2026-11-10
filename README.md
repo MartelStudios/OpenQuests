@@ -467,7 +467,8 @@ comes from.
 | `UseEntity` | Interacting with NPCs of a group a number of times. |
 | `KillNpc` | Killing NPCs of a group, either an existing one or one written inline. |
 | `KillPlayer` | Killing players, optionally a designated one. |
-| `ReachLocation` | Entering a radius around a position. Shown on the map, and on the compass while tracked, unless `"ShowOnMap": false`. |
+| `ReachLocation` | Entering a radius around a position. Shown on the map, and on the compass while tracked, unless `"ShowOnMap": false`. `Marker` names a particle system (`Drop_Uncommon` is the green glow of a dropped item) shown on the spot to its players while they run it; `Sound` plays to whoever reaches it, at `SoundPitch` (1 by default). |
+| `ReachPath` | Reaching every spot of `Locations`, each written like a `ReachLocation` (`Position`, `Radius`, `Marker`, `Sound`), in the order listed unless `"Ordered": false`. Only the spots still awaited show their marker. `ResetOn` lists what sends the count back to zero: `Skip`, reaching a spot ahead of the next one, and `Landing`, standing on solid ground outside every spot. `ResetSound` plays then. |
 | `EnterWorld` | Entering a world whose name matches a regular expression. |
 | `GameFlag` | A server game flag (`/gameflags list`) reaching `Level` (1 by default), such as `goblin_lab_power` once the goblin lab generator is repaired. Flags belong to the whole server: one repair completes the quest for everyone holding it, and a quest given afterwards completes at once. |
 | `TriggerVolume` | A `TriggerEventType` on trigger volumes whose whole name matches `VolumeNamePattern`, a number of times. Volumes pasted with a prefab keep their name, sometimes with a suffix, so this finds a spot in a generated world: `"(trash_pile_trigger\|enkindled_trigger_\|void_tower_trigger).*"` is the top of any breach watchtower. |

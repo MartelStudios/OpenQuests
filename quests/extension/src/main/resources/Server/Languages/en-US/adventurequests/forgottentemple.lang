@@ -6,7 +6,7 @@ dialogue.merchant-greeting.text=Back again, customer! I have essence, seeds and 
 dialogue.merchant.trade=Show me your wares.
 dialogue.merchant.bye=Another time.
 dialogue.merchant-intro.page1=A new face! Welcome to my stall, the only one this side of the portal. Essence, seeds, a little of everything, for those who can pay.
-dialogue.merchant-intro.page2=But I do not trade with tourists. The temple has its trial: race to the rune altar, jump, run, hold on, all in three minutes. Pass it and you are a customer. Here, some essence on credit, so you know I am serious.
+dialogue.merchant-intro.page2=But I do not trade with tourists. The temple has its trial: race to the rune altar, jump, climb the pillars, run, hold on, all in five minutes. Pass it and you are a customer. Here, some essence on credit, so you know I am serious.
 dialogue.merchant-intro.yes=I will take your trial.
 quest.defeat-forgotten-temple-guardian.title=Defeat the Guardian
 quest.defeat-forgotten-temple-guardian.description=The golem has stood watch over the temple for longer than anyone remembers.
@@ -29,7 +29,7 @@ quest.temple-offering.in-temple=Inside the Forgotten Temple
 quest.temple-offering.near-altar=Within 6 blocks of the rune altar
 quest.temple-trial.title=The Temple's trial
 quest.temple-trial.description=The temple measures those who enter it. Few are found worthy.
-quest.temple-trial.short=Complete the temple's trials within three minutes
+quest.temple-trial.short=Complete the temple's trials within five minutes
 quest.temple-trial.in-temple=Stay inside the Forgotten Temple: leaving fails the trial
 quest.temple-trial.warmup.title=Sprint-jump at the rune altar
 quest.temple-trial.warmup.description=Jump ten times while sprinting, close to the rune altar under the temple's central gate.
@@ -41,6 +41,8 @@ quest.temple-trial.run.title=Run through the temple for 20 seconds
 quest.temple-trial.run.description=Run for 20 seconds, exploring the temple grounds.
 quest.temple-trial.hold.title=Explore the temple for a minute
 quest.temple-trial.hold.description=Spend at least one minute inside the temple, looking around.
+quest.temple-trial.pillars.title=Climb the temple pillars
+quest.temple-trial.pillars.description=Jump from pillar to pillar in the ruined colonnade, following the green light.
 
 # Lab
 character.goblin-scientist.name=Makinomagistra
