@@ -19,7 +19,7 @@
     {
       "Type": "GrantQuest",
       "QuestAssetIds": [
-        "AdventureQuests_TempleTrial"
+        "AdventureQuests_TempleStatue"
       ],
       "AutoClaim": true
     }

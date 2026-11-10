@@ -26,23 +26,44 @@
       }
     },
     {
-      "Quest": "AdventureQuests_TempleTrial",
+      "Quest": "AdventureQuests_TempleStatue",
       "Position": {
         "X": 3,
         "Y": 0
       }
     },
     {
-      "Quest": "AdventureQuests_TempleOffering",
+      "Quest": "AdventureQuests_TempleMemories",
       "Position": {
         "X": 4,
         "Y": 0
       }
     },
     {
-      "Quest": "AdventureQuests_Flawless",
+      "Quest": "AdventureQuests_ReturnToMerchant",
+      "Position": {
+        "X": 5,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "AdventureQuests_TempleTrial",
       "Position": {
         "X": 6,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "AdventureQuests_TempleOffering",
+      "Position": {
+        "X": 7,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "AdventureQuests_Flawless",
+      "Position": {
+        "X": 9,
         "Y": 0
       }
     },

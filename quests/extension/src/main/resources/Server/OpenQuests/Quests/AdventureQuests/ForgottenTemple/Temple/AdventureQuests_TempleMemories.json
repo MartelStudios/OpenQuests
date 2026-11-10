@@ -1,0 +1,50 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Bench_Memories.png",
+  "Categories": ["AdventureQuests_Temple"],
+  "TitleKey": "adventurequests.forgottentemple.quest.temple-memories.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.temple-memories.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.temple-memories.short",
+  "CanBeAbandoned": false,
+  "AutoTrack": true,
+  "QuestAssetIds": [
+    {
+      "Type": "ReachValue",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-memories.find.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-memories.find.description",
+      "AnnounceOutcome": false,
+      "Source": { "Type": "Memories", "Measure": "Found" },
+      "Relative": true,
+      "TargetQuantity": 5
+    },
+    {
+      "Type": "NoOp",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-memories.hold.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-memories.hold.description",
+      "AnnounceOutcome": false,
+      "PersistProgression": false,
+      "Constraints": [
+        {
+          "Type": "InWorld",
+          "DescriptionKey": "adventurequests.forgottentemple.quest.temple-memories.in-temple",
+          "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)",
+          "OnLeave": "Pause"
+        },
+        {
+          "Type": "TimeLimit",
+          "Seconds": 60,
+          "OnExpire": "Successful"
+        }
+      ]
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_ReturnToMerchant"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

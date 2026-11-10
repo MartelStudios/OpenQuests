@@ -32,21 +32,32 @@ tourists, and fronts life essence to those who accept it.
 
 ## Quests and rewards
 
-`AdventureQuests_EnterForgottenTemple` grants `AdventureQuests_TalkToRootlingMerchant` (`Dialogue` on `AdventureQuests_MerchantIntro`,
-answer `Accept`), which rewards 100 `Ingredient_Life_Essence` and grants `AdventureQuests_TempleTrial`. A player
-without the talk quest gets the same answer assigning `AdventureQuests_TempleTrial` directly.
+`AdventureQuests_EnterForgottenTemple` grants `AdventureQuests_TalkToRootlingMerchant` (`Dialogue` on
+`AdventureQuests_MerchantIntro`, answer `Accept`), which rewards 100 `Ingredient_Life_Essence` and grants
+`AdventureQuests_TempleStatue`. A player without the talk quest gets the same answer assigning
+`AdventureQuests_TempleStatue` directly. The intro sends the player to the memories statue before any trial.
 
-The router opens his intro while `AdventureQuests_TempleTrial` was never assigned, otherwise his greeting. Every
-dialogue keeps a `Trade` answer opening the native barter shop `Kweebec_Merchant` (`OpenBarterShop`),
-so his stock stays as vanilla.
+- `AdventureQuests_TempleStatue`: composite, run to the rune altar (`ReachLocation`) and use the statue
+  `Bench_Memories` (`UseBlock`). Grants `AdventureQuests_TempleMemories`.
+- `AdventureQuests_TempleMemories`: composite, find at least 5 new memories (`ReachValue` on `Memories`
+  `Found`, `Relative`, anywhere) and explore the temple for a minute (`NoOp`, `InWorld` paused outside).
+  Grants `AdventureQuests_ReturnToMerchant`.
+- `AdventureQuests_ReturnToMerchant`: `Dialogue` on `AdventureQuests_MerchantTrial`, answer `Accept`, where he
+  describes each trial. Grants `AdventureQuests_TempleTrial` (sprint jumps around him, the pillar course, a
+  20 second run); the same answer assigns it directly to a player without the return quest.
+
+The router opens his intro while neither `AdventureQuests_TempleStatue` nor `AdventureQuests_TempleTrial` was
+ever assigned, his trial dialogue once `AdventureQuests_TempleMemories` succeeded and the trial was never
+assigned, otherwise his greeting. Every dialogue keeps a `Trade` answer opening the native barter shop
+`Kweebec_Merchant` (`OpenBarterShop`), so his stock stays as vanilla.
 
 ## Assets
 
 - `OpenDialogues/Characters/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_TempleMerchant.json`
 - `OpenDialogues/CharacterDistributions/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_TempleMerchant.json`
 - `OpenDialogues/Routers/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_TempleMerchant.json`
-- `OpenDialogues/Dialogues/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_MerchantIntro.json`, `AdventureQuests_MerchantGreeting.json`
-- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_TalkToRootlingMerchant.json`, chapter `AdventureQuests_ForgottenTemple`
+- `OpenDialogues/Dialogues/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_MerchantIntro.json`, `AdventureQuests_MerchantTrial.json`, `AdventureQuests_MerchantGreeting.json`
+- `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Temple/AdventureQuests_TalkToRootlingMerchant.json`, `AdventureQuests_TempleStatue.json`, `AdventureQuests_TempleMemories.json`, `AdventureQuests_ReturnToMerchant.json`, chapter `AdventureQuests_ForgottenTemple`
 - Lang keys in `Languages/*/adventurequests/forgottentemple.lang`, section `# Temple`
 
 ## Decision log
@@ -54,3 +65,6 @@ so his stock stays as vanilla.
 - 2026-11-08: the merchant takes over the native F to give the temple trial; a `Trade` answer is
   always there to open his native barter shop (user).
 - 2026-11-08: he gives only `AdventureQuests_TempleTrial`, the quest that follows talking to him (user).
+- 2026-11-10: before the trial, he sends the player to the memories statue, then to find at least 5
+  memories while exploring the temple; back at his stall he describes each trial. The race to the altar
+  and the minute of exploring moved out of the trial into these quests (user).

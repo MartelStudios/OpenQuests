@@ -1,0 +1,43 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Bench_Memories.png",
+  "Categories": ["AdventureQuests_Temple"],
+  "TitleKey": "adventurequests.forgottentemple.quest.temple-statue.title",
+  "DescriptionKey": "adventurequests.forgottentemple.quest.temple-statue.description",
+  "ShortDescriptionKey": "adventurequests.forgottentemple.quest.temple-statue.short",
+  "CanBeAbandoned": false,
+  "AutoTrack": true,
+  "QuestAssetIds": [
+    {
+      "Type": "ReachLocation",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-statue.race.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-statue.race.description",
+      "AnnounceOutcome": false,
+      "Position": {
+        "X": 4976,
+        "Y": 158,
+        "Z": 4983
+      },
+      "Radius": 6
+    },
+    {
+      "Type": "UseBlock",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-statue.use.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-statue.use.description",
+      "TargetQuantity": 1,
+      "AnnounceOutcome": false,
+      "BlockToUse": {
+        "ItemId": "Bench_Memories"
+      }
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_TempleMemories"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

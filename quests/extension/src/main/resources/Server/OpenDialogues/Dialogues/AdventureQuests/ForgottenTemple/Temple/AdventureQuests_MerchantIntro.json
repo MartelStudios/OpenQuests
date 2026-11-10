@@ -41,7 +41,7 @@
       "Actions": [
         {
           "Type": "AssignQuest",
-          "Quest": "AdventureQuests_TempleTrial"
+          "Quest": "AdventureQuests_TempleStatue"
         },
         {
           "Type": "Close"
