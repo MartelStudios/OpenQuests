@@ -38,6 +38,17 @@ Project rules for coding agents working in this repo. Generic Hytale platform le
 - Deleting `run/universe` for a fresh save is allowed; back it up first.
 - Never delete or rename a quest asset while the user's server runs: hot reload crashes every world holding that quest.
 - When the main checkout runs the user's server, work in a separate worktree.
+- An OpenDialogues character's NPC uuid is in `universe/resources/OpenDialoguesUniqueCharacters.json`; locate it with `/entity dump --entity=<uuid>`.
+- A copied universe can hold a character claim `Consumed: true`: OpenQuests Dialogues then fails every quest aimed at that character on creation. `/ocharacters reset dead` frees it.
+
+## Runtime pitfalls
+
+- `QuestLoadedEvent` fires inside `registerQuest`, before `assignQuest` adds the player and before the quest reaches the player store (queued). A listener failing a quest there finds no holder; a quest failed with nobody is never saved yet its id lands in the store. Check new quests on `QuestAddedToPlayerStoreEvent` instead (OpenQuestsDialogues `LostCharacterQuests`).
+- The Node Editor cannot be extended beyond world generation, so OpenDialogues dropped it for native Asset Editor declarations.
+
+## Cinematic dialogue display
+
+- Modelled on Endgame & QoL's dialogue look: full-width bottom group on a vertical black gradient, a white band texture with HorizontalBorder 180 tinted dark gold as hover background, `FontName: "Secondary"` uppercase names with LetterSpacing. OpenDialogues `Cinematic/CinematicPage.ui`.
 
 ## CurseForge page
 
