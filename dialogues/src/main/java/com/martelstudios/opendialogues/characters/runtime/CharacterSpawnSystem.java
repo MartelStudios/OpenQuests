@@ -72,7 +72,7 @@ public class CharacterSpawnSystem extends RefSystem<EntityStore> {
                 service.apply(npc);
             } else if (settings.get().isDraws()) {
                 int drawsBefore = npc.identity().getDraws().size();
-                String drawn = service.draw(npc, context(store, ref, world, entity));
+                String drawn = service.draw(npc, context(store, ref, world, entity)).character();
                 if (npc.identity().getDraws().size() != drawsBefore) LOGGER.atFine().log("NPC %s (%s) drew %s.", npc.uuid(), entity.getRoleName(), drawn == null ? "nobody" : "character '" + drawn + "'");
             }
             positions.record(store, ref, npc);

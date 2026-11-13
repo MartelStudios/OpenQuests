@@ -52,6 +52,8 @@ public class CharacterService {
     private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
     private final ResourceType<EntityStore, UniqueCharacters> uniqueType;
     private final Supplier<UniverseCharacters> universe;
+    private static final CharacterAssigner.Draw NOTHING = new CharacterAssigner.Draw(List.of(), null, List.of());
+
     private final Set<String> reported = ConcurrentHashMap.newKeySet();
     private final Map<String, OpenDialogueCharacterAsset> lastKnown = new ConcurrentHashMap<>();
     private final List<Predicate<String>> demands = new CopyOnWriteArrayList<>();
@@ -143,19 +145,20 @@ public class CharacterService {
     /**
      * Lets the distributions holding for an eligible NPC draw for it, recording each draw for good.
      *
-     * @return the id of the character given, {@code null} when the NPC stays nobody for now.
+     * @return what was drawn, its character {@code null} unless the NPC now carries it.
      */
-    @Nullable
-    String draw(@Nonnull CharacterNpc npc, @Nonnull FilterContext context) {
+    @Nonnull
+    CharacterAssigner.Draw draw(@Nonnull CharacterNpc npc, @Nonnull FilterContext context) {
         NpcEligibility eligible = eligibility.apply(npc.accessor(), npc.ref());
-        if (npc.identity().getCharacter() != null || !eligible.allows(true)) return null;
+        if (npc.identity().getCharacter() != null || !eligible.allows(true)) return NOTHING;
         CharacterEvent.Drawing drawing = events.dispatchFor(CharacterEvent.Drawing.class, null).dispatch(new CharacterEvent.Drawing(context));
-        if (drawing.isCancelled()) return null;
+        if (drawing.isCancelled()) return NOTHING;
 
         CharacterAssigner.Draw draw = CharacterAssigner.assign(npc.identity().getDraws(), List.copyOf(assets.distributions()), context, eligible == NpcEligibility.OwnInteraction, id -> npc.unique().isAvailable(id, assets::character), random, this::warnOnce);
         draw.drawn().forEach(npc.identity()::recordDraw);
         if (!draw.drawn().isEmpty()) stamp(npc, universe.get().generation());
-        return draw.character() != null && give(npc, draw.character(), true) ? draw.character() : null;
+        boolean given = draw.character() != null && give(npc, draw.character(), true);
+        return given ? draw : new CharacterAssigner.Draw(draw.drawn(), null, draw.blocked());
     }
 
     /**

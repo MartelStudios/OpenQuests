@@ -168,7 +168,7 @@ class CharacterServiceTest {
         bus.registerGlobal(CharacterEvent.Drawing.class, drawing -> drawing.setCancelled(true));
         CharacterNpc npc = npc();
 
-        assertNull(service().draw(npc, kweebec("Zone1")));
+        assertNull(service().draw(npc, kweebec("Zone1")).character());
 
         assertEquals(Set.of(), npc.identity().getDraws());
     }
@@ -179,7 +179,7 @@ class CharacterServiceTest {
         distribution("Village", "{ \"Character\": \"Mira\" }");
         CharacterNpc npc = npc();
 
-        assertEquals("Mira", service().draw(npc, kweebec("Zone1")));
+        assertEquals("Mira", service().draw(npc, kweebec("Zone1")).character());
 
         assertEquals("Mira", npc.identity().getCharacter());
         assertEquals(Set.of("Village"), npc.identity().getDraws());
@@ -196,7 +196,7 @@ class CharacterServiceTest {
         CharacterNpc npc = npc();
 
         assertFalse(service.give(npc, "Mira"));
-        assertEquals("Oak", service.draw(npc, kweebec("Zone1")));
+        assertEquals("Oak", service.draw(npc, kweebec("Zone1")).character());
         assertEquals(Set.of("B"), npc.identity().getDraws());
     }
 
@@ -207,7 +207,7 @@ class CharacterServiceTest {
         eligible = NpcEligibility.ModInteraction;
         CharacterNpc npc = npc();
 
-        assertNull(service().draw(npc, kweebec("Zone1")));
+        assertNull(service().draw(npc, kweebec("Zone1")).character());
         assertEquals(Set.of(), npc.identity().getDraws());
     }
 
@@ -341,7 +341,7 @@ class CharacterServiceTest {
         assertEquals(Set.of("D1"), npc.identity().getDraws());
         assertNull(unique.claimant("Gone"));
         assertEquals(1, warnings.size());
-        assertEquals("Mira", service.draw(npc, kweebec("Zone1")));
+        assertEquals("Mira", service.draw(npc, kweebec("Zone1")).character());
     }
 
     @Test
@@ -416,8 +416,8 @@ class CharacterServiceTest {
         distribution("B", "{ \"Character\": \"Oak\" }");
         CharacterService service = service();
 
-        assertEquals("Oak", service.draw(npc(), kweebec("Zone1")));
-        service.draw(npc(), kweebec("Zone1"));
+        assertEquals("Oak", service.draw(npc(), kweebec("Zone1")).character());
+        service.draw(npc(), kweebec("Zone1")).character();
 
         assertEquals(1, warnings.size());
         assertTrue(warnings.getFirst().contains("A"));
