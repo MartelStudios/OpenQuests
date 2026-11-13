@@ -138,6 +138,7 @@ that cannot be delivered, full inventory or player offline, waits for them. Noth
 |-------------------------------|----------------------------------------------------------------|
 | <code>TimeLimit</code>        | Ends the quest after a number of seconds, failed or successful |
 | <code>Deadline</code>         | Ends every quest from the asset at a set date                  |
+| <code>Within</code>           | Makes a count a combo: reach it in time or start again         |
 | <code>InWorld</code>          | Only counts in some worlds; leaving can fail the quest         |
 | <code>NearPosition</code>     | Only counts within a radius of a position                      |
 | <code>EntityCondition</code>  | Only counts while sprinting, out of combat, under an effect…   |

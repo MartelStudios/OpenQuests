@@ -5,8 +5,12 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestAsset;
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.Duration;
 
 /**
@@ -32,5 +36,15 @@ public class WithinConstraint extends QuestConstraint {
     @Nonnull
     public Duration getWindow() {
         return window;
+    }
+
+    /**
+     * Only a quest counting actions has a pace to judge; one counting what the player holds is refused.
+     */
+    @Nullable
+    @Override
+    public String validate(@Nonnull OpenQuestAsset asset) {
+        if (asset instanceof QuantityQuestAsset && !(asset instanceof HeldQuantityQuestAsset)) return null;
+        return "Within only fits a quest counting actions, not " + asset.getClass().getSimpleName();
     }
 }
