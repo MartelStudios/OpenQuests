@@ -223,6 +223,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new CharacterSpawnSystem(characterSettings::get, characterService, positions, waitlist, characterAssets));
         CharacterVacancyListener vacancies = new CharacterVacancyListener(characterAssets, new CharacterVacancies<>(waitlist, new WorldRedraws(characterSettings::get, characterService, characterAssets, positions)));
         getEventRegistry().registerGlobal(CharacterEvent.Released.class, vacancies::onReleased);
+        getEventRegistry().registerGlobal(RemoveWorldEvent.class, event -> waitlist.forgetIf(waiter -> waiter.world() == event.getWorld()));
         characterService.onUnanswered(NothingToSay::open);
         getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));

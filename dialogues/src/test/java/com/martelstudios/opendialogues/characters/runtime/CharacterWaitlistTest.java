@@ -63,6 +63,16 @@ class CharacterWaitlistTest {
     }
 
     @Test
+    void forgetIfLeavesOnlyTheMatchingWaiters() {
+        waitlist.waitFor("x1", List.of(s, t));
+        waitlist.waitFor("y1", List.of(s));
+        waitlist.forgetIf(waiter -> waiter.startsWith("x"));
+
+        assertEquals(Optional.of("y1"), waitlist.first(s));
+        assertEquals(Optional.empty(), waitlist.first(t));
+    }
+
+    @Test
     void worldSlotsOfTwoWorldsStayApart() {
         assertNotEquals(ClaimSlot.of("Oak", CHARACTERS::get, X), ClaimSlot.of("Oak", CHARACTERS::get, Y));
         assertEquals(new ClaimSlot("Oak", X), ClaimSlot.of("Oak", CHARACTERS::get, X));

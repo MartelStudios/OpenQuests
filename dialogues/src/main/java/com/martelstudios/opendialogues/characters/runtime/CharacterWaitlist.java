@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedSet;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * The NPCs waiting for a taken claim slot, in order of arrival. Nothing is saved: NPCs enlist
@@ -31,6 +33,14 @@ public final class CharacterWaitlist<W> {
      */
     public synchronized void forget(@Nonnull W waiter) {
         waitFor(waiter, List.of());
+    }
+
+    /**
+     * Stops the matching NPCs waiting, for a world closing: its store drops its NPCs without removing them.
+     */
+    public synchronized void forgetIf(@Nonnull Predicate<W> matches) {
+        queues.values().forEach(queue -> queue.removeIf(matches));
+        queues.values().removeIf(Set::isEmpty);
     }
 
     /**
