@@ -2,10 +2,10 @@ chapter.name=The Forgotten Temple
 
 # Temple
 character.temple-merchant.epithet=Temple merchant
-dialogue.merchant-greeting.text=Back again, customer! I offer rations, food for anyone who needs to restock. Care to take a look?
+dialogue.merchant-greeting.text=Back again, customer! I sell rations and hearty meals for anyone who needs to restock. Care to take a look?
 dialogue.merchant.trade=Show me your wares.
 dialogue.merchant.bye=Another time.
-dialogue.merchant-intro.page1=A new face! Welcome to my stall, the only one this side of the portal. Essence, seeds, a little of everything, for those who can pay.
+dialogue.merchant-intro.page1=A new face! Welcome to my stall, the only one this side of the portal. Rations and hearty meals, for those who can pay.
 dialogue.merchant-intro.page2=But I do not trade with tourists. Go and see the statue by the rune altar, under the central gate, and speak to it: it teaches you to catch the memories of the creatures you meet. Come back with a few, then we talk business. Here, some essence on credit, so you know I am serious.
 dialogue.merchant-intro.yes=I will see the statue.
 dialogue.merchant-trial.page1=The statue answers you now? Good, so you are no tourist. One last thing before you are a customer: the temple's trial, all in five minutes.
