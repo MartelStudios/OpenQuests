@@ -36,7 +36,7 @@ quests lead to the generator, then to the goblin scientist (`AdventureQuests_Gob
 |---|---|---|
 | `AdventureQuests_MeetSapling` | `Dialogue`, answer `Accept` of `AdventureQuests_SaplingGenerator` | grants `LabScrap` |
 | `AdventureQuests_LabScrap` | `Gather` 10 `Ingredient_Scraps` (breaches outside) | grants `LabGenerator` |
-| `AdventureQuests_LabGenerator` | `GameFlag` `goblin_lab_power` | 5 scraps, grants `MeetScientist` |
+| `AdventureQuests_LabGenerator` | `ReachValue` game flag `goblin_lab_power` | 5 scraps, grants `MeetScientist` |
 | `AdventureQuests_LabThrough` | granted by `LabConsole`: `LabThroughEnter` (`EnterWorld` the breach), then `LabThroughTell` (`Dialogue` on `SaplingThrough`) | 1 `PortalKey_The_Deepworks` |
 
 `AdventureQuests_EnterForgottenTemple` grants `MeetSapling`. The "Thank you" answer of

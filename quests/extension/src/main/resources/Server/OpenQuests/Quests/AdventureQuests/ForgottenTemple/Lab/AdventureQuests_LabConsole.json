@@ -1,6 +1,6 @@
 {
-  "Type": "GameFlag",
-  "Flag": "goblin_breach_duration",
+  "Type": "ReachValue",
+  "Source": { "Type": "GameFlag", "Flag": "goblin_breach_duration" },
   "SuccessfulRewards": [
     {
       "Type": "Item",

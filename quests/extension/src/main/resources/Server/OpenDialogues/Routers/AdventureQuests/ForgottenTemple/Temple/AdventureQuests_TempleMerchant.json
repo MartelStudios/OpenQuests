@@ -5,18 +5,90 @@
       {
         "When": {
           "Type": "RequiresQuest",
-          "QuestAssetId": "AdventureQuests_TempleTrial",
+          "QuestAssetId": "AdventureQuests_TalkToRootlingMerchant",
           "States": [
-            "InProgress",
-            "Successful",
-            "Failed",
-            "Abandoned"
-          ],
-          "Min": 0,
-          "Max": 0
+            "InProgress"
+          ]
         },
         "Then": {
           "Dialogue": "AdventureQuests_MerchantIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_ReturnToMerchant",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_MerchantTrial"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_TempleStatue",
+              "States": [
+                "InProgress",
+                "Successful",
+                "Failed",
+                "Abandoned"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_TempleTrial",
+              "States": [
+                "InProgress",
+                "Successful",
+                "Failed",
+                "Abandoned"
+              ],
+              "Min": 0,
+              "Max": 0
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_MerchantIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_TempleMemories",
+              "States": [
+                "Successful"
+              ]
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_TempleTrial",
+              "States": [
+                "InProgress",
+                "Successful",
+                "Failed",
+                "Abandoned"
+              ],
+              "Min": 0,
+              "Max": 0
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_MerchantTrial"
         }
       },
       {

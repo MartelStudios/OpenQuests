@@ -20,7 +20,6 @@ import com.martelstudios.openquests.extension.quests.consumeitem.ConsumeItemFeat
 import com.martelstudios.openquests.extension.quests.craft.CraftFeature;
 import com.martelstudios.openquests.extension.quests.dropitem.DropItemFeature;
 import com.martelstudios.openquests.extension.quests.enterworld.EnterWorldFeature;
-import com.martelstudios.openquests.extension.quests.gameflag.GameFlagFeature;
 import com.martelstudios.openquests.extension.quests.gather.GatherFeature;
 import com.martelstudios.openquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
 import com.martelstudios.openquests.extension.quests.kill.KillFeature;
@@ -32,6 +31,7 @@ import com.martelstudios.openquests.extension.quests.placeblock.PlaceBlockFeatur
 import com.martelstudios.openquests.extension.quests.quantity.QuantityFeature;
 import com.martelstudios.openquests.extension.quests.queststate.QuestStateFeature;
 import com.martelstudios.openquests.extension.quests.reachlocation.ReachLocationFeature;
+import com.martelstudios.openquests.extension.quests.reachvalue.ReachValueFeature;
 import com.martelstudios.openquests.extension.quests.triggervolume.TriggerVolumeFeature;
 import com.martelstudios.openquests.extension.quests.useblock.UseBlockFeature;
 import com.martelstudios.openquests.extension.quests.useentity.UseEntityFeature;
@@ -112,7 +112,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         PickupItemFeature.register(this, services);
         ReachLocationFeature.register(this, services);
         EnterWorldFeature.register(this, services);
-        GameFlagFeature.register(this, services);
+        ReachValueFeature.register(this, services);
         TriggerVolumeFeature.register(this, services);
         CompositeFeature.register(this, services);
         HudFeature.register(this, services, tracks);

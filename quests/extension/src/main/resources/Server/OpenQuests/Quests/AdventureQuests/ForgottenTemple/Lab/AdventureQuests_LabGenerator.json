@@ -1,6 +1,6 @@
 {
-  "Type": "GameFlag",
-  "Flag": "goblin_lab_power",
+  "Type": "ReachValue",
+  "Source": { "Type": "GameFlag", "Flag": "goblin_lab_power" },
   "SuccessfulRewards": [
     {
       "Type": "Item",

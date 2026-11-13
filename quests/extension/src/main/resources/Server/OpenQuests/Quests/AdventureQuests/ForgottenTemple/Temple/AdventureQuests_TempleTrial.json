@@ -9,18 +9,6 @@
   "AutoTrack": true,
   "QuestAssetIds": [
     {
-      "Type": "ReachLocation",
-      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.race.title",
-      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.race.description",
-      "AnnounceOutcome": false,
-      "Position": {
-        "X": 4976,
-        "Y": 158,
-        "Z": 4983
-      },
-      "Radius": 6
-    },
-    {
       "Type": "Jump",
       "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.title",
       "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.description",
@@ -38,23 +26,15 @@
         },
         {
           "Type": "NearPosition",
-          "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.near-altar",
+          "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.warmup.near-merchant",
           "Position": {
-            "X": 4976,
-            "Y": 158,
-            "Z": 4983
+            "X": 4992.5,
+            "Y": 157,
+            "Z": 4987.5
           },
           "Radius": 12
         }
       ]
-    },
-    {
-      "Type": "Run",
-      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.run.title",
-      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.run.description",
-      "Measure": "Seconds",
-      "TargetQuantity": 20,
-      "AnnounceOutcome": false
     },
     {
       "Type": "ReachPath",
@@ -78,18 +58,12 @@
       "ResetSound": "SFX_Incorrect_Tool"
     },
     {
-      "Type": "NoOp",
-      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.hold.title",
-      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.hold.description",
-      "AnnounceOutcome": false,
-      "PersistProgression": false,
-      "Constraints": [
-        {
-          "Type": "TimeLimit",
-          "Seconds": 60,
-          "OnExpire": "Successful"
-        }
-      ]
+      "Type": "Run",
+      "TitleKey": "adventurequests.forgottentemple.quest.temple-trial.run.title",
+      "DescriptionKey": "adventurequests.forgottentemple.quest.temple-trial.run.description",
+      "Measure": "Seconds",
+      "TargetQuantity": 20,
+      "AnnounceOutcome": false
     }
   ],
   "Constraints": [
