@@ -20,7 +20,7 @@ class FiltersTest {
         String json = "{ \"Type\": \"Role\", \"Roles\": [\"Kweebec_Seedling\"] }";
 
         assertTrue(filter(json).test(kweebec("Zone1")));
-        assertFalse(filter(json).test(new FilterContext(null, new Ref<>(null), null, "default", "Trork", "Zone1", "Forest", Set.<String>of()::contains)));
+        assertFalse(filter(json).test(new FilterContext(null, new Ref<>(null), "default", "Trork", "Zone1", "Forest", Set.<String>of()::contains)));
     }
 
     @Test
@@ -37,11 +37,11 @@ class FiltersTest {
     }
 
     @Test
-    void zoneFilterReadsPlayerZone() {
+    void zoneFilterReadsNpcZone() {
         String json = "{ \"Type\": \"Zone\", \"Zones\": [\"Zone1\"] }";
 
         assertTrue(filter(json).test(kweebec("Zone1")));
-        assertTrue(kweebec("Zone1").playerZone().equals("Zone1"));
+        assertTrue(kweebec("Zone1").zone().equals("Zone1"));
     }
 
     @Test
@@ -74,6 +74,6 @@ class FiltersTest {
     }
 
     private static FilterContext inWorld(String world) {
-        return new FilterContext(null, new Ref<>(null), null, world, "Kweebec_Seedling", "Zone1", "Forest", Set.<String>of()::contains);
+        return new FilterContext(null, new Ref<>(null), world, "Kweebec_Seedling", "Zone1", "Forest", Set.<String>of()::contains);
     }
 }

@@ -6,7 +6,7 @@ import com.martelstudios.opendialogues.characters.filters.FilterContext;
 import javax.annotation.Nonnull;
 
 /**
- * Holds where the player stands in one of the listed biomes.
+ * Holds where the NPC stands in one of the listed biomes.
  */
 public class OpenDialoguesBiomeFilter extends ListFilter {
 
@@ -18,6 +18,6 @@ public class OpenDialoguesBiomeFilter extends ListFilter {
 
     @Override
     protected boolean evaluate(@Nonnull FilterContext context) {
-        return lists(context.playerBiome());
+        return lists(context.biome());
     }
 }

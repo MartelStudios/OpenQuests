@@ -6,7 +6,7 @@ import com.martelstudios.opendialogues.characters.filters.FilterContext;
 import javax.annotation.Nonnull;
 
 /**
- * Holds where the player stands in one of the listed map regions, as the world map names them.
+ * Holds where the NPC stands in one of the listed map regions, as the world map names them.
  */
 public class OpenDialoguesZoneFilter extends ListFilter {
 
@@ -18,6 +18,6 @@ public class OpenDialoguesZoneFilter extends ListFilter {
 
     @Override
     protected boolean evaluate(@Nonnull FilterContext context) {
-        return lists(context.playerZone());
+        return lists(context.zone());
     }
 }
