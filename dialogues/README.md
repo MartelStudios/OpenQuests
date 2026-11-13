@@ -166,6 +166,8 @@ A world closing for good frees its `Alive` characters and loses its `Forever` + 
 keep such characters in worlds that stay, the overworld or a persistent instance.
 
 NPCs draw as they enter the world, spawned or loaded with their chunk, before any player sees them.
+An NPC refused a unique character another one holds waits for it, and the one waiting longest draws
+again once it is freed.
 The plugin's `Characters.json` holds `ScanRadius` (blocks around each player, 64) and `ScanInterval`
 (seconds, 5) for refreshing the characters near players, and `Draws` (false stops new draws). Admins steer characters with `/ocharacters`
 (alias `/oc`) on the NPC in view:

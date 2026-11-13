@@ -1,6 +1,5 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
-import com.hypixel.hytale.builtin.tagset.config.NPCGroup;
 import com.hypixel.hytale.component.AddReason;
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;
@@ -9,14 +8,10 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.RefSystem;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import com.hypixel.hytale.server.npc.role.support.WorldSupport;
-import com.hypixel.hytale.server.worldgen.chunk.ChunkGenerator;
-import com.hypixel.hytale.server.worldgen.chunk.ZoneBiomeResult;
-import com.martelstudios.opendialogues.characters.filters.FilterContext;
+import com.martelstudios.opendialogues.characters.CharacterAssets;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
@@ -33,15 +28,20 @@ public class CharacterSpawnSystem extends RefSystem<EntityStore> {
     private final Supplier<CharacterSettings> settings;
     private final CharacterService service;
     private final CharacterPositionsAccess positions;
+    private final CharacterWaitlist<Waiter> waitlist;
+    private final CharacterAssets assets;
 
     /**
      * @param settings  read anew on each NPC, so stopping draws needs no restart.
      * @param positions where an NPC carrying a character is recorded, so its marker shows at once.
+     * @param waitlist  where an NPC refused a taken unique character waits for it to be freed.
      */
-    public CharacterSpawnSystem(@Nonnull Supplier<CharacterSettings> settings, @Nonnull CharacterService service, @Nonnull CharacterPositionsAccess positions) {
+    public CharacterSpawnSystem(@Nonnull Supplier<CharacterSettings> settings, @Nonnull CharacterService service, @Nonnull CharacterPositionsAccess positions, @Nonnull CharacterWaitlist<Waiter> waitlist, @Nonnull CharacterAssets assets) {
         this.settings = settings;
         this.service = service;
         this.positions = positions;
+        this.waitlist = waitlist;
+        this.assets = assets;
     }
 
     @Nonnull
@@ -61,8 +61,13 @@ public class CharacterSpawnSystem extends RefSystem<EntityStore> {
         });
     }
 
+    /**
+     * Any removal, an unload included: a reloaded NPC draws again and enlists anew.
+     */
     @Override
-    public void onEntityRemove(@Nonnull Ref<EntityStore> ref, @Nonnull RemoveReason reason, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {}
+    public void onEntityRemove(@Nonnull Ref<EntityStore> ref, @Nonnull RemoveReason reason, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
+        waitlist.forget(new Waiter(ref, store.getExternalData().getWorld()));
+    }
 
     private void visit(@Nonnull World world, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref) {
         NPCEntity entity = store.getComponent(ref, NPCEntity.getComponentType());
@@ -72,32 +77,13 @@ public class CharacterSpawnSystem extends RefSystem<EntityStore> {
                 service.apply(npc);
             } else if (settings.get().isDraws()) {
                 int drawsBefore = npc.identity().getDraws().size();
-                String drawn = service.draw(npc, context(store, ref, world, entity));
+                CharacterAssigner.Draw draw = service.draw(npc, FilterContextFactory.of(store, ref, world, entity));
+                String drawn = draw.character();
+                waitlist.waitFor(new Waiter(ref, world), ClaimSlot.all(draw.blocked(), assets::character, world.getWorldConfig().getUuid()));
                 if (npc.identity().getDraws().size() != drawsBefore) LOGGER.atFine().log("NPC %s (%s) drew %s.", npc.uuid(), entity.getRoleName(), drawn == null ? "nobody" : "character '" + drawn + "'");
             }
             positions.record(store, ref, npc);
             return null;
         });
-    }
-
-    @Nonnull
-    private static FilterContext context(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull World world, @Nonnull NPCEntity npc) {
-        ZoneBiomeResult place = place(world, store.getComponent(ref, TransformComponent.getComponentType()));
-        String zone = place == null || place.getZoneResult() == null ? null : place.getZoneResult().getZone().name();
-        String biome = place == null || place.getBiome() == null ? null : place.getBiome().getName();
-        int roleIndex = npc.getRoleIndex();
-        return new FilterContext(store, ref, world.getName(), npc.getRoleName(), zone, biome, group -> {
-            int index = NPCGroup.getAssetMap().getIndexOrDefault(group, -1);
-            return index >= 0 && WorldSupport.hasTagInGroup(index, roleIndex);
-        });
-    }
-
-    /**
-     * Read from the world generator as vanilla's {@code BiomeDataSystem} does for players; a world
-     * without one (flat, void) has no zone nor biome.
-     */
-    private static ZoneBiomeResult place(@Nonnull World world, TransformComponent transform) {
-        if (transform == null || !(world.getChunkStore().getGenerator() instanceof ChunkGenerator generator)) return null;
-        return generator.getZoneBiomeResultAt((int) world.getWorldConfig().getSeed(), (int) transform.getPosition().x, (int) transform.getPosition().z);
     }
 }

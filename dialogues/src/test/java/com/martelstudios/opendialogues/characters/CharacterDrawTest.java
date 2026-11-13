@@ -122,6 +122,36 @@ class CharacterDrawTest {
         assertNull(draw.character());
     }
 
+    @Test
+    void assignReportsTheTakenCharactersOfAHoldingDistribution() {
+        OpenDialogueCharacterDistributionAsset village = distribution("Village", "[]", "{ \"Character\": \"Oak\" }, { \"Character\": \"Mira\" }");
+
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(village), kweebec("Zone1"), false, id -> false, rolls(), FAIL);
+
+        assertEquals(List.of("Oak", "Mira"), draw.blocked());
+        assertEquals(List.of(), draw.drawn());
+    }
+
+    @Test
+    void assignReportsNothingBlockedForAFilteredOutDistribution() {
+        OpenDialogueCharacterDistributionAsset temple = distribution("Temple", "[ { \"Type\": \"World\", \"Worlds\": [\"temple\"] } ]", "{ \"Character\": \"Oak\" }");
+
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(temple), kweebec("Zone1"), false, id -> false, rolls(), FAIL);
+
+        assertEquals(List.of(), draw.blocked());
+    }
+
+    @Test
+    void assignKeepsWhatBlockedItBeforeTheCharacterGiven() {
+        OpenDialogueCharacterDistributionAsset a = distribution("A", "[]", "{ \"Character\": \"Oak\" }");
+        OpenDialogueCharacterDistributionAsset b = distribution("B", "[]", "{ \"Character\": \"Mira\" }");
+
+        CharacterAssigner.Draw draw = CharacterAssigner.assign(Set.of(), List.of(a, b), kweebec("Zone1"), false, "Mira"::equals, rolls(0), FAIL);
+
+        assertEquals("Mira", draw.character());
+        assertEquals(List.of("Oak"), draw.blocked());
+    }
+
     @Nonnull
     private static List<OpenDialogueCharacterDistributionAsset.Entry> entries(@Nonnull String entries) {
         return List.of(distribution("Test", "[]", entries).getEntries());

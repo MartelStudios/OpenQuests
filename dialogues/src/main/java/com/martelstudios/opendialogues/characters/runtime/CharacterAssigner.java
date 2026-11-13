@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -24,8 +25,10 @@ public final class CharacterAssigner {
      *
      * @param drawn     the distributions that drew, in order, a draw of nobody included; to record for good.
      * @param character the id of the character given, {@code null} when the NPC stays nobody.
+     * @param blocked   the characters of holding distributions that were all taken, in draw order;
+     *                  the NPC may wait for one of them to be freed.
      */
-    public record Draw(@Nonnull List<String> drawn, @Nullable String character) {}
+    public record Draw(@Nonnull List<String> drawn, @Nullable String character, @Nonnull List<String> blocked) {}
 
     private static final Comparator<OpenDialogueCharacterDistributionAsset> ORDER = Comparator.comparingInt(OpenDialogueCharacterDistributionAsset::getPriority).reversed().thenComparing(OpenDialogueCharacterDistributionAsset::getId);
 
@@ -42,16 +45,22 @@ public final class CharacterAssigner {
     @Nonnull
     public static Draw assign(@Nonnull Set<String> alreadyDrawn, @Nonnull List<OpenDialogueCharacterDistributionAsset> distributions, @Nonnull FilterContext context, boolean ownInteraction, @Nonnull Predicate<String> available, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings) {
         List<String> drawn = new ArrayList<>();
+        Set<String> blocked = new LinkedHashSet<>();
         for (OpenDialogueCharacterDistributionAsset distribution : distributions.stream().sorted(ORDER).toList()) {
             if (ownInteraction && !distribution.overridesInteraction()) continue;
             if (alreadyDrawn.contains(distribution.getId()) || !holds(distribution, context, warnings)) continue;
 
             OpenDialogueCharacterDistributionAsset.Entry entry = CharacterDraw.draw(List.of(distribution.getEntries()), available, random);
-            if (entry == null) continue;
+            if (entry == null) {
+                for (OpenDialogueCharacterDistributionAsset.Entry taken : distribution.getEntries()) {
+                    if (taken.getCharacter() != null) blocked.add(taken.getCharacter());
+                }
+                continue;
+            }
             drawn.add(distribution.getId());
-            if (entry.getCharacter() != null) return new Draw(List.copyOf(drawn), entry.getCharacter());
+            if (entry.getCharacter() != null) return new Draw(List.copyOf(drawn), entry.getCharacter(), List.copyOf(blocked));
         }
-        return new Draw(List.copyOf(drawn), null);
+        return new Draw(List.copyOf(drawn), null, List.copyOf(blocked));
     }
 
     /**
