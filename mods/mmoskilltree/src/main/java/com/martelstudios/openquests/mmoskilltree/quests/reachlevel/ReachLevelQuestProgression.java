@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 import com.ziggfreed.mmoskilltree.i18n.Messages;
 import com.ziggfreed.mmoskilltree.skill.SkillRegistry;
@@ -14,7 +15,7 @@ import javax.annotation.Nullable;
 /**
  * Counts the player's level in the skill, rechecked whenever it changes.
  */
-public class ReachLevelQuestProgression extends QuantityQuestProgression<ReachLevelQuestProgression> {
+public class ReachLevelQuestProgression extends HeldQuantityQuestProgression<ReachLevelQuestProgression> {
 
     public static final BuilderCodec<ReachLevelQuestProgression> CODEC = BuilderCodec.builder(ReachLevelQuestProgression.class, ReachLevelQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                      .append(new KeyedCodec<>("Skill", Codec.STRING), (quest, skill) -> quest.skill = skill, quest -> quest.skill)

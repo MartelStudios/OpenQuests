@@ -26,6 +26,12 @@ public class ReachPathQuestProgression extends QuantityQuestProgression<ReachPat
 
     private Set<Integer> reached = ConcurrentHashMap.newKeySet();
 
+    @Override
+    protected void restartCombo() {
+        super.restartCombo();
+        reached.clear();
+    }
+
     protected ReachPathQuestProgression() {}
 
     @Override

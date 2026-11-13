@@ -4,14 +4,19 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
+import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.extension.constraints.time.WithinConstraint;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 
 import javax.annotation.Nonnull;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * Runtime state shared by every quest whose completion is "reach a target quantity of something".
@@ -25,6 +30,8 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
                                                                                         .append(new KeyedCodec<>("CurrentQuantity", Codec.INTEGER), (quest, quantity) -> quest.quantity = quantity, quest -> Integer.valueOf(quest.quantity))
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("TargetQuantity", Codec.INTEGER), (quest, quantity) -> quest.targetQuantity = quantity, quest -> quest.targetQuantity)
+                                                                                        .add()
+                                                                                        .append(new KeyedCodec<>("ComboStartedAt", Codec.LONG), (quest, millis) -> quest.comboStartedAt = Instant.ofEpochMilli(millis), quest -> quest.comboStartedAt == null ? null : Long.valueOf(quest.comboStartedAt.toEpochMilli()))
                                                                                         .add()
                                                                                         .build();
 
@@ -40,16 +47,60 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     @Nullable
     private Integer targetQuantity;
 
+    /**
+     * When the open combo window started, {@code null} with no {@code Within} or before the first action.
+     */
+    @Nullable
+    private Instant comboStartedAt;
+
     @Override
     public QuantityQuestAsset getAsset() {
         return (QuantityQuestAsset) super.getAsset();
     }
 
     /**
-     * @return how far the quest went.
+     * @return how far the quest went, nothing once its combo window closed.
      */
     public int getCurrentQuantity() {
-        return quantity;
+        return getCurrentQuantityAt(now());
+    }
+
+    /**
+     * @return how far the quest stands at that moment, nothing once its combo window closed by then.
+     */
+    public int getCurrentQuantityAt(@Nonnull Instant now) {
+        Instant endsAt = getComboEndsAt();
+        return endsAt != null && !now.isBefore(endsAt) ? 0 : quantity;
+    }
+
+    /**
+     * @return the combo window of the asset's {@code Within}, {@code null} for a quest counting at any pace.
+     */
+    @Nullable
+    protected Duration getComboWindow() {
+        OpenQuestAsset asset = super.getAsset();
+        if (asset == null) return null;
+
+        for (QuestConstraint constraint : asset.getConstraints()) {
+            if (constraint instanceof WithinConstraint within) return within.getWindow();
+        }
+        return null;
+    }
+
+    /**
+     * @return when the open combo window closes, {@code null} when none is open.
+     */
+    @Nullable
+    public Instant getComboEndsAt() {
+        Duration window = getComboWindow();
+        return window == null || comboStartedAt == null ? null : comboStartedAt.plus(window);
+    }
+
+    /**
+     * Drops what a missed combo had counted. A type remembering more than the count forgets it here too.
+     */
+    protected void restartCombo() {
+        quantity = 0;
     }
 
     /**
@@ -61,12 +112,27 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     }
 
     /**
-     * Adds to the count, over whatever it stands at on the copy it is made on.
+     * Adds to the count, over whatever it stands at on the copy it is made on. Carries the moment
+     * of the action, so a copy written elsewhere judges a combo window as this one did.
      */
-    public record Add(int amount) implements QuestOperation<QuantityQuestProgression<?>> {
+    public record Add(int amount, @Nonnull Instant at) implements QuestOperation<QuantityQuestProgression<?>> {
+
+        /**
+         * An action made now.
+         */
+        public Add(int amount) {
+            this(amount, Instant.now());
+        }
+
         @Override
         public boolean applyTo(@Nonnull QuantityQuestProgression<?> quest) {
             if (quest.isOver() || amount <= 0) return false;
+
+            Duration window = quest.getComboWindow();
+            if (window != null && (quest.comboStartedAt == null || !at.isBefore(quest.comboStartedAt.plus(window)))) {
+                quest.restartCombo();
+                quest.comboStartedAt = at;
+            }
 
             quest.quantity += amount;
             quest.settle();
@@ -74,12 +140,13 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
         }
 
         /**
-         * Two counts in a row are one count of both, steps walked between two writes going as one.
+         * Two counts in a row are one count of both, steps walked between two writes going as one,
+         * at the moment of the first.
          */
         @Nullable
         @Override
         public QuestOperation<QuantityQuestProgression<?>> followedBy(@Nonnull QuestOperation<?> next) {
-            return next instanceof Add more ? new Add(amount + more.amount) : null;
+            return next instanceof Add more ? new Add(amount + more.amount, at) : null;
         }
     }
 
@@ -161,10 +228,10 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     }
 
     /**
-     * @return {@code true} once the quantity reaches the target.
+     * @return {@code true} once the count reaches the target, judged on the count as last written rather than at the moment of reading.
      */
     public boolean checkCompletion() {
-        return getCurrentQuantity() >= getTargetQuantity();
+        return quantity >= getTargetQuantity();
     }
 
     /**

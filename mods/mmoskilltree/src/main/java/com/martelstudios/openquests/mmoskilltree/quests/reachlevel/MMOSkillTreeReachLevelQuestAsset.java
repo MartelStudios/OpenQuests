@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestAsset;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 import com.martelstudios.openquests.mmoskilltree.editor.DataSets;
 import com.martelstudios.openquests.mmoskilltree.skills.SkillReference;
@@ -12,7 +13,7 @@ import com.martelstudios.openquests.mmoskilltree.skills.SkillReference;
  * Reach a level in an MMO Skill Tree skill. {@code TargetQuantity} is the level, so the counter
  * every counted quest draws shows how far the player is.
  */
-public class MMOSkillTreeReachLevelQuestAsset extends QuantityQuestAsset implements SkillReference {
+public class MMOSkillTreeReachLevelQuestAsset extends HeldQuantityQuestAsset implements SkillReference {
 
     public static final BuilderCodec<MMOSkillTreeReachLevelQuestAsset> CODEC =
         BuilderCodec.builder(MMOSkillTreeReachLevelQuestAsset.class, MMOSkillTreeReachLevelQuestAsset::new, QuantityQuestAsset.BASE_CODEC)

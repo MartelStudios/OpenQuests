@@ -6,6 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.schema.metadata.ui.UIEditor;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.history.DialogueHistory;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestAsset;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
@@ -21,7 +22,7 @@ import java.util.Objects;
  * each narrow what counts and are all optional, so none counts any conversation. With
  * {@code UseHistory}, what the player did before the quest counts too.
  */
-public class OpenQuestsDialogueAsset extends QuantityQuestAsset implements TargetedQuest {
+public class OpenQuestsDialogueAsset extends HeldQuantityQuestAsset implements TargetedQuest {
 
     public static final BuilderCodec<OpenQuestsDialogueAsset> CODEC =
         BuilderCodec.builder(OpenQuestsDialogueAsset.class, OpenQuestsDialogueAsset::new, QuantityQuestAsset.BASE_CODEC)

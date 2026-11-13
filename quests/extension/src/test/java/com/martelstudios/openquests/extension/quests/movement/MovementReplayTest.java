@@ -57,7 +57,7 @@ class MovementReplayTest {
         quest.apply(new QuantityQuestProgression.Add(1));
         quest.apply(new QuantityQuestProgression.Add(2));
 
-        assertEquals(List.of(new QuantityQuestProgression.Add(3)), quest.getReplica().getPendingOperations());
+        assertEquals(List.of(3), quest.getReplica().getPendingOperations().stream().map(operation -> ((QuantityQuestProgression.Add) operation).amount()).toList());
     }
 
     @Test
