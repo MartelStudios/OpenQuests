@@ -5,6 +5,8 @@ import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -25,5 +27,13 @@ public record ClaimSlot(@Nonnull String characterId, @Nullable UUID world) {
         OpenDialogueCharacterAsset character = characters.apply(characterId);
         if (character == null || !character.getUniqueness().claims()) return null;
         return new ClaimSlot(characterId, character.getScope() == CharacterScope.Universe ? null : world);
+    }
+
+    /**
+     * @return the slots of the characters that have one, in order.
+     */
+    @Nonnull
+    public static List<ClaimSlot> all(@Nonnull List<String> characterIds, @Nonnull Function<String, OpenDialogueCharacterAsset> characters, @Nonnull UUID world) {
+        return characterIds.stream().map(id -> of(id, characters, world)).filter(Objects::nonNull).toList();
     }
 }
