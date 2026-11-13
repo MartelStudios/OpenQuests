@@ -2,7 +2,7 @@ chapter.name=Le Temple de l'Oubli
 
 # Temple
 character.temple-merchant.epithet=Marchand du temple
-dialogue.merchant-greeting.text=Te revoilà, client ! J'ai de l'essence, des graines et bien d'autres choses. Tu veux jeter un œil ?
+dialogue.merchant-greeting.text=Te revoilà, client ! Je propose des rations, de la nourriture pour qui a besoin de se ravitailler. Tu veux jeter un œil ?
 dialogue.merchant.trade=Montre-moi tes marchandises.
 dialogue.merchant.bye=Une autre fois.
 dialogue.merchant-intro.page1=Une nouvelle tête ! Bienvenue à mon étal, le seul de ce côté du portail. Essence, graines, un peu de tout, pour qui peut payer.

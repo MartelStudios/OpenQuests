@@ -2,7 +2,7 @@ chapter.name=The Forgotten Temple
 
 # Temple
 character.temple-merchant.epithet=Temple merchant
-dialogue.merchant-greeting.text=Back again, customer! I have essence, seeds and plenty more. Care to take a look?
+dialogue.merchant-greeting.text=Back again, customer! I offer rations, food for anyone who needs to restock. Care to take a look?
 dialogue.merchant.trade=Show me your wares.
 dialogue.merchant.bye=Another time.
 dialogue.merchant-intro.page1=A new face! Welcome to my stall, the only one this side of the portal. Essence, seeds, a little of everything, for those who can pay.
