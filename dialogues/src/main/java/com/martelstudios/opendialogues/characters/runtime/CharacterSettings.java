@@ -5,7 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 
 /**
- * How far and how often the scan looks for NPCs to give characters, read once at startup, and
+ * How far and how often the scan refreshes the characters near players, read once at startup, and
  * whether they may draw, read live.
  */
 public class CharacterSettings {
@@ -26,7 +26,7 @@ public class CharacterSettings {
     private float scanInterval = 5;
 
     /**
-     * @return the distance from a player, in blocks, within which NPCs draw.
+     * @return the distance from a player, in blocks, within which characters are refreshed.
      */
     public double getScanRadius() {
         return scanRadius;
@@ -40,7 +40,7 @@ public class CharacterSettings {
     }
 
     /**
-     * @return whether NPCs without a character may draw one; the scan runs either way.
+     * @return whether NPCs without a character may draw one; checked as each NPC enters the world.
      */
     public boolean isDraws() {
         return draws;

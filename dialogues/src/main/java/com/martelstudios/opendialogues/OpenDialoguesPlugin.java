@@ -46,6 +46,7 @@ import com.martelstudios.opendialogues.characters.runtime.CharacterDeathSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterHintSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterRemovalSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterScanSystem;
+import com.martelstudios.opendialogues.characters.runtime.CharacterSpawnSystem;
 import com.martelstudios.opendialogues.characters.runtime.CharacterService;
 import com.martelstudios.opendialogues.characters.runtime.NpcEligibility;
 import com.martelstudios.opendialogues.characters.runtime.CharacterSettings;
@@ -213,6 +214,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         CharacterPositionsAccess positions = new CharacterPositionsAccess(positionsType, characterService);
         characterMarkers = new CharacterMarkerProvider(positions, player -> historyRecorder.history(player), characterAssets::character);
         getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings::get, characterService, positions::positions));
+        getEntityStoreRegistry().registerSystem(new CharacterSpawnSystem(characterSettings::get, characterService));
         characterService.onUnanswered(NothingToSay::open);
         getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));

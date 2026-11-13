@@ -156,8 +156,8 @@ per NPC, such as a name.
 | `Role` | The NPC's role is one of `Roles`. |
 | `Group` | The role belongs to one of the NPC groups `Groups`. |
 | `World` | The world name matches one of `Worlds`, each a regular expression on the whole name: `default`, or `instance-Forgotten_Temple-.*` for every copy of an instance. |
-| `Zone` | The scanning player stands in one of `Zones`. |
-| `Biome` | The scanning player stands in one of `Biomes`. |
+| `Zone` | The NPC stands in one of `Zones`, as the world generator names them. |
+| `Biome` | The NPC stands in one of `Biomes`. |
 | `Unobstructed` | No block hitbox (tall grass, a bush) overlaps the upper half of the NPC's hitbox, where it stands at the draw, so players can aim F at it. Suited to NPCs that do not move. |
 
 Every filter also takes `Not`. NPCs that already react to F (merchants, quest givers) are skipped, unless the distribution sets `OverrideInteraction`.
@@ -165,8 +165,9 @@ Every filter also takes `Not`. NPCs that already react to F (merchants, quest gi
 A world closing for good frees its `Alive` characters and loses its `Forever` + `Universe` ones:
 keep such characters in worlds that stay, the overworld or a persistent instance.
 
-The plugin's `Characters.json` holds `ScanRadius` (blocks around each player, 24), `ScanInterval`
-(seconds, 5) and `Draws` (false stops new draws). Admins steer characters with `/ocharacters`
+NPCs draw as they enter the world, spawned or loaded with their chunk, before any player sees them.
+The plugin's `Characters.json` holds `ScanRadius` (blocks around each player, 24) and `ScanInterval`
+(seconds, 5) for refreshing the characters near players, and `Draws` (false stops new draws). Admins steer characters with `/ocharacters`
 (alias `/oc`) on the NPC in view:
 
 | Command | Does |

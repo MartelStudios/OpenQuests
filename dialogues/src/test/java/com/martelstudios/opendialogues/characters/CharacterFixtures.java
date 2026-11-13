@@ -96,6 +96,6 @@ public final class CharacterFixtures {
      */
     @Nonnull
     public static FilterContext kweebec(@Nullable String zone, @Nonnull String... groups) {
-        return new FilterContext(null, new Ref<>(null), null, "default", "Kweebec_Seedling", zone, "Forest", Set.of(groups)::contains);
+        return new FilterContext(null, new Ref<>(null), "default", "Kweebec_Seedling", zone, "Forest", Set.of(groups)::contains);
     }
 }
