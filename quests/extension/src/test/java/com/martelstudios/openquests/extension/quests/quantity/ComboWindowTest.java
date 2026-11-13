@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ComboWindowTest {
 
@@ -63,8 +64,21 @@ class ComboWindowTest {
     }
 
     @Test
-    void mergedAddsKeepTheFirstMoment() {
-        assertEquals(new QuantityQuestProgression.Add(3, T0), new QuantityQuestProgression.Add(1, T0).followedBy(new QuantityQuestProgression.Add(2, T0.plusSeconds(3))));
+    void addsAtTheSameMomentGoAsOne() {
+        assertEquals(new QuantityQuestProgression.Add(3, T0), new QuantityQuestProgression.Add(1, T0).followedBy(new QuantityQuestProgression.Add(2, T0)));
+    }
+
+    @Test
+    void addsAtDifferentMomentsStayApart() {
+        assertNull(new QuantityQuestProgression.Add(1, T0.plusSeconds(9)).followedBy(new QuantityQuestProgression.Add(1, T0.plusSeconds(11))));
+    }
+
+    @Test
+    void aCompletedComboKeepsItsCount() {
+        ComboQuest quest = combo();
+        for (int i = 0; i < 5; i++) quest.apply(new QuantityQuestProgression.Add(1, T0.plusSeconds(i)));
+
+        assertEquals(5, quest.getCurrentQuantityAt(T0.plusSeconds(3600)));
     }
 
     @Test

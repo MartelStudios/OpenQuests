@@ -9,6 +9,7 @@ import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,7 +44,17 @@ public class ReachPathQuestProgression extends QuantityQuestProgression<ReachPat
      * @return whether that spot is one the player is to reach now.
      */
     public boolean isAwaited(int spot) {
-        return getAsset().isOrdered() ? spot == getCurrentQuantity() : spot >= 0 && !reached.contains(spot);
+        return isAwaitedAt(spot, now());
+    }
+
+    /**
+     * @return whether that spot is one the player is to reach at that moment: a combo window closed
+     * by then gives every spot back.
+     */
+    public boolean isAwaitedAt(int spot, @Nonnull Instant at) {
+        int count = getCurrentQuantityAt(at);
+        if (getAsset().isOrdered()) return spot == count;
+        return spot >= 0 && (count == 0 || !reached.contains(spot));
     }
 
     @Nonnull
@@ -55,13 +66,23 @@ public class ReachPathQuestProgression extends QuantityQuestProgression<ReachPat
     /**
      * Counts a spot reached, one awaited or nothing happens.
      */
-    public record Reach(int spot) implements QuestOperation<ReachPathQuestProgression> {
+    public record Reach(int spot, @Nonnull Instant at) implements QuestOperation<ReachPathQuestProgression> {
+
+        /**
+         * A spot reached now.
+         */
+        public Reach(int spot) {
+            this(spot, Instant.now());
+        }
+
         @Override
         public boolean applyTo(@Nonnull ReachPathQuestProgression quest) {
-            if (quest.isOver() || !quest.isAwaited(spot)) return false;
+            if (quest.isOver() || !quest.isAwaitedAt(spot, at)) return false;
 
-            if (!quest.getAsset().isOrdered()) quest.reached.add(spot);
-            return new Add(1).applyTo(quest);
+            // Counted first: a combo restarting forgets the spots reached, this one aside
+            boolean counted = new Add(1, at).applyTo(quest);
+            if (counted && !quest.getAsset().isOrdered()) quest.reached.add(spot);
+            return counted;
         }
     }
 

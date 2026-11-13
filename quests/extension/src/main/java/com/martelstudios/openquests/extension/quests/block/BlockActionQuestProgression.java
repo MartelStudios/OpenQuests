@@ -9,6 +9,7 @@ import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -56,10 +57,18 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
      *
      * @param placedByPlayer for a break, whether a player had placed the block, as the world remembers
      */
-    public record Act(@Nonnull UUID playerId, @Nonnull BlockAction action, boolean placedByPlayer) implements QuestOperation<BlockActionQuestProgression<?>> {
+    public record Act(@Nonnull UUID playerId, @Nonnull BlockAction action, boolean placedByPlayer, @Nonnull Instant at) implements QuestOperation<BlockActionQuestProgression<?>> {
+
+        /**
+         * An action made now.
+         */
+        public Act(@Nonnull UUID playerId, @Nonnull BlockAction action, boolean placedByPlayer) {
+            this(playerId, action, placedByPlayer, Instant.now());
+        }
+
         @Override
         public boolean applyTo(@Nonnull BlockActionQuestProgression<?> quest) {
-            if (quest.isOver() || !quest.act(playerId, action, placedByPlayer)) return false;
+            if (quest.isOver() || !quest.act(playerId, action, placedByPlayer, at)) return false;
 
             quest.settle();
             return true;
@@ -72,7 +81,7 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
      *
      * @return whether anything changed, the count or the counters, which is what is worth saving.
      */
-    private boolean act(@Nonnull UUID playerId, @Nonnull BlockAction action, boolean placedByPlayer) {
+    private boolean act(@Nonnull UUID playerId, @Nonnull BlockAction action, boolean placedByPlayer, @Nonnull Instant at) {
         boolean guarded = isAntiAbuse();
         boolean changed = false;
         boolean fresh = true;
@@ -90,7 +99,7 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
             changed = true;
         }
 
-        if (fresh && counts(action) && new Add(1).applyTo(this)) changed = true;
+        if (fresh && counts(action) && new Add(1, at).applyTo(this)) changed = true;
 
         if (guarded && checkCompletion() && isStopOnComplete()) recoveries.clear();
 

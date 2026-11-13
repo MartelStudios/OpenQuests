@@ -66,11 +66,12 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     }
 
     /**
-     * @return how far the quest stands at that moment, nothing once its combo window closed by then.
+     * @return how far the quest stands at that moment, nothing once its combo window closed by then
+     * short of the target.
      */
     public int getCurrentQuantityAt(@Nonnull Instant now) {
         Instant endsAt = getComboEndsAt();
-        return endsAt != null && !now.isBefore(endsAt) ? 0 : quantity;
+        return endsAt != null && !now.isBefore(endsAt) && !isCompleted() ? 0 : quantity;
     }
 
     /**
@@ -140,13 +141,13 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
         }
 
         /**
-         * Two counts in a row are one count of both, steps walked between two writes going as one,
-         * at the moment of the first.
+         * Two counts made at the same moment are one count of both. Counts made apart stay apart,
+         * since a combo window may close between them.
          */
         @Nullable
         @Override
         public QuestOperation<QuantityQuestProgression<?>> followedBy(@Nonnull QuestOperation<?> next) {
-            return next instanceof Add more ? new Add(amount + more.amount, at) : null;
+            return next instanceof Add more && more.at.equals(at) ? new Add(amount + more.amount, at) : null;
         }
     }
 
