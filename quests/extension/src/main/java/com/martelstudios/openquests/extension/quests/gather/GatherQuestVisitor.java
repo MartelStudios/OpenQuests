@@ -7,7 +7,7 @@ import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
-import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestProgression;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class GatherQuestVisitor implements QuestVisitor<GatherQuestProgression> 
         int count = combinedItemContainer.countItemStacks(itemStack -> quest.getItemToGather()
                                                                             .matches(itemStack.getItemId()));
 
-        quest.apply(new QuantityQuestProgression.Count(count));
+        quest.apply(new HeldQuantityQuestProgression.Count(count));
 
         LOGGER.at(Level.FINE)
               .log("Quest %s progress for %s: %d/%d", quest.getId(), playerId, quest.getCurrentQuantity(), quest.getTargetQuantity());

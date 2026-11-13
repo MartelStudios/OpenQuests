@@ -66,7 +66,7 @@ public class ReachPathQuestProgression extends QuantityQuestProgression<ReachPat
         @Override
         public boolean applyTo(@Nonnull ReachPathQuestProgression quest) {
             quest.reached.clear();
-            return new Count(0).applyTo(quest);
+            return quest.moveCountTo(0);
         }
     }
 }

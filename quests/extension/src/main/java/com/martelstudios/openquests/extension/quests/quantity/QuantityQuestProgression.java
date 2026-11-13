@@ -84,19 +84,18 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     }
 
     /**
-     * Sets the count outright, for a quest counting what the player holds rather than what they did.
+     * Moves the count to that value outright and weighs the quest again.
+     *
+     * @return whether the count or the state moved
      */
-    public record Count(int quantity) implements QuestOperation<QuantityQuestProgression<?>> {
-        @Override
-        public boolean applyTo(@Nonnull QuantityQuestProgression<?> quest) {
-            if (quest.isOver()) return false;
+    protected boolean moveCountTo(int quantity) {
+        if (isOver()) return false;
 
-            QuestState before = quest.getState();
-            boolean moved = quest.quantity != quantity;
-            quest.quantity = quantity;
-            quest.settle();
-            return moved || quest.getState() != before;
-        }
+        QuestState before = getState();
+        boolean moved = this.quantity != quantity;
+        this.quantity = quantity;
+        settle();
+        return moved || getState() != before;
     }
 
     /**

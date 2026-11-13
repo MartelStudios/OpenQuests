@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestAsset;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
@@ -11,7 +12,7 @@ import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgr
  * Reach a value of the game read from a {@link ValueSource}, such as a game flag level or a count
  * of memories. {@code TargetQuantity} is the value to reach, 1 by default.
  */
-public class ReachValueQuestAsset extends QuantityQuestAsset {
+public class ReachValueQuestAsset extends HeldQuantityQuestAsset {
 
     public static final BuilderCodec<ReachValueQuestAsset> CODEC =
         BuilderCodec.builder(ReachValueQuestAsset.class, ReachValueQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
