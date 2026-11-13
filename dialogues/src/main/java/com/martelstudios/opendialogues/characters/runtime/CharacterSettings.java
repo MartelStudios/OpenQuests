@@ -21,7 +21,7 @@ public class CharacterSettings {
 
     private boolean draws = true;
 
-    private double scanRadius = 24;
+    private double scanRadius = 64;
 
     private float scanInterval = 5;
 

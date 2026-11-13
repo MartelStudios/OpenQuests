@@ -1,7 +1,9 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
@@ -31,5 +33,15 @@ public final class CharacterPositionsAccess {
         CharacterPositions positions = store.getResource(type);
         positions.catchUp(characters.universeRegistry().generation(), characters.worldRegistry(store).generation());
         return positions;
+    }
+
+    /**
+     * Records where an NPC carrying a character stands, so its marker follows it; on the world thread.
+     */
+    void record(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull CharacterNpc npc) {
+        String characterId = npc.identity().getCharacter();
+        TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
+        if (characterId == null || transform == null) return;
+        positions(store).record(characterId, npc.uuid(), transform.getPosition(), characters.displayName(npc.identity()));
     }
 }

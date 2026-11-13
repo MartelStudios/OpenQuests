@@ -117,6 +117,14 @@ public class CharacterService {
     }
 
     /**
+     * Reads the stored identity alone, so a scan skips NPCs without a character cheaply.
+     */
+    boolean carriesCharacter(@Nonnull ComponentAccessor<EntityStore> accessor, @Nonnull Ref<EntityStore> ref) {
+        OpenDialoguesNPCIdentity identity = accessor.getComponent(ref, identityType);
+        return identity != null && identity.getCharacter() != null;
+    }
+
+    /**
      * @return the NPC with its claims routed by scope, {@code null} for an entity without UUID.
      */
     @Nullable

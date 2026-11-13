@@ -213,8 +213,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         ResourceType<EntityStore, CharacterPositions> positionsType = getEntityStoreRegistry().registerResource(CharacterPositions.class, "OpenDialoguesCharacterPositions", CharacterPositions.CODEC);
         CharacterPositionsAccess positions = new CharacterPositionsAccess(positionsType, characterService);
         characterMarkers = new CharacterMarkerProvider(positions, player -> historyRecorder.history(player), characterAssets::character);
-        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings::get, characterService, positions::positions));
-        getEntityStoreRegistry().registerSystem(new CharacterSpawnSystem(characterSettings::get, characterService));
+        getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings::get, characterService, positions));
+        getEntityStoreRegistry().registerSystem(new CharacterSpawnSystem(characterSettings::get, characterService, positions));
         characterService.onUnanswered(NothingToSay::open);
         getEntityStoreRegistry().registerSystem(new CharacterTalkSystem(characterService, identityType));
         getEntityStoreRegistry().registerSystem(new CharacterHintSystem(characterService, identityType));

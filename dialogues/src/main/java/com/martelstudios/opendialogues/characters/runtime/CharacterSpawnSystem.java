@@ -32,13 +32,16 @@ public class CharacterSpawnSystem extends RefSystem<EntityStore> {
 
     private final Supplier<CharacterSettings> settings;
     private final CharacterService service;
+    private final CharacterPositionsAccess positions;
 
     /**
-     * @param settings read anew on each NPC, so stopping draws needs no restart.
+     * @param settings  read anew on each NPC, so stopping draws needs no restart.
+     * @param positions where an NPC carrying a character is recorded, so its marker shows at once.
      */
-    public CharacterSpawnSystem(@Nonnull Supplier<CharacterSettings> settings, @Nonnull CharacterService service) {
+    public CharacterSpawnSystem(@Nonnull Supplier<CharacterSettings> settings, @Nonnull CharacterService service, @Nonnull CharacterPositionsAccess positions) {
         this.settings = settings;
         this.service = service;
+        this.positions = positions;
     }
 
     @Nonnull
@@ -72,6 +75,7 @@ public class CharacterSpawnSystem extends RefSystem<EntityStore> {
                 String drawn = service.draw(npc, context(store, ref, world, entity));
                 if (npc.identity().getDraws().size() != drawsBefore) LOGGER.atFine().log("NPC %s (%s) drew %s.", npc.uuid(), entity.getRoleName(), drawn == null ? "nobody" : "character '" + drawn + "'");
             }
+            positions.record(store, ref, npc);
             return null;
         });
     }
