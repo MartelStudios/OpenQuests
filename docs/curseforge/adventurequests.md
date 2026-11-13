@@ -36,8 +36,6 @@ Over sixty quests in eight chapters, in English and French. A whole campaign thr
 
 🏅 **Flawless** stays a secret until you pass the trial without ever having failed it.
 
-🕯️ **An offering** follows: throw ten Essence of Life at the foot of the altar. Picking one back up to throw it again does not count twice.
-
 👥 **The temple has its people**, one of each for the whole server:
 
 * 🌱 **A curious seedling** who has never been outside wants feathers, then crystal shards of every colour, and pays in

@@ -2,10 +2,10 @@ chapter.name=Le Temple de l'Oubli
 
 # Temple
 character.temple-merchant.epithet=Marchand du temple
-dialogue.merchant-greeting.text=Te revoilà, client ! J'ai de l'essence, des graines et bien d'autres choses. Tu veux jeter un œil ?
+dialogue.merchant-greeting.text=Te revoilà, client ! Je vends des rations et de bons petits plats pour qui doit se ravitailler. Tu veux jeter un œil ?
 dialogue.merchant.trade=Montre-moi tes marchandises.
 dialogue.merchant.bye=Une autre fois.
-dialogue.merchant-intro.page1=Une nouvelle tête ! Bienvenue à mon étal, le seul de ce côté du portail. Essence, graines, un peu de tout, pour qui peut payer.
+dialogue.merchant-intro.page1=Une nouvelle tête ! Bienvenue à mon étal, le seul de ce côté du portail. Des rations et de bons petits plats, pour qui peut payer.
 dialogue.merchant-intro.page2=Mais je ne commerce pas avec les touristes. Va voir la statue près de l'autel des runes, sous la porte centrale, et parle-lui : elle t'apprend à capter les souvenirs des créatures que tu croises. Reviens avec quelques-uns, et on parlera affaires. Tiens, un peu d'essence à crédit, que tu saches que je suis sérieux.
 dialogue.merchant-intro.yes=J'irai voir la statue.
 dialogue.merchant-trial.page1=La statue te répond, maintenant ? Bien, tu n'es donc pas un touriste. Une dernière chose avant de devenir client : l'épreuve du temple, le tout en cinq minutes.
@@ -25,11 +25,6 @@ quest.flawless.never-failed.title=Ne jamais l'échouer
 quest.talk-to-rootling-merchant.title=Parler au marchand du temple
 quest.talk-to-rootling-merchant.description=Même dans un temple oublié, quelqu'un a trouvé de quoi faire commerce.
 quest.talk-to-rootling-merchant.short=Adressez-vous au marchand Kweebec du Temple de l'Oubli
-quest.temple-offering.title=Offrez de l'essence à l'autel des runes
-quest.temple-offering.description=L'autel se souvient de chaque offrande, et de qui l'a faite.
-quest.temple-offering.short=Jetez 10 Essences de vie au pied de l'autel des runes
-quest.temple-offering.in-temple=Dans le Temple de l'Oubli
-quest.temple-offering.near-altar=À moins de 6 blocs de l'autel des runes
 quest.temple-trial.title=L'épreuve du Temple
 quest.temple-trial.description=Le temple jauge ceux qui y entrent. Rares sont ceux qu'il juge dignes.
 quest.temple-trial.short=Réussissez les épreuves du temple en moins de cinq minutes
