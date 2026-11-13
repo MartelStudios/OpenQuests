@@ -4,6 +4,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
@@ -11,7 +12,7 @@ import javax.annotation.Nonnull;
 /**
  * Counts the openings, or the picks of an answer, that its asset's filters let through.
  */
-public class DialogueQuestProgression extends QuantityQuestProgression<DialogueQuestProgression> {
+public class DialogueQuestProgression extends HeldQuantityQuestProgression<DialogueQuestProgression> {
 
     public static final BuilderCodec<DialogueQuestProgression> CODEC = BuilderCodec.builder(DialogueQuestProgression.class, DialogueQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                    .build();

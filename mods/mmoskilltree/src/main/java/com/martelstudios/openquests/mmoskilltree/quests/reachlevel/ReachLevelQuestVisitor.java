@@ -3,7 +3,7 @@ package com.martelstudios.openquests.mmoskilltree.quests.reachlevel;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
-import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestProgression;
 import com.ziggfreed.mmoskilltree.api.MMOSkillTreeAPI;
 
 import javax.annotation.Nonnull;
@@ -27,7 +27,7 @@ public class ReachLevelQuestVisitor implements QuestVisitor<ReachLevelQuestProgr
         if (!quest.getPlayers().contains(playerId)) return;
 
         int level = MMOSkillTreeAPI.getLevel(playerRef.getStore(), playerRef, quest.getSkill());
-        quest.apply(new QuantityQuestProgression.Count(level));
+        quest.apply(new HeldQuantityQuestProgression.Count(level));
     }
 
     @Override

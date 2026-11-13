@@ -404,7 +404,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * The environment's time, the system's for a quest no store holds yet.
      */
     @Nonnull
-    private Instant now() {
+    protected Instant now() {
         return environment != null ? environment.clock().instant() : Instant.now();
     }
 

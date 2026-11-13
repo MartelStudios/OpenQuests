@@ -9,6 +9,7 @@ import com.martelstudios.openquests.dialogues.quests.dialogue.DialogueQuestProgr
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.Arrays;
 
 /**
@@ -70,7 +71,15 @@ public class DeliverQuestProgression extends QuantityQuestProgression<DeliverQue
      * Some of one item handed over. Capped on the copy it is made on, so a delivery racing another
      * never counts past the quantity.
      */
-    public record Delivered(int index, int amount) implements QuestOperation<DeliverQuestProgression> {
+    public record Delivered(int index, int amount, @Nonnull Instant at) implements QuestOperation<DeliverQuestProgression> {
+
+        /**
+         * Items handed over now.
+         */
+        public Delivered(int index, int amount) {
+            this(index, amount, Instant.now());
+        }
+
         @Override
         public boolean applyTo(@Nonnull DeliverQuestProgression quest) {
             if (quest.isOver()) return false;
@@ -78,7 +87,7 @@ public class DeliverQuestProgression extends QuantityQuestProgression<DeliverQue
             if (quest.delivered.length < quantities.length) quest.delivered = Arrays.copyOf(quest.delivered, quantities.length);
 
             int taken = accept(quest.delivered, quantities, index, amount);
-            return taken > 0 && new Add(taken).applyTo(quest);
+            return taken > 0 && new Add(taken, at).applyTo(quest);
         }
     }
 }

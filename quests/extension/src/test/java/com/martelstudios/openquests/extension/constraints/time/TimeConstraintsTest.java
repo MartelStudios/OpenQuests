@@ -1,7 +1,11 @@
 package com.martelstudios.openquests.extension.constraints.time;
 
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
+import com.martelstudios.openquests.extension.quests.castspell.CastSpellQuestAsset;
+import com.martelstudios.openquests.extension.quests.gather.GatherQuestAsset;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestAsset;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -55,6 +59,34 @@ class TimeConstraintsTest {
     @Test
     void aTimeLimitOfNothingDoesNotDecode() {
         assertNull(tryDecode(TimeLimitConstraint.CODEC, "{\"Seconds\": 0}"));
+    }
+
+    @Test
+    void withinRefusesAQuestThatIsNotCounted() {
+        assertNotNull(decode(WithinConstraint.CODEC, "{\"Seconds\": 10}").validate(asset()));
+    }
+
+    @Test
+    void withinRefusesHeldQuantities() {
+        WithinConstraint within = decode(WithinConstraint.CODEC, "{\"Seconds\": 10}");
+
+        assertNotNull(within.validate(decode(GatherQuestAsset.CODEC, "{\"TargetQuantity\": 5}")));
+        assertNotNull(within.validate(new HeldQuantityQuestAsset() {
+            @Override
+            public AbstractQuestProgression.Builder<?, ?> builder() {
+                throw new UnsupportedOperationException();
+            }
+        }));
+    }
+
+    @Test
+    void withinAcceptsCountedActions() {
+        assertNull(decode(WithinConstraint.CODEC, "{\"Seconds\": 10}").validate(decode(CastSpellQuestAsset.CODEC, "{\"TargetQuantity\": 5}")));
+    }
+
+    @Test
+    void aWithinOfNothingDoesNotDecode() {
+        assertNull(tryDecode(WithinConstraint.CODEC, "{\"Seconds\": 0}"));
     }
 
     @Test

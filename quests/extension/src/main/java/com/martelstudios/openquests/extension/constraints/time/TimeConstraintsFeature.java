@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 public final class TimeConstraintsFeature {
     public static final String TIME_LIMIT_TYPE_ID = "TimeLimit";
     public static final String DEADLINE_TYPE_ID = "Deadline";
+    public static final String WITHIN_TYPE_ID = "Within";
 
     private TimeConstraintsFeature() {}
 
@@ -23,8 +24,10 @@ public final class TimeConstraintsFeature {
     public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         QuestConstraint.CODEC.register(TIME_LIMIT_TYPE_ID, TimeLimitConstraint.class, TimeLimitConstraint.CODEC);
         QuestConstraint.CODEC.register(DEADLINE_TYPE_ID, DeadlineConstraint.class, DeadlineConstraint.CODEC);
+        QuestConstraint.CODEC.register(WITHIN_TYPE_ID, WithinConstraint.class, WithinConstraint.CODEC);
 
         QuestPageService.register(new TimeLimitRenderer());
         QuestPageService.register(new DeadlineRenderer());
+        QuestPageService.register(new WithinRenderer());
     }
 }

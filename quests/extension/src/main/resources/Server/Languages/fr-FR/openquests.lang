@@ -56,6 +56,7 @@ page.duration.seconds = {count, number} s
 page.duration.pair = {first} {second}
 page.constraint.time-limit = Temps limite
 page.constraint.time-left = Temps restant
+page.constraint.within = Fenêtre de combo
 page.constraint.deadline = Se termine dans
 page.constraint.in-world = Uniquement dans un monde correspondant à {world}
 page.constraint.in-world.fail = Uniquement dans un monde correspondant à {world}, en sortir fait échouer la quête

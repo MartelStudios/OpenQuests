@@ -54,10 +54,11 @@ class MovementReplayTest {
         quest.attach(ON_SHARED_STORAGE);
         quest.getReplica().markStored(new QuestReplica.Stored(1, QuestState.IN_PROGRESS, Set.of(), Set.of()));
 
-        quest.apply(new QuantityQuestProgression.Add(1));
-        quest.apply(new QuantityQuestProgression.Add(2));
+        java.time.Instant at = java.time.Instant.parse("2026-11-13T12:00:00Z");
+        quest.apply(new QuantityQuestProgression.Add(1, at));
+        quest.apply(new QuantityQuestProgression.Add(2, at));
 
-        assertEquals(List.of(new QuantityQuestProgression.Add(3)), quest.getReplica().getPendingOperations());
+        assertEquals(List.of(new QuantityQuestProgression.Add(3, at)), quest.getReplica().getPendingOperations());
     }
 
     @Test

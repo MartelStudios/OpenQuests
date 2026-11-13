@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.models.QuestOperation;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
@@ -13,7 +14,7 @@ import javax.annotation.Nullable;
 /**
  * Counts the watched value, or what it gained since the first read for a relative quest.
  */
-public class ReachValueQuestProgression extends QuantityQuestProgression<ReachValueQuestProgression> {
+public class ReachValueQuestProgression extends HeldQuantityQuestProgression<ReachValueQuestProgression> {
 
     public static final BuilderCodec<ReachValueQuestProgression> CODEC =
         BuilderCodec.builder(ReachValueQuestProgression.class, ReachValueQuestProgression::new, QuantityQuestProgression.BASE_CODEC)

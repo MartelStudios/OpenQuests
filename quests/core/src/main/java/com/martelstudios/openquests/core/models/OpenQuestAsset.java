@@ -321,7 +321,11 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
         return getAssetStore().getAssetMap();
     }
 
+    /**
+     * @return the asset under that id, {@code null} if there is none or no store is registered yet.
+     */
     public static OpenQuestAsset getAsset(String assetId) {
-        return getAssetMap().getAsset(assetId);
+        var store = getAssetStore();
+        return store == null ? null : store.getAssetMap().getAsset(assetId);
     }
 }

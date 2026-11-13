@@ -8,6 +8,7 @@ import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
+import java.time.Instant;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,10 +61,18 @@ public abstract class ItemExchangeQuestProgression<Q extends ItemExchangeQuestPr
     /**
      * A move of items this quest counts.
      */
-    public record Exchange(@Nonnull UUID playerId, @Nonnull ItemExchange exchange, int quantity) implements QuestOperation<ItemExchangeQuestProgression<?>> {
+    public record Exchange(@Nonnull UUID playerId, @Nonnull ItemExchange exchange, int quantity, @Nonnull Instant at) implements QuestOperation<ItemExchangeQuestProgression<?>> {
+
+        /**
+         * A move made now.
+         */
+        public Exchange(@Nonnull UUID playerId, @Nonnull ItemExchange exchange, int quantity) {
+            this(playerId, exchange, quantity, Instant.now());
+        }
+
         @Override
         public boolean applyTo(@Nonnull ItemExchangeQuestProgression<?> quest) {
-            if (quest.isOver() || !quest.exchange(playerId, exchange, quantity)) return false;
+            if (quest.isOver() || !quest.exchange(playerId, exchange, quantity, at)) return false;
 
             quest.settle();
             return true;
@@ -75,14 +84,14 @@ public abstract class ItemExchangeQuestProgression<Q extends ItemExchangeQuestPr
      *
      * @return whether anything changed, the count or the counters, which is what is worth saving.
      */
-    private boolean exchange(@Nonnull UUID playerId, @Nonnull ItemExchange exchange, int quantity) {
+    private boolean exchange(@Nonnull UUID playerId, @Nonnull ItemExchange exchange, int quantity, @Nonnull Instant at) {
         boolean guarded = isAntiAbuse();
 
         int fresh = quantity;
         if (guarded && exchange == ItemExchange.THROW) fresh = counters.recordThrow(playerId, quantity);
         if (guarded && exchange == ItemExchange.GROUND_PICKUP) fresh = counters.recordGroundPickup(playerId, quantity);
 
-        boolean counted = counts(exchange) && new Add(fresh).applyTo(this);
+        boolean counted = counts(exchange) && new Add(fresh, at).applyTo(this);
 
         return counted || (guarded && exchange != ItemExchange.HARVEST);
     }

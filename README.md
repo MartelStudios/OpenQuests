@@ -496,7 +496,7 @@ A spell counts once its cast goes through: one refused for want of mana, or stil
 `SpellToCast` names the spells, with `SpellIds` for runes (any item whose `Ability` sits in the
 `Core` slot, modded ones included) and `AbilityKeywords` for every spell carrying one of them, such as
 `Fire`. Either key accepts a spell; leaving `SpellToCast` out counts every spell. A time limit is
-the `TimeLimit` constraint, as for any other type.
+the `TimeLimit` constraint, a combo ("5 spells within 10 seconds") the `Within` one, as for any other counted type.
 
 ```json
 { "Type": "CastSpell", "TargetQuantity": 5, "SpellToCast": { "AbilityKeywords": ["Fire"] } }
@@ -780,6 +780,7 @@ malformed one stops the server with the asset named rather than failing the day 
 | --- | --- | --- |
 | `TimeLimit` | `Seconds`, `OnExpire` | Ends the quest that long after it started. A shared quest is timed from its own start. |
 | `Deadline` | `At`, `OnExpire` | Ends every quest from the asset at one moment, an ISO-8601 instant such as `"2026-12-31T23:00:00Z"`. Nothing is handed out past it. |
+| `Within` | `Seconds` | Makes a counted quest a combo: the target is to be reached that long after the first action counted, or the count drops to zero and the next action starts again. The quest never fails for it. Only a quest counting actions takes it; one counting what the player holds (`Gather`, `ReachValue`, `Dialogue`, `MMOSkillTreeReachLevel`) is refused at boot. |
 | `InWorld` | `WorldNamePattern`, `OnLeave` | Counts progress only in a world whose whole name matches, the way `EnterWorld` reads its own. `"OnLeave": "Fail"` fails the quest when its player goes from a matching world to one that is not; logging out is not leaving. |
 | `NearPosition` | `Position`, `Radius`, `WorldNamePattern` | Counts progress only within the radius, its edge included. The pattern, optional, says which world the position is in. |
 | `EntityCondition` | `Conditions` | Counts progress only while the player's entity meets every condition: the game's own, `Sprinting`, `OutOfCombat`, `HasEffect`…, so one another mod registers works too. |

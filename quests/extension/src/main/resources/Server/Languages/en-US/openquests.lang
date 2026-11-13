@@ -56,6 +56,7 @@ page.duration.seconds = {count, number} s
 page.duration.pair = {first} {second}
 page.constraint.time-limit = Time limit
 page.constraint.time-left = Time left
+page.constraint.within = Combo window
 page.constraint.deadline = Ends in
 page.constraint.in-world = Only in a world matching {world}
 page.constraint.in-world.fail = Only in a world matching {world}, leaving it fails the quest

@@ -3,9 +3,10 @@ package com.martelstudios.openquests.extension.quests.gather;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestAsset;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 
-public class GatherQuestAsset extends QuantityQuestAsset {
+public class GatherQuestAsset extends HeldQuantityQuestAsset {
 
     public static final BuilderCodec<GatherQuestAsset> CODEC =
         BuilderCodec.builder(GatherQuestAsset.class, GatherQuestAsset::new, QuantityQuestAsset.BASE_CODEC)

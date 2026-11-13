@@ -4,6 +4,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
@@ -13,7 +14,7 @@ import javax.annotation.Nullable;
  * Quest whose progress is however many of a given item the player currently holds, rechecked
  * on every inventory change.
  */
-public class GatherQuestProgression extends QuantityQuestProgression<GatherQuestProgression> {
+public class GatherQuestProgression extends HeldQuantityQuestProgression<GatherQuestProgression> {
 
     public static final BuilderCodec<GatherQuestProgression> CODEC = BuilderCodec.builder(GatherQuestProgression.class, GatherQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                  .append(new KeyedCodec<>("ItemToGather", QuestItemFilter.CODEC), (quest, item) -> quest.itemToGather = item, quest -> quest.itemToGather)

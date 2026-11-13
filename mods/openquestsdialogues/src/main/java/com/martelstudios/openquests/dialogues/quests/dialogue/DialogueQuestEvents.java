@@ -12,6 +12,7 @@ import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
+import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
@@ -54,7 +55,7 @@ public final class DialogueQuestEvents {
 
         EntityComponents.update(event.getPlayerId(), components -> {
             DialogueHistory history = components.getComponent(OpenDialoguesPlugin.get().getHistoryType());
-            if (history != null && !quest.isOver()) quest.apply(new QuantityQuestProgression.Count(quest.getAsset().countIn(history)));
+            if (history != null && !quest.isOver()) quest.apply(new HeldQuantityQuestProgression.Count(quest.getAsset().countIn(history)));
         });
     }
 
