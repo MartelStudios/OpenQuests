@@ -54,13 +54,6 @@
       }
     },
     {
-      "Quest": "AdventureQuests_TempleOffering",
-      "Position": {
-        "X": 7,
-        "Y": 0
-      }
-    },
-    {
       "Quest": "AdventureQuests_Flawless",
       "Position": {
         "X": 9,

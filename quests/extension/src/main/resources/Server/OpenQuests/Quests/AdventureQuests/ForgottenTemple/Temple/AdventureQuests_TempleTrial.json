@@ -87,13 +87,6 @@
       "ItemId": "Ingredient_Life_Essence",
       "Quantity": 50,
       "AutoClaim": true
-    },
-    {
-      "Type": "GrantQuest",
-      "QuestAssetIds": [
-        "AdventureQuests_TempleOffering"
-      ],
-      "AutoClaim": true
     }
   ]
 }
