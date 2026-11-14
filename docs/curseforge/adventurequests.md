@@ -1,8 +1,8 @@
 # Adventure Quests
 
-📦 **Over sixty quests, characters and dialogues for vanilla Hytale, ready the moment your server starts.**
+📦 **Over seventy quests, characters and dialogues for vanilla Hytale, ready the moment your server starts.**
 
-Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, characters who remember you, and feats for every way you move. OpenQuests ships with no quests of its own: this pack is the content. Works in multiplayer and singleplayer, on new or existing worlds.
+Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, Kweebec villagers with a favour to ask, characters who remember you, and feats for every way you move. OpenQuests ships with no quests of its own: this pack is the content. Works in multiplayer and singleplayer, on new or existing worlds.
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
 
@@ -12,7 +12,7 @@ Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: 
 
 ## ✨ What is inside
 
-Over sixty quests in eight chapters, in English and French. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
+Over seventy quests in eight chapters and seventeen village stories, in English and French. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
 
 🖼️ **Every quest has its icon**, from a crude hatchet to the breach's portal key, so the journal and its chapter graphs read at a glance.
 
@@ -46,6 +46,14 @@ Over sixty quests in eight chapters, in English and French. A whole campaign thr
   Talk to her before she leaves.
 * 🛡️ **A dreaming guard** wants to hear how you beat each boss of the breach, then to see a rune you forged and a spell cast, and sends
   you back through with a fragment.
+
+### 🏡 Kweebec villages
+
+🌱 **About one villager in two has a story.** Saplings, sproutlings, Razorleaf guards and the merchant each live one small incident, ask for your help once, then go back to village life. Each gets a name of its own, and a village feels alive without repeating itself.
+
+🥕 **Seventeen stories, each tied to who tells it.** A hungry sapling wants a ripe carrot from the garden, a would-be guard dreams of a crude sword, the smith's forge has gone cold, the alchemist's still just cracked, foxes scare the rabbits from their burrows. You pick crops, craft, hunt and deliver.
+
+🎁 **Rewards worth the detour, fitting the story:** potions from the alchemist, an iron sword or axe from the smith, eternal seeds from the farmer, recipes from the cook and the merchant. The merchant's stall still opens on request.
 
 ### 🕳️ The Goblin Breach
 
