@@ -91,7 +91,7 @@ val questExamplesManifest by tasks.registering {
             """
             {
                 "Group": "$group",
-                "Name": "HytaleAdventureQuests",
+                "Name": "AdventureQuests",
                 "Version": "$modVersion",
                 "Description": "Quests, characters and dialogues that bring vanilla Hytale to life. Delete to start from an empty quest list.",
                 "Authors": [
@@ -114,7 +114,7 @@ val questExamplesManifest by tasks.registering {
 }
 
 val questExamplesZip by tasks.registering(Zip::class) {
-    archiveBaseName.set("HytaleAdventureQuests")
+    archiveBaseName.set("AdventureQuests")
     archiveVersion.set(project.property("adventurequests_version").toString())
 
     // Manifest at the root, the rest keeping the paths it has under src/main/resources

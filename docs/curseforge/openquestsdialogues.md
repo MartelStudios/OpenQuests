@@ -58,7 +58,7 @@ their progress.
 ### 🧸 An example to start from
 
 *The strange plush* chapter of
-**[Hytale Adventure Quests](https://www.curseforge.com/hytale/mods/hytale-adventure-quests)** uses all of it: a goblin plush
+**[Adventure Quests](https://www.curseforge.com/hytale/mods/hytale-adventure-quests)** uses all of it: a goblin plush
 that hands you its quest when you first talk to it, asks to be fed ore, and has new things to say once its belly is
 full.
 

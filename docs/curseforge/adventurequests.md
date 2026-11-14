@@ -1,4 +1,4 @@
-# Hytale Adventure Quests
+# Adventure Quests
 
 📦 **Quests, characters and dialogues that bring vanilla Hytale to life. Install it, play it, delete it.**
 

@@ -19,7 +19,7 @@ on:
         required: false
         default: ''
       adventurequests_version:
-        description: 'Version of the Hytale Adventure Quests pack to publish, or empty to leave it out'
+        description: 'Version of the Adventure Quests pack to publish, or empty to leave it out'
         required: false
         default: ''
       mmoskilltree_version:
@@ -179,10 +179,10 @@ jobs:
             relations: ''
             project_id: '1678101'
             file: quests/core/build/libs/OpenQuestsCore-*.jar
-          - name: Hytale Adventure Quests
+          - name: Adventure Quests
             relations: openquests:requiredDependency,openquests-dialogues:requiredDependency
             project_id: '1680200'
-            file: quests/extension/build/distributions/HytaleAdventureQuests-*.zip
+            file: quests/extension/build/distributions/AdventureQuests-*.zip
             version_input: adventurequests_version
           - name: OpenDialogues
             relations: ''

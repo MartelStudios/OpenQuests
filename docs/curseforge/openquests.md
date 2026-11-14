@@ -13,7 +13,7 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 guardian with a sword, or find another way around._
 
 > 📦 **Want to see it in action ?** Install
-> **[Hytale Adventure Quests](https://www.curseforge.com/hytale/mods/hytale-adventure-quests)** next to OpenQuests: ready-made
+> **[Adventure Quests](https://www.curseforge.com/hytale/mods/hytale-adventure-quests)** next to OpenQuests: ready-made
 > quest lines, in English and French, handed to your players as soon as the server starts.
 
 ***
@@ -185,7 +185,7 @@ The same quest asset can be played four ways:
 
 * ⚔️ **OpenQuests**: this project, the quest types, rewards, journal and HUD
 * ⚙️ **OpenQuests Core**: the system underneath, pulled in with it
-* 📦 **Hytale Adventure Quests** (optional): the ready-made quest lines
+* 📦 **Adventure Quests** (optional): the ready-made quest lines
 
 Drop them in `mods/`. Nothing else to configure.
 
