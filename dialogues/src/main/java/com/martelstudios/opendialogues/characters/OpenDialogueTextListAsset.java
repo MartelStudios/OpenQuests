@@ -16,7 +16,8 @@ import javax.annotation.Nullable;
 
 /**
  * Translation keys a trait draws from, such as names or epithets, so a drawn text can carry a
- * title. Shared by several characters as a file of its own, or written inline in one.
+ * title, or plain texts shown as is. Shared by several characters as a file of its own, or written
+ * inline in one.
  */
 public class OpenDialogueTextListAsset implements JsonAssetWithMap<String, DefaultAssetMap<String, OpenDialogueTextListAsset>> {
 
@@ -58,7 +59,7 @@ public class OpenDialogueTextListAsset implements JsonAssetWithMap<String, Defau
     }
 
     /**
-     * @return the translation keys, possibly none.
+     * @return the translation keys or plain texts, possibly none.
      */
     @Nonnull
     public String[] getTexts() {

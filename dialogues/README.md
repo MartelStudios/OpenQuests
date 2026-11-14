@@ -140,7 +140,7 @@ A mod reveals characters on a player's map, sets their icon or puts them on the 
 when what it says changed.
 
 **`TextLists/`** (type **OpenDialogueTextListAsset**): `Texts`, a list of translation keys a trait draws one of
-per NPC, such as a name.
+per NPC, such as a name. A text with no translation shows as is, so a name can be written plainly.
 
 **`CharacterDistributions/`** (type **OpenDialogueCharacterDistributionAsset**): which NPCs draw what.
 
