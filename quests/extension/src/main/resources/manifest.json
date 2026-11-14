@@ -17,8 +17,8 @@
         "Hytale:NPC": "*",
         "Hytale:TagSet": "*",
         "Hytale:TriggerVolumes": "*",
-        "MartelStudios:OpenQuestsCore": "*",
-        "MartelStudios:OpenNavigation": "*"
+        "MartelStudios:OpenQuestsCore": "^5.1.0",
+        "MartelStudios:OpenNavigation": "^2.0.0"
     },
     "OptionalDependencies": {
         

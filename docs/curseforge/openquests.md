@@ -13,7 +13,7 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 guardian with a sword, or find another way around._
 
 > 📦 **Want to see it in action ?** Install
-> **[Hytale Adventure Quests](https://www.curseforge.com/hytale/mods/hytale-adventure-quests)** next to OpenQuests: ready-made
+> **[Adventure Quests](https://www.curseforge.com/hytale/mods/adventure-quests)** next to OpenQuests: ready-made
 > quest lines, in English and French, handed to your players as soon as the server starts.
 
 ***
@@ -38,6 +38,8 @@ description for the story, with paragraphs, italics and colours.
 
 🎁 **Rewards to look forward to.** Items, the next quests, commands, a prize drawn at random, or a popup where the
 player picks their own.
+
+🗺️ **Quests on the map.** Every running quest shows where to go on the world map, and the tracked one on the compass.
 
 ⏳ **Rules on any quest.** Time limits, worlds, cooldowns, caps: add them to any quest and combine them freely.
 
@@ -102,6 +104,7 @@ the chapter's file is written for you.
 | <code>KillNpc</code>                                     | Killing NPCs of a group                                            |
 | <code>KillPlayer</code>                                  | Killing players, optionally a designated one                       |
 | <code>ReachLocation</code>                               | Entering a radius around a position, shown on the map and compass  |
+| <code>ReachPath</code>                                   | Reaching a series of spots, in order or not: a parkour, a course   |
 | <code>EnterWorld</code>                                  | Entering a world whose name matches a pattern                      |
 | <code>ReachValue</code>                                  | A game flag or a count of memories reaching a value                |
 | <code>TriggerVolume</code>                               | Entering trigger volumes, even in generated worlds                 |
@@ -112,7 +115,7 @@ the chapter's file is written for you.
 | <code>QuestState</code>                                  | Another quest reaching a state: a prerequisite                     |
 | <code>NoOp</code>                                        | Nothing on its own: a command, a reward or your own plugin ends it |
 
-Items and blocks are named by id, by tag, or by family, such as any flower or any raw meat. `"AntiAbuse": true` stops
+Items and blocks are named by id, by tag, by family, such as any flower or any raw meat, or by crafting bench category. `"AntiAbuse": true` stops
 the same item thrown and picked up, or the same block placed and broken, from counting twice.
 
 ## 🎁 Rewards
@@ -185,7 +188,7 @@ The same quest asset can be played four ways:
 
 * ⚔️ **OpenQuests**: this project, the quest types, rewards, journal and HUD
 * ⚙️ **OpenQuests Core**: the system underneath, pulled in with it
-* 📦 **Hytale Adventure Quests** (optional): the ready-made quest lines
+* 📦 **Adventure Quests** (optional): the ready-made quest lines
 
 Drop them in `mods/`. Nothing else to configure.
 

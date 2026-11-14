@@ -13,7 +13,7 @@ _A character with a name, a title and a portrait, answers with icons and colours
 said last time._
 
 > 📦 **Want to see it in action ?** Install
-> **[Hytale Adventure Quests](https://www.curseforge.com/hytale/mods/hytale-adventure-quests)**: *The strange plush* chapter hands
+> **[Adventure Quests](https://www.curseforge.com/hytale/mods/adventure-quests)**: *The strange plush* chapter hands
 > you a hungry goblin plush that talks, begs for ore and changes its tune once fed.
 
 ***
@@ -43,7 +43,8 @@ greets a newcomer and a regular differently.
 
 👥 **Characters for passive NPCs.** Villagers, children, even a stag draw a character as players come near: a name of
 their own, a dialogue on F, and a place in your quests. Keep one unique for the whole server, give a role a few
-characters drawn by weight, and choose where each appears, down to an instance like the Forgotten Temple.
+characters drawn by weight, and choose where each appears, down to an instance like the Forgotten Temple. When a
+named character dies, word spreads in the chat.
 
 🗺️ **On the map.** Characters a player has met show on their world map with their name; one can show from the start,
 or never. A key character can also show on the compass of every player nearby.
@@ -186,6 +187,8 @@ interaction to an item.
 | <code>/odialogues display set <target> <display></code>      | Forces a display on a dialogue, a tag, a pack or everything    | Admins        |
 | <code>/odialogues display which <dialogue></code>            | Tells where a dialogue will open, and why                      | Admins        |
 | <code>/odialogues history reset <player></code>              | Forgets what a player said, so everyone greets them anew       | Admins        |
+| <code>/ocharacters info</code>, <code>assign</code>, <code>unassign</code> | Inspects or changes the character of the NPC in view, also <code>/oc</code> | Admins |
+| <code>/ocharacters reset</code>, <code>draws stop</code>     | Draws every character again, or stops new draws                | Admins        |
 
 ***
 

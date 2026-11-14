@@ -1033,7 +1033,7 @@ stops the server with an explicit reason rather than failing later at runtime.
 
 ## Pack layout
 
-The Hytale Adventure Quests pack (`quests/extension/src/main/resources`) follows one rule, so a new quest line slots in without a decision:
+The Adventure Quests pack (`quests/extension/src/main/resources`) follows one rule, so a new quest line slots in without a decision:
 
 - Every asset is named `AdventureQuests_<Name>`, and its id is that file name whatever folder holds it.
 - Files sit under `<Store>/AdventureQuests/<Line>/[<Arc>/]`, for example `OpenQuests/Quests/AdventureQuests/ForgottenTemple/Lab/AdventureQuests_LabBoiler.json`. Categories, chapter groups and chapters sit directly in `<Store>/AdventureQuests/`.
