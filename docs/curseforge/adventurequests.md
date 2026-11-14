@@ -1,6 +1,6 @@
 # Adventure Quests
 
-📦 **Over seventy quests, characters and dialogues for vanilla Hytale, ready the moment your server starts.**
+📦 **Over 150 quests, characters and dialogues for vanilla Hytale, ready the moment your server starts.**
 
 Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, Kweebec villagers with a favour to ask, characters who remember you, and feats for every way you move. OpenQuests ships with no quests of its own: this pack is the content. Works in multiplayer and singleplayer, on new or existing worlds.
 
@@ -12,7 +12,7 @@ Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: 
 
 ## ✨ What is inside
 
-Over seventy quests in eight chapters and seventeen village stories, in English and French. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
+Over 150 quests in English and French, across ten chapters and seventeen village stories. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
 
 🖼️ **Every quest has its icon**, from a crude hatchet to the breach's portal key, so the journal and its chapter graphs read at a glance.
 
@@ -49,11 +49,11 @@ Over seventy quests in eight chapters and seventeen village stories, in English 
 
 ### 🏡 Kweebec villages
 
-🌱 **About one villager in two has a story.** Saplings, sproutlings, Razorleaf guards and the merchant each live one small incident, ask for your help once, then go back to village life. Each gets a name of its own, and a village feels alive without repeating itself.
+🌱 **About one villager in two has a story.** Saplings, sproutlings, Razorleaf guards and the merchant each live one small incident, ask for your help once, then go back to village life. Each gets a name of its own.
 
 🥕 **Seventeen stories, each tied to who tells it.** A hungry sapling wants a ripe carrot from the garden, a would-be guard dreams of a crude sword, the smith's forge has gone cold, the alchemist's still just cracked, foxes scare the rabbits from their burrows. You pick crops, craft, hunt and deliver.
 
-🎁 **Rewards worth the detour, fitting the story:** potions from the alchemist, an iron sword or axe from the smith, eternal seeds from the farmer, recipes from the cook and the merchant. The merchant's stall still opens on request.
+🎁 **Rewards that fit the story:** potions from the alchemist, an iron sword or axe from the smith, eternal seeds from the farmer, recipes from the cook and the merchant. The merchant's stall still opens on request.
 
 ### 🕳️ The Goblin Breach
 
