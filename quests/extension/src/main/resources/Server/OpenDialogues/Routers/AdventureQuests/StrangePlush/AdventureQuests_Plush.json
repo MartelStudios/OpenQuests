@@ -28,7 +28,7 @@
         "Then": {
           "Dialogue": {
             "Title": "adventurequests.strangeplush.character.plush.name",
-            "Display": "Default",
+            "Display": "Cinematic",
             "Character": "AdventureQuests_Plush",
             "Tags": { "Series": ["AdventureQuests_StrangePlush"] },
             "Pages": [

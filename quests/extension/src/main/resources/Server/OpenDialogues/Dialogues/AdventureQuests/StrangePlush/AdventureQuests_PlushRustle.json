@@ -1,6 +1,6 @@
 {
   "Title": "adventurequests.strangeplush.dialogue.plush-rustle.title",
-  "Display": "Default",
+  "Display": "Cinematic",
   "Tags": { "Series": ["AdventureQuests_StrangePlush"] },
   "Pages": [
     { "Text": "adventurequests.strangeplush.dialogue.plush-rustle.text" }
