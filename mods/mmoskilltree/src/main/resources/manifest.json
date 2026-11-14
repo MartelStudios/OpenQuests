@@ -11,8 +11,8 @@
     "Website": "https://github.com/MartelStudios/OpenQuests",
     "ServerVersion": "^0.7.0",
     "Dependencies": {
-        "MartelStudios:OpenQuestsCore": "^5.0.0",
-        "MartelStudios:OpenQuests": "^5.0.0",
+        "MartelStudios:OpenQuestsCore": "^5.1.0",
+        "MartelStudios:OpenQuests": "^5.1.0",
         "Ziggfreed:MMOSkillTree": "*"
     },
     "OptionalDependencies": {
