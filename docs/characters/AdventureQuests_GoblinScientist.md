@@ -9,7 +9,7 @@
   invulnerable, who directs the vanilla lab repairs.
 - **Distribution:** `AdventureQuests_GoblinScientist`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight.
-- **Name:** drawn from `AdventureQuests_KweebecNames`, shared for now, since a nameplate holds a name, not a
+- **Name:** drawn from `AdventureQuests_GoblinNames` (plain names, the same in every language), since a nameplate holds a name, not a
   title. A new draw can change it when she comes back as a visitor. "Makinomagistra" / "Machinarque"
   stays only the character's fixed name, shown when no name was drawn; quest texts call her by her epithet.
   **Epithet:** "Lab foreman" / "Contremaîtresse du labo", on the character. Her dialogues name her with
