@@ -1,0 +1,8 @@
+{
+  "Type": "Craft",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-bandages.craft.title",
+  "TargetQuantity": 3,
+  "ItemToCraft": {
+    "ItemId": "Bandage_Crude"
+  }
+}

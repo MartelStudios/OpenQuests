@@ -1,0 +1,8 @@
+{
+  "Type": "InteractivelyPickup",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-mushroom.harvest.title",
+  "TargetQuantity": 1,
+  "ItemToPickup": {
+    "ResourceTypeId": "Mushrooms"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-mushroom.give.title",
+  "Character": "AdventureQuests_KweebecMushroom",
+  "Items": [
+    {
+      "Item": {
+        "ResourceTypeId": "Mushrooms"
+      },
+      "Quantity": 1
+    }
+  ]
+}

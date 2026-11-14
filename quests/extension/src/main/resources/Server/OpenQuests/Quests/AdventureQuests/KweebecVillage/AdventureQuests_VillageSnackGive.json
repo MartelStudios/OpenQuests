@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-snack.give.title",
+  "Character": "AdventureQuests_KweebecSnack",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Carrot_Item"
+      },
+      "Quantity": 1
+    }
+  ]
+}

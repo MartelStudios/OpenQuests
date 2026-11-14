@@ -1,0 +1,8 @@
+{
+  "Type": "Craft",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-display.craft.title",
+  "TargetQuantity": 2,
+  "ItemToCraft": {
+    "ItemId": "Food_Salad_Berry"
+  }
+}

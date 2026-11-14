@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-burrows.give.title",
+  "Character": "AdventureQuests_KweebecBurrows",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Carrot_Item"
+      },
+      "Quantity": 5
+    }
+  ]
+}

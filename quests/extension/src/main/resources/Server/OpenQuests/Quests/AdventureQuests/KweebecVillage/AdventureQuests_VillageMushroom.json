@@ -1,0 +1,29 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Plant_Crop_Mushroom_Common_Brown.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-mushroom.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-mushroom.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-mushroom.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageMushroomHarvest",
+    "AdventureQuests_VillageMushroomGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 30,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Potion_Stamina_Lesser",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

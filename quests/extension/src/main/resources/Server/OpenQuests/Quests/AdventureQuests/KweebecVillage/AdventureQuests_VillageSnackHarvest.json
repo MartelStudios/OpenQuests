@@ -1,0 +1,8 @@
+{
+  "Type": "InteractivelyPickup",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-snack.harvest.title",
+  "TargetQuantity": 1,
+  "ItemToPickup": {
+    "ItemId": "Plant_Crop_Carrot_Item"
+  }
+}

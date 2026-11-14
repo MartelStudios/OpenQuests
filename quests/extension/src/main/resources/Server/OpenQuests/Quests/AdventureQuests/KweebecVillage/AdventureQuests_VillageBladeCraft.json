@@ -1,0 +1,8 @@
+{
+  "Type": "Craft",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-blade.craft.title",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Weapon_Sword_Crude"
+  }
+}

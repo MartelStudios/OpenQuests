@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-blade.give.title",
+  "Character": "AdventureQuests_KweebecBlade",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Weapon_Sword_Crude"
+      },
+      "Quantity": 1
+    }
+  ]
+}

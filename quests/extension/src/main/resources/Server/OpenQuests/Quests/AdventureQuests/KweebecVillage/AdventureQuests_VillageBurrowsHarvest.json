@@ -1,0 +1,8 @@
+{
+  "Type": "InteractivelyPickup",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-burrows.harvest.title",
+  "TargetQuantity": 5,
+  "ItemToPickup": {
+    "ItemId": "Plant_Crop_Carrot_Item"
+  }
+}

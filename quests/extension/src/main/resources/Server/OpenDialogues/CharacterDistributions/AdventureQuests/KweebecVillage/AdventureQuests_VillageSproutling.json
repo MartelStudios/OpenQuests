@@ -1,0 +1,27 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Kweebec_Sproutling"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_KweebecBlade",
+      "Weight": 1
+    },
+    {
+      "Character": "AdventureQuests_KweebecIngredients",
+      "Weight": 1
+    },
+    {
+      "Character": "AdventureQuests_KweebecEmptyPot",
+      "Weight": 1
+    },
+    {
+      "Weight": 3
+    }
+  ]
+}

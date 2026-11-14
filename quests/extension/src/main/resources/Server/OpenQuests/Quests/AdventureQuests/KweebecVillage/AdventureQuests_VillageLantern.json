@@ -1,0 +1,47 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Plant_Crop_Pumpkin.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-lantern.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-lantern.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-lantern.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageLanternHarvest",
+    "AdventureQuests_VillageLanternGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 40,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Leather_Medium",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 40,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Bar_Copper",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 20,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Crystal_Yellow",
+            "Quantity": 2
+          }
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}
