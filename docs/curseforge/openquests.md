@@ -13,7 +13,7 @@ _Combine quests as deep as you want and wire them together with AND and OR to ge
 guardian with a sword, or find another way around._
 
 > 📦 **Want to see it in action ?** Install
-> **[Adventure Quests](https://www.curseforge.com/hytale/mods/hytale-adventure-quests)** next to OpenQuests: ready-made
+> **[Adventure Quests](https://www.curseforge.com/hytale/mods/adventure-quests)** next to OpenQuests: ready-made
 > quest lines, in English and French, handed to your players as soon as the server starts.
 
 ***

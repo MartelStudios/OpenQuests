@@ -172,7 +172,7 @@ jobs:
       matrix:
         include:
           - name: OpenQuests
-            relations: openquests-core:requiredDependency,opennavigation:requiredDependency,hytale-adventure-quests:optionalDependency
+            relations: openquests-core:requiredDependency,opennavigation:requiredDependency,adventure-quests:optionalDependency
             project_id: '1678106'
             file: quests/extension/build/libs/OpenQuests-*.jar
           - name: OpenQuests Core
