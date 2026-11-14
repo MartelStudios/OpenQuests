@@ -152,6 +152,19 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
     }
 
     /**
+     * Sets the count outright. Kept because mods built against 5.0 call it.
+     *
+     * @deprecated use {@link HeldQuantityQuestProgression.Count} on a held quantity quest
+     */
+    @Deprecated(since = "5.1.0", forRemoval = true)
+    public record Count(int quantity) implements QuestOperation<QuantityQuestProgression<?>> {
+        @Override
+        public boolean applyTo(@Nonnull QuantityQuestProgression<?> quest) {
+            return quest.moveCountTo(quantity);
+        }
+    }
+
+    /**
      * Moves the count to that value outright and weighs the quest again.
      *
      * @return whether the count or the state moved
