@@ -74,6 +74,6 @@ Every reward is listed in the journal the way MMO Skill Tree lists it, icon incl
 
 ## 📦 Requirements
 
-- OpenQuests and OpenQuests Core
+- OpenQuests and OpenQuests Core 5.0.0 or newer
 - MMO Skill Tree 1.7.2 or newer, with CommonLib 2.4.1 or newer
 - The MMO Skill Tree Mastery Pack for mastery points and the Mastery Trainer: it is what defines them

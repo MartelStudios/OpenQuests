@@ -64,5 +64,5 @@ full.
 
 ## 📦 Requirements
 
-- OpenQuests and OpenQuests Core 5.0.0 or newer
-- OpenDialogues
+- OpenQuests and OpenQuests Core 5.1.0 or newer
+- OpenDialogues 2.0.0 or newer

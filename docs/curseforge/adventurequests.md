@@ -141,7 +141,7 @@ All twenty-two quest types are in there, along with every constraint, the four s
 
 ## 🛠️ Installing
 
-Requires **OpenQuests**, whose quest types these assets are written against, and which pulls in **OpenQuests Core** in turn.
+Requires **OpenQuests** 5.1.0 or newer, with **OpenQuests Core**, plus **OpenDialogues** 2.0.0 and the **OpenQuests Dialogues** bridge 1.1.0 for its characters and conversations.
 
 This pack carries no code of its own. Drop the zip in `mods/`, and remove it whenever you want the quest list back to empty.
 
