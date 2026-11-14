@@ -1,0 +1,47 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Plant_Crop_Mushroom_Common_Brown.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-mushroom.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-mushroom.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-mushroom.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageMushroomHarvest",
+    "AdventureQuests_VillageMushroomGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 40,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Feathers_Light",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 20,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Crystal_Green",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 40,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Leather_Light",
+            "Quantity": 2
+          }
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}

@@ -1,10 +1,10 @@
 {
-  "Epithet": "adventurequests.kweebecvillage.character.kweebec-farmer.epithet",
+  "Epithet": "adventurequests.kweebecvillage.character.village-mushroom.epithet",
   "Traits": [
     {
       "Type": "Dialogue",
       "Dialogue": {
-        "Dialogue": "AdventureQuests_KweebecFarmer"
+        "Router": "AdventureQuests_KweebecMushroom"
       }
     },
     {

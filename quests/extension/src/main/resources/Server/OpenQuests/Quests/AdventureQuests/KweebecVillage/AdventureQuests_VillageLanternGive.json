@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-lantern.give.title",
+  "Character": "AdventureQuests_KweebecLantern",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Pumpkin_Item"
+      },
+      "Quantity": 1
+    }
+  ]
+}

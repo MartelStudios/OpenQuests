@@ -1,11 +1,10 @@
 {
-  "Epithet": "adventurequests.kweebecvillage.character.kweebec-child.epithet",
-  "Uniqueness": "Alive",
+  "Epithet": "adventurequests.kweebecvillage.character.village-drying-rack.epithet",
   "Traits": [
     {
       "Type": "Dialogue",
       "Dialogue": {
-        "Dialogue": "AdventureQuests_KweebecChild"
+        "Router": "AdventureQuests_KweebecDryingRack"
       }
     },
     {

@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-bandages.give.title",
+  "Character": "AdventureQuests_KweebecBandages",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Bandage_Crude"
+      },
+      "Quantity": 3
+    }
+  ]
+}

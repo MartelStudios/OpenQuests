@@ -1,0 +1,23 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Kweebec_Razorleaf"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_KweebecDullBlade",
+      "Weight": 1
+    },
+    {
+      "Character": "AdventureQuests_KweebecColdForge",
+      "Weight": 1
+    },
+    {
+      "Weight": 2
+    }
+  ]
+}

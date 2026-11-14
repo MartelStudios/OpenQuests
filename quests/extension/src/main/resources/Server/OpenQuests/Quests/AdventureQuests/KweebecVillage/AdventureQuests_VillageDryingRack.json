@@ -1,0 +1,29 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Hide_Medium.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-drying-rack.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-drying-rack.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-drying-rack.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageDryingRackHunt",
+    "AdventureQuests_VillageDryingRackGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Leather_Medium",
+      "Quantity": 4,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Strap_Leather",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

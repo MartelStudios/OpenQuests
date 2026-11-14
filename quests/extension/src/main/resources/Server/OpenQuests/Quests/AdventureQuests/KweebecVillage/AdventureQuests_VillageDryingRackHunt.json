@@ -1,0 +1,10 @@
+{
+  "Type": "KillNpc",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-drying-rack.hunt.title",
+  "TargetQuantity": 3,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Boar"
+    ]
+  }
+}

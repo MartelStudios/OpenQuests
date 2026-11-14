@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-drying-rack.give.title",
+  "Character": "AdventureQuests_KweebecDryingRack",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Hide_Medium"
+      },
+      "Quantity": 4
+    }
+  ]
+}

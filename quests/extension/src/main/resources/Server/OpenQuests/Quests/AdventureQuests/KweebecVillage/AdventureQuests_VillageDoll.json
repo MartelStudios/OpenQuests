@@ -1,0 +1,47 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Plant_Crop_Cotton.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-doll.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-doll.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-doll.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageDollHarvest",
+    "AdventureQuests_VillageDollGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 40,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Leather_Soft",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 40,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Feathers_Light",
+            "Quantity": 3
+          }
+        },
+        {
+          "Weight": 20,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Crystal_Pink",
+            "Quantity": 2
+          }
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}

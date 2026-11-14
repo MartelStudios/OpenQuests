@@ -1,0 +1,8 @@
+{
+  "Type": "InteractivelyPickup",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-doll.harvest.title",
+  "TargetQuantity": 3,
+  "ItemToPickup": {
+    "ItemId": "Plant_Crop_Cotton_Item"
+  }
+}

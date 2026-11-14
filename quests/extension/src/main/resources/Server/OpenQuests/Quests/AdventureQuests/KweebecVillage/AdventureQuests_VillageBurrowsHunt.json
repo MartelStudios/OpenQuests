@@ -1,0 +1,10 @@
+{
+  "Type": "KillNpc",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-burrows.hunt.title",
+  "TargetQuantity": 3,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Fox"
+    ]
+  }
+}

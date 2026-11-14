@@ -1,0 +1,8 @@
+{
+  "Type": "Craft",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-broken-still.craft.title",
+  "TargetQuantity": 2,
+  "ItemToCraft": {
+    "ItemId": "Potion_Health_Lesser"
+  }
+}

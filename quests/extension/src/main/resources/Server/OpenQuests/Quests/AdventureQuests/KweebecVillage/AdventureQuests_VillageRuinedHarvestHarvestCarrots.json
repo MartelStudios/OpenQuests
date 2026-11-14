@@ -1,0 +1,8 @@
+{
+  "Type": "InteractivelyPickup",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-ruined-harvest.harvestcarrots.title",
+  "TargetQuantity": 4,
+  "ItemToPickup": {
+    "ItemId": "Plant_Crop_Carrot_Item"
+  }
+}

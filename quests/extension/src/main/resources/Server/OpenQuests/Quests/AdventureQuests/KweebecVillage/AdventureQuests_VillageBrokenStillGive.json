@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-broken-still.give.title",
+  "Character": "AdventureQuests_KweebecBrokenStill",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Potion_Health_Lesser"
+      },
+      "Quantity": 2
+    }
+  ]
+}

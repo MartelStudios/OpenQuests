@@ -1,0 +1,40 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Food_Pie_Pumpkin.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-pies.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-pies.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-pies.short",
+  "Character": "AdventureQuests_KweebecPies",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Dough"
+      },
+      "Quantity": 2
+    },
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Pumpkin_Item"
+      },
+      "Quantity": 2
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Food_Pie_Pumpkin",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Recipe_Food_Pie_Pumpkin",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

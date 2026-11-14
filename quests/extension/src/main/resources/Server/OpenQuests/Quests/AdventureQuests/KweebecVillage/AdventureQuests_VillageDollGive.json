@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-doll.give.title",
+  "Character": "AdventureQuests_KweebecDoll",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Cotton_Item"
+      },
+      "Quantity": 3
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Tree_Sap.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-dull-blade.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-dull-blade.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-dull-blade.short",
+  "Character": "AdventureQuests_KweebecDullBlade",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Tree_Sap"
+      },
+      "Quantity": 6
+    },
+    {
+      "Item": {
+        "ItemId": "Ingredient_Fibre"
+      },
+      "Quantity": 10
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Stud_Iron",
+      "Quantity": 4,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Leather_Medium",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

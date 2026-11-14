@@ -1,0 +1,25 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-ruined-harvest.give.title",
+  "Character": "AdventureQuests_KweebecRuinedHarvest",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Carrot_Item"
+      },
+      "Quantity": 4
+    },
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Lettuce_Item"
+      },
+      "Quantity": 2
+    },
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Pumpkin_Item"
+      },
+      "Quantity": 2
+    }
+  ]
+}

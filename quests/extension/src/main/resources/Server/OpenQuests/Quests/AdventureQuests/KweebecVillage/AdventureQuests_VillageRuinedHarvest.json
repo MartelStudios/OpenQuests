@@ -1,0 +1,49 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Plant_Crop_Lettuce.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-ruined-harvest.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-ruined-harvest.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-ruined-harvest.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageRuinedHarvestHarvestCarrots",
+    "AdventureQuests_VillageRuinedHarvestHarvestLettuces",
+    "AdventureQuests_VillageRuinedHarvestHarvestPumpkins",
+    "AdventureQuests_VillageRuinedHarvestGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Bar_Iron",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 35,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 5
+          }
+        },
+        {
+          "Weight": 30,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Pie_Pumpkin",
+            "Quantity": 3
+          }
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}

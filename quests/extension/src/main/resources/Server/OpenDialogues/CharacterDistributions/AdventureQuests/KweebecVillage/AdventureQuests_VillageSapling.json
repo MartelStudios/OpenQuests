@@ -1,0 +1,35 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Kweebec_Sapling"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_KweebecSnack",
+      "Weight": 1
+    },
+    {
+      "Character": "AdventureQuests_KweebecMushroom",
+      "Weight": 1
+    },
+    {
+      "Character": "AdventureQuests_KweebecSeeds",
+      "Weight": 1
+    },
+    {
+      "Character": "AdventureQuests_KweebecRuinedHarvest",
+      "Weight": 1
+    },
+    {
+      "Character": "AdventureQuests_KweebecDryingRack",
+      "Weight": 1
+    },
+    {
+      "Weight": 5
+    }
+  ]
+}

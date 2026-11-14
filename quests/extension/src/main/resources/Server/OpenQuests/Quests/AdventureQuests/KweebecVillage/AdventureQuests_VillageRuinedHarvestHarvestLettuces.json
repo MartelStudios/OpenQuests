@@ -1,0 +1,8 @@
+{
+  "Type": "InteractivelyPickup",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-ruined-harvest.harvestlettuces.title",
+  "TargetQuantity": 2,
+  "ItemToPickup": {
+    "ItemId": "Plant_Crop_Lettuce_Item"
+  }
+}
