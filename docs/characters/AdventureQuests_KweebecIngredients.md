@@ -12,7 +12,7 @@
 
 A serious young alchemist, worried for its patients, who measures everything twice.
 
-- "A little one has a fever and my shelves are empty. I need red berries and blood petals for a healing brew."
+- "A little one has a fever and my shelves are empty. I need wild berries and red petals for a healing brew."
 - "The fever hasn't broken yet. Hurry, if you can."
 
 ## Wants
@@ -25,7 +25,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 
 ## Quests and rewards
 
-`AdventureQuests_VillageIngredients` (`Deliver`), offered by the intro's accept answer. Steps: Deliver: 12 `Plant_Fruit_Berries_Red`, 6 `Plant_Petals_Blood`.
+`AdventureQuests_VillageIngredients` (`Deliver`), offered by the intro's accept answer. Steps: Deliver: 12 `Plant_Fruit_Berries_Red`, 6 `Plant_Petals_Red`.
 Reward: 2 lesser health potions and 1 lesser stamina potion, its share of the batch: saves an alchemy bench and flasks early on.
 
 ## Assets

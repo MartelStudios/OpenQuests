@@ -25,7 +25,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 
 ## Quests and rewards
 
-`AdventureQuests_VillageBandages` (`Composite`: `AdventureQuests_VillageBandagesCraft`, `AdventureQuests_VillageBandagesGive`), offered by the intro's accept answer. Steps: Craft 3 crude bandages; Give the bandages to the healer.
+`AdventureQuests_VillageBandages` (`Composite`: `AdventureQuests_VillageBandagesCraft`, `AdventureQuests_VillageBandagesGive`), offered by the intro's accept answer. Steps: Craft 3 bandages; Give the bandages to the healer.
 Reward: 2 lesser health potions and 1 antidote, kept for emergencies.
 
 ## Assets

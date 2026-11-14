@@ -26,7 +26,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 ## Quests and rewards
 
 `AdventureQuests_VillageSnack` (`Composite`: `AdventureQuests_VillageSnackHarvest`, `AdventureQuests_VillageSnackGive`), offered by the intro's accept answer. Steps: Pick a ripe carrot; Give the carrot to the young Kweebec.
-Reward: Random: 3 light leathers, 2 soft leathers or 2 copper bars, the little treasures it hoarded.
+Reward: Random: 3 light leathers, 3 linen scraps or 2 copper ingots, the little treasures it hoarded.
 
 ## Assets
 

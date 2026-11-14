@@ -26,7 +26,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 ## Quests and rewards
 
 `AdventureQuests_VillageBrokenStill` (`Composite`: `AdventureQuests_VillageBrokenStillCraft`, `AdventureQuests_VillageBrokenStillGive`), offered by the intro's accept answer. Steps: Brew 2 lesser health potions; Give the potions to the alchemist.
-Reward: 2 iron bars and 5 life essences: the player does the brewing, so the pay is rarer than potions.
+Reward: 2 iron ingots and 5 essences of life: the player does the brewing, so the pay is rarer than potions.
 
 ## Assets
 

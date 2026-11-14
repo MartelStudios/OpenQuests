@@ -26,7 +26,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 ## Quests and rewards
 
 `AdventureQuests_VillageBlade` (`Composite`: `AdventureQuests_VillageBladeCraft`, `AdventureQuests_VillageBladeGive`), offered by the intro's accept answer. Steps: Craft a crude sword; Give the sword to the young Kweebec.
-Reward: 2 copper bars and 2 leather straps, its savings for a real blade.
+Reward: 2 copper ingots and 3 light leathers, its savings for a real blade.
 
 ## Assets
 

@@ -26,7 +26,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 ## Quests and rewards
 
 `AdventureQuests_VillageRuinedHarvest` (`Composite`: `AdventureQuests_VillageRuinedHarvestHarvestCarrots`, `AdventureQuests_VillageRuinedHarvestHarvestLettuces`, `AdventureQuests_VillageRuinedHarvestHarvestPumpkins`, `AdventureQuests_VillageRuinedHarvestGive`), offered by the intro's accept answer. Steps: Pick 4 ripe carrots; Pick 2 ripe lettuces; Pick 2 ripe pumpkins; Give the harvest to the farmer.
-Reward: Random: 2 iron bars, 5 life essences or 3 pumpkin pies.
+Reward: Random: 2 iron ingots, 5 essences of life or 3 pumpkin pies.
 
 ## Assets
 

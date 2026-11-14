@@ -26,7 +26,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 ## Quests and rewards
 
 `AdventureQuests_VillageMushroom` (`Composite`: `AdventureQuests_VillageMushroomHarvest`, `AdventureQuests_VillageMushroomGive`), offered by the intro's accept answer. Steps: Pick a mushroom; Give the mushroom to the young Kweebec.
-Reward: Random from its treasure box: 3 light feathers, 2 green crystals (rarer) or 2 light leathers.
+Reward: Random from its treasure box: 3 essences of life, 2 green crystal shards (rarer) or 2 light leathers.
 
 ## Assets
 

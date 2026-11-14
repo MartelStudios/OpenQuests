@@ -28,8 +28,8 @@
           "Weight": 33,
           "Reward": {
             "Type": "Item",
-            "ItemId": "Ingredient_Leather_Soft",
-            "Quantity": 2
+            "ItemId": "Ingredient_Fabric_Scrap_Linen",
+            "Quantity": 3
           }
         },
         {

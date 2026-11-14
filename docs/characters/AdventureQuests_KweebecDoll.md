@@ -26,7 +26,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 ## Quests and rewards
 
 `AdventureQuests_VillageDoll` (`Composite`: `AdventureQuests_VillageDollHarvest`, `AdventureQuests_VillageDollGive`), offered by the intro's accept answer. Steps: Pick 3 ripe cotton; Give the cotton to the young Kweebec.
-Reward: Random: 2 soft leathers, 3 light feathers, or 2 pink crystals (rarer).
+Reward: Random: 1 bolt of cotton, 3 linen scraps, or 2 pink crystal shards (rarer).
 
 ## Assets
 

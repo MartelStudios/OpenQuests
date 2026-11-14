@@ -26,7 +26,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 ## Quests and rewards
 
 `AdventureQuests_VillageDryingRack` (`Composite`: `AdventureQuests_VillageDryingRackHunt`, `AdventureQuests_VillageDryingRackGive`), offered by the intro's accept answer. Steps: Hunt 3 boars; Give 4 medium hides to the tanner.
-Reward: 4 medium leathers and 2 leather straps: every hide comes back tanned, plus straps.
+Reward: 4 medium leathers and 2 light leathers: every hide comes back tanned, plus light leather.
 
 ## Assets
 

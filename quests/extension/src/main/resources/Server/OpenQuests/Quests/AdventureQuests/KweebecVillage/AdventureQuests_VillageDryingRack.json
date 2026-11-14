@@ -20,7 +20,7 @@
     },
     {
       "Type": "Item",
-      "ItemId": "Ingredient_Strap_Leather",
+      "ItemId": "Ingredient_Leather_Light",
       "Quantity": 2,
       "AutoClaim": true
     }

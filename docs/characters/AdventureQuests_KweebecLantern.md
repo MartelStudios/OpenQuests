@@ -26,7 +26,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 ## Quests and rewards
 
 `AdventureQuests_VillageLantern` (`Composite`: `AdventureQuests_VillageLanternHarvest`, `AdventureQuests_VillageLanternGive`), offered by the intro's accept answer. Steps: Pick a ripe pumpkin; Give the pumpkin to the young Kweebec.
-Reward: Random: 2 medium leathers, 3 copper bars, or 2 yellow crystals (rarer), the glow it meant to put inside.
+Reward: Random: 2 medium leathers, 3 copper ingots, or 2 yellow crystal shards (rarer), the glow it meant to put inside.
 
 ## Assets
 

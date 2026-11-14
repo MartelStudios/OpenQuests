@@ -20,7 +20,7 @@
           "Weight": 40,
           "Reward": {
             "Type": "Item",
-            "ItemId": "Ingredient_Feathers_Light",
+            "ItemId": "Ingredient_Life_Essence",
             "Quantity": 3
           }
         },

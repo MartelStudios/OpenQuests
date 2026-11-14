@@ -26,7 +26,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 ## Quests and rewards
 
 `AdventureQuests_VillageEmptyPot` (`Deliver`), offered by the intro's accept answer. Steps: Deliver: 6 `Mushrooms`.
-Reward: 3 mushroom kebabs and the caesar salad recipe; the recipe is the real pull.
+Reward: 3 mushroom skewers and the caesar salad recipe; the recipe is the real pull.
 
 ## Assets
 

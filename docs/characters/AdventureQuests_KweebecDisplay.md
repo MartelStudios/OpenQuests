@@ -25,7 +25,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 
 ## Quests and rewards
 
-`AdventureQuests_VillageDisplay` (`Composite`: `AdventureQuests_VillageDisplayCraft`, `AdventureQuests_VillageDisplayGive`), offered by the intro's accept answer. Steps: Make 2 berry salads; Give the salads to the merchant.
+`AdventureQuests_VillageDisplay` (`Composite`: `AdventureQuests_VillageDisplayCraft`, `AdventureQuests_VillageDisplayGive`), offered by the intro's accept answer. Steps: Make 2 wild berry salads; Give the salads to the merchant.
 Reward: The apple pie recipe and 2 spices, from the merchant's own stock.
 Every dialogue keeps a "Show me your wares" answer opening the `Kweebec_Merchant` barter shop.
 

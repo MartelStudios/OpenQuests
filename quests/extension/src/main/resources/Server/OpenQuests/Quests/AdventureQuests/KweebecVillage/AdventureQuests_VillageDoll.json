@@ -20,15 +20,15 @@
           "Weight": 40,
           "Reward": {
             "Type": "Item",
-            "ItemId": "Ingredient_Leather_Soft",
-            "Quantity": 2
+            "ItemId": "Ingredient_Bolt_Cotton",
+            "Quantity": 1
           }
         },
         {
           "Weight": 40,
           "Reward": {
             "Type": "Item",
-            "ItemId": "Ingredient_Feathers_Light",
+            "ItemId": "Ingredient_Fabric_Scrap_Linen",
             "Quantity": 3
           }
         },
