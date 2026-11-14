@@ -1,14 +1,14 @@
 # Adventure Quests
 
-📦 **Quests, characters and dialogues that bring vanilla Hytale to life. Install it, play it, delete it.**
+📦 **Over sixty quests, characters and dialogues for vanilla Hytale, ready the moment your server starts.**
 
-Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, characters who remember you, and feats for every way you move. It runs on OpenQuests, which installs with an empty quest list on purpose.
+Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, characters who remember you, and feats for every way you move. OpenQuests ships with no quests of its own: this pack is the content. Works in multiplayer and singleplayer, on new or existing worlds.
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
 
 ![The journal's Chapters tab: the Adventure group unfolds, then The Forgotten Temple and The Goblin Breach open one after the other, each drawn as a graph of quest icons](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-chapters.gif?raw=true)
 
----
+***
 
 ## ✨ What is inside
 
@@ -18,7 +18,7 @@ Over sixty quests in eight chapters, in English and French. A whole campaign thr
 
 📝 **Two texts per quest.** The HUD shows a short line saying exactly what to do: *Kill 3 skeleton knights in the crypt*. The journal keeps the lore: *Armoured knights bar the way to the deepest tombs. Break through.*
 
----
+***
 
 ## ⚔️ Adventure
 
@@ -36,7 +36,7 @@ Over sixty quests in eight chapters, in English and French. A whole campaign thr
 
 🏅 **Flawless** stays a secret until you pass the trial without ever having failed it.
 
-👥 **The temple has its people**, one of each for the whole server:
+👥 **The temple has its people**, each a single character shared by the whole server:
 
 * 🌱 **A curious seedling** who has never been outside wants feathers, then crystal shards of every colour, and pays in
   trinkets he pilfered from the elders and the goblins.
@@ -49,7 +49,7 @@ Over sixty quests in eight chapters, in English and French. A whole campaign thr
 
 ### 🕳️ The Goblin Breach
 
-Thirty-six quests across the Guttering Hollows, the pocket world a Goblin Breach portal opens on. The chapter graph lays them out by region, and every link shows what leads where.
+Thirty-six quests across the Guttering Hollows, the pocket world a Goblin Breach portal opens onto. The chapter graph lays them out by region, and every link shows what leads where.
 
 ![Hovering The restless dead shows its tooltip and lights its two branches, then hovering Knights of the crypt shows its own](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-graph-tooltip.gif?raw=true)
 
@@ -95,7 +95,7 @@ Five quests told entirely through dialogues, with no NPC at all: the chapter tha
 
 📝 **Every dialogue feature in one story.** Pages, speakers and portraits, the cinematic and chat displays, coloured answers with icons, answers that hide until they make sense, lines picked by quest state or at random, and dialogues that hand out, complete or abandon quests through the **OpenQuests Dialogues** bridge.
 
----
+***
 
 ## 🌿 Survival
 
@@ -105,15 +105,15 @@ Five quests told entirely through dialogues, with no NPC at all: the chapter tha
 
 ### 🌲 Woodcutting
 
-🪵 **Lumberjack** counts the trunks you bring back from your fellings, and leaves out the ones you threw.
+🪵 **Lumberjack** counts the trunks you bring back from your fellings, and ignores trunks you dropped and picked up again.
 
 🪓 **The Great Felling** is a server event launched by an admin: five hundred trunks felled by the whole server, counting only while two players are online, before a closing date. A trunk placed and felled again counts once.
 
 ### 🧺 Daily life
 
-🫐 **Garden chores** asks for wild berries, five flowers and a wooden chest opened. It comes back at your next connection once the last one ended, at most once every twenty hours and seven times in all, and the journal counts down both.
+🫐 **Garden chores** asks for wild berries, five flowers and a wooden chest opened. It returns when you log in, up to once every 20 hours and seven times in all. The journal shows both countdowns.
 
----
+***
 
 ## 🏆 Feats
 
@@ -121,13 +121,13 @@ Five quests told entirely through dialogues, with no NPC at all: the chapter tha
 
 🗡️ **Combat:** **First blood** waits for your first duel.
 
----
+***
 
-All twenty-two quest types are in there, along with every constraint, the four scopes, all five reward types including rewards for failing, the three visibility modes, categories and chapters.
+Almost every quest type, constraint and reward is in there, along with the four scopes, rewards for failing, the three visibility modes, categories and chapters.
 
 ⛏️ Running **MMO Skill Tree**? The **[OpenQuests MMOSkillTree](https://www.curseforge.com/hytale/mods/openquests-mmoskilltree)** plugin brings a chapter of its own, *The prospector's path*, from a first bit of XP to Mining mastery.
 
----
+***
 
 ## 🎯 Three ways to use it
 
@@ -137,16 +137,16 @@ All twenty-two quest types are in there, along with every constraint, the four s
 
 🚀 **As a starting point.** Edit the chains into your own, or delete the pack and start from an empty quest list. Nothing else depends on it.
 
----
+***
 
 ## 🛠️ Installing
 
-Requires **OpenQuests** 5.1.0 or newer, with **OpenQuests Core**, plus **OpenDialogues** 2.0.0 and the **OpenQuests Dialogues** bridge 1.1.0 for its characters and conversations.
+Requires **OpenQuests** and **OpenQuests Core** 5.1.0 or newer, **OpenDialogues** 2.0.0 or newer and **OpenQuests Dialogues** 1.1.0 or newer. CurseForge installs them with it.
 
-This pack carries no code of its own. Drop the zip in `mods/`, and remove it whenever you want the quest list back to empty.
+This pack carries no code of its own. By hand, drop the zip in `mods/`, and remove it whenever you want the quest list back to empty.
 
----
+***
 
-**Source and documentation:** https://github.com/MartelStudios/OpenQuests
+**Source and documentation:** [https://github.com/MartelStudios/OpenQuests](https://github.com/MartelStudios/OpenQuests)
 
 MIT licensed.

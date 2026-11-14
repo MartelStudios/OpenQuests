@@ -1,18 +1,18 @@
 # OpenQuests
 
-⚔️ **A complete quest system for your Hytale server. Design your quests in the Asset Editor, drop the plugins in
-`mods/`, and your players have something to do.**
+⚔️ **A complete quest system for your Hytale server. Build quest lines in the Asset Editor, and your players get goals,
+a journal, a tracker and rewards to chase.**
 
-No code required. Everything below works out of the box.
+No code required. Works in multiplayer and singleplayer, on new or existing worlds.
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
 
 ![The quest tracker showing a composite quest: Introduction, holding Master the basics with its four gathering and crafting steps, an OR rule, and Skip Intro](https://github.com/MartelStudios/OpenQuests/blob/5298250c8df70e71b1956ce65d5b56d24f3eae3f/docs/images/quest-tracker.png?raw=true)
 
-_Combine quests as deep as you want and wire them together with AND and OR to get real branching progression. Beat the
+_Combine quests as deep as you want and wire them together with AND and OR to get branching progression. Beat the
 guardian with a sword, or find another way around._
 
-> 📦 **Want to see it in action ?** Install
+> 📦 **Want to see it in action?** Install
 > **[Adventure Quests](https://www.curseforge.com/hytale/mods/adventure-quests)** next to OpenQuests: ready-made
 > quest lines, in English and French, handed to your players as soon as the server starts.
 
@@ -31,10 +31,7 @@ needs.
 📖 **A quest journal with chapters.** `/ojournal` sorts your quests into chapters drawn as a map of how they lead into
 one another, and opens again right where you left it.
 
-🖼️ **Quests that read well.** Every quest has an icon, a short line on the HUD saying exactly what to do, and a
-description for the story, with paragraphs, italics and colours.
-
-📊 **A tracker HUD.** Titles, counters, nesting and timers, exactly as the screenshot shows. Players can hide or move it, and the server picks where it starts.
+📊 **A tracker HUD.** Titles, counters, nesting and timers. Players can hide or move it, and the server picks where it starts.
 
 🎁 **Rewards to look forward to.** Items, the next quests, commands, a prize drawn at random, or a popup where the
 player picks their own.
@@ -43,15 +40,9 @@ player picks their own.
 
 ⏳ **Rules on any quest.** Time limits, worlds, cooldowns, caps: add them to any quest and combine them freely.
 
-🌍 **Server-wide events.** "Kill 1,000,000 skeletons, together" is one quest, not a plugin.
+🌍 **Server-wide events.** "Kill 1,000,000 skeletons, together" is a single quest shared by the whole server.
 
 🔔 **An ending you can hear.** A finished quest takes over the middle of the screen and plays the sound you choose.
-
-🗄️ **Files or a database.** JSON files with nothing to configure, or PostgreSQL, MySQL, MariaDB and SQLite for large
-networks. Several servers can share the same quests.
-
-🛡️ **Checked at boot.** A missing reference or a loop between quests stops the server with a clear reason, not in front
-of a player hours later.
 
 🈯 **English and French included.** Every line of text is translatable.
 
@@ -128,12 +119,12 @@ the same item thrown and picked up, or the same block placed and broken, from co
 | <code>Random</code>     | Draws one of its rewards, each with its own weight        |
 | <code>Choice</code>     | Opens a popup where the player picks what they get        |
 | <code>Effect</code>     | Puts an effect on the player, a food buff or a potion     |
-| <code>Droplist</code>   | Rolls one of the game's drop lists, a dungeon chest say   |
+| <code>Droplist</code>   | Rolls one of the game's drop lists, such as a dungeon chest |
 
 ![In the Rewards tab, Claim on The veilbound coffer opens a Choose your reward popup, and picking Greater Health Potion closes it](https://github.com/MartelStudios/OpenQuests/blob/main/docs/images/journal-reward-choice.gif?raw=true)
 
-Rewards can be paid on success, on failure or on abandon, handed over at once or collected from the journal. A reward
-that cannot be delivered, full inventory or player offline, waits for them. Nothing is lost.
+Rewards can be paid on success, on failure or on abandon, handed over at once or collected from the journal. If a
+reward cannot be delivered (full inventory, player offline), it waits. Nothing is lost.
 
 ## ⏳ Constraints
 
@@ -150,13 +141,6 @@ that cannot be delivered, full inventory or player offline, waits for them. Noth
 | <code>FailOnDeath</code>      | Dying fails the quest                                          |
 | <code>Cooldown</code>         | At most once per period, a day for a daily quest               |
 | <code>MaxQuests</code>        | A set number of times, or one at a time                        |
-
-```
-"Constraints": [
-  { "Type": "TimeLimit", "Seconds": 300 },
-  { "Type": "Cooldown", "Seconds": 86400 }
-]
-```
 
 The journal shows them with the time left, and a timed quest gets a countdown bar on the tracker.
 
@@ -187,10 +171,11 @@ The same quest asset can be played four ways:
 ### Installing
 
 * ⚔️ **OpenQuests**: this project, the quest types, rewards, journal and HUD
-* ⚙️ **OpenQuests Core**: the system underneath, pulled in with it
+* ⚙️ **OpenQuests Core**: the system underneath, which CurseForge installs with it
 * 📦 **Adventure Quests** (optional): the ready-made quest lines
 
-Drop them in `mods/`. Nothing else to configure.
+Installing by hand? Drop OpenQuests and OpenQuests Core in `mods/`. Nothing else to configure, and a missing reference
+or a loop between quests stops the server at boot with a clear reason, not in front of a player hours later.
 
 ### Writing a quest
 
@@ -218,22 +203,14 @@ Underneath, a quest is a JSON asset, steps included:
 An assignment, beside it, says who gets it and when: on connection, on entering a world, or on a schedule, once or again
 and again.
 
-```
-{
-  "Trigger": { "Type": "PlayerEnterWorld", "WorldNamePattern": "instance-Portals-Portals_Goblins-.*" },
-  "Scope": { "Type": "World" },
-  "QuestAssetIds": ["GoblinBreachIntruders"]
-}
-```
-
 ### Commands
 
 | Command                                               | Effect                                                                       | Granted to                      |
 |-------------------------------------------------------|------------------------------------------------------------------------------|---------------------------------|
 | <code>/ojournal</code>                                | Opens the quest journal, also <code>/journal</code> and <code>/quests</code> | <code>hytale:Adventurer</code>  |
-| <code>/oquest abandon <quest></code>                  | Gives your matching quests up                                                | <code>hytale:Adventurer</code>  |
-| <code>/oquest complete <quest></code>                 | Ends them as successful                                                      | <code>hytale:WorldEditor</code> |
-| <code>/oquest fail <quest></code>                     | Ends them as failed                                                          | <code>hytale:WorldEditor</code> |
+| <code>/oquest abandon <quest></code>                  | Abandons your matching quests                                                | <code>hytale:Adventurer</code>  |
+| <code>/oquest complete <quest></code>                 | Completes them                                                               | <code>hytale:WorldEditor</code> |
+| <code>/oquest fail <quest></code>                     | Fails them                                                                   | <code>hytale:WorldEditor</code> |
 | <code>/oquest create player <assetId> <player></code> | Hands a quest to a player                                                    | <code>hytale:WorldEditor</code> |
 | <code>/oquest create world <assetId> <world></code>   | Shares a quest with a world                                                  | <code>hytale:WorldEditor</code> |
 | <code>/oquest create universe <assetId></code>        | Shares a quest with the whole server                                         | <code>hytale:WorldEditor</code> |

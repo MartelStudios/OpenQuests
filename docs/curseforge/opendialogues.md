@@ -3,7 +3,8 @@
 💬 **Dialogue trees for your Hytale server. Give your NPCs and items something to say, let players answer, and make
 every answer count.**
 
-No code required. Write dialogues in the Asset Editor, drop the plugin in `mods/`, and talk.
+No code required. Write dialogues in the Asset Editor, drop the plugin in `mods/`, and talk. Works in multiplayer and
+singleplayer, on new or existing worlds.
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
 
@@ -12,7 +13,7 @@ No code required. Write dialogues in the Asset Editor, drop the plugin in `mods/
 _A character with a name, a title and a portrait, answers with icons and colours, and a story that remembers what you
 said last time._
 
-> 📦 **Want to see it in action ?** Install
+> 📦 **Want to see it in action?** Install
 > **[Adventure Quests](https://www.curseforge.com/hytale/mods/adventure-quests)**: *The strange plush* chapter hands
 > you a hungry goblin plush that talks, begs for ore and changes its tune once fed.
 
@@ -23,7 +24,7 @@ said last time._
 📝 **Everything in the Asset Editor.** Dialogues, characters and routers are assets, checked as you type. Nest a whole
 conversation in a single file, or split it as you like.
 
-🎭 **Three ways to show a dialogue, and yours.** A framed panel, a cinematic band across the bottom of the screen, or
+🎭 **Three displays, or your own.** A framed panel, a cinematic band across the bottom of the screen, or
 plain chat. Each dialogue picks its own, the server owner has the last word, and a mod can add a display matching its
 server's UI.
 
@@ -39,12 +40,10 @@ permission, or a choice made earlier. Otherwise it stays hidden.
 🧠 **A memory per player.** Every dialogue opened and every answer picked is saved with the player, so a character
 greets a newcomer and a regular differently.
 
-🔀 **Routers.** One id, many dialogues: the first whose condition holds, or one drawn at random by weight.
+🔀 **One character, many moods.** Routers pick the first dialogue whose condition holds, or one at random by weight.
 
-👥 **Characters for passive NPCs.** Villagers, children, even a stag draw a character as players come near: a name of
-their own, a dialogue on F, and a place in your quests. Keep one unique for the whole server, give a role a few
-characters drawn by weight, and choose where each appears, down to an instance like the Forgotten Temple. When a
-named character dies, word spreads in the chat.
+👥 **Characters for passive NPCs.** Villagers, children, even a stag get a name, a dialogue on F and a place in your
+quests. When a named character dies, word spreads in the chat.
 
 🗺️ **On the map.** Characters a player has met show on their world map with their name; one can show from the start,
 or never. A key character can also show on the compass of every player nearby.
@@ -54,7 +53,7 @@ or never. A key character can also show on the compass of every player nearby.
 🛡️ **Checked at boot.** A missing dialogue or a router going round in circles is logged when assets load, not met by a
 player hours later.
 
-🈯 **Translatable.** Every line is a translation key.
+🈯 **English and French included.** Every line is a translation key.
 
 ***
 
@@ -88,7 +87,7 @@ everything, without touching the files.
 
 ### 🎨 Your own
 
-Your server has its own look ? Give its dialogues the same. A display is a plugin's few lines: point the panel at your
+Your server has its own look? Give its dialogues the same. A custom display takes a few lines of plugin code: point the panel at your
 own `.ui` files, or draw dialogues any way you like, and register it under a name. Dialogues then name it like any
 other.
 
@@ -128,11 +127,12 @@ Routers lead to dialogues or to other routers, so a character's whole personalit
 
 ## ⚔️ With OpenQuests
 
-Install the **OpenQuests Dialogues** bridge next to [OpenQuests](https://www.curseforge.com/hytale/mods/openquests) and
-dialogues and quests talk to each other:
+Install the **[OpenQuests Dialogues](https://www.curseforge.com/hytale/mods/openquests-dialogues)** bridge next to
+[OpenQuests](https://www.curseforge.com/hytale/mods/openquests) and dialogues and quests talk to each other:
 
 * **A `Dialogue` quest type:** open a dialogue, or pick one of its answers, a number of times. "Talk to the merchant"
   is one quest.
+* **A `Deliver` quest type:** bring items to a character, handed over a few at a time.
 * **Answers that hand out quests** with `AssignQuest`, or end them with `SetQuestState`.
 * **A `RequiresQuest` condition:** an answer that only shows while a quest is running, or once it is done.
 * **Quests aimed at a character:** talk to the Kweebec mage, bring seeds to the enchanted stag. A quest aimed at a

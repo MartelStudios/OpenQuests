@@ -1,14 +1,14 @@
 # OpenQuests MMOSkillTree
 
-🌳 **Quests and rewards built on MMO Skill Tree: ask for levels, XP, abilities and bounties, pay in everything MMO Skill Tree pays.**
+🌳 **Quests and rewards built on MMO Skill Tree: ask for levels, XP, abilities and bounties, and pay out in XP, levels, mastery points, titles and more.**
 
 Write your quests once in OpenQuests and let them speak MMO Skill Tree. This plugin adds quest types that follow what players do in MMO Skill Tree and rewards that feed them, usable in any quest, chain or daily assignment.
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
 
----
+***
 
-## ✨ What is inside
+## ✨ What you get
 
 ### 🗺️ Quest types
 
@@ -26,7 +26,7 @@ Write your quests once in OpenQuests and let them speak MMO Skill Tree. This plu
 
 🎚️ **`MMOSkillTreeLevel`** raises a skill by whole levels, however far up the curve the player is.
 
-💎 **`MMOSkillTreeCurrency`** credits a currency, mastery points first, which the mastery trees are bought with.
+💎 **`MMOSkillTreeCurrency`** credits a currency, such as mastery points, which the mastery trees are bought with.
 
 🤝 **`MMOSkillTreeReputation`** adds standing with a reputation, such as the Mastery Trainer, whose ranks pay mastery points and open lessons on the trainer's board.
 
@@ -58,7 +58,7 @@ Every reward is listed in the journal the way MMO Skill Tree lists it, icon incl
 /oquest create player MMOSkillTree_Prospector1_FirstSteps <player>
 ```
 
-✍️ **Written in the asset editor.** Skills, abilities, boards, currencies, reputations, loot tables, titles and the rest are picked from a list rather than typed by hand, and a wrong id fails at load instead of in a player's hands.
+✍️ **Written in the Asset Editor.** Skills, abilities, boards, currencies, reputations, loot tables, titles and the rest are picked from a list rather than typed by hand, and a wrong id fails at load instead of in a player's hands.
 
 ```json
 {
@@ -72,8 +72,18 @@ Every reward is listed in the journal the way MMO Skill Tree lists it, icon incl
 }
 ```
 
-## 📦 Requirements
+***
+
+## 🛠️ Installing
 
 - OpenQuests and OpenQuests Core 5.0.0 or newer
 - MMO Skill Tree 1.7.2 or newer, with CommonLib 2.4.1 or newer
 - The MMO Skill Tree Mastery Pack for mastery points and the Mastery Trainer: it is what defines them
+
+CurseForge installs OpenQuests with it; by hand, drop everything in `mods/`.
+
+***
+
+**Source and documentation:** [https://github.com/MartelStudios/OpenQuests](https://github.com/MartelStudios/OpenQuests)
+
+MIT licensed.
