@@ -5,7 +5,7 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
-import com.martelstudios.opendialogues.displays.impl.chat.ChatDisplay;
+import com.martelstudios.opendialogues.displays.impl.page.PageDisplay;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,7 +32,7 @@ public class DisplayRules {
      */
     public record Choice(@Nonnull String source, @Nonnull String display) {}
 
-    private volatile String defaultDisplay = ChatDisplay.ID;
+    private volatile String defaultDisplay = PageDisplay.ID;
 
     // Replaced whole on each change, so a dialogue opening on a world thread reads a consistent list.
     private volatile DisplayRule[] rules = new DisplayRule[0];

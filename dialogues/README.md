@@ -83,7 +83,7 @@ Server owners pick displays with `/odialogues display`, saved in the plugin's `D
 
 | Command | Does |
 | --- | --- |
-| `default <display>` | Display for dialogues naming none. `Chat` at first. |
+| `default <display>` | Display for dialogues naming none. `Default` at first. |
 | `set <target> <display> [--position=<n>]` | Display for dialogues matching `*`, `dialogue:<id>`, `tag:<tag>` or `pack:<pack>`, over their own `Display`. |
 | `unset <target>` | Removes that rule. |
 | `list` | Shows the default and the rules in order. |
