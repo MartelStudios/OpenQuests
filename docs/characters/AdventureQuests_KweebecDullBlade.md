@@ -26,7 +26,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 ## Quests and rewards
 
 `AdventureQuests_VillageDullBlade` (`Deliver`), offered by the intro's accept answer. Steps: Deliver: 6 `Ingredient_Tree_Sap`, 10 `Ingredient_Fibre`.
-Reward: 4 iron studs and 2 medium leathers, spares from its armor kit.
+Reward: 1 iron repair kit and 2 medium leathers, spares from its own kit.
 
 ## Assets
 

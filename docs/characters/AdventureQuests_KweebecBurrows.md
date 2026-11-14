@@ -25,7 +25,7 @@ One of the random village stories: the NPC lives this one incident, then stays a
 
 ## Quests and rewards
 
-`AdventureQuests_VillageBurrows` (`Composite`: `AdventureQuests_VillageBurrowsHunt`, `AdventureQuests_VillageBurrowsHarvest`, `AdventureQuests_VillageBurrowsGive`), offered by the intro's accept answer. Steps: Hunt 3 foxes; Pick 5 ripe carrots; Give the carrots to the rabbit keeper.
+`AdventureQuests_VillageBurrows` (`Composite`: `AdventureQuests_VillageBurrowsHunt`, `AdventureQuests_VillageBurrowsHarvest`, `AdventureQuests_VillageBurrowsGive`), offered by the intro's accept answer. Steps: Hunt 1 fox; Pick 5 ripe carrots; Give the carrots to the rabbit keeper.
 Reward: 4 light leathers and 2 cooked meats: the weakest reward of the batch, a tamed bunny would be better (needs a check).
 
 ## Assets

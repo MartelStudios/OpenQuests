@@ -25,8 +25,8 @@
   "SuccessfulRewards": [
     {
       "Type": "Item",
-      "ItemId": "Ingredient_Stud_Iron",
-      "Quantity": 4,
+      "ItemId": "Tool_Repair_Kit_Iron",
+      "Quantity": 1,
       "AutoClaim": true
     },
     {
