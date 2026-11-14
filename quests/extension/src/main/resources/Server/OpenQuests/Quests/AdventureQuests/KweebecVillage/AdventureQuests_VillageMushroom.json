@@ -13,34 +13,16 @@
   ],
   "SuccessfulRewards": [
     {
-      "Type": "Random",
-      "AutoClaim": true,
-      "Rewards": [
-        {
-          "Weight": 40,
-          "Reward": {
-            "Type": "Item",
-            "ItemId": "Ingredient_Life_Essence",
-            "Quantity": 3
-          }
-        },
-        {
-          "Weight": 20,
-          "Reward": {
-            "Type": "Item",
-            "ItemId": "Ingredient_Crystal_Green",
-            "Quantity": 2
-          }
-        },
-        {
-          "Weight": 40,
-          "Reward": {
-            "Type": "Item",
-            "ItemId": "Ingredient_Leather_Light",
-            "Quantity": 2
-          }
-        }
-      ]
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 30,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Potion_Stamina_Lesser",
+      "Quantity": 1,
+      "AutoClaim": true
     }
   ],
   "AutoTrack": true
