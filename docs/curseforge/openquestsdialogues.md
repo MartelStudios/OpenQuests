@@ -69,7 +69,7 @@ full.
 
 ## 🛠️ Installing
 
-Requires **OpenQuests** and **OpenQuests Core** 5.1.0 or newer, and **OpenDialogues** 2.0.0 or newer. CurseForge
+Requires **OpenQuests** and **OpenQuests Core** 5.1.0 or newer, and **OpenDialogues** 2.2.0 or newer. CurseForge
 installs them with it; by hand, drop them all in `mods/`.
 
 ***

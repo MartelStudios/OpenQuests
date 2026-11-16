@@ -104,7 +104,7 @@ val questExamplesManifest by tasks.registering {
                 "Dependencies": {
                     "$group:OpenQuests": "^5.1.0",
                     "$group:OpenDialogues": "^2.0.0",
-                    "$group:OpenQuestsDialogues": "^1.1.0"
+                    "$group:OpenQuestsDialogues": "^1.2.0"
                 },
                 "DisabledByDefault": false,
                 "IncludesAssetPack": true
