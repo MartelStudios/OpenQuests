@@ -29,7 +29,11 @@
       "Weight": 1
     },
     {
-      "Weight": 5
+      "Character": "AdventureQuests_KweebecReplant",
+      "Weight": 1
+    },
+    {
+      "Weight": 6
     }
   ]
 }
