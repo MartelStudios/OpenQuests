@@ -184,7 +184,8 @@ The plugin's `Characters.json` holds `ScanRadius` (blocks around each player, 64
 
 With OpenQuests and the OpenQuestsDialogues bridge, quests aim at a character: `Dialogue` (talk to
 it, or pick an answer) and `Deliver` (bring it items, which takes over F while the quest runs). A
-quest aimed at a `Forever` + `Universe` character fails once that character is lost. See the
+quest aimed at a `Forever` + `Universe` character fails once that character is lost. The
+`NearCharacter` constraint counts any quest's progress only near an NPC carrying a character. See the
 Forgotten Temple and Kweebec village characters in the Adventure Quests pack.
 
 ## Extending
