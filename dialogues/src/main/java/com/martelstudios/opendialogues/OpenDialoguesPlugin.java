@@ -148,6 +148,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     private DialogueHistoryRecorder historyRecorder;
 
+    private CharacterPositionsAccess characterPositions;
+
     private CharacterMarkerProvider characterMarkers;
 
     private PacketFilter mapWatcher;
@@ -216,7 +218,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         CharacterAssets characterAssets = CharacterAssets.live();
         characterService = new CharacterService(characterAssets, NpcEligibility::of, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
         ResourceType<EntityStore, CharacterPositions> positionsType = getEntityStoreRegistry().registerResource(CharacterPositions.class, "OpenDialoguesCharacterPositions", CharacterPositions.CODEC);
-        CharacterPositionsAccess positions = new CharacterPositionsAccess(positionsType, characterService);
+        CharacterPositionsAccess positions = characterPositions = new CharacterPositionsAccess(positionsType, characterService);
         characterMarkers = new CharacterMarkerProvider(positions, player -> historyRecorder.history(player), characterAssets::character);
         getEntityStoreRegistry().registerSystem(new CharacterScanSystem(characterSettings::get, characterService, positions));
         CharacterWaitlist<Waiter> waitlist = new CharacterWaitlist<>();
@@ -408,6 +410,14 @@ public class OpenDialoguesPlugin extends JavaPlugin {
     @Nonnull
     public CharacterMarkerProvider getCharacterMarkers() {
         return characterMarkers;
+    }
+
+    /**
+     * @return where each world's NPCs carrying a character stand, for bridges asking who is near.
+     */
+    @Nonnull
+    public CharacterPositionsAccess getCharacterPositions() {
+        return characterPositions;
     }
 
     /**
