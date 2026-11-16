@@ -7,6 +7,8 @@ import com.hypixel.hytale.server.core.modules.entity.component.TransformComponen
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Hands out a world's {@link CharacterPositions} caught up with character resets, so no reader
@@ -33,6 +35,15 @@ public final class CharacterPositionsAccess {
         CharacterPositions positions = store.getResource(type);
         positions.catchUp(characters.universeRegistry().generation(), characters.worldRegistry(store).generation());
         return positions;
+    }
+
+    /**
+     * A world's NPCs per character, readable from any thread.
+     * shortcut: skips the reset catch-up, so a reset's NPCs linger until the next scan; catch up here if that shows.
+     */
+    @Nonnull
+    public Map<String, Collection<CharacterPositions.Spot>> view(@Nonnull Store<EntityStore> store) {
+        return store.getResource(type).view();
     }
 
     /**

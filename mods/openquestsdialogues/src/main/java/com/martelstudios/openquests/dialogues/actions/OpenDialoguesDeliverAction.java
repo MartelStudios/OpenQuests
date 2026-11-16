@@ -19,11 +19,11 @@ import javax.annotation.Nonnull;
  * Hands the player's running delivery quest of an asset whatever it still misses that they carry,
  * as much as they have; nothing to give leaves it as it was.
  */
-public class OpenQuestsDeliverAction extends DialogueAction {
+public class OpenDialoguesDeliverAction extends DialogueAction {
 
     public static final String TYPE = "Deliver";
 
-    public static final BuilderCodec<OpenQuestsDeliverAction> CODEC = BuilderCodec.builder(OpenQuestsDeliverAction.class, OpenQuestsDeliverAction::new, DialogueAction.BASE_CODEC)
+    public static final BuilderCodec<OpenDialoguesDeliverAction> CODEC = BuilderCodec.builder(OpenDialoguesDeliverAction.class, OpenDialoguesDeliverAction::new, DialogueAction.BASE_CODEC)
                                                                               .append(new KeyedCodec<>("Quest", Codec.STRING), (action, quest) -> action.quest = quest, action -> action.quest)
                                                                               .addValidator(Validators.nonNull())
                                                                               .add()
@@ -31,7 +31,7 @@ public class OpenQuestsDeliverAction extends DialogueAction {
 
     private String quest;
 
-    OpenQuestsDeliverAction() {}
+    OpenDialoguesDeliverAction() {}
 
     /**
      * Defers to the player's world thread when called elsewhere, since only it may touch the inventory.

@@ -15,18 +15,18 @@ import java.util.function.Function;
  * Holds while the player's quests from an asset stand as asked, written like OpenQuests'
  * {@code RequiresQuest} constraint: running, done, never failed, never taken.
  */
-public class OpenQuestsRequiresQuestCondition extends DialogueCondition {
+public class OpenDialoguesRequiresQuestCondition extends DialogueCondition {
 
     public static final String TYPE = "RequiresQuest";
 
-    public static final BuilderCodec<OpenQuestsRequiresQuestCondition> CODEC = QuestRequirement.appendFields(BuilderCodec.builder(OpenQuestsRequiresQuestCondition.class, OpenQuestsRequiresQuestCondition::new, DialogueCondition.BASE_CODEC),
+    public static final BuilderCodec<OpenDialoguesRequiresQuestCondition> CODEC = QuestRequirement.appendFields(BuilderCodec.builder(OpenDialoguesRequiresQuestCondition.class, OpenDialoguesRequiresQuestCondition::new, DialogueCondition.BASE_CODEC),
                                                                                                              condition -> condition.requirement)
                                                                                                .build();
 
     @Nonnull
     protected final QuestRequirement requirement = new QuestRequirement();
 
-    protected OpenQuestsRequiresQuestCondition() {}
+    protected OpenDialoguesRequiresQuestCondition() {}
 
     /**
      * Does not hold without a player, as for a context built for no one.

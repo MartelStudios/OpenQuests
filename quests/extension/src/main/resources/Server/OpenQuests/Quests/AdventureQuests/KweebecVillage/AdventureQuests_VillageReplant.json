@@ -1,0 +1,52 @@
+{
+  "Type": "PlaceBlock",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Carrot.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-replant.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-replant.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-replant.short",
+  "TargetQuantity": 4,
+  "BlockToPlace": {
+    "ItemId": "Plant_Seeds_Carrot"
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_KweebecReplant",
+      "Radius": 20
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Plant_Seeds_Carrot_Eternal",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Pie_Pumpkin",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 50
+          }
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}

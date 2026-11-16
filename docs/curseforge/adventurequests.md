@@ -12,7 +12,7 @@ Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: 
 
 ## ✨ What is inside
 
-Over 150 quests in English and French, across ten chapters and seventeen village stories. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
+Over 150 quests in English and French, across ten chapters and eighteen village stories. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
 
 🖼️ **Every quest has its icon**, from a crude hatchet to the breach's portal key, so the journal and its chapter graphs read at a glance.
 

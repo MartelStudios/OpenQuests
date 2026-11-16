@@ -22,13 +22,13 @@ import javax.annotation.Nonnull;
  * Ends the player's quests from an asset, the way {@code /oquest complete} does: through the
  * progression, so events, a composite parent and the quest's own rewards follow as if played.
  */
-public class OpenQuestsSetQuestStateAction extends DialogueAction {
+public class OpenDialoguesSetQuestStateAction extends DialogueAction {
 
     public static final String TYPE = "SetQuestState";
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    public static final BuilderCodec<OpenQuestsSetQuestStateAction> CODEC = BuilderCodec.builder(OpenQuestsSetQuestStateAction.class, OpenQuestsSetQuestStateAction::new, DialogueAction.BASE_CODEC)
+    public static final BuilderCodec<OpenDialoguesSetQuestStateAction> CODEC = BuilderCodec.builder(OpenDialoguesSetQuestStateAction.class, OpenDialoguesSetQuestStateAction::new, DialogueAction.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("Quest", Codec.STRING), (action, quest) -> action.quest = quest, action -> action.quest)
                                                                                     .addValidator(Validators.nonNull())
                                                                                     .add()

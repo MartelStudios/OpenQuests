@@ -5,6 +5,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.dialogues.actions.QuestActionsFeature;
 import com.martelstudios.openquests.dialogues.conditions.QuestConditionsFeature;
+import com.martelstudios.openquests.dialogues.constraints.NearCharacterFeature;
 import com.martelstudios.openquests.dialogues.quests.LostCharacterQuests;
 import com.martelstudios.openquests.dialogues.map.TurnInMarkers;
 import com.martelstudios.openquests.dialogues.quests.deliver.DeliverFeature;
@@ -35,5 +36,6 @@ public class OpenQuestsDialoguesPlugin extends JavaPlugin {
         TurnInMarkers.register(this, services);
         QuestActionsFeature.register();
         QuestConditionsFeature.register();
+        NearCharacterFeature.register();
     }
 }

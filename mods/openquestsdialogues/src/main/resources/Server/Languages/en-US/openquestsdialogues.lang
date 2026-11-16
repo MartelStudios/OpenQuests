@@ -10,3 +10,4 @@ quest.default.someone = someone
 delivery.list = You bring me {items}?
 delivery.give = Give {item}.
 delivery.other = Something else.
+page.constraint.near-character = Only within {radius, number} blocks of {character}
