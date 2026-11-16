@@ -10,20 +10,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class OpenQuestsRequiresQuestConditionTest {
+class OpenDialoguesRequiresQuestConditionTest {
 
     /**
      * Decodes without running validators: the asset id check needs the quest store loaded.
      */
-    private static OpenQuestsRequiresQuestCondition decode(String json) throws IOException {
+    private static OpenDialoguesRequiresQuestCondition decode(String json) throws IOException {
         try (RawJsonReader reader = RawJsonReader.fromBuffer(json.toCharArray())) {
-            return OpenQuestsRequiresQuestCondition.CODEC.decodeJson(reader, new ExtraInfo());
+            return OpenDialoguesRequiresQuestCondition.CODEC.decodeJson(reader, new ExtraInfo());
         }
     }
 
     @Test
     void decodes_requirement_fields() throws IOException {
-        OpenQuestsRequiresQuestCondition condition = decode("{\"QuestAssetId\":\"ElderPotion\",\"States\":[\"InProgress\"]}");
+        OpenDialoguesRequiresQuestCondition condition = decode("{\"QuestAssetId\":\"ElderPotion\",\"States\":[\"InProgress\"]}");
 
         assertEquals("ElderPotion", condition.getRequirement().getQuestAssetId());
         assertNull(condition.validate(id -> null));
@@ -31,7 +31,7 @@ class OpenQuestsRequiresQuestConditionTest {
 
     @Test
     void bounds_error_reported() throws IOException {
-        OpenQuestsRequiresQuestCondition condition = decode("{\"QuestAssetId\":\"ElderPotion\",\"Min\":2,\"Max\":1}");
+        OpenDialoguesRequiresQuestCondition condition = decode("{\"QuestAssetId\":\"ElderPotion\",\"Min\":2,\"Max\":1}");
 
         assertNotNull(condition.validate(id -> null));
     }

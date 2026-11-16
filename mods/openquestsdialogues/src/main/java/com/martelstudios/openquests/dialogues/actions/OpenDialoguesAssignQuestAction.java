@@ -16,13 +16,13 @@ import javax.annotation.Nonnull;
  * Hands the player a new quest from an asset, unless its constraints refuse them. It does not
  * check whether they already hold one: preventing a second grant is the constraints' business.
  */
-public class OpenQuestsAssignQuestAction extends DialogueAction {
+public class OpenDialoguesAssignQuestAction extends DialogueAction {
 
     public static final String TYPE = "AssignQuest";
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    public static final BuilderCodec<OpenQuestsAssignQuestAction> CODEC = BuilderCodec.builder(OpenQuestsAssignQuestAction.class, OpenQuestsAssignQuestAction::new, DialogueAction.BASE_CODEC)
+    public static final BuilderCodec<OpenDialoguesAssignQuestAction> CODEC = BuilderCodec.builder(OpenDialoguesAssignQuestAction.class, OpenDialoguesAssignQuestAction::new, DialogueAction.BASE_CODEC)
                                                                                   .append(new KeyedCodec<>("Quest", new ContainedAssetCodec<>(OpenQuestAsset.class, OpenQuestAsset.CODEC)), (action, quest) -> action.quest = quest, action -> action.quest)
                                                                                   .addValidator(Validators.nonNull())
                                                                                   .add()

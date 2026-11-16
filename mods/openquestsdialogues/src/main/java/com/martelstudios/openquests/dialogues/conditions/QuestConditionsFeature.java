@@ -13,6 +13,6 @@ public final class QuestConditionsFeature {
      * Registers the conditions with OpenDialogues, which sets up before this plugin.
      */
     public static void register() {
-        OpenDialoguesPlugin.get().getRegistry().registerCondition(OpenQuestsRequiresQuestCondition.TYPE, OpenQuestsRequiresQuestCondition.class, OpenQuestsRequiresQuestCondition.CODEC);
+        OpenDialoguesPlugin.get().getRegistry().registerCondition(OpenDialoguesRequiresQuestCondition.TYPE, OpenDialoguesRequiresQuestCondition.class, OpenDialoguesRequiresQuestCondition.CODEC);
     }
 }

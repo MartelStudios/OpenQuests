@@ -11,14 +11,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class OpenQuestsSetQuestStateActionTest {
+class OpenDialoguesSetQuestStateActionTest {
 
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
-    private static OpenQuestsSetQuestStateAction decode(String json) {
+    private static OpenDialoguesSetQuestStateAction decode(String json) {
         try (RawJsonReader reader = RawJsonReader.fromBuffer(json.toCharArray())) {
             ExtraInfo extraInfo = new AssetExtraInfo<>(new AssetExtraInfo.Data(OpenQuestAsset.class, "Test", null));
-            OpenQuestsSetQuestStateAction action = OpenQuestsSetQuestStateAction.CODEC.decodeJson(reader, extraInfo);
+            OpenDialoguesSetQuestStateAction action = OpenDialoguesSetQuestStateAction.CODEC.decodeJson(reader, extraInfo);
             extraInfo.getValidationResults().logOrThrowValidatorExceptions(LOGGER);
             return action;
         } catch (Exception e) {
@@ -28,7 +28,7 @@ class OpenQuestsSetQuestStateActionTest {
 
     @Test
     void successful_decodes() {
-        OpenQuestsSetQuestStateAction action = decode("{\"Quest\":\"ElderPotion\",\"State\":\"Successful\"}");
+        OpenDialoguesSetQuestStateAction action = decode("{\"Quest\":\"ElderPotion\",\"State\":\"Successful\"}");
 
         assertEquals("ElderPotion", action.getQuest());
         assertEquals(QuestState.SUCCESSFUL, action.getState());
