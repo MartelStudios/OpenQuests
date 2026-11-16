@@ -10,3 +10,4 @@ quest.default.someone = quelqu'un
 delivery.list = Tu m'apportes {items} ?
 delivery.give = Remettre {item}.
 delivery.other = Autre chose.
+page.constraint.near-character = Uniquement à moins de {radius, number} blocs de {character}

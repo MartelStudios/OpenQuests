@@ -8,6 +8,7 @@ import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestP
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Counts the openings, or the picks of an answer, that its asset's filters let through.
@@ -51,13 +52,21 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
     }
 
     /**
-     * The epithet rather than a drawn name, since one title serves every NPC carrying the character;
-     * "someone" for a character without one.
+     * The fixed name, else the epithet, never a drawn name, since one text serves every NPC carrying
+     * the character; "someone" for a character with neither.
      */
     @Nonnull
     public static Message characterName(@Nonnull String characterId) {
-        OpenDialogueCharacterAsset character = OpenDialogueCharacterAsset.getCharacter(characterId);
-        String epithet = character == null ? null : character.getEpithet();
-        return Message.translation(epithet != null ? epithet : "openquestsdialogues.quest.default.someone");
+        return Message.translation(characterNameKey(OpenDialogueCharacterAsset.getCharacter(characterId)));
+    }
+
+    /**
+     * @return the translation key {@link #characterName} shows; {@code null} stands for an unknown character.
+     */
+    @Nonnull
+    static String characterNameKey(@Nullable OpenDialogueCharacterAsset character) {
+        if (character != null && character.getName() != null) return character.getName();
+        if (character != null && character.getEpithet() != null) return character.getEpithet();
+        return "openquestsdialogues.quest.default.someone";
     }
 }
