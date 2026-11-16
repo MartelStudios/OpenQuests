@@ -135,6 +135,8 @@ Install the **[OpenQuests Dialogues](https://www.curseforge.com/hytale/mods/open
 * **A `Deliver` quest type:** bring items to a character, handed over a few at a time.
 * **Answers that hand out quests** with `AssignQuest`, or end them with `SetQuestState`.
 * **A `RequiresQuest` condition:** an answer that only shows while a quest is running, or once it is done.
+* **A `NearCharacter` constraint:** a quest that only counts near an NPC carrying a character, "plant carrots in
+  the village" in every world.
 * **Quests aimed at a character:** talk to the Kweebec mage, bring seeds to the enchanted stag. A quest aimed at a
   character lost for good fails on its own.
 
