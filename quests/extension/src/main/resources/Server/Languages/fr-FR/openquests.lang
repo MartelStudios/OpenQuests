@@ -126,3 +126,6 @@ feedback.successful = Quête terminée
 feedback.failed = Quête échouée
 feedback.abandoned = Quête abandonnée
 
+team_type.party = Groupe
+team.default_name = Équipe de {player}
+

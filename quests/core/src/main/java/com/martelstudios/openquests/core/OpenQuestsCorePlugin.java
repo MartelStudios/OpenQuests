@@ -48,6 +48,7 @@ import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
+import com.martelstudios.openquests.core.teams.TeamTypes;
 import com.martelstudios.openquests.core.utils.ServerPlayers;
 
 import javax.annotation.Nonnull;
@@ -56,7 +57,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -107,7 +110,19 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
             getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, QuestStoreComponent::new),
             getEntityStoreRegistry().registerComponent(PendingRewardStoreComponent.class, PendingRewardStoreComponent::new));
 
-        Platform platform = new Platform(HytaleServer.get().getEventBus(), Clock.systemUTC(), HytaleServer.SCHEDULED_EXECUTOR, new ServerPlayers(), components, () -> OpenQuestTeamType.getAssetStore().getAssetMap().getAssetMap().values());
+        Platform platform = new Platform(HytaleServer.get().getEventBus(), Clock.systemUTC(), HytaleServer.SCHEDULED_EXECUTOR, new ServerPlayers(), components, new TeamTypes() {
+            @Override
+            public OpenQuestTeamType get(@Nonnull String id) {
+                return OpenQuestTeamType.getAsset(id);
+            }
+
+            @Nonnull
+            @Override
+            public Collection<OpenQuestTeamType> all() {
+                // A copy, as a pack reload replaces the map while a caller walks it
+                return List.copyOf(OpenQuestTeamType.getAssetStore().getAssetMap().getAssetMap().values());
+            }
+        });
         services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), platform);
         services.install();
 

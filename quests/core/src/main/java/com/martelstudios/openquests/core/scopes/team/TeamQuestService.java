@@ -10,6 +10,7 @@ import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
 import com.martelstudios.openquests.core.teams.TeamKey;
+import com.martelstudios.openquests.core.teams.TeamTypes;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.utils.Players;
 
@@ -21,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 /**
  * Holds the quests each team shares: indexes them under the team's key, hands them to its online
@@ -45,9 +45,9 @@ public class TeamQuestService {
     private final QuestProgressionService progression;
     private final Players players;
     private final PlayerComponentTypes components;
-    private final Supplier<Collection<OpenQuestTeamType>> teamTypes;
+    private final TeamTypes teamTypes;
 
-    public TeamQuestService(@Nonnull ScopeIndexes indexes, @Nonnull QuestProgressionService progression, @Nonnull Players players, @Nonnull PlayerComponentTypes components, @Nonnull Supplier<Collection<OpenQuestTeamType>> teamTypes) {
+    public TeamQuestService(@Nonnull ScopeIndexes indexes, @Nonnull QuestProgressionService progression, @Nonnull Players players, @Nonnull PlayerComponentTypes components, @Nonnull TeamTypes teamTypes) {
         this.indexes = indexes;
         this.progression = progression;
         this.players = players;
@@ -142,7 +142,7 @@ public class TeamQuestService {
         List<TeamKey> teams = new ArrayList<>();
         named.forEach((type, name) -> teams.add(new TeamKey(type, name)));
 
-        for (OpenQuestTeamType type : teamTypes.get()) {
+        for (OpenQuestTeamType type : teamTypes.all()) {
             if (type.isPersonalTeam() && !named.containsKey(type.getId())) teams.add(TeamKey.personal(type.getId(), playerId));
         }
         return teams;

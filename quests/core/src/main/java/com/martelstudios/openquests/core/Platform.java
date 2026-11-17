@@ -2,14 +2,12 @@ package com.martelstudios.openquests.core;
 
 import com.hypixel.hytale.event.IEventBus;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
-import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
+import com.martelstudios.openquests.core.teams.TeamTypes;
 import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
 import java.time.Clock;
-import java.util.Collection;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Supplier;
 
 /**
  * What the services take from the server they run on. The plugin hands over the real server's,
@@ -27,4 +25,4 @@ public record Platform(@Nonnull IEventBus events,
                        @Nonnull ScheduledExecutorService scheduler,
                        @Nonnull Players players,
                        @Nonnull PlayerComponentTypes components,
-                       @Nonnull Supplier<Collection<OpenQuestTeamType>> teamTypes) {}
+                       @Nonnull TeamTypes teamTypes) {}

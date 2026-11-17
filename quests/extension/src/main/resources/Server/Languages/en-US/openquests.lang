@@ -126,3 +126,6 @@ feedback.successful = Quest complete
 feedback.failed = Quest failed
 feedback.abandoned = Quest abandoned
 
+team_type.party = Party
+team.default_name = {player}'s team
+

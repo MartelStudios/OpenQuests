@@ -25,7 +25,6 @@ import java.util.function.BiConsumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TeamAssignmentTest {
@@ -110,11 +109,6 @@ class TeamAssignmentTest {
 
             assertEquals(Set.of(new TeamKey("faction", "lion")), Set.copyOf(targets.teams));
         }
-    }
-
-    @Test
-    void anUnknownTeamTypeIsInconsistent() {
-        assertNotNull(new TeamAssignmentScope("nobody_declared_this").findInconsistency(new PlayerConnectTrigger()));
     }
 
     @Nonnull

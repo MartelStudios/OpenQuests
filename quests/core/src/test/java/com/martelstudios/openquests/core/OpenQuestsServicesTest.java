@@ -7,6 +7,7 @@ import com.hypixel.hytale.event.IEventRegistry;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
+import com.martelstudios.openquests.core.teams.TeamTypes;
 import com.martelstudios.openquests.core.utils.Players;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class OpenQuestsServicesTest {
 
     private final Platform platform = new Platform(Untouched.of(IEventBus.class), Clock.systemUTC(), Untouched.of(ScheduledExecutorService.class), Untouched.of(Players.class),
-                                                   new PlayerComponentTypes(new ComponentType<>(), new ComponentType<>()), List::of);
+                                                   new PlayerComponentTypes(new ComponentType<>(), new ComponentType<>()), TeamTypes.of(List.of()));
     private final OpenQuestsServices services = new OpenQuestsServices(Untouched.of(QuestStorage.class), 5, platform);
 
     @Test

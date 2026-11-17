@@ -8,13 +8,11 @@ import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.assignments.AssignmentTargets;
 import com.martelstudios.openquests.core.assignments.Occasion;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
-import com.martelstudios.openquests.core.assignments.trigger.AssignmentTrigger;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
 import com.martelstudios.openquests.core.teams.TeamKey;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
@@ -28,6 +26,7 @@ public class TeamAssignmentScope extends AssignmentScope {
     public static final BuilderCodec<TeamAssignmentScope> CODEC = BuilderCodec.builder(TeamAssignmentScope.class, TeamAssignmentScope::new, AssignmentScope.BASE_CODEC)
                                                                               .append(new KeyedCodec<>("TeamType", Codec.STRING), (scope, type) -> scope.teamType = type, scope -> scope.teamType)
                                                                               .addValidator(Validators.nonNull())
+                                                                              .addValidator(OpenQuestTeamType.VALIDATOR_CACHE.getValidator())
                                                                               .add()
                                                                               .build();
 
@@ -57,12 +56,5 @@ public class TeamAssignmentScope extends AssignmentScope {
             TeamKey team = teams.teamOf(teamType, memberId, member);
             if (team != null) targets.team(team, null);
         });
-    }
-
-    @Nullable
-    @Override
-    public String findInconsistency(@Nonnull AssignmentTrigger trigger) {
-        if (OpenQuestTeamType.getAsset(teamType) == null) return "no team type " + teamType + " is declared";
-        return null;
     }
 }
