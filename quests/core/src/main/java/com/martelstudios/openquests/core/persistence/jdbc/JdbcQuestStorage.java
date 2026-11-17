@@ -12,6 +12,7 @@ import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestProgressionRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
+import com.martelstudios.openquests.core.persistence.TeamRecord;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -98,6 +99,7 @@ public class JdbcQuestStorage implements QuestStorage {
     private String playerTable;
     private String messageTable;
     private String assignmentTable;
+    private String teamTable;
     private String versionTable;
 
     @Nullable
@@ -128,6 +130,7 @@ public class JdbcQuestStorage implements QuestStorage {
         playerTable = prefix + "player";
         messageTable = prefix + "player_message";
         assignmentTable = prefix + "quest_assignment";
+        teamTable = prefix + "teams";
         versionTable = prefix + "schema_version";
 
         insertMemberSql = dialect.insertIgnoring(questIndexTable, "index_key, quest_id");
@@ -908,6 +911,73 @@ public class JdbcQuestStorage implements QuestStorage {
         return record == null ? null : record.quest;
     }
 
+    /**
+     * The version lives in its own column, which the conditional update compares; the document's
+     * copy is overwritten with it on read.
+     */
+    @Nullable
+    @Override
+    public TeamRecord loadTeam(@Nonnull UUID teamId) {
+        return pool.with(connection -> {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT data, version FROM " + teamTable + " WHERE team_id = ?")) {
+                statement.setString(1, teamId.toString());
+
+                try (ResultSet results = statement.executeQuery()) {
+                    if (!results.next()) return null;
+
+                    return CodecJson.decode(TeamRecord.CODEC, results.getString(1), "team " + teamId).withVersion(results.getLong(2));
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean createTeam(@Nonnull TeamRecord team) {
+        String data = CodecJson.encode(TeamRecord.CODEC, team.withVersion(0));
+
+        return pool.inTransaction(connection -> {
+            try (PreparedStatement select = connection.prepareStatement("SELECT 1 FROM " + teamTable + " WHERE team_id = ?")) {
+                select.setString(1, team.getId().toString());
+                try (ResultSet results = select.executeQuery()) {
+                    if (results.next()) return false;
+                }
+            }
+
+            try (PreparedStatement insert = connection.prepareStatement("INSERT INTO " + teamTable + " (team_id, data, version, updated_at) VALUES (?, ?, 0, ?)")) {
+                insert.setString(1, team.getId().toString());
+                insert.setString(2, data);
+                insert.setLong(3, System.currentTimeMillis());
+                insert.executeUpdate();
+            }
+            return true;
+        });
+    }
+
+    @Override
+    public boolean updateTeam(@Nonnull TeamRecord expected, @Nonnull TeamRecord next) {
+        long version = expected.getVersion() + 1;
+        String data = CodecJson.encode(TeamRecord.CODEC, next.withVersion(version));
+
+        return pool.with(connection -> {
+            try (PreparedStatement update = connection.prepareStatement("UPDATE " + teamTable + " SET data = ?, version = ?, updated_at = ? WHERE team_id = ? AND version = ?")) {
+                update.setString(1, data);
+                update.setLong(2, version);
+                update.setLong(3, System.currentTimeMillis());
+                update.setString(4, expected.getId().toString());
+                update.setLong(5, expected.getVersion());
+                return update.executeUpdate() == 1;
+            }
+        });
+    }
+
+    @Override
+    public void deleteTeam(@Nonnull UUID teamId) {
+        pool.with(connection -> {
+            execute(connection, "DELETE FROM " + teamTable + " WHERE team_id = ?", teamId.toString());
+            return null;
+        });
+    }
+
     private static void execute(@Nonnull Connection connection, @Nonnull String sql, @Nonnull String argument) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, argument);
@@ -1030,6 +1100,13 @@ public class JdbcQuestStorage implements QuestStorage {
                 + "last_at BIGINT NOT NULL, "
                 + "occasion VARCHAR(255) NOT NULL, "
                 + "PRIMARY KEY (holder_key, assignment_id, quest_asset_id))");
+
+            // Added beside the layout rather than in it: older tables gain it without a new version
+            statement.execute("CREATE TABLE IF NOT EXISTS " + teamTable + " ("
+                + "team_id VARCHAR(36) NOT NULL PRIMARY KEY, "
+                + "data " + text + " NOT NULL, "
+                + "version BIGINT NOT NULL, "
+                + "updated_at BIGINT NOT NULL)");
         }
 
         createIndex(connection, "idx_" + questPlayerTable + "_player", questPlayerTable, "player_id");

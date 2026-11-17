@@ -11,6 +11,7 @@ import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestProgressionRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
+import com.martelstudios.openquests.core.persistence.TeamRecord;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -35,7 +36,7 @@ import java.util.function.Consumer;
 
 /**
  * The quests as JSON files under the universe directory, which is where a server with no database
- * keeps them: one file per progression, per player, per index, per shared holder, per message.
+ * keeps them: one file per progression, per player, per index, per shared holder, per message, per team.
  *
  * <p>Written by one server only, so a quest is always written over its file.
  */
@@ -62,6 +63,7 @@ public class DiskQuestStorage implements QuestStorage {
     private DiskDataStore<QuestIndexRecord> indexes;
     private DiskDataStore<AssignmentRecordsFile> assignments;
     private DiskDataStore<PlayerMessage> messages;
+    private DiskDataStore<TeamRecord> teams;
 
     public DiskQuestStorage(@Nonnull String rootPath) {
         this.rootPath = rootPath;
@@ -74,6 +76,7 @@ public class DiskQuestStorage implements QuestStorage {
         indexes = new DiskDataStore<>(child("indexes"), QuestIndexRecord.CODEC);
         assignments = new DiskDataStore<>(child("assignments"), AssignmentRecordsFile.CODEC);
         messages = new DiskDataStore<>(child("messages"), PlayerMessage.CODEC);
+        teams = new DiskDataStore<>(child("teams"), TeamRecord.CODEC);
 
         // list() and loadAll() walk a directory stream, which throws on one that is not there yet
         createDirectory(progressions.getPath());
@@ -81,6 +84,7 @@ public class DiskQuestStorage implements QuestStorage {
         createDirectory(indexes.getPath());
         createDirectory(assignments.getPath());
         createDirectory(messages.getPath());
+        createDirectory(teams.getPath());
 
         LOGGER.atInfo().log("Quest storage: JSON files under %s", rootPath);
     }
@@ -444,6 +448,51 @@ public class DiskQuestStorage implements QuestStorage {
         }
         waiting.sort(Comparator.comparingLong(PlayerMessage::getAt));
         return waiting;
+    }
+
+    @Nullable
+    @Override
+    public TeamRecord loadTeam(@Nonnull UUID teamId) {
+        try {
+            return teams.load(teamId.toString());
+        } catch (IOException e) {
+            LOGGER.atWarning().withCause(e).log("Failed to read team %s", teamId);
+            return null;
+        }
+    }
+
+    @Override
+    public boolean createTeam(@Nonnull TeamRecord team) {
+        synchronized (lockOf("teams/" + team.getId())) {
+            if (Files.exists(teams.getPath().resolve(team.getId() + ".json"))) return false;
+
+            teams.save(team.getId().toString(), team.withVersion(0));
+            return true;
+        }
+    }
+
+    @Override
+    public boolean updateTeam(@Nonnull TeamRecord expected, @Nonnull TeamRecord next) {
+        synchronized (lockOf("teams/" + expected.getId())) {
+            TeamRecord stored = loadTeam(expected.getId());
+            if (stored == null || stored.getVersion() != expected.getVersion()) return false;
+
+            teams.save(expected.getId().toString(), next.withVersion(expected.getVersion() + 1));
+            return true;
+        }
+    }
+
+    @Override
+    public void deleteTeam(@Nonnull UUID teamId) {
+        synchronized (lockOf("teams/" + teamId)) {
+            try {
+                teams.remove(teamId.toString());
+            } catch (NoSuchFileException e) {
+                // Deleted already
+            } catch (IOException e) {
+                LOGGER.atWarning().withCause(e).log("Failed to delete team %s", teamId);
+            }
+        }
     }
 
     @Nonnull

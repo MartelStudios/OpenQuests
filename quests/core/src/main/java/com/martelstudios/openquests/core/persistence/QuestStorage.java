@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
  * Everything the quest system keeps between restarts, and the only thing the rest of the core
  * knows about where it is kept. A backend answers for each kind of record through a port of its
  * own, so a caller depends on the one it uses: the progressions, the indexes of running quests,
- * the players and their messages, the assignment records.
+ * the players and their messages, the assignment records, the teams.
  *
  * <p>Several servers may share one backend. Every record has one writer, or is written through an
  * operation that cannot lose what another server wrote: a change made on the latest version, a
@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
  * <p>Reads block, and writes are durable once they return. They are meant for a thread of their
  * own, never a world's, but for a player connecting and a world loading.
  */
-public interface QuestStorage extends ProgressionStore, IndexStore, PlayerStore, AssignmentStore, AutoCloseable {
+public interface QuestStorage extends ProgressionStore, IndexStore, PlayerStore, AssignmentStore, TeamStore, AutoCloseable {
 
     /**
      * Opens the backend and brings it up to the shape this version expects.
