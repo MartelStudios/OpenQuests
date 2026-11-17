@@ -23,6 +23,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -107,7 +108,7 @@ public class QuestRewardService {
 
         QuestReward[] rewards = personal.toArray(PendingRewards.NO_REWARDS);
         for (UUID playerId : questCompletedEvent.recipients(() -> services.getTeamQuestService().completionPlayers(quest))) {
-            owe(playerId, new PendingRewards(quest, rewards));
+            owe(playerId, new PendingRewards(quest, rewards), questCompletedEvent.getVersion());
         }
     }
 
@@ -132,8 +133,12 @@ public class QuestRewardService {
      * standing in their record, nothing holding their components to write it into.
      */
     private void owe(@Nonnull UUID playerId, @Nonnull PendingRewards pending) {
+        owe(playerId, pending, 0);
+    }
+
+    private void owe(@Nonnull UUID playerId, @Nonnull PendingRewards pending, int completionVersion) {
         if (!players.isOnline(playerId)) {
-            storage.postMessage(PlayerMessage.owed(playerId, pending));
+            storage.postMessage(PlayerMessage.owed(playerId, pending, completionVersion));
             return;
         }
 
@@ -170,8 +175,10 @@ public class QuestRewardService {
     public void claimAutoOnWorldEntry(@Nonnull UUID playerId, @Nonnull EntityComponents playerComponents) {
         if (!claimAuto(playerComponents)) return;
 
+        var settled = Set.copyOf(getPending(playerComponents).snapshot());
+
         services.getQuestSyncService().execute("settled rewards for player " + playerId,
-                () -> services.getQuestPlayerStateService().saveNow(playerId));
+                () -> services.getQuestPlayerStateService().saveNow(playerId, settled));
     }
 
     /**

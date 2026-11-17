@@ -23,6 +23,8 @@ public class QuestCompletedEvent implements IEvent<UUID> {
     @Nonnull
     private final QuestState state;
 
+    private final int version;
+
     private final boolean endedHere;
     private Set<UUID> recipients;
 
@@ -37,9 +39,10 @@ public class QuestCompletedEvent implements IEvent<UUID> {
      * @param state the outcome reached, which the quest may have moved past by the time this is heard
      * @param endedHere whether this server ended the quest, rather than learning another did
      */
-    public QuestCompletedEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state, boolean endedHere) {
+    public QuestCompletedEvent(@Nonnull AbstractQuestProgression<?> quest, @Nonnull QuestState state, int version, boolean endedHere) {
         this.quest = quest;
         this.state = state;
+        this.version = version;
         this.endedHere = endedHere;
     }
 
@@ -51,6 +54,11 @@ public class QuestCompletedEvent implements IEvent<UUID> {
     @Nonnull
     public QuestState getState() {
         return state;
+    }
+
+    /** @return the quest state transition that ended it, stable across retries and copies. */
+    public int getVersion() {
+        return version;
     }
 
     /**

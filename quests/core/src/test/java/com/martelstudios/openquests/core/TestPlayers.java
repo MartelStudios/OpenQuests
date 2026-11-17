@@ -69,6 +69,12 @@ public final class TestPlayers implements Players {
         return players.computeIfAbsent(playerId, id -> new Player());
     }
 
+    /** Returns a component copy like a holder transferred into an entity store. */
+    @Nonnull
+    public EntityComponents copyOf(@Nonnull UUID playerId) {
+        return ((Player) of(playerId)).copy();
+    }
+
     @Nonnull
     private Component<EntityStore> create(@Nonnull ComponentType<EntityStore, ?> type) {
         if (type == types.questStore()) return new QuestStoreComponent();
@@ -95,6 +101,12 @@ public final class TestPlayers implements Players {
     private final class Player implements EntityComponents {
         // By identity: component types the entity store never registered all compare equal
         private final Map<ComponentType<EntityStore, ?>, Component<EntityStore>> components = new IdentityHashMap<>();
+
+        private synchronized Player copy() {
+            Player copy = new Player();
+            components.forEach((type, component) -> copy.components.put(type, component.clone()));
+            return copy;
+        }
 
         @Nullable
         @Override

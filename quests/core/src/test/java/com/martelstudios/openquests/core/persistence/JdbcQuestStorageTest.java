@@ -309,21 +309,23 @@ class JdbcQuestStorageTest {
     }
 
     @Test
-    void aDebtLeftForAPlayerWaitsUntilTheirRecordTakesItIn() {
+    void repeatedDebtMessagesForOneCompletionAreStoredOnce() {
         UUID playerId = UUID.randomUUID();
         TestQuestProgression quest = quest("Owed", playerId);
         storage.writeProgressions(List.of(quest));
         storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of(), Map.of()), List.of(), true);
 
-        storage.postMessage(PlayerMessage.owed(playerId, new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")})));
-        // The same completion, now owing less: taken in, it replaces rather than piling up
-        storage.postMessage(PlayerMessage.owed(playerId, new PendingRewards(quest, new QuestReward[0])));
+        storage.postMessage(PlayerMessage.owed(playerId, new PendingRewards(quest, new QuestReward[]{new TestQuestReward("berries")}), 1));
+        // A second progression instance announcing the same completion must not enqueue it again.
+        storage.postMessage(PlayerMessage.owed(playerId, new PendingRewards(quest, new QuestReward[0]), 1));
+
+        assertEquals(1, storage.loadMessages(List.of(playerId)).size());
 
         PlayerQuestRecord read = takeInMessages(storage, playerId);
 
         assertEquals(handed("OnConnection", "StartHatchet"), read.getAssignments());
         assertEquals(1, read.getPendingRewards().size());
-        assertEquals(0, read.getPendingRewards().iterator().next().getRewards().length);
+        assertEquals("berries", ((TestQuestReward) read.getPendingRewards().iterator().next().getRewards()[0]).getLabel());
         assertTrue(storage.loadMessages(List.of(playerId)).isEmpty());
     }
 
@@ -365,17 +367,20 @@ class JdbcQuestStorageTest {
         UUID playerId = UUID.randomUUID();
         storage.savePlayer(playerId, new PlayerQuestRecord(Set.of(), handed("OnConnection", "StartHatchet"), Set.of(), Map.of(), Map.of()), List.of(), true);
 
-        storage.postMessage(PlayerMessage.ended(playerId, "DailyWood", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000), Instant.ofEpochMilli(2_000)));
-        storage.postMessage(PlayerMessage.ended(playerId, "DailyWood", QuestState.ABANDONED, Instant.ofEpochMilli(3_000), Instant.ofEpochMilli(4_000)));
+        UUID successfulQuest = UUID.randomUUID();
+        storage.postMessage(PlayerMessage.ended(playerId, successfulQuest, 1, "DailyWood", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000), Instant.ofEpochMilli(2_000)));
+        storage.postMessage(PlayerMessage.ended(playerId, successfulQuest, 1, "DailyWood", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000), Instant.ofEpochMilli(2_100)));
+        storage.postMessage(PlayerMessage.ended(playerId, successfulQuest, 3, "DailyWood", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000), Instant.ofEpochMilli(2_500)));
+        storage.postMessage(PlayerMessage.ended(playerId, UUID.randomUUID(), 1, "DailyWood", QuestState.ABANDONED, Instant.ofEpochMilli(3_000), Instant.ofEpochMilli(4_000)));
 
         PlayerQuestRecord read = takeInMessages(storage, playerId);
         QuestCompletions completions = read.getCompletions().get("DailyWood");
 
         assertEquals(handed("OnConnection", "StartHatchet"), read.getAssignments());
         assertNotNull(completions);
-        assertEquals(1, completions.count(QuestState.SUCCESSFUL));
+        assertEquals(2, completions.count(QuestState.SUCCESSFUL));
         assertEquals(1, completions.count(QuestState.ABANDONED));
-        assertEquals(2, completions.total());
+        assertEquals(3, completions.total());
         assertEquals(Instant.ofEpochMilli(4_000), completions.getLastCompletedAt());
     }
 
@@ -383,7 +388,7 @@ class JdbcQuestStorageTest {
     void anEndingLeftForAPlayerNobodyHasHeardOfStartsTheirRecord() {
         UUID playerId = UUID.randomUUID();
 
-        storage.postMessage(PlayerMessage.ended(playerId, "DailyWood", QuestState.FAILED, null, Instant.ofEpochMilli(2_000)));
+        storage.postMessage(PlayerMessage.ended(playerId, UUID.randomUUID(), 1, "DailyWood", QuestState.FAILED, null, Instant.ofEpochMilli(2_000)));
 
         PlayerQuestRecord read = takeInMessages(storage, playerId);
         assertFalse(read.isEmpty());

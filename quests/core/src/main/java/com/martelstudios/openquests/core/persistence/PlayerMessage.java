@@ -10,6 +10,7 @@ import com.martelstudios.openquests.core.teams.TeamChange;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -56,7 +57,12 @@ public final class PlayerMessage {
      */
     @Nonnull
     public static PlayerMessage owed(@Nonnull UUID playerId, @Nonnull PendingRewards owed) {
-        PlayerMessage message = create(playerId);
+        return owed(playerId, owed, 0);
+    }
+
+    @Nonnull
+    public static PlayerMessage owed(@Nonnull UUID playerId, @Nonnull PendingRewards owed, int completionVersion) {
+        PlayerMessage message = create(playerId, "owed:" + owed.getQuestId() + ":" + completionVersion);
         message.owed = owed;
         return message;
     }
@@ -65,8 +71,8 @@ public final class PlayerMessage {
      * @return a message counting how a quest from that asset ended for the player.
      */
     @Nonnull
-    public static PlayerMessage ended(@Nonnull UUID playerId, @Nonnull String assetId, @Nonnull QuestState outcome, @Nullable Instant startedAt, @Nullable Instant completedAt) {
-        PlayerMessage message = create(playerId);
+    public static PlayerMessage ended(@Nonnull UUID playerId, @Nonnull UUID questId, int completionVersion, @Nonnull String assetId, @Nonnull QuestState outcome, @Nullable Instant startedAt, @Nullable Instant completedAt) {
+        PlayerMessage message = create(playerId, "ended:" + questId + ":" + completionVersion);
         message.ending = new Ending(assetId, outcome, startedAt, completedAt);
         return message;
     }
@@ -148,6 +154,16 @@ public final class PlayerMessage {
     private static PlayerMessage create(@Nonnull UUID playerId) {
         PlayerMessage message = new PlayerMessage();
         message.id = UUID.randomUUID();
+        message.playerId = playerId;
+        message.at = System.currentTimeMillis();
+        return message;
+    }
+
+    /** Gives retried completion messages the same durable identity across progression instances. */
+    @Nonnull
+    private static PlayerMessage create(@Nonnull UUID playerId, @Nonnull String effect) {
+        PlayerMessage message = new PlayerMessage();
+        message.id = UUID.nameUUIDFromBytes((playerId + ":" + effect).getBytes(StandardCharsets.UTF_8));
         message.playerId = playerId;
         message.at = System.currentTimeMillis();
         return message;

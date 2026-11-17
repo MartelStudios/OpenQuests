@@ -820,7 +820,11 @@ public class JdbcQuestStorage implements QuestStorage {
                 insert.setString(2, message.getPlayerId().toString());
                 insert.setString(3, data);
                 insert.setLong(4, System.currentTimeMillis());
-                insert.executeUpdate();
+                try {
+                    insert.executeUpdate();
+                } catch (SQLException duplicate) {
+                    if (!isDuplicateKey(duplicate)) throw duplicate;
+                }
             }
             return null;
         });
