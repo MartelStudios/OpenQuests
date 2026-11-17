@@ -76,6 +76,17 @@ class TeamQuestServiceTest {
     }
 
     @Test
+    void anOfflineMembersStoredEntityIsLeftAlone() {
+        UUID alice = harness.players().connect();
+        UUID bob = UUID.randomUUID();
+        UUID teamId = team("faction", alice, bob);
+
+        share(teamId, harness.register());
+
+        assertTrue(harness.questsOf(bob).isEmpty());
+    }
+
+    @Test
     void aMemberBoundOnAnotherServerSeesTheQuestHere() {
         UUID bob = harness.players().connect();
         UUID teamId = team("faction", bob);

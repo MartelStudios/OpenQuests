@@ -39,6 +39,7 @@ class QuestCopierTest {
         harness = new QuestHarness();
         progression = harness.services().getQuestProgressionService();
         copier = new QuestCopier(progression);
+        harness.players().connect(leaver);
     }
 
     @AfterEach

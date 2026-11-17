@@ -79,7 +79,12 @@ public class PlayerQuestService {
         }
     }
 
+    /**
+     * Only for a player online here: the store is rebuilt from the storage at connection, and a
+     * write to an absent player's stored entity could roll back a server hosting them.
+     */
     public void addQuestToPlayerStore(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        if (!players.isOnline(playerId)) return;
         players.update(playerId, player -> addQuestToPlayerStore(player.ensureAndGetComponent(components.questStore()), quest, playerId));
     }
 
@@ -91,7 +96,11 @@ public class PlayerQuestService {
         eventBus.dispatchFor(QuestAddedToPlayerStoreEvent.class, playerId).dispatch(new QuestAddedToPlayerStoreEvent(quest, playerId));
     }
 
+    /**
+     * Only for a player online here, as {@link #addQuestToPlayerStore(AbstractQuestProgression, UUID)}.
+     */
     public void removeQuestFromPlayerStore(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        if (!players.isOnline(playerId)) return;
         players.update(playerId, player -> removeQuestFromPlayerStore(player.ensureAndGetComponent(components.questStore()), quest, playerId));
     }
 
