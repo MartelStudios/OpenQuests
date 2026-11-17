@@ -19,6 +19,7 @@ import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +53,7 @@ public final class QuestHarness implements AutoCloseable {
         storage = new JdbcQuestStorage(new JdbcQuestStorage.JdbcSettings(url, null, null, null, null, "oqtest_", 4, 10, true, SqlDialect.fromUrl(url)));
         storage.start();
 
-        services = new OpenQuestsServices(storage, 5, new Platform(events, clock, scheduler, players, players.types(), TeamTypes.of(teamTypes)));
+        services = new OpenQuestsServices(storage, 5, Duration.ofHours(24), new Platform(events, clock, scheduler, players, players.types(), TeamTypes.of(teamTypes)));
         services.listen(events);
         services.install();
     }

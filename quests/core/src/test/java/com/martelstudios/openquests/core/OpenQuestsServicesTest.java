@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Proxy;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ class OpenQuestsServicesTest {
 
     private final Platform platform = new Platform(Untouched.of(IEventBus.class), Clock.systemUTC(), Untouched.of(ScheduledExecutorService.class), Untouched.of(Players.class),
                                                    new PlayerComponentTypes(new ComponentType<>(), new ComponentType<>()), TeamTypes.of(List.of()));
-    private final OpenQuestsServices services = new OpenQuestsServices(Untouched.of(QuestStorage.class), 5, platform);
+    private final OpenQuestsServices services = new OpenQuestsServices(Untouched.of(QuestStorage.class), 5, Duration.ofHours(24), platform);
 
     @Test
     void everyServiceSubscribesWhenToldToListen() {

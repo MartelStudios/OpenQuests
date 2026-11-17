@@ -22,7 +22,8 @@ import javax.annotation.Nonnull;
  *     "DriverPath": "libs/postgresql-42.7.4.jar"
  *   },
  *   "SaveIntervalMinutes": 5,
- *   "SyncSeconds": 5
+ *   "SyncSeconds": 5,
+ *   "TeamInvitationHours": 24
  * }
  * }</pre>
  */
@@ -34,6 +35,8 @@ public class OpenQuestsConfig {
                                                                            .append(new KeyedCodec<>("SaveIntervalMinutes", Codec.INTEGER), (config, minutes) -> config.saveIntervalMinutes = minutes, config -> Integer.valueOf(config.saveIntervalMinutes))
                                                                            .add()
                                                                            .append(new KeyedCodec<>("SyncSeconds", Codec.INTEGER), (config, seconds) -> config.syncSeconds = seconds, config -> Integer.valueOf(config.syncSeconds))
+                                                                           .add()
+                                                                           .append(new KeyedCodec<>("TeamInvitationHours", Codec.INTEGER), (config, hours) -> config.teamInvitationHours = hours, config -> Integer.valueOf(config.teamInvitationHours))
                                                                            .add()
                                                                            .build();
 
@@ -51,6 +54,11 @@ public class OpenQuestsConfig {
      */
     private int syncSeconds = 5;
 
+    /**
+     * How long an invitation into a team waits for the invited player to accept it.
+     */
+    private int teamInvitationHours = 24;
+
     @Nonnull
     public QuestStorageProvider getStorage() {
         return storage;
@@ -65,5 +73,12 @@ public class OpenQuestsConfig {
      */
     public int getSyncSeconds() {
         return Math.max(1, syncSeconds);
+    }
+
+    /**
+     * @return how many hours an invitation into a team stays open, at least one.
+     */
+    public int getTeamInvitationHours() {
+        return Math.max(1, teamInvitationHours);
     }
 }

@@ -57,6 +57,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -123,7 +124,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
                 return List.copyOf(OpenQuestTeamType.getAssetStore().getAssetMap().getAssetMap().values());
             }
         });
-        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), platform);
+        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), Duration.ofHours(settings.getTeamInvitationHours()), platform);
         services.install();
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);

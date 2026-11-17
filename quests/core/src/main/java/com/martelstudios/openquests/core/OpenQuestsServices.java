@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
+import com.martelstudios.openquests.core.teams.Teams;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldClosingService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
@@ -28,6 +29,7 @@ import com.martelstudios.openquests.core.sync.QuestSyncService;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Clock;
+import java.time.Duration;
 
 /**
  * The core services, built once over a storage and wired to each other. The plugin builds one
@@ -49,6 +51,7 @@ public final class OpenQuestsServices implements QuestEnvironment {
     private final PlayerQuestService playerQuests;
     private final UniverseQuestService universe;
     private final TeamQuestService teams;
+    private final Teams teamDocuments;
     private final WorldQuestService worlds;
     private final WorldGroupIndex worldGroups;
     private final ScopeServices scopes;
@@ -58,8 +61,9 @@ public final class OpenQuestsServices implements QuestEnvironment {
 
     /**
      * @param syncSeconds how often quests shared between servers are read back
+     * @param teamInvitation how long an invitation into a team stays open
      */
-    public OpenQuestsServices(@Nonnull QuestStorage storage, long syncSeconds, @Nonnull Platform platform) {
+    public OpenQuestsServices(@Nonnull QuestStorage storage, long syncSeconds, @Nonnull Duration teamInvitation, @Nonnull Platform platform) {
         this.storage = storage;
         this.platform = platform;
 
@@ -73,6 +77,7 @@ public final class OpenQuestsServices implements QuestEnvironment {
         universe = new UniverseQuestService(scopeIndexes, progression, platform.players());
         worlds = new WorldQuestService(scopeIndexes, progression, sync, playerQuests, platform.components());
         worldGroups = new WorldGroupIndex(scopeIndexes, progression, worlds);
+        teamDocuments = new Teams(storage, storage, platform.teamTypes(), platform.clock(), teamInvitation);
         teams = new TeamQuestService(scopeIndexes, progression, platform.players(), platform.components(), platform.teamTypes());
         scopes = new ScopeServices(universe, worlds, worldGroups, teams);
         worldClosing = new WorldClosingService(storage, progression, scopes, platform.players());
@@ -218,6 +223,14 @@ public final class OpenQuestsServices implements QuestEnvironment {
     @Nonnull
     public TeamQuestService getTeamQuestService() {
         return teams;
+    }
+
+    /**
+     * @return the team documents, for what changes who is in a team.
+     */
+    @Nonnull
+    public Teams getTeams() {
+        return teamDocuments;
     }
 
     @Nonnull
