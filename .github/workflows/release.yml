@@ -174,38 +174,53 @@ jobs:
           - name: OpenQuests
             relations: openquests-core:requiredDependency,opennavigation:requiredDependency
             project_id: '1678106'
+            changelog: openquests
             file: quests/extension/build/libs/OpenQuests-*.jar
           - name: OpenQuests Core
             relations: ''
             project_id: '1678101'
+            changelog: openquests-core
             file: quests/core/build/libs/OpenQuestsCore-*.jar
           - name: Adventure Quests
             relations: openquests:requiredDependency,openquests-dialogues:requiredDependency
             project_id: '1680200'
+            changelog: adventurequests
             file: quests/extension/build/distributions/AdventureQuests-*.zip
             version_input: adventurequests_version
           - name: OpenDialogues
             relations: ''
             project_id: '1775215'
+            changelog: opendialogues
             file: dialogues/build/libs/OpenDialogues-*.jar
             version_input: dialogues_version
           - name: OpenQuests Dialogues
             relations: openquests:requiredDependency,opendialogues:requiredDependency
             project_id: '1775233'
+            changelog: openquestsdialogues
             file: mods/openquestsdialogues/build/libs/OpenQuestsDialogues-*.jar
             version_input: openquestsdialogues_version
           - name: OpenQuests MMOSkillTree
             relations: openquests:requiredDependency,mmo-skill-tree:requiredDependency,mmo-skill-tree-mastery-pack:optionalDependency
             project_id: '1752171'
+            changelog: mmoskilltree
             file: mods/mmoskilltree/build/libs/OpenQuestsMMOSkillTree-*.jar
             # Versioned on its own, and only published when a version is given for it
             version_input: mmoskilltree_version
 
     steps:
+      # At the tag, so the changelog published is the one reviewed with the release
+      - name: Fetch the changelogs
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+          path: repo
+          sparse-checkout: docs/changelogs
+
       - name: Fetch the artefacts
         uses: actions/download-artifact@v4
         with:
           name: release-artifacts
+          path: artefacts
 
       - name: Upload ${{ matrix.name }}
         if: inputs[matrix.version_input || 'version'] != ''
@@ -231,15 +246,23 @@ jobs:
           fi
 
           # Matched by name, so it does not matter how the download laid the tree out
-          FILE=$(find . -type f -name "$(basename '${{ matrix.file }}')" -print -quit)
+          FILE=$(find artefacts -type f -name "$(basename '${{ matrix.file }}')" -print -quit)
 
           if [[ -z "$FILE" ]]; then
             echo "::error::No artefact matching ${{ matrix.file }}"
-            find . -type f \( -name '*.jar' -o -name '*.zip' \) -print
+            find artefacts -type f \( -name '*.jar' -o -name '*.zip' \) -print
             exit 1
           fi
 
-          jq -n --arg changelog "Released with [$TAG]($RELEASE_URL)." \
+          CHANGELOG="Full changelog: [$TAG]($RELEASE_URL)."
+          NOTES="repo/docs/changelogs/${{ matrix.changelog }}/$VERSION.md"
+          if [[ -f "$NOTES" ]]; then
+            CHANGELOG="$(cat "$NOTES")"$'\n\n'"$CHANGELOG"
+          else
+            echo "::warning::No $NOTES, $NAME is published with the link alone."
+          fi
+
+          jq -n --arg changelog "$CHANGELOG" \
                 --arg displayName "$NAME $VERSION" \
                 --argjson versions "[$GAME_VERSION]" \
                 '{changelog: $changelog, changelogType: "markdown", displayName: $displayName, releaseType: "release", gameVersions: $versions}' \
