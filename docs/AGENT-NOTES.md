@@ -53,6 +53,7 @@ Project rules for coding agents working in this repo. Generic Hytale platform le
 ## CurseForge page
 
 - `docs/curseforge/openquests.md` sells the mod: concise, no upgrade or migration sections, no field-by-field or API detail (that is the README). Add at most a line or a table row per feature. In a table, write `<quest>` raw inside `<code>`, and never a bare `|` in a cell. The user pastes it by hand.
+- The CurseForge file changelog comes from `docs/changelogs/<changelog>/<version>.md` (folder names in the `changelog` keys of `release.yml`), merged before the release runs. The workflow adds the GitHub release link below it, and publishes the link alone when the file is missing.
 
 ## Character sheets
 
