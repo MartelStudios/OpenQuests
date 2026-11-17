@@ -13,8 +13,10 @@ import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
+import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
+import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.utils.Players;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
@@ -23,11 +25,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
+
 import java.util.function.Consumer;
 
 /**
@@ -68,16 +72,24 @@ public class QuestAssignmentService {
     @Nonnull
     private final Players players;
 
+    @Nonnull
+    private final PlayerComponentTypes components;
+
+    @Nonnull
+    private final QuestPlayerStateService playerState;
+
     /**
      * @param scheduler where the schedule is checked, shared with the rest of the server
      */
     public QuestAssignmentService(@Nonnull QuestStorage storage, @Nonnull QuestProgressionService progression, @Nonnull ScopeServices scopes,
-                                  @Nonnull Players players, @Nonnull PlayerComponentTypes components, @Nonnull Clock clock, @Nonnull ScheduledExecutorService scheduler) {
+                                  @Nonnull Players players, @Nonnull PlayerComponentTypes components, @Nonnull QuestPlayerStateService playerState, @Nonnull Clock clock, @Nonnull ScheduledExecutorService scheduler) {
         this.records = new SharedAssignmentRecords(storage);
         this.holders = new AssignmentHolders(records, progression, scopes, components);
         this.offer = new AssignmentOffer(ids -> progression.progress(new SetStateVisitor(QuestState.FAILED), ids), clock);
         this.scopes = scopes;
         this.players = players;
+        this.components = components;
+        this.playerState = playerState;
         this.clock = clock;
         this.scheduler = scheduler;
     }
@@ -153,6 +165,28 @@ public class QuestAssignmentService {
             Occasion occasion = assignment.getTrigger().onEnterWorld(playerRef.getUuid(), player, world);
             if (occasion != null) evaluate(assignment, occasion);
         });
+    }
+
+    /**
+     * @return the teams of that type the occasion reaches: its player's, or for an occasion with
+     * none, those of every player online here, read from their sessions on the calling thread.
+     */
+    @Nonnull
+    Set<UUID> teamsReached(@Nonnull String teamType, @Nonnull Occasion occasion) {
+        EntityComponents player = occasion.getPlayer();
+        if (player != null) {
+            QuestStoreComponent questStore = player.getComponent(components.questStore());
+            UUID teamId = questStore == null ? null : questStore.getTeams().get(teamType);
+            return teamId == null ? Set.of() : Set.of(teamId);
+        }
+
+        Set<UUID> teamIds = new HashSet<>();
+        for (UUID playerId : players.online()) {
+            QuestStoreComponent questStore = playerState.getQuestStore(playerId);
+            UUID teamId = questStore == null ? null : questStore.getTeams().get(teamType);
+            if (teamId != null) teamIds.add(teamId);
+        }
+        return teamIds;
     }
 
     /**
@@ -240,17 +274,14 @@ public class QuestAssignmentService {
         }
 
         @Override
-        public void team(@Nonnull UUID teamId, @Nullable UUID joining) {
+        public void team(@Nonnull String teamType, @Nonnull Occasion occasion) {
+            UUID joining = occasion.getPlayer() != null ? occasion.getPlayerId() : null;
             String key = occasion.timeKey();
-            if (isSettled(AssignmentHolders.teamKey(teamId), key)) return;
 
-            offerAll(holders.team(teamId, joining), key);
-        }
+            for (UUID teamId : teamsReached(teamType, occasion)) {
+                if (isSettled(AssignmentHolders.teamKey(teamId), key)) continue;
 
-        @Override
-        public void eachOnlinePlayer(@Nonnull BiConsumer<UUID, EntityComponents> action) {
-            for (UUID playerId : players.online()) {
-                players.update(playerId, player -> action.accept(playerId, player));
+                offerAll(holders.team(teamId, joining), key);
             }
         }
 

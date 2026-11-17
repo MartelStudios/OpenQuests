@@ -6,7 +6,6 @@ import com.martelstudios.openquests.core.utils.EntityComponents;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 
 /**
  * The holders a scope can hand one occasion of an assignment to. A scope only picks among them:
@@ -44,14 +43,8 @@ public interface AssignmentTargets {
     void universe(@Nullable UUID joining);
 
     /**
-     * @param joining the player still connecting, not online yet for the team to hand a quest
-     * created now to them
+     * The occasion's player stands for their team of that type; without a player, every team of
+     * that type with a member online here is reached, each once.
      */
-    void team(@Nonnull UUID teamId, @Nullable UUID joining);
-
-    /**
-     * Runs the action for every player online, each on the thread of the world they are in, for a
-     * scope that must read a player before it picks.
-     */
-    void eachOnlinePlayer(@Nonnull BiConsumer<UUID, EntityComponents> action);
+    void team(@Nonnull String teamType, @Nonnull Occasion occasion);
 }

@@ -4,17 +4,12 @@ import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
-import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.assignments.AssignmentTargets;
 import com.martelstudios.openquests.core.assignments.Occasion;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
-import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
-import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.UUID;
 
 /**
  * One quest per team of a type, shared by its members. The occasion's player stands for their
@@ -44,23 +39,6 @@ public class TeamAssignmentScope extends AssignmentScope {
      */
     @Override
     public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion, @Nonnull AssignmentTargets targets) {
-        UUID playerId = occasion.getPlayerId();
-
-        if (playerId != null && occasion.getPlayer() != null) {
-            UUID teamId = teamOf(occasion.getPlayer());
-            if (teamId != null) targets.team(teamId, playerId);
-            return;
-        }
-
-        targets.eachOnlinePlayer((memberId, member) -> {
-            UUID teamId = teamOf(member);
-            if (teamId != null) targets.team(teamId, null);
-        });
-    }
-
-    @Nullable
-    private UUID teamOf(@Nonnull EntityComponents player) {
-        QuestStoreComponent questStore = player.getComponent(OpenQuestsServices.installed().getPlatform().components().questStore());
-        return questStore == null ? null : questStore.getTeams().get(teamType);
+        targets.team(teamType, occasion);
     }
 }

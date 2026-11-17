@@ -1,27 +1,18 @@
 package com.martelstudios.openquests.core.assignments;
 
-import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.QuestHarness;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.persistence.TestQuestProgression;
-import com.martelstudios.openquests.core.assignments.repeat.OnceRepeat;
-import com.martelstudios.openquests.core.assignments.scope.TeamAssignmentScope;
-import com.martelstudios.openquests.core.assignments.trigger.PlayerConnectTrigger;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.teams.TestTeamTypes;
-import com.martelstudios.openquests.core.utils.EntityComponents;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -55,16 +46,15 @@ class TeamAssignmentTest {
     }
 
     @Test
-    void aSoloPlayerGetsTheQuestInTheirPersonalTeam() {
+    void aSoloPlayerIsReachedThroughTheirPersonalTeam() {
         try (QuestHarness harness = new QuestHarness()) {
             harness.teamTypes().add(TestTeamTypes.type("party", true));
-            UUID alice = harness.players().connect();
+            UUID alice = host(harness, harness.players().connect());
             harness.services().getTeamService().onConnect(alice, "Alice", harness.players().of(alice));
 
-            Recording targets = reach(harness, "party", Occasion.connection(alice, harness.players().of(alice)));
+            Set<UUID> reached = harness.services().getQuestAssignmentService().teamsReached("party", Occasion.connection(alice, harness.players().of(alice)));
 
-            assertEquals(List.of(questStore(harness, alice).getTeams().get("party")), targets.teams);
-            assertEquals(List.of(alice), targets.joining);
+            assertEquals(Set.of(questStore(harness, alice).getTeams().get("party")), reached);
         }
     }
 
@@ -72,90 +62,42 @@ class TeamAssignmentTest {
     void aPlayerWithoutAFactionGetsNothing() {
         try (QuestHarness harness = new QuestHarness()) {
             harness.teamTypes().add(TestTeamTypes.type("faction", false));
-            UUID alice = harness.players().connect();
+            UUID alice = host(harness, harness.players().connect());
 
-            Recording targets = reach(harness, "faction", Occasion.connection(alice, harness.players().of(alice)));
-
-            assertTrue(targets.teams.isEmpty());
+            assertTrue(harness.services().getQuestAssignmentService().teamsReached("faction", Occasion.connection(alice, harness.players().of(alice))).isEmpty());
         }
     }
 
     @Test
-    void aScheduleReachesTeamsWithAMemberOnline() {
+    void aScheduleOffersEachTeamOnce() {
         try (QuestHarness harness = new QuestHarness()) {
             harness.teamTypes().add(TestTeamTypes.type("faction", false));
-            UUID alice = harness.players().connect();
-            UUID bob = harness.players().connect();
-            UUID carol = harness.players().connect();
+            UUID alice = host(harness, harness.players().connect());
+            UUID bob = host(harness, harness.players().connect());
+            UUID carol = host(harness, harness.players().connect());
             UUID lion = UUID.randomUUID();
             questStore(harness, alice).setTeam("faction", lion);
             questStore(harness, bob).setTeam("faction", lion);
             questStore(harness, carol).setTeam("faction", UUID.randomUUID());
             harness.players().disconnect(carol);
 
-            Recording targets = reach(harness, "faction", Occasion.period("period:2026-11-16T00:00:00Z"));
+            Set<UUID> reached = harness.services().getQuestAssignmentService().teamsReached("faction", Occasion.period("period:2026-11-16T00:00:00Z"));
 
-            assertEquals(Set.of(lion), Set.copyOf(targets.teams));
+            assertEquals(Set.of(lion), reached);
         }
+    }
+
+    /**
+     * Opens the player's session as their connection would, which a schedule reads teams from.
+     */
+    @Nonnull
+    private static UUID host(@Nonnull QuestHarness harness, @Nonnull UUID playerId) {
+        harness.services().getQuestPlayerStateService().host(playerId, harness.players().of(playerId));
+        return playerId;
     }
 
     @Nonnull
     private static QuestStoreComponent questStore(@Nonnull QuestHarness harness, @Nonnull UUID playerId) {
         return harness.players().of(playerId).ensureAndGetComponent(harness.players().types().questStore());
-    }
-
-    @Nonnull
-    private static Recording reach(@Nonnull QuestHarness harness, @Nonnull String teamType, @Nonnull Occasion occasion) {
-        Recording targets = new Recording(harness);
-        new TeamAssignmentScope(teamType).reach(assignment(), occasion, targets);
-        return targets;
-    }
-
-    @Nonnull
-    private static OpenQuestAssignment assignment() {
-        OpenQuestAssignment assignment = new OpenQuestAssignment();
-        assignment.id = "Story";
-        assignment.trigger = new PlayerConnectTrigger();
-        assignment.repeat = new OnceRepeat();
-        return assignment;
-    }
-
-    /**
-     * Keeps the teams a scope picks, the online players being the harness's.
-     */
-    private static final class Recording implements AssignmentTargets {
-        private final QuestHarness harness;
-        private final List<UUID> teams = new ArrayList<>();
-        private final List<UUID> joining = new ArrayList<>();
-
-        private Recording(@Nonnull QuestHarness harness) {
-            this.harness = harness;
-        }
-
-        @Override
-        public void team(@Nonnull UUID teamId, @Nullable UUID joining) {
-            teams.add(teamId);
-            if (joining != null) this.joining.add(joining);
-        }
-
-        @Override
-        public void eachOnlinePlayer(@Nonnull BiConsumer<UUID, EntityComponents> action) {
-            for (UUID playerId : harness.players().online()) action.accept(playerId, harness.players().of(playerId));
-        }
-
-        @Override
-        public void player(@Nonnull UUID playerId, @Nonnull EntityComponents player) {}
-
-        @Override
-        public void onlinePlayers() {}
-
-        @Override
-        public void world(@Nonnull World world, @Nullable UUID joining) {}
-
-        @Override
-        public void group(@Nonnull String group, @Nullable UUID joining) {}
-
-        @Override
-        public void universe(@Nullable UUID joining) {}
     }
 }

@@ -1,12 +1,10 @@
 package com.martelstudios.openquests.core.services;
 
-import com.hypixel.hytale.component.Holder;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
-import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestCompletions;
@@ -21,6 +19,7 @@ import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreCompon
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestProgressionStore;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
@@ -84,9 +83,14 @@ public class QuestPlayerStateService {
      * first, which waits for the server they come from to have written them out.
      */
     private void handlePlayerConnectEvent(@Nonnull PlayerConnectEvent playerConnectEvent) {
-        UUID playerId = playerConnectEvent.getPlayerRef().getUuid();
-        Holder<EntityStore> holder = playerConnectEvent.getHolder();
+        host(playerConnectEvent.getPlayerRef().getUuid(), EntityComponents.of(playerConnectEvent.getHolder()));
+    }
 
+    /**
+     * Opens the session of a connecting player: their record and quests read into the components
+     * handed in, which the player is still being built from.
+     */
+    public void host(@Nonnull UUID playerId, @Nonnull EntityComponents holder) {
         PlayerQuestRecord record = storage.hostPlayer(playerId);
 
         // What other servers left them while they were away, let go of once the record holding it is written

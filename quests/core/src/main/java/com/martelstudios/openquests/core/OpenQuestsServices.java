@@ -84,7 +84,7 @@ public final class OpenQuestsServices implements QuestEnvironment {
         teamService = new TeamService(teamDocuments, teams, platform.teamTypes(), platform.components());
         scopes = new ScopeServices(universe, worlds, worldGroups, teams);
         worldClosing = new WorldClosingService(storage, progression, scopes, platform.players());
-        assignments = new QuestAssignmentService(storage, progression, scopes, platform.players(), platform.components(), platform.clock(), platform.scheduler());
+        assignments = new QuestAssignmentService(storage, progression, scopes, platform.players(), platform.components(), playerState, platform.clock(), platform.scheduler());
         deadlines = new QuestDeadlineService(progression, platform.clock(), platform.scheduler());
 
         // What other servers write besides the quests themselves, read on each tick of the sync
