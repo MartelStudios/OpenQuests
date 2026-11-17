@@ -382,11 +382,15 @@ public class QuestProgressionStore {
         }
 
         // add() keeps whichever instance was already there; the one just read is a copy, possibly
-        // older than a leave whose write is still queued, so the live instance decides
+        // older than a leave whose write is still queued, so the live instance decides. Read under
+        // its lock: a restack briefly holds the written copy's players before replaying the rest
         List<AbstractQuestProgression<?>> held = new ArrayList<>(loaded.size());
         for (AbstractQuestProgression<?> quest : loaded) {
             AbstractQuestProgression<?> current = get(quest.getId());
-            if (current != null && (current.getPlayers().contains(playerId) || current.getAbandonedPlayers().contains(playerId))) held.add(current);
+            if (current == null) continue;
+            synchronized (current) {
+                if (current.getPlayers().contains(playerId) || current.getAbandonedPlayers().contains(playerId)) held.add(current);
+            }
         }
         return held;
     }
