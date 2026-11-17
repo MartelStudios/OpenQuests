@@ -142,14 +142,16 @@ class TeamQuestServiceTest {
         assertEquals(0, restored.grants);
 
         harness.players().connect(bob);
-        // The world-entry listener calls claimAuto with that same holder.
-        rewards.claimAuto(holder);
+        // World entry can receive a copied holder; the settled state still has to reach the connection session.
+        EntityComponents worldHolder = harness.players().copyOf(bob);
+        rewards.claimAutoOnWorldEntry(bob, worldHolder);
         assertEquals(autoClaim ? 1 : 0, restored.grants);
         if (!autoClaim) assertTrue(rewards.claim(quest.getId(), holder));
         assertEquals(1, restored.grants);
-        assertFalse(rewards.isOwed(quest.getId(), holder));
+        assertFalse(rewards.isOwed(quest.getId(), autoClaim ? worldHolder : holder));
 
-        state.saveNow(bob);
+        if (autoClaim) harness.settle();
+        else state.saveNow(bob);
         assertTrue(harness.storage().loadMessages(Set.of(bob)).isEmpty());
         assertTrue(harness.storage().loadPlayer(bob).getPendingRewards().isEmpty());
         state.host(bob, holder);

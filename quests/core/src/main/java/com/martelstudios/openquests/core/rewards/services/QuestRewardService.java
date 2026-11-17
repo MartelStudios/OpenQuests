@@ -3,6 +3,7 @@ package com.martelstudios.openquests.core.rewards.services;
 import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerAbandonedEvent;
@@ -22,6 +23,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -60,7 +62,7 @@ public class QuestRewardService {
      * Subscribes to the quest ends that pay rewards, and to the arrivals that deliver pending ones.
      */
     public void listen(@Nonnull IEventRegistry events) {
-        events.registerGlobal(AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
+        events.registerGlobal(EventPriority.LAST, AddPlayerToWorldEvent.class, this::handleAddPlayerToWorldEvent);
         // EventPriority.FIRST, to grant rewards earlier
         events.registerGlobal(EventPriority.FIRST, QuestCompletedEvent.class, this::handleQuestCompletedEvent);
         events.registerGlobal(EventPriority.FIRST, QuestPlayerAbandonedEvent.class, this::handleQuestPlayerAbandonedEvent);
@@ -106,7 +108,7 @@ public class QuestRewardService {
 
         QuestReward[] rewards = personal.toArray(PendingRewards.NO_REWARDS);
         for (UUID playerId : questCompletedEvent.recipients(() -> services.getTeamQuestService().completionPlayers(quest))) {
-            owe(playerId, new PendingRewards(quest, rewards));
+            owe(playerId, new PendingRewards(quest, rewards), questCompletedEvent.getVersion());
         }
     }
 
@@ -131,8 +133,12 @@ public class QuestRewardService {
      * standing in their record, nothing holding their components to write it into.
      */
     private void owe(@Nonnull UUID playerId, @Nonnull PendingRewards pending) {
+        owe(playerId, pending, 0);
+    }
+
+    private void owe(@Nonnull UUID playerId, @Nonnull PendingRewards pending, int completionVersion) {
         if (!players.isOnline(playerId)) {
-            storage.postMessage(PlayerMessage.owed(playerId, pending));
+            storage.postMessage(PlayerMessage.owed(playerId, pending, completionVersion));
             return;
         }
 
@@ -158,19 +164,35 @@ public class QuestRewardService {
      * store only once the join finishes, so asking for their entity here finds nothing.
      */
     private void handleAddPlayerToWorldEvent(@Nonnull AddPlayerToWorldEvent addPlayerToWorldEvent) {
-        claimAuto(EntityComponents.of(addPlayerToWorldEvent.getHolder()));
+        var holder = addPlayerToWorldEvent.getHolder();
+        PlayerRef player = holder.getComponent(PlayerRef.getComponentType());
+        if (player == null) return;
+
+        claimAutoOnWorldEntry(player.getUuid(), EntityComponents.of(holder));
+    }
+
+    /** Settles automatic rewards on the world thread and persists the receipt on the storage worker. */
+    public void claimAutoOnWorldEntry(@Nonnull UUID playerId, @Nonnull EntityComponents playerComponents) {
+        if (!claimAuto(playerComponents)) return;
+
+        var settled = Set.copyOf(getPending(playerComponents).snapshot());
+
+        services.getQuestSyncService().execute("settled rewards for player " + playerId,
+                () -> services.getQuestPlayerStateService().saveNow(playerId, settled));
     }
 
     /**
      * Hands over everything standing that the quest claims on the player's behalf. What is left
      * behind is what a quest expects them to come and collect.
      */
-    public void claimAuto(@Nonnull EntityComponents playerComponents) {
+    public boolean claimAuto(@Nonnull EntityComponents playerComponents) {
         PendingRewardStore store = getPending(playerComponents);
+        boolean claimed = false;
 
         for (PendingRewards pending : store.getAll()) {
-            grantAuto(pending, playerComponents);
+            claimed |= grantAuto(pending, playerComponents);
         }
+        return claimed;
     }
 
     /**
@@ -187,9 +209,10 @@ public class QuestRewardService {
         return true;
     }
 
-    private void grantAuto(@Nonnull PendingRewards pending, @Nonnull EntityComponents playerComponents) {
+    private boolean grantAuto(@Nonnull PendingRewards pending, @Nonnull EntityComponents playerComponents) {
         QuestReward[] rewards = pending.getRewards();
         var remaining = new ArrayList<>(Arrays.asList(rewards));
+        boolean claimed = false;
 
         for (QuestReward reward : rewards) {
             if (!reward.isAutoClaim()) continue;
@@ -199,9 +222,11 @@ public class QuestRewardService {
             remaining.remove(reward);
             pending.setRewards(remaining.toArray(PendingRewards.NO_REWARDS));
             getPending(playerComponents).markDirty();
+            claimed = true;
         }
 
-        if (pending.isEmpty()) getPending(playerComponents).remove(pending.getQuestId());
+        if (pending.isEmpty()) claimed |= getPending(playerComponents).remove(pending.getQuestId());
+        return claimed;
     }
 
     /**

@@ -11,6 +11,7 @@ import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.models.QuestTally;
 import com.martelstudios.openquests.core.persistence.PlayerMessage;
+import com.martelstudios.openquests.core.rewards.models.PendingRewards;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.rewards.services.QuestRewardService;
@@ -187,6 +188,16 @@ public class QuestPlayerStateService {
     public void saveNow(@Nonnull UUID playerId) {
         Session session = sessions.get(playerId);
         if (session != null) save(playerId, session, false, false);
+    }
+
+    /** Persists the pending rewards as they stand on the player's world entity after settlement. */
+    public void saveNow(@Nonnull UUID playerId, @Nonnull Set<PendingRewards> pendingRewards) {
+        Session session = sessions.get(playerId);
+        if (session == null) return;
+
+        session.rewards().pending.restore(pendingRewards);
+        session.rewards().pending.markDirty();
+        save(playerId, session, false, false);
     }
 
     /**
@@ -402,11 +413,11 @@ public class QuestPlayerStateService {
         if (assetId == null) return;
 
         for (UUID playerId : questCompletedEvent.recipients(() -> completionPlayers.apply(quest))) {
-            recordCompletion(playerId, assetId, questCompletedEvent.getState(), quest);
+            recordCompletion(playerId, assetId, questCompletedEvent.getState(), questCompletedEvent.getVersion(), quest);
         }
 
         for (UUID playerId : quest.getAbandonedPlayers()) {
-            recordCompletion(playerId, assetId, QuestState.ABANDONED, quest);
+            recordCompletion(playerId, assetId, QuestState.ABANDONED, questCompletedEvent.getVersion(), quest);
         }
     }
 
@@ -414,14 +425,14 @@ public class QuestPlayerStateService {
      * Into the session of a player this server hosts, written with the rest of their record; left
      * as a message for one it does not.
      */
-    private void recordCompletion(@Nonnull UUID playerId, @Nonnull String assetId, @Nonnull QuestState outcome, @Nonnull AbstractQuestProgression<?> quest) {
+    private void recordCompletion(@Nonnull UUID playerId, @Nonnull String assetId, @Nonnull QuestState outcome, int completionVersion, @Nonnull AbstractQuestProgression<?> quest) {
         Session session = sessions.get(playerId);
         if (session != null) {
             session.questStore().recordCompletion(assetId, outcome, quest.getStartedAt(), quest.getCompletedAt());
             return;
         }
 
-        storage.postMessage(PlayerMessage.ended(playerId, assetId, outcome, quest.getStartedAt(), quest.getCompletedAt()));
+        storage.postMessage(PlayerMessage.ended(playerId, quest.getId(), completionVersion, assetId, outcome, quest.getStartedAt(), quest.getCompletedAt()));
     }
 
     /**
