@@ -199,6 +199,23 @@ public class QuestAssignmentService {
     }
 
     /**
+     * Deletes the records of a holder gone for good, a disbanded team.
+     */
+    public void deleteHolder(@Nonnull String holderKey) {
+        settled.forget(holderKey);
+        records.delete(holderKey);
+    }
+
+    /**
+     * Gives a holder what another was handed, so a player going on alone from a team is not
+     * handed again what the team already got. A record the holder already has is kept.
+     */
+    public void copyHolder(@Nonnull String fromKey, @Nonnull String toKey) {
+        records.reload(fromKey);
+        records.get(fromKey).snapshot().forEach((assignmentId, byAsset) -> byAsset.forEach((questAssetId, record) -> records.claim(toKey, assignmentId, questAssetId, null, record)));
+    }
+
+    /**
      * A world closing for good takes its records with it, deleted from the store as it closes.
      */
     private void handleRemoveWorldEvent(@Nonnull RemoveWorldEvent removeWorldEvent) {

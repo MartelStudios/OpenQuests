@@ -1,9 +1,13 @@
 package com.martelstudios.openquests.core.teams;
 
+import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
+import com.martelstudios.openquests.core.events.TeamJoinedEvent;
+import com.martelstudios.openquests.core.events.TeamLeftEvent;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
@@ -14,7 +18,9 @@ import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -33,9 +39,12 @@ public class TeamService {
     private final Players players;
     private final ScopeIndexes indexes;
     private final QuestAssignmentService assignments;
+    private final QuestCopier copier;
+    private final IEventBus events;
 
     public TeamService(@Nonnull Teams teams, @Nonnull TeamQuestService teamQuests, @Nonnull TeamTypes types, @Nonnull PlayerComponentTypes components,
-                       @Nonnull QuestPlayerStateService playerState, @Nonnull Players players, @Nonnull ScopeIndexes indexes, @Nonnull QuestAssignmentService assignments) {
+                       @Nonnull QuestPlayerStateService playerState, @Nonnull Players players, @Nonnull ScopeIndexes indexes, @Nonnull QuestAssignmentService assignments,
+                       @Nonnull QuestCopier copier, @Nonnull IEventBus events) {
         this.teams = teams;
         this.teamQuests = teamQuests;
         this.types = types;
@@ -44,6 +53,144 @@ public class TeamService {
         this.players = players;
         this.indexes = indexes;
         this.assignments = assignments;
+        this.copier = copier;
+        this.events = events;
+    }
+
+    /**
+     * @return the team the player would disband by joining another of that type: one they are
+     * alone in with quests running, which they would lose. {@code null} when nothing is lost.
+     */
+    @Nullable
+    public TeamRecord wouldLose(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull String type) {
+        UUID current = questStore(player).getTeams().get(type);
+        if (current == null) return null;
+
+        TeamRecord team = teams.get(current);
+        if (team == null || !team.getMembers().equals(List.of(playerId))) return null;
+
+        return teamQuests.getRunningQuests(current).isEmpty() ? null : team;
+    }
+
+    /**
+     * Creates a team owned by the player, who leaves their team of that type as on a join.
+     *
+     * @param name {@code null} for the default name, read after the player's
+     * @return the new team's id.
+     */
+    @Nonnull
+    public UUID create(@Nonnull String type, @Nonnull UUID playerId, @Nonnull String playerName, @Nonnull EntityComponents player, @Nullable String name) {
+        leaveCurrent(playerId, player, type);
+
+        UUID teamId = teams.create(type, playerId, playerName, name).getId();
+        questStore(player).setTeam(type, teamId);
+        dispatch(new TeamJoinedEvent(playerId, teamId));
+        return teamId;
+    }
+
+    /**
+     * The player leaves their team of that type, with no copy and no new team of their own, then
+     * joins this one and its running quests, whatever their assets say of them.
+     *
+     * @throws IllegalArgumentException for a team that is gone.
+     */
+    public void join(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull UUID teamId) {
+        TeamRecord team = teams.get(teamId);
+        if (team == null) throw new IllegalArgumentException("No team " + teamId);
+        if (teamId.equals(questStore(player).getTeams().get(team.getType()))) return;
+
+        leaveCurrent(playerId, player, team.getType());
+        teams.addMember(teamId, playerId);
+        enter(playerId, player, team.getType(), teamId);
+    }
+
+    /**
+     * The player leaves their team of that type and its running quests. For a personal-team type,
+     * they go on in a new team of their own holding a copy of those quests and of what the team
+     * was handed. A team left empty is disbanded, once the copy is made.
+     */
+    public void leave(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull EntityComponents player, @Nonnull String type) {
+        UUID current = questStore(player).getTeams().get(type);
+        if (current == null) return;
+
+        TeamRecord left = teams.removeMember(current, playerId);
+        OpenQuestTeamType teamType = types.get(type);
+        UUID own = teamType != null && teamType.isPersonalTeam() ? startOwn(current, type, playerId, playerName) : null;
+
+        exit(playerId, player, type, current, left == null);
+        if (own != null) enter(playerId, player, type, own);
+    }
+
+    /**
+     * Applies the quest side of a change whose documents were written elsewhere. Does nothing when
+     * the documents no longer agree, the player having moved again since.
+     */
+    public void apply(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull EntityComponents player, @Nonnull TeamChange change) {
+        if (change.to() != null) {
+            TeamRecord to = teams.get(change.to());
+            if (to == null || !to.getMembers().contains(playerId)) return;
+        }
+        if (change.from() != null) {
+            TeamRecord from = teams.get(change.from());
+            if (from != null && from.getMembers().contains(playerId)) return;
+
+            exit(playerId, player, change.type(), change.from(), false);
+        }
+        if (change.to() != null) enter(playerId, player, change.type(), change.to());
+    }
+
+    /**
+     * Leaving on the way to another team: no copy, no team of their own.
+     */
+    private void leaveCurrent(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull String type) {
+        UUID current = questStore(player).getTeams().get(type);
+        if (current == null) return;
+
+        TeamRecord left = teams.removeMember(current, playerId);
+        exit(playerId, player, type, current, left == null);
+    }
+
+    /**
+     * Only the quests the player still holds are copied: one they gave up stays given up.
+     */
+    @Nonnull
+    private UUID startOwn(@Nonnull UUID from, @Nonnull String type, @Nonnull UUID playerId, @Nonnull String playerName) {
+        UUID own = teams.create(type, playerId, playerName, null).getId();
+
+        for (AbstractQuestProgression<?> quest : teamQuests.getRunningQuests(from)) {
+            if (quest.getPlayers().contains(playerId)) teamQuests.addQuest(own, copier.copyFor(quest, playerId).getId());
+        }
+        assignments.copyHolder(TeamQuestService.key(from), TeamQuestService.key(own));
+        return own;
+    }
+
+    private void exit(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull String type, @Nonnull UUID teamId, boolean disband) {
+        teamQuests.leaveRunningQuests(teamId, playerId);
+        if (disband) {
+            teamQuests.disband(teamId);
+            assignments.deleteHolder(TeamQuestService.key(teamId));
+        }
+        questStore(player).setTeam(type, null);
+        dispatch(new TeamLeftEvent(playerId, teamId));
+    }
+
+    private void enter(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull String type, @Nonnull UUID teamId) {
+        questStore(player).setTeam(type, teamId);
+        teamQuests.joinRunningQuests(teamId, playerId);
+        dispatch(new TeamJoinedEvent(playerId, teamId));
+    }
+
+    @Nonnull
+    private QuestStoreComponent questStore(@Nonnull EntityComponents player) {
+        return player.ensureAndGetComponent(components.questStore());
+    }
+
+    private void dispatch(@Nonnull TeamJoinedEvent event) {
+        events.dispatchFor(TeamJoinedEvent.class, event.getPlayerId()).dispatch(event);
+    }
+
+    private void dispatch(@Nonnull TeamLeftEvent event) {
+        events.dispatchFor(TeamLeftEvent.class, event.getPlayerId()).dispatch(event);
     }
 
     /**

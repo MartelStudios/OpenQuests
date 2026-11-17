@@ -138,6 +138,23 @@ public class TeamQuestService {
     }
 
     /**
+     * @return the team's quests still running, read back if need be.
+     */
+    @Nonnull
+    public List<AbstractQuestProgression<?>> getRunningQuests(@Nonnull UUID teamId) {
+        return indexes.resolve(key(teamId)).stream().filter(quest -> !quest.isOver()).toList();
+    }
+
+    /**
+     * Takes a member leaving the team off its running quests, without them giving the quests up.
+     */
+    public void leaveRunningQuests(@Nonnull UUID teamId, @Nonnull UUID playerId) {
+        for (AbstractQuestProgression<?> quest : getRunningQuests(teamId)) {
+            quest.removePlayer(playerId);
+        }
+    }
+
+    /**
      * Has a member join the team's running quests, a connecting one included, and drops from the
      * index the quests found over.
      */

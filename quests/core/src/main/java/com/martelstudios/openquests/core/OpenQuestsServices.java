@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
+import com.martelstudios.openquests.core.teams.QuestCopier;
 import com.martelstudios.openquests.core.teams.TeamService;
 import com.martelstudios.openquests.core.teams.Teams;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
@@ -84,7 +85,7 @@ public final class OpenQuestsServices implements QuestEnvironment {
         scopes = new ScopeServices(universe, worlds, worldGroups, teams);
         worldClosing = new WorldClosingService(storage, progression, scopes, platform.players());
         assignments = new QuestAssignmentService(storage, progression, scopes, platform.players(), platform.components(), playerState, platform.clock(), platform.scheduler());
-        teamService = new TeamService(teamDocuments, teams, platform.teamTypes(), platform.components(), playerState, platform.players(), scopeIndexes, assignments);
+        teamService = new TeamService(teamDocuments, teams, platform.teamTypes(), platform.components(), playerState, platform.players(), scopeIndexes, assignments, new QuestCopier(progression), platform.events());
         deadlines = new QuestDeadlineService(progression, platform.clock(), platform.scheduler());
 
         // What other servers write besides the quests themselves, read on each tick of the sync
