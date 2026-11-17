@@ -231,6 +231,12 @@ disbanded, its running quests and records with it, which is why joining another 
 player is alone in asks for `--confirm`. A `Shared` `GrantQuest` hands a team chain's follow-ups to
 the same team, once.
 
+Teams are sized for parties and small factions, up to about 50 members. Every shared quest binds
+each member, a member joining binds every running quest, and an ending leaves a message for each
+absent member, so the cost of a quest grows with the team. Servers sharing one storage must run the
+same OpenQuests version: an older one drops the teams from the records it writes and deletes team
+messages unread.
+
 ### Storage
 
 Where a quest is kept is decided by one interface, `QuestStorage`, and named in `config.json`.
