@@ -138,6 +138,15 @@ public class ScopeIndexes {
     }
 
     /**
+     * Lets go of an index nobody here reads for now, its last changes written first. The storage
+     * keeps it, and the next read brings it back.
+     */
+    public void unload(@Nonnull String key) {
+        QuestsRecord record = records.remove(key);
+        if (record != null) writer.flushIndex(record, key);
+    }
+
+    /**
      * Writes what is still unwritten in every index, for the save pass and the shutdown: an index
      * that wrote its last change already writes nothing.
      */

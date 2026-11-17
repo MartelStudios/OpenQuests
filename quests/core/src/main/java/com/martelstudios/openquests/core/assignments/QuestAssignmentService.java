@@ -190,6 +190,15 @@ public class QuestAssignmentService {
     }
 
     /**
+     * Lets go of what is kept in memory for that holder, the storage keeping its records: read
+     * again the next time something is handed to it.
+     */
+    public void forgetHolder(@Nonnull String holderKey) {
+        settled.forget(holderKey);
+        records.forget(holderKey);
+    }
+
+    /**
      * A world closing for good takes its records with it, deleted from the store as it closes.
      */
     private void handleRemoveWorldEvent(@Nonnull RemoveWorldEvent removeWorldEvent) {
