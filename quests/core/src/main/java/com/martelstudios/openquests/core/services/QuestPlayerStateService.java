@@ -26,6 +26,7 @@ import com.martelstudios.openquests.core.utils.Players;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +125,8 @@ public class QuestPlayerStateService {
             if (message.getTeam() != null) teamChanges.add(message);
             else delivered.add(message.getId());
         }
+        // Messages left in the same millisecond load in any order: the backend revision is the real one
+        teamChanges.sort(Comparator.comparingLong(message -> message.getTeam().revision()));
 
         List<AbstractQuestProgression<?>> held = progressionStore.loadForPlayer(playerId);
 
