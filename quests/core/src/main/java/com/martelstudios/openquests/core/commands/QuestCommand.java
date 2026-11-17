@@ -18,5 +18,6 @@ public class QuestCommand extends AbstractCommandCollection {
         this.addSubCommand(new QuestStateCommand(services.getQuestProgressionService(), services.getPlatform().components(), "complete", "Ends your running quests of a given asset as success", QuestState.SUCCESSFUL, HytalePermissionsProvider.GROUP_WORLD_EDITOR));
         this.addSubCommand(new QuestStateCommand(services.getQuestProgressionService(), services.getPlatform().components(), "fail", "Ends your running quests of a given asset as failed", QuestState.FAILED, HytalePermissionsProvider.GROUP_WORLD_EDITOR));
         this.addSubCommand(new QuestStateCommand(services.getQuestProgressionService(), services.getPlatform().components(), "abandon", "Ends your running quests of a given asset as abandoned", QuestState.ABANDONED));
+        this.addSubCommand(new TeamCommand(services));
     }
 }

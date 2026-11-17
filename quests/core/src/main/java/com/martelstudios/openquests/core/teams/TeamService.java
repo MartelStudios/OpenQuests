@@ -69,12 +69,15 @@ public class TeamService {
     @Nullable
     public TeamRecord wouldLose(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull String type) {
         UUID current = questStore(player).getTeams().get(type);
-        if (current == null) return null;
+        return current == null ? null : losing(current, playerId);
+    }
 
-        TeamRecord team = teams.get(current);
+    @Nullable
+    private TeamRecord losing(@Nonnull UUID teamId, @Nonnull UUID playerId) {
+        TeamRecord team = teams.get(teamId);
         if (team == null || !team.getMembers().equals(List.of(playerId))) return null;
 
-        return teamQuests.getRunningQuests(current).isEmpty() ? null : team;
+        return teamQuests.getRunningQuests(teamId).isEmpty() ? null : team;
     }
 
     /**
@@ -182,6 +185,25 @@ public class TeamService {
         if (joined != null) teamQuests.joinRunningQuests(joined, playerId);
 
         storage.postMessage(PlayerMessage.team(playerId, new TeamChange(type, from, joined)));
+    }
+
+    /**
+     * @return the player's team of that type: their session's if hosted here, else their record's
+     * as the changes waiting for them leave it. {@code null} for none.
+     */
+    @Nullable
+    public UUID currentTeamOf(@Nonnull UUID playerId, @Nonnull String type) {
+        QuestStoreComponent hosted = playerState.getQuestStore(playerId);
+        return hosted != null ? hosted.getTeams().get(type) : absentTeamOf(playerId, type);
+    }
+
+    /**
+     * As {@link #wouldLose(UUID, EntityComponents, String)}, for any known player.
+     */
+    @Nullable
+    public TeamRecord wouldLose(@Nonnull UUID playerId, @Nonnull String type) {
+        UUID current = currentTeamOf(playerId, type);
+        return current == null ? null : losing(current, playerId);
     }
 
     /**
