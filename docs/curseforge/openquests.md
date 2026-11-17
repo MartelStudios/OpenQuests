@@ -146,13 +146,15 @@ The journal shows them with the time left, and a timed quest gets a countdown ba
 
 ## 🌐 Who a quest belongs to
 
-The same quest asset can be played four ways:
+The same quest asset can be played five ways:
 
 * **👤 Player.** Everyone runs their own copy, at their own pace.
 * **🚪 World.** Shared by everyone inside a world, perfect for a dungeon: slay the boss, survive ten waves, light every
   brazier. Whoever is there at the end gets the reward.
 * **🗺️ Worlds.** One quest across every copy of a dungeon: a daily hunt counting every run of the day.
 * **🌍 Universe.** One counter the whole community pushes. This is where a quest becomes a server event.
+* **🤝 Team.** One quest per party or faction, shared by every member, online or not: invite friends and play a story
+  together.
 
 ## 🎨 Make it yours
 
@@ -214,6 +216,8 @@ and again.
 | <code>/oquest create player <assetId> <player></code> | Hands a quest to a player                                                    | <code>hytale:WorldEditor</code> |
 | <code>/oquest create world <assetId> <world></code>   | Shares a quest with a world                                                  | <code>hytale:WorldEditor</code> |
 | <code>/oquest create universe <assetId></code>        | Shares a quest with the whole server                                         | <code>hytale:WorldEditor</code> |
+| <code>/oquest team invite</code>, <code>accept</code>, <code>rename</code>, <code>leave</code>, <code>members</code> | Manages your own team                                   | <code>hytale:Adventurer</code>  |
+| <code>/oquest team admin create</code>, <code>join</code>, <code>leave</code>, <code>members</code> | Manages anyone's team, online or not                   | <code>hytale:WorldEditor</code> |
 | <code>/ohud show</code>, <code>/ohud hide</code>      | Shows or hides your quest tracker                                            | <code>hytale:Adventurer</code>  |
 | <code>/ohud move --side=<side> --top=<n></code>       | Moves it, also <code>--offset=<n></code> from the side                       | <code>hytale:Adventurer</code>  |
 | <code>/ohud reset</code>                              | Puts it back where the server wants it                                       | <code>hytale:Adventurer</code>  |
