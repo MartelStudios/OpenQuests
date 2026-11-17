@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
+import com.martelstudios.openquests.core.teams.TeamKey;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.utils.Players;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -236,6 +238,21 @@ public class QuestAssignmentService {
             if (isSettled(AssignmentHolders.universeKey(), key)) return;
 
             offerAll(holders.universe(joining), key);
+        }
+
+        @Override
+        public void team(@Nonnull TeamKey team, @Nullable UUID joining) {
+            String key = occasion.timeKey();
+            if (isSettled(AssignmentHolders.teamKey(team), key)) return;
+
+            offerAll(holders.team(team, joining), key);
+        }
+
+        @Override
+        public void eachOnlinePlayer(@Nonnull BiConsumer<UUID, EntityComponents> action) {
+            for (UUID playerId : players.online()) {
+                players.update(playerId, player -> action.accept(playerId, player));
+            }
         }
 
         private boolean isSettled(@Nonnull String holderKey, @Nonnull String key) {

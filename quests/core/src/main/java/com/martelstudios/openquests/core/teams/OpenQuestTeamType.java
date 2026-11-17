@@ -66,6 +66,7 @@ public class OpenQuestTeamType implements JsonAssetWithMap<String, DefaultAssetM
      */
     @Nullable
     public static OpenQuestTeamType getAsset(@Nonnull String id) {
-        return getAssetStore().getAssetMap().getAsset(id);
+        var store = getAssetStore();
+        return store == null ? null : store.getAssetMap().getAsset(id);
     }
 }

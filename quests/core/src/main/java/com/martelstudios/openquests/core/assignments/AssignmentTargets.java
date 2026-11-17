@@ -1,11 +1,13 @@
 package com.martelstudios.openquests.core.assignments;
 
 import com.hypixel.hytale.server.core.universe.world.World;
+import com.martelstudios.openquests.core.teams.TeamKey;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 /**
  * The holders a scope can hand one occasion of an assignment to. A scope only picks among them:
@@ -41,4 +43,16 @@ public interface AssignmentTargets {
      * created now to them
      */
     void universe(@Nullable UUID joining);
+
+    /**
+     * @param joining the player still connecting, not online yet for the team to hand a quest
+     * created now to them
+     */
+    void team(@Nonnull TeamKey team, @Nullable UUID joining);
+
+    /**
+     * Runs the action for every player online, each on the thread of the world they are in, for a
+     * scope that must read a player before it picks.
+     */
+    void eachOnlinePlayer(@Nonnull BiConsumer<UUID, EntityComponents> action);
 }

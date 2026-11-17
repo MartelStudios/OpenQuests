@@ -17,6 +17,7 @@ import com.martelstudios.openquests.core.assignments.repeat.OnceRepeat;
 import com.martelstudios.openquests.core.assignments.repeat.ReplaceRepeat;
 import com.martelstudios.openquests.core.assignments.scope.AssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.PlayerAssignmentScope;
+import com.martelstudios.openquests.core.assignments.scope.TeamAssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.UniverseAssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.WorldAssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.WorldsAssignmentScope;
@@ -122,6 +123,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         AssignmentScope.CODEC.register(WorldAssignmentScope.TYPE, WorldAssignmentScope.class, WorldAssignmentScope.CODEC);
         AssignmentScope.CODEC.register(WorldsAssignmentScope.TYPE, WorldsAssignmentScope.class, WorldsAssignmentScope.CODEC);
         AssignmentScope.CODEC.register(UniverseAssignmentScope.TYPE, UniverseAssignmentScope.class, UniverseAssignmentScope.CODEC);
+        AssignmentScope.CODEC.register(TeamAssignmentScope.TYPE, TeamAssignmentScope.class, TeamAssignmentScope.CODEC);
         AssignmentRepeat.CODEC.register(OnceRepeat.TYPE, OnceRepeat.class, OnceRepeat.CODEC);
         AssignmentRepeat.CODEC.register(AfterEndRepeat.TYPE, AfterEndRepeat.class, AfterEndRepeat.CODEC);
         AssignmentRepeat.CODEC.register(ReplaceRepeat.TYPE, ReplaceRepeat.class, ReplaceRepeat.CODEC);
@@ -150,12 +152,12 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
                                                     .loadsAfter(OpenQuestCategory.class, Item.class, EntityStatType.class)
                                                     .build());
 
-        // After the quests, which the assignments name and are checked against
+        // After the quests and the team types, which the assignments name and are checked against
         getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestAssignment.class, new DefaultAssetMap<>())
                                                     .setPath("OpenQuests/Assignments/")
                                                     .setCodec(OpenQuestAssignment.CODEC)
                                                     .setKeyFunction(OpenQuestAssignment::getId)
-                                                    .loadsAfter(OpenQuestAsset.class)
+                                                    .loadsAfter(OpenQuestAsset.class, OpenQuestTeamType.class)
                                                     .build());
 
         getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestChapterGroup.class, new DefaultAssetMap<>())

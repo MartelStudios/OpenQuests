@@ -14,6 +14,7 @@ import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -145,6 +146,17 @@ public class TeamQuestService {
             if (type.isPersonalTeam() && !named.containsKey(type.getId())) teams.add(TeamKey.personal(type.getId(), playerId));
         }
         return teams;
+    }
+
+    /**
+     * @return the player's team of that type, {@code null} when they have none.
+     */
+    @Nullable
+    public TeamKey teamOf(@Nonnull String type, @Nonnull UUID playerId, @Nonnull EntityComponents player) {
+        for (TeamKey team : teamsOf(playerId, player)) {
+            if (team.type().equals(type)) return team;
+        }
+        return null;
     }
 
     /**
