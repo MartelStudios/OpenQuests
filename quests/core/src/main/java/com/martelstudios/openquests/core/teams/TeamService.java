@@ -86,23 +86,6 @@ public class TeamService {
     }
 
     /**
-     * Creates a team owned by the player, who leaves their team of that type as on a join.
-     *
-     * @param name {@code null} for the default name, read after the player's
-     * @return the new team's id.
-     */
-    @Nonnull
-    public UUID create(@Nonnull String type, @Nonnull UUID playerId, @Nonnull String playerName, @Nonnull EntityComponents player, @Nullable String name) {
-        leaveCurrent(playerId, player, type);
-
-        UUID teamId = teams.create(type, playerId, playerName, name).getId();
-        questStore(player).setTeam(type, teamId);
-        saveSoon(playerId);
-        dispatch(new TeamJoinedEvent(playerId, teamId));
-        return teamId;
-    }
-
-    /**
      * The player leaves their team of that type, with no copy and no new team of their own, then
      * joins this one and its running quests, whatever their assets say of them.
      *
