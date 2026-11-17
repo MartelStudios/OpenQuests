@@ -189,7 +189,7 @@ class TeamServiceTest {
         UUID bobs = party(bob);
         share(bobs, harness.register());
 
-        service.apply(alice, "Alice", harness.players().of(alice), new TeamChange("party", own, bobs));
+        service.apply(alice, harness.players().of(alice), new TeamChange("party", own, bobs));
 
         assertEquals(own, questStore(alice).getTeams().get("party"));
         assertTrue(harness.questsOf(alice).isEmpty());

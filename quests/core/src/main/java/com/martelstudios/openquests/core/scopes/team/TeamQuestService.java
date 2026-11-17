@@ -161,6 +161,8 @@ public class TeamQuestService {
     public void joinRunningQuests(@Nonnull UUID teamId, @Nonnull UUID playerId) {
         for (AbstractQuestProgression<?> quest : indexes.resolve(key(teamId))) {
             if (quest.isOver()) indexes.remove(key(teamId), quest.getId());
+            // Bound while away or on another server, which no event here told their store of
+            else if (quest.getPlayers().contains(playerId)) playerQuests.addQuestToPlayerStore(quest, playerId);
             else progression.joinQuest(quest, playerId, false);
         }
     }
