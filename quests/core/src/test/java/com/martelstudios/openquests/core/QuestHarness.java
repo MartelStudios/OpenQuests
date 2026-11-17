@@ -5,12 +5,15 @@ import com.hypixel.hytale.event.EventPriority;
 import com.hypixel.hytale.event.IEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.TestQuestProgression;
 import com.martelstudios.openquests.core.persistence.TestQuestReward;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
 import com.martelstudios.openquests.core.persistence.jdbc.SqlDialect;
 import com.martelstudios.openquests.core.rewards.QuestReward;
+import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
+import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
 
 import javax.annotation.Nonnull;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The core services running for real over an in-memory database and an event bus of their own,
@@ -30,6 +34,7 @@ public final class QuestHarness implements AutoCloseable {
         // What the database stores is read back through the codecs, test types included
         AbstractQuestProgression.CODEC.register(TestQuestProgression.TYPE, TestQuestProgression.class, TestQuestProgression.CODEC);
         QuestReward.CODEC.register(TestQuestReward.TYPE, TestQuestReward.class, TestQuestReward.CODEC);
+        QuestScope.CODEC.register(TeamQuestScope.TYPE, TeamQuestScope.class, TeamQuestScope.CODEC);
     }
 
     private final QuestStorage storage;
@@ -37,6 +42,7 @@ public final class QuestHarness implements AutoCloseable {
     private final TestClock clock = new TestClock();
     private final ManualScheduler scheduler = new ManualScheduler(clock);
     private final TestPlayers players = new TestPlayers();
+    private final List<OpenQuestTeamType> teamTypes = new CopyOnWriteArrayList<>();
     private final OpenQuestsServices services;
     private final List<Object> heard = new ArrayList<>();
 
@@ -45,7 +51,7 @@ public final class QuestHarness implements AutoCloseable {
         storage = new JdbcQuestStorage(new JdbcQuestStorage.JdbcSettings(url, null, null, null, null, "oqtest_", 4, 10, true, SqlDialect.fromUrl(url)));
         storage.start();
 
-        services = new OpenQuestsServices(storage, 5, new Platform(events, clock, scheduler, players, players.types()));
+        services = new OpenQuestsServices(storage, 5, new Platform(events, clock, scheduler, players, players.types(), () -> teamTypes));
         services.listen(events);
         services.install();
     }
@@ -73,6 +79,14 @@ public final class QuestHarness implements AutoCloseable {
     @Nonnull
     public TestPlayers players() {
         return players;
+    }
+
+    /**
+     * @return the team types the packs would declare, empty until a test adds some.
+     */
+    @Nonnull
+    public List<OpenQuestTeamType> teamTypes() {
+        return teamTypes;
     }
 
     /**

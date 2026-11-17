@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class OpenQuestsServicesTest {
 
     private final Platform platform = new Platform(Untouched.of(IEventBus.class), Clock.systemUTC(), Untouched.of(ScheduledExecutorService.class), Untouched.of(Players.class),
-                                                   new PlayerComponentTypes(new ComponentType<>(), new ComponentType<>()));
+                                                   new PlayerComponentTypes(new ComponentType<>(), new ComponentType<>()), List::of);
     private final OpenQuestsServices services = new OpenQuestsServices(Untouched.of(QuestStorage.class), 5, platform);
 
     @Test
@@ -43,6 +43,7 @@ class OpenQuestsServicesTest {
             "deadlines", services.getQuestDeadlineService()::listen,
             "players", services.getPlayerQuestService()::listen,
             "universe", services.getUniverseQuestService()::listen,
+            "teams", services.getTeamQuestService()::listen,
             "worlds", services.getWorldQuestService()::listen,
             "assignments", services.getQuestAssignmentService()::listen
         );

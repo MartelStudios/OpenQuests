@@ -40,6 +40,7 @@ import com.martelstudios.openquests.core.persistence.disk.DiskQuestStorageProvid
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorageProvider;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
+import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
@@ -105,13 +106,14 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
             getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, QuestStoreComponent::new),
             getEntityStoreRegistry().registerComponent(PendingRewardStoreComponent.class, PendingRewardStoreComponent::new));
 
-        Platform platform = new Platform(HytaleServer.get().getEventBus(), Clock.systemUTC(), HytaleServer.SCHEDULED_EXECUTOR, new ServerPlayers(), components);
+        Platform platform = new Platform(HytaleServer.get().getEventBus(), Clock.systemUTC(), HytaleServer.SCHEDULED_EXECUTOR, new ServerPlayers(), components, () -> OpenQuestTeamType.getAssetStore().getAssetMap().getAssetMap().values());
         services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), platform);
         services.install();
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
         QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);
         QuestScope.CODEC.register(UniverseQuestScope.TYPE, UniverseQuestScope.class, UniverseQuestScope.CODEC);
+        QuestScope.CODEC.register(TeamQuestScope.TYPE, TeamQuestScope.class, TeamQuestScope.CODEC);
 
         AssignmentTrigger.CODEC.register(PlayerConnectTrigger.TYPE, PlayerConnectTrigger.class, PlayerConnectTrigger.CODEC);
         AssignmentTrigger.CODEC.register(PlayerEnterWorldTrigger.TYPE, PlayerEnterWorldTrigger.class, PlayerEnterWorldTrigger.CODEC);

@@ -14,6 +14,7 @@ import com.martelstudios.openquests.core.scopes.ScopeIndexFollower;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
+import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldClosingService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
@@ -47,6 +48,7 @@ public final class OpenQuestsServices implements QuestEnvironment {
     private final ScopeIndexes scopeIndexes;
     private final PlayerQuestService playerQuests;
     private final UniverseQuestService universe;
+    private final TeamQuestService teams;
     private final WorldQuestService worlds;
     private final WorldGroupIndex worldGroups;
     private final ScopeServices scopes;
@@ -71,13 +73,14 @@ public final class OpenQuestsServices implements QuestEnvironment {
         universe = new UniverseQuestService(scopeIndexes, progression, platform.players());
         worlds = new WorldQuestService(scopeIndexes, progression, sync, playerQuests, platform.components());
         worldGroups = new WorldGroupIndex(scopeIndexes, progression, worlds);
-        scopes = new ScopeServices(universe, worlds, worldGroups);
+        teams = new TeamQuestService(scopeIndexes, progression, platform.players(), platform.components(), platform.teamTypes());
+        scopes = new ScopeServices(universe, worlds, worldGroups, teams);
         worldClosing = new WorldClosingService(storage, progression, scopes, platform.players());
         assignments = new QuestAssignmentService(storage, progression, scopes, platform.players(), platform.components(), platform.clock(), platform.scheduler());
         deadlines = new QuestDeadlineService(progression, platform.clock(), platform.scheduler());
 
         // What other servers write besides the quests themselves, read on each tick of the sync
-        ScopeIndexFollower indexFollower = new ScopeIndexFollower(scopeIndexes, universe, worldGroups);
+        ScopeIndexFollower indexFollower = new ScopeIndexFollower(scopeIndexes, universe, worldGroups, teams);
         sync.onEachTick(indexFollower::follow);
         sync.onEachTick(playerState::takeInMessages);
     }
@@ -92,6 +95,7 @@ public final class OpenQuestsServices implements QuestEnvironment {
         playerState.listen(events);
         rewards.listen(events);
         universe.listen(events);
+        teams.listen(events);
         worlds.listen(events);
         worldClosing.listen(events);
 
@@ -209,6 +213,11 @@ public final class OpenQuestsServices implements QuestEnvironment {
     @Nonnull
     public UniverseQuestService getUniverseQuestService() {
         return universe;
+    }
+
+    @Nonnull
+    public TeamQuestService getTeamQuestService() {
+        return teams;
     }
 
     @Nonnull
