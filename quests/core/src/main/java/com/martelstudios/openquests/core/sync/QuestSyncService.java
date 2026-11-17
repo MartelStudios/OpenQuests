@@ -248,7 +248,14 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync {
             // Held three ticks, so a tick running late never lets a player go to another server
             storage.renewHosting(Duration.ofSeconds(Math.max(30, 3 * intervalSeconds)));
 
-            for (Runnable task : eachTick) task.run();
+            // One task failing leaves the next its turn: the player messages come after the indexes
+            for (Runnable task : eachTick) {
+                try {
+                    task.run();
+                } catch (RuntimeException e) {
+                    LOGGER.atWarning().withCause(e).log("A task following the other servers failed, trying again next tick");
+                }
+            }
         } catch (Throwable e) {
             // Anything thrown out of a scheduled task cancels every tick after it, silently
             LOGGER.atWarning().withCause(e).log("Following the other servers on the quest storage failed");

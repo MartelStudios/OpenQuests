@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,6 +107,28 @@ class TeamQuestServiceTest {
         quest.apply(new AbstractQuestProgression.Join(bob));
 
         teamQuests.joinAdded(teamId, List.of(quest.getId()));
+
+        assertTrue(harness.questsOf(bob).contains(quest.getId()));
+    }
+
+    @Test
+    void aQuestAnotherServerSharedIsBroughtAgainAfterAFailure() {
+        UUID bob = harness.players().connect();
+        UUID teamId = team("faction", bob);
+        teamQuests.getQuestIds(teamId);
+        TestQuestProgression quest = harness.register();
+        quest.apply(new AbstractQuestProgression.SetScope(new TeamQuestScope(teamId)));
+        quest.apply(new AbstractQuestProgression.Join(bob));
+        harness.storage().addToIndex(TeamQuestService.key(teamId), List.of(quest.getId()));
+        ScopeIndexFollower follower = new ScopeIndexFollower(harness.services().getScopeIndexes(), harness.services().getUniverseQuestService(),
+                harness.services().getWorldGroupIndex(), new FailingOnce(harness));
+
+        try {
+            follower.follow();
+        } catch (RuntimeException ignored) {
+            // Before the fix the failure escaped; the ids it absorbed are what matters
+        }
+        follower.follow();
 
         assertTrue(harness.questsOf(bob).contains(quest.getId()));
     }
@@ -208,6 +231,26 @@ class TeamQuestServiceTest {
     @Nonnull
     private QuestStoreComponent questStore(@Nonnull UUID playerId) {
         return harness.players().of(playerId).ensureAndGetComponent(harness.players().types().questStore());
+    }
+
+    /**
+     * Fails the first time it brings in what another server shared, as a storage blip would.
+     */
+    private static final class FailingOnce extends TeamQuestService {
+        private boolean failed;
+
+        FailingOnce(@Nonnull QuestHarness harness) {
+            super(harness.services().getScopeIndexes(), harness.services().getQuestProgressionService(), harness.players(), harness.services().getTeams(), harness.services().getPlayerQuestService());
+        }
+
+        @Override
+        public void joinAdded(@Nonnull UUID teamId, @Nonnull Collection<UUID> questIds) {
+            if (!failed) {
+                failed = true;
+                throw new IllegalStateException("storage blip");
+            }
+            super.joinAdded(teamId, questIds);
+        }
     }
 
     /**
