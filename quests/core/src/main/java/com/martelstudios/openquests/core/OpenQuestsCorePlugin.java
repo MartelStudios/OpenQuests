@@ -45,6 +45,7 @@ import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
 import com.martelstudios.openquests.core.utils.ServerPlayers;
 
 import javax.annotation.Nonnull;
@@ -131,6 +132,12 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
                                                     .setPath("OpenQuests/Categories/")
                                                     .setCodec(OpenQuestCategory.CODEC)
                                                     .setKeyFunction(OpenQuestCategory::getId)
+                                                    .build());
+
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestTeamType.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenQuests/TeamTypes/")
+                                                    .setCodec(OpenQuestTeamType.CODEC)
+                                                    .setKeyFunction(OpenQuestTeamType::getId)
                                                     .build());
 
         // After the categories, items and stats, which the quests name and are checked against, even from the same pack
