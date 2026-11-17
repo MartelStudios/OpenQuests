@@ -68,10 +68,14 @@ public class Teams {
 
     /**
      * Appends the player, and drops their invitation into this team now that it is used.
+     *
+     * @throws IllegalArgumentException for a team gone or emptied, which is being disbanded.
      */
     @Nonnull
     public TeamRecord addMember(@Nonnull UUID teamId, @Nonnull UUID playerId) {
         TeamRecord team = existing(teamId, change(teamId, current -> {
+            // Emptied: being disbanded by the server that emptied it
+            if (current.getMembers().isEmpty()) return null;
             List<UUID> members = new ArrayList<>(current.getMembers());
             if (!members.contains(playerId)) members.add(playerId);
             return current.withMembers(members).withInvitations(without(current.getInvitations(), playerId));
@@ -85,7 +89,7 @@ public class Teams {
      * Removes the player, the first member left becoming owner if they owned it.
      *
      * @return the team left behind, or {@code null} once nobody is left: the server whose write
-     * emptied it deletes it, so one server disbands it.
+     * emptied it deletes it, unless a player joined in between, who keeps it.
      */
     @Nullable
     public TeamRecord removeMember(@Nonnull UUID teamId, @Nonnull UUID playerId) {
@@ -97,7 +101,7 @@ public class Teams {
         });
         if (team == null || !team.getMembers().isEmpty()) return team;
 
-        store.deleteTeam(teamId);
+        if (!store.deleteTeam(teamId, team.getVersion())) return store.loadTeam(teamId);
         for (TeamInvitation invitation : team.getInvitations()) {
             indexes.removeFromIndex(invitationsKey(invitation.player()), List.of(teamId));
         }
@@ -122,6 +126,8 @@ public class Teams {
         long expiresAt = clock.millis() + invitationLifetime.toMillis();
 
         TeamRecord team = existing(teamId, change(teamId, current -> {
+            // Emptied: being disbanded by the server that emptied it
+            if (current.getMembers().isEmpty()) return null;
             List<TeamInvitation> invitations = without(owned(current, by).getInvitations(), playerId);
             invitations.add(new TeamInvitation(playerId, by, expiresAt));
             return current.withInvitations(invitations);
@@ -166,6 +172,7 @@ public class Teams {
             if (current == null) return null;
 
             TeamRecord next = change.apply(current);
+            if (next == null) return null;
             if (store.updateTeam(current, next)) return next.withVersion(current.getVersion() + 1);
         }
         throw new IllegalStateException("Team " + teamId + " kept changing under " + MAX_TRIES + " writes");

@@ -971,10 +971,21 @@ public class JdbcQuestStorage implements QuestStorage {
     }
 
     @Override
-    public void deleteTeam(@Nonnull UUID teamId) {
-        pool.with(connection -> {
-            execute(connection, "DELETE FROM " + teamTable + " WHERE team_id = ?", teamId.toString());
-            return null;
+    public boolean deleteTeam(@Nonnull UUID teamId, long expectedVersion) {
+        return pool.inTransaction(connection -> {
+            try (PreparedStatement delete = connection.prepareStatement("DELETE FROM " + teamTable + " WHERE team_id = ? AND version = ?")) {
+                delete.setString(1, teamId.toString());
+                delete.setLong(2, expectedVersion);
+                if (delete.executeUpdate() == 1) return true;
+            }
+
+            // Nothing deleted: gone already, or written since
+            try (PreparedStatement select = connection.prepareStatement("SELECT 1 FROM " + teamTable + " WHERE team_id = ?")) {
+                select.setString(1, teamId.toString());
+                try (ResultSet results = select.executeQuery()) {
+                    return !results.next();
+                }
+            }
         });
     }
 

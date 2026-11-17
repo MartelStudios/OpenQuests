@@ -107,6 +107,55 @@ class TeamsTest {
     }
 
     @Test
+    void anEmptiedTeamTakesNoMember() {
+        UUID teamId = teams.create("party", alice, "Alice", "Alice's team").getId();
+        TeamRecord read = teams.get(teamId);
+        // Emptied by another server that has not deleted it yet
+        harness.storage().updateTeam(read, read.withMembers(List.of()));
+
+        assertThrows(IllegalArgumentException.class, () -> teams.addMember(teamId, bob));
+    }
+
+    @Test
+    void aMemberWhoJoinedAsTheTeamEmptiedIsKept() {
+        TeamStore store = harness.storage();
+        TeamStore joinedBeforeTheDelete = new TeamStore() {
+            @Nullable
+            @Override
+            public TeamRecord loadTeam(@Nonnull UUID teamId) {
+                return store.loadTeam(teamId);
+            }
+
+            @Override
+            public boolean createTeam(@Nonnull TeamRecord team) {
+                return store.createTeam(team);
+            }
+
+            @Override
+            public boolean updateTeam(@Nonnull TeamRecord expected, @Nonnull TeamRecord next) {
+                return store.updateTeam(expected, next);
+            }
+
+            /**
+             * Bob joins on another server between the write that emptied the team and its deletion.
+             */
+            @Override
+            public boolean deleteTeam(@Nonnull UUID teamId, long expectedVersion) {
+                TeamRecord emptied = store.loadTeam(teamId);
+                store.updateTeam(emptied, emptied.withMembers(List.of(bob)));
+                return store.deleteTeam(teamId, expectedVersion);
+            }
+        };
+        Teams racing = new Teams(joinedBeforeTheDelete, harness.storage(), TeamTypes.of(harness.teamTypes()), harness.clock(), Duration.ofHours(24));
+        UUID teamId = racing.create("party", alice, "Alice", "Alice's team").getId();
+
+        TeamRecord left = racing.removeMember(teamId, alice);
+
+        assertEquals(List.of(bob), left.getMembers());
+        assertEquals(List.of(bob), teams.get(teamId).getMembers());
+    }
+
+    @Test
     void aLostWriteIsRetried() {
         AtomicBoolean lost = new AtomicBoolean();
         TeamStore store = harness.storage();
@@ -135,8 +184,8 @@ class TeamsTest {
             }
 
             @Override
-            public void deleteTeam(@Nonnull UUID teamId) {
-                store.deleteTeam(teamId);
+            public boolean deleteTeam(@Nonnull UUID teamId, long expectedVersion) {
+                return store.deleteTeam(teamId, expectedVersion);
             }
         };
         Teams retrying = new Teams(losingOnce, harness.storage(), TeamTypes.of(harness.teamTypes()), harness.clock(), Duration.ofHours(24));

@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TeamServiceTest {
@@ -181,6 +182,36 @@ class TeamServiceTest {
 
         teams.addMember(own, bob);
         assertNull(service.wouldLose(alice, harness.players().of(alice), "party"));
+    }
+
+    @Test
+    void joiningATeamThatEmptiedKeepsTheOldOne() {
+        UUID own = party(alice);
+        TestQuestProgression quest = share(own, harness.register());
+        UUID bobs = party(bob);
+        TeamRecord read = teams.get(bobs);
+        harness.storage().updateTeam(read, read.withMembers(List.of()));
+
+        assertThrows(IllegalArgumentException.class, () -> service.join(alice, harness.players().of(alice), bobs));
+
+        assertEquals(own, questStore(alice).getTeams().get("party"));
+        assertEquals(List.of(alice), teams.get(own).getMembers());
+        assertTrue(quest.getPlayers().contains(alice));
+    }
+
+    @Test
+    void aChangeFromAStaleRecordLeavesTheTeamThePlayerIsReallyIn() {
+        UUID bobs = party(bob);
+        service.join(alice, harness.players().of(alice), bobs);
+        UUID lions = teams.create("party", UUID.randomUUID(), "Carol", "Lions").getId();
+        teams.addMember(lions, alice);
+        UUID stale = UUID.randomUUID();
+
+        // Written by a server that read alice's record before she joined bob
+        service.apply(alice, harness.players().of(alice), new TeamChange("party", stale, lions));
+
+        assertEquals(lions, questStore(alice).getTeams().get("party"));
+        assertFalse(teams.get(bobs).getMembers().contains(alice));
     }
 
     @Test

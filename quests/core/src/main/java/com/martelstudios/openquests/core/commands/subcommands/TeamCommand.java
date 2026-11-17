@@ -209,7 +209,12 @@ public class TeamCommand extends AbstractCommandCollection {
             if (!tools.confirmed(context, tools.service().wouldLose(sender.getUuid(), player, type), confirmFlag.get(context))) return;
 
             TeamRecord team = inviting.get(0);
-            tools.service().join(sender.getUuid(), player, team.getId());
+            try {
+                tools.service().join(sender.getUuid(), player, team.getId());
+            } catch (IllegalArgumentException e) {
+                context.sendMessage(Message.translation("openquests.commands.team.unknown").param("team", Tools.name(team)));
+                return;
+            }
             context.sendMessage(Message.translation("openquests.commands.team.joined").param("player", sender.getUsername()).param("team", Tools.name(team)));
         }
 

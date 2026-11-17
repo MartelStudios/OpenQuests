@@ -67,9 +67,21 @@ class TeamStoreTest {
         TeamRecord team = team(UUID.randomUUID());
         teams.createTeam(team);
 
-        teams.deleteTeam(team.getId());
+        assertTrue(teams.deleteTeam(team.getId(), 0));
 
         assertNull(teams.loadTeam(team.getId()));
+    }
+
+    @Test
+    void aStaleDeleteIsRefused() {
+        TeamStore teams = open();
+        TeamRecord team = team(UUID.randomUUID());
+        teams.createTeam(team);
+        TeamRecord read = teams.loadTeam(team.getId());
+        teams.updateTeam(read, read.withName("Changed since"));
+
+        assertFalse(teams.deleteTeam(team.getId(), 0));
+        assertEquals("Changed since", teams.loadTeam(team.getId()).getName());
     }
 
     @Test

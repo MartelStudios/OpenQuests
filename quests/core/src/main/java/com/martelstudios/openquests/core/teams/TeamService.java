@@ -107,8 +107,9 @@ public class TeamService {
         if (team == null) throw new IllegalArgumentException("No team " + teamId);
         if (teamId.equals(questStore(player).getTeams().get(team.getType()))) return;
 
-        leaveCurrent(playerId, player, team.getType());
+        // Into the new team first: one emptied meanwhile refuses, leaving the player where they were
         teams.addMember(teamId, playerId);
+        leaveCurrent(playerId, player, team.getType());
         enter(playerId, player, team.getType(), teamId);
     }
 
@@ -141,8 +142,15 @@ public class TeamService {
         if (change.from() != null) {
             TeamRecord from = teams.get(change.from());
             if (from != null && from.getMembers().contains(playerId)) return;
+        }
 
-            exit(playerId, player, change.type(), change.from(), false);
+        UUID held = questStore(player).getTeams().get(change.type());
+        if (change.from() != null) exit(playerId, player, change.type(), change.from(), false);
+
+        // The writer read a record older than this session: the team held here was never left
+        if (held != null && !held.equals(change.from()) && !held.equals(change.to())) {
+            TeamRecord left = teams.removeMember(held, playerId);
+            exit(playerId, player, change.type(), held, left == null);
         }
         if (change.to() != null) enter(playerId, player, change.type(), change.to());
     }
@@ -169,6 +177,7 @@ public class TeamService {
         UUID from = absentTeamOf(playerId, type);
         if (Objects.equals(from, to)) return;
 
+        if (to != null) teams.addMember(to, playerId);
         UUID joined = to;
         if (from != null) {
             TeamRecord left = teams.removeMember(from, playerId);
@@ -181,7 +190,6 @@ public class TeamService {
                 assignments.deleteHolder(TeamQuestService.key(from));
             }
         }
-        if (to != null) teams.addMember(to, playerId);
         if (joined != null) teamQuests.joinRunningQuests(joined, playerId);
 
         storage.postMessage(PlayerMessage.team(playerId, new TeamChange(type, from, joined)));

@@ -32,7 +32,9 @@ public interface TeamStore {
     boolean updateTeam(@Nonnull TeamRecord expected, @Nonnull TeamRecord next);
 
     /**
-     * Removes the team, a no-op if it is already gone.
+     * Removes the team if it is still at that version: a player who joined it in between keeps it.
+     *
+     * @return {@code false} if another write came in between; {@code true} once gone, already or now.
      */
-    void deleteTeam(@Nonnull UUID teamId);
+    boolean deleteTeam(@Nonnull UUID teamId, long expectedVersion);
 }

@@ -456,8 +456,8 @@ public class DiskQuestStorage implements QuestStorage {
         try {
             return teams.load(teamId.toString());
         } catch (IOException e) {
-            LOGGER.atWarning().withCause(e).log("Failed to read team %s", teamId);
-            return null;
+            // Not null: a team read as gone is disbanded, quests and all
+            throw new QuestStorageException("Failed to read team " + teamId, e);
         }
     }
 
@@ -483,8 +483,12 @@ public class DiskQuestStorage implements QuestStorage {
     }
 
     @Override
-    public void deleteTeam(@Nonnull UUID teamId) {
+    public boolean deleteTeam(@Nonnull UUID teamId, long expectedVersion) {
         synchronized (lockOf("teams/" + teamId)) {
+            TeamRecord stored = loadTeam(teamId);
+            if (stored == null) return true;
+            if (stored.getVersion() != expectedVersion) return false;
+
             try {
                 teams.remove(teamId.toString());
             } catch (NoSuchFileException e) {
@@ -492,6 +496,7 @@ public class DiskQuestStorage implements QuestStorage {
             } catch (IOException e) {
                 LOGGER.atWarning().withCause(e).log("Failed to delete team %s", teamId);
             }
+            return true;
         }
     }
 
