@@ -59,6 +59,11 @@ public class QuestStoreComponent implements Component<EntityStore> {
     private volatile HudSettings hud = HudSettings.NONE;
 
     /**
+     * The team of each team type this player was put in, by type. Personal teams are implied.
+     */
+    private final Map<String, String> teams = new ConcurrentHashMap<>();
+
+    /**
      * Set when something here changed and the player's record is owed a write.
      */
     private transient boolean dirty;
@@ -73,6 +78,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
         this.completions.putAll(other.completions);
         this.tracking.putAll(other.tracking);
         this.hud = other.hud;
+        this.teams.putAll(other.teams);
         this.dirty = other.dirty;
     }
 
@@ -176,17 +182,34 @@ public class QuestStoreComponent implements Component<EntityStore> {
     }
 
     /**
+     * @return the team this player belongs to in each team type, by type, for their record.
+     */
+    @Nonnull
+    public Map<String, String> getTeams() {
+        return Map.copyOf(teams);
+    }
+
+    /**
+     * @param name {@code null} for no team of that type, which for a personal-team type means their own.
+     */
+    public void setTeam(@Nonnull String type, @Nullable String name) {
+        String before = name == null ? teams.remove(type) : teams.put(type, name);
+        if (!Objects.equals(before, name)) markDirty();
+    }
+
+    /**
      * Takes over what was read back for this player, which is how a session starts.
      *
      * @param questIds the quests that answered, not the ids their record listed, so a dead id is
      * dropped here rather than carried another session.
      */
-    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Map<String, QuestCompletions> completions, @Nonnull Map<UUID, Boolean> tracking, @Nonnull HudSettings hud) {
+    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Map<String, QuestCompletions> completions, @Nonnull Map<UUID, Boolean> tracking, @Nonnull HudSettings hud, @Nonnull Map<String, String> teams) {
         quests.replaceAll(questIds);
         this.assignments.replaceAll(assignments);
         this.completions.putAll(completions);
         this.tracking.putAll(tracking);
         this.hud = hud;
+        this.teams.putAll(teams);
         dirty = false;
     }
 
