@@ -237,6 +237,20 @@ absent member, so the cost of a quest grows with the team. Servers sharing one s
 same OpenQuests version: an older one drops the teams from the records it writes and deletes team
 messages unread.
 
+Membership moves, personal quest copies, inherited assignment history and their notification commit
+together in SQL. The disk backend journals the same move and finishes an interrupted write before
+the next team operation or at startup. A player's team cache is rebuilt from authoritative
+membership, not trusted to recover a move after a crash. JDBC keeps a player-to-team index for this
+lookup; the added `team_guard` and `team_member` tables are created alongside existing saves.
+Team commands perform storage work off the world thread and report failures rather than announcing
+a move that never committed. Notifications are retried and ordered so an old one cannot replace a
+newer membership in the player's session.
+
+A connection assignment scoped to `Team` is remembered by that team. Leaving a personal team
+copies this assignment history, so going on alone does not restart its introduction. A new team
+created without inherited history can receive it, and joining another team follows that team's
+running story rather than the joining player's past completions.
+
 ### Storage
 
 Where a quest is kept is decided by one interface, `QuestStorage`, and named in `config.json`.

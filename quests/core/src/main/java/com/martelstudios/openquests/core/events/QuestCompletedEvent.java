@@ -6,6 +6,8 @@ import com.martelstudios.openquests.core.models.QuestState;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Fired once a quest reached a terminal state and left the store. Keyed by quest id, so a
@@ -22,6 +24,14 @@ public class QuestCompletedEvent implements IEvent<UUID> {
     private final QuestState state;
 
     private final boolean endedHere;
+    private Set<UUID> recipients;
+
+    /** Resolves membership once so rewards and completion history use the same committed team snapshot. */
+    @Nonnull
+    public synchronized Set<UUID> recipients(@Nonnull Supplier<Set<UUID>> resolve) {
+        if (recipients == null) recipients = Set.copyOf(resolve.get());
+        return recipients;
+    }
 
     /**
      * @param state the outcome reached, which the quest may have moved past by the time this is heard

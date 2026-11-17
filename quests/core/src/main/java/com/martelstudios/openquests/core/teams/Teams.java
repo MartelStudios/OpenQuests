@@ -4,6 +4,7 @@ import com.martelstudios.openquests.core.persistence.IndexStore;
 import com.martelstudios.openquests.core.persistence.TeamInvitation;
 import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.persistence.TeamStore;
+import com.martelstudios.openquests.core.persistence.TeamTransaction;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,6 +50,7 @@ public class Teams {
      */
     @Nonnull
     public TeamRecord create(@Nonnull String type, @Nonnull UUID owner, @Nonnull String ownerName, @Nullable String name) {
+        validateName(name);
         if (types.get(type) == null) throw new IllegalArgumentException("No team type " + type + " is declared");
 
         for (int tries = 0; tries < MAX_TRIES; tries++) {
@@ -66,6 +68,11 @@ public class Teams {
         return store.loadTeam(teamId);
     }
 
+    /** Rechecked while the move holds the team write lock, so an expired invitation cannot authorize a join. */
+    public boolean hasInvitation(@Nonnull TeamRecord team, @Nonnull UUID playerId) {
+        return team.getInvitations().stream().anyMatch(invitation -> invitation.player().equals(playerId) && invitation.expiresAt() > clock.millis());
+    }
+
     /**
      * Appends the player, and drops their invitation into this team now that it is used.
      *
@@ -81,7 +88,7 @@ public class Teams {
             return current.withMembers(members).withInvitations(without(current.getInvitations(), playerId));
         }));
 
-        indexes.removeFromIndex(invitationsKey(playerId), List.of(teamId));
+        forgetInvitationIfStale(teamId, playerId);
         return team;
     }
 
@@ -113,7 +120,13 @@ public class Teams {
      */
     @Nonnull
     public TeamRecord rename(@Nonnull UUID teamId, @Nonnull UUID by, @Nonnull String name) {
+        validateName(name);
         return existing(teamId, change(teamId, current -> owned(current, by).withName(name)));
+    }
+
+    /** Bounds newly supplied names without rejecting existing stored documents. */
+    public static void validateName(@Nullable String name) {
+        if (name != null && name.length() > 64) throw new IllegalArgumentException("Team names must not exceed 64 characters");
     }
 
     /**
@@ -124,17 +137,17 @@ public class Teams {
     @Nonnull
     public TeamRecord invite(@Nonnull UUID teamId, @Nonnull UUID by, @Nonnull UUID playerId) {
         long expiresAt = clock.millis() + invitationLifetime.toMillis();
-
-        TeamRecord team = existing(teamId, change(teamId, current -> {
-            // Emptied: being disbanded by the server that emptied it
-            if (current.getMembers().isEmpty()) return null;
-            List<TeamInvitation> invitations = without(owned(current, by).getInvitations(), playerId);
+        TeamRecord[] written = new TeamRecord[1];
+        store.transactTeams(playerId, teamId, documents -> {
+            TeamRecord current = existing(teamId, documents.stream().filter(team -> team.getId().equals(teamId)).findFirst().orElse(null));
+            if (current.getMembers().isEmpty()) throw new IllegalArgumentException("Emptied team " + teamId);
+            List<TeamInvitation> invitations = new ArrayList<>(without(owned(current, by).getInvitations(), playerId).stream()
+                    .filter(invitation -> invitation.expiresAt() > clock.millis()).toList());
             invitations.add(new TeamInvitation(playerId, by, expiresAt));
-            return current.withInvitations(invitations);
-        }));
-
-        indexes.addToIndex(invitationsKey(playerId), List.of(teamId));
-        return team;
+            written[0] = current.withInvitations(invitations).withVersion(current.getVersion() + 1);
+            return new TeamTransaction(List.of(written[0]), null).addToIndex(invitationsKey(playerId), teamId);
+        });
+        return written[0];
     }
 
     /**
@@ -156,8 +169,16 @@ public class Teams {
             else if (team.getType().equals(type)) inviting.add(team);
         }
 
-        if (!stale.isEmpty()) indexes.removeFromIndex(invitationsKey(playerId), stale);
+        for (UUID teamId : stale) forgetInvitationIfStale(teamId, playerId);
         return inviting;
+    }
+
+    private void forgetInvitationIfStale(UUID teamId, UUID playerId) {
+        store.transactTeams(playerId, teamId, documents -> {
+            TeamRecord current = documents.stream().filter(team -> team.getId().equals(teamId)).findFirst().orElse(null);
+            TeamTransaction transaction = new TeamTransaction(List.of(), null);
+            return current != null && hasInvitation(current, playerId) ? transaction : transaction.removeFromIndex(invitationsKey(playerId), teamId);
+        });
     }
 
     /**
@@ -202,6 +223,7 @@ public class Teams {
      */
     @Nonnull
     public static String invitationsKey(@Nonnull UUID playerId) {
+        // This generic index contains team ids, never quest ids: a dangling-quest cleanup must skip it.
         return "team-invitations:" + playerId;
     }
 }

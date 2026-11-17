@@ -9,10 +9,14 @@ import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
 import com.martelstudios.openquests.core.events.TeamJoinedEvent;
 import com.martelstudios.openquests.core.events.TeamLeftEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.persistence.PlayerMessage;
+import com.martelstudios.openquests.core.persistence.QuestProgressionRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.TeamRecord;
+import com.martelstudios.openquests.core.persistence.TeamTransaction;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
+import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
@@ -23,20 +27,19 @@ import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
-/**
- * Keeps a player's teams and their quests in step: the team documents on one side, the quests
- * the teams share on the other, and the player's record caching which teams they are in.
- */
+/** Commits membership once, then recovers quest effects and updates the hosted player's cache. */
 public class TeamService {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
-
     private final Teams teams;
     private final TeamQuestService teamQuests;
     private final TeamTypes types;
@@ -67,306 +70,261 @@ public class TeamService {
         this.sync = sync;
     }
 
-    /**
-     * @return the team the player would disband by joining another of that type: one they are
-     * alone in with quests running, which they would lose. {@code null} when nothing is lost.
-     */
+    /** @return the personal team whose running progress would be discarded by joining another. */
     @Nullable
     public TeamRecord wouldLose(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull String type) {
-        UUID current = questStore(player).getTeams().get(type);
-        return current == null ? null : losing(current, playerId);
+        return wouldLose(playerId, type);
     }
 
-    @Nullable
-    private TeamRecord losing(@Nonnull UUID teamId, @Nonnull UUID playerId) {
-        TeamRecord team = teams.get(teamId);
-        if (team == null || !team.getMembers().equals(List.of(playerId))) return null;
-
-        return teamQuests.getRunningQuests(teamId).isEmpty() ? null : team;
-    }
-
-    /**
-     * The player leaves their team of that type, with no copy and no new team of their own, then
-     * joins this one and its running quests, whatever their assets say of them.
-     *
-     * @throws IllegalArgumentException for a team that is gone.
-     */
-    public void join(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull UUID teamId) {
-        TeamRecord team = teams.get(teamId);
-        if (team == null) throw new IllegalArgumentException("No team " + teamId);
-        if (teamId.equals(questStore(player).getTeams().get(team.getType()))) return;
-
-        // Into the new team first: one emptied meanwhile refuses, leaving the player where they were
-        teams.addMember(teamId, playerId);
-        leaveCurrent(playerId, player, team.getType());
-        enter(playerId, player, team.getType(), teamId);
-    }
-
-    /**
-     * The player leaves their team of that type and its running quests. For a personal-team type,
-     * they go on in a new team of their own holding a copy of those quests and of what the team
-     * was handed. A team left empty is disbanded, once the copy is made.
-     */
-    public void leave(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull EntityComponents player, @Nonnull String type) {
-        UUID current = questStore(player).getTeams().get(type);
-        if (current == null || isAloneInPersonal(current, type, playerId)) return;
-
-        TeamRecord left = teams.removeMember(current, playerId);
-        OpenQuestTeamType teamType = types.get(type);
-        UUID own = teamType != null && teamType.isPersonalTeam() ? startOwn(current, type, playerId, playerName) : null;
-
-        exit(playerId, player, type, current, left == null);
-        if (own != null) enter(playerId, player, type, own);
-    }
-
-    /**
-     * Applies the quest side of a change whose documents were written elsewhere. Does nothing when
-     * the documents no longer agree, the player having moved again since.
-     */
-    public void apply(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull TeamChange change) {
-        if (change.to() != null) {
-            TeamRecord to = teams.get(change.to());
-            if (to == null || !to.getMembers().contains(playerId)) return;
-        }
-        if (change.from() != null) {
-            TeamRecord from = teams.get(change.from());
-            if (from != null && from.getMembers().contains(playerId)) return;
-        }
-
-        UUID held = questStore(player).getTeams().get(change.type());
-        if (change.from() != null) exit(playerId, player, change.type(), change.from(), false);
-
-        // The writer read a record older than this session: the team held here was never left
-        if (held != null && !held.equals(change.from()) && !held.equals(change.to())) {
-            TeamRecord left = teams.removeMember(held, playerId);
-            exit(playerId, player, change.type(), held, left == null);
-        }
-        if (change.to() != null) enter(playerId, player, change.type(), change.to());
-    }
-
-    /**
-     * Moves any known player into that team, or out of their team of that type for {@code null}.
-     * A player online here changes at once on their thread. Any other has the documents and the
-     * quests changed now, bound while away like any team member, and is left a message their
-     * record takes in when next hosted.
-     *
-     * @throws IllegalArgumentException for a team that is gone.
-     */
-    public void change(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull String type, @Nullable UUID to) {
-        if (to != null && teams.get(to) == null) throw new IllegalArgumentException("No team " + to);
-
-        if (players.isOnline(playerId)) {
-            // Runs on the player's thread after the caller returned: nobody else would see it fail
-            players.update(playerId, player -> {
-                try {
-                    if (to == null) leave(playerId, playerName, player, type);
-                    else join(playerId, player, to);
-                } catch (RuntimeException e) {
-                    LOGGER.atWarning().withCause(e).log("Could not move player %s to team %s", playerId, to);
-                }
-            });
-            return;
-        }
-
-        UUID from = absentTeamOf(playerId, type);
-        if (Objects.equals(from, to) || (to == null && from != null && isAloneInPersonal(from, type, playerId))) return;
-
-        if (to != null) teams.addMember(to, playerId);
-        UUID joined = to;
-        if (from != null) {
-            TeamRecord left = teams.removeMember(from, playerId);
-            OpenQuestTeamType teamType = types.get(type);
-            if (to == null && teamType != null && teamType.isPersonalTeam()) joined = startOwn(from, type, playerId, playerName);
-
-            teamQuests.leaveRunningQuests(from, playerId);
-            if (left == null) {
-                teamQuests.disband(from);
-                assignments.deleteHolder(TeamQuestService.key(from));
-            }
-        }
-        if (joined != null) teamQuests.joinRunningQuests(joined, playerId);
-
-        storage.postMessage(PlayerMessage.team(playerId, new TeamChange(type, from, joined)));
-    }
-
-    /**
-     * @return the player's team of that type: their session's if hosted here, else their record's
-     * as the changes waiting for them leave it. {@code null} for none.
-     */
+    /** @return the current authoritative membership, independently of the server hosting the player. */
     @Nullable
     public UUID currentTeamOf(@Nonnull UUID playerId, @Nonnull String type) {
-        QuestStoreComponent hosted = playerState.getQuestStore(playerId);
-        return hosted != null ? hosted.getTeams().get(type) : absentTeamOf(playerId, type);
+        return storage.loadTeamsForPlayer(playerId).stream().filter(team -> team.getType().equals(type))
+                .map(TeamRecord::getId).findFirst().orElse(null);
     }
 
-    /**
-     * As {@link #wouldLose(UUID, EntityComponents, String)}, for any known player.
-     */
+    /** @return what joining would discard, or null when nobody loses running progress. */
     @Nullable
     public TeamRecord wouldLose(@Nonnull UUID playerId, @Nonnull String type) {
-        UUID current = currentTeamOf(playerId, type);
-        return current == null ? null : losing(current, playerId);
+        UUID id = currentTeamOf(playerId, type);
+        TeamRecord team = id == null ? null : teams.get(id);
+        return team != null && team.getMembers().equals(List.of(playerId)) && !teamQuests.getRunningQuests(id).isEmpty() ? team : null;
     }
 
-    /**
-     * The team their record names, as the changes still waiting for them leave it.
-     */
-    @Nullable
-    private UUID absentTeamOf(@Nonnull UUID playerId, @Nonnull String type) {
-        UUID teamId = storage.loadPlayer(playerId).getTeams().get(type);
-        for (PlayerMessage message : storage.loadMessages(List.of(playerId))) {
-            TeamChange change = message.getTeam();
-            if (change != null && change.type().equals(type)) teamId = change.to();
+    /** Runs on a storage thread; joining keeps the destination's history and discards the old personal team's. */
+    public void join(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull UUID teamId) {
+        TeamRecord target = teams.get(teamId);
+        if (target == null) throw new IllegalArgumentException("No team " + teamId);
+        PlayerMessage message = move(playerId, "", target.getType(), teamId, false);
+        if (message != null) {
+            prepare(playerId, message.getTeam());
+            apply(playerId, player, message.getTeam());
         }
-        return teamId;
     }
 
-    /**
-     * Leaving on the way to another team: no copy, no team of their own.
-     */
-    private void leaveCurrent(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull String type) {
-        UUID current = questStore(player).getTeams().get(type);
-        if (current == null) return;
-
-        TeamRecord left = teams.removeMember(current, playerId);
-        exit(playerId, player, type, current, left == null);
+    /** Runs on a storage thread; a personal departure snapshots progress before changing membership. */
+    public void leave(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull EntityComponents player, @Nonnull String type) {
+        PlayerMessage message = move(playerId, playerName, type, null, false);
+        if (message != null) {
+            prepare(playerId, message.getTeam());
+            apply(playerId, player, message.getTeam());
+        }
     }
 
-    /**
-     * Leaving such a team would end in a team of their own with the same quests: kept as it is,
-     * rather than deleted, recreated and copied for nothing.
-     */
-    private boolean isAloneInPersonal(@Nonnull UUID teamId, @Nonnull String type, @Nonnull UUID playerId) {
-        OpenQuestTeamType teamType = types.get(type);
-        if (teamType == null || !teamType.isPersonalTeam()) return false;
-
-        TeamRecord team = teams.get(teamId);
-        return team != null && team.getMembers().equals(List.of(playerId));
+    /** Performs a durable move; the notification remains available if quest effects fail afterwards. */
+    public void change(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull String type, @Nullable UUID to) {
+        PlayerMessage message = move(playerId, playerName, type, to, false);
+        if (message == null) return;
+        prepare(playerId, message.getTeam());
+        if (players.isOnline(playerId)) players.update(playerId, player -> apply(playerId, player, message.getTeam()));
     }
 
-    /**
-     * Only the quests the player still holds are copied: one they gave up stays given up.
-     */
+    /** Completes only after the durable move and its quest effects succeed; failures reach the command caller. */
     @Nonnull
-    private UUID startOwn(@Nonnull UUID from, @Nonnull String type, @Nonnull UUID playerId, @Nonnull String playerName) {
-        UUID own = teams.create(type, playerId, playerName, null).getId();
+    public CompletableFuture<Void> changeAsync(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull String type, @Nullable UUID to) {
+        return sync.submit(() -> change(playerId, playerName, type, to));
+    }
 
-        for (AbstractQuestProgression<?> quest : teamQuests.getRunningQuests(from)) {
-            if (quest.getPlayers().contains(playerId)) teamQuests.addQuest(own, copier.copyFor(quest, playerId).getId(), List.of(playerId));
+    /** Runs a command's reads, validation and writes together off the world thread. */
+    @Nonnull
+    public CompletableFuture<Void> execute(@Nonnull Runnable command) { return sync.submit(command); }
+
+    /** Creates and joins the destination in the same commit, so a crash cannot leave a spare membership. */
+    @Nonnull
+    public TeamRecord create(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull String type, @Nullable String name) {
+        Teams.validateName(name);
+        TeamRecord created = new TeamRecord(UUID.randomUUID(), type, name, playerName, playerId, List.of(playerId), List.of());
+        PlayerMessage message = move(playerId, playerName, type, created.getId(), false, created, false);
+        complete(playerId, message);
+        return created;
+    }
+
+    /** Accepts only an invitation still valid in the same locked snapshot that changes membership. */
+    public void accept(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull String type, @Nonnull UUID destination) {
+        complete(playerId, move(playerId, playerName, type, destination, false, null, true));
+    }
+
+    private void complete(UUID playerId, PlayerMessage message) {
+        if (message == null) return;
+        prepare(playerId, message.getTeam());
+        if (players.isOnline(playerId)) players.update(playerId, player -> apply(playerId, player, message.getTeam()));
+    }
+
+    private PlayerMessage move(UUID playerId, String playerName, String type, UUID requested, boolean ensurePersonal) {
+        return move(playerId, playerName, type, requested, ensurePersonal, null, false);
+    }
+
+    private PlayerMessage move(UUID playerId, String playerName, String type, UUID requested, boolean ensurePersonal,
+                               TeamRecord created, boolean requireInvitation) {
+        OpenQuestTeamType definition = types.get(type);
+        if (definition == null) throw new IllegalArgumentException("Unknown team type " + type);
+        return storage.transactTeams(playerId, requested, all -> {
+            List<TeamRecord> sources = all.stream().filter(team -> team.getType().equals(type) && team.getMembers().contains(playerId)).toList();
+            if (ensurePersonal && !sources.isEmpty()) return new TeamTransaction(List.of(), null);
+            if (!ensurePersonal && requested == null && (sources.isEmpty() || definition.isPersonalTeam() && sources.size() == 1
+                    && sources.getFirst().getMembers().equals(List.of(playerId)))) return new TeamTransaction(List.of(), null);
+            TeamRecord target = requested == null ? null : all.stream().filter(team -> team.getId().equals(requested)).findFirst().orElse(created);
+            if (requested != null && target == null) throw new IllegalArgumentException("No team " + requested);
+            if (target != null && (!target.getType().equals(type) || target.getMembers().isEmpty()))
+                throw new IllegalArgumentException("Gone or wrong-type team " + requested);
+            if (requireInvitation && !teams.hasInvitation(target, playerId)) throw new IllegalArgumentException("No current invitation");
+            if (target != null && sources.size() == 1 && sources.getFirst().getId().equals(target.getId()))
+                return new TeamTransaction(List.of(), null);
+
+            List<QuestProgressionRecord> copies = new ArrayList<>();
+            Map<String, Map<String, AssignmentRecord>> history = new HashMap<>();
+            if (requested == null && definition.isPersonalTeam()) {
+                target = new TeamRecord(UUID.randomUUID(), type, null, playerName, playerId, List.of(playerId), List.of());
+                // Preparation has no registrations or writes: failure leaves both memberships untouched.
+                for (TeamRecord source : sources) {
+                    for (AbstractQuestProgression<?> quest : teamQuests.getRunningQuests(source.getId())) {
+                        if (quest.getPlayers().contains(playerId)) copier.snapshot(quest, playerId).forEach(copy -> copies.add(new QuestProgressionRecord(copy)));
+                    }
+                    storage.loadAssignments(TeamQuestService.key(source.getId())).snapshot().forEach((assignment, records) ->
+                            history.computeIfAbsent(assignment, ignored -> new HashMap<>()).putAll(records));
+                }
+            }
+            UUID destination = target == null ? null : target.getId();
+            List<TeamRecord> writes = new ArrayList<>();
+            List<UUID> left = new ArrayList<>();
+            for (TeamRecord source : sources) {
+                if (source.getId().equals(destination)) continue;
+                List<UUID> members = new ArrayList<>(source.getMembers());
+                members.remove(playerId);
+                UUID owner = source.getOwner().equals(playerId) && !members.isEmpty() ? members.getFirst() : source.getOwner();
+                writes.add(source.withMembers(members).withOwner(owner).withVersion(source.getVersion() + 1));
+                left.add(source.getId());
+            }
+            if (target != null) {
+                List<UUID> members = new ArrayList<>(target.getMembers());
+                if (!members.contains(playerId)) members.add(playerId);
+                boolean existed = all.stream().anyMatch(team -> team.getId().equals(destination));
+                writes.add(target.withMembers(members).withInvitations(target.getInvitations().stream()
+                        .filter(invite -> !invite.player().equals(playerId)).toList()).withVersion(existed ? target.getVersion() + 1 : 0));
+            }
+            TeamTransaction transaction = new TeamTransaction(writes, PlayerMessage.team(playerId, new TeamChange(type, left, destination, copies, history)));
+            if (destination != null) transaction.removeFromIndex(Teams.invitationsKey(playerId), destination);
+            return transaction;
+        });
+    }
+
+    /** Runs on the storage worker before any component update; replay never generates new copy ids. */
+    public void prepare(@Nonnull UUID playerId, @Nonnull TeamChange change) {
+        UUID current = currentTeamOf(playerId, change.type());
+        // A later move supersedes this notification. It must not resurrect an old personal team.
+        boolean currentMove = Objects.equals(current, change.to());
+        if (currentMove && current != null) {
+            List<AbstractQuestProgression<?>> roots = new ArrayList<>();
+            for (QuestProgressionRecord snapshot : change.copies()) {
+                AbstractQuestProgression<?> copy = snapshot.quest;
+                if (copy.getParentId() == null) {
+                    copy.apply(new AbstractQuestProgression.SetScope(new TeamQuestScope(current)));
+                }
+                AbstractQuestProgression<?> persisted = storage.loadProgression(copy.getId());
+                if (persisted == null) storage.writeProgressions(List.of(copy));
+                AbstractQuestProgression<?> actual = persisted == null ? copy : persisted;
+                if (actual.getParentId() == null && !actual.isOver()) roots.add(actual);
+                if (playerState.getQuestStore(playerId) != null) {
+                    teamQuests.restoreCopy(persisted == null ? copy : persisted);
+                }
+            }
+            for (AbstractQuestProgression<?> root : roots) storage.addToIndex(TeamQuestService.key(current), List.of(root.getId()));
+            change.assignments().forEach((assignment, records) -> records.forEach((asset, record) ->
+                    storage.claimAssignment(TeamQuestService.key(current), assignment, asset, null, record)));
+            assignments.forgetHolder(TeamQuestService.key(current));
         }
-        assignments.copyHolder(TeamQuestService.key(from), TeamQuestService.key(own));
-        return own;
-    }
-
-    private void exit(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull String type, @Nonnull UUID teamId, boolean disband) {
-        teamQuests.leaveRunningQuests(teamId, playerId);
-        if (disband) {
-            teamQuests.disband(teamId);
-            assignments.deleteHolder(TeamQuestService.key(teamId));
+        for (UUID source : change.sources()) {
+            if (source.equals(current)) continue;
+            teamQuests.leaveRunningQuests(source, playerId);
+            TeamRecord team = teams.get(source);
+            if (team == null || team.getMembers().isEmpty()) {
+                teamQuests.disband(source);
+                assignments.deleteHolder(TeamQuestService.key(source));
+                if (team != null) storage.deleteTeam(source, team.getVersion());
+            }
         }
-        questStore(player).setTeam(type, null);
-        saveSoon(playerId);
-        dispatch(new TeamLeftEvent(playerId, teamId));
+        if (currentMove && current != null) teamQuests.joinRunningQuests(current, playerId);
+        Set<UUID> touched = new HashSet<>(change.sources());
+        if (change.to() != null) touched.add(change.to());
+        sync.execute("teams without a local member", () -> {
+            Set<UUID> hosted = playerState.getHostedPlayers();
+            for (UUID id : touched) {
+                TeamRecord team = teams.get(id);
+                if (team != null && team.getMembers().stream().anyMatch(member -> players.isOnline(member) || hosted.contains(member))) continue;
+                teamQuests.unload(id);
+                assignments.forgetHolder(TeamQuestService.key(id));
+            }
+        });
     }
 
-    private void enter(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull String type, @Nonnull UUID teamId) {
-        questStore(player).setTeam(type, teamId);
-        saveSoon(playerId);
-        teamQuests.joinRunningQuests(teamId, playerId);
-        dispatch(new TeamJoinedEvent(playerId, teamId));
-    }
-
-    /**
-     * The record is the only way back from a player to their teams: written now, off this thread,
-     * so a crash before the save pass cannot leave them in a team that no longer lists them.
-     */
-    private void saveSoon(@Nonnull UUID playerId) {
+    /** Updates only the hosted cache; storage work must have succeeded through prepare first. */
+    public void apply(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull TeamChange change) {
+        QuestStoreComponent store = player.ensureAndGetComponent(components.questStore());
+        UUID held;
+        synchronized (store) {
+            if (!store.acceptTeamRevision(change.type(), change.revision())) return;
+            held = store.getTeams().get(change.type());
+            store.setTeam(change.type(), change.to());
+        }
+        if (held != null && !held.equals(change.to())) events.dispatchFor(TeamLeftEvent.class, playerId).dispatch(new TeamLeftEvent(playerId, held));
+        if (change.to() != null && !change.to().equals(held)) events.dispatchFor(TeamJoinedEvent.class, playerId).dispatch(new TeamJoinedEvent(playerId, change.to()));
         sync.execute("the teams of player " + playerId, () -> playerState.saveNow(playerId));
     }
 
-    @Nonnull
-    private QuestStoreComponent questStore(@Nonnull EntityComponents player) {
-        return player.ensureAndGetComponent(components.questStore());
+    /** Checks authoritative membership on the storage worker before accepting a delayed notification. */
+    public boolean isCurrent(@Nonnull UUID playerId, @Nonnull TeamChange change) {
+        return Objects.equals(currentTeamOf(playerId, change.type()), change.to());
     }
 
-    private void dispatch(@Nonnull TeamJoinedEvent event) {
-        events.dispatchFor(TeamJoinedEvent.class, event.getPlayerId()).dispatch(event);
-    }
-
-    private void dispatch(@Nonnull TeamLeftEvent event) {
-        events.dispatchFor(TeamLeftEvent.class, event.getPlayerId()).dispatch(event);
-    }
-
-    /**
-     * Subscribes to connections and departures. Registered after the player state service, so the
-     * record naming the player's teams is read first, and before assignments, so they find every
-     * team. A departure runs before that service closes the session it reads.
-     */
-    public void listen(@Nonnull IEventRegistry events) {
-        events.registerGlobal(PlayerConnectEvent.class, event -> {
-            UUID playerId = event.getPlayerRef().getUuid();
-            try {
-                onConnect(playerId, event.getPlayerRef().getUsername(), EntityComponents.of(event.getHolder()));
-            } catch (RuntimeException e) {
-                // A storage error must not stop the connection; the teams are checked again next time
-                LOGGER.atWarning().withCause(e).log("Could not check the teams of connecting player %s", playerId);
-            }
+    /** Registers connection reconciliation, whose holder is available before world entry. */
+    public void listen(@Nonnull IEventRegistry registry) {
+        registry.registerGlobal(PlayerConnectEvent.class, event -> {
+            UUID player = event.getPlayerRef().getUuid();
+            try { onConnect(player, event.getPlayerRef().getUsername(), EntityComponents.of(event.getHolder())); }
+            catch (RuntimeException e) { LOGGER.atWarning().withCause(e).log("Could not reconcile the teams of player %s", player); }
         });
-        events.registerGlobal(PlayerDisconnectEvent.class, event -> onDisconnect(event.getPlayerRef().getUuid()));
+        registry.registerGlobal(PlayerDisconnectEvent.class, event -> onDisconnect(event.getPlayerRef().getUuid()));
     }
 
-    /**
-     * Lets go of the teams of a leaving player that nobody else plays here, so memory and the sync
-     * follow the players online rather than every team seen since boot.
-     */
+    /** Releases teams nobody hosted here still plays. */
     public void onDisconnect(@Nonnull UUID playerId) {
         QuestStoreComponent leaving = playerState.getQuestStore(playerId);
         if (leaving == null) return;
-
-        Set<UUID> stillPlayed = new HashSet<>();
-        for (UUID otherId : players.online()) {
-            QuestStoreComponent other = otherId.equals(playerId) ? null : playerState.getQuestStore(otherId);
-            if (other != null) stillPlayed.addAll(other.getTeams().values());
+        Set<UUID> held = new HashSet<>();
+        for (UUID other : players.online()) {
+            QuestStoreComponent store = other.equals(playerId) ? null : playerState.getQuestStore(other);
+            if (store != null) held.addAll(store.getTeams().values());
         }
-
-        for (UUID teamId : leaving.getTeams().values()) {
-            if (stillPlayed.contains(teamId)) continue;
-
-            indexes.unload(TeamQuestService.key(teamId));
-            assignments.forgetHolder(TeamQuestService.key(teamId));
+        for (UUID id : leaving.getTeams().values()) if (!held.contains(id)) {
+            indexes.unload(TeamQuestService.key(id));
+            assignments.forgetHolder(TeamQuestService.key(id));
         }
     }
 
-    /**
-     * Applies the team changes left while the player was away, checks the record against the team
-     * documents, gives them a team of every personal-team type they have none of, and joins them
-     * to their teams' running quests.
-     */
+    /** Rebuilds the cache from documents, recovering a crash even when the cached player record is stale. */
     public void onConnect(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull EntityComponents player) {
-        // Before the record is checked: a change made while they were away names teams it no longer lists
+        Map<String, UUID> previous = new HashMap<>(player.ensureAndGetComponent(components.questStore()).getTeams());
         playerState.applyTeamChanges(playerId, player);
-
-        QuestStoreComponent questStore = player.ensureAndGetComponent(components.questStore());
-
-        for (Map.Entry<String, UUID> entry : questStore.getTeams().entrySet()) {
-            TeamRecord team = teams.get(entry.getValue());
-            if (team == null) {
-                // A crash between the last member leaving and the disband left its quests and records
+        QuestStoreComponent store = player.ensureAndGetComponent(components.questStore());
+        for (OpenQuestTeamType type : types.all()) {
+            if (type.isPersonalTeam()) {
+                PlayerMessage created = move(playerId, playerName, type.getId(), null, true);
+                if (created != null) { prepare(playerId, created.getTeam()); apply(playerId, player, created.getTeam()); }
+            }
+        }
+        Map<String, UUID> actual = new HashMap<>();
+        for (TeamRecord team : storage.loadTeamsForPlayer(playerId)) actual.put(team.getType(), team.getId());
+        for (var entry : previous.entrySet()) {
+            if (actual.containsValue(entry.getValue())) continue;
+            TeamRecord old = teams.get(entry.getValue());
+            if (old == null || old.getMembers().isEmpty()) {
                 teamQuests.disband(entry.getValue());
                 assignments.deleteHolder(TeamQuestService.key(entry.getValue()));
             }
-            if (team == null || !team.getMembers().contains(playerId)) questStore.setTeam(entry.getKey(), null);
+            store.setTeam(entry.getKey(), null);
         }
-
-        for (OpenQuestTeamType type : types.all()) {
-            if (type.isPersonalTeam() && !questStore.getTeams().containsKey(type.getId())) {
-                questStore.setTeam(type.getId(), teams.create(type.getId(), playerId, playerName, null).getId());
-            }
-        }
-        saveSoon(playerId);
-
-        for (UUID teamId : questStore.getTeams().values()) {
-            teamQuests.joinRunningQuests(teamId, playerId);
-        }
+        actual.forEach(store::setTeam);
+        for (UUID team : actual.values()) teamQuests.joinRunningQuests(team, playerId, store);
+        sync.execute("the connected player's teams", () -> playerState.saveNow(playerId));
     }
 }

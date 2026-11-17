@@ -39,6 +39,7 @@ public class JdbcConnectionPool implements AutoCloseable {
     private final ConcurrentLinkedDeque<Pooled> idle = new ConcurrentLinkedDeque<>();
 
     private volatile boolean closed;
+    private final ThreadLocal<Connection> transactionConnection = new ThreadLocal<>();
 
     public JdbcConnectionPool(@Nonnull Driver driver, @Nonnull String url, @Nonnull Properties properties, int size, int acquireTimeoutSeconds) {
         this.driver = driver;
@@ -53,6 +54,11 @@ public class JdbcConnectionPool implements AutoCloseable {
      * transaction never leaves one behind.
      */
     public <T> T with(@Nonnull SqlWork<T> work) {
+        Connection active = transactionConnection.get();
+        if (active != null) {
+            try { return work.run(active); }
+            catch (SQLException failure) { throw new QuestStorageException("Quest storage query failed", failure); }
+        }
         Connection connection = acquire();
 
         try {
@@ -70,8 +76,10 @@ public class JdbcConnectionPool implements AutoCloseable {
      * if it does not.
      */
     public <T> T inTransaction(@Nonnull SqlWork<T> work) {
+        if (transactionConnection.get() != null) return with(work);
         return with(connection -> {
             connection.setAutoCommit(false);
+            transactionConnection.set(connection);
             try {
                 T result = work.run(connection);
                 connection.commit();
@@ -79,6 +87,8 @@ public class JdbcConnectionPool implements AutoCloseable {
             } catch (SQLException | RuntimeException e) {
                 rollbackQuietly(connection);
                 throw e;
+            } finally {
+                transactionConnection.remove();
             }
         });
     }

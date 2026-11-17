@@ -172,6 +172,7 @@ public final class QuestHarness implements AutoCloseable {
     public void close() {
         events.shutdown();
         scheduler.shutdownNow();
+        services.getQuestSyncService().stop();
         storage.close();
     }
 

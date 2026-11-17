@@ -23,7 +23,6 @@ import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
 import com.martelstudios.openquests.core.teams.TeamService;
 import com.martelstudios.openquests.core.teams.Teams;
-import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -59,6 +58,14 @@ public class TeamCommand extends AbstractCommandCollection {
      * What every team command reads teams through, and how it names them.
      */
     private record Tools(@Nonnull Teams teams, @Nonnull TeamService service, @Nonnull Clock clock) {
+
+        void run(CommandContext context, Runnable command) {
+            service.execute(command).exceptionally(failure -> {
+                context.sendMessage(Message.translation("openquests.commands.team.failed"));
+                com.hypixel.hytale.logger.HytaleLogger.forEnclosingClass().atWarning().withCause(failure).log("Team command failed");
+                return null;
+            });
+        }
 
         @Nonnull
         static Message name(@Nonnull TeamRecord team) {
@@ -139,6 +146,14 @@ public class TeamCommand extends AbstractCommandCollection {
             this.tools = tools;
         }
 
+        @Override
+        protected final void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store,
+                                     @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef sender, @Nonnull World world) {
+            tools.run(context, () -> executeStored(context, sender));
+        }
+
+        protected abstract void executeStored(@Nonnull CommandContext context, @Nonnull PlayerRef sender);
+
         @Nullable
         protected UUID ownTeam(@Nonnull CommandContext context, @Nonnull PlayerRef sender) {
             UUID teamId = tools.service().currentTeamOf(sender.getUuid(), context.get(typeArg).getId());
@@ -157,7 +172,7 @@ public class TeamCommand extends AbstractCommandCollection {
         }
 
         @Override
-        protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef sender, @Nonnull World world) {
+        protected void executeStored(@Nonnull CommandContext context, @Nonnull PlayerRef sender) {
             UUID teamId = ownTeam(context, sender);
             if (teamId == null) return;
 
@@ -185,7 +200,7 @@ public class TeamCommand extends AbstractCommandCollection {
         }
 
         @Override
-        protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef sender, @Nonnull World world) {
+        protected void executeStored(@Nonnull CommandContext context, @Nonnull PlayerRef sender) {
             String type = context.get(typeArg).getId();
             ProfileServiceClient.PublicGameProfile inviter = context.get(inviterArg);
 
@@ -205,12 +220,12 @@ public class TeamCommand extends AbstractCommandCollection {
                 return;
             }
 
-            EntityComponents player = EntityComponents.of(ref);
-            if (!tools.confirmed(context, tools.service().wouldLose(sender.getUuid(), player, type), confirmFlag.get(context))) return;
+
+            if (!tools.confirmed(context, tools.service().wouldLose(sender.getUuid(), type), confirmFlag.get(context))) return;
 
             TeamRecord team = inviting.get(0);
             try {
-                tools.service().join(sender.getUuid(), player, team.getId());
+                tools.service().accept(sender.getUuid(), sender.getUsername(), type, team.getId());
             } catch (IllegalArgumentException e) {
                 context.sendMessage(Message.translation("openquests.commands.team.unknown").param("team", Tools.name(team)));
                 return;
@@ -234,7 +249,7 @@ public class TeamCommand extends AbstractCommandCollection {
         }
 
         @Override
-        protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef sender, @Nonnull World world) {
+        protected void executeStored(@Nonnull CommandContext context, @Nonnull PlayerRef sender) {
             UUID teamId = ownTeam(context, sender);
             if (teamId == null) return;
 
@@ -254,10 +269,10 @@ public class TeamCommand extends AbstractCommandCollection {
         }
 
         @Override
-        protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef sender, @Nonnull World world) {
+        protected void executeStored(@Nonnull CommandContext context, @Nonnull PlayerRef sender) {
             if (ownTeam(context, sender) == null) return;
 
-            tools.service().leave(sender.getUuid(), sender.getUsername(), EntityComponents.of(ref), context.get(typeArg).getId());
+            tools.service().change(sender.getUuid(), sender.getUsername(), context.get(typeArg).getId(), null);
             context.sendMessage(Message.translation("openquests.commands.team.left").param("player", sender.getUsername()));
         }
     }
@@ -269,7 +284,7 @@ public class TeamCommand extends AbstractCommandCollection {
         }
 
         @Override
-        protected void execute(@Nonnull CommandContext context, @Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> ref, @Nonnull PlayerRef sender, @Nonnull World world) {
+        protected void executeStored(@Nonnull CommandContext context, @Nonnull PlayerRef sender) {
             UUID teamId = ownTeam(context, sender);
             TeamRecord team = teamId == null ? null : tools.teams().get(teamId);
             if (team != null) tools.describe(context, team);
@@ -296,7 +311,23 @@ public class TeamCommand extends AbstractCommandCollection {
         }
     }
 
-    private static class AdminCreateCommand extends CommandBase {
+    private abstract static class TeamAdminCommand extends CommandBase {
+        private final Tools commandTools;
+
+        TeamAdminCommand(String name, String description, Tools tools) {
+            super(name, description);
+            commandTools = tools;
+        }
+
+        @Override
+        protected final void executeSync(@Nonnull CommandContext context) {
+            commandTools.run(context, () -> executeStored(context));
+        }
+
+        protected abstract void executeStored(@Nonnull CommandContext context);
+    }
+
+    private static class AdminCreateCommand extends TeamAdminCommand {
 
         @Nonnull
         private final RequiredArg<OpenQuestTeamType> typeArg = withRequiredArg("type", "Team type", TEAM_TYPE);
@@ -314,23 +345,22 @@ public class TeamCommand extends AbstractCommandCollection {
         private final Tools tools;
 
         AdminCreateCommand(@Nonnull Tools tools) {
-            super("create", "Creates a team owned by a player");
+            super("create", "Creates a team owned by a player", tools);
             this.tools = tools;
         }
 
         @Override
-        protected void executeSync(@Nonnull CommandContext context) {
+        protected void executeStored(@Nonnull CommandContext context) {
             String type = context.get(typeArg).getId();
             ProfileServiceClient.PublicGameProfile profile = context.get(playerArg);
             if (!tools.confirmed(context, tools.service().wouldLose(profile.getUuid(), type), confirmFlag.get(context))) return;
 
-            TeamRecord team = tools.teams().create(type, profile.getUuid(), profile.getUsername(), context.get(nameArg));
-            tools.service().change(profile.getUuid(), profile.getUsername(), type, team.getId());
+            TeamRecord team = tools.service().create(profile.getUuid(), profile.getUsername(), type, context.get(nameArg));
             context.sendMessage(Message.translation("openquests.commands.team.created").param("team", Tools.name(team)).param("id", team.getId().toString()).param("player", profile.getUsername()));
         }
     }
 
-    private static class AdminJoinCommand extends CommandBase {
+    private static class AdminJoinCommand extends TeamAdminCommand {
 
         @Nonnull
         private final RequiredArg<ProfileServiceClient.PublicGameProfile> playerArg = withRequiredArg("player", "server.commands.argtype.player.desc", GAME_PROFILE_LOOKUP);
@@ -348,12 +378,12 @@ public class TeamCommand extends AbstractCommandCollection {
         private final Tools tools;
 
         AdminJoinCommand(@Nonnull Tools tools) {
-            super("join", "Puts a player in a team");
+            super("join", "Puts a player in a team", tools);
             this.tools = tools;
         }
 
         @Override
-        protected void executeSync(@Nonnull CommandContext context) {
+        protected void executeStored(@Nonnull CommandContext context) {
             String type = context.get(typeArg).getId();
             ProfileServiceClient.PublicGameProfile profile = context.get(playerArg);
             TeamRecord team = tools.resolve(context, context.get(teamArg), type);
@@ -365,7 +395,7 @@ public class TeamCommand extends AbstractCommandCollection {
         }
     }
 
-    private static class AdminLeaveCommand extends CommandBase {
+    private static class AdminLeaveCommand extends TeamAdminCommand {
 
         @Nonnull
         private final RequiredArg<ProfileServiceClient.PublicGameProfile> playerArg = withRequiredArg("player", "server.commands.argtype.player.desc", GAME_PROFILE_LOOKUP);
@@ -377,12 +407,12 @@ public class TeamCommand extends AbstractCommandCollection {
         private final Tools tools;
 
         AdminLeaveCommand(@Nonnull Tools tools) {
-            super("leave", "Takes a player out of their team");
+            super("leave", "Takes a player out of their team", tools);
             this.tools = tools;
         }
 
         @Override
-        protected void executeSync(@Nonnull CommandContext context) {
+        protected void executeStored(@Nonnull CommandContext context) {
             String type = context.get(typeArg).getId();
             ProfileServiceClient.PublicGameProfile profile = context.get(playerArg);
             if (tools.service().currentTeamOf(profile.getUuid(), type) == null) {
@@ -395,7 +425,7 @@ public class TeamCommand extends AbstractCommandCollection {
         }
     }
 
-    private static class AdminMembersCommand extends CommandBase {
+    private static class AdminMembersCommand extends TeamAdminCommand {
 
         @Nonnull
         private final RequiredArg<OpenQuestTeamType> typeArg = withRequiredArg("type", "Team type", TEAM_TYPE);
@@ -407,12 +437,12 @@ public class TeamCommand extends AbstractCommandCollection {
         private final Tools tools;
 
         AdminMembersCommand(@Nonnull Tools tools) {
-            super("members", "Lists a team's members");
+            super("members", "Lists a team's members", tools);
             this.tools = tools;
         }
 
         @Override
-        protected void executeSync(@Nonnull CommandContext context) {
+        protected void executeStored(@Nonnull CommandContext context) {
             TeamRecord team = tools.resolve(context, context.get(teamArg), context.get(typeArg).getId());
             if (team != null) tools.describe(context, team);
         }

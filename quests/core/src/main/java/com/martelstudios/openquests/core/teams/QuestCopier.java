@@ -4,9 +4,6 @@ import com.hypixel.hytale.codec.ExtraInfo;
 import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
-import org.bson.BsonArray;
-import org.bson.BsonDocument;
-import org.bson.BsonString;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,9 +29,21 @@ public class QuestCopier {
      */
     @Nonnull
     public AbstractQuestProgression<?> copyFor(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        AbstractQuestProgression<?> copy = copy(quest, null);
+        List<AbstractQuestProgression<?>> copies = snapshot(quest, playerId);
+        // Registration precedes the membership event used to populate the online player's index.
+        for (AbstractQuestProgression<?> item : copies) item.prepareCopy(item.getId(), item.getParentId(), null);
+        copies.forEach(progression::registerLoadedQuest);
+        AbstractQuestProgression<?> copy = copies.getLast();
         copy.addPlayer(playerId);
         return copy;
+    }
+
+    /** @return detached copies, children first, whose fixed ids can safely be persisted in a retried move. */
+    @Nonnull
+    public List<AbstractQuestProgression<?>> snapshot(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        List<AbstractQuestProgression<?>> copies = new ArrayList<>();
+        copy(quest, null, playerId, copies);
+        return copies;
     }
 
     /**
@@ -42,31 +51,25 @@ public class QuestCopier {
      * through registration of a new quest, which would start the group with fresh steps.
      */
     @Nonnull
-    private AbstractQuestProgression<?> copy(@Nonnull AbstractQuestProgression<?> quest, @Nullable UUID parentId) {
-        UUID copyId = UUID.randomUUID();
-        BsonDocument document;
+    private AbstractQuestProgression<?> copy(@Nonnull AbstractQuestProgression<?> quest, @Nullable UUID parentId,
+                                              UUID playerId, List<AbstractQuestProgression<?>> copies) {
+        AbstractQuestProgression<?> copy;
         synchronized (quest) {
-            document = AbstractQuestProgression.CODEC.encode(quest, ExtraInfo.THREAD_LOCAL.get()).asDocument();
+            var info = ExtraInfo.THREAD_LOCAL.get();
+            copy = AbstractQuestProgression.CODEC.decode(AbstractQuestProgression.CODEC.encode(quest, info), info);
         }
-
-        document.put("Id", new BsonString(copyId.toString()));
-        document.put("Players", new BsonArray());
-        document.remove("AbandonedPlayers");
-        document.remove("Scope");
-        if (parentId != null) document.put("ParentId", new BsonString(parentId.toString()));
-
-        if (quest instanceof AbstractCompositeQuestProgression<?> group) {
-            List<BsonString> childIds = new ArrayList<>();
+        if (copy == null) throw new IllegalStateException("Cannot copy quest " + quest.getId());
+        copy.prepareCopy(UUID.randomUUID(), parentId, playerId);
+        if (quest instanceof AbstractCompositeQuestProgression<?> group && copy instanceof AbstractCompositeQuestProgression<?> copiedGroup) {
+            List<UUID> childIds = new ArrayList<>();
             for (UUID childId : group.getChildIds()) {
                 AbstractQuestProgression<?> child = progression.loadQuest(childId);
-                if (child != null) childIds.add(new BsonString(copy(child, copyId).getId().toString()));
+                if (child == null) throw new IllegalStateException("Cannot copy missing quest step " + childId);
+                childIds.add(copy(child, copy.getId(), playerId, copies).getId());
             }
-            document.put("QuestIds", new BsonArray(childIds));
+            copiedGroup.prepareCopiedChildren(childIds.toArray(UUID[]::new));
         }
-
-        AbstractQuestProgression<?> copy = AbstractQuestProgression.CODEC.decode(document, ExtraInfo.THREAD_LOCAL.get());
-        progression.registerLoadedQuest(copy);
-        copy.markDirty();
+        copies.add(copy);
         return copy;
     }
 }

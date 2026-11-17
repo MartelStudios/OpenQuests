@@ -19,3 +19,5 @@ commands.team.created = Created {team} ({id}) for {player}.
 commands.team.unknown = No team matches {team}.
 commands.team.wrong_type = That team is of another type.
 commands.team.members = {team} ({id}), owner {owner}: {members}
+
+commands.team.failed = The team operation could not be completed. Please try again.

@@ -12,6 +12,7 @@ import com.martelstudios.openquests.core.persistence.QuestProgressionRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.TeamRecord;
+import com.martelstudios.openquests.core.persistence.TeamTransaction;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,6 +34,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * The quests as JSON files under the universe directory, which is where a server with no database
@@ -64,6 +66,10 @@ public class DiskQuestStorage implements QuestStorage {
     private DiskDataStore<AssignmentRecordsFile> assignments;
     private DiskDataStore<PlayerMessage> messages;
     private DiskDataStore<TeamRecord> teams;
+    private final Object teamLock = new Object();
+    private TeamJournal teamJournal;
+    private final Map<UUID, Set<UUID>> teamMembers = new HashMap<>();
+    private final Map<UUID, Set<UUID>> playerTeams = new HashMap<>();
 
     public DiskQuestStorage(@Nonnull String rootPath) {
         this.rootPath = rootPath;
@@ -85,6 +91,29 @@ public class DiskQuestStorage implements QuestStorage {
         createDirectory(assignments.getPath());
         createDirectory(messages.getPath());
         createDirectory(teams.getPath());
+        teamJournal = new TeamJournal(teams.getPath().resolveSibling("team-transactions"), transaction -> {
+            for (TeamRecord team : transaction.teams()) {
+                teams.save(team.getId().toString(), team);
+                indexTeamMembers(team);
+            }
+            transaction.added().forEach(this::addToIndex);
+            transaction.removed().forEach(this::removeFromIndex);
+            if (transaction.message() == null) return;
+            for (QuestProgressionRecord snapshot : transaction.message().getTeam().copies()) {
+                // A replay never replaces progress made on a copy already written by an earlier pass.
+                if (!Files.exists(progressions.getPath().resolve(snapshot.quest.getId() + ".json")))
+                    writeProgressions(List.of(snapshot.quest));
+                if (snapshot.quest.getParentId() == null)
+                    addToIndex("team:" + transaction.message().getTeam().to(), List.of(snapshot.quest.getId()));
+            }
+            transaction.message().getTeam().assignments().forEach((assignment, records) -> records.forEach((asset, record) ->
+                    claimAssignment("team:" + transaction.message().getTeam().to(), assignment, asset, null, record)));
+            postMessage(transaction.message());
+        });
+        teamJournal.recover();
+        teamMembers.clear();
+        playerTeams.clear();
+        for (TeamRecord team : loadTeams()) indexTeamMembers(team);
 
         LOGGER.atInfo().log("Quest storage: JSON files under %s", rootPath);
     }
@@ -453,38 +482,118 @@ public class DiskQuestStorage implements QuestStorage {
     @Nullable
     @Override
     public TeamRecord loadTeam(@Nonnull UUID teamId) {
-        try {
-            return teams.load(teamId.toString());
-        } catch (IOException e) {
-            // Not null: a team read as gone is disbanded, quests and all
-            throw new QuestStorageException("Failed to read team " + teamId, e);
+        synchronized (teamLock) {
+            teamJournal.recover();
+            try {
+                TeamRecord team = teams.load(teamId.toString());
+                if (team == null && Files.exists(teams.getPath().resolve(teamId + ".json")))
+                    throw new QuestStorageException("Unreadable team " + teamId);
+                return team;
+            } catch (IOException e) {
+                // Not null: a team read as gone is disbanded, quests and all
+                throw new QuestStorageException("Failed to read team " + teamId, e);
+            }
+        }
+    }
+
+    @Nonnull
+    @Override
+    public List<TeamRecord> loadTeams() {
+        synchronized (teamLock) {
+            teamJournal.recover();
+            try (var files = Files.list(teams.getPath())) {
+                List<TeamRecord> result = new ArrayList<>();
+                for (Path file : files.filter(path -> path.getFileName().toString().endsWith(".json")).toList()) {
+                    String name = file.getFileName().toString();
+                    TeamRecord team = loadTeam(UUID.fromString(name.substring(0, name.length() - 5)));
+                    if (team != null) result.add(team);
+                }
+                return result;
+            } catch (IOException e) {
+                throw new QuestStorageException("Could not read team membership", e);
+            }
+        }
+    }
+
+    private void indexTeamMembers(TeamRecord team) {
+        Set<UUID> previous = teamMembers.put(team.getId(), Set.copyOf(team.getMembers()));
+        if (previous != null) for (UUID player : previous) {
+            Set<UUID> ids = playerTeams.get(player);
+            if (ids != null) {
+                ids.remove(team.getId());
+                if (ids.isEmpty()) playerTeams.remove(player);
+            }
+        }
+        for (UUID player : team.getMembers()) playerTeams.computeIfAbsent(player, ignored -> new HashSet<>()).add(team.getId());
+    }
+
+    @Nonnull
+    @Override
+    public List<TeamRecord> loadTeamsForPlayer(@Nonnull UUID playerId) {
+        synchronized (teamLock) {
+            teamJournal.recover();
+            List<TeamRecord> result = new ArrayList<>();
+            for (UUID id : playerTeams.getOrDefault(playerId, Set.of())) {
+                TeamRecord team = loadTeam(id);
+                if (team != null) result.add(team);
+            }
+            return result;
+        }
+    }
+
+    @Nullable
+    @Override
+    public PlayerMessage transactTeams(@Nonnull UUID playerId, @Nullable UUID destination,
+                                       @Nonnull Function<List<TeamRecord>, TeamTransaction> plan) {
+        synchronized (teamLock) {
+            List<TeamRecord> documents = loadTeamsForPlayer(playerId);
+            if (destination != null && documents.stream().noneMatch(team -> team.getId().equals(destination))) {
+                TeamRecord team = loadTeam(destination);
+                if (team != null) documents.add(team);
+            }
+            TeamTransaction transaction = plan.apply(documents);
+            teamJournal.commit(transaction);
+            return transaction.message();
+        }
+    }
+
+    @Nullable
+    @Override
+    public PlayerMessage transactTeams(@Nonnull Function<List<TeamRecord>, TeamTransaction> plan) {
+        synchronized (teamLock) {
+            TeamTransaction transaction = plan.apply(loadTeams());
+            teamJournal.commit(transaction);
+            return transaction.message();
         }
     }
 
     @Override
     public boolean createTeam(@Nonnull TeamRecord team) {
-        synchronized (lockOf("teams/" + team.getId())) {
+        synchronized (teamLock) {
+            teamJournal.recover();
             if (Files.exists(teams.getPath().resolve(team.getId() + ".json"))) return false;
 
             teams.save(team.getId().toString(), team.withVersion(0));
+            indexTeamMembers(team);
             return true;
         }
     }
 
     @Override
     public boolean updateTeam(@Nonnull TeamRecord expected, @Nonnull TeamRecord next) {
-        synchronized (lockOf("teams/" + expected.getId())) {
+        synchronized (teamLock) {
             TeamRecord stored = loadTeam(expected.getId());
             if (stored == null || stored.getVersion() != expected.getVersion()) return false;
 
             teams.save(expected.getId().toString(), next.withVersion(expected.getVersion() + 1));
+            indexTeamMembers(next);
             return true;
         }
     }
 
     @Override
     public boolean deleteTeam(@Nonnull UUID teamId, long expectedVersion) {
-        synchronized (lockOf("teams/" + teamId)) {
+        synchronized (teamLock) {
             TeamRecord stored = loadTeam(teamId);
             if (stored == null) return true;
             if (stored.getVersion() != expectedVersion) return false;
@@ -494,8 +603,10 @@ public class DiskQuestStorage implements QuestStorage {
             } catch (NoSuchFileException e) {
                 // Deleted already
             } catch (IOException e) {
-                LOGGER.atWarning().withCause(e).log("Failed to delete team %s", teamId);
+                throw new QuestStorageException("Failed to delete team " + teamId, e);
             }
+            indexTeamMembers(stored.withMembers(List.of()));
+            teamMembers.remove(teamId);
             return true;
         }
     }

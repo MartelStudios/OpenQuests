@@ -125,6 +125,19 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync {
         }
     }
 
+    /** Runs storage work without swallowing its outcome, so commands cannot report a failed move as successful. */
+    @Nonnull
+    public java.util.concurrent.CompletableFuture<Void> submit(@Nonnull Runnable task) {
+        var result = new java.util.concurrent.CompletableFuture<Void>();
+        try {
+            worker.execute(() -> {
+                try { task.run(); result.complete(null); }
+                catch (Throwable failure) { result.completeExceptionally(failure); }
+            });
+        } catch (RejectedExecutionException failure) { result.completeExceptionally(failure); }
+        return result;
+    }
+
     /**
      * Writes what changed in an index as soon as it changes, off the game threads: a stopping
      * server stops its worlds before the last save pass could read their indexes, and loses none

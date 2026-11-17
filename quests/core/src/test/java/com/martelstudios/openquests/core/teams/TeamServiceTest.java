@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -237,7 +236,7 @@ class TeamServiceTest {
         TeamRecord read = teams.get(bobs);
         harness.storage().updateTeam(read, read.withMembers(List.of()));
 
-        assertDoesNotThrow(() -> service.change(alice, "Alice", "party", bobs));
+        assertThrows(IllegalArgumentException.class, () -> service.change(alice, "Alice", "party", bobs));
 
         assertEquals(own, questStore(alice).getTeams().get("party"));
     }
@@ -248,10 +247,8 @@ class TeamServiceTest {
         service.join(alice, harness.players().of(alice), bobs);
         UUID lions = teams.create("party", UUID.randomUUID(), "Carol", "Lions").getId();
         teams.addMember(lions, alice);
-        UUID stale = UUID.randomUUID();
-
-        // Written by a server that read alice's record before she joined bob
-        service.apply(alice, harness.players().of(alice), new TeamChange("party", stale, lions));
+        // Both documents list Alice, as a partial older move could leave them.
+        service.change(alice, "Alice", "party", lions);
 
         assertEquals(lions, questStore(alice).getTeams().get("party"));
         assertFalse(teams.get(bobs).getMembers().contains(alice));
@@ -263,7 +260,8 @@ class TeamServiceTest {
         UUID bobs = party(bob);
         share(bobs, harness.register());
 
-        service.apply(alice, harness.players().of(alice), new TeamChange("party", own, bobs));
+        harness.storage().postMessage(com.martelstudios.openquests.core.persistence.PlayerMessage.team(alice, new TeamChange("party", own, bobs)));
+        harness.services().getQuestPlayerStateService().takeInMessages();
 
         assertEquals(own, questStore(alice).getTeams().get("party"));
         assertTrue(harness.questsOf(alice).isEmpty());
@@ -272,6 +270,7 @@ class TeamServiceTest {
     @Nonnull
     private UUID connect(@Nonnull String name) {
         UUID playerId = harness.players().connect();
+        harness.services().getQuestPlayerStateService().host(playerId, harness.players().of(playerId));
         service.onConnect(playerId, name, harness.players().of(playerId));
         return playerId;
     }

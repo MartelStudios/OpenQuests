@@ -2,12 +2,14 @@ package com.martelstudios.openquests.core.scopes.team;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.teams.Teams;
 import com.martelstudios.openquests.core.utils.Players;
+import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.HashSet;
 
 /**
  * Holds the quests each team shares: indexes them under the team's key and binds its members to
@@ -37,6 +40,49 @@ public class TeamQuestService {
     private final Players players;
     private final Teams teams;
     private final PlayerQuestService playerQuests;
+
+    /** Restores a persisted move's fixed copy once; replay keeps the current progression already loaded. */
+    public void restoreCopy(@Nonnull AbstractQuestProgression<?> copy) {
+        if (progression.getQuest(copy.getId()) == null) progression.registerLoadedQuest(copy);
+    }
+
+    /** Releases an already loaded team's index and quest trees once nobody here hosts a member. */
+    public void unload(@Nonnull UUID teamId) {
+        if (!indexes.getLoadedKeys(TEAM_INDEX_PREFIX).contains(key(teamId))) return;
+        List<AbstractQuestProgression<?>> held = List.copyOf(indexes.resolve(key(teamId)));
+        indexes.unload(key(teamId));
+        for (AbstractQuestProgression<?> quest : held) if (!isHeldOnline(quest)) unloadTree(quest);
+    }
+
+    private boolean isHeldOnline(AbstractQuestProgression<?> quest) {
+        if (quest.getPlayers().stream().anyMatch(players::isOnline) || quest.getAbandonedPlayers().stream().anyMatch(players::isOnline)) return true;
+        return quest instanceof AbstractCompositeQuestProgression<?> composite && composite.getChildren().stream().anyMatch(this::isHeldOnline);
+    }
+
+    private void unloadTree(AbstractQuestProgression<?> quest) {
+        if (quest instanceof AbstractCompositeQuestProgression<?> composite) {
+            for (AbstractQuestProgression<?> child : composite.getChildren()) unloadTree(child);
+        }
+        progression.unloadQuest(quest.getId());
+    }
+
+    /** Uses committed team membership even if a move's quest binding is still waiting to be recovered. */
+    @Nonnull
+    public Set<UUID> completionPlayers(@Nonnull AbstractQuestProgression<?> quest) {
+        AbstractQuestProgression<?> root = quest;
+        Set<UUID> visited = new HashSet<>();
+        while (root.getParentId() != null && visited.add(root.getId())) {
+            AbstractQuestProgression<?> parent = progression.loadQuest(root.getParentId());
+            if (parent == null) break;
+            root = parent;
+        }
+        if (!(root.getScope() instanceof TeamQuestScope scope)) return Set.copyOf(quest.getPlayers());
+        TeamRecord team = teams.get(scope.getTeamId());
+        if (team == null) return Set.of();
+        Set<UUID> recipients = new HashSet<>(team.getMembers());
+        recipients.removeAll(quest.getAbandonedPlayers());
+        return recipients;
+    }
 
     public TeamQuestService(@Nonnull ScopeIndexes indexes, @Nonnull QuestProgressionService progression, @Nonnull Players players, @Nonnull Teams teams, @Nonnull PlayerQuestService playerQuests) {
         this.indexes = indexes;
@@ -171,11 +217,18 @@ public class TeamQuestService {
      * index the quests found over.
      */
     public void joinRunningQuests(@Nonnull UUID teamId, @Nonnull UUID playerId) {
+        joinRunningQuests(teamId, playerId, null);
+    }
+
+    /** Uses the incoming holder at connection, before the universe necessarily lists the player as online. */
+    public void joinRunningQuests(@Nonnull UUID teamId, @Nonnull UUID playerId, @Nullable QuestStoreComponent connectingStore) {
         for (AbstractQuestProgression<?> quest : indexes.resolve(key(teamId))) {
             if (quest.isOver()) indexes.remove(key(teamId), quest.getId());
-            // Bound while away or on another server, which no event here told their store of
-            else if (quest.getPlayers().contains(playerId)) playerQuests.addQuestToPlayerStore(quest, playerId);
-            else progression.joinQuest(quest, playerId, false);
+            else {
+                if (!quest.getPlayers().contains(playerId)) progression.joinQuest(quest, playerId, false);
+                if (connectingStore != null) playerQuests.addQuestToPlayerStore(connectingStore, quest, playerId);
+                else playerQuests.addQuestToPlayerStore(quest, playerId);
+            }
         }
     }
 

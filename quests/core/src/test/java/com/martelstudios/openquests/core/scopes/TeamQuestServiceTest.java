@@ -88,6 +88,20 @@ class TeamQuestServiceTest {
     }
 
     @Test
+    void aConnectingHolderReceivesQuestsBeforeTheUniverseListsThePlayerOnline() {
+        UUID alice = harness.players().connect();
+        UUID bob = UUID.randomUUID();
+        UUID teamId = team("faction", alice, bob);
+        TestQuestProgression quest = share(teamId, harness.register());
+        assertTrue(harness.questsOf(bob).isEmpty());
+        assertFalse(harness.players().isOnline(bob));
+
+        teamService.onConnect(bob, "Bob", harness.players().of(bob));
+
+        assertTrue(harness.questsOf(bob).contains(quest.getId()));
+    }
+
+    @Test
     void anOfflineMembersStoredEntityIsLeftAlone() {
         UUID alice = harness.players().connect();
         UUID bob = UUID.randomUUID();

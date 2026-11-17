@@ -34,6 +34,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 /**
  * A player's session, from the storage's point of view: everything they hold is read back when
@@ -64,6 +67,14 @@ public class QuestPlayerStateService {
      */
     @Nullable
     private volatile TeamChangeHandler teamChangeHandler;
+    private volatile BiConsumer<UUID, TeamChange> prepareTeamChange = (player, change) -> {};
+    private volatile BiPredicate<UUID, TeamChange> currentTeamChange = (player, change) -> true;
+    private Function<AbstractQuestProgression<?>, Set<UUID>> completionPlayers = quest -> Set.copyOf(quest.getPlayers());
+
+    /** Shares the reward service's committed membership resolution when a quest ends during a move. */
+    public void completionPlayers(@Nonnull Function<AbstractQuestProgression<?>, Set<UUID>> resolve) {
+        completionPlayers = resolve;
+    }
 
     public QuestPlayerStateService(@Nonnull QuestProgressionStore progressionStore, @Nonnull QuestRewardService rewardService, @Nonnull Players players, @Nonnull PlayerComponentTypes components) {
         this.progressionStore = progressionStore;
@@ -208,7 +219,8 @@ public class QuestPlayerStateService {
         record.setHud(questStore.getHud());
         record.getTeams().putAll(questStore.getTeams());
 
-        storage.savePlayer(playerId, record, delivered, leaving);
+        if (!storage.savePlayer(playerId, record, delivered, leaving))
+            throw new com.martelstudios.openquests.core.persistence.QuestStorageException("The player's hosting lease was lost: " + playerId);
         session.delivered().removeAll(delivered);
 
         questStore.consumeChanges();
@@ -236,7 +248,7 @@ public class QuestPlayerStateService {
             if (ending != null) session.questStore().recordCompletion(ending.getAssetId(), ending.getOutcome(), ending.startedAt(), ending.completedAt());
 
             if (message.getTeam() == null) session.delivered().add(message.getId());
-            else players.update(message.getPlayerId(), player -> applyTeamChange(session, message, player));
+            else if (prepareTeamChange(session, message)) players.update(message.getPlayerId(), player -> applyTeamChange(session, message, player));
         }
     }
 
@@ -258,6 +270,24 @@ public class QuestPlayerStateService {
         }
     }
 
+    private boolean prepareTeamChange(Session session, PlayerMessage message) {
+        try {
+            prepareTeamChange.accept(message.getPlayerId(), message.getTeam());
+            if (currentTeamChange.test(message.getPlayerId(), message.getTeam())) return true;
+            session.delivered().add(message.getId());
+        } catch (RuntimeException failure) {
+            session.seen().remove(message.getId());
+            LOGGER.atWarning().withCause(failure).log("Could not recover a team move for player %s", message.getPlayerId());
+        }
+        return false;
+    }
+
+    /** Prepares durable quest effects on the storage worker before scheduling a component-only update. */
+    public void prepareTeamChanges(@Nonnull BiConsumer<UUID, TeamChange> prepare, @Nonnull BiPredicate<UUID, TeamChange> current) {
+        prepareTeamChange = prepare;
+        currentTeamChange = current;
+    }
+
     /**
      * Sets what applies the team changes other servers leave the players hosted here.
      */
@@ -276,7 +306,9 @@ public class QuestPlayerStateService {
         List<PlayerMessage> messages = List.copyOf(session.teamChanges());
         session.teamChanges().clear();
         for (int i = 0; i < messages.size(); i++) {
-            if (applyTeamChange(session, messages.get(i), player)) continue;
+            PlayerMessage message = messages.get(i);
+            if (!prepareTeamChange(session, message) && session.delivered().contains(message.getId())) continue;
+            if (session.seen().contains(message.getId()) && applyTeamChange(session, message, player)) continue;
 
             for (PlayerMessage rest : messages.subList(i + 1, messages.size())) session.seen().remove(rest.getId());
             return;
@@ -366,7 +398,7 @@ public class QuestPlayerStateService {
         String assetId = quest.getAssetId();
         if (assetId == null) return;
 
-        for (UUID playerId : quest.getPlayers()) {
+        for (UUID playerId : questCompletedEvent.recipients(() -> completionPlayers.apply(quest))) {
             recordCompletion(playerId, assetId, questCompletedEvent.getState(), quest);
         }
 

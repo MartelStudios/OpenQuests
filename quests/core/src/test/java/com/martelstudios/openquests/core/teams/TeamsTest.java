@@ -21,6 +21,31 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TeamsTest {
+    @Test
+    void cleaningAnExpiredPointerDoesNotHideAConcurrentNewInvitation() {
+        UUID teamId = teams.create("party", alice, "Alice", null).getId();
+        teams.invite(teamId, alice, bob);
+        harness.clock().advance(Duration.ofHours(25));
+        TeamStore store = harness.storage();
+        AtomicBoolean renewed = new AtomicBoolean();
+        TeamStore racingRead = new TeamStore() {
+            @Override public TeamRecord loadTeam(UUID id) {
+                TeamRecord stale = store.loadTeam(id);
+                if (id.equals(teamId) && renewed.compareAndSet(false, true)) teams.invite(teamId, alice, bob);
+                return stale;
+            }
+            @Override public boolean createTeam(TeamRecord team) { return store.createTeam(team); }
+            @Override public boolean updateTeam(TeamRecord expected, TeamRecord next) { return store.updateTeam(expected, next); }
+            @Override public boolean deleteTeam(UUID id, long version) { return store.deleteTeam(id, version); }
+            @Override public com.martelstudios.openquests.core.persistence.PlayerMessage transactTeams(java.util.function.Function<List<TeamRecord>, com.martelstudios.openquests.core.persistence.TeamTransaction> plan) {
+                return store.transactTeams(plan);
+            }
+        };
+        Teams reader = new Teams(racingRead, harness.storage(), TeamTypes.of(harness.teamTypes()), harness.clock(), Duration.ofHours(24));
+        reader.invitationsOf(bob, "party");
+        assertTrue(renewed.get());
+        assertEquals(List.of(teamId), teams.invitationsOf(bob, "party").stream().map(TeamRecord::getId).toList());
+    }
 
     private final UUID alice = UUID.randomUUID();
     private final UUID bob = UUID.randomUUID();
@@ -160,6 +185,10 @@ class TeamsTest {
         AtomicBoolean lost = new AtomicBoolean();
         TeamStore store = harness.storage();
         TeamStore losingOnce = new TeamStore() {
+            @Override
+            public com.martelstudios.openquests.core.persistence.PlayerMessage transactTeams(java.util.function.Function<List<TeamRecord>, com.martelstudios.openquests.core.persistence.TeamTransaction> plan) {
+                return store.transactTeams(plan);
+            }
             @Nullable
             @Override
             public TeamRecord loadTeam(@Nonnull UUID teamId) {

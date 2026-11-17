@@ -62,6 +62,14 @@ public class QuestStoreComponent implements Component<EntityStore> {
      * The id of this player's team of each team type, by type, as their record caches it.
      */
     private final Map<String, UUID> teams = new ConcurrentHashMap<>();
+    private final Map<String, Long> teamRevisions = new ConcurrentHashMap<>();
+
+    /** Rejects a delayed cache update after a newer committed move already reached this session. */
+    public synchronized boolean acceptTeamRevision(@Nonnull String type, long revision) {
+        if (revision > 0 && revision <= teamRevisions.getOrDefault(type, 0L)) return false;
+        if (revision > 0) teamRevisions.put(type, revision);
+        return true;
+    }
 
     /**
      * Set when something here changed and the player's record is owed a write.
@@ -79,6 +87,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
         this.tracking.putAll(other.tracking);
         this.hud = other.hud;
         this.teams.putAll(other.teams);
+        this.teamRevisions.putAll(other.teamRevisions);
         this.dirty = other.dirty;
     }
 
