@@ -350,6 +350,11 @@ public class TeamService {
 
         for (Map.Entry<String, UUID> entry : questStore.getTeams().entrySet()) {
             TeamRecord team = teams.get(entry.getValue());
+            if (team == null) {
+                // A crash between the last member leaving and the disband left its quests and records
+                teamQuests.disband(entry.getValue());
+                assignments.deleteHolder(TeamQuestService.key(entry.getValue()));
+            }
             if (team == null || !team.getMembers().contains(playerId)) questStore.setTeam(entry.getKey(), null);
         }
 

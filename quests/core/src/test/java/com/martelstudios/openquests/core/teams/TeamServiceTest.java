@@ -216,6 +216,21 @@ class TeamServiceTest {
     }
 
     @Test
+    void aConnectionClearsWhatACrashLeftOfADeletedTeam() {
+        UUID own = party(alice);
+        TestQuestProgression quest = share(own, harness.register());
+        harness.storage().claimAssignment(TeamQuestService.key(own), "Story", "Test", null, record());
+        // A crash between the last member leaving and the disband
+        harness.storage().deleteTeam(own, teams.get(own).getVersion());
+
+        service.onConnect(alice, "Alice", harness.players().of(alice));
+
+        assertTrue(teamQuests.getQuestIds(own).isEmpty());
+        assertNull(harness.services().getQuestProgressionService().getQuest(quest.getId()));
+        assertTrue(harness.storage().loadAssignments(TeamQuestService.key(own)).isEmpty());
+    }
+
+    @Test
     void anOnlineChangeThatFailsLeavesThePlayerWhereTheyWere() {
         UUID own = party(alice);
         UUID bobs = party(bob);
