@@ -6,6 +6,7 @@ import com.martelstudios.openquests.core.events.QuestPlayerAddedEvent;
 import com.martelstudios.openquests.core.events.QuestPlayerRemovedEvent;
 import com.martelstudios.openquests.core.events.QuestUnregisteredEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.scopes.player.events.QuestAddedToPlayerStoreEvent;
 import com.martelstudios.openquests.core.scopes.player.events.QuestRemovedFromPlayerStoreEvent;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
@@ -79,19 +80,34 @@ public class PlayerQuestService {
         }
     }
 
+    /**
+     * Only for a player online here: the store is rebuilt from the storage at connection, and a
+     * write to an absent player's stored entity could roll back a server hosting them.
+     */
     public void addQuestToPlayerStore(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        if (!players.isOnline(playerId)) return;
         players.update(playerId, player -> addQuestToPlayerStore(player.ensureAndGetComponent(components.questStore()), quest, playerId));
     }
 
+    /** Restores bound descendants too: copying and remote binding do not emit local join events. */
     public void addQuestToPlayerStore(@Nonnull QuestStoreComponent playerStore, @Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
-        if (!playerStore.getQuests().register(quest.getId())) return;
-
-        playerStore.markDirty();
-
-        eventBus.dispatchFor(QuestAddedToPlayerStoreEvent.class, playerId).dispatch(new QuestAddedToPlayerStoreEvent(quest, playerId));
+        if (playerStore.getQuests().register(quest.getId())) {
+            playerStore.markDirty();
+            eventBus.dispatchFor(QuestAddedToPlayerStoreEvent.class, playerId).dispatch(new QuestAddedToPlayerStoreEvent(quest, playerId));
+        }
+        if (quest instanceof AbstractCompositeQuestProgression<?> composite) {
+            for (AbstractQuestProgression<?> child : composite.getChildren()) {
+                if (child.getPlayers().contains(playerId) || child.isAbandonedBy(playerId))
+                    addQuestToPlayerStore(playerStore, child, playerId);
+            }
+        }
     }
 
+    /**
+     * Only for a player online here, as {@link #addQuestToPlayerStore(AbstractQuestProgression, UUID)}.
+     */
     public void removeQuestFromPlayerStore(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        if (!players.isOnline(playerId)) return;
         players.update(playerId, player -> removeQuestFromPlayerStore(player.ensureAndGetComponent(components.questStore()), quest, playerId));
     }
 

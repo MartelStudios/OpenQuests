@@ -125,6 +125,19 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync {
         }
     }
 
+    /** Runs storage work without swallowing its outcome, so commands cannot report a failed move as successful. */
+    @Nonnull
+    public java.util.concurrent.CompletableFuture<Void> submit(@Nonnull Runnable task) {
+        var result = new java.util.concurrent.CompletableFuture<Void>();
+        try {
+            worker.execute(() -> {
+                try { task.run(); result.complete(null); }
+                catch (Throwable failure) { result.completeExceptionally(failure); }
+            });
+        } catch (RejectedExecutionException failure) { result.completeExceptionally(failure); }
+        return result;
+    }
+
     /**
      * Writes what changed in an index as soon as it changes, off the game threads: a stopping
      * server stops its worlds before the last save pass could read their indexes, and loses none
@@ -248,7 +261,14 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync {
             // Held three ticks, so a tick running late never lets a player go to another server
             storage.renewHosting(Duration.ofSeconds(Math.max(30, 3 * intervalSeconds)));
 
-            for (Runnable task : eachTick) task.run();
+            // One task failing leaves the next its turn: the player messages come after the indexes
+            for (Runnable task : eachTick) {
+                try {
+                    task.run();
+                } catch (RuntimeException e) {
+                    LOGGER.atWarning().withCause(e).log("A task following the other servers failed, trying again next tick");
+                }
+            }
         } catch (Throwable e) {
             // Anything thrown out of a scheduled task cancels every tick after it, silently
             LOGGER.atWarning().withCause(e).log("Following the other servers on the quest storage failed");

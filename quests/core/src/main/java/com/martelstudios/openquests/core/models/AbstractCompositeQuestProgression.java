@@ -43,6 +43,12 @@ public abstract class AbstractCompositeQuestProgression<Q extends AbstractCompos
         return childIds;
     }
 
+    /** Replaces child references after the children of a detached copy received their own identities. */
+    public void prepareCopiedChildren(@Nonnull UUID[] copiedIds) {
+        childIds = copiedIds.clone();
+        markDirty();
+    }
+
     /**
      * @return the steps that are in memory, in order. One that already left it is skipped, which
      * is how a step that ended and kept no record drops out.

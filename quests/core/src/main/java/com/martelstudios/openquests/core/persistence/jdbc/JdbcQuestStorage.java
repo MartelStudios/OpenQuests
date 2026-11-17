@@ -12,6 +12,9 @@ import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.QuestProgressionRecord;
 import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
+import com.martelstudios.openquests.core.persistence.TeamRecord;
+import com.martelstudios.openquests.core.persistence.TeamTransaction;
+import com.martelstudios.openquests.core.persistence.TeamChangePersistence;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,6 +36,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 
 /**
  * The quests in a relational database, for a server keeping tens of thousands of them or for
@@ -98,6 +102,9 @@ public class JdbcQuestStorage implements QuestStorage {
     private String playerTable;
     private String messageTable;
     private String assignmentTable;
+    private String teamTable;
+    private String teamGuardTable;
+    private String teamMemberTable;
     private String versionTable;
 
     @Nullable
@@ -128,6 +135,9 @@ public class JdbcQuestStorage implements QuestStorage {
         playerTable = prefix + "player";
         messageTable = prefix + "player_message";
         assignmentTable = prefix + "quest_assignment";
+        teamTable = prefix + "teams";
+        teamGuardTable = prefix + "team_guard";
+        teamMemberTable = prefix + "team_member";
         versionTable = prefix + "schema_version";
 
         insertMemberSql = dialect.insertIgnoring(questIndexTable, "index_key, quest_id");
@@ -143,6 +153,7 @@ public class JdbcQuestStorage implements QuestStorage {
         pool = new JdbcConnectionPool(driverLoader.getDriver(), settings.url(), properties, settings.poolSize(), settings.connectionTimeoutSeconds());
 
         prepareSchema();
+        rebuildTeamMemberships();
         dropLongEnded();
 
         LOGGER.atInfo().log("Quest storage: %s as %s", settings.url(), dialect);
@@ -745,6 +756,7 @@ public class JdbcQuestStorage implements QuestStorage {
         // The link table owns the ids; a copy here could only disagree with it
         PlayerQuestRecord stored = new PlayerQuestRecord(Set.of(), record.getAssignments(), record.getPendingRewards(), record.getCompletions(), record.getTracking());
         stored.setHud(record.getHud());
+        stored.getTeams().putAll(record.getTeams());
         String data = CodecJson.encode(PlayerQuestRecord.CODEC, stored);
         long now = System.currentTimeMillis();
         String letGo = leaving ? ", host = NULL, host_until = NULL" : "";
@@ -907,6 +919,224 @@ public class JdbcQuestStorage implements QuestStorage {
         return record == null ? null : record.quest;
     }
 
+    /**
+     * The version lives in its own column, which the conditional update compares; the document's
+     * copy is overwritten with it on read.
+     */
+    @Nullable
+    @Override
+    public TeamRecord loadTeam(@Nonnull UUID teamId) {
+        return pool.with(connection -> {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT data, version FROM " + teamTable + " WHERE team_id = ?")) {
+                statement.setString(1, teamId.toString());
+
+                try (ResultSet results = statement.executeQuery()) {
+                    if (!results.next()) return null;
+
+                    return decodeTeam(results.getString(1), results.getLong(2));
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean createTeam(@Nonnull TeamRecord team) {
+        String data = CodecJson.encode(TeamRecord.CODEC, team.withVersion(0));
+
+        return teamTransaction(connection -> {
+            try (PreparedStatement select = connection.prepareStatement("SELECT 1 FROM " + teamTable + " WHERE team_id = ?")) {
+                select.setString(1, team.getId().toString());
+                try (ResultSet results = select.executeQuery()) {
+                    if (results.next()) return false;
+                }
+            }
+
+            try (PreparedStatement insert = connection.prepareStatement("INSERT INTO " + teamTable + " (team_id, data, version, updated_at) VALUES (?, ?, 0, ?)")) {
+                insert.setString(1, team.getId().toString());
+                insert.setString(2, data);
+                insert.setLong(3, System.currentTimeMillis());
+                insert.executeUpdate();
+            }
+            replaceTeamMembers(connection, team);
+            return true;
+        });
+    }
+
+    @Override
+    public boolean updateTeam(@Nonnull TeamRecord expected, @Nonnull TeamRecord next) {
+        long version = expected.getVersion() + 1;
+        String data = CodecJson.encode(TeamRecord.CODEC, next.withVersion(version));
+
+        return teamTransaction(connection -> {
+            try (PreparedStatement update = connection.prepareStatement("UPDATE " + teamTable + " SET data = ?, version = ?, updated_at = ? WHERE team_id = ? AND version = ?")) {
+                update.setString(1, data);
+                update.setLong(2, version);
+                update.setLong(3, System.currentTimeMillis());
+                update.setString(4, expected.getId().toString());
+                update.setLong(5, expected.getVersion());
+                boolean written = update.executeUpdate() == 1;
+                if (written) replaceTeamMembers(connection, next);
+                return written;
+            }
+        });
+    }
+
+    @Override
+    public boolean deleteTeam(@Nonnull UUID teamId, long expectedVersion) {
+        return teamTransaction(connection -> {
+            try (PreparedStatement delete = connection.prepareStatement("DELETE FROM " + teamTable + " WHERE team_id = ? AND version = ?")) {
+                delete.setString(1, teamId.toString());
+                delete.setLong(2, expectedVersion);
+                if (delete.executeUpdate() == 1) {
+                    try (PreparedStatement members = connection.prepareStatement("DELETE FROM " + teamMemberTable + " WHERE team_id = ?")) {
+                        members.setString(1, teamId.toString());
+                        members.executeUpdate();
+                    }
+                    return true;
+                }
+            }
+
+            // Nothing deleted: gone already, or written since
+            try (PreparedStatement select = connection.prepareStatement("SELECT 1 FROM " + teamTable + " WHERE team_id = ?")) {
+                select.setString(1, teamId.toString());
+                try (ResultSet results = select.executeQuery()) {
+                    return !results.next();
+                }
+            }
+        });
+    }
+
+    private <T> T teamTransaction(JdbcConnectionPool.SqlWork<T> work) {
+        return pool.inTransaction(connection -> {
+            // The write locks this row until commit, including on SQLite. All team writers use it.
+            try (Statement statement = connection.createStatement()) {
+                if (statement.executeUpdate("UPDATE " + teamGuardTable + " SET revision = revision + 1 WHERE id = 1") != 1)
+                    throw new QuestStorageException("The team write guard is missing");
+            }
+            return work.run(connection);
+        });
+    }
+
+    @Nonnull
+    @Override
+    public List<TeamRecord> loadTeams() {
+        return pool.with(this::readTeams);
+    }
+
+    @Nonnull
+    @Override
+    public List<TeamRecord> loadTeamsForPlayer(@Nonnull UUID playerId) {
+        return pool.with(connection -> readTeamsForPlayer(connection, playerId));
+    }
+
+    private List<TeamRecord> readTeamsForPlayer(Connection connection, UUID playerId) throws SQLException {
+        List<TeamRecord> result = new ArrayList<>();
+        try (PreparedStatement query = connection.prepareStatement("SELECT t.data, t.version FROM " + teamTable + " t JOIN "
+                + teamMemberTable + " m ON m.team_id = t.team_id WHERE m.player_id = ?")) {
+            query.setString(1, playerId.toString());
+            try (ResultSet rows = query.executeQuery()) {
+                while (rows.next()) result.add(decodeTeam(rows.getString(1), rows.getLong(2)));
+            }
+        }
+        return result;
+    }
+
+    private void replaceTeamMembers(Connection connection, TeamRecord team) throws SQLException {
+        try (PreparedStatement delete = connection.prepareStatement("DELETE FROM " + teamMemberTable + " WHERE team_id = ?")) {
+            delete.setString(1, team.getId().toString());
+            delete.executeUpdate();
+        }
+        try (PreparedStatement insert = connection.prepareStatement("INSERT INTO " + teamMemberTable + " (team_id, player_id) VALUES (?, ?)")) {
+            for (UUID player : team.getMembers()) {
+                insert.setString(1, team.getId().toString());
+                insert.setString(2, player.toString());
+                insert.addBatch();
+            }
+            insert.executeBatch();
+        }
+    }
+
+    private void rebuildTeamMemberships() {
+        teamTransaction(connection -> {
+            try (Statement clear = connection.createStatement()) { clear.executeUpdate("DELETE FROM " + teamMemberTable); }
+            for (TeamRecord team : readTeams(connection)) replaceTeamMembers(connection, team);
+            return null;
+        });
+    }
+
+    private List<TeamRecord> readTeams(Connection connection) throws SQLException {
+        List<TeamRecord> result = new ArrayList<>();
+        try (Statement statement = connection.createStatement();
+             ResultSet rows = statement.executeQuery("SELECT data, version FROM " + teamTable)) {
+            while (rows.next()) result.add(decodeTeam(rows.getString(1), rows.getLong(2)));
+        }
+        return result;
+    }
+
+    private TeamRecord decodeTeam(String json, long version) {
+        TeamRecord team = CodecJson.decode(TeamRecord.CODEC, json, "team document");
+        if (team == null) throw new QuestStorageException("Unreadable team document; refusing to discard its membership");
+        return team.withVersion(version);
+    }
+
+    @Nullable
+    @Override
+    public PlayerMessage transactTeams(@Nonnull Function<List<TeamRecord>, TeamTransaction> plan) {
+        return commitTeams(null, null, plan);
+    }
+
+    @Nullable
+    @Override
+    public PlayerMessage transactTeams(@Nonnull UUID playerId, @Nullable UUID destination,
+                                       @Nonnull Function<List<TeamRecord>, TeamTransaction> plan) {
+        return commitTeams(playerId, destination, plan);
+    }
+
+    private PlayerMessage commitTeams(UUID playerId, UUID destination, Function<List<TeamRecord>, TeamTransaction> plan) {
+        return teamTransaction(connection -> {
+            List<TeamRecord> documents = playerId == null ? readTeams(connection) : readTeamsForPlayer(connection, playerId);
+            if (destination != null && documents.stream().noneMatch(team -> team.getId().equals(destination))) {
+                TeamRecord target = loadTeam(destination);
+                if (target != null) documents.add(target);
+            }
+            TeamTransaction transaction = plan.apply(documents);
+            PlayerMessage message = transaction.message();
+            if (transaction.isEmpty()) return null;
+            if (message != null) try (Statement statement = connection.createStatement();
+                 ResultSet row = statement.executeQuery("SELECT revision FROM " + teamGuardTable + " WHERE id = 1")) {
+                row.next();
+                message.getTeam().setRevision(row.getLong(1));
+            }
+            for (TeamRecord team : transaction.teams()) {
+                try (PreparedStatement delete = connection.prepareStatement("DELETE FROM " + teamTable + " WHERE team_id = ?")) {
+                    delete.setString(1, team.getId().toString());
+                    delete.executeUpdate();
+                }
+                try (PreparedStatement insert = connection.prepareStatement("INSERT INTO " + teamTable + " (team_id, data, version, updated_at) VALUES (?, ?, ?, ?)")) {
+                    insert.setString(1, team.getId().toString());
+                    insert.setString(2, CodecJson.encode(TeamRecord.CODEC, team));
+                    insert.setLong(3, team.getVersion());
+                    insert.setLong(4, System.currentTimeMillis());
+                    insert.executeUpdate();
+                }
+                replaceTeamMembers(connection, team);
+            }
+            transaction.added().forEach(this::addToIndex);
+            transaction.removed().forEach(this::removeFromIndex);
+            if (message == null) return null;
+            // Copies and inherited history are committed before the source can be dissolved elsewhere.
+            TeamChangePersistence.restore(this, message.getTeam());
+            try (PreparedStatement insert = connection.prepareStatement("INSERT INTO " + messageTable + " (id, player_id, data, created_at) VALUES (?, ?, ?, ?)")) {
+                insert.setString(1, message.getId().toString());
+                insert.setString(2, message.getPlayerId().toString());
+                insert.setString(3, CodecJson.encode(PlayerMessage.CODEC, message));
+                insert.setLong(4, message.getAt());
+                insert.executeUpdate();
+            }
+            return message;
+        });
+    }
+
     private static void execute(@Nonnull Connection connection, @Nonnull String sql, @Nonnull String argument) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, argument);
@@ -1029,12 +1259,34 @@ public class JdbcQuestStorage implements QuestStorage {
                 + "last_at BIGINT NOT NULL, "
                 + "occasion VARCHAR(255) NOT NULL, "
                 + "PRIMARY KEY (holder_key, assignment_id, quest_asset_id))");
+
+            // Added beside the layout rather than in it: older tables gain it without a new version
+            statement.execute("CREATE TABLE IF NOT EXISTS " + teamTable + " ("
+                + "team_id VARCHAR(36) NOT NULL PRIMARY KEY, "
+                + "data " + text + " NOT NULL, "
+                + "version BIGINT NOT NULL, "
+                + "updated_at BIGINT NOT NULL)");
+            statement.execute("CREATE TABLE IF NOT EXISTS " + teamGuardTable + " (id INTEGER NOT NULL PRIMARY KEY, revision BIGINT NOT NULL)");
+            statement.execute("CREATE TABLE IF NOT EXISTS " + teamMemberTable + " (team_id VARCHAR(36) NOT NULL, player_id VARCHAR(36) NOT NULL, PRIMARY KEY (team_id, player_id))");
+        }
+
+        try (Statement statement = connection.createStatement();
+             ResultSet row = statement.executeQuery("SELECT id FROM " + teamGuardTable + " WHERE id = 1")) {
+            if (!row.next()) {
+                try (Statement insert = connection.createStatement()) {
+                    insert.executeUpdate("INSERT INTO " + teamGuardTable + " (id, revision) VALUES (1, 0)");
+                } catch (SQLException e) {
+                    // Another server may have initialized the same guard after the read.
+                    if (!isDuplicateKey(e)) throw e;
+                }
+            }
         }
 
         createIndex(connection, "idx_" + questPlayerTable + "_player", questPlayerTable, "player_id");
         createIndex(connection, "idx_" + questIndexTable + "_quest", questIndexTable, "quest_id");
         createIndex(connection, "idx_" + questTable + "_asset", questTable, "asset_id");
         createIndex(connection, "idx_" + messageTable + "_player", messageTable, "player_id");
+        createIndex(connection, "idx_" + teamMemberTable + "_player", teamMemberTable, "player_id");
     }
 
     private static void createIndex(@Nonnull Connection connection, @Nonnull String name, @Nonnull String table, @Nonnull String column) {

@@ -477,10 +477,18 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     public void onUnregistered() {}
 
-    /**
-     * Add the player to the quest progression
-     * @return {@code false} if the player already held this quest.
-     */
+    /** Gives a detached codec copy its own identity without emitting events against the source. */
+    public void prepareCopy(@Nonnull UUID copyId, @Nullable UUID parent, @Nullable UUID playerId) {
+        id = copyId;
+        parentId = parent;
+        scope = null;
+        players.clear();
+        if (playerId != null) players.add(playerId);
+        abandonedPlayers.clear();
+        markDirty();
+    }
+
+    /** @return false if the player already held this quest. */
     public boolean addPlayer(@Nonnull UUID playerId) {
         if (!apply(new AbstractQuestProgression.Join(playerId))) return false;
 

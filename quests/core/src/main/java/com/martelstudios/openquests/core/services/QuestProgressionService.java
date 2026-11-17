@@ -171,11 +171,19 @@ public class QuestProgressionService {
      * the quest is over.
      */
     public boolean joinQuest(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId) {
+        return joinQuest(quest, playerId, true);
+    }
+
+    /**
+     * As {@link #joinQuest(AbstractQuestProgression, UUID)}, the constraints asked only when told
+     * to: a team member joins what their team holds whatever the asset says of them.
+     */
+    public boolean joinQuest(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID playerId, boolean checkEligibility) {
         if (quest.getPlayers().contains(playerId)) return false;
         if (quest.isAbandonedBy(playerId) || dataStore.getLive(quest.getId()) == null) return false;
 
         OpenQuestAsset asset = quest.getAsset();
-        if (asset != null && !isEligible(asset, playerId, quest)) return false;
+        if (checkEligibility && asset != null && !isEligible(asset, playerId, quest)) return false;
 
         return quest.addPlayer(playerId);
     }

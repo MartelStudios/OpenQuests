@@ -84,6 +84,7 @@ several ways.
 | | `World` | one quest per world, shared by everyone inside: the world entered, or each open world its own `WorldNamePattern` names |
 | | `Worlds` | one quest shared by a whole group of worlds: those its own `WorldNamePattern` names, or those its trigger happens in |
 | | `Universe` | one quest for the whole server |
+| | `Team` | one quest per team of its `TeamType`, shared by every member online or not: the occasion's player's team, or on a schedule each team with a member online, once |
 | `Repeat` | `Once` (default) | once per occasion |
 | | `AfterEnd` | again on the next occasion once what the last one opened has ended, done, failed or given up |
 | | `Replace` | anew on every occasion, what the last one opened failing if it is still running |
@@ -167,7 +168,7 @@ never depends on it, only the reverse.
 
 A scope sharing a quest writes itself on it as `getScope()`, data the quest never acts on: a
 `QuestScope` registered under a `"Type"` (`World` with its worlds, `Worlds` with its group as well,
-`Universe`), `null` for a quest
+`Universe`, `Team` with its team id), `null` for a quest
 its players hold on their own. Each kind says how a quest it holds is shared, let go of, and
 whether it outlives a world closing, so a shared `GrantQuest` keeps a chain in its scope, a quest leaving for
 good leaves its indexes, and a closing world settles its quests without anything telling the kinds
@@ -202,6 +203,53 @@ runs: they could not be finished before the end of their world, however they wer
 index and its assignment records go with it, and a quest no journal holds is deleted. A crash keeps everything, the world
 being reloaded, and so does a server stop, which removes no world. A quest another open world
 still shares goes on there.
+
+#### Team scope
+One quest per team, shared by every member: a party of friends playing one adventure together,
+or a faction progressing together on an MMO server. A team is of a team type, an asset under
+`Server/OpenQuests/TeamTypes/`:
+
+```json
+{ "NameKey": "openquests.team_type.party", "PersonalTeam": true }
+```
+
+With `PersonalTeam`, every player always has a team of that type, one of their own until they join
+another, created as they connect: a party. Without it, a player has one only once an admin puts
+them in one: a faction. The `party` type ships in the extension jar, so every pack reaches the same
+parties by naming it. A pack redeclaring `party` replaces it, harmless only if the two match; a
+type of a pack's own carries its prefix (`<Mod>_<Name>`).
+
+A team is a stored document (a generated id, a name, an owner, its members in order, pending
+invitations), written over the version it was read at, so servers sharing one storage never lose a
+change. A quest shared with a team is bound to every member, online or not, so the absent are paid
+like the others. Joining a team joins its running quests whatever their constraints say, and pays
+nothing of the past. Leaving takes the player off them; the owner leaving passes ownership to the
+first member left. Leaving a `PersonalTeam` type gives the player a new team of their own holding
+a copy of the running quests, so they go on alone from where they were; one already alone in it
+stays where they are. A team left empty is
+disbanded, its running quests and records with it, which is why joining another team from one the
+player is alone in asks for `--confirm`. A `Shared` `GrantQuest` hands a team chain's follow-ups to
+the same team, once.
+
+Teams are sized for parties and small factions, up to about 50 members. Every shared quest binds
+each member, a member joining binds every running quest, and an ending leaves a message for each
+absent member, so the cost of a quest grows with the team. Servers sharing one storage must run the
+same OpenQuests version: an older one drops the teams from the records it writes and deletes team
+messages unread.
+
+Membership moves, personal quest copies, inherited assignment history and their notification commit
+together in SQL. The disk backend journals the same move and finishes an interrupted write before
+the next team operation or at startup. A player's team cache is rebuilt from authoritative
+membership, not trusted to recover a move after a crash. JDBC keeps a player-to-team index for this
+lookup; the added `team_guard` and `team_member` tables are created alongside existing saves.
+Team commands perform storage work off the world thread and report failures rather than announcing
+a move that never committed. Notifications are retried and ordered so an old one cannot replace a
+newer membership in the player's session.
+
+A connection assignment scoped to `Team` is remembered by that team. Leaving a personal team
+copies this assignment history, so going on alone does not restart its introduction. A new team
+created without inherited history can receive it, and joining another team follows that team's
+running story rather than the joining player's past completions.
 
 ### Storage
 
@@ -675,6 +723,15 @@ Permissions are generated from the plugin and the command path, so `/oquest comp
 `martelstudios.openquestscore.command.oquest.complete`. The whole tree is granted to
 `hytale:WorldEditor` except `/oquest abandon` granted to `hytale:Adventurer`. A player can give up a quest of their own. Each command only ever
 reaches the sender's quests, so the wider group grants nothing over anybody else.
+
+`/oquest team` manages teams. A player, under `hytale:Adventurer`, acts on their own team of a type:
+`invite <type> <player>` and `rename <type> <name>` for its owner, `accept <type> [inviter]
+[--confirm]` for an invitation (listed when several wait), `leave <type>` and `members <type>`.
+`/oquest team admin`, under `hytale:WorldEditor`, acts on anyone's: `create <type> <player> [name]
+[--confirm]`, `join <player> <type> <team> [--confirm]`, `leave <player> <type>` and `members <type>
+<team>`. A `<team>` is a team id, for scripts, or the name of one of its members; a `<player>` is
+any known player, a change for one not online here waiting for their next connection. Invitations
+last `TeamInvitationHours` (24 by default, in `config.json`).
 
 `/ohud show|hide|reset` and `/ohud move [--side=Left|Right] [--offset=N] [--top=N]` change the
 sender's own [tracker](#quest-tracker), granted to `hytale:Adventurer`. `/ohud default` takes the

@@ -1,0 +1,229 @@
+package com.martelstudios.openquests.core.teams;
+
+import com.martelstudios.openquests.core.QuestHarness;
+import com.martelstudios.openquests.core.persistence.TeamRecord;
+import com.martelstudios.openquests.core.persistence.TeamStore;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.time.Duration;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.martelstudios.openquests.core.teams.TestTeamTypes.type;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class TeamsTest {
+    @Test
+    void cleaningAnExpiredPointerDoesNotHideAConcurrentNewInvitation() {
+        UUID teamId = teams.create("party", alice, "Alice", null).getId();
+        teams.invite(teamId, alice, bob);
+        harness.clock().advance(Duration.ofHours(25));
+        TeamStore store = harness.storage();
+        AtomicBoolean renewed = new AtomicBoolean();
+        TeamStore racingRead = new TeamStore() {
+            @Override public TeamRecord loadTeam(UUID id) {
+                TeamRecord stale = store.loadTeam(id);
+                if (id.equals(teamId) && renewed.compareAndSet(false, true)) teams.invite(teamId, alice, bob);
+                return stale;
+            }
+            @Override public boolean createTeam(TeamRecord team) { return store.createTeam(team); }
+            @Override public boolean updateTeam(TeamRecord expected, TeamRecord next) { return store.updateTeam(expected, next); }
+            @Override public boolean deleteTeam(UUID id, long version) { return store.deleteTeam(id, version); }
+            @Override public com.martelstudios.openquests.core.persistence.PlayerMessage transactTeams(java.util.function.Function<List<TeamRecord>, com.martelstudios.openquests.core.persistence.TeamTransaction> plan) {
+                return store.transactTeams(plan);
+            }
+        };
+        Teams reader = new Teams(racingRead, harness.storage(), TeamTypes.of(harness.teamTypes()), harness.clock(), Duration.ofHours(24));
+        reader.invitationsOf(bob, "party");
+        assertTrue(renewed.get());
+        assertEquals(List.of(teamId), teams.invitationsOf(bob, "party").stream().map(TeamRecord::getId).toList());
+    }
+
+    private final UUID alice = UUID.randomUUID();
+    private final UUID bob = UUID.randomUUID();
+    private final UUID carol = UUID.randomUUID();
+
+    private QuestHarness harness;
+    private Teams teams;
+
+    @BeforeEach
+    void open() {
+        harness = new QuestHarness();
+        harness.teamTypes().add(type("party", true));
+        teams = harness.services().getTeams();
+    }
+
+    @AfterEach
+    void close() {
+        harness.close();
+    }
+
+    @Test
+    void aNewTeamIsOwnedByItsCreator() {
+        TeamRecord team = teams.create("party", alice, "Alice", "Alice's team");
+
+        TeamRecord read = teams.get(team.getId());
+        assertEquals(alice, read.getOwner());
+        assertEquals(List.of(alice), read.getMembers());
+        assertEquals("party", read.getType());
+        assertEquals("Alice's team", read.getName());
+    }
+
+    @Test
+    void aMemberIsAppended() {
+        TeamRecord team = teams.create("party", alice, "Alice", "Alice's team");
+
+        teams.addMember(team.getId(), bob);
+
+        assertEquals(List.of(alice, bob), teams.get(team.getId()).getMembers());
+    }
+
+    @Test
+    void theFirstMemberSucceedsTheOwner() {
+        UUID teamId = teams.create("party", alice, "Alice", "Alice's team").getId();
+        teams.addMember(teamId, bob);
+        teams.addMember(teamId, carol);
+
+        TeamRecord left = teams.removeMember(teamId, alice);
+
+        assertEquals(bob, left.getOwner());
+        assertEquals(List.of(bob, carol), left.getMembers());
+        assertEquals(left.getMembers(), teams.get(teamId).getMembers());
+    }
+
+    @Test
+    void theLastMemberLeavingDeletesTheTeam() {
+        UUID teamId = teams.create("party", alice, "Alice", "Alice's team").getId();
+
+        assertNull(teams.removeMember(teamId, alice));
+        assertNull(teams.get(teamId));
+    }
+
+    @Test
+    void onlyTheOwnerInvitesAndRenames() {
+        UUID teamId = teams.create("party", alice, "Alice", "Alice's team").getId();
+        teams.addMember(teamId, bob);
+
+        assertThrows(IllegalArgumentException.class, () -> teams.invite(teamId, bob, carol));
+        assertThrows(IllegalArgumentException.class, () -> teams.rename(teamId, bob, "Bob's"));
+
+        teams.invite(teamId, alice, carol);
+        teams.rename(teamId, alice, "The Three");
+        assertEquals("The Three", teams.get(teamId).getName());
+        assertEquals(List.of(teamId), teams.invitationsOf(carol, "party").stream().map(TeamRecord::getId).toList());
+    }
+
+    @Test
+    void anInvitationExpires() {
+        UUID teamId = teams.create("party", alice, "Alice", "Alice's team").getId();
+        teams.invite(teamId, alice, bob);
+
+        harness.clock().advance(Duration.ofHours(25));
+
+        assertTrue(teams.invitationsOf(bob, "party").isEmpty());
+    }
+
+    @Test
+    void anEmptiedTeamTakesNoMember() {
+        UUID teamId = teams.create("party", alice, "Alice", "Alice's team").getId();
+        TeamRecord read = teams.get(teamId);
+        // Emptied by another server that has not deleted it yet
+        harness.storage().updateTeam(read, read.withMembers(List.of()));
+
+        assertThrows(IllegalArgumentException.class, () -> teams.addMember(teamId, bob));
+    }
+
+    @Test
+    void aMemberWhoJoinedAsTheTeamEmptiedIsKept() {
+        TeamStore store = harness.storage();
+        TeamStore joinedBeforeTheDelete = new TeamStore() {
+            @Nullable
+            @Override
+            public TeamRecord loadTeam(@Nonnull UUID teamId) {
+                return store.loadTeam(teamId);
+            }
+
+            @Override
+            public boolean createTeam(@Nonnull TeamRecord team) {
+                return store.createTeam(team);
+            }
+
+            @Override
+            public boolean updateTeam(@Nonnull TeamRecord expected, @Nonnull TeamRecord next) {
+                return store.updateTeam(expected, next);
+            }
+
+            /**
+             * Bob joins on another server between the write that emptied the team and its deletion.
+             */
+            @Override
+            public boolean deleteTeam(@Nonnull UUID teamId, long expectedVersion) {
+                TeamRecord emptied = store.loadTeam(teamId);
+                store.updateTeam(emptied, emptied.withMembers(List.of(bob)));
+                return store.deleteTeam(teamId, expectedVersion);
+            }
+        };
+        Teams racing = new Teams(joinedBeforeTheDelete, harness.storage(), TeamTypes.of(harness.teamTypes()), harness.clock(), Duration.ofHours(24));
+        UUID teamId = racing.create("party", alice, "Alice", "Alice's team").getId();
+
+        TeamRecord left = racing.removeMember(teamId, alice);
+
+        assertEquals(List.of(bob), left.getMembers());
+        assertEquals(List.of(bob), teams.get(teamId).getMembers());
+    }
+
+    @Test
+    void aLostWriteIsRetried() {
+        AtomicBoolean lost = new AtomicBoolean();
+        TeamStore store = harness.storage();
+        TeamStore losingOnce = new TeamStore() {
+            @Override
+            public com.martelstudios.openquests.core.persistence.PlayerMessage transactTeams(java.util.function.Function<List<TeamRecord>, com.martelstudios.openquests.core.persistence.TeamTransaction> plan) {
+                return store.transactTeams(plan);
+            }
+            @Nullable
+            @Override
+            public TeamRecord loadTeam(@Nonnull UUID teamId) {
+                return store.loadTeam(teamId);
+            }
+
+            @Override
+            public boolean createTeam(@Nonnull TeamRecord team) {
+                return store.createTeam(team);
+            }
+
+            /**
+             * Another server's rename lands first, as if it had written between the read and this write.
+             */
+            @Override
+            public boolean updateTeam(@Nonnull TeamRecord expected, @Nonnull TeamRecord next) {
+                if (lost.compareAndSet(false, true)) {
+                    store.updateTeam(expected, expected.withName("Renamed elsewhere"));
+                    return false;
+                }
+                return store.updateTeam(expected, next);
+            }
+
+            @Override
+            public boolean deleteTeam(@Nonnull UUID teamId, long expectedVersion) {
+                return store.deleteTeam(teamId, expectedVersion);
+            }
+        };
+        Teams retrying = new Teams(losingOnce, harness.storage(), TeamTypes.of(harness.teamTypes()), harness.clock(), Duration.ofHours(24));
+        UUID teamId = retrying.create("party", alice, "Alice", "Alice's team").getId();
+
+        retrying.addMember(teamId, bob);
+
+        TeamRecord read = teams.get(teamId);
+        assertEquals(List.of(alice, bob), read.getMembers());
+        assertEquals("Renamed elsewhere", read.getName());
+    }
+}

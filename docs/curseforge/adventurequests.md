@@ -28,6 +28,8 @@ Over 150 quests in English and French, across ten chapters and eighteen village 
 
 ⛓️ **Then a chain that hands itself along.** Tools, a workbench, then **Choose your weapon**: four crude weapons, any one of which ends it.
 
+🤝 **Play it as a party.** The story, from the introduction to the Forgotten Temple, is shared by your party: invite friends with <code>/oquest team invite party <player></code> and every step counts for all of you.
+
 ### 🏛️ The Forgotten Temple
 
 💀 **Defeat the Guardian** fails the moment you die, and hands itself straight back: try again. Then enter the temple and **talk to the merchant**: he sets you the temple's trial, and still opens his stall on request.

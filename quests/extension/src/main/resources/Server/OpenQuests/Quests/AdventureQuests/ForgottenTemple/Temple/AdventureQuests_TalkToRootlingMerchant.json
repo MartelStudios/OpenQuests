@@ -18,6 +18,7 @@
     },
     {
       "Type": "GrantQuest",
+      "Shared": true,
       "QuestAssetIds": [
         "AdventureQuests_TempleStatue"
       ],

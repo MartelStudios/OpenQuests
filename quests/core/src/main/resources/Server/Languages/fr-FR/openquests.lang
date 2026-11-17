@@ -1,3 +1,23 @@
 quest.default.title = Quête sans titre
 commands.argtype.quest.name = Asset de quête
 commands.argtype.quest.usage = L'identifiant d'un asset de quête OpenQuests
+commands.argtype.team_type.name = Type d'équipe
+commands.argtype.team_type.usage = L'identifiant d'un type d'équipe OpenQuests
+team.default_name = Équipe de {player}
+commands.team.none = Vous n'avez pas d'équipe de ce type.
+commands.team.player_none = {player} n'a pas d'équipe de ce type.
+commands.team.not_owner = Seul le propriétaire de {team} peut faire cela.
+commands.team.invited = {player} est invité dans {team} pour {hours, number} heures.
+commands.team.no_invitation = Aucune invitation dans une équipe de ce type n'attend.
+commands.team.several_invitations = Plusieurs invitations attendent, nommez qui vous invite :
+commands.team.invitation = {inviter} vous invite dans {team}, {hours, number} heures restantes
+commands.team.would_lose = Quitter {team} la dissout et perd ses quêtes en cours. Ajoutez --confirm pour continuer.
+commands.team.joined = {player} a rejoint {team}.
+commands.team.left = {player} a quitté son équipe de ce type.
+commands.team.renamed = L'équipe s'appelle désormais {team}.
+commands.team.created = {team} ({id}) créée pour {player}.
+commands.team.unknown = Aucune équipe ne correspond à {team}.
+commands.team.wrong_type = Cette équipe est d'un autre type.
+commands.team.members = {team} ({id}), propriétaire {owner} : {members}
+
+commands.team.failed = L'op�ration sur l'�quipe n'a pas pu aboutir. R�essayez.

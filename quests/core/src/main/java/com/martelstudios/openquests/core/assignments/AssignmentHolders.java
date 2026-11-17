@@ -2,6 +2,8 @@ package com.martelstudios.openquests.core.assignments;
 
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.scopes.ScopeServices;
+import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
+import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
@@ -76,6 +78,14 @@ public final class AssignmentHolders {
     }
 
     /**
+     * @return {@code team:<uuid>}.
+     */
+    @Nonnull
+    public static String teamKey(@Nonnull UUID teamId) {
+        return TeamQuestService.key(teamId);
+    }
+
+    /**
      * @param player the player's components, written on the thread the occasion came on
      */
     @Nonnull
@@ -105,5 +115,13 @@ public final class AssignmentHolders {
     @Nonnull
     public AssignmentHolder universe(@Nullable UUID joining) {
         return new SharedAssignmentHolder(progression, scopes, records, universeKey(), UniverseQuestScope.INSTANCE, joining);
+    }
+
+    /**
+     * @param joining the member still connecting, handed what is created on their way in
+     */
+    @Nonnull
+    public AssignmentHolder team(@Nonnull UUID teamId, @Nullable UUID joining) {
+        return new SharedAssignmentHolder(progression, scopes, records, teamKey(teamId), new TeamQuestScope(teamId), joining);
     }
 }

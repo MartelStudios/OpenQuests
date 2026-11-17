@@ -68,4 +68,12 @@ public final class SharedAssignmentRecords {
     public void forget(@Nonnull String holderKey) {
         byHolder.remove(holderKey);
     }
+
+    /**
+     * Drops a holder gone for good, its records deleted from the store too.
+     */
+    public void delete(@Nonnull String holderKey) {
+        byHolder.remove(holderKey);
+        storage.deleteAssignments(holderKey);
+    }
 }

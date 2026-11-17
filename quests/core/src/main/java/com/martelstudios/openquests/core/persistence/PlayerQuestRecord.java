@@ -40,6 +40,8 @@ public class PlayerQuestRecord {
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Hud", HudSettings.CODEC), (record, hud) -> record.hud = hud, record -> record.hud.isEmpty() ? null : record.hud)
                                                                             .add()
+                                                                            .append(new KeyedCodec<>("Teams", new MapCodec<>(Codec.UUID_STRING, HashMap<String, UUID>::new)), (record, teams) -> record.teams.putAll(teams), record -> record.teams.isEmpty() ? null : record.teams)
+                                                                            .add()
                                                                             .build();
 
     private final Set<UUID> questIds = new HashSet<>();
@@ -60,6 +62,11 @@ public class PlayerQuestRecord {
      */
     @Nonnull
     private HudSettings hud = HudSettings.NONE;
+
+    /**
+     * The id of the player's team of each team type, by type: a cache of the team documents, checked at connection.
+     */
+    private final Map<String, UUID> teams = new HashMap<>();
 
     public PlayerQuestRecord() {}
 
@@ -123,6 +130,14 @@ public class PlayerQuestRecord {
         return hud;
     }
 
+    /**
+     * @return the live map of the team the player belongs to in each team type, by type.
+     */
+    @Nonnull
+    public Map<String, UUID> getTeams() {
+        return teams;
+    }
+
     public void setHud(@Nonnull HudSettings hud) {
         this.hud = hud;
     }
@@ -164,6 +179,6 @@ public class PlayerQuestRecord {
      * backend may answer without having anything written down.
      */
     public boolean isEmpty() {
-        return questIds.isEmpty() && assignments.isEmpty() && pendingRewards.isEmpty() && completions.isEmpty() && tracking.isEmpty() && hud.isEmpty();
+        return questIds.isEmpty() && assignments.isEmpty() && pendingRewards.isEmpty() && completions.isEmpty() && tracking.isEmpty() && hud.isEmpty() && teams.isEmpty();
     }
 }

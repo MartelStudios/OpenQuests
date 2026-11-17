@@ -59,6 +59,19 @@ public class QuestStoreComponent implements Component<EntityStore> {
     private volatile HudSettings hud = HudSettings.NONE;
 
     /**
+     * The id of this player's team of each team type, by type, as their record caches it.
+     */
+    private final Map<String, UUID> teams = new ConcurrentHashMap<>();
+    private final Map<String, Long> teamRevisions = new ConcurrentHashMap<>();
+
+    /** Rejects a delayed cache update after a newer committed move already reached this session. */
+    public synchronized boolean acceptTeamRevision(@Nonnull String type, long revision) {
+        if (revision > 0 && revision <= teamRevisions.getOrDefault(type, 0L)) return false;
+        if (revision > 0) teamRevisions.put(type, revision);
+        return true;
+    }
+
+    /**
      * Set when something here changed and the player's record is owed a write.
      */
     private transient boolean dirty;
@@ -73,6 +86,8 @@ public class QuestStoreComponent implements Component<EntityStore> {
         this.completions.putAll(other.completions);
         this.tracking.putAll(other.tracking);
         this.hud = other.hud;
+        this.teams.putAll(other.teams);
+        this.teamRevisions.putAll(other.teamRevisions);
         this.dirty = other.dirty;
     }
 
@@ -176,17 +191,34 @@ public class QuestStoreComponent implements Component<EntityStore> {
     }
 
     /**
+     * @return the team this player belongs to in each team type, by type, for their record.
+     */
+    @Nonnull
+    public Map<String, UUID> getTeams() {
+        return Map.copyOf(teams);
+    }
+
+    /**
+     * @param teamId {@code null} for no team of that type.
+     */
+    public void setTeam(@Nonnull String type, @Nullable UUID teamId) {
+        UUID before = teamId == null ? teams.remove(type) : teams.put(type, teamId);
+        if (!Objects.equals(before, teamId)) markDirty();
+    }
+
+    /**
      * Takes over what was read back for this player, which is how a session starts.
      *
      * @param questIds the quests that answered, not the ids their record listed, so a dead id is
      * dropped here rather than carried another session.
      */
-    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Map<String, QuestCompletions> completions, @Nonnull Map<UUID, Boolean> tracking, @Nonnull HudSettings hud) {
+    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Map<String, QuestCompletions> completions, @Nonnull Map<UUID, Boolean> tracking, @Nonnull HudSettings hud, @Nonnull Map<String, UUID> teams) {
         quests.replaceAll(questIds);
         this.assignments.replaceAll(assignments);
         this.completions.putAll(completions);
         this.tracking.putAll(tracking);
         this.hud = hud;
+        this.teams.putAll(teams);
         dirty = false;
     }
 

@@ -1,0 +1,13 @@
+{
+  "Trigger": {
+    "Type": "PlayerConnect"
+  },
+  "Scope": {
+    "Type": "Team",
+    "TeamType": "party"
+  },
+  "QuestAssetIds": [
+    "AdventureQuests_Intro",
+    "AdventureQuests_SkipIntro"
+  ]
+}

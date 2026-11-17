@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.core.scopes;
 
+import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
@@ -13,7 +14,9 @@ import javax.annotation.Nonnull;
  * @param universe the quests the whole server shares
  * @param worlds the quests of each world
  * @param worldGroups the quests of each group of worlds
+ * @param teams the quests of each team
  */
 public record ScopeServices(@Nonnull UniverseQuestService universe,
                             @Nonnull WorldQuestService worlds,
-                            @Nonnull WorldGroupIndex worldGroups) {}
+                            @Nonnull WorldGroupIndex worldGroups,
+                            @Nonnull TeamQuestService teams) {}

@@ -19,6 +19,7 @@
   "SuccessfulRewards": [
     {
       "Type": "GrantQuest",
+      "Shared": true,
       "QuestAssetIds": [
         "AdventureQuests_EnterForgottenTemple"
       ],
@@ -28,6 +29,7 @@
   "FailedRewards": [
     {
       "Type": "GrantQuest",
+      "Shared": true,
       "QuestAssetIds": [
         "AdventureQuests_DefeatForgottenTempleGuardian"
       ],

@@ -3,8 +3,6 @@
     "Type": "PlayerConnect"
   },
   "QuestAssetIds": [
-    "AdventureQuests_Intro",
-    "AdventureQuests_SkipIntro",
     "AdventureQuests_GatherMeat",
     "AdventureQuests_RunNovice",
     "AdventureQuests_SprintNovice",

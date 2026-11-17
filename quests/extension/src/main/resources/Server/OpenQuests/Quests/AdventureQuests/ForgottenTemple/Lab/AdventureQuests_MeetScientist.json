@@ -15,6 +15,7 @@
   "SuccessfulRewards": [
     {
       "Type": "GrantQuest",
+      "Shared": true,
       "QuestAssetIds": [
         "AdventureQuests_LabGateway"
       ],

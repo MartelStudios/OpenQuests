@@ -17,6 +17,7 @@ import com.martelstudios.openquests.core.assignments.repeat.OnceRepeat;
 import com.martelstudios.openquests.core.assignments.repeat.ReplaceRepeat;
 import com.martelstudios.openquests.core.assignments.scope.AssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.PlayerAssignmentScope;
+import com.martelstudios.openquests.core.assignments.scope.TeamAssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.UniverseAssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.WorldAssignmentScope;
 import com.martelstudios.openquests.core.assignments.scope.WorldsAssignmentScope;
@@ -40,11 +41,14 @@ import com.martelstudios.openquests.core.persistence.disk.DiskQuestStorageProvid
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorageProvider;
 import com.martelstudios.openquests.core.rewards.stores.PendingRewardStoreComponent;
+import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestScope;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
+import com.martelstudios.openquests.core.teams.TeamTypes;
 import com.martelstudios.openquests.core.utils.ServerPlayers;
 
 import javax.annotation.Nonnull;
@@ -53,7 +57,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
+import java.time.Duration;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -104,13 +111,26 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
             getEntityStoreRegistry().registerComponent(QuestStoreComponent.class, QuestStoreComponent::new),
             getEntityStoreRegistry().registerComponent(PendingRewardStoreComponent.class, PendingRewardStoreComponent::new));
 
-        Platform platform = new Platform(HytaleServer.get().getEventBus(), Clock.systemUTC(), HytaleServer.SCHEDULED_EXECUTOR, new ServerPlayers(), components);
-        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), platform);
+        Platform platform = new Platform(HytaleServer.get().getEventBus(), Clock.systemUTC(), HytaleServer.SCHEDULED_EXECUTOR, new ServerPlayers(), components, new TeamTypes() {
+            @Override
+            public OpenQuestTeamType get(@Nonnull String id) {
+                return OpenQuestTeamType.getAsset(id);
+            }
+
+            @Nonnull
+            @Override
+            public Collection<OpenQuestTeamType> all() {
+                // A copy, as a pack reload replaces the map while a caller walks it
+                return List.copyOf(OpenQuestTeamType.getAssetStore().getAssetMap().getAssetMap().values());
+            }
+        });
+        services = new OpenQuestsServices(questStorage, settings.getSyncSeconds(), Duration.ofHours(settings.getTeamInvitationHours()), platform);
         services.install();
 
         QuestScope.CODEC.register(WorldQuestScope.TYPE, WorldQuestScope.class, WorldQuestScope.CODEC);
         QuestScope.CODEC.register(WorldsQuestScope.TYPE, WorldsQuestScope.class, WorldsQuestScope.CODEC);
         QuestScope.CODEC.register(UniverseQuestScope.TYPE, UniverseQuestScope.class, UniverseQuestScope.CODEC);
+        QuestScope.CODEC.register(TeamQuestScope.TYPE, TeamQuestScope.class, TeamQuestScope.CODEC);
 
         AssignmentTrigger.CODEC.register(PlayerConnectTrigger.TYPE, PlayerConnectTrigger.class, PlayerConnectTrigger.CODEC);
         AssignmentTrigger.CODEC.register(PlayerEnterWorldTrigger.TYPE, PlayerEnterWorldTrigger.class, PlayerEnterWorldTrigger.CODEC);
@@ -119,6 +139,7 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
         AssignmentScope.CODEC.register(WorldAssignmentScope.TYPE, WorldAssignmentScope.class, WorldAssignmentScope.CODEC);
         AssignmentScope.CODEC.register(WorldsAssignmentScope.TYPE, WorldsAssignmentScope.class, WorldsAssignmentScope.CODEC);
         AssignmentScope.CODEC.register(UniverseAssignmentScope.TYPE, UniverseAssignmentScope.class, UniverseAssignmentScope.CODEC);
+        AssignmentScope.CODEC.register(TeamAssignmentScope.TYPE, TeamAssignmentScope.class, TeamAssignmentScope.CODEC);
         AssignmentRepeat.CODEC.register(OnceRepeat.TYPE, OnceRepeat.class, OnceRepeat.CODEC);
         AssignmentRepeat.CODEC.register(AfterEndRepeat.TYPE, AfterEndRepeat.class, AfterEndRepeat.CODEC);
         AssignmentRepeat.CODEC.register(ReplaceRepeat.TYPE, ReplaceRepeat.class, ReplaceRepeat.CODEC);
@@ -133,6 +154,12 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
                                                     .setKeyFunction(OpenQuestCategory::getId)
                                                     .build());
 
+        getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestTeamType.class, new DefaultAssetMap<>())
+                                                    .setPath("OpenQuests/TeamTypes/")
+                                                    .setCodec(OpenQuestTeamType.CODEC)
+                                                    .setKeyFunction(OpenQuestTeamType::getId)
+                                                    .build());
+
         // After the categories, items and stats, which the quests name and are checked against, even from the same pack
         getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestAsset.class, new DefaultAssetMap<>())
                                                     .setPath("OpenQuests/Quests/")
@@ -141,12 +168,12 @@ public class OpenQuestsCorePlugin extends JavaPlugin {
                                                     .loadsAfter(OpenQuestCategory.class, Item.class, EntityStatType.class)
                                                     .build());
 
-        // After the quests, which the assignments name and are checked against
+        // After the quests and the team types, which the assignments name and are checked against
         getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestAssignment.class, new DefaultAssetMap<>())
                                                     .setPath("OpenQuests/Assignments/")
                                                     .setCodec(OpenQuestAssignment.CODEC)
                                                     .setKeyFunction(OpenQuestAssignment::getId)
-                                                    .loadsAfter(OpenQuestAsset.class)
+                                                    .loadsAfter(OpenQuestAsset.class, OpenQuestTeamType.class)
                                                     .build());
 
         getAssetRegistry().register(HytaleAssetStore.builder(OpenQuestChapterGroup.class, new DefaultAssetMap<>())

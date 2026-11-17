@@ -48,6 +48,13 @@ public final class TestPlayers implements Players {
     }
 
     /**
+     * Brings a known player back online, their components as they left them.
+     */
+    public void connect(@Nonnull UUID playerId) {
+        online.add(playerId);
+    }
+
+    /**
      * Takes the player off the server, their components kept as stored data.
      */
     public void disconnect(@Nonnull UUID playerId) {

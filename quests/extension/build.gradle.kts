@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.util.PatternSet
 import java.util.zip.ZipFile
 
 plugins {
@@ -67,11 +68,17 @@ tasks.named<Jar>("jar") {
 // their own, so a server owner keeps the quest types and drops the example chain by deleting one file.
 val questExamples = listOf("Server/OpenQuests/**", "Server/OpenDialogues/**", "Server/Item/**", "Common/Icons/AdventureQuests/**", "Server/Languages/*/adventurequests/**")
 
+// Team types every pack may reference, so they ship with the jar rather than the example pack
+val keptInJar = listOf("Server/OpenQuests/TeamTypes/**")
+val questContent = PatternSet().include(questExamples).exclude(keptInJar)
+
 // Only the published jar loses them: stageAllModAssets and prepareRunServer link the dev run
 // against src/main/resources rather than this output, so runAllMods keeps the quests, and keeps
 // them editable live. Installing the pack into run/mods would just load the same assets twice.
 tasks.named<Copy>("processResources") {
-    exclude(questExamples)
+    // Files only: an include pattern also matches its parent folders, which would empty the jar
+    exclude { !it.isDirectory && questContent.asSpec.isSatisfiedBy(it) }
+    includeEmptyDirs = false
 }
 
 val questExamplesManifest by tasks.registering {
@@ -122,6 +129,7 @@ val questExamplesZip by tasks.registering(Zip::class) {
     from(questExamplesManifest)
     from("src/main/resources") {
         include(questExamples)
+        exclude(keptInJar)
     }
 }
 
@@ -155,7 +163,7 @@ val verifyReleaseArtifacts by tasks.registering {
     )
 
     val resourcesRoot = file("src/main/resources")
-    val questSources = fileTree(resourcesRoot) { include(questExamples) }
+    val questSources = fileTree(resourcesRoot) { include(questExamples); exclude(keptInJar) }
 
     doLast {
         published.forEach { (glob, artifacts) ->

@@ -105,7 +105,7 @@ public class QuestRewardService {
         if (personal.isEmpty()) return;
 
         QuestReward[] rewards = personal.toArray(PendingRewards.NO_REWARDS);
-        for (UUID playerId : quest.getPlayers()) {
+        for (UUID playerId : questCompletedEvent.recipients(() -> services.getTeamQuestService().completionPlayers(quest))) {
             owe(playerId, new PendingRewards(quest, rewards));
         }
     }

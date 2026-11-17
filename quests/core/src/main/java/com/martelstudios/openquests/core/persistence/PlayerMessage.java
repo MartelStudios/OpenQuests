@@ -6,6 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.rewards.models.PendingRewards;
+import com.martelstudios.openquests.core.teams.TeamChange;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,8 +14,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Something a server leaves a player it does not host: a debt to pay them, or how a quest ended
- * for them. The server hosting the player, now or next, takes it into their record.
+ * Something a server leaves a player it does not host: a debt to pay them, how a quest ended
+ * for them, or a team change. The server hosting the player, now or next, takes it into their record.
  */
 public final class PlayerMessage {
 
@@ -29,6 +30,8 @@ public final class PlayerMessage {
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Ended", Ending.CODEC), (message, ending) -> message.ending = ending, message -> message.ending)
                                                                          .add()
+                                                                         .append(new KeyedCodec<>("Team", TeamChange.CODEC), (message, team) -> message.team = team, message -> message.team)
+                                                                         .add()
                                                                          .build();
 
     private UUID id;
@@ -42,6 +45,9 @@ public final class PlayerMessage {
 
     @Nullable
     private Ending ending;
+
+    @Nullable
+    private TeamChange team;
 
     private PlayerMessage() {}
 
@@ -63,6 +69,26 @@ public final class PlayerMessage {
         PlayerMessage message = create(playerId);
         message.ending = new Ending(assetId, outcome, startedAt, completedAt);
         return message;
+    }
+
+    /**
+     * @return a message telling the player's record of a team change whose documents and quests
+     * were written already.
+     */
+    @Nonnull
+    public static PlayerMessage team(@Nonnull UUID playerId, @Nonnull TeamChange change) {
+        PlayerMessage message = create(playerId);
+        message.team = change;
+        return message;
+    }
+
+    /**
+     * @return the team change it carries, {@code null} for any other message. Applied on the
+     * player's thread, never through {@link #applyTo}.
+     */
+    @Nullable
+    public TeamChange getTeam() {
+        return team;
     }
 
     /**

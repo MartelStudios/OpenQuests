@@ -14,6 +14,7 @@
   "SuccessfulRewards": [
     {
       "Type": "GrantQuest",
+      "Shared": true,
       "QuestAssetIds": [
         "AdventureQuests_GuardTaleRevenant",
         "AdventureQuests_GuardTaleGlutton",

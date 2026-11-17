@@ -41,4 +41,10 @@ public interface AssignmentTargets {
      * created now to them
      */
     void universe(@Nullable UUID joining);
+
+    /**
+     * The occasion's player stands for their team of that type; without a player, every team of
+     * that type with a member online here is reached, each once.
+     */
+    void team(@Nonnull String teamType, @Nonnull Occasion occasion);
 }
