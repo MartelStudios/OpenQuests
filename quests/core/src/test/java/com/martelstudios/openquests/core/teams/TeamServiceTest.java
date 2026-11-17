@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -197,6 +198,18 @@ class TeamServiceTest {
         assertEquals(own, questStore(alice).getTeams().get("party"));
         assertEquals(List.of(alice), teams.get(own).getMembers());
         assertTrue(quest.getPlayers().contains(alice));
+    }
+
+    @Test
+    void anOnlineChangeThatFailsLeavesThePlayerWhereTheyWere() {
+        UUID own = party(alice);
+        UUID bobs = party(bob);
+        TeamRecord read = teams.get(bobs);
+        harness.storage().updateTeam(read, read.withMembers(List.of()));
+
+        assertDoesNotThrow(() -> service.change(alice, "Alice", "party", bobs));
+
+        assertEquals(own, questStore(alice).getTeams().get("party"));
     }
 
     @Test

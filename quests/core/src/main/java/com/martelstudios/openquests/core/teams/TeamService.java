@@ -2,6 +2,7 @@ package com.martelstudios.openquests.core.teams;
 
 import com.hypixel.hytale.event.IEventBus;
 import com.hypixel.hytale.event.IEventRegistry;
+import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.martelstudios.openquests.core.assignments.QuestAssignmentService;
@@ -33,6 +34,7 @@ import java.util.UUID;
  * the teams share on the other, and the player's record caching which teams they are in.
  */
 public class TeamService {
+    private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
 
     private final Teams teams;
     private final TeamQuestService teamQuests;
@@ -164,15 +166,20 @@ public class TeamService {
      * @throws IllegalArgumentException for a team that is gone.
      */
     public void change(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull String type, @Nullable UUID to) {
+        if (to != null && teams.get(to) == null) throw new IllegalArgumentException("No team " + to);
+
         if (players.isOnline(playerId)) {
+            // Runs on the player's thread after the caller returned: nobody else would see it fail
             players.update(playerId, player -> {
-                if (to == null) leave(playerId, playerName, player, type);
-                else join(playerId, player, to);
+                try {
+                    if (to == null) leave(playerId, playerName, player, type);
+                    else join(playerId, player, to);
+                } catch (RuntimeException e) {
+                    LOGGER.atWarning().withCause(e).log("Could not move player %s to team %s", playerId, to);
+                }
             });
             return;
         }
-
-        if (to != null && teams.get(to) == null) throw new IllegalArgumentException("No team " + to);
 
         UUID from = absentTeamOf(playerId, type);
         if (Objects.equals(from, to)) return;
@@ -287,7 +294,15 @@ public class TeamService {
      * team. A departure runs before that service closes the session it reads.
      */
     public void listen(@Nonnull IEventRegistry events) {
-        events.registerGlobal(PlayerConnectEvent.class, event -> onConnect(event.getPlayerRef().getUuid(), event.getPlayerRef().getUsername(), EntityComponents.of(event.getHolder())));
+        events.registerGlobal(PlayerConnectEvent.class, event -> {
+            UUID playerId = event.getPlayerRef().getUuid();
+            try {
+                onConnect(playerId, event.getPlayerRef().getUsername(), EntityComponents.of(event.getHolder()));
+            } catch (RuntimeException e) {
+                // A storage error must not stop the connection; the teams are checked again next time
+                LOGGER.atWarning().withCause(e).log("Could not check the teams of connecting player %s", playerId);
+            }
+        });
         events.registerGlobal(PlayerDisconnectEvent.class, event -> onDisconnect(event.getPlayerRef().getUuid()));
     }
 
