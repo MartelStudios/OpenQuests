@@ -17,6 +17,7 @@ import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.sync.QuestSyncService;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.utils.Players;
 
@@ -47,10 +48,11 @@ public class TeamService {
     private final QuestCopier copier;
     private final IEventBus events;
     private final QuestStorage storage;
+    private final QuestSyncService sync;
 
     public TeamService(@Nonnull Teams teams, @Nonnull TeamQuestService teamQuests, @Nonnull TeamTypes types, @Nonnull PlayerComponentTypes components,
                        @Nonnull QuestPlayerStateService playerState, @Nonnull Players players, @Nonnull ScopeIndexes indexes, @Nonnull QuestAssignmentService assignments,
-                       @Nonnull QuestCopier copier, @Nonnull IEventBus events, @Nonnull QuestStorage storage) {
+                       @Nonnull QuestCopier copier, @Nonnull IEventBus events, @Nonnull QuestStorage storage, @Nonnull QuestSyncService sync) {
         this.teams = teams;
         this.teamQuests = teamQuests;
         this.types = types;
@@ -62,6 +64,7 @@ public class TeamService {
         this.copier = copier;
         this.events = events;
         this.storage = storage;
+        this.sync = sync;
     }
 
     /**
@@ -94,6 +97,7 @@ public class TeamService {
 
         UUID teamId = teams.create(type, playerId, playerName, name).getId();
         questStore(player).setTeam(type, teamId);
+        saveSoon(playerId);
         dispatch(new TeamJoinedEvent(playerId, teamId));
         return teamId;
     }
@@ -266,13 +270,23 @@ public class TeamService {
             assignments.deleteHolder(TeamQuestService.key(teamId));
         }
         questStore(player).setTeam(type, null);
+        saveSoon(playerId);
         dispatch(new TeamLeftEvent(playerId, teamId));
     }
 
     private void enter(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull String type, @Nonnull UUID teamId) {
         questStore(player).setTeam(type, teamId);
+        saveSoon(playerId);
         teamQuests.joinRunningQuests(teamId, playerId);
         dispatch(new TeamJoinedEvent(playerId, teamId));
+    }
+
+    /**
+     * The record is the only way back from a player to their teams: written now, off this thread,
+     * so a crash before the save pass cannot leave them in a team that no longer lists them.
+     */
+    private void saveSoon(@Nonnull UUID playerId) {
+        sync.execute("the teams of player " + playerId, () -> playerState.saveNow(playerId));
     }
 
     @Nonnull
@@ -349,6 +363,7 @@ public class TeamService {
                 questStore.setTeam(type.getId(), teams.create(type.getId(), playerId, playerName, null).getId());
             }
         }
+        saveSoon(playerId);
 
         for (UUID teamId : questStore.getTeams().values()) {
             teamQuests.joinRunningQuests(teamId, playerId);

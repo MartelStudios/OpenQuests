@@ -167,6 +167,15 @@ public class QuestPlayerStateService {
     }
 
     /**
+     * Writes a hosted player out now rather than at the next save pass: their record is the only
+     * way back to their teams, which a crash in between would lose.
+     */
+    public void saveNow(@Nonnull UUID playerId) {
+        Session session = sessions.get(playerId);
+        if (session != null) save(playerId, session, false, false);
+    }
+
+    /**
      * Writes a player record and the quests it names together: written apart, one can name a quest
      * the other never stored.
      *

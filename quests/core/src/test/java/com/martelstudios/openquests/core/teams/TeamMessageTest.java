@@ -140,6 +140,25 @@ class TeamMessageTest {
         assertEquals(bobs, questStore(alice).getTeams().get("party"));
     }
 
+    @Test
+    void aNewPersonalTeamIsWrittenAtOnce() {
+        connect(alice, "Alice");
+        harness.settle();
+
+        assertEquals(party(alice), harness.storage().loadPlayer(alice).getTeams().get("party"));
+    }
+
+    @Test
+    void aJoinIsWrittenAtOnce() {
+        connect(alice, "Alice");
+        UUID bobs = party(bob);
+
+        service.join(alice, harness.players().of(alice), bobs);
+        harness.settle();
+
+        assertEquals(bobs, harness.storage().loadPlayer(alice).getTeams().get("party"));
+    }
+
     @Nonnull
     private QuestPlayerStateService playerState() {
         return harness.services().getQuestPlayerStateService();
