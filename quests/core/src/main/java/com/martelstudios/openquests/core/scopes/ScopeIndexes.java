@@ -133,8 +133,10 @@ public class ScopeIndexes {
      * storage, the deletion written in order with the rest.
      */
     public void delete(@Nonnull String key) {
-        records.remove(key);
-        writer.deleteIndex(key);
+        // Empty until the deletion is written: a read meanwhile would bring the stored index back
+        QuestsRecord deleted = new QuestsRecord();
+        records.put(key, deleted);
+        writer.deleteIndex(key, () -> records.computeIfPresent(key, (k, record) -> record == deleted && record.isEmpty() ? null : record));
     }
 
     /**
@@ -179,8 +181,8 @@ public class ScopeIndexes {
         void flushIndex(@Nonnull QuestsRecord record, @Nonnull String key);
 
         /**
-         * Lets go of an index nothing will read again.
+         * Lets go of an index nothing will read again, then runs {@code written}.
          */
-        void deleteIndex(@Nonnull String key);
+        void deleteIndex(@Nonnull String key, @Nonnull Runnable written);
     }
 }

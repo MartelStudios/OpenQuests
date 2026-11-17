@@ -70,6 +70,25 @@ class ScopeIndexesTest {
         assertFalse(storage.has(GROUP));
     }
 
+    @Test
+    void aReadBeforeTheDeletionIsWrittenFindsTheIndexEmpty() {
+        storage.addToIndex(GROUP, Set.of(first));
+        Runnable[] queued = new Runnable[1];
+        ScopeIndexes deferred = new ScopeIndexes(storage, new ScopeIndexes.Writer() {
+            @Override public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String key) { record.flush(storage, key); }
+            @Override public void deleteIndex(@Nonnull String key, @Nonnull Runnable written) {
+                queued[0] = () -> { storage.deleteIndex(key); written.run(); };
+            }
+        }, new QuestProgressionStore(Untouched.of(QuestStorage.class), Untouched.of(QuestEnvironment.class)));
+        deferred.getIds(GROUP);
+
+        deferred.delete(GROUP);
+
+        assertTrue(deferred.getIds(GROUP).isEmpty());
+        queued[0].run();
+        assertTrue(deferred.getLoadedKeys("worlds:").isEmpty());
+    }
+
     /**
      * Writes on the caller's thread, which is all a test needs of the storage thread.
      */
@@ -80,8 +99,9 @@ class ScopeIndexesTest {
         }
 
         @Override
-        public void deleteIndex(@Nonnull String key) {
+        public void deleteIndex(@Nonnull String key, @Nonnull Runnable written) {
             storage.deleteIndex(key);
+            written.run();
         }
     }
 }

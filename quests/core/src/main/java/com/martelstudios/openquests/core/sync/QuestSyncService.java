@@ -153,8 +153,11 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync {
      * Written in order with the changes made to the index before.
      */
     @Override
-    public void deleteIndex(@Nonnull String key) {
-        execute("the " + key + " index", () -> storage.deleteIndex(key));
+    public void deleteIndex(@Nonnull String key, @Nonnull Runnable written) {
+        execute("the " + key + " index", () -> {
+            storage.deleteIndex(key);
+            written.run();
+        });
     }
 
     /**
