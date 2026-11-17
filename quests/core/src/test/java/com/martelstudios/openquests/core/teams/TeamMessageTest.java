@@ -2,10 +2,13 @@ package com.martelstudios.openquests.core.teams;
 
 import com.martelstudios.openquests.core.QuestHarness;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.persistence.PlayerMessage;
 import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.TestQuestProgression;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
+import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.utils.EntityComponents;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -100,6 +103,50 @@ class TeamMessageTest {
         assertFalse(bobsQuest.getPlayers().contains(alice));
         assertFalse(harness.questsOf(alice).contains(bobsQuest.getId()));
         assertEquals(List.of(bob), teams.get(bobs).getMembers());
+    }
+
+    @Test
+    void aChangeThatFailsAtConnectionIsTakenInAgain() {
+        UUID bobs = party(bob);
+        TestQuestProgression quest = share(bobs, harness.register());
+        service.change(alice, "Alice", "party", bobs);
+        playerState().handleTeamChanges(TeamMessageTest::failing);
+
+        connect(alice, "Alice");
+        playerState().saveAllOnline(false);
+        playerState().handleTeamChanges(service::apply);
+        playerState().takeInMessages();
+
+        assertEquals(bobs, questStore(alice).getTeams().get("party"));
+        assertTrue(harness.questsOf(alice).contains(quest.getId()));
+    }
+
+    @Test
+    void aChangeThatFailsOnlineIsTakenInAgain() {
+        connect(alice, "Alice");
+        UUID own = party(alice);
+        UUID bobs = party(bob);
+        // Written by another server
+        teams.addMember(bobs, alice);
+        teams.removeMember(own, alice);
+        harness.storage().postMessage(PlayerMessage.team(alice, new TeamChange("party", own, bobs)));
+        playerState().handleTeamChanges(TeamMessageTest::failing);
+
+        playerState().takeInMessages();
+        playerState().saveAllOnline(false);
+        playerState().handleTeamChanges(service::apply);
+        playerState().takeInMessages();
+
+        assertEquals(bobs, questStore(alice).getTeams().get("party"));
+    }
+
+    @Nonnull
+    private QuestPlayerStateService playerState() {
+        return harness.services().getQuestPlayerStateService();
+    }
+
+    private static void failing(@Nonnull UUID playerId, @Nonnull EntityComponents player, @Nonnull TeamChange change) {
+        throw new IllegalStateException("storage blip");
     }
 
     /**

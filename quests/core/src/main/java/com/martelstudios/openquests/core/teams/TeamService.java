@@ -320,7 +320,7 @@ public class TeamService {
      */
     public void onConnect(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull EntityComponents player) {
         // Before the record is checked: a change made while they were away names teams it no longer lists
-        for (TeamChange change : playerState.takeTeamChanges(playerId)) apply(playerId, player, change);
+        playerState.applyTeamChanges(playerId, player);
 
         QuestStoreComponent questStore = player.ensureAndGetComponent(components.questStore());
 

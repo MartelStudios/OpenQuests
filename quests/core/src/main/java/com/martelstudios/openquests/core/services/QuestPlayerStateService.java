@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -103,11 +104,14 @@ public class QuestPlayerStateService {
 
         // What other servers left them while they were away, let go of once the record holding it is written
         Set<UUID> delivered = ConcurrentHashMap.newKeySet();
-        List<TeamChange> teamChanges = new CopyOnWriteArrayList<>();
+        Set<UUID> seen = ConcurrentHashMap.newKeySet();
+        List<PlayerMessage> teamChanges = new CopyOnWriteArrayList<>();
         for (PlayerMessage message : storage.loadMessages(List.of(playerId))) {
             message.applyTo(record);
-            if (message.getTeam() != null) teamChanges.add(message.getTeam());
-            delivered.add(message.getId());
+            seen.add(message.getId());
+            // A team change is let go of once applied, at connection
+            if (message.getTeam() != null) teamChanges.add(message);
+            else delivered.add(message.getId());
         }
 
         List<AbstractQuestProgression<?>> held = progressionStore.loadForPlayer(playerId);
@@ -132,7 +136,7 @@ public class QuestPlayerStateService {
         PendingRewardStoreComponent rewards = holder.ensureAndGetComponent(components.pendingRewards());
         rewards.pending.restore(record.getPendingRewards());
 
-        sessions.put(playerId, new Session(questStore, rewards, delivered, teamChanges));
+        sessions.put(playerId, new Session(questStore, rewards, delivered, seen, teamChanges));
     }
 
     /**
@@ -210,7 +214,7 @@ public class QuestPlayerStateService {
     public void deliverMessages(@Nonnull List<PlayerMessage> messages) {
         for (PlayerMessage message : messages) {
             Session session = sessions.get(message.getPlayerId());
-            if (session == null || !session.delivered().add(message.getId())) continue;
+            if (session == null || !session.seen().add(message.getId())) continue;
 
             // Into the component held here, so the debt is written with the record even if the player
             // leaves before it is paid; then paid on their thread where it claims itself
@@ -222,9 +226,26 @@ public class QuestPlayerStateService {
             PlayerMessage.Ending ending = message.getEnding();
             if (ending != null) session.questStore().recordCompletion(ending.getAssetId(), ending.getOutcome(), ending.startedAt(), ending.completedAt());
 
-            TeamChange change = message.getTeam();
-            TeamChangeHandler handler = teamChangeHandler;
-            if (change != null && handler != null) players.update(message.getPlayerId(), player -> handler.apply(message.getPlayerId(), player, change));
+            if (message.getTeam() == null) session.delivered().add(message.getId());
+            else players.update(message.getPlayerId(), player -> applyTeamChange(session, message, player));
+        }
+    }
+
+    /**
+     * Let go of only once applied: one that fails is taken in again on the next pass.
+     *
+     * @return whether it was applied.
+     */
+    private boolean applyTeamChange(@Nonnull Session session, @Nonnull PlayerMessage message, @Nonnull EntityComponents player) {
+        TeamChangeHandler handler = teamChangeHandler;
+        try {
+            if (handler != null) handler.apply(message.getPlayerId(), player, Objects.requireNonNull(message.getTeam()));
+            session.delivered().add(message.getId());
+            return true;
+        } catch (RuntimeException e) {
+            LOGGER.atWarning().withCause(e).log("Could not apply a team change to player %s, retried on the next pass", message.getPlayerId());
+            session.seen().remove(message.getId());
+            return false;
         }
     }
 
@@ -236,17 +257,21 @@ public class QuestPlayerStateService {
     }
 
     /**
-     * @return the team changes read with the player's record at connection, in the order they
-     * were left, handed out once.
+     * Applies the team changes read with the player's record at connection, in the order they were
+     * left. One that fails stops the rest, all taken in again on the next pass.
      */
-    @Nonnull
-    public List<TeamChange> takeTeamChanges(@Nonnull UUID playerId) {
+    public void applyTeamChanges(@Nonnull UUID playerId, @Nonnull EntityComponents player) {
         Session session = sessions.get(playerId);
-        if (session == null) return List.of();
+        if (session == null) return;
 
-        List<TeamChange> changes = List.copyOf(session.teamChanges());
+        List<PlayerMessage> messages = List.copyOf(session.teamChanges());
         session.teamChanges().clear();
-        return changes;
+        for (int i = 0; i < messages.size(); i++) {
+            if (applyTeamChange(session, messages.get(i), player)) continue;
+
+            for (PlayerMessage rest : messages.subList(i + 1, messages.size())) session.seen().remove(rest.getId());
+            return;
+        }
     }
 
     /**
@@ -383,10 +408,10 @@ public class QuestPlayerStateService {
     /**
      * What one player's session holds, as the components themselves rather than a way back to them,
      * and the messages taken into them that the next write lets go of.
-     */
-    /**
+     *
+     * @param seen the messages taken in or being applied, so a pass reading them again skips them
      * @param teamChanges the team changes read at connection, for the team service to apply once the
      * player is far enough along to be handed quests
      */
-    private record Session(@Nonnull QuestStoreComponent questStore, @Nonnull PendingRewardStoreComponent rewards, @Nonnull Set<UUID> delivered, @Nonnull List<TeamChange> teamChanges) {}
+    private record Session(@Nonnull QuestStoreComponent questStore, @Nonnull PendingRewardStoreComponent rewards, @Nonnull Set<UUID> delivered, @Nonnull Set<UUID> seen, @Nonnull List<PlayerMessage> teamChanges) {}
 }
