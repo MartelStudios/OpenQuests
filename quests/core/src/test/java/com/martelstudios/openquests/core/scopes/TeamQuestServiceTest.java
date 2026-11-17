@@ -1,6 +1,8 @@
 package com.martelstudios.openquests.core.scopes;
 
 import com.hypixel.hytale.codec.ExtraInfo;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.QuestHarness;
 import com.martelstudios.openquests.core.TestQuestAsset;
 import com.martelstudios.openquests.core.constraints.AssignmentRequest;
@@ -8,15 +10,19 @@ import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.persistence.TestQuestProgression;
+import com.martelstudios.openquests.core.rewards.QuestReward;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.teams.TeamService;
 import com.martelstudios.openquests.core.teams.Teams;
 import com.martelstudios.openquests.core.teams.TestTeamTypes;
+import com.martelstudios.openquests.core.utils.EntityComponents;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -26,10 +32,15 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TeamQuestServiceTest {
+
+    static {
+        QuestReward.CODEC.register("TeamReconnectTest", ReconnectReward.class, ReconnectReward.CODEC);
+    }
 
     private QuestHarness harness;
     private Teams teams;
@@ -85,6 +96,72 @@ class TeamQuestServiceTest {
         share(teamId, harness.register());
 
         assertTrue(harness.questsOf(bob).isEmpty());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void anOfflineMemberCollectsACompletedQuestsRewardsOnConnection(boolean autoClaim) {
+        UUID alice = harness.players().connect();
+        UUID bob = UUID.randomUUID();
+        UUID teamId = team("faction", alice, bob);
+        ReconnectReward original = new ReconnectReward();
+        original.automatic(autoClaim);
+        TestQuestProgression quest = share(teamId, harness.register(new TestQuestAsset().paying(original)));
+
+        harness.count(quest, 5, 5);
+        harness.settle();
+
+        assertTrue(quest.getPlayers().contains(bob));
+        assertTrue(harness.questsOf(bob).isEmpty());
+        assertTrue(teamQuests.getQuestIds(teamId).isEmpty(), "connection cannot rely on the running team index");
+        assertEquals(autoClaim ? 1 : 0, original.grants, "only Alice can collect before Bob connects");
+        assertTrue(harness.storage().loadMessages(Set.of(bob)).stream().anyMatch(message -> message.getOwed() != null));
+
+        // The connect event supplies the holder before the player is online in the universe.
+        EntityComponents holder = harness.players().of(bob);
+        var state = harness.services().getQuestPlayerStateService();
+        var rewards = harness.services().getQuestRewardService();
+        state.host(bob, holder);
+        assertTrue(rewards.isOwed(quest.getId(), holder));
+        var pending = rewards.getPending(holder).get(quest.getId());
+        ReconnectReward restored = (ReconnectReward) pending.getRewards()[0];
+        assertEquals(0, restored.grants);
+
+        harness.players().connect(bob);
+        // The world-entry listener calls claimAuto with that same holder.
+        rewards.claimAuto(holder);
+        assertEquals(autoClaim ? 1 : 0, restored.grants);
+        if (!autoClaim) assertTrue(rewards.claim(quest.getId(), holder));
+        assertEquals(1, restored.grants);
+        assertFalse(rewards.isOwed(quest.getId(), holder));
+
+        state.saveNow(bob);
+        assertTrue(harness.storage().loadMessages(Set.of(bob)).isEmpty());
+        assertTrue(harness.storage().loadPlayer(bob).getPendingRewards().isEmpty());
+        state.host(bob, holder);
+        rewards.claimAuto(holder);
+        assertFalse(rewards.claim(quest.getId(), holder));
+        assertEquals(1, restored.grants);
+    }
+
+    /** A serializable reward whose successful delivery can be observed after the storage round trip. */
+    public static final class ReconnectReward extends QuestReward {
+        static final BuilderCodec<ReconnectReward> CODEC = BuilderCodec.builder(
+                ReconnectReward.class, ReconnectReward::new, QuestReward.BASE_CODEC).build();
+
+        private int grants;
+
+        public ReconnectReward() {}
+
+        void automatic(boolean value) {
+            autoClaim = value;
+        }
+
+        @Override
+        public boolean grant(@Nonnull OpenQuestsServices services, @Nonnull UUID sourceQuestId, @Nonnull EntityComponents player) {
+            grants++;
+            return true;
+        }
     }
 
     @Test
