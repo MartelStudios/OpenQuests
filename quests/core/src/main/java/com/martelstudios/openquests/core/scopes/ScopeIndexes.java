@@ -144,8 +144,10 @@ public class ScopeIndexes {
      * keeps it, and the next read brings it back.
      */
     public void unload(@Nonnull String key) {
-        QuestsRecord record = records.remove(key);
-        if (record != null) writer.flushIndex(record, key);
+        QuestsRecord record = records.get(key);
+        if (record == null) return;
+        // Kept until written: a read meanwhile would bring back the stored index without its last changes
+        writer.flushIndex(record, key, () -> records.computeIfPresent(key, (k, held) -> held == record && held.isWritten() ? null : held));
     }
 
     /**
@@ -178,7 +180,14 @@ public class ScopeIndexes {
         /**
          * Writes what changed in that index since it was last written.
          */
-        void flushIndex(@Nonnull QuestsRecord record, @Nonnull String key);
+        default void flushIndex(@Nonnull QuestsRecord record, @Nonnull String key) {
+            flushIndex(record, key, () -> {});
+        }
+
+        /**
+         * Writes what changed in that index since it was last written, then runs {@code written}.
+         */
+        void flushIndex(@Nonnull QuestsRecord record, @Nonnull String key, @Nonnull Runnable written);
 
         /**
          * Lets go of an index nothing will read again, then runs {@code written}.

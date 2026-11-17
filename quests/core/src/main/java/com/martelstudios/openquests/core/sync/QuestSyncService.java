@@ -145,8 +145,11 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync {
      * quest always before the index listing it.
      */
     @Override
-    public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String indexKey) {
-        execute("the " + indexKey + " index", () -> record.flush(storage, indexKey, this::store));
+    public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String indexKey, @Nonnull Runnable written) {
+        execute("the " + indexKey + " index", () -> {
+            record.flush(storage, indexKey, this::store);
+            written.run();
+        });
     }
 
     /**

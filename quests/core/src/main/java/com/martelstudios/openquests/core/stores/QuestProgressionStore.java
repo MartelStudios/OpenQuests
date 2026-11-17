@@ -59,6 +59,13 @@ public class QuestProgressionStore {
     @Nonnull
     private final Set<UUID> setAside = ConcurrentHashMap.newKeySet();
 
+    /**
+     * Shared quests unloaded with changes the storage thread has yet to write: read back before
+     * then, the stored copy would miss them, so this instance comes back instead.
+     */
+    @Nonnull
+    private final Map<UUID, AbstractQuestProgression<?>> leaving = new ConcurrentHashMap<>();
+
     @Nonnull
     private final QuestStorage storage;
 
@@ -82,8 +89,10 @@ public class QuestProgressionStore {
      * A quest read back having already ended goes straight to the archive, so the split survives a
      * restart without being written down anywhere. One whose asset no longer fits is set aside.
      */
-    public void add(@Nonnull AbstractQuestProgression<?> quest) {
-        if (quests.containsKey(quest.getId()) || archived.containsKey(quest.getId())) return;
+    public void add(@Nonnull AbstractQuestProgression<?> read) {
+        if (quests.containsKey(read.getId()) || archived.containsKey(read.getId())) return;
+        AbstractQuestProgression<?> unwritten = leaving.remove(read.getId());
+        AbstractQuestProgression<?> quest = unwritten != null ? unwritten : read;
 
         String mismatch = QuestTypeRegistry.findAssetMismatch(quest);
         if (mismatch != null) {
@@ -122,6 +131,11 @@ public class QuestProgressionStore {
         if (quest == null) return null;
 
         save(quest);
+        if (quest.isShared() && quest.hasChanges()) {
+            leaving.put(id, quest);
+            // Queued behind the write save() just handed the storage thread
+            environment.services().getQuestSyncService().execute("letting go of quest " + id, () -> leaving.remove(id, quest));
+        }
 
         if (remove(id) == null) archived.remove(id);
 

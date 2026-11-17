@@ -136,6 +136,13 @@ public class QuestsRecord {
         return this.questIds;
     }
 
+    /**
+     * @return whether everything registered here is written, nothing added or removed since.
+     */
+    public synchronized boolean isWritten() {
+        return stored.equals(questIds);
+    }
+
     public boolean isEmpty() {
         return this.questIds.isEmpty();
     }
