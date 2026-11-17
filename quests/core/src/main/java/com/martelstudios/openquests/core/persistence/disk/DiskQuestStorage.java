@@ -2,7 +2,8 @@ package com.martelstudios.openquests.core.persistence.disk;
 
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.server.core.universe.Universe;
-import com.hypixel.hytale.server.core.universe.datastore.DiskDataStore;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.common.util.PathUtil;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
 import com.martelstudios.openquests.core.models.AssignmentRecords;
@@ -13,6 +14,7 @@ import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.persistence.TeamTransaction;
+import com.martelstudios.openquests.core.persistence.TeamChangePersistence;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,6 +50,7 @@ public class DiskQuestStorage implements QuestStorage {
     public static final String ID = "Disk";
 
     private final String rootPath;
+    private final Path explicitRoot;
 
     /**
      * One lock per player file, kept for the life of the server: a lock map that forgets entries
@@ -60,12 +63,12 @@ public class DiskQuestStorage implements QuestStorage {
      */
     private final Map<String, Object> keyLocks = new ConcurrentHashMap<>();
 
-    private DiskDataStore<QuestProgressionRecord> progressions;
-    private DiskDataStore<PlayerQuestRecord> players;
-    private DiskDataStore<QuestIndexRecord> indexes;
-    private DiskDataStore<AssignmentRecordsFile> assignments;
-    private DiskDataStore<PlayerMessage> messages;
-    private DiskDataStore<TeamRecord> teams;
+    private QuestFiles<QuestProgressionRecord> progressions;
+    private QuestFiles<PlayerQuestRecord> players;
+    private QuestFiles<QuestIndexRecord> indexes;
+    private QuestFiles<AssignmentRecordsFile> assignments;
+    private QuestFiles<PlayerMessage> messages;
+    private QuestFiles<TeamRecord> teams;
     private final Object teamLock = new Object();
     private TeamJournal teamJournal;
     private final Map<UUID, Set<UUID>> teamMembers = new HashMap<>();
@@ -73,24 +76,24 @@ public class DiskQuestStorage implements QuestStorage {
 
     public DiskQuestStorage(@Nonnull String rootPath) {
         this.rootPath = rootPath;
+        this.explicitRoot = null;
+    }
+
+    /** Uses an already resolved directory for standalone tools and storage integration tests. */
+    public DiskQuestStorage(@Nonnull Path root) {
+        this.rootPath = root.toAbsolutePath().toString();
+        this.explicitRoot = root.toAbsolutePath();
     }
 
     @Override
     public void start() {
-        progressions = new DiskDataStore<>(child("progressions"), QuestProgressionRecord.CODEC);
-        players = new DiskDataStore<>(child("players"), PlayerQuestRecord.CODEC);
-        indexes = new DiskDataStore<>(child("indexes"), QuestIndexRecord.CODEC);
-        assignments = new DiskDataStore<>(child("assignments"), AssignmentRecordsFile.CODEC);
-        messages = new DiskDataStore<>(child("messages"), PlayerMessage.CODEC);
-        teams = new DiskDataStore<>(child("teams"), TeamRecord.CODEC);
+        progressions = files("progressions", QuestProgressionRecord.CODEC);
+        players = files("players", PlayerQuestRecord.CODEC);
+        indexes = files("indexes", QuestIndexRecord.CODEC);
+        assignments = files("assignments", AssignmentRecordsFile.CODEC);
+        messages = files("messages", PlayerMessage.CODEC);
+        teams = files("teams", TeamRecord.CODEC);
 
-        // list() and loadAll() walk a directory stream, which throws on one that is not there yet
-        createDirectory(progressions.getPath());
-        createDirectory(players.getPath());
-        createDirectory(indexes.getPath());
-        createDirectory(assignments.getPath());
-        createDirectory(messages.getPath());
-        createDirectory(teams.getPath());
         teamJournal = new TeamJournal(teams.getPath().resolveSibling("team-transactions"), transaction -> {
             for (TeamRecord team : transaction.teams()) {
                 teams.save(team.getId().toString(), team);
@@ -99,15 +102,7 @@ public class DiskQuestStorage implements QuestStorage {
             transaction.added().forEach(this::addToIndex);
             transaction.removed().forEach(this::removeFromIndex);
             if (transaction.message() == null) return;
-            for (QuestProgressionRecord snapshot : transaction.message().getTeam().copies()) {
-                // A replay never replaces progress made on a copy already written by an earlier pass.
-                if (!Files.exists(progressions.getPath().resolve(snapshot.quest.getId() + ".json")))
-                    writeProgressions(List.of(snapshot.quest));
-                if (snapshot.quest.getParentId() == null)
-                    addToIndex("team:" + transaction.message().getTeam().to(), List.of(snapshot.quest.getId()));
-            }
-            transaction.message().getTeam().assignments().forEach((assignment, records) -> records.forEach((asset, record) ->
-                    claimAssignment("team:" + transaction.message().getTeam().to(), assignment, asset, null, record)));
+            TeamChangePersistence.restore(this, transaction.message().getTeam());
             postMessage(transaction.message());
         });
         teamJournal.recover();
@@ -622,8 +617,15 @@ public class DiskQuestStorage implements QuestStorage {
     }
 
     @Nonnull
-    private String child(@Nonnull String name) {
-        return Paths.get(rootPath, name).toString();
+    private <T> QuestFiles<T> files(String name, BuilderCodec<T> codec) {
+        Path path = explicitRoot == null
+                ? PathUtil.resolvePathWithinDir(Universe.get().getPath(), Paths.get(rootPath, name).toString())
+                : explicitRoot.resolve(name);
+        if (path == null) throw new QuestStorageException("Invalid quest storage path " + rootPath);
+        QuestFiles<T> files = new QuestFiles<>(path, codec);
+        try { files.migrate(); }
+        catch (IOException failure) { throw new QuestStorageException("Could not prepare quest files " + path, failure); }
+        return files;
     }
 
     /**
@@ -641,11 +643,4 @@ public class DiskQuestStorage implements QuestStorage {
         return name.toString();
     }
 
-    private static void createDirectory(@Nonnull Path path) {
-        try {
-            Files.createDirectories(path);
-        } catch (IOException e) {
-            throw new QuestStorageException("Failed to create the quest directory " + path, e);
-        }
-    }
 }

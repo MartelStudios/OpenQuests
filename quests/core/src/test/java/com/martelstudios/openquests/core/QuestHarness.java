@@ -51,13 +51,22 @@ public final class QuestHarness implements AutoCloseable {
     private final List<Object> heard = new ArrayList<>();
 
     public QuestHarness() {
-        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
-        storage = new JdbcQuestStorage(new JdbcQuestStorage.JdbcSettings(url, null, null, null, null, "oqtest_", 4, 10, true, SqlDialect.fromUrl(url)));
+        this(memoryStorage());
+    }
+
+    /** Starts an independent server's services over a supplied, unopened backend. */
+    public QuestHarness(@Nonnull QuestStorage storage) {
+        this.storage = storage;
         storage.start();
 
         services = new OpenQuestsServices(storage, 5, Duration.ofHours(24), new Platform(events, clock, scheduler, players, players.types(), TeamTypes.of(teamTypes)));
         services.listen(events);
         services.install();
+    }
+
+    private static QuestStorage memoryStorage() {
+        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        return new JdbcQuestStorage(new JdbcQuestStorage.JdbcSettings(url, null, null, null, null, "oqtest_", 4, 10, true, SqlDialect.fromUrl(url)));
     }
 
     @Nonnull

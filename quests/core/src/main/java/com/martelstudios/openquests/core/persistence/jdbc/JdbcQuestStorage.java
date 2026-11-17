@@ -14,6 +14,7 @@ import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.QuestStorageException;
 import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.persistence.TeamTransaction;
+import com.martelstudios.openquests.core.persistence.TeamChangePersistence;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -1124,13 +1125,7 @@ public class JdbcQuestStorage implements QuestStorage {
             transaction.removed().forEach(this::removeFromIndex);
             if (message == null) return null;
             // Copies and inherited history are committed before the source can be dissolved elsewhere.
-            for (var snapshot : message.getTeam().copies()) {
-                writeProgressions(List.of(snapshot.quest));
-                if (snapshot.quest.getParentId() == null)
-                    addToIndex("team:" + message.getTeam().to(), List.of(snapshot.quest.getId()));
-            }
-            message.getTeam().assignments().forEach((assignment, records) -> records.forEach((asset, record) ->
-                    claimAssignment("team:" + message.getTeam().to(), assignment, asset, null, record)));
+            TeamChangePersistence.restore(this, message.getTeam());
             try (PreparedStatement insert = connection.prepareStatement("INSERT INTO " + messageTable + " (id, player_id, data, created_at) VALUES (?, ?, ?, ?)")) {
                 insert.setString(1, message.getId().toString());
                 insert.setString(2, message.getPlayerId().toString());

@@ -16,7 +16,6 @@ import com.martelstudios.openquests.core.persistence.QuestStorage;
 import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.persistence.TeamTransaction;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
-import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.services.QuestPlayerStateService;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
@@ -29,11 +28,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -46,8 +43,7 @@ public class TeamService {
     private final PlayerComponentTypes components;
     private final QuestPlayerStateService playerState;
     private final Players players;
-    private final ScopeIndexes indexes;
-    private final QuestAssignmentService assignments;
+    private final TeamQuestRecovery recovery;
     private final QuestCopier copier;
     private final IEventBus events;
     private final QuestStorage storage;
@@ -62,8 +58,7 @@ public class TeamService {
         this.components = components;
         this.playerState = playerState;
         this.players = players;
-        this.indexes = indexes;
-        this.assignments = assignments;
+        this.recovery = new TeamQuestRecovery(teams, teamQuests, storage, assignments, playerState, players, indexes, sync);
         this.copier = copier;
         this.events = events;
         this.storage = storage;
@@ -79,8 +74,7 @@ public class TeamService {
     /** @return the current authoritative membership, independently of the server hosting the player. */
     @Nullable
     public UUID currentTeamOf(@Nonnull UUID playerId, @Nonnull String type) {
-        return storage.loadTeamsForPlayer(playerId).stream().filter(team -> team.getType().equals(type))
-                .map(TeamRecord::getId).findFirst().orElse(null);
+        return recovery.currentTeamOf(playerId, type);
     }
 
     /** @return what joining would discard, or null when nobody loses running progress. */
@@ -113,10 +107,7 @@ public class TeamService {
 
     /** Performs a durable move; the notification remains available if quest effects fail afterwards. */
     public void change(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull String type, @Nullable UUID to) {
-        PlayerMessage message = move(playerId, playerName, type, to, false);
-        if (message == null) return;
-        prepare(playerId, message.getTeam());
-        if (players.isOnline(playerId)) players.update(playerId, player -> apply(playerId, player, message.getTeam()));
+        complete(playerId, move(playerId, playerName, type, to, false));
     }
 
     /** Completes only after the durable move and its quest effects succeed; failures reach the command caller. */
@@ -210,51 +201,7 @@ public class TeamService {
 
     /** Runs on the storage worker before any component update; replay never generates new copy ids. */
     public void prepare(@Nonnull UUID playerId, @Nonnull TeamChange change) {
-        UUID current = currentTeamOf(playerId, change.type());
-        // A later move supersedes this notification. It must not resurrect an old personal team.
-        boolean currentMove = Objects.equals(current, change.to());
-        if (currentMove && current != null) {
-            List<AbstractQuestProgression<?>> roots = new ArrayList<>();
-            for (QuestProgressionRecord snapshot : change.copies()) {
-                AbstractQuestProgression<?> copy = snapshot.quest;
-                if (copy.getParentId() == null) {
-                    copy.apply(new AbstractQuestProgression.SetScope(new TeamQuestScope(current)));
-                }
-                AbstractQuestProgression<?> persisted = storage.loadProgression(copy.getId());
-                if (persisted == null) storage.writeProgressions(List.of(copy));
-                AbstractQuestProgression<?> actual = persisted == null ? copy : persisted;
-                if (actual.getParentId() == null && !actual.isOver()) roots.add(actual);
-                if (playerState.getQuestStore(playerId) != null) {
-                    teamQuests.restoreCopy(persisted == null ? copy : persisted);
-                }
-            }
-            for (AbstractQuestProgression<?> root : roots) storage.addToIndex(TeamQuestService.key(current), List.of(root.getId()));
-            change.assignments().forEach((assignment, records) -> records.forEach((asset, record) ->
-                    storage.claimAssignment(TeamQuestService.key(current), assignment, asset, null, record)));
-            assignments.forgetHolder(TeamQuestService.key(current));
-        }
-        for (UUID source : change.sources()) {
-            if (source.equals(current)) continue;
-            teamQuests.leaveRunningQuests(source, playerId);
-            TeamRecord team = teams.get(source);
-            if (team == null || team.getMembers().isEmpty()) {
-                teamQuests.disband(source);
-                assignments.deleteHolder(TeamQuestService.key(source));
-                if (team != null) storage.deleteTeam(source, team.getVersion());
-            }
-        }
-        if (currentMove && current != null) teamQuests.joinRunningQuests(current, playerId);
-        Set<UUID> touched = new HashSet<>(change.sources());
-        if (change.to() != null) touched.add(change.to());
-        sync.execute("teams without a local member", () -> {
-            Set<UUID> hosted = playerState.getHostedPlayers();
-            for (UUID id : touched) {
-                TeamRecord team = teams.get(id);
-                if (team != null && team.getMembers().stream().anyMatch(member -> players.isOnline(member) || hosted.contains(member))) continue;
-                teamQuests.unload(id);
-                assignments.forgetHolder(TeamQuestService.key(id));
-            }
-        });
+        recovery.prepare(playerId, change);
     }
 
     /** Updates only the hosted cache; storage work must have succeeded through prepare first. */
@@ -288,17 +235,7 @@ public class TeamService {
 
     /** Releases teams nobody hosted here still plays. */
     public void onDisconnect(@Nonnull UUID playerId) {
-        QuestStoreComponent leaving = playerState.getQuestStore(playerId);
-        if (leaving == null) return;
-        Set<UUID> held = new HashSet<>();
-        for (UUID other : players.online()) {
-            QuestStoreComponent store = other.equals(playerId) ? null : playerState.getQuestStore(other);
-            if (store != null) held.addAll(store.getTeams().values());
-        }
-        for (UUID id : leaving.getTeams().values()) if (!held.contains(id)) {
-            indexes.unload(TeamQuestService.key(id));
-            assignments.forgetHolder(TeamQuestService.key(id));
-        }
+        recovery.onDisconnect(playerId);
     }
 
     /** Rebuilds the cache from documents, recovering a crash even when the cached player record is stale. */
@@ -314,17 +251,7 @@ public class TeamService {
         }
         Map<String, UUID> actual = new HashMap<>();
         for (TeamRecord team : storage.loadTeamsForPlayer(playerId)) actual.put(team.getType(), team.getId());
-        for (var entry : previous.entrySet()) {
-            if (actual.containsValue(entry.getValue())) continue;
-            TeamRecord old = teams.get(entry.getValue());
-            if (old == null || old.getMembers().isEmpty()) {
-                teamQuests.disband(entry.getValue());
-                assignments.deleteHolder(TeamQuestService.key(entry.getValue()));
-            }
-            store.setTeam(entry.getKey(), null);
-        }
-        actual.forEach(store::setTeam);
-        for (UUID team : actual.values()) teamQuests.joinRunningQuests(team, playerId, store);
+        recovery.reconcile(playerId, previous, actual, store);
         sync.execute("the connected player's teams", () -> playerState.saveNow(playerId));
     }
 }

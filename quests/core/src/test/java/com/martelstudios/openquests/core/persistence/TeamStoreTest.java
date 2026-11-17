@@ -2,12 +2,16 @@ package com.martelstudios.openquests.core.persistence;
 
 import com.martelstudios.openquests.core.persistence.jdbc.JdbcQuestStorage;
 import com.martelstudios.openquests.core.persistence.jdbc.SqlDialect;
+import com.martelstudios.openquests.core.persistence.disk.DiskQuestStorage;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.UUID;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,21 +19,22 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The shared backend keeps a team whole, and refuses a change made on a version another server
- * replaced. The disk one needs a running universe to place its files, so no test reaches it.
+ * Both backends keep a team whole and refuse changes made against a superseded version.
  */
 class TeamStoreTest {
 
     private QuestStorage storage;
+    @TempDir Path folder;
 
     @AfterEach
     void close() {
         if (storage != null) storage.close();
     }
 
-    @Test
-    void aTeamSurvivesItsStore() {
-        TeamStore teams = open();
+    @ParameterizedTest
+    @ValueSource(strings = {"h2", "disk"})
+    void aTeamSurvivesItsStore(String backend) {
+        TeamStore teams = open(backend);
         UUID alice = UUID.randomUUID();
         UUID bob = UUID.randomUUID();
         TeamRecord team = team(alice).withMembers(List.of(alice, bob)).withInvitations(List.of(new TeamInvitation(UUID.randomUUID(), alice, 1234L)));
@@ -47,9 +52,10 @@ class TeamStoreTest {
         assertFalse(teams.createTeam(team));
     }
 
-    @Test
-    void aStaleUpdateIsRefused() {
-        TeamStore teams = open();
+    @ParameterizedTest
+    @ValueSource(strings = {"h2", "disk"})
+    void aStaleUpdateIsRefused(String backend) {
+        TeamStore teams = open(backend);
         TeamRecord team = team(UUID.randomUUID());
         teams.createTeam(team);
 
@@ -61,9 +67,10 @@ class TeamStoreTest {
         assertEquals("First", teams.loadTeam(team.getId()).getName());
     }
 
-    @Test
-    void aDeletedTeamIsGone() {
-        TeamStore teams = open();
+    @ParameterizedTest
+    @ValueSource(strings = {"h2", "disk"})
+    void aDeletedTeamIsGone(String backend) {
+        TeamStore teams = open(backend);
         TeamRecord team = team(UUID.randomUUID());
         teams.createTeam(team);
 
@@ -72,9 +79,10 @@ class TeamStoreTest {
         assertNull(teams.loadTeam(team.getId()));
     }
 
-    @Test
-    void aStaleDeleteIsRefused() {
-        TeamStore teams = open();
+    @ParameterizedTest
+    @ValueSource(strings = {"h2", "disk"})
+    void aStaleDeleteIsRefused(String backend) {
+        TeamStore teams = open(backend);
         TeamRecord team = team(UUID.randomUUID());
         teams.createTeam(team);
         TeamRecord read = teams.loadTeam(team.getId());
@@ -84,9 +92,10 @@ class TeamStoreTest {
         assertEquals("Changed since", teams.loadTeam(team.getId()).getName());
     }
 
-    @Test
-    void membersKeepTheirOrder() {
-        TeamStore teams = open();
+    @ParameterizedTest
+    @ValueSource(strings = {"h2", "disk"})
+    void membersKeepTheirOrder(String backend) {
+        TeamStore teams = open(backend);
         UUID a = UUID.randomUUID();
         UUID b = UUID.randomUUID();
         UUID c = UUID.randomUUID();
@@ -102,9 +111,10 @@ class TeamStoreTest {
     }
 
     @Nonnull
-    private TeamStore open() {
+    private TeamStore open(String backend) {
         String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
-        storage = new JdbcQuestStorage(new JdbcQuestStorage.JdbcSettings(url, null, null, null, null, "oqtest_", 4, 10, true, SqlDialect.fromUrl(url)));
+        storage = backend.equals("disk") ? new DiskQuestStorage(folder)
+                : new JdbcQuestStorage(new JdbcQuestStorage.JdbcSettings(url, null, null, null, null, "oqtest_", 4, 10, true, SqlDialect.fromUrl(url)));
         storage.start();
         return storage;
     }
