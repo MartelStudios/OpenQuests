@@ -269,7 +269,7 @@ public class TeamService {
         UUID own = teams.create(type, playerId, playerName, null).getId();
 
         for (AbstractQuestProgression<?> quest : teamQuests.getRunningQuests(from)) {
-            if (quest.getPlayers().contains(playerId)) teamQuests.addQuest(own, copier.copyFor(quest, playerId).getId());
+            if (quest.getPlayers().contains(playerId)) teamQuests.addQuest(own, copier.copyFor(quest, playerId).getId(), List.of(playerId));
         }
         assignments.copyHolder(TeamQuestService.key(from), TeamQuestService.key(own));
         return own;

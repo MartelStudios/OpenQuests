@@ -87,6 +87,16 @@ class TeamQuestServiceTest {
     }
 
     @Test
+    void aQuestHandedToAGoneTeamIsDropped() {
+        UUID gone = UUID.randomUUID();
+
+        TestQuestProgression quest = share(gone, harness.register());
+
+        assertTrue(teamQuests.getQuestIds(gone).isEmpty());
+        assertNull(harness.services().getQuestProgressionService().getQuest(quest.getId()));
+    }
+
+    @Test
     void aMemberBoundOnAnotherServerSeesTheQuestHere() {
         UUID bob = harness.players().connect();
         UUID teamId = team("faction", bob);

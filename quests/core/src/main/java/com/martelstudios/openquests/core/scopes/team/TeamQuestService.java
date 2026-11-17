@@ -81,6 +81,21 @@ public class TeamQuestService {
      * not, so the absent are paid and counted like the others.
      */
     public void addQuest(@Nonnull UUID teamId, @Nonnull UUID questId) {
+        TeamRecord team = teams.get(teamId);
+        if (team != null) {
+            addQuest(teamId, questId, team.getMembers());
+            return;
+        }
+
+        // Handed out from a stale session: nobody would ever play it
+        AbstractQuestProgression<?> quest = progression.getQuest(questId);
+        if (quest != null) progression.unregisterQuest(quest);
+    }
+
+    /**
+     * As {@link #addQuest(UUID, UUID)}, for a caller who knows the members: one read less per quest.
+     */
+    public void addQuest(@Nonnull UUID teamId, @Nonnull UUID questId, @Nonnull Collection<UUID> members) {
         AbstractQuestProgression<?> quest = progression.loadQuest(questId);
         if (quest == null) return;
 
@@ -91,10 +106,7 @@ public class TeamQuestService {
 
         LOGGER.atInfo().log("Added quest %s to team %s", questId, teamId);
 
-        TeamRecord team = teams.get(teamId);
-        if (team == null) return;
-
-        for (UUID memberId : team.getMembers()) {
+        for (UUID memberId : members) {
             progression.joinQuest(quest, memberId, false);
         }
     }
