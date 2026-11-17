@@ -126,7 +126,7 @@ public class TeamService {
      */
     public void leave(@Nonnull UUID playerId, @Nonnull String playerName, @Nonnull EntityComponents player, @Nonnull String type) {
         UUID current = questStore(player).getTeams().get(type);
-        if (current == null) return;
+        if (current == null || isAloneInPersonal(current, type, playerId)) return;
 
         TeamRecord left = teams.removeMember(current, playerId);
         OpenQuestTeamType teamType = types.get(type);
@@ -186,7 +186,7 @@ public class TeamService {
         }
 
         UUID from = absentTeamOf(playerId, type);
-        if (Objects.equals(from, to)) return;
+        if (Objects.equals(from, to) || (to == null && from != null && isAloneInPersonal(from, type, playerId))) return;
 
         if (to != null) teams.addMember(to, playerId);
         UUID joined = to;
@@ -247,6 +247,18 @@ public class TeamService {
 
         TeamRecord left = teams.removeMember(current, playerId);
         exit(playerId, player, type, current, left == null);
+    }
+
+    /**
+     * Leaving such a team would end in a team of their own with the same quests: kept as it is,
+     * rather than deleted, recreated and copied for nothing.
+     */
+    private boolean isAloneInPersonal(@Nonnull UUID teamId, @Nonnull String type, @Nonnull UUID playerId) {
+        OpenQuestTeamType teamType = types.get(type);
+        if (teamType == null || !teamType.isPersonalTeam()) return false;
+
+        TeamRecord team = teams.get(teamId);
+        return team != null && team.getMembers().equals(List.of(playerId));
     }
 
     /**

@@ -225,7 +225,8 @@ change. A quest shared with a team is bound to every member, online or not, so t
 like the others. Joining a team joins its running quests whatever their constraints say, and pays
 nothing of the past. Leaving takes the player off them; the owner leaving passes ownership to the
 first member left. Leaving a `PersonalTeam` type gives the player a new team of their own holding
-a copy of the running quests, so they go on alone from where they were. A team left empty is
+a copy of the running quests, so they go on alone from where they were; one already alone in it
+stays where they are. A team left empty is
 disbanded, its running quests and records with it, which is why joining another team from one the
 player is alone in asks for `--confirm`. A `Shared` `GrantQuest` hands a team chain's follow-ups to
 the same team, once.

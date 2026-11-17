@@ -8,6 +8,7 @@ import com.martelstudios.openquests.core.events.TeamJoinedEvent;
 import com.martelstudios.openquests.core.events.TeamLeftEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.AssignmentRecord;
+import com.martelstudios.openquests.core.persistence.PlayerQuestRecord;
 import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.persistence.TestQuestProgression;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
@@ -61,10 +62,12 @@ class TeamServiceTest {
     void joiningDropsTheProgressOfATeamLeftEmpty() {
         UUID own = party(alice);
         TestQuestProgression lost = share(own, harness.register());
+        harness.storage().claimAssignment(TeamQuestService.key(own), "Story", "Test", null, record());
 
         service.join(alice, harness.players().of(alice), party(bob));
 
         assertNull(teams.get(own));
+        assertTrue(harness.storage().loadAssignments(TeamQuestService.key(own)).isEmpty());
         assertNull(harness.services().getQuestProgressionService().getQuest(lost.getId()));
         assertFalse(harness.questsOf(alice).contains(lost.getId()));
     }
@@ -117,18 +120,30 @@ class TeamServiceTest {
     }
 
     @Test
-    void theLastMemberLeavingKeepsACopy() {
+    void leavingAPartyAloneChangesNothing() {
         UUID own = party(alice);
         TestQuestProgression quest = share(own, harness.register());
-        harness.count(quest, 3, 5);
-        harness.storage().claimAssignment(TeamQuestService.key(own), "Story", "Test", null, record());
 
         service.leave(alice, "Alice", harness.players().of(alice), "party");
+        service.change(alice, "Alice", "party", null);
 
-        assertNull(teams.get(own));
-        assertNull(harness.services().getQuestProgressionService().getQuest(quest.getId()));
-        assertTrue(harness.storage().loadAssignments(TeamQuestService.key(own)).isEmpty());
-        assertEquals(3, onlyQuestOf(questStore(alice).getTeams().get("party")).getCounter());
+        assertEquals(own, party(alice));
+        assertEquals(Set.of(quest.getId()), teamQuests.getQuestIds(own));
+        assertTrue(quest.getPlayers().contains(alice));
+    }
+
+    @Test
+    void anAbsentPlayerLeavingAPartyAloneChangesNothing() {
+        UUID carol = UUID.randomUUID();
+        UUID carols = teams.create("party", carol, "Carol", null).getId();
+        PlayerQuestRecord record = new PlayerQuestRecord();
+        record.getTeams().put("party", carols);
+        harness.storage().savePlayer(carol, record, List.of(), true);
+
+        service.change(carol, "Carol", "party", null);
+
+        assertEquals(List.of(carol), teams.get(carols).getMembers());
+        assertTrue(harness.storage().loadMessages(List.of(carol)).isEmpty());
     }
 
     @Test
