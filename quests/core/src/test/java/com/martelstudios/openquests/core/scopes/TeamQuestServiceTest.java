@@ -143,13 +143,14 @@ class TeamQuestServiceTest {
 
         harness.players().connect(bob);
         // The world-entry listener calls claimAuto with that same holder.
-        rewards.claimAuto(holder);
+        rewards.claimAutoOnWorldEntry(bob, holder);
         assertEquals(autoClaim ? 1 : 0, restored.grants);
         if (!autoClaim) assertTrue(rewards.claim(quest.getId(), holder));
         assertEquals(1, restored.grants);
         assertFalse(rewards.isOwed(quest.getId(), holder));
 
-        state.saveNow(bob);
+        if (autoClaim) harness.settle();
+        else state.saveNow(bob);
         assertTrue(harness.storage().loadMessages(Set.of(bob)).isEmpty());
         assertTrue(harness.storage().loadPlayer(bob).getPendingRewards().isEmpty());
         state.host(bob, holder);

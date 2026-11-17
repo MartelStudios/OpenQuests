@@ -107,6 +107,20 @@ class QuestPlayerFlowTest {
     }
 
     @Test
+    void aSharedCompletionReplayedByItsFirstWriteIsPaidOnlyOnce() {
+        UUID player = UUID.randomUUID();
+        TestQuestProgression quest = harness.register(new TestQuestAsset().paying(new TestQuestReward("gold")));
+        quest.join(player);
+
+        harness.count(quest, 5, 5);
+        quest.announce(QuestState.IN_PROGRESS, quest.getStateVersion(), true);
+        harness.settle();
+
+        List<PlayerMessage> messages = harness.storage().loadMessages(Set.of(player));
+        assertEquals(1, messages.stream().filter(message -> message.getOwed() != null).count());
+    }
+
+    @Test
     void theLastHolderGivingUpAbandonsTheQuestAndIsPaidForIt() {
         UUID player = harness.players().connect();
         TestQuestProgression quest = harness.assign(new TestQuestAsset().payingOnAbandon(new TestQuestReward("consolation")), player);

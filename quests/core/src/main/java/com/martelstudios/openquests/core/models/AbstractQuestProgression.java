@@ -207,6 +207,9 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     transient boolean dirty;
 
+    /** A terminal transition may first be announced locally, then replayed by shared storage. */
+    private transient volatile boolean completionAnnounced;
+
     /**
      * What the quest acts through, attached by the store holding it. A quest no store holds yet
      * tells nobody of its changes and is written by this server alone.
@@ -362,13 +365,20 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      * @param madeHere whether this server made the change, and pays what an end pays
      */
     public void announce(@Nonnull QuestState previousState, @Nonnull QuestStateVersion now, boolean madeHere) {
-        if (now.state().isCompleted()) {
+        if (now.state().isCompleted() && markCompletionAnnounced()) {
             dispatch(QuestCompletedEvent.class, getId(), new QuestCompletedEvent(this, now.state(), madeHere));
         }
 
         // Last, so a listener reacting to the transition reads a quest that has already been paid
         // and filed rather than one still being settled.
         dispatch(QuestStateChangedEvent.class, getId(), new QuestStateChangedEvent(this, previousState, now));
+    }
+
+    /** Keeps a local completion announcement from being paid again when its first shared write lands. */
+    private synchronized boolean markCompletionAnnounced() {
+        if (completionAnnounced) return false;
+        completionAnnounced = true;
+        return true;
     }
 
     /**
