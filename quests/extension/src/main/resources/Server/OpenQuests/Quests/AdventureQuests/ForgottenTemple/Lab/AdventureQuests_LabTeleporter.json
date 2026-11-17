@@ -28,6 +28,7 @@
     },
     {
       "Type": "GrantQuest",
+      "Shared": true,
       "QuestAssetIds": [
         "AdventureQuests_LabBoiler",
         "AdventureQuests_LabEngine",

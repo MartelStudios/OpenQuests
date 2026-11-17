@@ -47,6 +47,7 @@
   "SuccessfulRewards": [
     {
       "Type": "GrantQuest",
+      "Shared": true,
       "AutoClaim": true,
       "QuestAssetIds": [
         "AdventureQuests_DefeatForgottenTempleGuardian"

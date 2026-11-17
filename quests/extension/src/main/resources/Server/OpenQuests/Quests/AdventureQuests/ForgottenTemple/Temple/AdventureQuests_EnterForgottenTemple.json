@@ -11,6 +11,7 @@
   "SuccessfulRewards": [
     {
       "Type": "GrantQuest",
+      "Shared": true,
       "QuestAssetIds": [
         "AdventureQuests_TalkToRootlingMerchant",
         "AdventureQuests_MeetSapling",
