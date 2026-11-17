@@ -646,6 +646,37 @@ class JdbcQuestStorageTest {
     }
 
     @Test
+    void aCopyTakingOnAStoredOneNeverShowsItWithoutWhatItHasStillToWrite() {
+        String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
+        QuestStorage onA = open(url);
+        QuestStorage onB = open(url);
+        SYNC.shared = true;
+
+        try {
+            TestQuestProgression quest = quest("Holding");
+            onA.writeProgressions(List.of(quest));
+            TestQuestProgression copyOnB = attached((TestQuestProgression) onB.loadProgression(quest.getId()));
+
+            quest.addToCounter(5);
+            write(onA, quest);
+
+            // Made again during the restack: reads the copy as a reader outside its lock would
+            List<Integer> seen = new java.util.ArrayList<>();
+            copyOnB.apply(stored -> seen.add(copyOnB.getCounter()));
+            copyOnB.addToCounter(3);
+            seen.clear();
+            copyOnB.getReplica().restack(onB.loadProgression(quest.getId()), 0);
+
+            assertEquals(List.of(3), seen);
+            assertEquals(8, copyOnB.getCounter());
+        } finally {
+            SYNC.shared = false;
+            onA.close();
+            onB.close();
+        }
+    }
+
+    @Test
     void aCopyTakingOnAStoredOneKeepsWhatItHasStillToWrite() {
         String url = "jdbc:h2:mem:openquests-" + UUID.randomUUID() + ";DB_CLOSE_DELAY=-1";
         QuestStorage onA = open(url);
