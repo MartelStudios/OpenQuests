@@ -22,29 +22,32 @@ class PlayerTeamsRecordTest {
         try (QuestHarness harness = new QuestHarness()) {
             UUID playerId = UUID.randomUUID();
             PlayerQuestRecord record = new PlayerQuestRecord();
-            record.getTeams().put("faction", "lion");
+            UUID lion = UUID.randomUUID();
+            record.getTeams().put("faction", lion);
             assertFalse(record.isEmpty());
 
             harness.storage().savePlayer(playerId, record, List.of(), true);
 
-            assertEquals(Map.of("faction", "lion"), harness.storage().loadPlayer(playerId).getTeams());
+            assertEquals(Map.of("faction", lion), harness.storage().loadPlayer(playerId).getTeams());
         }
     }
 
     @Test
     void aSessionCarriesTheTeamsItWasGiven() {
         QuestStoreComponent store = new QuestStoreComponent();
-        store.restore(Set.of(), Map.of(), Map.of(), Map.of(), HudSettings.NONE, Map.of("faction", "lion"));
+        UUID lion = UUID.randomUUID();
+        store.restore(Set.of(), Map.of(), Map.of(), Map.of(), HudSettings.NONE, Map.of("faction", lion));
 
-        assertEquals(Map.of("faction", "lion"), new QuestStoreComponent(store).getTeams());
+        assertEquals(Map.of("faction", lion), new QuestStoreComponent(store).getTeams());
     }
 
     @Test
     void changingATeamIsOwedAWrite() {
         QuestStoreComponent store = new QuestStoreComponent();
-        store.setTeam("party", "amis");
+        UUID party = UUID.randomUUID();
+        store.setTeam("party", party);
 
-        assertEquals(Map.of("party", "amis"), store.getTeams());
+        assertEquals(Map.of("party", party), store.getTeams());
         assertTrue(store.consumeChanges());
 
         store.setTeam("party", null);

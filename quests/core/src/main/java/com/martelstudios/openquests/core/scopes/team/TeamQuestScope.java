@@ -3,10 +3,10 @@ package com.martelstudios.openquests.core.scopes.team;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestScope;
 import com.martelstudios.openquests.core.scopes.ScopeServices;
-import com.martelstudios.openquests.core.teams.TeamKey;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -21,24 +21,25 @@ public class TeamQuestScope extends QuestScope {
     public static final String TYPE = "Team";
 
     public static final BuilderCodec<TeamQuestScope> CODEC = BuilderCodec.builder(TeamQuestScope.class, TeamQuestScope::new, QuestScope.BASE_CODEC)
-                                                                         .append(new KeyedCodec<>("Team", Codec.STRING), (scope, key) -> scope.team = TeamKey.parseHolderKey(key), scope -> scope.team == null ? null : scope.team.holderKey())
+                                                                         .append(new KeyedCodec<>("Team", Codec.UUID_STRING), (scope, teamId) -> scope.teamId = teamId, scope -> scope.teamId)
+                                                                         .addValidator(Validators.nonNull())
                                                                          .add()
                                                                          .build();
 
-    protected TeamKey team;
+    protected UUID teamId;
 
     protected TeamQuestScope() {}
 
-    public TeamQuestScope(@Nonnull TeamKey team) {
-        this.team = team;
+    public TeamQuestScope(@Nonnull UUID teamId) {
+        this.teamId = teamId;
     }
 
     /**
-     * @return the team sharing the quest.
+     * @return the id of the team sharing the quest.
      */
     @Nonnull
-    public TeamKey getTeam() {
-        return team;
+    public UUID getTeamId() {
+        return teamId;
     }
 
     /**
@@ -52,23 +53,23 @@ public class TeamQuestScope extends QuestScope {
     @Nonnull
     @Override
     public Collection<UUID> getQuestIds(@Nonnull ScopeServices services) {
-        return List.copyOf(services.teams().getQuestIds(team));
+        return List.copyOf(services.teams().getQuestIds(teamId));
     }
 
     @Override
     public void share(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
-        quest.apply(new AbstractQuestProgression.SetScope(new TeamQuestScope(team)));
-        services.teams().addQuest(team, quest.getId());
+        quest.apply(new AbstractQuestProgression.SetScope(new TeamQuestScope(teamId)));
+        services.teams().addQuest(teamId, quest.getId());
     }
 
     @Override
     public void release(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
-        services.teams().removeQuest(team, quest.getId());
+        services.teams().removeQuest(teamId, quest.getId());
     }
 
     @Override
     public void retire(@Nonnull ScopeServices services, @Nonnull AbstractQuestProgression<?> quest) {
-        services.teams().unindex(team, quest.getId());
+        services.teams().unindex(teamId, quest.getId());
     }
 
     /**

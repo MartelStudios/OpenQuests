@@ -40,7 +40,7 @@ public class PlayerQuestRecord {
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Hud", HudSettings.CODEC), (record, hud) -> record.hud = hud, record -> record.hud.isEmpty() ? null : record.hud)
                                                                             .add()
-                                                                            .append(new KeyedCodec<>("Teams", new MapCodec<>(Codec.STRING, HashMap<String, String>::new)), (record, teams) -> record.teams.putAll(teams), record -> record.teams.isEmpty() ? null : record.teams)
+                                                                            .append(new KeyedCodec<>("Teams", new MapCodec<>(Codec.UUID_STRING, HashMap<String, UUID>::new)), (record, teams) -> record.teams.putAll(teams), record -> record.teams.isEmpty() ? null : record.teams)
                                                                             .add()
                                                                             .build();
 
@@ -64,9 +64,9 @@ public class PlayerQuestRecord {
     private HudSettings hud = HudSettings.NONE;
 
     /**
-     * The team of each team type the player was put in, by type. Personal teams are implied, never listed.
+     * The id of the player's team of each team type, by type: a cache of the team documents, checked at connection.
      */
-    private final Map<String, String> teams = new HashMap<>();
+    private final Map<String, UUID> teams = new HashMap<>();
 
     public PlayerQuestRecord() {}
 
@@ -134,7 +134,7 @@ public class PlayerQuestRecord {
      * @return the live map of the team the player belongs to in each team type, by type.
      */
     @Nonnull
-    public Map<String, String> getTeams() {
+    public Map<String, UUID> getTeams() {
         return teams;
     }
 

@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The core services running for real over an in-memory database and an event bus of their own,
@@ -149,6 +151,21 @@ public final class QuestHarness implements AutoCloseable {
      */
     public void count(@Nonnull TestQuestProgression quest, int delta, int target) {
         services.getQuestProgressionService().progress(new Counting(delta, target), List.of(quest.getId()));
+    }
+
+    /**
+     * Waits for the storage thread to run what was queued on it. A quest spanning servers is
+     * written there, and its end announced there, after the change that made it returned.
+     */
+    public void settle() {
+        CountDownLatch done = new CountDownLatch(1);
+        services.getQuestSyncService().execute("settling a test", done::countDown);
+        try {
+            if (!done.await(5, TimeUnit.SECONDS)) throw new IllegalStateException("The storage thread did not settle");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override

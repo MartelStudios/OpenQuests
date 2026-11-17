@@ -1,32 +1,28 @@
 package com.martelstudios.openquests.core.scopes.team;
 
-import com.hypixel.hytale.event.IEventRegistry;
 import com.hypixel.hytale.logger.HytaleLogger;
-import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.scopes.ScopeIndexes;
+import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
-import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
-import com.martelstudios.openquests.core.stores.QuestStoreComponent;
-import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
-import com.martelstudios.openquests.core.teams.TeamKey;
-import com.martelstudios.openquests.core.teams.TeamTypes;
-import com.martelstudios.openquests.core.utils.EntityComponents;
+import com.martelstudios.openquests.core.teams.Teams;
 import com.martelstudios.openquests.core.utils.Players;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Holds the quests each team shares: indexes them under the team's key, hands them to its online
- * members and to members connecting later. Members are listed under a key of the team's own, but
- * for a personal team, whose name gives its only member.
+ * Holds the quests each team shares: indexes them under the team's key and binds its members to
+ * them, every member when a quest is shared and each one as they connect. Who is a member is read
+ * from the team's document at each use, never kept here.
+ *
+ * <p>A member joins the team's quests past the constraints of their assets: the team holds them
+ * already, and a member left out would split the team.
  */
 public class TeamQuestService {
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -36,158 +32,134 @@ public class TeamQuestService {
      */
     public static final String TEAM_INDEX_PREFIX = "team:";
 
-    /**
-     * The prefix of every team's members index.
-     */
-    public static final String MEMBERS_INDEX_PREFIX = "team-members:";
-
     private final ScopeIndexes indexes;
     private final QuestProgressionService progression;
     private final Players players;
-    private final PlayerComponentTypes components;
-    private final TeamTypes teamTypes;
+    private final Teams teams;
+    private final PlayerQuestService playerQuests;
 
-    public TeamQuestService(@Nonnull ScopeIndexes indexes, @Nonnull QuestProgressionService progression, @Nonnull Players players, @Nonnull PlayerComponentTypes components, @Nonnull TeamTypes teamTypes) {
+    public TeamQuestService(@Nonnull ScopeIndexes indexes, @Nonnull QuestProgressionService progression, @Nonnull Players players, @Nonnull Teams teams, @Nonnull PlayerQuestService playerQuests) {
         this.indexes = indexes;
         this.progression = progression;
         this.players = players;
-        this.components = components;
-        this.teamTypes = teamTypes;
+        this.teams = teams;
+        this.playerQuests = playerQuests;
     }
 
     /**
-     * Subscribes to connections, which bring the player's teams' quests to them. Registered after
-     * the player state service, so the record naming their teams is read first.
+     * @return {@code team:<uuid>}, the key of the team's running quests and assignment records.
      */
-    public void listen(@Nonnull IEventRegistry events) {
-        events.registerGlobal(PlayerConnectEvent.class, event -> joinRunningQuests(event.getPlayerRef().getUuid(), EntityComponents.of(event.getHolder())));
+    @Nonnull
+    public static String key(@Nonnull UUID teamId) {
+        return TEAM_INDEX_PREFIX + teamId;
+    }
+
+    /**
+     * @return the team that key names, {@code null} for the key of anything else.
+     */
+    @Nullable
+    public static UUID parseKey(@Nonnull String key) {
+        if (!key.startsWith(TEAM_INDEX_PREFIX)) return null;
+
+        try {
+            return UUID.fromString(key.substring(TEAM_INDEX_PREFIX.length()));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     /**
      * @return the live ids of the team's running quests.
      */
     @Nonnull
-    public Set<UUID> getQuestIds(@Nonnull TeamKey team) {
-        return indexes.getIds(team.holderKey());
+    public Set<UUID> getQuestIds(@Nonnull UUID teamId) {
+        return indexes.getIds(key(teamId));
     }
 
     /**
-     * Shares the quest with the team: scope written, indexed, joined by the online members.
+     * Shares the quest with the team: scope written, indexed, and every member bound, online or
+     * not, so the absent are paid and counted like the others.
      */
-    public void addQuest(@Nonnull TeamKey team, @Nonnull UUID questId) {
+    public void addQuest(@Nonnull UUID teamId, @Nonnull UUID questId) {
         AbstractQuestProgression<?> quest = progression.loadQuest(questId);
         if (quest == null) return;
 
         // Before the index lists it, which writes the quest: another server reading it finds it shared
-        if (!isSharedBy(quest, team)) quest.apply(new AbstractQuestProgression.SetScope(new TeamQuestScope(team)));
+        if (!isSharedBy(quest, teamId)) quest.apply(new AbstractQuestProgression.SetScope(new TeamQuestScope(teamId)));
 
-        if (!indexes.add(team.holderKey(), questId)) return;
+        if (!indexes.add(key(teamId), questId)) return;
 
-        LOGGER.atInfo().log("Added quest %s to team %s", questId, team.holderKey());
+        LOGGER.atInfo().log("Added quest %s to team %s", questId, teamId);
 
-        joinOnlineMembers(team, quest);
+        TeamRecord team = teams.get(teamId);
+        if (team == null) return;
+
+        for (UUID memberId : team.getMembers()) {
+            progression.joinQuest(quest, memberId, false);
+        }
     }
 
     /**
      * Takes the quest away from the team, its scope cleared while it is still there to write on.
      */
-    public void removeQuest(@Nonnull TeamKey team, @Nonnull UUID questId) {
-        indexes.remove(team.holderKey(), questId);
+    public void removeQuest(@Nonnull UUID teamId, @Nonnull UUID questId) {
+        indexes.remove(key(teamId), questId);
 
         AbstractQuestProgression<?> quest = progression.getQuest(questId);
-        if (quest != null && isSharedBy(quest, team)) quest.apply(new AbstractQuestProgression.SetScope(null));
+        if (quest != null && isSharedBy(quest, teamId)) quest.apply(new AbstractQuestProgression.SetScope(null));
     }
 
     /**
      * Takes an ended quest off the team's running ones; it keeps its scope and its players.
      */
-    public void unindex(@Nonnull TeamKey team, @Nonnull UUID questId) {
-        indexes.remove(team.holderKey(), questId);
+    public void unindex(@Nonnull UUID teamId, @Nonnull UUID questId) {
+        indexes.remove(key(teamId), questId);
     }
 
     /**
-     * @return the team's members, online or not.
+     * Brings the quests another server shared with the team to the members online here. That
+     * server bound them already, so no event told this one: their store takes the quest directly.
      */
-    @Nonnull
-    public Set<UUID> members(@Nonnull TeamKey team) {
-        UUID owner = team.owner();
-        if (owner != null) return Set.of(owner);
+    public void joinAdded(@Nonnull UUID teamId, @Nonnull Collection<UUID> questIds) {
+        TeamRecord team = teams.get(teamId);
+        if (team == null) return;
 
-        return Set.copyOf(indexes.getIds(team.membersKey()));
-    }
-
-    /**
-     * Lists the player as a member. A personal team lists nobody: its name says who.
-     */
-    public void addMember(@Nonnull TeamKey team, @Nonnull UUID playerId) {
-        if (!team.isPersonal()) indexes.add(team.membersKey(), playerId);
-    }
-
-    /**
-     * Takes the player off the team's members.
-     */
-    public void removeMember(@Nonnull TeamKey team, @Nonnull UUID playerId) {
-        if (!team.isPersonal()) indexes.remove(team.membersKey(), playerId);
-    }
-
-    /**
-     * @return the teams the player is in: those their record names, and their personal team of
-     * every personal-team type it names none of.
-     */
-    @Nonnull
-    public List<TeamKey> teamsOf(@Nonnull UUID playerId, @Nonnull EntityComponents player) {
-        QuestStoreComponent questStore = player.getComponent(components.questStore());
-        Map<String, String> named = questStore == null ? Map.of() : questStore.getTeams();
-
-        List<TeamKey> teams = new ArrayList<>();
-        named.forEach((type, name) -> teams.add(new TeamKey(type, name)));
-
-        for (OpenQuestTeamType type : teamTypes.all()) {
-            if (type.isPersonalTeam() && !named.containsKey(type.getId())) teams.add(TeamKey.personal(type.getId(), playerId));
-        }
-        return teams;
-    }
-
-    /**
-     * @return the player's team of that type, {@code null} when they have none.
-     */
-    @Nullable
-    public TeamKey teamOf(@Nonnull String type, @Nonnull UUID playerId, @Nonnull EntityComponents player) {
-        for (TeamKey team : teamsOf(playerId, player)) {
-            if (team.type().equals(type)) return team;
-        }
-        return null;
-    }
-
-    /**
-     * Has the team's members online here join the quests another server shared with it.
-     */
-    public void joinAdded(@Nonnull TeamKey team, @Nonnull Collection<UUID> questIds) {
         for (UUID questId : questIds) {
             AbstractQuestProgression<?> quest = progression.loadQuest(questId);
-            if (quest != null) joinOnlineMembers(team, quest);
-        }
-    }
+            if (quest == null) continue;
 
-    /**
-     * Has a connecting player join the running quests of every team they are in, through the
-     * components handed in: they are not online yet.
-     */
-    public void joinRunningQuests(@Nonnull UUID playerId, @Nonnull EntityComponents player) {
-        for (TeamKey team : teamsOf(playerId, player)) {
-            for (AbstractQuestProgression<?> quest : indexes.resolve(team.holderKey())) {
-                progression.joinQuest(quest, playerId);
+            for (UUID memberId : team.getMembers()) {
+                if (!players.isOnline(memberId)) continue;
+
+                if (quest.getPlayers().contains(memberId)) playerQuests.addQuestToPlayerStore(quest, memberId);
+                else progression.joinQuest(quest, memberId, false);
             }
         }
     }
 
-    private void joinOnlineMembers(@Nonnull TeamKey team, @Nonnull AbstractQuestProgression<?> quest) {
-        for (UUID playerId : members(team)) {
-            if (players.isOnline(playerId)) progression.joinQuest(quest, playerId);
+    /**
+     * Has a member join the team's running quests, a connecting one included, and drops from the
+     * index the quests found over.
+     */
+    public void joinRunningQuests(@Nonnull UUID teamId, @Nonnull UUID playerId) {
+        for (AbstractQuestProgression<?> quest : indexes.resolve(key(teamId))) {
+            if (quest.isOver()) indexes.remove(key(teamId), quest.getId());
+            else progression.joinQuest(quest, playerId, false);
         }
     }
 
-    private static boolean isSharedBy(@Nonnull AbstractQuestProgression<?> quest, @Nonnull TeamKey team) {
-        return quest.getScope() instanceof TeamQuestScope scope && team.equals(scope.getTeam());
+    /**
+     * Ends the team's share of quests: its running quests unregistered and its index deleted. Its
+     * assignment records are the caller's to delete, through the assignment service caching them.
+     */
+    public void disband(@Nonnull UUID teamId) {
+        for (AbstractQuestProgression<?> quest : List.copyOf(indexes.resolve(key(teamId)))) {
+            progression.unregisterQuest(quest);
+        }
+        indexes.delete(key(teamId));
+    }
+
+    private static boolean isSharedBy(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID teamId) {
+        return quest.getScope() instanceof TeamQuestScope scope && teamId.equals(scope.getTeamId());
     }
 }

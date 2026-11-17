@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.scopes.ScopeIndexes;
 import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.player.PlayerQuestService;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
+import com.martelstudios.openquests.core.teams.TeamService;
 import com.martelstudios.openquests.core.teams.Teams;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldClosingService;
@@ -52,6 +53,7 @@ public final class OpenQuestsServices implements QuestEnvironment {
     private final UniverseQuestService universe;
     private final TeamQuestService teams;
     private final Teams teamDocuments;
+    private final TeamService teamService;
     private final WorldQuestService worlds;
     private final WorldGroupIndex worldGroups;
     private final ScopeServices scopes;
@@ -78,7 +80,8 @@ public final class OpenQuestsServices implements QuestEnvironment {
         worlds = new WorldQuestService(scopeIndexes, progression, sync, playerQuests, platform.components());
         worldGroups = new WorldGroupIndex(scopeIndexes, progression, worlds);
         teamDocuments = new Teams(storage, storage, platform.teamTypes(), platform.clock(), teamInvitation);
-        teams = new TeamQuestService(scopeIndexes, progression, platform.players(), platform.components(), platform.teamTypes());
+        teams = new TeamQuestService(scopeIndexes, progression, platform.players(), teamDocuments, playerQuests);
+        teamService = new TeamService(teamDocuments, teams, platform.teamTypes(), platform.components());
         scopes = new ScopeServices(universe, worlds, worldGroups, teams);
         worldClosing = new WorldClosingService(storage, progression, scopes, platform.players());
         assignments = new QuestAssignmentService(storage, progression, scopes, platform.players(), platform.components(), platform.clock(), platform.scheduler());
@@ -100,7 +103,7 @@ public final class OpenQuestsServices implements QuestEnvironment {
         playerState.listen(events);
         rewards.listen(events);
         universe.listen(events);
-        teams.listen(events);
+        teamService.listen(events);
         worlds.listen(events);
         worldClosing.listen(events);
 
@@ -231,6 +234,14 @@ public final class OpenQuestsServices implements QuestEnvironment {
     @Nonnull
     public Teams getTeams() {
         return teamDocuments;
+    }
+
+    /**
+     * @return what keeps players' teams and their quests in step.
+     */
+    @Nonnull
+    public TeamService getTeamService() {
+        return teamService;
     }
 
     @Nonnull

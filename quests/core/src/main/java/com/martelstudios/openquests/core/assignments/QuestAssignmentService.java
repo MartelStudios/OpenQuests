@@ -15,7 +15,6 @@ import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
-import com.martelstudios.openquests.core.teams.TeamKey;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.core.utils.Players;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
@@ -241,11 +240,11 @@ public class QuestAssignmentService {
         }
 
         @Override
-        public void team(@Nonnull TeamKey team, @Nullable UUID joining) {
+        public void team(@Nonnull UUID teamId, @Nullable UUID joining) {
             String key = occasion.timeKey();
-            if (isSettled(AssignmentHolders.teamKey(team), key)) return;
+            if (isSettled(AssignmentHolders.teamKey(teamId), key)) return;
 
-            offerAll(holders.team(team, joining), key);
+            offerAll(holders.team(teamId, joining), key);
         }
 
         @Override

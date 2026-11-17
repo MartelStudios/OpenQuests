@@ -43,15 +43,16 @@ public class Teams {
     }
 
     /**
+     * @param name {@code null} for the default name, read after {@code ownerName}
      * @return a new team of that type, its owner its only member.
      * @throws IllegalArgumentException for a type no pack declares.
      */
     @Nonnull
-    public TeamRecord create(@Nonnull String type, @Nonnull UUID owner, @Nonnull String name) {
+    public TeamRecord create(@Nonnull String type, @Nonnull UUID owner, @Nonnull String ownerName, @Nullable String name) {
         if (types.get(type) == null) throw new IllegalArgumentException("No team type " + type + " is declared");
 
         for (int tries = 0; tries < MAX_TRIES; tries++) {
-            TeamRecord team = new TeamRecord(UUID.randomUUID(), type, name, owner, List.of(owner), List.of());
+            TeamRecord team = new TeamRecord(UUID.randomUUID(), type, name, ownerName, owner, List.of(owner), List.of());
             if (store.createTeam(team)) return team;
         }
         throw new IllegalStateException("Could not draw a free team id");

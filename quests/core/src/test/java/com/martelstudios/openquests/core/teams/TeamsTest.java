@@ -43,7 +43,7 @@ class TeamsTest {
 
     @Test
     void aNewTeamIsOwnedByItsCreator() {
-        TeamRecord team = teams.create("party", alice, "Alice's team");
+        TeamRecord team = teams.create("party", alice, "Alice", "Alice's team");
 
         TeamRecord read = teams.get(team.getId());
         assertEquals(alice, read.getOwner());
@@ -54,7 +54,7 @@ class TeamsTest {
 
     @Test
     void aMemberIsAppended() {
-        TeamRecord team = teams.create("party", alice, "Alice's team");
+        TeamRecord team = teams.create("party", alice, "Alice", "Alice's team");
 
         teams.addMember(team.getId(), bob);
 
@@ -63,7 +63,7 @@ class TeamsTest {
 
     @Test
     void theFirstMemberSucceedsTheOwner() {
-        UUID teamId = teams.create("party", alice, "Alice's team").getId();
+        UUID teamId = teams.create("party", alice, "Alice", "Alice's team").getId();
         teams.addMember(teamId, bob);
         teams.addMember(teamId, carol);
 
@@ -76,7 +76,7 @@ class TeamsTest {
 
     @Test
     void theLastMemberLeavingDeletesTheTeam() {
-        UUID teamId = teams.create("party", alice, "Alice's team").getId();
+        UUID teamId = teams.create("party", alice, "Alice", "Alice's team").getId();
 
         assertNull(teams.removeMember(teamId, alice));
         assertNull(teams.get(teamId));
@@ -84,7 +84,7 @@ class TeamsTest {
 
     @Test
     void onlyTheOwnerInvitesAndRenames() {
-        UUID teamId = teams.create("party", alice, "Alice's team").getId();
+        UUID teamId = teams.create("party", alice, "Alice", "Alice's team").getId();
         teams.addMember(teamId, bob);
 
         assertThrows(IllegalArgumentException.class, () -> teams.invite(teamId, bob, carol));
@@ -98,7 +98,7 @@ class TeamsTest {
 
     @Test
     void anInvitationExpires() {
-        UUID teamId = teams.create("party", alice, "Alice's team").getId();
+        UUID teamId = teams.create("party", alice, "Alice", "Alice's team").getId();
         teams.invite(teamId, alice, bob);
 
         harness.clock().advance(Duration.ofHours(25));
@@ -140,7 +140,7 @@ class TeamsTest {
             }
         };
         Teams retrying = new Teams(losingOnce, harness.storage(), TeamTypes.of(harness.teamTypes()), harness.clock(), Duration.ofHours(24));
-        UUID teamId = retrying.create("party", alice, "Alice's team").getId();
+        UUID teamId = retrying.create("party", alice, "Alice", "Alice's team").getId();
 
         retrying.addMember(teamId, bob);
 

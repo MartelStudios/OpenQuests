@@ -3,7 +3,6 @@ package com.martelstudios.openquests.core.scopes;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
-import com.martelstudios.openquests.core.teams.TeamKey;
 
 import javax.annotation.Nonnull;
 import java.util.HashSet;
@@ -35,8 +34,6 @@ public final class ScopeIndexFollower {
     public void follow() {
         Set<String> keys = new HashSet<>(indexes.getLoadedKeys(WorldGroupIndex.GROUP_INDEX_PREFIX));
         keys.addAll(indexes.getLoadedKeys(TeamQuestService.TEAM_INDEX_PREFIX));
-        // Members too, so a team reaches the players other servers put in it
-        keys.addAll(indexes.getLoadedKeys(TeamQuestService.MEMBERS_INDEX_PREFIX));
         keys.add(UniverseQuestService.UNIVERSE_INDEX_KEY);
 
         Map<String, Set<UUID>> added = indexes.refresh(keys);
@@ -45,8 +42,8 @@ public final class ScopeIndexFollower {
         worldGroups.spreadAdded(added);
 
         added.forEach((key, questIds) -> {
-            TeamKey team = TeamKey.parseHolderKey(key);
-            if (team != null) teams.joinAdded(team, questIds);
+            UUID teamId = TeamQuestService.parseKey(key);
+            if (teamId != null) teams.joinAdded(teamId, questIds);
         });
     }
 }

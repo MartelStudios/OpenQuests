@@ -1,7 +1,6 @@
 package com.martelstudios.openquests.core.assignments;
 
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.martelstudios.openquests.core.teams.TeamKey;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
@@ -48,7 +47,7 @@ public interface AssignmentTargets {
      * @param joining the player still connecting, not online yet for the team to hand a quest
      * created now to them
      */
-    void team(@Nonnull TeamKey team, @Nullable UUID joining);
+    void team(@Nonnull UUID teamId, @Nullable UUID joining);
 
     /**
      * Runs the action for every player online, each on the thread of the world they are in, for a

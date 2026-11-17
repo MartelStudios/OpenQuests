@@ -9,7 +9,7 @@ import com.martelstudios.openquests.core.assignments.scope.TeamAssignmentScope;
 import com.martelstudios.openquests.core.assignments.trigger.PlayerConnectTrigger;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
-import com.martelstudios.openquests.core.teams.TeamKey;
+import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.teams.TestTeamTypes;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import org.junit.jupiter.api.Test;
@@ -29,28 +29,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TeamAssignmentTest {
 
-    private static final TeamKey AMIS = new TeamKey("party", "amis");
-
     @Test
     void twoMembersShareOneQuest() {
         try (QuestHarness harness = new QuestHarness()) {
+            harness.teamTypes().add(TestTeamTypes.type("party", true));
             TeamQuestService teams = harness.services().getTeamQuestService();
             UUID alice = harness.players().connect();
             UUID bob = harness.players().connect();
-            teams.addMember(AMIS, alice);
-            teams.addMember(AMIS, bob);
+            UUID amis = harness.services().getTeams().create("party", alice, "Alice", "Amis").getId();
+            harness.services().getTeams().addMember(amis, bob);
 
             AssignmentHolders holders = new AssignmentHolders(new SharedAssignmentRecords(harness.storage()), harness.services().getQuestProgressionService(), harness.services().getScopeServices(), harness.players().types());
             AssignmentRecord next = AssignmentRecord.next(null, "once", Instant.now());
 
             // Straight to the holders: a quest built from an asset id is set aside without an asset store
-            assertTrue(holders.team(AMIS, alice).handOut(new TestQuestProgression(), "Story", "Test", null, next));
-            AssignmentHolder forBob = holders.team(AMIS, bob);
+            assertTrue(holders.team(amis, alice).handOut(new TestQuestProgression(), "Story", "Test", null, next));
+            AssignmentHolder forBob = holders.team(amis, bob);
             assertEquals(next, forBob.getRecord("Story", "Test"));
             assertFalse(forBob.handOut(new TestQuestProgression(), "Story", "Test", null, next));
 
-            assertEquals(1, teams.getQuestIds(AMIS).size());
-            AbstractQuestProgression<?> quest = harness.services().getQuestProgressionService().getQuest(teams.getQuestIds(AMIS).iterator().next());
+            assertEquals(1, teams.getQuestIds(amis).size());
+            AbstractQuestProgression<?> quest = harness.services().getQuestProgressionService().getQuest(teams.getQuestIds(amis).iterator().next());
             assertEquals(Set.of(alice, bob), Set.copyOf(quest.getPlayers()));
         }
     }
@@ -60,24 +59,12 @@ class TeamAssignmentTest {
         try (QuestHarness harness = new QuestHarness()) {
             harness.teamTypes().add(TestTeamTypes.type("party", true));
             UUID alice = harness.players().connect();
+            harness.services().getTeamService().onConnect(alice, "Alice", harness.players().of(alice));
 
             Recording targets = reach(harness, "party", Occasion.connection(alice, harness.players().of(alice)));
 
-            assertEquals(List.of(TeamKey.personal("party", alice)), targets.teams);
+            assertEquals(List.of(questStore(harness, alice).getTeams().get("party")), targets.teams);
             assertEquals(List.of(alice), targets.joining);
-        }
-    }
-
-    @Test
-    void aMemberIsReachedThroughTheirTeam() {
-        try (QuestHarness harness = new QuestHarness()) {
-            harness.teamTypes().add(TestTeamTypes.type("party", true));
-            UUID alice = harness.players().connect();
-            harness.players().of(alice).ensureAndGetComponent(harness.players().types().questStore()).setTeam("party", "amis");
-
-            Recording targets = reach(harness, "party", Occasion.connection(alice, harness.players().of(alice)));
-
-            assertEquals(List.of(AMIS), targets.teams);
         }
     }
 
@@ -100,15 +87,21 @@ class TeamAssignmentTest {
             UUID alice = harness.players().connect();
             UUID bob = harness.players().connect();
             UUID carol = harness.players().connect();
-            harness.players().of(alice).ensureAndGetComponent(harness.players().types().questStore()).setTeam("faction", "lion");
-            harness.players().of(bob).ensureAndGetComponent(harness.players().types().questStore()).setTeam("faction", "lion");
-            harness.players().of(carol).ensureAndGetComponent(harness.players().types().questStore()).setTeam("faction", "wolf");
+            UUID lion = UUID.randomUUID();
+            questStore(harness, alice).setTeam("faction", lion);
+            questStore(harness, bob).setTeam("faction", lion);
+            questStore(harness, carol).setTeam("faction", UUID.randomUUID());
             harness.players().disconnect(carol);
 
             Recording targets = reach(harness, "faction", Occasion.period("period:2026-11-16T00:00:00Z"));
 
-            assertEquals(Set.of(new TeamKey("faction", "lion")), Set.copyOf(targets.teams));
+            assertEquals(Set.of(lion), Set.copyOf(targets.teams));
         }
+    }
+
+    @Nonnull
+    private static QuestStoreComponent questStore(@Nonnull QuestHarness harness, @Nonnull UUID playerId) {
+        return harness.players().of(playerId).ensureAndGetComponent(harness.players().types().questStore());
     }
 
     @Nonnull
@@ -132,7 +125,7 @@ class TeamAssignmentTest {
      */
     private static final class Recording implements AssignmentTargets {
         private final QuestHarness harness;
-        private final List<TeamKey> teams = new ArrayList<>();
+        private final List<UUID> teams = new ArrayList<>();
         private final List<UUID> joining = new ArrayList<>();
 
         private Recording(@Nonnull QuestHarness harness) {
@@ -140,8 +133,8 @@ class TeamAssignmentTest {
         }
 
         @Override
-        public void team(@Nonnull TeamKey team, @Nullable UUID joining) {
-            teams.add(team);
+        public void team(@Nonnull UUID teamId, @Nullable UUID joining) {
+            teams.add(teamId);
             if (joining != null) this.joining.add(joining);
         }
 

@@ -59,9 +59,9 @@ public class QuestStoreComponent implements Component<EntityStore> {
     private volatile HudSettings hud = HudSettings.NONE;
 
     /**
-     * The team of each team type this player was put in, by type. Personal teams are implied.
+     * The id of this player's team of each team type, by type, as their record caches it.
      */
-    private final Map<String, String> teams = new ConcurrentHashMap<>();
+    private final Map<String, UUID> teams = new ConcurrentHashMap<>();
 
     /**
      * Set when something here changed and the player's record is owed a write.
@@ -185,16 +185,16 @@ public class QuestStoreComponent implements Component<EntityStore> {
      * @return the team this player belongs to in each team type, by type, for their record.
      */
     @Nonnull
-    public Map<String, String> getTeams() {
+    public Map<String, UUID> getTeams() {
         return Map.copyOf(teams);
     }
 
     /**
-     * @param name {@code null} for no team of that type, which for a personal-team type means their own.
+     * @param teamId {@code null} for no team of that type.
      */
-    public void setTeam(@Nonnull String type, @Nullable String name) {
-        String before = name == null ? teams.remove(type) : teams.put(type, name);
-        if (!Objects.equals(before, name)) markDirty();
+    public void setTeam(@Nonnull String type, @Nullable UUID teamId) {
+        UUID before = teamId == null ? teams.remove(type) : teams.put(type, teamId);
+        if (!Objects.equals(before, teamId)) markDirty();
     }
 
     /**
@@ -203,7 +203,7 @@ public class QuestStoreComponent implements Component<EntityStore> {
      * @param questIds the quests that answered, not the ids their record listed, so a dead id is
      * dropped here rather than carried another session.
      */
-    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Map<String, QuestCompletions> completions, @Nonnull Map<UUID, Boolean> tracking, @Nonnull HudSettings hud, @Nonnull Map<String, String> teams) {
+    public void restore(@Nonnull Set<UUID> questIds, @Nonnull Map<String, Map<String, AssignmentRecord>> assignments, @Nonnull Map<String, QuestCompletions> completions, @Nonnull Map<UUID, Boolean> tracking, @Nonnull HudSettings hud, @Nonnull Map<String, UUID> teams) {
         quests.replaceAll(questIds);
         this.assignments.replaceAll(assignments);
         this.completions.putAll(completions);

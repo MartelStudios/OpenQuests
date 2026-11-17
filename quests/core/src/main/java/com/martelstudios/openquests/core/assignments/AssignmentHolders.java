@@ -3,6 +3,7 @@ package com.martelstudios.openquests.core.assignments;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.martelstudios.openquests.core.scopes.ScopeServices;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
+import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestScope;
 import com.martelstudios.openquests.core.scopes.universe.UniverseQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldGroupIndex;
@@ -11,7 +12,6 @@ import com.martelstudios.openquests.core.scopes.world.WorldQuestService;
 import com.martelstudios.openquests.core.scopes.world.WorldsQuestScope;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.PlayerComponentTypes;
-import com.martelstudios.openquests.core.teams.TeamKey;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
@@ -78,11 +78,11 @@ public final class AssignmentHolders {
     }
 
     /**
-     * @return {@code team:<type>:<name>}.
+     * @return {@code team:<uuid>}.
      */
     @Nonnull
-    public static String teamKey(@Nonnull TeamKey team) {
-        return team.holderKey();
+    public static String teamKey(@Nonnull UUID teamId) {
+        return TeamQuestService.key(teamId);
     }
 
     /**
@@ -121,7 +121,7 @@ public final class AssignmentHolders {
      * @param joining the member still connecting, handed what is created on their way in
      */
     @Nonnull
-    public AssignmentHolder team(@Nonnull TeamKey team, @Nullable UUID joining) {
-        return new SharedAssignmentHolder(progression, scopes, records, teamKey(team), new TeamQuestScope(team), joining);
+    public AssignmentHolder team(@Nonnull UUID teamId, @Nullable UUID joining) {
+        return new SharedAssignmentHolder(progression, scopes, records, teamKey(teamId), new TeamQuestScope(teamId), joining);
     }
 }

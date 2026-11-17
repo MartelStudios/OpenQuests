@@ -45,7 +45,7 @@ class OpenQuestsServicesTest {
             "deadlines", services.getQuestDeadlineService()::listen,
             "players", services.getPlayerQuestService()::listen,
             "universe", services.getUniverseQuestService()::listen,
-            "teams", services.getTeamQuestService()::listen,
+            "teams", services.getTeamService()::listen,
             "worlds", services.getWorldQuestService()::listen,
             "assignments", services.getQuestAssignmentService()::listen
         );

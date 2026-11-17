@@ -8,11 +8,12 @@ import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.assignments.AssignmentTargets;
 import com.martelstudios.openquests.core.assignments.Occasion;
 import com.martelstudios.openquests.core.assignments.OpenQuestAssignment;
-import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
+import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.teams.OpenQuestTeamType;
-import com.martelstudios.openquests.core.teams.TeamKey;
+import com.martelstudios.openquests.core.utils.EntityComponents;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
@@ -43,18 +44,23 @@ public class TeamAssignmentScope extends AssignmentScope {
      */
     @Override
     public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion, @Nonnull AssignmentTargets targets) {
-        TeamQuestService teams = OpenQuestsServices.installed().getTeamQuestService();
         UUID playerId = occasion.getPlayerId();
 
         if (playerId != null && occasion.getPlayer() != null) {
-            TeamKey team = teams.teamOf(teamType, playerId, occasion.getPlayer());
-            if (team != null) targets.team(team, playerId);
+            UUID teamId = teamOf(occasion.getPlayer());
+            if (teamId != null) targets.team(teamId, playerId);
             return;
         }
 
         targets.eachOnlinePlayer((memberId, member) -> {
-            TeamKey team = teams.teamOf(teamType, memberId, member);
-            if (team != null) targets.team(team, null);
+            UUID teamId = teamOf(member);
+            if (teamId != null) targets.team(teamId, null);
         });
+    }
+
+    @Nullable
+    private UUID teamOf(@Nonnull EntityComponents player) {
+        QuestStoreComponent questStore = player.getComponent(OpenQuestsServices.installed().getPlatform().components().questStore());
+        return questStore == null ? null : questStore.getTeams().get(teamType);
     }
 }

@@ -2,132 +2,200 @@ package com.martelstudios.openquests.core.scopes;
 
 import com.hypixel.hytale.codec.ExtraInfo;
 import com.martelstudios.openquests.core.QuestHarness;
+import com.martelstudios.openquests.core.TestQuestAsset;
+import com.martelstudios.openquests.core.constraints.AssignmentRequest;
+import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.persistence.TeamRecord;
 import com.martelstudios.openquests.core.persistence.TestQuestProgression;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestScope;
 import com.martelstudios.openquests.core.scopes.team.TeamQuestService;
-import com.martelstudios.openquests.core.teams.TeamKey;
+import com.martelstudios.openquests.core.stores.QuestStoreComponent;
+import com.martelstudios.openquests.core.teams.TeamService;
+import com.martelstudios.openquests.core.teams.Teams;
 import com.martelstudios.openquests.core.teams.TestTeamTypes;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TeamQuestServiceTest {
 
-    private static final TeamKey LION = new TeamKey("faction", "lion");
+    private QuestHarness harness;
+    private Teams teams;
+    private TeamQuestService teamQuests;
+    private TeamService teamService;
 
-    @Test
-    void aSharedQuestReachesEveryOnlineMember() {
-        try (QuestHarness harness = new QuestHarness()) {
-            TeamQuestService teams = harness.services().getTeamQuestService();
-            UUID alice = harness.players().connect();
-            UUID bob = harness.players().connect();
-            teams.addMember(LION, alice);
-            teams.addMember(LION, bob);
+    @BeforeEach
+    void open() {
+        harness = new QuestHarness();
+        harness.teamTypes().add(TestTeamTypes.type("party", true));
+        harness.teamTypes().add(TestTeamTypes.type("faction", false));
+        teams = harness.services().getTeams();
+        teamQuests = harness.services().getTeamQuestService();
+        teamService = harness.services().getTeamService();
+    }
 
-            TestQuestProgression quest = harness.register();
-            new TeamQuestScope(LION).share(harness.services().getScopeServices(), quest);
-
-            assertEquals(Set.of(alice, bob), Set.copyOf(quest.getPlayers()));
-            assertEquals(2, quest.getPlayers().size());
-            assertEquals(Set.of(quest.getId()), teams.getQuestIds(LION));
-        }
+    @AfterEach
+    void close() {
+        harness.close();
     }
 
     @Test
-    void aConnectingMemberJoinsTheTeamsRunningQuests() {
-        try (QuestHarness harness = new QuestHarness()) {
-            TeamQuestService teams = harness.services().getTeamQuestService();
-            UUID alice = harness.players().connect();
-            harness.players().of(alice).ensureAndGetComponent(harness.players().types().questStore()).setTeam("faction", "lion");
-            teams.addMember(LION, alice);
-            harness.players().disconnect(alice);
+    void aSharedQuestReachesEveryMember() {
+        UUID alice = harness.players().connect();
+        UUID bob = harness.players().connect();
+        UUID teamId = team("faction", alice, bob);
 
-            TestQuestProgression quest = harness.register();
-            new TeamQuestScope(LION).share(harness.services().getScopeServices(), quest);
-            assertTrue(quest.getPlayers().isEmpty());
+        TestQuestProgression quest = share(teamId, harness.register());
 
-            harness.players().connect(alice);
-            teams.joinRunningQuests(alice, harness.players().of(alice));
-
-            assertEquals(List.of(alice), List.copyOf(quest.getPlayers()));
-            assertTrue(harness.questsOf(alice).contains(quest.getId()));
-        }
+        assertEquals(Set.of(alice, bob), Set.copyOf(quest.getPlayers()));
+        assertEquals(2, quest.getPlayers().size());
+        assertEquals(Set.of(quest.getId()), teamQuests.getQuestIds(teamId));
+        assertTrue(harness.questsOf(alice).contains(quest.getId()));
     }
 
     @Test
-    void aPersonalTeamHoldsItsOwnerOnly() {
-        try (QuestHarness harness = new QuestHarness()) {
-            UUID id = UUID.randomUUID();
+    void anOfflineMemberIsBoundToANewQuest() {
+        UUID alice = harness.players().connect();
+        UUID bob = UUID.randomUUID();
+        UUID teamId = team("faction", alice, bob);
 
-            assertEquals(Set.of(id), harness.services().getTeamQuestService().members(TeamKey.personal("party", id)));
-        }
+        TestQuestProgression quest = share(teamId, harness.register());
+
+        assertTrue(quest.getPlayers().contains(bob));
     }
 
     @Test
-    void aPlayerIsInTheirPersonalTeamOfEveryTypeTheyNamedNoTeamOf() {
-        try (QuestHarness harness = new QuestHarness()) {
-            harness.teamTypes().add(TestTeamTypes.type("party", true));
-            harness.teamTypes().add(TestTeamTypes.type("faction", false));
-            harness.teamTypes().add(TestTeamTypes.type("guild", true));
-            UUID alice = harness.players().connect();
-            harness.players().of(alice).ensureAndGetComponent(harness.players().types().questStore()).setTeam("guild", "smiths");
+    void aMemberBoundOnAnotherServerSeesTheQuestHere() {
+        UUID bob = harness.players().connect();
+        UUID teamId = team("faction", bob);
+        TestQuestProgression quest = harness.register();
+        // What reading back a quest another server shared and bound bob to looks like
+        quest.apply(new AbstractQuestProgression.SetScope(new TeamQuestScope(teamId)));
+        quest.apply(new AbstractQuestProgression.Join(bob));
 
-            List<TeamKey> teams = harness.services().getTeamQuestService().teamsOf(alice, harness.players().of(alice));
+        teamQuests.joinAdded(teamId, List.of(quest.getId()));
 
-            assertEquals(Set.of(TeamKey.personal("party", alice), new TeamKey("guild", "smiths")), Set.copyOf(teams));
-        }
+        assertTrue(harness.questsOf(bob).contains(quest.getId()));
+    }
+
+    @Test
+    void aConnectingMemberJoinsDespiteTheConstraints() {
+        UUID alice = harness.players().connect();
+        UUID teamId = team("faction", alice);
+        TestQuestProgression quest = share(teamId, harness.register(new TestQuestAsset(new Refusing())));
+        UUID bob = UUID.randomUUID();
+        teams.addMember(teamId, bob);
+
+        harness.players().connect(bob);
+        questStore(bob).setTeam("faction", teamId);
+        teamService.onConnect(bob, "Bob", harness.players().of(bob));
+
+        assertTrue(quest.getPlayers().contains(bob));
+        assertTrue(harness.questsOf(bob).contains(quest.getId()));
+    }
+
+    @Test
+    void aConnectingPlayerGetsTheirPersonalTeams() {
+        UUID alice = harness.players().connect();
+
+        teamService.onConnect(alice, "Alice", harness.players().of(alice));
+
+        Map<String, UUID> named = questStore(alice).getTeams();
+        assertEquals(Set.of("party"), named.keySet());
+        TeamRecord party = teams.get(named.get("party"));
+        assertEquals(alice, party.getOwner());
+        assertEquals(List.of(alice), party.getMembers());
+        assertNull(party.getName());
+        assertEquals("Alice", party.getNamedAfter());
+    }
+
+    @Test
+    void aRecordNamingATeamThatDroppedThemIsCorrected() {
+        UUID alice = harness.players().connect();
+        UUID lion = team("faction", UUID.randomUUID());
+        questStore(alice).setTeam("faction", lion);
+        UUID party = teams.create("party", alice, "Alice", null).getId();
+        questStore(alice).setTeam("party", party);
+
+        teamService.onConnect(alice, "Alice", harness.players().of(alice));
+
+        assertEquals(Map.of("party", party), questStore(alice).getTeams());
     }
 
     @Test
     void aSharedFollowUpIsCreatedOnce() {
-        try (QuestHarness harness = new QuestHarness()) {
-            TeamQuestService teams = harness.services().getTeamQuestService();
-            teams.addMember(LION, harness.players().connect());
-            teams.addMember(LION, harness.players().connect());
-            TestQuestProgression quest = harness.register();
-            new TeamQuestScope(LION).share(harness.services().getScopeServices(), quest);
+        UUID teamId = team("faction", harness.players().connect(), harness.players().connect());
+        TestQuestProgression quest = share(teamId, harness.register());
 
-            harness.count(quest, 5, 5);
-            TestQuestProgression followUp = harness.register();
-            quest.getScope().share(harness.services().getScopeServices(), followUp);
+        harness.count(quest, 5, 5);
+        harness.settle();
+        TestQuestProgression followUp = harness.register();
+        quest.getScope().share(harness.services().getScopeServices(), followUp);
 
-            assertEquals(Set.of(followUp.getId()), teams.getQuestIds(LION));
-            assertEquals(2, followUp.getPlayers().size());
-        }
+        assertEquals(Set.of(followUp.getId()), teamQuests.getQuestIds(teamId));
+        assertEquals(2, followUp.getPlayers().size());
     }
 
     @Test
     void anEndedQuestLeavesTheIndex() {
-        try (QuestHarness harness = new QuestHarness()) {
-            TeamQuestService teams = harness.services().getTeamQuestService();
-            teams.addMember(LION, harness.players().connect());
-            TestQuestProgression quest = harness.register();
-            new TeamQuestScope(LION).share(harness.services().getScopeServices(), quest);
+        UUID teamId = team("faction", harness.players().connect());
+        TestQuestProgression quest = share(teamId, harness.register());
 
-            harness.count(quest, 5, 5);
+        harness.count(quest, 5, 5);
+        harness.settle();
 
-            assertTrue(quest.isOver());
-            assertTrue(teams.getQuestIds(LION).isEmpty());
-            assertEquals(new TeamQuestScope(LION).getTeam(), ((TeamQuestScope) quest.getScope()).getTeam());
-        }
+        assertTrue(quest.isOver());
+        assertTrue(teamQuests.getQuestIds(teamId).isEmpty());
+        assertEquals(teamId, ((TeamQuestScope) quest.getScope()).getTeamId());
     }
 
     @Test
     void aTeamScopeReadsBackItsTeam() {
-        try (QuestHarness harness = new QuestHarness()) {
-            TestQuestProgression quest = harness.register();
-            new TeamQuestScope(LION).share(harness.services().getScopeServices(), quest);
+        UUID teamId = team("faction", harness.players().connect());
+        TestQuestProgression quest = share(teamId, harness.register());
 
-            ExtraInfo extraInfo = ExtraInfo.THREAD_LOCAL.get();
-            AbstractQuestProgression<?> read = AbstractQuestProgression.CODEC.decode(AbstractQuestProgression.CODEC.encode(quest, extraInfo), extraInfo);
+        ExtraInfo extraInfo = ExtraInfo.THREAD_LOCAL.get();
+        AbstractQuestProgression<?> read = AbstractQuestProgression.CODEC.decode(AbstractQuestProgression.CODEC.encode(quest, extraInfo), extraInfo);
 
-            assertEquals(LION, ((TeamQuestScope) read.getScope()).getTeam());
+        assertEquals(teamId, ((TeamQuestScope) read.getScope()).getTeamId());
+    }
+
+    @Nonnull
+    private UUID team(@Nonnull String type, @Nonnull UUID owner, @Nonnull UUID... others) {
+        UUID teamId = teams.create(type, owner, "Owner", "Lions").getId();
+        for (UUID other : others) teams.addMember(teamId, other);
+        return teamId;
+    }
+
+    @Nonnull
+    private TestQuestProgression share(@Nonnull UUID teamId, @Nonnull TestQuestProgression quest) {
+        new TeamQuestScope(teamId).share(harness.services().getScopeServices(), quest);
+        return quest;
+    }
+
+    @Nonnull
+    private QuestStoreComponent questStore(@Nonnull UUID playerId) {
+        return harness.players().of(playerId).ensureAndGetComponent(harness.players().types().questStore());
+    }
+
+    /**
+     * Turns every player away.
+     */
+    private static final class Refusing extends QuestConstraint {
+        @Override
+        public boolean allowsAssignment(@Nonnull AssignmentRequest request) {
+            return false;
         }
     }
 }

@@ -6,6 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +23,8 @@ public final class TeamRecord {
                                                                      .add()
                                                                      .append(new KeyedCodec<>("Name", Codec.STRING), (team, name) -> team.name = name, team -> team.name)
                                                                      .add()
+                                                                     .append(new KeyedCodec<>("NamedAfter", Codec.STRING), (team, player) -> team.namedAfter = player, team -> team.namedAfter)
+                                                                     .add()
                                                                      .append(new KeyedCodec<>("Owner", Codec.UUID_STRING), (team, owner) -> team.owner = owner, team -> team.owner)
                                                                      .add()
                                                                      .append(new KeyedCodec<>("Members", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new)), (team, members) -> team.members = List.of(members), team -> team.members.toArray(UUID[]::new))
@@ -35,6 +38,7 @@ public final class TeamRecord {
     private UUID id;
     private String type;
     private String name;
+    private String namedAfter;
     private UUID owner;
     private List<UUID> members = List.of();
     private List<TeamInvitation> invitations = List.of();
@@ -42,14 +46,15 @@ public final class TeamRecord {
 
     private TeamRecord() {}
 
-    public TeamRecord(@Nonnull UUID id, @Nonnull String type, @Nonnull String name, @Nonnull UUID owner, @Nonnull List<UUID> members, @Nonnull List<TeamInvitation> invitations) {
-        this(id, type, name, owner, members, invitations, 0);
+    public TeamRecord(@Nonnull UUID id, @Nonnull String type, @Nullable String name, @Nonnull String namedAfter, @Nonnull UUID owner, @Nonnull List<UUID> members, @Nonnull List<TeamInvitation> invitations) {
+        this(id, type, name, namedAfter, owner, members, invitations, 0);
     }
 
-    private TeamRecord(@Nonnull UUID id, @Nonnull String type, @Nonnull String name, @Nonnull UUID owner, @Nonnull List<UUID> members, @Nonnull List<TeamInvitation> invitations, long version) {
+    private TeamRecord(@Nonnull UUID id, @Nonnull String type, @Nullable String name, @Nonnull String namedAfter, @Nonnull UUID owner, @Nonnull List<UUID> members, @Nonnull List<TeamInvitation> invitations, long version) {
         this.id = id;
         this.type = type;
         this.name = name;
+        this.namedAfter = namedAfter;
         this.owner = owner;
         this.members = List.copyOf(members);
         this.invitations = List.copyOf(invitations);
@@ -73,11 +78,20 @@ public final class TeamRecord {
     }
 
     /**
-     * @return what players read, not unique.
+     * @return the name the owner gave it, not unique, or {@code null} for the default name, which
+     * is translated for each reader and so not stored as text.
      */
-    @Nonnull
+    @Nullable
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return the name of the player the team was created for, which the default name reads.
+     */
+    @Nonnull
+    public String getNamedAfter() {
+        return namedAfter;
     }
 
     /**
@@ -116,7 +130,7 @@ public final class TeamRecord {
      */
     @Nonnull
     public TeamRecord withName(@Nonnull String name) {
-        return new TeamRecord(id, type, name, owner, members, invitations, version);
+        return new TeamRecord(id, type, name, namedAfter, owner, members, invitations, version);
     }
 
     /**
@@ -124,7 +138,7 @@ public final class TeamRecord {
      */
     @Nonnull
     public TeamRecord withOwner(@Nonnull UUID owner) {
-        return new TeamRecord(id, type, name, owner, members, invitations, version);
+        return new TeamRecord(id, type, name, namedAfter, owner, members, invitations, version);
     }
 
     /**
@@ -132,7 +146,7 @@ public final class TeamRecord {
      */
     @Nonnull
     public TeamRecord withMembers(@Nonnull List<UUID> members) {
-        return new TeamRecord(id, type, name, owner, members, invitations, version);
+        return new TeamRecord(id, type, name, namedAfter, owner, members, invitations, version);
     }
 
     /**
@@ -140,7 +154,7 @@ public final class TeamRecord {
      */
     @Nonnull
     public TeamRecord withInvitations(@Nonnull List<TeamInvitation> invitations) {
-        return new TeamRecord(id, type, name, owner, members, invitations, version);
+        return new TeamRecord(id, type, name, namedAfter, owner, members, invitations, version);
     }
 
     /**
@@ -148,6 +162,6 @@ public final class TeamRecord {
      */
     @Nonnull
     public TeamRecord withVersion(long version) {
-        return new TeamRecord(id, type, name, owner, members, invitations, version);
+        return new TeamRecord(id, type, name, namedAfter, owner, members, invitations, version);
     }
 }

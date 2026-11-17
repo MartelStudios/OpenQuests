@@ -40,6 +40,7 @@ class TeamStoreTest {
         assertEquals(team.getId(), read.getId());
         assertEquals("party", read.getType());
         assertEquals("Alice's team", read.getName());
+        assertEquals("Alice", read.getNamedAfter());
         assertEquals(alice, read.getOwner());
         assertEquals(List.of(alice, bob), read.getMembers());
         assertEquals(team.getInvitations(), read.getInvitations());
@@ -85,7 +86,7 @@ class TeamStoreTest {
 
     @Nonnull
     private static TeamRecord team(@Nonnull UUID owner) {
-        return new TeamRecord(UUID.randomUUID(), "party", "Alice's team", owner, List.of(owner), List.of());
+        return new TeamRecord(UUID.randomUUID(), "party", "Alice's team", "Alice", owner, List.of(owner), List.of());
     }
 
     @Nonnull
