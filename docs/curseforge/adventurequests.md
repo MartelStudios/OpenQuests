@@ -151,7 +151,7 @@ Almost every quest type, constraint and reward is in there, along with the four 
 
 ## 🛠️ Installing
 
-Requires **OpenQuests** and **OpenQuests Core** 5.1.0 or newer, **OpenDialogues** 2.0.0 or newer and **OpenQuests Dialogues** 1.2.0 or newer. CurseForge installs them with it.
+Requires **OpenQuests** and **OpenQuests Core** 5.2.0 or newer, **OpenDialogues** 2.3.0 or newer and **OpenQuests Dialogues** 1.2.0 or newer. CurseForge installs them with it.
 
 This pack carries no code of its own. By hand, drop the zip in `mods/`, and remove it whenever you want the quest list back to empty.
 
