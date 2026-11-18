@@ -203,10 +203,12 @@ public final class QuestReplica<Q extends AbstractQuestProgression<Q>> {
         synchronized (quest) {
             pending.subList(0, written).clear();
 
-            copyStoredFields(from);
+            // Made on a copy, then taken on whole: a reader outside the lock never sees the stored
+            // copy without what is still to write
+            AbstractQuestProgression<?> next = from.getReplica().copy();
+            for (QuestOperation<? super Q> operation : pending) next.getReplica().replay(operation);
+            copyStoredFields(next);
             markStored(from.getReplica().stored);
-
-            for (QuestOperation<? super Q> operation : pending) quest.make(operation);
             quest.dirty = !pending.isEmpty();
         }
     }

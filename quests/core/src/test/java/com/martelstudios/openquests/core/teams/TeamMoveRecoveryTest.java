@@ -47,6 +47,8 @@ class TeamMoveRecoveryTest {
 
             harness.services().getTeamService().change(absent, "Absent", "faction", team.getId());
             harness.settle();
+            // The release runs on the storage thread, and the unload it leaves is written on a later pass
+            harness.settle();
 
             assertFalse(harness.services().getScopeIndexes().getLoadedKeys(TeamQuestService.TEAM_INDEX_PREFIX).contains(TeamQuestService.key(team.getId())));
             assertNull(harness.services().getQuestProgressionService().getQuest(quest.getId()));

@@ -9,6 +9,8 @@ import com.martelstudios.openquests.core.stores.QuestsRecord;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -70,18 +72,58 @@ class ScopeIndexesTest {
         assertFalse(storage.has(GROUP));
     }
 
+    @Test
+    void aReadBeforeAnUnloadIsWrittenFindsWhatItWillWrite() {
+        List<Runnable> queued = new ArrayList<>();
+        ScopeIndexes deferred = new ScopeIndexes(storage, new ScopeIndexes.Writer() {
+            @Override public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String key, @Nonnull Runnable written) {
+                queued.add(() -> { record.flush(storage, key); written.run(); });
+            }
+            @Override public void deleteIndex(@Nonnull String key, @Nonnull Runnable written) {}
+        }, new QuestProgressionStore(Untouched.of(QuestStorage.class), Untouched.of(QuestEnvironment.class)));
+        deferred.add(GROUP, first);
+
+        deferred.unload(GROUP);
+
+        assertEquals(Set.of(first), deferred.getIds(GROUP));
+        queued.forEach(Runnable::run);
+        assertEquals(Set.of(first), storage.loadIndex(GROUP));
+        assertTrue(deferred.getLoadedKeys("worlds:").isEmpty());
+    }
+
+    @Test
+    void aReadBeforeTheDeletionIsWrittenFindsTheIndexEmpty() {
+        storage.addToIndex(GROUP, Set.of(first));
+        Runnable[] queued = new Runnable[1];
+        ScopeIndexes deferred = new ScopeIndexes(storage, new ScopeIndexes.Writer() {
+            @Override public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String key, @Nonnull Runnable written) { record.flush(storage, key); written.run(); }
+            @Override public void deleteIndex(@Nonnull String key, @Nonnull Runnable written) {
+                queued[0] = () -> { storage.deleteIndex(key); written.run(); };
+            }
+        }, new QuestProgressionStore(Untouched.of(QuestStorage.class), Untouched.of(QuestEnvironment.class)));
+        deferred.getIds(GROUP);
+
+        deferred.delete(GROUP);
+
+        assertTrue(deferred.getIds(GROUP).isEmpty());
+        queued[0].run();
+        assertTrue(deferred.getLoadedKeys("worlds:").isEmpty());
+    }
+
     /**
      * Writes on the caller's thread, which is all a test needs of the storage thread.
      */
     private record WritingAtOnce(@Nonnull MemoryIndexStore storage) implements ScopeIndexes.Writer {
         @Override
-        public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String key) {
+        public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String key, @Nonnull Runnable written) {
             record.flush(storage, key);
+            written.run();
         }
 
         @Override
-        public void deleteIndex(@Nonnull String key) {
+        public void deleteIndex(@Nonnull String key, @Nonnull Runnable written) {
             storage.deleteIndex(key);
+            written.run();
         }
     }
 }

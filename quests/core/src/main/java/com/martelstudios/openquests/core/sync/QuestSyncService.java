@@ -145,16 +145,22 @@ public class QuestSyncService implements ScopeIndexes.Writer, QuestSync {
      * quest always before the index listing it.
      */
     @Override
-    public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String indexKey) {
-        execute("the " + indexKey + " index", () -> record.flush(storage, indexKey, this::store));
+    public void flushIndex(@Nonnull QuestsRecord record, @Nonnull String indexKey, @Nonnull Runnable written) {
+        execute("the " + indexKey + " index", () -> {
+            record.flush(storage, indexKey, this::store);
+            written.run();
+        });
     }
 
     /**
      * Written in order with the changes made to the index before.
      */
     @Override
-    public void deleteIndex(@Nonnull String key) {
-        execute("the " + key + " index", () -> storage.deleteIndex(key));
+    public void deleteIndex(@Nonnull String key, @Nonnull Runnable written) {
+        execute("the " + key + " index", () -> {
+            storage.deleteIndex(key);
+            written.run();
+        });
     }
 
     /**
