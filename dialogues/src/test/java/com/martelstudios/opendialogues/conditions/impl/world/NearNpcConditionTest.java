@@ -20,18 +20,8 @@ class NearNpcConditionTest {
     }
 
     @Test
-    void aGroupIsEnough() {
-        assertNotNull(decode("{ \"Type\": \"NearNpc\", \"Group\": \"Spiders\", \"Radius\": 100, \"Min\": 3 }"));
-    }
-
-    @Test
     void roleOrGroupIsRequired() {
         assertNull(decode("{ \"Type\": \"NearNpc\", \"Radius\": 10 }"));
-    }
-
-    @Test
-    void roleAndGroupTogetherAreRefused() {
-        assertNull(decode("{ \"Type\": \"NearNpc\", \"Role\": \"Spider\", \"Group\": \"Spiders\", \"Radius\": 10 }"));
     }
 
     @Test

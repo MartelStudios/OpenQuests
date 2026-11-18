@@ -36,6 +36,7 @@ public class OpenDialoguesNearNpcCondition extends DialogueCondition {
                                                                                        .append(new KeyedCodec<>("Role", Codec.STRING), (condition, role) -> condition.role = role, condition -> condition.role)
                                                                                        .add()
                                                                                        .append(new KeyedCodec<>("Group", Codec.STRING), (condition, group) -> condition.group = group, condition -> condition.group)
+                                                                                       .addValidator(NPCGroup.VALIDATOR_CACHE.getValidator())
                                                                                        .add()
                                                                                        .append(new KeyedCodec<>("Radius", Codec.DOUBLE, true), (condition, radius) -> condition.radius = radius, condition -> condition.radius)
                                                                                        .add()
@@ -90,6 +91,8 @@ public class OpenDialoguesNearNpcCondition extends DialogueCondition {
     @Nullable
     @Override
     public String validate(@Nonnull Function<String, OpenDialogueAsset> dialogues) {
+        NPCPlugin npcs = NPCPlugin.get();
+        if (role != null && npcs != null && !npcs.hasRoleName(role)) return "Unknown Role " + role;
         return CountBounds.validate(min, max);
     }
 }
