@@ -102,6 +102,8 @@ other.
 | <code>Holding</code>             | The item in hand matches                                    |
 | <code>Inventory</code>           | The inventory holds enough of an item, a resource or a tag  |
 | <code>HasPermission</code>       | The player has a permission                                 |
+| <code>NearNpc</code>             | Enough NPCs of a role or group stand around the player      |
+| <code>NearBlock</code>           | Enough blocks of a kind lie around the player               |
 | <code>Composite</code>           | All of its conditions hold, or one of them                  |
 
 Every condition can be turned around with `"Not": true`. Put one in an answer's `When` to show it only when it holds,
