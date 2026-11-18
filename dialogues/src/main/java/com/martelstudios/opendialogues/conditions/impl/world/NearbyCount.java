@@ -27,9 +27,16 @@ public final class NearbyCount {
         for (T candidate : candidates) {
             if (!counts.test(candidate)) continue;
             count++;
-            if (max != null ? count > max : count >= min) break;
+            if (settled(count, min, max)) break;
         }
         return CountBounds.within(count, min, max);
+    }
+
+    /**
+     * @return whether counting further cannot change the answer: past {@code max}, or {@code min} reached without one.
+     */
+    static boolean settled(int count, int min, @Nullable Integer max) {
+        return max != null ? count > max : count >= min;
     }
 
     /**

@@ -65,6 +65,7 @@ that does not hold, and the selector moves on. See `AdventureQuests_Plush` in th
 | `Holding` | The item in hand matches `Item`. |
 | `Inventory` | The inventory holds between `Min` and `Max` items matching `Item`. |
 | `NearNpc` | Between `Min` and `Max` living NPCs of `Role` or `Group` stand within `Radius` (at most 128) of the player. The NPC being talked to counts when it matches. |
+| `NearBlock` | Between `Min` and `Max` blocks whose item matches `Block` (only in `State`, such as `StageFinal`, when set) lie within `Radius` (at most 128) of the player. Chunks not in memory count nothing. |
 | `Composite` | Every (`Operator` `And`, the default), or one (`Or`), of `Conditions` holds. |
 
 Every condition also takes `Not`: when true, it holds exactly when it would not.
