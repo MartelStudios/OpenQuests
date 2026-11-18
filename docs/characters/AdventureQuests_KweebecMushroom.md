@@ -25,17 +25,18 @@ One of the random village stories: the NPC lives this one incident, then stays a
 
 ## Quests and rewards
 
-`AdventureQuests_VillageMushroom` (`Composite`: `AdventureQuests_VillageMushroomHarvest`, `AdventureQuests_VillageMushroomGive`), offered by the intro's accept answer. Steps: Pick a mushroom; Give the mushroom to the young Kweebec.
+`AdventureQuests_VillageMushroom` (`Composite`: `AdventureQuests_VillageMushroomHarvest`, `AdventureQuests_VillageMushroomGive`), offered by the intro's accept answer. Steps: Pick a mushroom within 100 blocks of an NPC carrying this character; Give the mushroom to the young Kweebec.
 Reward: 30 essences of life and 1 lesser stamina potion, from its treasure box.
 
 ## Assets
 
 - `OpenDialogues/Characters/AdventureQuests/KweebecVillage/AdventureQuests_KweebecMushroom.json`
-- `OpenDialogues/Routers/AdventureQuests/KweebecVillage/AdventureQuests_KweebecMushroom.json`: intro until the quest runs or succeeded, waiting while it runs, thanks after.
-- `OpenDialogues/Dialogues/AdventureQuests/KweebecVillage/AdventureQuests_VillageMushroom{Intro,Waiting,Thanks}.json`
+- `OpenDialogues/Routers/AdventureQuests/KweebecVillage/AdventureQuests_KweebecMushroom.json`: intro when the quest is not started and a mushroom lies within 100 blocks (`NearBlock` `Mushrooms`); a short absent line when not started and none is near; waiting while it runs; thanks after.
+- `OpenDialogues/Dialogues/AdventureQuests/KweebecVillage/AdventureQuests_VillageMushroom{Intro,Absent,Waiting,Thanks}.json`: waiting offers to give up (`SetQuestState` `Abandoned`) when no mushroom is within 100 blocks.
 - `OpenQuests/Quests/AdventureQuests/KweebecVillage/AdventureQuests_VillageMushroom*.json`
 - Lang keys `village-mushroom` in `Languages/*/adventurequests/kweebecvillage.lang`.
 
 ## Decision log
 
 - 2026-11-14: picked from the brainstorm catalogue; reward reviewed for usefulness and coherence (user).
+- 2026-11-17: offered only near mushrooms and the harvest counted only near the village, since picked mushrooms do not grow back (user).
