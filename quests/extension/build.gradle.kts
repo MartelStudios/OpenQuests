@@ -110,7 +110,7 @@ val questExamplesManifest by tasks.registering {
                 "ServerVersion": "$serverVersion",
                 "Dependencies": {
                     "$group:OpenQuests": "^5.2.0",
-                    "$group:OpenDialogues": "^2.0.0",
+                    "$group:OpenDialogues": "^2.3.0",
                     "$group:OpenQuestsDialogues": "^1.2.0"
                 },
                 "DisabledByDefault": false,
