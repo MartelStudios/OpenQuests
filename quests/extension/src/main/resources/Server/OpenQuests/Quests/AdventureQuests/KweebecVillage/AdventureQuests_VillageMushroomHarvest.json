@@ -4,5 +4,12 @@
   "TargetQuantity": 1,
   "ItemToPickup": {
     "ResourceTypeId": "Mushrooms"
-  }
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_KweebecMushroom",
+      "Radius": 100
+    }
+  ]
 }

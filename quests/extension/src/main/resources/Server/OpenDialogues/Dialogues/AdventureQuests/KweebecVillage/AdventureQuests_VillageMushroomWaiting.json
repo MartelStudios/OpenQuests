@@ -21,6 +21,28 @@
       ]
     },
     {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-mushroom.giveup",
+      "When": {
+        "Type": "NearBlock",
+        "Block": {
+          "ResourceTypeId": "Mushrooms"
+        },
+        "Radius": 100,
+        "Min": 0,
+        "Max": 0
+      },
+      "Actions": [
+        {
+          "Type": "SetQuestState",
+          "Quest": "AdventureQuests_VillageMushroom",
+          "State": "Abandoned"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
       "Text": "adventurequests.kweebecvillage.dialogue.village.later",
       "Actions": [
         {
