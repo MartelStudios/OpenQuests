@@ -54,9 +54,7 @@ public class OpenDialoguesNearBlockCondition extends DialogueCondition {
     protected Integer max;
 
     @Nullable
-    private BlockTypeAssetMap<String, BlockType> resolvedFrom;
-    private int resolvedCount;
-    private IntSet ids = IntSet.of();
+    private volatile Resolved resolved;
 
     protected OpenDialoguesNearBlockCondition() {}
 
@@ -79,24 +77,28 @@ public class OpenDialoguesNearBlockCondition extends DialogueCondition {
     @Nonnull
     private IntSet ids() {
         BlockTypeAssetMap<String, BlockType> types = BlockType.getAssetMap();
-        if (types == resolvedFrom && types.getNextIndex() == resolvedCount) return ids;
-        IntSet resolved = new IntOpenHashSet();
+        Resolved current = resolved;
+        if (current != null && current.from() == types && current.count() == types.getNextIndex()) return current.ids();
+        IntSet ids = new IntOpenHashSet();
         for (int index = 0; index < types.getNextIndex(); index++) {
             BlockType type = types.getAsset(index);
             Item item = type == null ? null : type.getItem();
             if (item == null || !block.matches(item.getId())) continue;
             if (state == null) {
-                resolved.add(index);
+                ids.add(index);
             } else if (!type.isState()) {
                 int stateIndex = types.getIndexOrDefault(type.getBlockKeyForState(state), -1);
-                if (stateIndex >= 0) resolved.add(stateIndex);
+                if (stateIndex >= 0) ids.add(stateIndex);
             }
         }
-        ids = resolved;
-        resolvedFrom = types;
-        resolvedCount = types.getNextIndex();
+        resolved = new Resolved(types, types.getNextIndex(), ids);
         return ids;
     }
+
+    /**
+     * One immutable snapshot, so worlds ticking on other threads never see a half-built set.
+     */
+    private record Resolved(BlockTypeAssetMap<String, BlockType> from, int count, IntSet ids) {}
 
     @Nullable
     @Override
