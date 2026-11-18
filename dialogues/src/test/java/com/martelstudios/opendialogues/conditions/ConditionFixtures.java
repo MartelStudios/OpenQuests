@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues.conditions;
 
+import com.martelstudios.opendialogues.conditions.impl.world.OpenDialoguesNearNpcCondition;
 import com.martelstudios.opendialogues.CodecJson;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesAnsweredCondition;
@@ -21,6 +22,7 @@ public final class ConditionFixtures {
         registry.registerCondition(OpenDialoguesOpenedCondition.TYPE, OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition.CODEC);
         registry.registerCondition(OpenDialoguesAnsweredCondition.TYPE, OpenDialoguesAnsweredCondition.class, OpenDialoguesAnsweredCondition.CODEC);
         registry.registerCondition(OpenDialoguesHasPermissionCondition.TYPE, OpenDialoguesHasPermissionCondition.class, OpenDialoguesHasPermissionCondition.CODEC);
+        registry.registerCondition(OpenDialoguesNearNpcCondition.TYPE, OpenDialoguesNearNpcCondition.class, OpenDialoguesNearNpcCondition.CODEC);
     }
 
     private ConditionFixtures() {}

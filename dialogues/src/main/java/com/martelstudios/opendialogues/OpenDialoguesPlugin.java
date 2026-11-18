@@ -96,6 +96,7 @@ import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesAnsw
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesOpenedCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.OpenDialoguesHoldingCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.OpenDialoguesInventoryCondition;
+import com.martelstudios.opendialogues.conditions.impl.world.OpenDialoguesNearNpcCondition;
 import com.martelstudios.opendialogues.conditions.impl.permission.OpenDialoguesHasPermissionCondition;
 import com.martelstudios.opendialogues.conditions.impl.logic.OpenDialoguesCompositeCondition;
 
@@ -191,6 +192,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerCondition(OpenDialoguesAnsweredCondition.TYPE, OpenDialoguesAnsweredCondition.class, OpenDialoguesAnsweredCondition.CODEC);
         registry.registerCondition(OpenDialoguesHoldingCondition.TYPE, OpenDialoguesHoldingCondition.class, OpenDialoguesHoldingCondition.CODEC);
         registry.registerCondition(OpenDialoguesInventoryCondition.TYPE, OpenDialoguesInventoryCondition.class, OpenDialoguesInventoryCondition.CODEC);
+        registry.registerCondition(OpenDialoguesNearNpcCondition.TYPE, OpenDialoguesNearNpcCondition.class, OpenDialoguesNearNpcCondition.CODEC);
         registry.registerCondition(OpenDialoguesHasPermissionCondition.TYPE, OpenDialoguesHasPermissionCondition.class, OpenDialoguesHasPermissionCondition.CODEC);
 
         registry.registerFilter(OpenDialoguesRoleFilter.TYPE, OpenDialoguesRoleFilter.class, OpenDialoguesRoleFilter.CODEC);
