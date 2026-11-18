@@ -18,6 +18,13 @@ public final class CountBounds {
     }
 
     /**
+     * @return whether counting further cannot change the answer: past {@code max}, or {@code min} reached without one.
+     */
+    public static boolean settled(int count, int min, @Nullable Integer max) {
+        return max != null ? count > max : count >= min;
+    }
+
+    /**
      * @return why no count can lie between the bounds, {@code null} if one can.
      */
     @Nullable

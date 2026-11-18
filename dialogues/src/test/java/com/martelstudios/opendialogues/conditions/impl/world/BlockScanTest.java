@@ -1,7 +1,6 @@
 package com.martelstudios.opendialogues.conditions.impl.world;
 
 import it.unimi.dsi.fastutil.ints.IntList;
-import it.unimi.dsi.fastutil.ints.IntSet;
 import org.joml.Vector3d;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BlockScanTest {
 
     private static final int MUSHROOM = 7;
-    private static final IntSet IDS = IntSet.of(MUSHROOM);
+    private static final IntList IDS = IntList.of(MUSHROOM);
     private static final Vector3d CENTRE = new Vector3d(0.5, 64.5, 0.5);
 
     @Test

@@ -12,6 +12,8 @@ import com.martelstudios.opendialogues.conditions.CountBounds;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.OpenDialoguesItemFilter;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
@@ -75,7 +77,7 @@ public class OpenDialoguesNearBlockCondition extends DialogueCondition {
      * Resolved again when block types are added or reloaded, which grows or replaces the asset map.
      */
     @Nonnull
-    private IntSet ids() {
+    private IntList ids() {
         BlockTypeAssetMap<String, BlockType> types = BlockType.getAssetMap();
         Resolved current = resolved;
         if (current != null && current.from() == types && current.count() == types.getNextIndex()) return current.ids();
@@ -91,14 +93,15 @@ public class OpenDialoguesNearBlockCondition extends DialogueCondition {
                 if (stateIndex >= 0) ids.add(stateIndex);
             }
         }
-        resolved = new Resolved(types, types.getNextIndex(), ids);
-        return ids;
+        IntList list = new IntArrayList(ids);
+        resolved = new Resolved(types, types.getNextIndex(), list);
+        return list;
     }
 
     /**
      * One immutable snapshot, so worlds ticking on other threads never see a half-built set.
      */
-    private record Resolved(BlockTypeAssetMap<String, BlockType> from, int count, IntSet ids) {}
+    private record Resolved(BlockTypeAssetMap<String, BlockType> from, int count, IntList ids) {}
 
     @Nullable
     @Override
