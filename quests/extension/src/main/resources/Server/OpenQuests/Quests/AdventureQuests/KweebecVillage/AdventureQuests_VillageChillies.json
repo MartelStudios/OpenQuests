@@ -1,0 +1,36 @@
+{
+  "Type": "PlaceBlock",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Chilli.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-chillies.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-chillies.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-chillies.short",
+  "TargetQuantity": 4,
+  "BlockToPlace": {
+    "ItemId": "Plant_Seeds_Chilli"
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_KweebecChillies",
+      "Radius": 20
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Plant_Seeds_Chilli_Eternal",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Fire_Essence",
+      "Quantity": 5,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

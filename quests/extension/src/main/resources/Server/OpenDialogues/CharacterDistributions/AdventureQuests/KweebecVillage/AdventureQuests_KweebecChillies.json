@@ -1,0 +1,19 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Kweebec_Sapling_Pink"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_KweebecChillies",
+      "Weight": 1
+    },
+    {
+      "Weight": 13
+    }
+  ]
+}
