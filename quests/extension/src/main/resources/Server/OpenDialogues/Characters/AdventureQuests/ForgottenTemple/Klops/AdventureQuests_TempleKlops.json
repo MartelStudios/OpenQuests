@@ -1,0 +1,14 @@
+{
+  "Name": "adventurequests.forgottentemple.character.temple-klops.name",
+  "Epithet": "adventurequests.forgottentemple.character.temple-klops.epithet",
+  "Uniqueness": "Forever",
+  "Scope": "Universe",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Dialogue": "AdventureQuests_TempleKlops"
+      }
+    }
+  ]
+}

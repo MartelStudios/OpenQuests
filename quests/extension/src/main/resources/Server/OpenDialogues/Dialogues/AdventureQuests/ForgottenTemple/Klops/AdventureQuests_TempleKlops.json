@@ -1,0 +1,20 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_TempleKlops",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.temple-klops.text"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.forgottentemple.dialogue.temple-klops.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}
