@@ -292,3 +292,7 @@ dialogue.sapling.bye=Prends soin de toi.
 quest.meet-sapling.title=Rencontrer le jeune Kweebec
 quest.meet-sapling.description=Il fuit quand les gobelins font des farces.
 quest.meet-sapling.short=Parler au jeune Kweebec
+character.temple-klops.name=Bramwell
+character.temple-klops.epithet=Marchand Klops
+dialogue.temple-klops.text=La sève des Kweebec bouche un tuyau mieux que tout ce que fabriquent les gobelins. Si tu croises un marchand Kweebec, dis-lui que le vieux Bramwell achète toujours.
+dialogue.temple-klops.bye=Je lui dirai.

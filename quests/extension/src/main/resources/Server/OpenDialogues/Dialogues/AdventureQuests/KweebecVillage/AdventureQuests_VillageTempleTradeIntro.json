@@ -1,0 +1,48 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-temple-trade.intro.page1"
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-temple-trade.intro.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-temple-trade.accept",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_VillageTempleTrade"
+        },
+        {
+          "Type": "Command",
+          "Command": "give {player} Ingredient_Tree_Sap --quantity=8"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village.trade",
+      "Actions": [
+        {
+          "Type": "OpenBarterShop",
+          "Shop": "Kweebec_Merchant"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village.decline",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}
