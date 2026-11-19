@@ -74,11 +74,11 @@ class TriggerVolumeQuestAssetTest {
 
     /**
      * Decodes the shipped asset's own volume fields alone: the rest of it needs the asset stores. Read
-     * off the sources, since example quests are kept out of the jar and its resources.
+     * off the Adventure Quests module sources, which ship the quests apart from this jar.
      */
     private static TriggerVolumeQuestAsset decodeShipped(String id) throws IOException {
         List<Path> found;
-        try (Stream<Path> files = Files.walk(Path.of("src/main/resources/Server/OpenQuests/Quests"))) {
+        try (Stream<Path> files = Files.walk(Path.of("../../mods/adventurequests/src/main/resources/Server/OpenQuests/Quests"))) {
             found = files.filter(file -> file.getFileName().toString().equals(id + ".json")).toList();
         }
         assertEquals(1, found.size(), id);

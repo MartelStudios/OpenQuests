@@ -1,4 +1,3 @@
-import org.gradle.api.tasks.util.PatternSet
 import java.util.zip.ZipFile
 
 plugins {
@@ -64,79 +63,6 @@ tasks.named<Jar>("jar") {
     archiveVersion.set(project.property("version").toString())
 }
 
-// The ship quests as content. They leave the jar and travel as an asset pack of
-// their own, so a server owner keeps the quest types and drops the example chain by deleting one file.
-val questExamples = listOf("Server/OpenQuests/**", "Server/OpenDialogues/**", "Server/Item/**", "Common/Icons/AdventureQuests/**", "Server/Languages/*/adventurequests/**")
-
-// Team types every pack may reference, so they ship with the jar rather than the example pack
-val keptInJar = listOf("Server/OpenQuests/TeamTypes/**")
-val questContent = PatternSet().include(questExamples).exclude(keptInJar)
-
-// Only the published jar loses them: stageAllModAssets and prepareRunServer link the dev run
-// against src/main/resources rather than this output, so runAllMods keeps the quests, and keeps
-// them editable live. Installing the pack into run/mods would just load the same assets twice.
-tasks.named<Copy>("processResources") {
-    // Files only: an include pattern also matches its parent folders, which would empty the jar
-    exclude { !it.isDirectory && questContent.asSpec.isSatisfiedBy(it) }
-    includeEmptyDirs = false
-}
-
-val questExamplesManifest by tasks.registering {
-    val manifest = layout.buildDirectory.file("questExamples/manifest.json")
-    outputs.file(manifest)
-
-    val group = project.property("manifest_group").toString()
-    val modVersion = project.property("adventurequests_version").toString()
-    val author = project.property("mod_author").toString()
-    val url = project.property("mod_url").toString()
-    val serverVersion = project.property("manifestServerVersion").toString()
-
-    doLast {
-        val file = manifest.get().asFile
-        file.parentFile.mkdirs()
-        file.writeText(
-            """
-            {
-                "Group": "$group",
-                "Name": "AdventureQuests",
-                "Version": "$modVersion",
-                "Description": "Quests, characters and dialogues that bring vanilla Hytale to life. Delete to start from an empty quest list.",
-                "Authors": [
-                    {
-                        "Name": "$author"
-                    }
-                ],
-                "Website": "$url",
-                "ServerVersion": "$serverVersion",
-                "Dependencies": {
-                    "$group:OpenQuests": "^5.2.0",
-                    "$group:OpenDialogues": "^2.3.0",
-                    "$group:OpenQuestsDialogues": "^1.2.0"
-                },
-                "DisabledByDefault": false,
-                "IncludesAssetPack": true
-            }
-            """.trimIndent() + "\n"
-        )
-    }
-}
-
-val questExamplesZip by tasks.registering(Zip::class) {
-    archiveBaseName.set("AdventureQuests")
-    archiveVersion.set(project.property("adventurequests_version").toString())
-
-    // Manifest at the root, the rest keeping the paths it has under src/main/resources
-    from(questExamplesManifest)
-    from("src/main/resources") {
-        include(questExamples)
-        exclude(keptInJar)
-    }
-}
-
-tasks.named("assemble") {
-    dependsOn(questExamplesZip)
-}
-
 fun archiveEntries(archive: File): Set<String> =
     ZipFile(archive).use { zip -> zip.entries().asSequence().map { it.name }.toSet() }
 
@@ -145,25 +71,22 @@ val verifyReleaseArtifacts by tasks.registering {
     group = "verification"
     description = "Checks the jars and the quest content pack that the release publishes."
 
-    dependsOn(":quests:core:jar", tasks.named("jar"), questExamplesZip, ":mods:mmoskilltree:jar")
+    dependsOn(":quests:core:jar", tasks.named("jar"), ":mods:adventurequests:packZip", ":mods:mmoskilltree:jar")
 
     val modVersion = project.property("version").toString()
-    val adventureQuestsVersion = project.property("adventurequests_version").toString()
-    // Read late: the pack is configured after this project and carries a version of its own
+    // Read late: the packs are configured after this project and carry a version of their own
+    val adventureQuestsVersion = provider { project(":mods:adventurequests").version.toString() }
     val packVersion = provider { project(":mods:mmoskilltree").version.toString() }
     val coreJars = fileTree(project(":quests:core").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val extensionJars = fileTree(layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
-    val contentPacks = fileTree(layout.buildDirectory.dir("distributions").get().asFile) { include("*.zip") }
+    val contentPacks = fileTree(project(":mods:adventurequests").layout.buildDirectory.dir("distributions").get().asFile) { include("*.zip") }
     val packJars = fileTree(project(":mods:mmoskilltree").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val published = mapOf(
         "quests/core/build/libs/*.jar" to (coreJars to provider { modVersion }),
         "quests/extension/build/libs/*.jar" to (extensionJars to provider { modVersion }),
-        "quests/extension/build/distributions/*.zip" to (contentPacks to provider { adventureQuestsVersion }),
+        "mods/adventurequests/build/distributions/*.zip" to (contentPacks to adventureQuestsVersion),
         "mods/mmoskilltree/build/libs/*.jar" to (packJars to packVersion)
     )
-
-    val resourcesRoot = file("src/main/resources")
-    val questSources = fileTree(resourcesRoot) { include(questExamples); exclude(keptInJar) }
 
     doLast {
         published.forEach { (glob, artifacts) ->
@@ -192,27 +115,21 @@ val verifyReleaseArtifacts by tasks.registering {
             logger.lifecycle("Release artefact: ${artifact.name} (${artifact.length() / 1024} KiB)")
         }
 
-        val quests = questSources.files
-            .map { it.toRelativeString(resourcesRoot).replace(File.separatorChar, '/') }
-            .toSet()
-
-        val jar = extensionJars.singleFile
-        val leaked = quests.intersect(archiveEntries(jar)).sorted()
-        if (leaked.isNotEmpty()) {
-            throw GradleException("${jar.name} still carries quest content: ${leaked.joinToString()}")
-        }
-
-        val pack = contentPacks.singleFile
-        val packed = archiveEntries(pack)
-
         // AssetModule skips a pack with no manifest.json of its own, and only warns about it
-        if (!packed.contains("manifest.json")) {
+        val pack = contentPacks.singleFile
+        if (!archiveEntries(pack).contains("manifest.json")) {
             throw GradleException("${pack.name} has no manifest.json, the server would skip it.")
         }
 
-        val absent = (quests - packed).sorted()
-        if (absent.isNotEmpty()) {
-            throw GradleException("${pack.name} is missing quest content: ${absent.joinToString()}")
+        // A content pack has no plugin class: a Main, even blank, makes the server look for one
+        val manifest = ZipFile(pack).use { zip ->
+            groovy.json.JsonSlurper().parse(zip.getInputStream(zip.getEntry("manifest.json"))) as Map<*, *>
+        }
+        if (manifest.containsKey("Main")) {
+            throw GradleException("${pack.name} declares a Main in its manifest.json.")
+        }
+        if (manifest["Version"] != adventureQuestsVersion.get()) {
+            throw GradleException("${pack.name} has manifest version ${manifest["Version"]}, not ${adventureQuestsVersion.get()}.")
         }
     }
 }
