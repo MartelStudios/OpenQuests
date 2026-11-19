@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-big-scythe.give.title",
+  "Character": "AdventureQuests_KweebecBigScythe",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Wheat_Item"
+      },
+      "Quantity": 5
+    }
+  ]
+}
