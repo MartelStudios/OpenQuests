@@ -1,0 +1,15 @@
+{
+  "Type": "InteractivelyPickup",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-big-scythe.harvest.title",
+  "TargetQuantity": 5,
+  "ItemToPickup": {
+    "ItemId": "Plant_Crop_Wheat_Item"
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_KweebecBigScythe",
+      "Radius": 30
+    }
+  ]
+}
