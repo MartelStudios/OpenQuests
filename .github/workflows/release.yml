@@ -65,7 +65,7 @@ jobs:
           fi
           if [[ -n "$ADVENTUREQUESTS_VERSION" ]]; then
             TAGS+=("adventurequests-v$ADVENTUREQUESTS_VERSION")
-            FILES+=$'quests/extension/build/distributions/*.zip\n'
+            FILES+=$'mods/adventurequests/build/distributions/*.zip\n'
           fi
           if [[ -n "$PACK_VERSION" ]]; then
             TAGS+=("mmoskilltree-v$PACK_VERSION")
@@ -120,7 +120,7 @@ jobs:
             sed -i "s/^openquestsdialogues_version = .*/openquestsdialogues_version = $BRIDGE_VERSION/" mods/openquestsdialogues/gradle.properties
           fi
           if [[ -n "$ADVENTUREQUESTS_VERSION" ]]; then
-            sed -i "s/^adventurequests_version = .*/adventurequests_version = $ADVENTUREQUESTS_VERSION/" quests/extension/gradle.properties
+            sed -i "s/^adventurequests_version = .*/adventurequests_version = $ADVENTUREQUESTS_VERSION/" mods/adventurequests/gradle.properties
           fi
           if [[ -n "$PACK_VERSION" ]]; then
             sed -i "s/^mmoskilltree_version = .*/mmoskilltree_version = $PACK_VERSION/" mods/mmoskilltree/gradle.properties
@@ -185,7 +185,7 @@ jobs:
             relations: openquests:requiredDependency,openquests-dialogues:requiredDependency
             project_id: '1680200'
             changelog: adventurequests
-            file: quests/extension/build/distributions/AdventureQuests-*.zip
+            file: mods/adventurequests/build/distributions/AdventureQuests-*.zip
             version_input: adventurequests_version
           - name: OpenDialogues
             relations: ''
