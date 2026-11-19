@@ -1,0 +1,26 @@
+{
+    "Group": "MartelStudios",
+    "Name": "AdventureQuests",
+    "Version": "1.5.0",
+    "Description": "Quests, characters and dialogues that bring vanilla Hytale to life. Delete to start from an empty quest list.",
+    "Authors": [
+        {
+            "Name": "Hazard4U"
+        }
+    ],
+    "Website": "https://github.com/MartelStudios/OpenQuests",
+    "ServerVersion": "^0.7.0",
+    "Dependencies": {
+        "MartelStudios:OpenQuests": "^5.2.0",
+        "MartelStudios:OpenDialogues": "^2.3.0",
+        "MartelStudios:OpenQuestsDialogues": "^1.2.0"
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "IncludesAssetPack": true,
+    "UpdateChecker": {
+        "CurseForge": "1680200"
+    }
+}
