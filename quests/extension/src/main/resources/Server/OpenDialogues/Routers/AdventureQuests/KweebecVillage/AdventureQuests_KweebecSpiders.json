@@ -1,0 +1,66 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_VillageSpiders",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "NearNpc",
+              "Role": "Spider",
+              "Radius": 100,
+              "Min": 3
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSpidersIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_VillageSpiders",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSpidersAbsent"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_VillageSpiders",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSpidersWaiting"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSpidersThanks"
+        }
+      }
+    ]
+  }
+}
