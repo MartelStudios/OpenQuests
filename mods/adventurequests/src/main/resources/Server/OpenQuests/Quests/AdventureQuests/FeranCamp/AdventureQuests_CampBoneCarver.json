@@ -1,0 +1,53 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Weapon_Sword_Bone.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.ferancamp.quest.camp-bone-carver.title",
+  "DescriptionKey": "adventurequests.ferancamp.quest.camp-bone-carver.description",
+  "ShortDescriptionKey": "adventurequests.ferancamp.quest.camp-bone-carver.short",
+  "Character": "AdventureQuests_FeranBoneCarver",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Bone_Fragment"
+      },
+      "Quantity": 10
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Choice",
+      "Choices": 1,
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Weapon_Sword_Bone",
+            "Quantity": 1
+          },
+          "Count": 1
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Weapon_Spear_Bone",
+            "Quantity": 1
+          },
+          "Count": 1
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Weapon_Daggers_Bone",
+            "Quantity": 1
+          },
+          "Count": 1
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}

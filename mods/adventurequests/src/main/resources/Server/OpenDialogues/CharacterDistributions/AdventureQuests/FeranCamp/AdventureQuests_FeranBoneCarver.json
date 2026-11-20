@@ -1,0 +1,26 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Feran_Civilian"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-.*"
+      ],
+      "Not": true
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_FeranBoneCarver",
+      "Weight": 1
+    },
+    {
+      "Weight": 13
+    }
+  ]
+}

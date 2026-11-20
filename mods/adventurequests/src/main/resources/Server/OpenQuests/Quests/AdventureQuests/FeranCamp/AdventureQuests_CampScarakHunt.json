@@ -1,0 +1,38 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Chitin_Sturdy.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.ferancamp.quest.camp-scarak-hunt.title",
+  "DescriptionKey": "adventurequests.ferancamp.quest.camp-scarak-hunt.description",
+  "ShortDescriptionKey": "adventurequests.ferancamp.quest.camp-scarak-hunt.short",
+  "TargetQuantity": 3,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Scarak_Seeker*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_FeranScarakHunt",
+      "Radius": 100
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Weapon_Spear_Bone",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Chitin_Sturdy",
+      "Quantity": 4,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}
