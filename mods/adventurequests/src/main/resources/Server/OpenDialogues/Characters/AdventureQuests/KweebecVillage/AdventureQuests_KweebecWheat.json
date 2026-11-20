@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.kweebecvillage.character.village-wheat.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_KweebecWheat"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "Type": "PlaceBlock",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Wheat.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-wheat.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-wheat.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-wheat.short",
+  "TargetQuantity": 4,
+  "BlockToPlace": {
+    "ItemId": "Plant_Seeds_Wheat"
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_KweebecWheat",
+      "Radius": 20
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Plant_Seeds_Wheat_Eternal",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Flour",
+      "Quantity": 4,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}
