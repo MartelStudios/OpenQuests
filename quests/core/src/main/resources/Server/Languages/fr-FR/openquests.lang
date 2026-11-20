@@ -20,4 +20,4 @@ commands.team.unknown = Aucune équipe ne correspond à {team}.
 commands.team.wrong_type = Cette équipe est d'un autre type.
 commands.team.members = {team} ({id}), propriétaire {owner} : {members}
 
-commands.team.failed = L'op�ration sur l'�quipe n'a pas pu aboutir. R�essayez.
+commands.team.failed = L'opération sur l'équipe n'a pas pu aboutir. Réessayez.
