@@ -1,0 +1,16 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Klops_Gentleman"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_KlopsGentleman",
+      "Weight": 1
+    }
+  ]
+}

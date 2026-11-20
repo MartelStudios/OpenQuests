@@ -1,0 +1,19 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-spices.give.title",
+  "Character": "AdventureQuests_KweebecSpices",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Salt"
+      },
+      "Quantity": 5
+    },
+    {
+      "Item": {
+        "ItemId": "Ingredient_Spices"
+      },
+      "Quantity": 5
+    }
+  ]
+}

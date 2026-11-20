@@ -1,0 +1,11 @@
+{
+  "Epithet": "adventurequests.kweebecvillage.character.klops-gentleman.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Dialogue": "AdventureQuests_KlopsGentleman"
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.kweebecvillage.character.village-spices.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_KweebecSpices"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}
