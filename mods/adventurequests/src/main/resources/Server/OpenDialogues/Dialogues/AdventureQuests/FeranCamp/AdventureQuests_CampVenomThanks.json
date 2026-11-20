@@ -1,0 +1,20 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_FeranVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-venom.thanks"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

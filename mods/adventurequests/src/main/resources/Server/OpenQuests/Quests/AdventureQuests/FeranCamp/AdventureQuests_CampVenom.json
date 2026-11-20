@@ -1,0 +1,34 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Sac_Venom.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.ferancamp.quest.camp-venom.title",
+  "DescriptionKey": "adventurequests.ferancamp.quest.camp-venom.description",
+  "ShortDescriptionKey": "adventurequests.ferancamp.quest.camp-venom.short",
+  "Character": "AdventureQuests_FeranVenom",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Sac_Venom"
+      },
+      "Quantity": 3
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Weapon_Daggers_Bone",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Potion_Antidote",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}
