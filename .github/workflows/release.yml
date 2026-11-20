@@ -182,7 +182,7 @@ jobs:
             changelog: openquests-core
             file: quests/core/build/libs/OpenQuestsCore-*.jar
           - name: Adventure Quests
-            relations: openquests:requiredDependency,openquests-dialogues:requiredDependency
+            relations: openquests:requiredDependency,opendialogues:requiredDependency,openquests-dialogues:requiredDependency
             project_id: '1680200'
             changelog: adventurequests
             file: mods/adventurequests/build/distributions/AdventureQuests-*.zip
