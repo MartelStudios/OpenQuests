@@ -1,4 +1,13 @@
 character.feran-villager.name=Feran
+character.camp-scarak-hunt.epithet=Chasseur de Scarak
+dialogue.camp-scarak-hunt.intro.page1=Tu sens ça ? Des Scarak. Leurs éclaireurs repèrent notre camp avant que l'essaim arrive.
+dialogue.camp-scarak-hunt.intro.page2=Tue trois éclaireurs et l'essaim restera aveugle. Un Feran ne refuse jamais cette chasse. Et toi ?
+dialogue.camp-scarak-hunt.absent=Pas de Scarak dans le vent aujourd'hui. Repose-toi tant que tu peux, étranger.
+dialogue.camp-scarak-hunt.waiting=Les éclaireurs tournent haut. Frappe quand ils plongent.
+dialogue.camp-scarak-hunt.thanks=Trois éclaireurs ! L'essaim reste aveugle. Prends ma lance de rechange, et leurs carapaces.
+quest.camp-scarak-hunt.title=Aveugler l'essaim
+quest.camp-scarak-hunt.description=Des éclaireurs Scarak repèrent un camp Feran avant l'attaque de l'essaim. Un chasseur les veut morts.
+quest.camp-scarak-hunt.short=Tuez 3 éclaireurs Scarak près du chasseur Feran
 dialogue.camp.decline=Pas maintenant.
 dialogue.camp.give=Les voici.
 dialogue.camp.later=Pas encore.

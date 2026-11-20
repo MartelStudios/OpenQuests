@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.ferancamp.character.camp-scarak-hunt.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_FeranScarakHunt"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_FeranNames"
+    }
+  ]
+}

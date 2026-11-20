@@ -1,4 +1,13 @@
 character.feran-villager.name=Feran
+character.camp-scarak-hunt.epithet=Scarak hunter
+dialogue.camp-scarak-hunt.intro.page1=Smell that? Scarak. Their seekers scout our camp before the swarm comes.
+dialogue.camp-scarak-hunt.intro.page2=Kill three seekers and the swarm stays blind. A Feran never refuses that hunt. Do you?
+dialogue.camp-scarak-hunt.absent=No Scarak on the wind today. Rest while you can, stranger.
+dialogue.camp-scarak-hunt.waiting=The seekers circle high. Strike when they dive.
+dialogue.camp-scarak-hunt.thanks=Three seekers! The swarm stays blind. Take my spare spear, and their shells.
+quest.camp-scarak-hunt.title=Blind the swarm
+quest.camp-scarak-hunt.description=Scarak seekers scout a Feran camp before the swarm attacks. A hunter wants them dead.
+quest.camp-scarak-hunt.short=Kill 3 Scarak seekers near the Feran hunter
 dialogue.camp.decline=Not now.
 dialogue.camp.give=Here they are.
 dialogue.camp.later=Not yet.

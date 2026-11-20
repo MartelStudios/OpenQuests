@@ -1,0 +1,66 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_CampScarakHunt",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "NearNpc",
+              "Group": "Scarak",
+              "Radius": 100,
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampScarakHuntIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_CampScarakHunt",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampScarakHuntAbsent"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_CampScarakHunt",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampScarakHuntWaiting"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_CampScarakHuntThanks"
+        }
+      }
+    ]
+  }
+}
