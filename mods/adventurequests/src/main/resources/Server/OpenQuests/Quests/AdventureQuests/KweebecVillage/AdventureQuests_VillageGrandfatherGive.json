@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-grandfather.give.title",
+  "Character": "AdventureQuests_KweebecGrandfather",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Life_Essence_Concentrated"
+      },
+      "Quantity": 1
+    }
+  ]
+}

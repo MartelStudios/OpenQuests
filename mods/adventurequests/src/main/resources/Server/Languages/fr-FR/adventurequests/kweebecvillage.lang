@@ -5,6 +5,22 @@ dialogue.kweebec-mage.bye=Je garderai l'oreille tendue.
 quest.kweebec-mage.title=Le seul mage
 quest.kweebec-mage.description=Il n'existe qu'un seul mage kweebec sur toutes les terres, et les racines parlent à travers lui. Trouvez-le avant qu'il ne soit trop tard.
 quest.kweebec-mage.short=Parler au mage kweebec
+character.village-grandfather.epithet=Gardien du Grand-père
+dialogue.village-grandfather.intro.page1=Tu as entendu parler du Grand-père ? Le premier arbre, celui dont chaque Kweebec est issu.
+dialogue.village-grandfather.intro.page2=Il est fatigué. Ses feuilles tombent avant l'automne et sa sève coule lentement. Seule la vie elle-même peut le réveiller.
+dialogue.village-grandfather.intro.page3=Récolte cent essences de vie, réunis-les en une seule à l'établi agricole, et apporte-la-moi. Je la lui porterai.
+dialogue.village-grandfather.accept=Je vais réveiller le Grand-père.
+dialogue.village-grandfather.waiting=Cent essences, réunies en une seule. Le Grand-père peut attendre encore un peu, mais pas toujours.
+dialogue.village-grandfather.tale.page1=Tu sens ? Ça bat comme un cœur. Assieds-toi, je vais te dire pourquoi c'est important.
+dialogue.village-grandfather.tale.page2=Il y a très longtemps, il n'y avait que le Grand-père, seul sur une terre nue. Il laissait tomber une graine à chaque printemps, et chaque graine s'éveillait en Kweebec.
+dialogue.village-grandfather.tale.page3=Nous avons planté les forêts autour de lui pour qu'il ne soit plus jamais seul. Chaque village garde encore un arbre pour lui.
+dialogue.village-grandfather.tale.page4=Tu lui as offert un printemps qu'il n'avait plus. Prends ces graines qui ne meurent jamais, comme lui. Choisis comme tu veux.
+quest.village-grandfather.title=Le Grand-père est fatigué
+quest.village-grandfather.description=Le Grand-père, premier arbre des Kweebec, s'affaiblit. Seule une vie concentrée peut le réveiller.
+quest.village-grandfather.short=Fabriquez une essence de vie concentrée et apportez-la au gardien du Grand-père
+quest.village-grandfather.gather.title=Récoltez 100 essences de vie
+quest.village-grandfather.craft.title=Fabriquez une essence de vie concentrée
+quest.village-grandfather.give.title=Donnez-la au gardien du Grand-père
 
 # Village stories
 dialogue.village.decline=Pas maintenant.

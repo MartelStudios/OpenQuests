@@ -1,0 +1,8 @@
+{
+  "Type": "Craft",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-grandfather.craft.title",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Ingredient_Life_Essence_Concentrated"
+  }
+}
