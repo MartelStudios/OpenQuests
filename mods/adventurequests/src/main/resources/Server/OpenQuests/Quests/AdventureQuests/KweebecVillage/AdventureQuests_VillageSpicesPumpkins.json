@@ -1,0 +1,27 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-spices.pumpkins.title",
+  "Character": "AdventureQuests_KlopsGentleman",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Pumpkin_Item"
+      },
+      "Quantity": 4
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Salt",
+      "Quantity": 5,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Spices",
+      "Quantity": 5,
+      "AutoClaim": true
+    }
+  ]
+}

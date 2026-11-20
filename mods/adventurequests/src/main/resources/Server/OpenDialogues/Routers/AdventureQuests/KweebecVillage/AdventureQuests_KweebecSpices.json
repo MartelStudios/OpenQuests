@@ -1,0 +1,39 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_VillageSpices",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSpicesIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_VillageSpices",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSpicesWaiting"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSpicesThanks"
+        }
+      }
+    ]
+  }
+}

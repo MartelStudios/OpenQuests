@@ -1,0 +1,35 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Plant_Crop_Pumpkin.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-spices.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-spices.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-spices.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageSpicesPumpkins",
+    "AdventureQuests_VillageSpicesGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Recipe_Food_Pie_Pumpkin",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 3,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Potion_Health_Greater",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}
