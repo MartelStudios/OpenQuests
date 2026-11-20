@@ -1,0 +1,137 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Life_Essence_Concentrated.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-grandfather.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-grandfather.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-grandfather.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageGrandfatherGather",
+    "AdventureQuests_VillageGrandfatherCraft",
+    "AdventureQuests_VillageGrandfatherGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Choice",
+      "Choices": 5,
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Carrot_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Aubergine_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Cauliflower_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Chilli_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Corn_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Cotton_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Lettuce_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Onion_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Potato_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Pumpkin_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Rice_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Tomato_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Turnip_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Plant_Seeds_Wheat_Eternal",
+            "Quantity": 1
+          },
+          "Count": 5
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}

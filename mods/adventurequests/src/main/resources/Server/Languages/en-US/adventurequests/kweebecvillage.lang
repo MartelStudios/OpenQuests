@@ -5,6 +5,22 @@ dialogue.kweebec-mage.bye=I will keep my ears open.
 quest.kweebec-mage.title=The only mage
 quest.kweebec-mage.description=There is only one Kweebec mage in all the lands, and the roots speak through them. Seek them out before it is too late.
 quest.kweebec-mage.short=Talk to the Kweebec mage
+character.village-grandfather.epithet=Keeper of the Grandfather
+dialogue.village-grandfather.intro.page1=Have you heard of the Grandfather? The first tree, the one every Kweebec grew from.
+dialogue.village-grandfather.intro.page2=He is tired. His leaves fall before autumn and his sap runs slow. Only life itself can wake him.
+dialogue.village-grandfather.intro.page3=Gather a hundred essences of life, bind them into one at a farming bench, and bring it to me. I will take it to him.
+dialogue.village-grandfather.accept=I will wake the Grandfather.
+dialogue.village-grandfather.waiting=A hundred essences, bound into one. The Grandfather can wait a little longer, but not forever.
+dialogue.village-grandfather.tale.page1=Feel it? It pulses like a heart. Sit, and I will tell you why it matters.
+dialogue.village-grandfather.tale.page2=Long ago, there was only the Grandfather, alone in a bare land. He dropped one seed each spring, and each seed woke as a Kweebec.
+dialogue.village-grandfather.tale.page3=We planted the forests around him so he would never be alone again. Every village still keeps a tree for him.
+dialogue.village-grandfather.tale.page4=You gave him a spring he did not have. Take these seeds that never die, the way he never does. Choose as you like.
+quest.village-grandfather.title=The Grandfather is tired
+quest.village-grandfather.description=The Grandfather, the first tree of the Kweebec, is weakening. Only concentrated life can wake him.
+quest.village-grandfather.short=Make a concentrated essence of life and bring it to the keeper of the Grandfather
+quest.village-grandfather.gather.title=Gather 100 essences of life
+quest.village-grandfather.craft.title=Craft a concentrated essence of life
+quest.village-grandfather.give.title=Give it to the keeper of the Grandfather
 
 # Village stories
 dialogue.village.decline=Not right now.

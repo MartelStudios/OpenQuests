@@ -1,0 +1,8 @@
+{
+  "Type": "Gather",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-grandfather.gather.title",
+  "TargetQuantity": 100,
+  "ItemToGather": {
+    "ItemId": "Ingredient_Life_Essence"
+  }
+}

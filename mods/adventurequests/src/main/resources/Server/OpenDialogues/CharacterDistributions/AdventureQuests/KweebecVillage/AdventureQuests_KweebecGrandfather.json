@@ -1,0 +1,26 @@
+{
+  "Filters": [
+    {
+      "Type": "Group",
+      "Groups": [
+        "Kweebec_Civilian"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-.*"
+      ],
+      "Not": true
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_KweebecGrandfather",
+      "Weight": 1
+    },
+    {
+      "Weight": 13
+    }
+  ]
+}
