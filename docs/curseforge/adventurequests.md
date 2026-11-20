@@ -2,7 +2,7 @@
 
 📦 **Over 200 quests, characters and dialogues for vanilla Hytale, ready the moment your server starts.**
 
-Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, Kweebec villagers with a favour to ask, characters who remember you, and feats for every way you move. OpenQuests ships with no quests of its own: this pack is the content. Works in multiplayer and singleplayer, on new or existing worlds.
+Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, Kweebec villagers with a favour to ask, characters who remember you, and feats for every way you move. [OpenQuests](https://www.curseforge.com/hytale/mods/openquests) ships with no quests of its own: this pack is the content. Works in multiplayer and singleplayer, on new or existing worlds.
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
 
