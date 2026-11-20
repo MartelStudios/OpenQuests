@@ -1,0 +1,15 @@
+{
+  "Type": "InteractivelyPickup",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-heavy-pumpkins.harvest.title",
+  "TargetQuantity": 2,
+  "ItemToPickup": {
+    "ItemId": "Plant_Crop_Pumpkin_Item"
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_KweebecHeavyPumpkins",
+      "Radius": 30
+    }
+  ]
+}
