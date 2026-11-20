@@ -59,7 +59,7 @@ Over 200 quests in English and French, across ten chapters and twenty-seven vill
 
 ### Feran camps
 
-**Three camp stories.** Hunt Scaraks, bring venom for a windwalker's darts, or trade bone fragments with a carver for a weapon.
+**Four camp stories.** Hunt Scaraks, bring venom for a windwalker's darts, trade bone fragments with a carver for a weapon, or defend the camp from sand skeletons.
 
 ### 🕳️ The Goblin Breach
 
