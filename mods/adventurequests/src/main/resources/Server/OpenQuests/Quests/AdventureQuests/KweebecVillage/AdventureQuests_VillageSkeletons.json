@@ -1,0 +1,38 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Bone_Fragment.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-skeletons.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-skeletons.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-skeletons.short",
+  "TargetQuantity": 3,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "*Skeleton*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_KweebecSkeletons",
+      "Radius": 100
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bone_Fragment",
+      "Quantity": 3,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Potion_Health",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}
