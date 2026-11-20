@@ -12,7 +12,7 @@ Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: 
 
 ## ✨ What is inside
 
-Over 200 quests in English and French, across ten chapters and twenty-two village stories. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
+Over 200 quests in English and French, across ten chapters and twenty-seven village stories. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
 
 🖼️ **Every quest has its icon**, from a crude hatchet to the breach's portal key, so the journal and its chapter graphs read at a glance.
 
@@ -53,7 +53,7 @@ Over 200 quests in English and French, across ten chapters and twenty-two villag
 
 🌱 **About one villager in two has a story.** Saplings, sproutlings, Razorleaf guards and the merchant each live one small incident, ask for your help once, then go back to village life. Each gets a name of its own.
 
-🥕 **Twenty-two stories, each tied to who tells it.** A hungry sapling wants a ripe carrot from the garden, a would-be guard dreams of a crude sword, the smith's forge has gone cold, the alchemist's still just cracked, foxes scare the rabbits from their burrows. You pick crops, craft, hunt and deliver.
+🥕 **Twenty-seven stories, each tied to who tells it.** A hungry sapling wants a ripe carrot from the garden, a would-be guard dreams of a crude sword, the smith's forge has gone cold, the alchemist's still just cracked, foxes scare the rabbits from their burrows. You pick crops, craft, hunt and deliver.
 
 🎁 **Rewards that fit the story:** potions from the alchemist, an iron sword or axe from the smith, eternal seeds from the farmer, recipes from the cook and the merchant. The merchant's stall still opens on request.
 
