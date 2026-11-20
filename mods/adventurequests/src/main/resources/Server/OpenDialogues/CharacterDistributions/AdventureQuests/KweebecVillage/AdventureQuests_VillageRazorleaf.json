@@ -17,7 +17,11 @@
       "Weight": 1
     },
     {
-      "Weight": 2
+      "Character": "AdventureQuests_KweebecSkeletons",
+      "Weight": 1
+    },
+    {
+      "Weight": 3
     }
   ]
 }

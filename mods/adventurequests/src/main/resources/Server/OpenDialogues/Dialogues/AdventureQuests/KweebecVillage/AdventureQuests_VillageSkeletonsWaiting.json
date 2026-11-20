@@ -1,0 +1,40 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-skeletons.waiting"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-skeletons.giveup",
+      "When": {
+        "Type": "NearNpc",
+        "Group": "Skeleton",
+        "Radius": 100,
+        "Min": 0,
+        "Max": 0
+      },
+      "Actions": [
+        {
+          "Type": "SetQuestState",
+          "Quest": "AdventureQuests_VillageSkeletons",
+          "State": "Abandoned"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village.later",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}
