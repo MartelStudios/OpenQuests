@@ -57,6 +57,10 @@ Over 200 quests in English and French, across ten chapters and twenty-seven vill
 
 🎁 **Rewards that fit the story:** potions from the alchemist, an iron sword or axe from the smith, eternal seeds from the farmer, recipes from the cook and the merchant. The merchant's stall still opens on request.
 
+### Feran camps
+
+**Three camp stories.** Hunt Scaraks, bring venom for a windwalker's darts, or trade bone fragments with a carver for a weapon.
+
 ### 🕳️ The Goblin Breach
 
 Thirty-six quests across the Guttering Hollows, the pocket world a Goblin Breach portal opens onto. The chapter graph lays them out by region, and every link shows what leads where.
