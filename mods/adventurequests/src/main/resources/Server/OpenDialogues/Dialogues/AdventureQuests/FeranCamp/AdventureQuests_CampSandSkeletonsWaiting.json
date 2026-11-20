@@ -1,0 +1,40 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_FeranVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-sand-skeletons.waiting"
+    }
+  ],
+  "Responses": [
+    {
+      "When": {
+        "Type": "NearNpc",
+        "Group": "Skeleton",
+        "Radius": 100,
+        "Min": 0,
+        "Max": 0
+      },
+      "Text": "adventurequests.ferancamp.dialogue.camp.giveup",
+      "Actions": [
+        {
+          "Type": "SetQuestState",
+          "Quest": "AdventureQuests_CampSandSkeletons",
+          "State": "Abandoned"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp.later",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

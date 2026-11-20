@@ -1,0 +1,38 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Bone_Fragment.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.ferancamp.quest.camp-sand-skeletons.title",
+  "DescriptionKey": "adventurequests.ferancamp.quest.camp-sand-skeletons.description",
+  "ShortDescriptionKey": "adventurequests.ferancamp.quest.camp-sand-skeletons.short",
+  "TargetQuantity": 4,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Skeleton_Sand_*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_FeranSandSkeletons",
+      "Radius": 100
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Potion_Health_Greater",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Silver",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

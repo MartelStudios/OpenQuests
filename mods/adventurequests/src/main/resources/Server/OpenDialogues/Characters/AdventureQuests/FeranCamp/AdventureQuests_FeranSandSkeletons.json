@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.ferancamp.character.camp-sand-skeletons.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_FeranSandSkeletons"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_FeranNames"
+    }
+  ]
+}
