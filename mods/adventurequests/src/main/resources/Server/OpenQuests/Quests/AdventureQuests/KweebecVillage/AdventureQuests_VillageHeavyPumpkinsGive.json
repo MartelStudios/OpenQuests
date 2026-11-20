@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-heavy-pumpkins.give.title",
+  "Character": "AdventureQuests_KweebecHeavyPumpkins",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Pumpkin_Item"
+      },
+      "Quantity": 2
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.kweebecvillage.character.village-heavy-pumpkins.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_KweebecHeavyPumpkins"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}
