@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.ferancamp.character.camp-bone-carver.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_FeranBoneCarver"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_FeranNames"
+    }
+  ]
+}
