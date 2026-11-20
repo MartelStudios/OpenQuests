@@ -1,0 +1,29 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Food_Egg.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.ferancamp.quest.camp-stolen-eggs.title",
+  "DescriptionKey": "adventurequests.ferancamp.quest.camp-stolen-eggs.description",
+  "ShortDescriptionKey": "adventurequests.ferancamp.quest.camp-stolen-eggs.short",
+  "QuestAssetIds": [
+    "AdventureQuests_CampStolenEggsLoot",
+    "AdventureQuests_CampStolenEggsGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Leather_Medium",
+      "Quantity": 3,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 20,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

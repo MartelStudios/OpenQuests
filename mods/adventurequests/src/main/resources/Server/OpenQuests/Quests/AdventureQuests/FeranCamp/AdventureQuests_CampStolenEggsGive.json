@@ -1,0 +1,22 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.ferancamp.quest.camp-stolen-eggs.give.title",
+  "Character": "AdventureQuests_FeranStolenEggs",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Food_Egg"
+      },
+      "Quantity": 5
+    }
+  ],
+  "Constraints": [
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "AdventureQuests_CampStolenEggsLoot",
+      "States": [
+        "Successful"
+      ]
+    }
+  ]
+}
