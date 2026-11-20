@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.ferancamp.character.camp-ancestor-skulls.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_FeranAncestorSkulls"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_FeranNames"
+    }
+  ]
+}

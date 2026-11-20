@@ -1,0 +1,29 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Deco_Bone_Skulls_Feran.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.ferancamp.quest.camp-ancestor-skulls.title",
+  "DescriptionKey": "adventurequests.ferancamp.quest.camp-ancestor-skulls.description",
+  "ShortDescriptionKey": "adventurequests.ferancamp.quest.camp-ancestor-skulls.short",
+  "QuestAssetIds": [
+    "AdventureQuests_CampAncestorSkullsLoot",
+    "AdventureQuests_CampAncestorSkullsGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Potion_Health_Large",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 30,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

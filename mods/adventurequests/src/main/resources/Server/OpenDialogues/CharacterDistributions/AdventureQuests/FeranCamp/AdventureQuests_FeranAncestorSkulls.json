@@ -1,0 +1,26 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Feran_Windwalker"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-.*"
+      ],
+      "Not": true
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_FeranAncestorSkulls",
+      "Weight": 1
+    },
+    {
+      "Weight": 13
+    }
+  ]
+}
