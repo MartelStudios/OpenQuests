@@ -1,5 +1,6 @@
-package com.martelstudios.openquests.extension.quests.movement;
+package com.martelstudios.openquests.extension.quests.wait;
 
+import com.martelstudios.openquests.extension.quests.playertick.PlayerTickQuestProgression;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.protocol.MovementStates;
 import com.hypixel.hytale.server.core.Message;
@@ -14,7 +15,7 @@ import java.time.Instant;
  * Counts the time its holders spend in game. Sampled with the movement quests since a tick is the
  * only clock a player carries, but whatever they do counts, standing still included.
  */
-public class WaitQuestProgression extends MovementQuestProgression<WaitQuestProgression> {
+public class WaitQuestProgression extends PlayerTickQuestProgression<WaitQuestProgression> {
 
     public static final BuilderCodec<WaitQuestProgression> CODEC =
         BuilderCodec.builder(WaitQuestProgression.class, WaitQuestProgression::new, QuantityQuestProgression.BASE_CODEC)

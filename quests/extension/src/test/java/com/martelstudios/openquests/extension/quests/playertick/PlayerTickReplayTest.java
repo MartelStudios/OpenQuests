@@ -1,4 +1,4 @@
-package com.martelstudios.openquests.extension.quests.movement;
+package com.martelstudios.openquests.extension.quests.playertick;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.event.EventBus;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class MovementReplayTest {
+class PlayerTickReplayTest {
 
     private static final UUID PLAYER = UUID.randomUUID();
 
@@ -37,11 +37,11 @@ class MovementReplayTest {
         here.getReplica().markStored(new QuestReplica.Stored(1, QuestState.IN_PROGRESS, Set.of(PLAYER), Set.of()));
         here.consumeChanges();
 
-        new MovementQuestVisitor(PLAYER, new MovementStates(), 0.6, 0.05).progress(here);
+        new PlayerTickQuestVisitor(PLAYER, new MovementStates(), 0.6, 0.05).progress(here);
         PaceQuest stored = CodecJson.decode(PaceQuest.CODEC, CodecJson.encode(PaceQuest.CODEC, here), "quest");
 
         // The second sample makes a whole metre here, from the fraction only this copy carries
-        new MovementQuestVisitor(PLAYER, new MovementStates(), 0.6, 0.05).progress(here);
+        new PlayerTickQuestVisitor(PLAYER, new MovementStates(), 0.6, 0.05).progress(here);
         for (QuestOperation<?> operation : here.getReplica().getPendingOperations()) stored.getReplica().replay(operation);
 
         assertEquals(1, here.getCurrentQuantity());
@@ -108,7 +108,7 @@ class MovementReplayTest {
     /**
      * Counts metres, standing in for the shipped paces without an asset store.
      */
-    static final class PaceQuest extends MovementQuestProgression<PaceQuest> {
+    static final class PaceQuest extends PlayerTickQuestProgression<PaceQuest> {
         static final BuilderCodec<PaceQuest> CODEC = BuilderCodec.builder(PaceQuest.class, PaceQuest::new, QuantityQuestProgression.BASE_CODEC).build();
 
         static final class Builder extends QuantityQuestProgression.Builder<PaceQuest, Builder> {

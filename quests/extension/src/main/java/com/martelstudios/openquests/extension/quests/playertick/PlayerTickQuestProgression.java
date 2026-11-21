@@ -1,4 +1,4 @@
-package com.martelstudios.openquests.extension.quests.movement;
+package com.martelstudios.openquests.extension.quests.playertick;
 
 import com.hypixel.hytale.protocol.MovementStates;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -7,16 +7,15 @@ import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgr
 import javax.annotation.Nonnull;
 
 /**
- * Runtime state shared by every quest counted from how the player moves. Subtypes only say what one
+ * Runtime state shared by quests that count player tick samples. Subtypes decide what one
  * sample is worth; the counter and the completion check come from {@link QuantityQuestProgression}.
  *
  * @param <Q> the concrete quest type extending this class
  */
-public abstract class MovementQuestProgression<Q extends MovementQuestProgression<Q>> extends QuantityQuestProgression<Q> {
+public abstract class PlayerTickQuestProgression<Q extends PlayerTickQuestProgression<Q>> extends QuantityQuestProgression<Q> {
 
     /**
-     * What the samples have been worth without yet adding up to a whole unit. Not serialized: under
-     * one metre is not worth a field in every save, and a restart losing it costs a single step.
+     * The fractional progress toward the next whole unit. This remainder resets on restart.
      */
     private transient double pending;
 

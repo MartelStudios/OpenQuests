@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.quests.movement;
 
+import com.martelstudios.openquests.extension.quests.playertick.PlayerTickQuestProgression;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.protocol.MovementStates;
 import com.hypixel.hytale.server.core.Message;
@@ -7,7 +8,7 @@ import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgr
 
 import javax.annotation.Nonnull;
 
-public class JumpQuestProgression extends MovementQuestProgression<JumpQuestProgression> {
+public class JumpQuestProgression extends PlayerTickQuestProgression<JumpQuestProgression> {
 
     public static final BuilderCodec<JumpQuestProgression> CODEC =
         BuilderCodec.builder(JumpQuestProgression.class, JumpQuestProgression::new, QuantityQuestProgression.BASE_CODEC)

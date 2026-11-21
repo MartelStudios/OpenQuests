@@ -1,4 +1,4 @@
-package com.martelstudios.openquests.extension.quests.movement;
+package com.martelstudios.openquests.extension.quests.wait;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;

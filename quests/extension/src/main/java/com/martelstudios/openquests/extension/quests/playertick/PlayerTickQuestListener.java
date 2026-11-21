@@ -1,4 +1,4 @@
-package com.martelstudios.openquests.extension.quests.movement;
+package com.martelstudios.openquests.extension.quests.playertick;
 
 import com.hypixel.hytale.component.ComponentType;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -7,11 +7,10 @@ import com.martelstudios.openquests.extension.listener.QuestListenerComponent;
 import javax.annotation.Nonnull;
 
 /**
- * The movement quests a player is running, whatever their pace and whether they count steps or
- * jumps. The kind is registered on {@link MovementQuestProgression}, so a quest type built on it
- * elsewhere is listed here too without saying anything.
+ * The quests a player is running that count player tick samples. This listener is registered on
+ * {@link PlayerTickQuestProgression}, so it covers all its subtypes.
  */
-public class MovementQuestListener extends QuestListenerComponent {
+public class PlayerTickQuestListener extends QuestListenerComponent {
 
     /**
      * As far as a player could plausibly move between two ticks. Anything beyond is a teleport or
@@ -23,8 +22,8 @@ public class MovementQuestListener extends QuestListenerComponent {
     private double lastZ;
     private boolean sampled;
 
-    public static ComponentType<EntityStore, MovementQuestListener> getComponentType() {
-        return MovementFeature.getListenerType();
+    public static ComponentType<EntityStore, PlayerTickQuestListener> getComponentType() {
+        return PlayerTickFeature.getListenerType();
     }
 
     /**
@@ -56,6 +55,6 @@ public class MovementQuestListener extends QuestListenerComponent {
     @Nonnull
     @Override
     protected QuestListenerComponent create() {
-        return new MovementQuestListener();
+        return new PlayerTickQuestListener();
     }
 }
