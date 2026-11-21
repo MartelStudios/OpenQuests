@@ -293,7 +293,3 @@ dialogue.sapling.bye=Take care.
 quest.meet-sapling.title=Meet the young Kweebec
 quest.meet-sapling.description=He flees when the goblins play their pranks.
 quest.meet-sapling.short=Talk to the young Kweebec
-character.temple-klops.name=Bramwell
-character.temple-klops.epithet=Klops trader
-dialogue.temple-klops.text=Kweebec sap seals a pipe better than anything the goblins make. If you pass a Kweebec merchant, tell them old Bramwell is still buying.
-dialogue.temple-klops.bye=I will.
