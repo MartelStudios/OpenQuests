@@ -28,9 +28,12 @@ public class ScheduleTrigger extends AssignmentTrigger {
     public static final BuilderCodec<ScheduleTrigger> CODEC = BuilderCodec.builder(ScheduleTrigger.class, ScheduleTrigger::new, AssignmentTrigger.BASE_CODEC)
                                                                           .append(new KeyedCodec<>("At", Codec.STRING), ScheduleTrigger::setAt, trigger -> trigger.at)
                                                                           .addValidator(Validators.nonNull())
+                                                                          .documentation("Start date and time in ISO 8601 format with an offset.")
                                                                           .add()
                                                                           .append(new KeyedCodec<>("Every", Codec.STRING), ScheduleTrigger::setEvery, trigger -> trigger.every)
+                                                                          .documentation("ISO 8601 duration between occasions, omitted for a schedule without recurring periods.")
                                                                           .add()
+                                                                          .documentation("Offers quests from a specified time and optionally repeats on a fixed schedule.")
                                                                           .build();
 
     private String at;

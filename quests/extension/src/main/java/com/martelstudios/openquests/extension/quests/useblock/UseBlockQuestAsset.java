@@ -13,7 +13,9 @@ public class UseBlockQuestAsset extends QuantityQuestAsset {
     public static final BuilderCodec<UseBlockQuestAsset> CODEC =
         BuilderCodec.builder(UseBlockQuestAsset.class, UseBlockQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("BlockToUse", QuestItemFilter.CODEC), (asset, block) -> asset.blockToUse = block, asset -> asset.blockToUse)
+                    .documentation("Filter for blocks whose interactions count.")
                     .add()
+                    .documentation("Defines a quest for interacting with blocks.")
                     .build();
 
     protected QuestItemFilter blockToUse;

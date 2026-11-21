@@ -15,7 +15,9 @@ public abstract class TravelQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<TravelQuestAsset> BASE_CODEC = BuilderCodec.abstractBuilder(TravelQuestAsset.class, QuantityQuestAsset.BASE_CODEC)
                                                                                 .append(new KeyedCodec<>("Measure", new EnumCodec<>(Measure.class)), (asset, measure) -> asset.measure = measure, asset -> asset.measure)
+                                                                                .documentation("Counts distance in metres by default, or time spent moving at the required pace when set to Seconds.")
                                                                                 .add()
+                                                                                .documentation("Defines how quests measure movement at a specified pace.")
                                                                                 .build();
 
     protected Measure measure = Measure.METRES;

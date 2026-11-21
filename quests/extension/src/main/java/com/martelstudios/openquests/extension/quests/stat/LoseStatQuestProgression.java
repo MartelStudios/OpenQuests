@@ -15,6 +15,7 @@ public class LoseStatQuestProgression extends QuantityQuestProgression<LoseStatQ
 
     public static final BuilderCodec<LoseStatQuestProgression> CODEC =
         BuilderCodec.builder(LoseStatQuestProgression.class, LoseStatQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
+                    .documentation("Stores progress toward losing a target amount of a stat.")
                     .build();
 
     /**

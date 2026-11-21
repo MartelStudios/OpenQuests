@@ -14,7 +14,9 @@ public class PlaceBlockQuestProgression extends BlockActionQuestProgression<Plac
 
     public static final BuilderCodec<PlaceBlockQuestProgression> CODEC = BuilderCodec.builder(PlaceBlockQuestProgression.class, PlaceBlockQuestProgression::new, BlockActionQuestProgression.BASE_CODEC)
                                                                               .append(new KeyedCodec<>("BlockToPlace", QuestItemFilter.CODEC), (quest, block) -> quest.blockToPlace = block, quest -> quest.blockToPlace)
+                                                                              .documentation("Overrides the block filter for this instance, falling back to the asset when omitted.")
                                                                               .add()
+                                                                              .documentation("Stores progress for a quest about placing blocks.")
                                                                               .build();
 
     /**

@@ -17,7 +17,9 @@ public class AssignmentRecordsFile {
 
     public static final BuilderCodec<AssignmentRecordsFile> CODEC = BuilderCodec.builder(AssignmentRecordsFile.class, AssignmentRecordsFile::new)
                                                                                 .append(new KeyedCodec<>("Assignments", AssignmentRecords.MAP_CODEC), (file, records) -> file.records.putAll(records), file -> file.records)
+                                                                                .documentation("Handout records grouped by assignment and quest asset ID, empty by default.")
                                                                                 .add()
+                                                                                .documentation("Stores assignment history for a shared scope on disk.")
                                                                                 .build();
 
     private final Map<String, Map<String, AssignmentRecord>> records = new HashMap<>();

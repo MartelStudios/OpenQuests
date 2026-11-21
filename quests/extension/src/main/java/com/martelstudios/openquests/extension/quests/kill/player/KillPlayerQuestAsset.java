@@ -16,7 +16,9 @@ public class KillPlayerQuestAsset extends QuantityQuestAsset {
     public static final BuilderCodec<KillPlayerQuestAsset> CODEC =
         BuilderCodec.builder(KillPlayerQuestAsset.class, KillPlayerQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("PlayerToKill", Codec.STRING), (asset, player) -> asset.playerToKill = player, asset -> asset.playerToKill)
+                    .documentation("Username or UUID of the player to kill, with any player counting when omitted or empty.")
                     .add()
+                    .documentation("Defines a quest for killing players.")
                     .build();
 
     @Nullable

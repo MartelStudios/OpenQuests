@@ -20,11 +20,15 @@ public final class AssignmentRecord {
 
     public static final BuilderCodec<AssignmentRecord> CODEC = BuilderCodec.builder(AssignmentRecord.class, AssignmentRecord::new)
                                                                            .append(new KeyedCodec<>("Count", Codec.INTEGER), (record, count) -> record.count = count, record -> Integer.valueOf(record.count))
+                                                                           .documentation("Number of times the quest was handed out, initially zero.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("LastAt", Codec.LONG), (record, millis) -> record.lastAt = millis, record -> Long.valueOf(record.lastAt))
+                                                                           .documentation("Time of the most recent handout in epoch milliseconds, initially zero.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Occasion", Codec.STRING), (record, occasion) -> record.occasion = occasion, record -> record.occasion)
+                                                                           .documentation("Identifier of the most recent handout occasion, initially unset.")
                                                                            .add()
+                                                                           .documentation("Records offers handed out for one assignment and quest.")
                                                                            .build();
 
     private int count;

@@ -14,7 +14,9 @@ public class UniverseAssignmentScope extends AssignmentScope {
 
     public static final String TYPE = "Universe";
 
-    public static final BuilderCodec<UniverseAssignmentScope> CODEC = BuilderCodec.builder(UniverseAssignmentScope.class, UniverseAssignmentScope::new, AssignmentScope.BASE_CODEC).build();
+    public static final BuilderCodec<UniverseAssignmentScope> CODEC = BuilderCodec.builder(UniverseAssignmentScope.class, UniverseAssignmentScope::new, AssignmentScope.BASE_CODEC)
+                                                                                  .documentation("Shares one quest instance across the server.")
+                                                                                  .build();
 
     /**
      * The player still connecting, if this is their connection, joins a quest created now.

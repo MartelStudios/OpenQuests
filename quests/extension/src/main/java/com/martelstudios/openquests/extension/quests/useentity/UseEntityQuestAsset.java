@@ -16,7 +16,9 @@ public class UseEntityQuestAsset extends QuantityQuestAsset {
         BuilderCodec.builder(UseEntityQuestAsset.class, UseEntityQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("NpcGroupId", NPCGroup.CHILD_ASSET_CODEC, true), (asset, groupId) -> asset.npcGroupId = groupId, asset -> asset.npcGroupId)
                     .addValidator(Validators.nonNull())
+                    .documentation("NPC group whose members count when interacted with.")
                     .add()
+                    .documentation("Defines a quest for interacting with NPCs.")
                     .build();
 
     protected String npcGroupId;

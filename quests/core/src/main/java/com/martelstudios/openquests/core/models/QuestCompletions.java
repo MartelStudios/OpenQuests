@@ -27,15 +27,21 @@ public final class QuestCompletions {
      */
     public static final BuilderCodec<QuestCompletions> CODEC = BuilderCodec.builder(QuestCompletions.class, QuestCompletions::new)
                                                                            .append(new KeyedCodec<>("Successful", Codec.INTEGER), (completions, count) -> completions.successful = count, completions -> completions.successful == 0 ? null : Integer.valueOf(completions.successful))
+                                                                           .documentation("Number of quests that succeeded, initially zero.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Failed", Codec.INTEGER), (completions, count) -> completions.failed = count, completions -> completions.failed == 0 ? null : Integer.valueOf(completions.failed))
+                                                                           .documentation("Number of quests that failed, initially zero.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Abandoned", Codec.INTEGER), (completions, count) -> completions.abandoned = count, completions -> completions.abandoned == 0 ? null : Integer.valueOf(completions.abandoned))
+                                                                           .documentation("Number of quests that were abandoned, initially zero.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("LastStartedAt", Codec.LONG), (completions, millis) -> completions.lastStartedAt = Instant.ofEpochMilli(millis), completions -> completions.lastStartedAt == null ? null : Long.valueOf(completions.lastStartedAt.toEpochMilli()))
+                                                                           .documentation("Most recent recorded start time, absent until recorded.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("LastCompletedAt", Codec.LONG), (completions, millis) -> completions.lastCompletedAt = Instant.ofEpochMilli(millis), completions -> completions.lastCompletedAt == null ? null : Long.valueOf(completions.lastCompletedAt.toEpochMilli()))
+                                                                           .documentation("Most recent recorded end time, absent until recorded.")
                                                                            .add()
+                                                                           .documentation("Stores a player's quest outcome tallies and timing for one asset.")
                                                                            .build();
 
     private int successful;

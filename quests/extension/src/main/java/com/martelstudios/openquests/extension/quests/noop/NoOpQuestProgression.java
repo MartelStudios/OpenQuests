@@ -9,6 +9,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 public class NoOpQuestProgression extends AbstractQuestProgression<NoOpQuestProgression> {
 
     public static final BuilderCodec<NoOpQuestProgression> CODEC = BuilderCodec.builder(NoOpQuestProgression.class, NoOpQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
+                                                                               .documentation("Stores the state of a quest whose outcome is set externally.")
                                                                                .build();
 
     protected NoOpQuestProgression() {}

@@ -17,7 +17,9 @@ public class QuestStateQuestProgression extends AbstractQuestProgression<QuestSt
 
     public static final BuilderCodec<QuestStateQuestProgression> CODEC = BuilderCodec.builder(QuestStateQuestProgression.class, QuestStateQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
                                                                                      .append(new KeyedCodec<>("QuestAssetId", Codec.STRING), (quest, assetId) -> quest.questAssetId = assetId, quest -> quest.questAssetId)
+                                                                                     .documentation("Asset ID to watch for this instance, falling back to the configured requirement when omitted.")
                                                                                      .add()
+                                                                                     .documentation("Stores the watched quest override for a quest state objective.")
                                                                                      .build();
 
     /**

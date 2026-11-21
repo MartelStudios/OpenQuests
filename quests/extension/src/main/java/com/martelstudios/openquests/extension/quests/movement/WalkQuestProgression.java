@@ -10,6 +10,7 @@ public class WalkQuestProgression extends TravelQuestProgression<WalkQuestProgre
 
     public static final BuilderCodec<WalkQuestProgression> CODEC =
         BuilderCodec.builder(WalkQuestProgression.class, WalkQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
+                    .documentation("Stores progress toward a walking target.")
                     .build();
 
     protected WalkQuestProgression() {}

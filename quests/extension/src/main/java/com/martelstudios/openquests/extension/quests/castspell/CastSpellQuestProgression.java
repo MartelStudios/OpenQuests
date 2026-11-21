@@ -12,7 +12,9 @@ public class CastSpellQuestProgression extends QuantityQuestProgression<CastSpel
 
     public static final BuilderCodec<CastSpellQuestProgression> CODEC = BuilderCodec.builder(CastSpellQuestProgression.class, CastSpellQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("SpellToCast", QuestSpellFilter.CODEC), (quest, spell) -> quest.spellToCast = spell, quest -> quest.spellToCast)
+                                                                                    .documentation("Overrides the spell filter for this instance, falling back to the asset when omitted.")
                                                                                     .add()
+                                                                                    .documentation("Stores progress for a quest about casting spells.")
                                                                                     .build();
 
     /**

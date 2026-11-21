@@ -10,6 +10,7 @@ public class SprintQuestProgression extends TravelQuestProgression<SprintQuestPr
 
     public static final BuilderCodec<SprintQuestProgression> CODEC =
         BuilderCodec.builder(SprintQuestProgression.class, SprintQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
+                    .documentation("Stores progress toward a sprinting target.")
                     .build();
 
     protected SprintQuestProgression() {}

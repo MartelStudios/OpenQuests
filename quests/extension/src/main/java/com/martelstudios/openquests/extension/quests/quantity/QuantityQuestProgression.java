@@ -28,11 +28,15 @@ public abstract class QuantityQuestProgression<Q extends QuantityQuestProgressio
 
     public static final BuilderCodec<QuantityQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(QuantityQuestProgression.class, AbstractQuestProgression.BASE_CODEC)
                                                                                         .append(new KeyedCodec<>("CurrentQuantity", Codec.INTEGER), (quest, quantity) -> quest.quantity = quantity, quest -> Integer.valueOf(quest.quantity))
+                                                                                        .documentation("Amount counted so far, initially zero.")
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("TargetQuantity", Codec.INTEGER), (quest, quantity) -> quest.targetQuantity = quantity, quest -> quest.targetQuantity)
+                                                                                        .documentation("Amount required for this instance, falling back to the asset when omitted.")
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("ComboStartedAt", Codec.LONG), (quest, millis) -> quest.comboStartedAt = Instant.ofEpochMilli(millis), quest -> quest.comboStartedAt == null ? null : Long.valueOf(quest.comboStartedAt.toEpochMilli()))
+                                                                                        .documentation("Time the current combo began, unset until its first counted action.")
                                                                                         .add()
+                                                                                        .documentation("Stores the count and optional target override for a measured quest.")
                                                                                         .build();
 
     /**

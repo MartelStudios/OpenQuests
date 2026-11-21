@@ -26,7 +26,9 @@ public abstract class AssignmentScope {
     /**
      * Serializes the fields shared by every kind; concrete codecs chain from this.
      */
-    public static final BuilderCodec<AssignmentScope> BASE_CODEC = BuilderCodec.abstractBuilder(AssignmentScope.class).build();
+    public static final BuilderCodec<AssignmentScope> BASE_CODEC = BuilderCodec.abstractBuilder(AssignmentScope.class)
+                                                                               .documentation("Defines who receives or shares a quest offered by an assignment.")
+                                                                               .build();
 
     /**
      * Picks among the targets every holder this occasion concerns, each of which is then offered

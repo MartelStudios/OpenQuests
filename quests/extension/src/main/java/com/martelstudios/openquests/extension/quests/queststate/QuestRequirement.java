@@ -49,6 +49,7 @@ public final class QuestRequirement {
         return appendBounds(builder.append(new KeyedCodec<>("QuestAssetId", Codec.STRING, true), (owner, assetId) -> requirement.apply(owner).questAssetId = assetId, owner -> requirement.apply(owner).questAssetId)
                                    .addValidator(Validators.nonNull())
                                    .addValidatorLate(() -> OpenQuestAsset.VALIDATOR_CACHE.getValidator().late())
+                                   .documentation("Asset ID of the quests to count.")
                                    .add(), requirement);
     }
 
@@ -73,12 +74,15 @@ public final class QuestRequirement {
         return builder.append(new KeyedCodec<>("States", QuestStates.CODEC), (owner, states) -> requirement.apply(owner).states = states, owner -> requirement.apply(owner).states)
                       .addValidator(Validators.nonEmptyArray())
                       .addValidator(Validators.uniqueInArray())
+                      .documentation("Quest statuses included in the count, defaulting to all statuses.")
                       .add()
                       .append(new KeyedCodec<>("Min", Codec.INTEGER), (owner, min) -> requirement.apply(owner).min = min, owner -> Integer.valueOf(requirement.apply(owner).min))
                       .addValidator(Validators.min(0))
+                      .documentation("Minimum number of matching quests required, defaulting to one.")
                       .add()
                       .append(new KeyedCodec<>("Max", Codec.INTEGER), (owner, max) -> requirement.apply(owner).max = max, owner -> requirement.apply(owner).max)
                       .addValidator(Validators.min(0))
+                      .documentation("Maximum number of matching quests allowed, with no limit by default.")
                       .add();
     }
 

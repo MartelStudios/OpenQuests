@@ -10,6 +10,7 @@ import com.martelstudios.openquests.core.models.OpenQuestAsset;
 public class NoOpQuestAsset extends OpenQuestAsset {
 
     public static final BuilderCodec<NoOpQuestAsset> CODEC = BuilderCodec.builder(NoOpQuestAsset.class, NoOpQuestAsset::new, OpenQuestAsset.BASE_CODEC)
+                                                                         .documentation("Defines a quest whose outcome is driven by an external action.")
                                                                          .build();
 
     protected NoOpQuestAsset() {}

@@ -27,9 +27,12 @@ public class CooldownConstraint extends QuestConstraint {
                                                                              .append(new KeyedCodec<>("Seconds", Codec.DURATION_SECONDS, true), (constraint, duration) -> constraint.duration = duration, constraint -> constraint.duration)
                                                                              .addValidator(Validators.nonNull())
                                                                              .addValidator(Validators.greaterThan(Duration.ZERO))
+                                                                             .documentation("Time the player must wait before receiving another quest from the asset, in seconds.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("From", new EnumCodec<>(From.class)), (constraint, from) -> constraint.from = from, constraint -> constraint.from)
+                                                                             .documentation("Measures the wait from the prior quest's Completion by default, or from its Start.")
                                                                              .add()
+                                                                             .documentation("Delays reassignment of quests from this asset.")
                                                                              .build();
 
     protected Duration duration;

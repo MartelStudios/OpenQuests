@@ -13,7 +13,9 @@ public class PickupItemQuestAsset extends ItemExchangeQuestAsset {
     public static final BuilderCodec<PickupItemQuestAsset> CODEC =
         BuilderCodec.builder(PickupItemQuestAsset.class, PickupItemQuestAsset::new, ItemExchangeQuestAsset.BASE_CODEC)
             .append(new KeyedCodec<>("ItemToPickup", QuestItemFilter.CODEC), (asset, item) -> asset.itemToPickup = item, asset -> asset.itemToPickup)
+            .documentation("Filter for items that count when picked up.")
             .add()
+            .documentation("Defines a quest for picking up items.")
             .build();
 
     protected QuestItemFilter itemToPickup;

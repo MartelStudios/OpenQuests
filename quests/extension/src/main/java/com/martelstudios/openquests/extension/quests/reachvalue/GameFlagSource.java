@@ -24,7 +24,9 @@ public class GameFlagSource extends ValueSource {
                     .append(new KeyedCodec<>("Flag", Codec.STRING, true), (source, flag) -> source.flag = flag, source -> source.flag)
                     .addValidator(Validators.nonNull())
                     .addValidator(Validators.nonEmptyString())
+                    .documentation("Name of the server game flag to read.")
                     .add()
+                    .documentation("Reads the level of a server game flag for a quest.")
                     .build();
 
     private String flag;

@@ -21,7 +21,9 @@ public class TimeLimitConstraint extends ExpiringConstraint {
                                                                               .append(new KeyedCodec<>("Seconds", Codec.DURATION_SECONDS, true), (constraint, duration) -> constraint.duration = duration, constraint -> constraint.duration)
                                                                               .addValidator(Validators.nonNull())
                                                                               .addValidator(Validators.greaterThan(Duration.ZERO))
+                                                                              .documentation("Time allowed after the quest starts, in seconds.")
                                                                               .add()
+                                                                              .documentation("Ends a quest after a fixed time measured from its start.")
                                                                               .build();
 
     protected Duration duration;

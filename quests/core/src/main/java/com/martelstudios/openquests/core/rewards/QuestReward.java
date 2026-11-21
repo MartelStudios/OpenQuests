@@ -29,7 +29,9 @@ public abstract class QuestReward {
      */
     public static final BuilderCodec<QuestReward> BASE_CODEC = BuilderCodec.abstractBuilder(QuestReward.class)
                                                                            .append(new KeyedCodec<>("AutoClaim", Codec.BOOLEAN), (reward, value) -> reward.autoClaim = value, reward -> Boolean.valueOf(reward.autoClaim))
+                                                                           .documentation("Attempts to grant the reward as the quest ends, false by default.")
                                                                            .add()
+                                                                           .documentation("Defines the claiming behavior shared by quest rewards.")
                                                                            .build();
 
     protected boolean autoClaim;

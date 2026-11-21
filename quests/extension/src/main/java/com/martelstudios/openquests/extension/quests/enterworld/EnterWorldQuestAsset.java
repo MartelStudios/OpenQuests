@@ -15,7 +15,9 @@ public class EnterWorldQuestAsset extends OpenQuestAsset {
         BuilderCodec.builder(EnterWorldQuestAsset.class, EnterWorldQuestAsset::new, OpenQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC, true), (asset, pattern) -> asset.worldNamePattern = pattern, asset -> asset.worldNamePattern)
                     .addValidator(Validators.nonNull())
+                    .documentation("Regular expression matched against the entire name of the world entered.")
                     .add()
+                    .documentation("Defines a quest for entering a matching world.")
                     .build();
 
     protected WorldNamePattern worldNamePattern;

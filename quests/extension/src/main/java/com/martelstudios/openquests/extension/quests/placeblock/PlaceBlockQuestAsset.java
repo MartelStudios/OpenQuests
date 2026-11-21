@@ -13,7 +13,9 @@ public class PlaceBlockQuestAsset extends BlockActionQuestAsset {
     public static final BuilderCodec<PlaceBlockQuestAsset> CODEC =
         BuilderCodec.builder(PlaceBlockQuestAsset.class, PlaceBlockQuestAsset::new, BlockActionQuestAsset.BASE_CODEC)
             .append(new KeyedCodec<>("BlockToPlace", QuestItemFilter.CODEC), (asset, block) -> asset.blockToPlace = block, asset -> asset.blockToPlace)
+            .documentation("Filter for blocks that count when placed.")
             .add()
+            .documentation("Defines a quest for placing blocks.")
             .build();
 
     protected QuestItemFilter blockToPlace;

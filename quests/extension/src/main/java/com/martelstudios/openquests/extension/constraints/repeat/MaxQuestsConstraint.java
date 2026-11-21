@@ -22,11 +22,14 @@ public class MaxQuestsConstraint extends QuestConstraint {
     public static final BuilderCodec<MaxQuestsConstraint> CODEC = BuilderCodec.builder(MaxQuestsConstraint.class, MaxQuestsConstraint::new, QuestConstraint.BASE_CODEC)
                                                                               .append(new KeyedCodec<>("Count", Codec.INTEGER, true), (constraint, count) -> constraint.count = count, constraint -> Integer.valueOf(constraint.count))
                                                                               .addValidator(Validators.min(1))
+                                                                              .documentation("Number of matching quests at which further assignments are blocked.")
                                                                               .add()
                                                                               .append(new KeyedCodec<>("States", QuestStates.CODEC), (constraint, states) -> constraint.states = states, constraint -> constraint.states)
                                                                               .addValidator(Validators.nonEmptyArray())
                                                                               .addValidator(Validators.uniqueInArray())
+                                                                              .documentation("Quest statuses counted toward the limit, defaulting to all statuses.")
                                                                               .add()
+                                                                              .documentation("Limits how many quests from the asset a player may receive.")
                                                                               .build();
 
     protected int count;

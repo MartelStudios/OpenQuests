@@ -12,6 +12,7 @@ public class WaitQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<WaitQuestAsset> CODEC =
         BuilderCodec.builder(WaitQuestAsset.class, WaitQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
+                    .documentation("Counts seconds spent in game toward a target duration.")
                     .build();
 
     private WaitQuestAsset() {}

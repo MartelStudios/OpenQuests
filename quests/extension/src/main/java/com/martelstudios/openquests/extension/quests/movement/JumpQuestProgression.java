@@ -12,6 +12,7 @@ public class JumpQuestProgression extends PlayerTickQuestProgression<JumpQuestPr
 
     public static final BuilderCodec<JumpQuestProgression> CODEC =
         BuilderCodec.builder(JumpQuestProgression.class, JumpQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
+                    .documentation("Stores progress toward a jump count.")
                     .build();
 
     /**

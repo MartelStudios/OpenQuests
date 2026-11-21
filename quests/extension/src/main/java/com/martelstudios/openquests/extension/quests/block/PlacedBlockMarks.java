@@ -30,7 +30,9 @@ public final class PlacedBlockMarks implements Component<ChunkStore> {
 
     public static final BuilderCodec<PlacedBlockMarks> CODEC = BuilderCodec.builder(PlacedBlockMarks.class, PlacedBlockMarks::new)
                                                                            .append(new KeyedCodec<>("Data", Codec.BYTE_ARRAY), PlacedBlockMarks::read, PlacedBlockMarks::write)
+                                                                           .documentation("Encoded marks identifying which blocks in the chunk were placed by a player.")
                                                                            .add()
+                                                                           .documentation("Stores player placement marks for blocks in a chunk.")
                                                                            .build();
 
     @Nullable

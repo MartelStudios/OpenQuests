@@ -27,14 +27,19 @@ public class ReachPathQuestAsset extends QuantityQuestAsset {
         BuilderCodec.builder(ReachPathQuestAsset.class, ReachPathQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("Locations", new ArrayCodec<>(ReachLocationQuestAsset.CODEC, ReachLocationQuestAsset[]::new)), (asset, locations) -> asset.locations = locations, asset -> asset.locations)
                     .addValidator(Validators.nonEmptyArray())
+                    .documentation("Destinations to reach, with at least one required.")
                     .add()
                     .append(new KeyedCodec<>("Ordered", Codec.BOOLEAN), (asset, ordered) -> asset.ordered = ordered, asset -> Boolean.valueOf(asset.ordered))
+                    .documentation("Requires destinations to be reached in the listed order, true by default.")
                     .add()
                     .append(new KeyedCodec<>("ResetOn", new ArrayCodec<>(new EnumCodec<>(Reset.class), Reset[]::new)), (asset, resets) -> asset.resetOn = resets, asset -> asset.resetOn)
+                    .documentation("Events that clear progress, with no reset events by default.")
                     .add()
                     .append(new KeyedCodec<>("ResetSound", Codec.STRING), (asset, sound) -> asset.resetSound = sound, asset -> asset.resetSound)
                     .addValidator(SoundEvent.VALIDATOR_CACHE.getValidator())
+                    .documentation("Sound event played when the path resets, with no sound by default.")
                     .add()
+                    .documentation("Defines a quest that visits several destinations.")
                     .build();
 
     protected ReachLocationQuestAsset[] locations = new ReachLocationQuestAsset[0];

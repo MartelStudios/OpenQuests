@@ -32,19 +32,24 @@ public class OpenQuestAssignment implements JsonAssetWithMap<String, DefaultAsse
     public static final AssetBuilderCodec<String, OpenQuestAssignment> CODEC = AssetBuilderCodec.builder(OpenQuestAssignment.class, OpenQuestAssignment::new, Codec.STRING, (assignment, id) -> assignment.id = id, assignment -> assignment.id, (assignment, data) -> assignment.data = data, assignment -> assignment.data)
                                                                                                 .append(new KeyedCodec<>("Trigger", AssignmentTrigger.CODEC), (assignment, trigger) -> assignment.trigger = trigger, assignment -> assignment.trigger)
                                                                                                 .addValidator(Validators.nonNull())
+                                                                                                .documentation("Event or schedule that creates an occasion to offer the quests.")
                                                                                                 .add()
                                                                                                 .append(new KeyedCodec<>("Scope", AssignmentScope.CODEC), (assignment, scope) -> assignment.scope = scope, assignment -> assignment.scope)
+                                                                                                .documentation("Recipients who receive or share each quest, defaulting to Player.")
                                                                                                 .add()
                                                                                                 .append(new KeyedCodec<>("Repeat", AssignmentRepeat.CODEC), (assignment, repeat) -> assignment.repeat = repeat, assignment -> assignment.repeat)
+                                                                                                .documentation("Rule for handing out a quest again, defaulting to Once.")
                                                                                                 .add()
                                                                                                 .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(Codec.STRING, String[]::new)), (assignment, ids) -> assignment.questAssetIds = ids, assignment -> assignment.questAssetIds)
                                                                                                 .addValidator(Validators.nonEmptyArray())
                                                                                                 .addValidator(OpenQuestAsset.VALIDATOR_CACHE.getArrayValidator())
+                                                                                                .documentation("Quest asset IDs offered by this assignment, empty by default.")
                                                                                                 .add()
                                                                                                 .validator((assignment, results) -> {
                                                                                                     String error = assignment.findInconsistency();
                                                                                                     if (error != null) results.fail(error);
                                                                                                 })
+                                                                                                .documentation("Defines when, to whom, and how often quests are handed out.")
                                                                                                 .build();
 
     protected String id;

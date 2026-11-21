@@ -23,10 +23,12 @@ public class QuestSpellFilter {
                                                                            .append(new KeyedCodec<>("SpellIds", Codec.STRING_ARRAY), (filter, ids) -> filter.spellIds = ids, filter -> filter.spellIds)
                                                                            .addValidator(Validators.nonNullArrayElements())
                                                                            .addValidator(Item.VALIDATOR_CACHE.getArrayValidator())
+                                                                           .documentation("Rune item IDs accepted by this filter, with no ID restriction when both lists are empty.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("AbilityKeywords", Codec.STRING_ARRAY), (filter, keywords) -> filter.abilityKeywords = keywords, filter -> filter.abilityKeywords)
                                                                            .addValidator(Validators.nonNullArrayElements())
                                                                            .addValidatorLate(() -> AbilityKeyword.VALIDATOR_CACHE.getArrayValidator().late())
+                                                                           .documentation("Ability keywords accepted by this filter, with no keyword restriction when both lists are empty.")
                                                                            .add()
                                                                            .validator((filter, results) -> {
                                                                                if (filter.spellIds == null) return;
@@ -35,6 +37,7 @@ public class QuestSpellFilter {
                                                                                    if (id != null && spellOf(id) == null) results.fail(id + " is not a spell: its Ability is not in the Core slot");
                                                                                }
                                                                            })
+                                                                           .documentation("Accepts spells matching any listed rune ID or ability keyword.")
                                                                            .build();
 
     @Nullable

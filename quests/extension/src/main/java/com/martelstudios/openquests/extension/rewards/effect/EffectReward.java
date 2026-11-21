@@ -27,12 +27,16 @@ public class EffectReward extends QuestReward {
                                                                        .append(new KeyedCodec<>("Effect", Codec.STRING, true), (reward, effect) -> reward.effect = effect, reward -> reward.effect)
                                                                        .addValidator(Validators.nonNull())
                                                                        .addValidatorLate(() -> EntityEffect.VALIDATOR_CACHE.getValidator().late())
+                                                                       .documentation("Asset ID of the entity effect to apply.")
                                                                        .add()
                                                                        .append(new KeyedCodec<>("DurationSeconds", Codec.DOUBLE), (reward, seconds) -> reward.durationSeconds = seconds, reward -> reward.durationSeconds)
                                                                        .addValidator(Validators.greaterThan(0.0))
+                                                                       .documentation("Duration in seconds, using the effect's own duration when omitted.")
                                                                        .add()
                                                                        .append(new KeyedCodec<>("OverlapBehavior", OverlapBehavior.CODEC), (reward, overlap) -> reward.overlapBehavior = overlap, reward -> reward.overlapBehavior)
+                                                                       .documentation("Controls how an existing instance of the effect is handled, using the effect's own behavior when omitted.")
                                                                        .add()
+                                                                       .documentation("Applies an entity effect to the player.")
                                                                        .build();
 
     protected String effect;

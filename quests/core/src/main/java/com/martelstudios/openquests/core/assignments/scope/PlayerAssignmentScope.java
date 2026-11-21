@@ -15,7 +15,9 @@ public class PlayerAssignmentScope extends AssignmentScope {
 
     public static final String TYPE = "Player";
 
-    public static final BuilderCodec<PlayerAssignmentScope> CODEC = BuilderCodec.builder(PlayerAssignmentScope.class, PlayerAssignmentScope::new, AssignmentScope.BASE_CODEC).build();
+    public static final BuilderCodec<PlayerAssignmentScope> CODEC = BuilderCodec.builder(PlayerAssignmentScope.class, PlayerAssignmentScope::new, AssignmentScope.BASE_CODEC)
+                                                                                .documentation("Gives the player concerned their own quest instance.")
+                                                                                .build();
 
     @Override
     public void reach(@Nonnull OpenQuestAssignment assignment, @Nonnull Occasion occasion, @Nonnull AssignmentTargets targets) {

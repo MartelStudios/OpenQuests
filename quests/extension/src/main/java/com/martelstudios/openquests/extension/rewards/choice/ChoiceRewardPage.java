@@ -162,9 +162,12 @@ public class ChoiceRewardPage extends InteractiveCustomUIPage<ChoiceRewardPage.E
 
         public static final BuilderCodec<EventDataModel> CODEC = BuilderCodec.builder(EventDataModel.class, EventDataModel::new)
                                                                              .append(new KeyedCodec<>(KEY_ACTION, Codec.STRING), (data, value) -> data.action = value, data -> data.action)
+                                                                             .documentation("Action requested by the popup.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>(KEY_INDEX, Codec.STRING), (data, value) -> data.index = value, data -> data.index)
+                                                                             .documentation("Index of the selected reward entry, when applicable.")
                                                                              .add()
+                                                                             .documentation("Carries an interaction from the reward choice popup.")
                                                                              .build();
 
         private String action;

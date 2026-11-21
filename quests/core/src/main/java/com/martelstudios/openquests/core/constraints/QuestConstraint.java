@@ -32,7 +32,9 @@ public abstract class QuestConstraint {
      */
     public static final BuilderCodec<QuestConstraint> BASE_CODEC = BuilderCodec.abstractBuilder(QuestConstraint.class)
                                                                                .append(new KeyedCodec<>("DescriptionKey", Codec.STRING), (constraint, key) -> constraint.descriptionKey = key, constraint -> constraint.descriptionKey)
+                                                                               .documentation("Translation key overriding the generated condition text, with an empty string hiding the condition.")
                                                                                .add()
+                                                                               .documentation("Defines the journal description shared by quest rules.")
                                                                                .build();
 
     /**

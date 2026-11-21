@@ -16,7 +16,9 @@ public class EnterWorldQuestProgression extends AbstractQuestProgression<EnterWo
 
     public static final BuilderCodec<EnterWorldQuestProgression> CODEC = BuilderCodec.builder(EnterWorldQuestProgression.class, EnterWorldQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
                                                                                      .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC), (quest, pattern) -> quest.worldNamePattern = pattern, quest -> quest.worldNamePattern)
+                                                                                     .documentation("Overrides the world name pattern for this instance, falling back to the asset when omitted.")
                                                                                      .add()
+                                                                                     .documentation("Stores progress for a quest about entering a matching world.")
                                                                                      .build();
 
     /**

@@ -17,7 +17,9 @@ public class UniverseQuestScope extends QuestScope {
 
     public static final String TYPE = "Universe";
 
-    public static final BuilderCodec<UniverseQuestScope> CODEC = BuilderCodec.builder(UniverseQuestScope.class, UniverseQuestScope::new, QuestScope.BASE_CODEC).build();
+    public static final BuilderCodec<UniverseQuestScope> CODEC = BuilderCodec.builder(UniverseQuestScope.class, UniverseQuestScope::new, QuestScope.BASE_CODEC)
+                                                                             .documentation("Identifies a quest shared across the server.")
+                                                                             .build();
 
     /**
      * The scope holds nothing of its own, so one serves every quest the server shares.

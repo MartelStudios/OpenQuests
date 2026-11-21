@@ -40,13 +40,18 @@ public final class HudSettings {
      */
     public static final BuilderCodec<HudSettings> CODEC = BuilderCodec.builder(HudSettings.class, HudSettings::new)
                                                                       .append(new KeyedCodec<>("Visible", Codec.BOOLEAN), (settings, visible) -> settings.visible = visible, settings -> settings.visible)
+                                                                      .documentation("Controls whether the tracker is shown, falling back to the default when omitted.")
                                                                       .add()
                                                                       .append(new KeyedCodec<>("Side", new EnumCodec<>(Side.class)), (settings, side) -> settings.side = side, settings -> settings.side)
+                                                                      .documentation("Screen edge used to anchor the tracker, falling back to the default when omitted.")
                                                                       .add()
                                                                       .append(new KeyedCodec<>("Offset", Codec.INTEGER), (settings, offset) -> settings.offset = offset, settings -> settings.offset)
+                                                                      .documentation("Distance in UI pixels from the chosen screen edge, falling back to the default when omitted.")
                                                                       .add()
                                                                       .append(new KeyedCodec<>("Top", Codec.INTEGER), (settings, top) -> settings.top = top, settings -> settings.top)
+                                                                      .documentation("Distance in UI pixels from the upper screen edge, falling back to the default when omitted.")
                                                                       .add()
+                                                                      .documentation("Defines optional overrides for the quest tracker layout and visibility.")
                                                                       .build();
 
     @Nullable

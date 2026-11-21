@@ -28,7 +28,9 @@ public class WorldQuestScope extends QuestScope {
 
     public static final BuilderCodec<WorldQuestScope> CODEC = BuilderCodec.builder(WorldQuestScope.class, WorldQuestScope::new, QuestScope.BASE_CODEC)
                                                                           .append(new KeyedCodec<>("Worlds", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new)), (scope, ids) -> scope.worlds.addAll(List.of(ids)), scope -> scope.worlds.toArray(UUID[]::new))
+                                                                          .documentation("UUIDs of participating worlds, initially empty.")
                                                                           .add()
+                                                                          .documentation("Stores the worlds that share a quest instance.")
                                                                           .build();
 
     protected final Set<UUID> worlds = ConcurrentHashMap.newKeySet();

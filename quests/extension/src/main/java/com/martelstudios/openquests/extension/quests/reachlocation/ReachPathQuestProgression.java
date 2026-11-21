@@ -22,7 +22,9 @@ public class ReachPathQuestProgression extends QuantityQuestProgression<ReachPat
     public static final BuilderCodec<ReachPathQuestProgression> CODEC =
         BuilderCodec.builder(ReachPathQuestProgression.class, ReachPathQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                     .append(new KeyedCodec<>("Reached", new ArrayCodec<>(Codec.INTEGER, Integer[]::new)), (quest, reached) -> quest.reached.addAll(java.util.List.of(reached)), quest -> quest.reached.toArray(Integer[]::new))
+                    .documentation("Indices of destinations reached so far, initially empty.")
                     .add()
+                    .documentation("Stores progress through a sequence of destinations.")
                     .build();
 
     private Set<Integer> reached = ConcurrentHashMap.newKeySet();

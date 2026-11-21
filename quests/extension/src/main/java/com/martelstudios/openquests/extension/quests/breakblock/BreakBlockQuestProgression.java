@@ -14,7 +14,9 @@ public class BreakBlockQuestProgression extends BlockActionQuestProgression<Brea
 
     public static final BuilderCodec<BreakBlockQuestProgression> CODEC = BuilderCodec.builder(BreakBlockQuestProgression.class, BreakBlockQuestProgression::new, BlockActionQuestProgression.BASE_CODEC)
                                                                               .append(new KeyedCodec<>("BlockToBreak", QuestItemFilter.CODEC), (quest, block) -> quest.blockToBreak = block, quest -> quest.blockToBreak)
+                                                                              .documentation("Overrides the block filter for this instance, falling back to the asset when omitted.")
                                                                               .add()
+                                                                              .documentation("Stores progress for a quest about breaking blocks.")
                                                                               .build();
 
     /**

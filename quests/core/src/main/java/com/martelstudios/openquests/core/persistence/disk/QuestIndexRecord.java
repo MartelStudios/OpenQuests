@@ -19,7 +19,9 @@ public class QuestIndexRecord {
 
     public static final BuilderCodec<QuestIndexRecord> CODEC = BuilderCodec.builder(QuestIndexRecord.class, QuestIndexRecord::new)
                                                                            .append(new KeyedCodec<>("Quests", new SetCodec<>(Codec.UUID_STRING, HashSet<UUID>::new, false)), (record, ids) -> record.questIds.addAll(ids), record -> record.questIds)
+                                                                           .documentation("Quest instance UUIDs in the index, initially empty.")
                                                                            .add()
+                                                                           .documentation("Stores the quest instance IDs in a scope's index.")
                                                                            .build();
 
     private final Set<UUID> questIds = new HashSet<>();

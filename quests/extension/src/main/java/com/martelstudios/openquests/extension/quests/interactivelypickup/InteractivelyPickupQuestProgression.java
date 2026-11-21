@@ -15,7 +15,9 @@ public class InteractivelyPickupQuestProgression extends QuantityQuestProgressio
 
     public static final BuilderCodec<InteractivelyPickupQuestProgression> CODEC = BuilderCodec.builder(InteractivelyPickupQuestProgression.class, InteractivelyPickupQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                               .append(new KeyedCodec<>("ItemToPickup", QuestItemFilter.CODEC), (quest, item) -> quest.itemToPickup = item, quest -> quest.itemToPickup)
+                                                                                              .documentation("Overrides the item filter for this instance, falling back to the asset when omitted.")
                                                                                               .add()
+                                                                                              .documentation("Stores progress for a quest about harvesting items through an interaction.")
                                                                                               .build();
 
     @Nullable

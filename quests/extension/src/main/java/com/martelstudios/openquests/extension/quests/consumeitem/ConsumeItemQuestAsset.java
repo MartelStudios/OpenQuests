@@ -13,7 +13,9 @@ public class ConsumeItemQuestAsset extends QuantityQuestAsset {
     public static final BuilderCodec<ConsumeItemQuestAsset> CODEC =
         BuilderCodec.builder(ConsumeItemQuestAsset.class, ConsumeItemQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("ItemToConsume", QuestItemFilter.CODEC), (asset, item) -> asset.itemToConsume = item, asset -> asset.itemToConsume)
+                    .documentation("Filter for items that count when consumed.")
                     .add()
+                    .documentation("Defines a quest for consuming items.")
                     .build();
 
     protected QuestItemFilter itemToConsume;

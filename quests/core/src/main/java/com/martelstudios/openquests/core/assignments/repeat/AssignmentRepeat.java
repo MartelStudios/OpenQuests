@@ -26,7 +26,9 @@ public abstract class AssignmentRepeat {
      */
     public static final BuilderCodec<AssignmentRepeat> BASE_CODEC = BuilderCodec.abstractBuilder(AssignmentRepeat.class)
                                                                                 .append(new KeyedCodec<>("Max", Codec.INTEGER), (repeat, max) -> repeat.max = max, repeat -> repeat.max == 0 ? null : Integer.valueOf(repeat.max))
+                                                                                .documentation("Maximum handouts of each quest per holder from this assignment, unlimited by default.")
                                                                                 .add()
+                                                                                .documentation("Defines whether and how often an assignment hands out another quest.")
                                                                                 .build();
 
     /**

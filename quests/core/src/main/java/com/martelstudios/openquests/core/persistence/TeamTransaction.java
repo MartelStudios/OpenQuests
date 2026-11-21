@@ -19,15 +19,15 @@ import java.util.UUID;
 /** A team move and its durable notification, committed together or replayed together after a crash. */
 public final class TeamTransaction {
     public static final BuilderCodec<TeamTransaction> CODEC = BuilderCodec.builder(TeamTransaction.class, TeamTransaction::new)
-            .append(new KeyedCodec<>("Id", Codec.UUID_STRING), (value, id) -> value.id = id, value -> value.id).add()
+            .append(new KeyedCodec<>("Id", Codec.UUID_STRING), (value, id) -> value.id = id, value -> value.id).documentation("Transaction UUID, generated when omitted.").add()
             .append(new KeyedCodec<>("Teams", new ArrayCodec<>(TeamRecord.CODEC, TeamRecord[]::new)),
-                    (value, teams) -> value.teams = List.of(teams), value -> value.teams.toArray(TeamRecord[]::new)).add()
+                    (value, teams) -> value.teams = List.of(teams), value -> value.teams.toArray(TeamRecord[]::new)).documentation("Team snapshots written by this transaction, empty by default.").add()
             .append(new KeyedCodec<>("Message", PlayerMessage.CODEC),
-                    (value, message) -> value.message = message, value -> value.message).add()
+                    (value, message) -> value.message = message, value -> value.message).documentation("Optional player message queued as part of the transaction.").add()
             .append(new KeyedCodec<>("Added", new MapCodec<>(new SetCodec<>(Codec.UUID_STRING, HashSet<UUID>::new, false), HashMap<String, Set<UUID>>::new)),
-                    (value, added) -> value.added = added, value -> value.added).add()
+                    (value, added) -> value.added = added, value -> value.added).documentation("Player UUIDs added to each membership index key, empty by default.").add()
             .append(new KeyedCodec<>("Removed", new MapCodec<>(new SetCodec<>(Codec.UUID_STRING, HashSet<UUID>::new, false), HashMap<String, Set<UUID>>::new)),
-                    (value, removed) -> value.removed = removed, value -> value.removed).add().build();
+                    (value, removed) -> value.removed = removed, value -> value.removed).documentation("Player UUIDs removed from each membership index key, empty by default.").add().documentation("Stores the related team and membership updates for one transaction.").build();
 
     private List<TeamRecord> teams = List.of();
     private PlayerMessage message;

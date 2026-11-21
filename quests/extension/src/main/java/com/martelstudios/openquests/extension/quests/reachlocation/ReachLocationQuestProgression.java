@@ -12,6 +12,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 public class ReachLocationQuestProgression extends AbstractQuestProgression<ReachLocationQuestProgression> {
 
     public static final BuilderCodec<ReachLocationQuestProgression> CODEC = BuilderCodec.builder(ReachLocationQuestProgression.class, ReachLocationQuestProgression::new, AbstractQuestProgression.BASE_CODEC)
+                                                                                        .documentation("Stores the state of a quest to reach a destination.")
                                                                                         .build();
 
     protected ReachLocationQuestProgression() {}

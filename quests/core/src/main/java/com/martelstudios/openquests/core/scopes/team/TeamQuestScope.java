@@ -23,7 +23,9 @@ public class TeamQuestScope extends QuestScope {
     public static final BuilderCodec<TeamQuestScope> CODEC = BuilderCodec.builder(TeamQuestScope.class, TeamQuestScope::new, QuestScope.BASE_CODEC)
                                                                          .append(new KeyedCodec<>("Team", Codec.UUID_STRING), (scope, teamId) -> scope.teamId = teamId, scope -> scope.teamId)
                                                                          .addValidator(Validators.nonNull())
+                                                                         .documentation("UUID of the team that shares the quest.")
                                                                          .add()
+                                                                         .documentation("Identifies a quest shared by a team.")
                                                                          .build();
 
     protected UUID teamId;

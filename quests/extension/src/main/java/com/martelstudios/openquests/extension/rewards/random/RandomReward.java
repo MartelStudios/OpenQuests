@@ -22,7 +22,9 @@ public class RandomReward extends QuestReward {
     public static final BuilderCodec<RandomReward> CODEC = BuilderCodec.builder(RandomReward.class, RandomReward::new, QuestReward.BASE_CODEC)
                                                                        .append(new KeyedCodec<>("Rewards", new ArrayCodec<>(Entry.CODEC, Entry[]::new), true), (reward, entries) -> reward.entries = entries, reward -> reward.entries)
                                                                        .addValidator(Validators.nonEmptyArray())
+                                                                       .documentation("Weighted entries eligible for the draw, empty by default.")
                                                                        .add()
+                                                                       .documentation("Draws one reward from a weighted list.")
                                                                        .build();
 
     protected Entry[] entries = new Entry[0];
@@ -73,10 +75,13 @@ public class RandomReward extends QuestReward {
         public static final BuilderCodec<Entry> CODEC = BuilderCodec.builder(Entry.class, Entry::new)
                                                                     .append(new KeyedCodec<>("Reward", QuestReward.CODEC, true), (entry, reward) -> entry.reward = reward, entry -> entry.reward)
                                                                     .addValidator(Validators.nonNull())
+                                                                    .documentation("Reward granted when this entry is drawn.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("Weight", Codec.DOUBLE), (entry, weight) -> entry.weight = weight, entry -> Double.valueOf(entry.weight))
                                                                     .addValidator(Validators.greaterThan(0.0))
+                                                                    .documentation("Relative chance of drawing this entry, defaulting to one.")
                                                                     .add()
+                                                                    .documentation("Defines one weighted entry in a random reward.")
                                                                     .build();
 
         protected QuestReward reward;

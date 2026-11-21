@@ -10,6 +10,7 @@ public class RunQuestProgression extends TravelQuestProgression<RunQuestProgress
 
     public static final BuilderCodec<RunQuestProgression> CODEC =
         BuilderCodec.builder(RunQuestProgression.class, RunQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
+                    .documentation("Stores progress toward a running target.")
                     .build();
 
     protected RunQuestProgression() {}

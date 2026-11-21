@@ -29,19 +29,27 @@ public class PlayerQuestRecord {
 
     public static final BuilderCodec<PlayerQuestRecord> CODEC = BuilderCodec.builder(PlayerQuestRecord.class, PlayerQuestRecord::new)
                                                                             .append(new KeyedCodec<>("Quests", new SetCodec<>(Codec.UUID_STRING, HashSet<UUID>::new, false)), (record, ids) -> record.questIds.addAll(ids), record -> record.questIds)
+                                                                            .documentation("Quest instance UUIDs associated with the player, empty by default.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Assignments", AssignmentRecords.MAP_CODEC), (record, assignments) -> record.assignments.putAll(assignments), record -> record.assignments)
+                                                                            .documentation("Assignment records grouped by assignment and quest asset ID, empty by default.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("PendingRewards", new SetCodec<>(PendingRewards.CODEC, HashSet<PendingRewards>::new, false)), (record, owed) -> record.pendingRewards.addAll(owed), record -> record.pendingRewards)
+                                                                            .documentation("Unclaimed rewards owed to the player, empty by default.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Completions", new MapCodec<>(QuestCompletions.CODEC, HashMap<String, QuestCompletions>::new)), (record, completions) -> record.completions.putAll(completions), record -> record.completions)
+                                                                            .documentation("Completion tallies by quest asset ID, empty by default.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Tracking", new MapCodec<>(Codec.BOOLEAN, HashMap<String, Boolean>::new)), PlayerQuestRecord::readTracking, PlayerQuestRecord::writeTracking)
+                                                                            .documentation("Explicit tracker choices by quest instance UUID, falling back to the asset when unset.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Hud", HudSettings.CODEC), (record, hud) -> record.hud = hud, record -> record.hud.isEmpty() ? null : record.hud)
+                                                                            .documentation("Individual tracker settings, falling back to server defaults for unset values.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Teams", new MapCodec<>(Codec.UUID_STRING, HashMap<String, UUID>::new)), (record, teams) -> record.teams.putAll(teams), record -> record.teams.isEmpty() ? null : record.teams)
+                                                                            .documentation("Team UUIDs by team type asset ID, empty by default.")
                                                                             .add()
+                                                                            .documentation("Stores one player's quests, rewards, history, team memberships, and tracker preferences.")
                                                                             .build();
 
     private final Set<UUID> questIds = new HashSet<>();

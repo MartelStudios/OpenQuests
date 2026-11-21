@@ -15,11 +15,15 @@ public final class QuestOrigin {
 
     public static final BuilderCodec<QuestOrigin> CODEC = BuilderCodec.builder(QuestOrigin.class, QuestOrigin::new)
                                                                       .append(new KeyedCodec<>("Assignment", Codec.STRING), (origin, id) -> origin.assignmentId = id, origin -> origin.assignmentId)
+                                                                      .documentation("Asset ID of the assignment that opened the chain.")
                                                                       .add()
                                                                       .append(new KeyedCodec<>("Quest", Codec.STRING), (origin, id) -> origin.questAssetId = id, origin -> origin.questAssetId)
+                                                                      .documentation("Asset ID of the quest originally handed out.")
                                                                       .add()
                                                                       .append(new KeyedCodec<>("Occasion", Codec.STRING), (origin, occasion) -> origin.occasion = occasion, origin -> origin.occasion)
+                                                                      .documentation("Identifier of the occasion on which the chain was opened.")
                                                                       .add()
+                                                                      .documentation("Identifies the assignment occasion that started a quest chain.")
                                                                       .build();
 
     private String assignmentId;

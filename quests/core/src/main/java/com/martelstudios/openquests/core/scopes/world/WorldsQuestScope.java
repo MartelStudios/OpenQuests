@@ -23,7 +23,9 @@ public class WorldsQuestScope extends WorldQuestScope {
 
     public static final BuilderCodec<WorldsQuestScope> CODEC = BuilderCodec.builder(WorldsQuestScope.class, WorldsQuestScope::new, WorldQuestScope.CODEC)
                                                                            .append(new KeyedCodec<>("Group", Codec.STRING), (scope, group) -> scope.group = group, scope -> scope.group)
+                                                                           .documentation("Assignment ID that identifies the shared world group.")
                                                                            .add()
+                                                                           .documentation("Identifies a quest shared across a group of worlds.")
                                                                            .build();
 
     protected String group;

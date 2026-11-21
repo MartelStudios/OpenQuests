@@ -16,11 +16,15 @@ public final class TeamInvitation {
 
     public static final BuilderCodec<TeamInvitation> CODEC = BuilderCodec.builder(TeamInvitation.class, TeamInvitation::new)
                                                                          .append(new KeyedCodec<>("Player", Codec.UUID_STRING), (invitation, id) -> invitation.player = id, invitation -> invitation.player)
+                                                                         .documentation("UUID of the invited player.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("InvitedBy", Codec.UUID_STRING), (invitation, id) -> invitation.invitedBy = id, invitation -> invitation.invitedBy)
+                                                                         .documentation("UUID of the player who sent the invitation.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("ExpiresAt", Codec.LONG), (invitation, at) -> invitation.expiresAt = at, invitation -> Long.valueOf(invitation.expiresAt))
+                                                                         .documentation("Time after which the invitation expires.")
                                                                          .add()
+                                                                         .documentation("Stores an invitation for a player to join a team.")
                                                                          .build();
 
     private UUID player;

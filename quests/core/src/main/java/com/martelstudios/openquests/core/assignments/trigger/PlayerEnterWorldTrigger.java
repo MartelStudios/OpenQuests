@@ -21,7 +21,9 @@ public class PlayerEnterWorldTrigger extends AssignmentTrigger {
 
     public static final BuilderCodec<PlayerEnterWorldTrigger> CODEC = BuilderCodec.builder(PlayerEnterWorldTrigger.class, PlayerEnterWorldTrigger::new, AssignmentTrigger.BASE_CODEC)
                                                                                   .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC), (trigger, pattern) -> trigger.worldNamePattern = pattern, trigger -> trigger.worldNamePattern)
+                                                                                  .documentation("Regular expression matched against the entire world name, accepting any world when omitted.")
                                                                                   .add()
+                                                                                  .documentation("Offers quests when a player enters a matching world.")
                                                                                   .build();
 
     @Nullable

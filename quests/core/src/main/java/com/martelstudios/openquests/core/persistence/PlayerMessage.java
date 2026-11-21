@@ -22,17 +22,24 @@ public final class PlayerMessage {
 
     public static final BuilderCodec<PlayerMessage> CODEC = BuilderCodec.builder(PlayerMessage.class, PlayerMessage::new)
                                                                          .append(new KeyedCodec<>("Id", Codec.UUID_STRING), (message, id) -> message.id = id, message -> message.id)
+                                                                         .documentation("UUID identifying the queued update.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("PlayerId", Codec.UUID_STRING), (message, id) -> message.playerId = id, message -> message.playerId)
+                                                                         .documentation("UUID of the player receiving the update.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("At", Codec.LONG), (message, at) -> message.at = at, message -> Long.valueOf(message.at))
+                                                                         .documentation("Time the update was queued, in epoch milliseconds.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Owed", PendingRewards.CODEC), (message, owed) -> message.owed = owed, message -> message.owed)
+                                                                         .documentation("Rewards to add to the player's unclaimed rewards, if present.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Ended", Ending.CODEC), (message, ending) -> message.ending = ending, message -> message.ending)
+                                                                         .documentation("Quest outcome to record for the player, if present.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Team", TeamChange.CODEC), (message, team) -> message.team = team, message -> message.team)
+                                                                         .documentation("Team membership update to apply, if present.")
                                                                          .add()
+                                                                         .documentation("Stores a queued update for a player.")
                                                                          .build();
 
     private UUID id;
@@ -176,13 +183,18 @@ public final class PlayerMessage {
 
         private static final BuilderCodec<Ending> CODEC = BuilderCodec.builder(Ending.class, Ending::new)
                                                                       .append(new KeyedCodec<>("AssetId", Codec.STRING), (ending, assetId) -> ending.assetId = assetId, ending -> ending.assetId)
+                                                                      .documentation("Asset ID of the quest that ended.")
                                                                       .add()
                                                                       .append(new KeyedCodec<>("Outcome", new EnumCodec<>(QuestState.class)), (ending, outcome) -> ending.outcome = outcome, ending -> ending.outcome)
+                                                                      .documentation("Status reached when the quest ended.")
                                                                       .add()
                                                                       .append(new KeyedCodec<>("StartedAt", Codec.LONG), (ending, millis) -> ending.startedAt = millis, ending -> ending.startedAt)
+                                                                      .documentation("Quest start time in epoch milliseconds, omitted when unavailable.")
                                                                       .add()
                                                                       .append(new KeyedCodec<>("CompletedAt", Codec.LONG), (ending, millis) -> ending.completedAt = millis, ending -> ending.completedAt)
+                                                                      .documentation("Quest end time in epoch milliseconds, omitted when unavailable.")
                                                                       .add()
+                                                                      .documentation("Stores a quest outcome carried by a queued player update.")
                                                                       .build();
 
         private String assetId;

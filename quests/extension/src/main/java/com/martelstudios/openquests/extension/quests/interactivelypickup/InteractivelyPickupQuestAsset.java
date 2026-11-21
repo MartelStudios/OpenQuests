@@ -10,7 +10,9 @@ public class InteractivelyPickupQuestAsset extends QuantityQuestAsset {
     public static final BuilderCodec<InteractivelyPickupQuestAsset> CODEC =
         BuilderCodec.builder(InteractivelyPickupQuestAsset.class, InteractivelyPickupQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
             .append(new KeyedCodec<>("ItemToPickup", QuestItemFilter.CODEC), (asset, item) -> asset.itemToPickup = item, asset -> asset.itemToPickup)
+            .documentation("Filter for items picked up through a harvest interaction.")
             .add()
+            .documentation("Defines a quest for harvesting items through an interaction.")
             .build();
 
     protected QuestItemFilter itemToPickup;

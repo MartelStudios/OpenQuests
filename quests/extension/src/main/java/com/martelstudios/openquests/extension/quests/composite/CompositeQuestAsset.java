@@ -21,11 +21,15 @@ public class CompositeQuestAsset extends OpenQuestAsset {
                                                                             .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(new ContainedAssetCodec<>(OpenQuestAsset.class, OpenQuestAsset.CODEC), String[]::new)), (asset, ids) -> asset.assetIds = ids, asset -> asset.assetIds)
                                                                             .addValidator(Validators.nonEmptyArray())
                                                                             .addValidator(Validators.uniqueInArray())
+                                                                            .documentation("Child quest asset IDs in display order, with at least one required.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Operator", new EnumCodec<>(Operator.class)), (asset, operator) -> asset.operator = operator, asset -> asset.operator)
+                                                                            .documentation("Controls whether all or any children must succeed, defaulting to And.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("PersistChildrenHistory", Codec.BOOLEAN), (asset, value) -> asset.persistChildrenHistory = value, asset -> Boolean.valueOf(asset.persistChildrenHistory))
+                                                                            .documentation("Lets children use their own history settings when true, and defaults to suppressing their history.")
                                                                             .add()
+                                                                            .documentation("Combines several child quests into a single objective.")
                                                                             .build();
 
     protected String[] assetIds = new String[0];

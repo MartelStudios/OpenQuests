@@ -17,9 +17,12 @@ public class PendingRewards {
 
     public static final BuilderCodec<PendingRewards> CODEC = BuilderCodec.builder(PendingRewards.class, PendingRewards::new)
                                                                          .append(new KeyedCodec<>("QuestId", Codec.UUID_STRING), (owed, questId) -> owed.questId = questId, owed -> owed.questId)
+                                                                         .documentation("UUID of the quest instance that earned the rewards.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Rewards", new ArrayCodec<>(QuestReward.CODEC, QuestReward[]::new)), (owed, rewards) -> owed.rewards = rewards, owed -> owed.rewards)
+                                                                         .documentation("Rewards that remain to be claimed from the quest, empty by default.")
                                                                          .add()
+                                                                         .documentation("Stores the rewards still owed from a quest instance.")
                                                                          .build();
 
     public static final QuestReward[] NO_REWARDS = new QuestReward[0];

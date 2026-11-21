@@ -13,7 +13,9 @@ public class BreakBlockQuestAsset extends BlockActionQuestAsset {
     public static final BuilderCodec<BreakBlockQuestAsset> CODEC =
         BuilderCodec.builder(BreakBlockQuestAsset.class, BreakBlockQuestAsset::new, BlockActionQuestAsset.BASE_CODEC)
             .append(new KeyedCodec<>("BlockToBreak", QuestItemFilter.CODEC), (asset, block) -> asset.blockToBreak = block, asset -> asset.blockToBreak)
+            .documentation("Filter for blocks that count when broken.")
             .add()
+            .documentation("Defines a quest for breaking blocks.")
             .build();
 
     protected QuestItemFilter blockToBreak;

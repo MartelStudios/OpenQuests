@@ -14,7 +14,9 @@ public class CastSpellQuestAsset extends QuantityQuestAsset {
     public static final BuilderCodec<CastSpellQuestAsset> CODEC =
         BuilderCodec.builder(CastSpellQuestAsset.class, CastSpellQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("SpellToCast", QuestSpellFilter.CODEC), (asset, spell) -> asset.spellToCast = spell, asset -> asset.spellToCast)
+                    .documentation("Filter for successful spell casts, with all spells accepted when omitted.")
                     .add()
+                    .documentation("Defines a quest for casting spells.")
                     .build();
 
     /**

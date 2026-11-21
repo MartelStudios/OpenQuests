@@ -27,9 +27,12 @@ public class ItemReward extends QuestReward {
     public static final BuilderCodec<ItemReward> CODEC = BuilderCodec.builder(ItemReward.class, ItemReward::new, QuestReward.BASE_CODEC)
                                                                      .append(new KeyedCodec<>("ItemId", Codec.STRING), (reward, itemId) -> reward.itemId = itemId, reward -> reward.itemId)
                                                                      .addValidator(Item.VALIDATOR_CACHE.getValidator())
+                                                                     .documentation("Asset ID of the item to give.")
                                                                      .add()
                                                                      .append(new KeyedCodec<>("Quantity", Codec.INTEGER), (reward, quantity) -> reward.quantity = quantity, reward -> Integer.valueOf(reward.quantity))
+                                                                     .documentation("Number of items to give, defaulting to one.")
                                                                      .add()
+                                                                     .documentation("Gives a stack of items to the player.")
                                                                      .build();
 
     protected String itemId;

@@ -19,6 +19,7 @@ public class RequiresQuestConstraint extends QuestConstraint {
 
     public static final BuilderCodec<RequiresQuestConstraint> CODEC = QuestRequirement.appendListFields(BuilderCodec.builder(RequiresQuestConstraint.class, RequiresQuestConstraint::new, QuestConstraint.BASE_CODEC),
                                                                                                     constraint -> constraint.requirement)
+                                                                                      .documentation("Allows progress while the acting player meets a requirement about other quests.")
                                                                                       .build();
 
     @Nonnull
