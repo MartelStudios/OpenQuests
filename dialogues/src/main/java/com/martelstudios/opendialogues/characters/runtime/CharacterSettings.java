@@ -12,11 +12,15 @@ public class CharacterSettings {
 
     public static final BuilderCodec<CharacterSettings> CODEC = BuilderCodec.builder(CharacterSettings.class, CharacterSettings::new)
                                                                             .append(new KeyedCodec<>("ScanRadius", Codec.DOUBLE), (settings, radius) -> settings.scanRadius = radius, settings -> settings.scanRadius)
+                                                                            .documentation("Distance in blocks around each player to refresh NPC characters, defaulting to 64.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("ScanInterval", Codec.FLOAT), (settings, interval) -> settings.scanInterval = interval, settings -> settings.scanInterval)
+                                                                            .documentation("Time between refreshes in seconds, defaulting to 5.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Draws", Codec.BOOLEAN), (settings, draws) -> settings.draws = draws, settings -> settings.draws)
+                                                                            .documentation("Allows new character assignments when true, which is the default.")
                                                                             .add()
+                                                                            .documentation("Configures character assignment and refreshes around players.")
                                                                             .build();
 
     private boolean draws = true;

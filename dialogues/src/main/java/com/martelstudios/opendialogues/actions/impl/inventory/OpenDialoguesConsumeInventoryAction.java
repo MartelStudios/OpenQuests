@@ -29,7 +29,9 @@ public class OpenDialoguesConsumeInventoryAction extends DialogueAction {
                                                                                          .append(new KeyedCodec<>("Items", new ArrayCodec<>(OpenDialoguesItemQuantity.CODEC, OpenDialoguesItemQuantity[]::new), true), (action, items) -> action.items = items, action -> action.items)
                                                                                          .addValidator(Validators.nonNull())
                                                                                          .addValidator(Validators.nonEmptyArray())
+                                                                                         .documentation("Item requirements and quantities to remove from the player's inventory.")
                                                                                          .add()
+                                                                                         .documentation("Removes items from the player's inventory only if every configured quantity can be met.")
                                                                                          .build();
 
     private OpenDialoguesItemQuantity[] items;

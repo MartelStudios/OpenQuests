@@ -47,13 +47,18 @@ public class CharacterPositions implements Resource<EntityStore> {
 
         static final BuilderCodec<Saved> CODEC = BuilderCodec.builder(Saved.class, Saved::new)
                                                              .append(new KeyedCodec<>("Character", Codec.STRING), (saved, character) -> saved.character = character, saved -> saved.character)
+                                                             .documentation("ID of the identity carried by the entity.")
                                                              .add()
                                                              .append(new KeyedCodec<>("Npc", Codec.STRING), (saved, npc) -> saved.npc = npc, saved -> saved.npc)
+                                                             .documentation("UUID of the entity at this location.")
                                                              .add()
                                                              .append(new KeyedCodec<>("Position", Vector3dUtil.CODEC), (saved, position) -> saved.position = position, saved -> saved.position)
+                                                             .documentation("Last recorded coordinates of the entity.")
                                                              .add()
                                                              .append(new KeyedCodec<>("Name", Codec.STRING), (saved, name) -> saved.name = name, saved -> saved.name)
+                                                             .documentation("Recorded name used to label the map marker.")
                                                              .add()
+                                                             .documentation("Stores the last known location and display name of a character's NPC.")
                                                              .build();
 
         String character;
@@ -64,11 +69,15 @@ public class CharacterPositions implements Resource<EntityStore> {
 
     public static final BuilderCodec<CharacterPositions> CODEC = BuilderCodec.builder(CharacterPositions.class, CharacterPositions::new)
                                                                              .append(new KeyedCodec<>("Npcs", new ArrayCodec<>(Saved.CODEC, Saved[]::new)), CharacterPositions::load, CharacterPositions::save)
+                                                                             .documentation("Last known character locations in this world, empty by default.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("UniverseGeneration", Codec.INTEGER), (positions, generation) -> positions.universeGeneration = generation, positions -> positions.universeGeneration)
+                                                                             .documentation("Universe reset counter recorded for these locations, initially zero.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("WorldGeneration", Codec.INTEGER), (positions, generation) -> positions.worldGeneration = generation, positions -> positions.worldGeneration)
+                                                                             .documentation("World reset counter recorded for these locations, initially zero.")
                                                                              .add()
+                                                                             .documentation("Persists last known character locations in a world.")
                                                                              .build();
 
     private final Map<UUID, Placed> npcs = new ConcurrentHashMap<>();

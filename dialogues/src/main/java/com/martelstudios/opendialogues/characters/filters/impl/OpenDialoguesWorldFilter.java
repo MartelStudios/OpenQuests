@@ -19,6 +19,7 @@ public class OpenDialoguesWorldFilter extends CharacterFilter {
 
     public static final BuilderCodec<OpenDialoguesWorldFilter> CODEC = BuilderCodec.builder(OpenDialoguesWorldFilter.class, OpenDialoguesWorldFilter::new, CharacterFilter.BASE_CODEC)
                                                                                    .append(new KeyedCodec<>("Worlds", new ArrayCodec<>(WorldNamePattern.CODEC, WorldNamePattern[]::new)), (filter, worlds) -> filter.worlds = worlds, filter -> filter.worlds)
+                                                                                   .documentation("Regular expressions matched against the entire world name, empty by default.")
                                                                                    .add()
                                                                                    .validator((filter, results) -> {
                                                                                        for (WorldNamePattern world : filter.worlds) {
@@ -27,6 +28,7 @@ public class OpenDialoguesWorldFilter extends CharacterFilter {
                                                                                            return;
                                                                                        }
                                                                                    })
+                                                                                   .documentation("Matches NPCs by their world name.")
                                                                                    .build();
 
     protected WorldNamePattern[] worlds = new WorldNamePattern[0];

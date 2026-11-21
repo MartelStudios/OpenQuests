@@ -32,9 +32,12 @@ public class OpenDialoguesDialogueTrait extends CharacterTrait {
     public static final BuilderCodec<OpenDialoguesDialogueTrait> CODEC = BuilderCodec.builder(OpenDialoguesDialogueTrait.class, OpenDialoguesDialogueTrait::new, CharacterTrait.BASE_CODEC)
                                                                                      .append(new KeyedCodec<>("Dialogue", OpenDialoguesTarget.CODEC), (trait, dialogue) -> trait.dialogue = dialogue, trait -> trait.dialogue)
                                                                                      .addValidator(Validators.nonNull())
+                                                                                     .documentation("Dialogue or router opened with the NPC as the source.")
                                                                                      .add()
                                                                                      .append(new KeyedCodec<>("Hint", Codec.STRING), (trait, hint) -> trait.hint = hint, trait -> trait.hint)
+                                                                                     .documentation("Interaction prompt translation key, defaulting to server.interactionHints.generic.")
                                                                                      .add()
+                                                                                     .documentation("Lets the player open a conversation by interacting with the NPC.")
                                                                                      .build();
 
     private OpenDialoguesTarget dialogue;

@@ -14,14 +14,17 @@ public class OpenDialoguesTarget {
 
     public static final BuilderCodec<OpenDialoguesTarget> CODEC = BuilderCodec.builder(OpenDialoguesTarget.class, OpenDialoguesTarget::new)
                                                                          .append(new KeyedCodec<>("Dialogue", OpenDialogueAsset.CONTAINED_CODEC), (target, dialogue) -> target.dialogue = dialogue, target -> target.dialogue)
+                                                                         .documentation("Dialogue asset ID or inline asset to open.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Router", OpenDialogueRouterAsset.CONTAINED_CODEC), (target, router) -> target.router = router, target -> target.router)
+                                                                         .documentation("Router asset ID or inline asset to resolve.")
                                                                          .add()
                                                                          .validator((target, results) -> {
                                                                              if ((target.dialogue == null) == (target.router == null)) {
                                                                                  results.fail("Exactly one of Dialogue or Router must be set");
                                                                              }
                                                                          })
+                                                                         .documentation("Points to a dialogue directly or through another router.")
                                                                          .build();
 
     @Nullable

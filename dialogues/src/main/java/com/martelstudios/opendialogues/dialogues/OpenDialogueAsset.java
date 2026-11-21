@@ -39,24 +39,32 @@ public class OpenDialogueAsset implements JsonAssetWithMap<String, DefaultAssetM
      */
     public static final BuilderCodec<OpenDialogueAsset> BODY_CODEC = BuilderCodec.builder(OpenDialogueAsset.class, OpenDialogueAsset::new)
                                                                                  .append(new KeyedCodec<>("Title", Codec.STRING), (dialogue, title) -> dialogue.title = title, dialogue -> dialogue.title)
+                                                                                 .documentation("Heading shown above the pages, omitted by default.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Color", new ColorCodec()), (dialogue, color) -> dialogue.color = color, dialogue -> dialogue.color)
+                                                                                 .documentation("Tint for the heading and pages in chat, with no tint by default.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Display", Codec.STRING), (dialogue, display) -> dialogue.display = display, dialogue -> dialogue.display)
                                                                                  .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DISPLAYS_DATA_SET)))
+                                                                                 .documentation("Registered display to try after server overrides, with an empty value deferring to the server default.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Character", OpenDialogueCharacterAsset.CONTAINED_CODEC), (dialogue, character) -> dialogue.character = character, dialogue -> dialogue.character)
+                                                                                 .documentation("Speaker asset ID or inline asset, with no configured speaker by default.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("UseSourceCharacter", Codec.BOOLEAN), (dialogue, use) -> dialogue.useSourceCharacter = use, dialogue -> dialogue.useSourceCharacter)
+                                                                                 .documentation("Uses the source NPC's character with field-by-field fallback to the configured speaker when true, and defaults to false.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Pages", new ArrayCodec<>(OpenDialoguesPage.CODEC, OpenDialoguesPage[]::new)), (dialogue, pages) -> dialogue.pages = pages, dialogue -> dialogue.pages)
+                                                                                 .documentation("Dialogue content in reading order, empty by default.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Responses", new ArrayCodec<>(OpenDialoguesResponse.CODEC, OpenDialoguesResponse[]::new)), (dialogue, responses) -> dialogue.responses = responses, dialogue -> dialogue.responses)
+                                                                                 .documentation("Choices offered to the player, empty by default.")
                                                                                  .add()
                                                                                  .validator((dialogue, results) -> {
                                                                                      String error = dialogue.findAnswerKeyError();
                                                                                      if (error != null) results.fail(error);
                                                                                  })
+                                                                                 .documentation("Defines a conversation with pages, optional speaker information, and answers.")
                                                                                  .build();
 
     public static final AssetBuilderCodec<String, OpenDialogueAsset> CODEC = AssetBuilderCodec.wrap(BODY_CODEC, Codec.STRING, (dialogue, id) -> dialogue.id = id, dialogue -> dialogue.id, (dialogue, data) -> dialogue.data = data, dialogue -> dialogue.data);

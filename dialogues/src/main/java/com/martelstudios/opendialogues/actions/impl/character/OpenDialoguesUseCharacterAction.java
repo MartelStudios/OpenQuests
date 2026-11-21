@@ -20,7 +20,9 @@ public class OpenDialoguesUseCharacterAction extends DialogueAction {
 
     public static final String TYPE = "UseCharacter";
 
-    public static final BuilderCodec<OpenDialoguesUseCharacterAction> CODEC = BuilderCodec.builder(OpenDialoguesUseCharacterAction.class, OpenDialoguesUseCharacterAction::new, DialogueAction.BASE_CODEC).build();
+    public static final BuilderCodec<OpenDialoguesUseCharacterAction> CODEC = BuilderCodec.builder(OpenDialoguesUseCharacterAction.class, OpenDialoguesUseCharacterAction::new, DialogueAction.BASE_CODEC)
+                                                                                          .documentation("Runs the source NPC's character interaction or ends the dialogue if that interaction cannot run.")
+                                                                                          .build();
 
     /**
      * Defers to the player's world thread, the only one that may read the NPC.

@@ -26,14 +26,18 @@ public class OpenDialoguesItemFilter {
 
     public static final BuilderCodec<OpenDialoguesItemFilter> CODEC = BuilderCodec.builder(OpenDialoguesItemFilter.class, OpenDialoguesItemFilter::new)
                                                                              .append(new KeyedCodec<>("BlockTag", Codec.STRING), (filter, tag) -> filter.blockTag = tag, filter -> filter.blockTag)
+                                                                             .documentation("Accepts items with this block tag.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("Category", Codec.STRING), (filter, category) -> filter.category = category, filter -> filter.category)
+                                                                             .documentation("Accepts items whose recipes list this bench category.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("ItemId", Codec.STRING), (filter, id) -> filter.itemId = id, filter -> filter.itemId)
                                                                              .addValidator(Item.VALIDATOR_CACHE.getValidator())
+                                                                             .documentation("Accepts the exact item asset ID.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("ResourceTypeId", Codec.STRING), (filter, id) -> filter.resourceTypeId = id, filter -> filter.resourceTypeId)
                                                                              .addValidator(ResourceType.VALIDATOR_CACHE.getValidator())
+                                                                             .documentation("Accepts items with this resource type asset ID.")
                                                                              .add()
                                                                              .validator((filter, results) -> {
                                                                                  if (filter.blockTag == null && filter.category == null && filter.itemId == null && filter.resourceTypeId == null) {
@@ -43,6 +47,7 @@ public class OpenDialoguesItemFilter {
                                                                              .afterDecode(filter -> {
                                                                                  if (filter.blockTag != null) filter.blockTagIndex = AssetRegistry.getOrCreateTagIndex(filter.blockTag);
                                                                              })
+                                                                             .documentation("Matches an item if it meets any configured criterion.")
                                                                              .build();
 
     @Nullable

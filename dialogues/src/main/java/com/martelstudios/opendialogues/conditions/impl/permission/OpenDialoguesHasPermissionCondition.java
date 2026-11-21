@@ -20,7 +20,9 @@ public class OpenDialoguesHasPermissionCondition extends DialogueCondition {
                                                                                  .append(new KeyedCodec<>("Permission", Codec.STRING, true), (condition, permission) -> condition.permission = permission, condition -> condition.permission)
                                                                                  .addValidator(Validators.nonNull())
                                                                                  .addValidator(Validators.nonEmptyString())
+                                                                                 .documentation("Permission node the player must have.")
                                                                                  .add()
+                                                                                 .documentation("Tests whether the player has a permission.")
                                                                                  .build();
 
     protected String permission;

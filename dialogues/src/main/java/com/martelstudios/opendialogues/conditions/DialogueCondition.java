@@ -27,7 +27,9 @@ public abstract class DialogueCondition {
      */
     public static final BuilderCodec<DialogueCondition> BASE_CODEC = BuilderCodec.abstractBuilder(DialogueCondition.class)
                                                                          .append(new KeyedCodec<>("Not", Codec.BOOLEAN), (condition, not) -> condition.not = not, condition -> condition.not)
+                                                                         .documentation("Inverts the test result when true and defaults to false.")
                                                                          .add()
+                                                                         .documentation("Tests whether a route or answer is available in the current context.")
                                                                          .build();
 
     protected boolean not;

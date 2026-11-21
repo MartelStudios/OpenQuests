@@ -19,9 +19,12 @@ public class DisplayRule {
 
     public static final BuilderCodec<DisplayRule> CODEC = BuilderCodec.builder(DisplayRule.class, DisplayRule::new)
                                                                       .append(new KeyedCodec<>("Target", Codec.STRING), (rule, target) -> rule.target = target, rule -> rule.target)
+                                                                      .documentation("Match all dialogues with * or select a dialogue, tag, or pack using dialogue:, tag:, or pack:.")
                                                                       .add()
                                                                       .append(new KeyedCodec<>("Display", Codec.STRING), (rule, display) -> rule.display = display, rule -> rule.display)
+                                                                      .documentation("ID of the registered display to use for matching dialogues.")
                                                                       .add()
+                                                                      .documentation("Overrides the display for dialogues that match a target.")
                                                                       .build();
 
     private String target = ALL;

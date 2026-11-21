@@ -30,11 +30,15 @@ public class UniverseCharacters {
 
         public static final BuilderCodec<Claim> CODEC = BuilderCodec.builder(Claim.class, Claim::new)
                                                                     .append(new KeyedCodec<>("Npc", Codec.STRING), (claim, npc) -> claim.npc = npc, claim -> claim.npc)
+                                                                    .documentation("UUID of the entity holding the claim, when present.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("World", Codec.STRING), (claim, world) -> claim.world = world, claim -> claim.world)
+                                                                    .documentation("World that owns the claim, when present.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("Consumed", Codec.BOOLEAN), (claim, consumed) -> claim.consumed = consumed, claim -> claim.consumed)
+                                                                    .documentation("Whether the character is permanently used up, defaulting to false.")
                                                                     .add()
+                                                                    .documentation("Stores a universe-level claim on a unique character.")
                                                                     .build();
 
         private String npc;
@@ -52,11 +56,15 @@ public class UniverseCharacters {
 
     public static final BuilderCodec<UniverseCharacters> CODEC = BuilderCodec.builder(UniverseCharacters.class, UniverseCharacters::new)
                                                                              .append(new KeyedCodec<>("Claims", new MapCodec<>(Claim.CODEC, HashMap<String, Claim>::new)), UniverseCharacters::putAll, UniverseCharacters::snapshot)
+                                                                             .documentation("Claims keyed by character ID, initially empty.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("Generation", Codec.INTEGER), (universe, generation) -> universe.generation = generation, UniverseCharacters::generation)
+                                                                             .documentation("Universe reset counter for character assignments, initially zero.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("DeadGeneration", Codec.INTEGER), (universe, generation) -> universe.deadGeneration = generation, UniverseCharacters::deadGeneration)
+                                                                             .documentation("Reset counter for permanently lost characters, initially zero.")
                                                                              .add()
+                                                                             .documentation("Persists universe-wide character uniqueness claims and reset counters.")
                                                                              .build();
 
     private final Map<String, Claim> claims = new HashMap<>();

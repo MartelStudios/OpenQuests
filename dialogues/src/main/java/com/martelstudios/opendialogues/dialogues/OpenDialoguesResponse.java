@@ -21,18 +21,25 @@ public class OpenDialoguesResponse {
 
     public static final BuilderCodec<OpenDialoguesResponse> CODEC = BuilderCodec.builder(OpenDialoguesResponse.class, OpenDialoguesResponse::new)
                                                                            .append(new KeyedCodec<>("Id", Codec.STRING), (response, id) -> response.id = id, response -> response.id)
+                                                                           .documentation("Stable identifier for history and conditions, defaulting to the answer's one-based position.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Text", Codec.STRING), (response, text) -> response.text = text, response -> response.text)
+                                                                           .documentation("Label shown for the choice, empty by default.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Color", new ColorCodec()), (response, color) -> response.color = color, response -> response.color)
+                                                                           .documentation("Tint for the page button or chat label, with no tint by default.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Icon", Codec.STRING), (response, icon) -> response.icon = icon, response -> response.icon)
                                                                            .addValidator(OpenDialogueCharacterAsset.ICON_VALIDATOR)
+                                                                           .documentation("Image under Icons shown before the button label, omitted by default.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Actions", new ArrayCodec<>(DialogueAction.CODEC, DialogueAction[]::new)), (response, actions) -> response.actions = actions, response -> response.actions)
+                                                                           .documentation("Operations run in order when selected, empty by default.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("When", DialogueCondition.CODEC), (response, when) -> response.when = when, response -> response.when)
+                                                                           .documentation("Test the choice must pass to be available, with no restriction by default.")
                                                                            .add()
+                                                                           .documentation("Defines an answer the player can choose and the actions it runs.")
                                                                            .build();
 
     @Nullable

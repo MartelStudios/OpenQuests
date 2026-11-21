@@ -27,7 +27,9 @@ public class OpenDialogueRouterAsset implements JsonAssetWithMap<String, Default
      */
     public static final BuilderCodec<OpenDialogueRouterAsset> BODY_CODEC = BuilderCodec.builder(OpenDialogueRouterAsset.class, OpenDialogueRouterAsset::new)
                                                                                        .append(new KeyedCodec<>("Selector", DialogueSelector.CODEC, true), (router, selector) -> router.selector = selector, router -> router.selector)
+                                                                                       .documentation("Selection strategy that decides which target to resolve.")
                                                                                        .add()
+                                                                                       .documentation("Chooses a dialogue based on the player's context.")
                                                                                        .build();
 
     public static final AssetBuilderCodec<String, OpenDialogueRouterAsset> CODEC = AssetBuilderCodec.wrap(BODY_CODEC, Codec.STRING, (router, id) -> router.id = id, router -> router.id, (router, data) -> router.data = data, router -> router.data);

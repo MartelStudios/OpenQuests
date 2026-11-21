@@ -21,7 +21,9 @@ public abstract class DialogueAction {
     /**
      * Serializes the fields shared by every kind; concrete codecs chain from this.
      */
-    public static final BuilderCodec<DialogueAction> BASE_CODEC = BuilderCodec.abstractBuilder(DialogueAction.class).build();
+    public static final BuilderCodec<DialogueAction> BASE_CODEC = BuilderCodec.abstractBuilder(DialogueAction.class)
+                                                                              .documentation("Runs an operation when the player selects an answer.")
+                                                                              .build();
 
     /**
      * Runs the action for the player who picked the answer.

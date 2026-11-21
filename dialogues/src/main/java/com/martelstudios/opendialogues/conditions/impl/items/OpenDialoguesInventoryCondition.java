@@ -23,11 +23,15 @@ public class OpenDialoguesInventoryCondition extends DialogueCondition {
 
     public static final BuilderCodec<OpenDialoguesInventoryCondition> CODEC = BuilderCodec.builder(OpenDialoguesInventoryCondition.class, OpenDialoguesInventoryCondition::new, DialogueCondition.BASE_CODEC)
                                                                              .append(new KeyedCodec<>("Item", OpenDialoguesItemFilter.CODEC, true), (condition, item) -> condition.item = item, condition -> condition.item)
+                                                                             .documentation("Criteria for items counted in the player's inventory.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("Min", Codec.INTEGER), (condition, min) -> condition.min = min, condition -> condition.min)
+                                                                             .documentation("Minimum matching item count, defaulting to 1.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("Max", Codec.INTEGER), (condition, max) -> condition.max = max, condition -> condition.max)
+                                                                             .documentation("Maximum matching item count, with no upper limit by default.")
                                                                              .add()
+                                                                             .documentation("Tests how many matching items the player carries.")
                                                                              .build();
 
     protected OpenDialoguesItemFilter item;

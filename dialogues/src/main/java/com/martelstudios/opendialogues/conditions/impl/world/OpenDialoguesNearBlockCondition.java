@@ -31,20 +31,26 @@ public class OpenDialoguesNearBlockCondition extends DialogueCondition {
 
     public static final BuilderCodec<OpenDialoguesNearBlockCondition> CODEC = BuilderCodec.builder(OpenDialoguesNearBlockCondition.class, OpenDialoguesNearBlockCondition::new, DialogueCondition.BASE_CODEC)
                                                                                          .append(new KeyedCodec<>("Block", OpenDialoguesItemFilter.CODEC, true), (condition, block) -> condition.block = block, condition -> condition.block)
+                                                                                         .documentation("Item criteria for block types to count.")
                                                                                          .add()
                                                                                          .append(new KeyedCodec<>("State", Codec.STRING), (condition, state) -> condition.state = state, condition -> condition.state)
+                                                                                         .documentation("Block state to count, with no state restriction by default.")
                                                                                          .add()
                                                                                          .append(new KeyedCodec<>("Radius", Codec.DOUBLE, true), (condition, radius) -> condition.radius = radius, condition -> condition.radius)
+                                                                                         .documentation("Search distance from the player in blocks, up to 128.")
                                                                                          .add()
                                                                                          .append(new KeyedCodec<>("Min", Codec.INTEGER), (condition, min) -> condition.min = min, condition -> condition.min)
+                                                                                         .documentation("Minimum matching block count, defaulting to 1.")
                                                                                          .add()
                                                                                          .append(new KeyedCodec<>("Max", Codec.INTEGER), (condition, max) -> condition.max = max, condition -> condition.max)
+                                                                                         .documentation("Maximum matching block count, with no upper limit by default.")
                                                                                          .add()
                                                                                          .validator((condition, results) -> {
                                                                                              if (condition.block == null) results.fail("Block must be set");
                                                                                              String radius = NearbyCount.validateRadius(condition.radius);
                                                                                              if (radius != null) results.fail(radius);
                                                                                          })
+                                                                                         .documentation("Tests for matching blocks near the player in loaded chunks.")
                                                                                          .build();
 
     protected OpenDialoguesItemFilter block;

@@ -249,9 +249,12 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
 
         public static final BuilderCodec<EventDataModel> CODEC = BuilderCodec.builder(EventDataModel.class, EventDataModel::new)
                                                                              .append(new KeyedCodec<>(KEY_ACTION, Codec.STRING), (data, value) -> data.action = value, data -> data.action)
+                                                                             .documentation("Operation requested by the page, either next, answer, or close.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>(KEY_INDEX, Codec.STRING), (data, value) -> data.index = value, data -> data.index)
+                                                                             .documentation("Selected answer's numeric position encoded as a string for an answer event.")
                                                                              .add()
+                                                                             .documentation("Carries the payload sent by the dialogue page controls.")
                                                                              .build();
 
         private String action;

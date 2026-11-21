@@ -13,7 +13,9 @@ public class OpenDialoguesCloseAction extends DialogueAction {
 
     public static final String TYPE = "Close";
 
-    public static final BuilderCodec<OpenDialoguesCloseAction> CODEC = BuilderCodec.builder(OpenDialoguesCloseAction.class, OpenDialoguesCloseAction::new, DialogueAction.BASE_CODEC).build();
+    public static final BuilderCodec<OpenDialoguesCloseAction> CODEC = BuilderCodec.builder(OpenDialoguesCloseAction.class, OpenDialoguesCloseAction::new, DialogueAction.BASE_CODEC)
+                                                                                   .documentation("Ends the dialogue the player just answered.")
+                                                                                   .build();
 
     @Override
     public void execute(@Nonnull DialogueContext context) {

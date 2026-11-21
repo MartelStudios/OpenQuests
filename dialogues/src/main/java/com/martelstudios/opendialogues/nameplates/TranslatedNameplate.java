@@ -22,7 +22,9 @@ public class TranslatedNameplate implements Component<EntityStore> {
 
     public static final BuilderCodec<TranslatedNameplate> CODEC = BuilderCodec.builder(TranslatedNameplate.class, TranslatedNameplate::new)
                                                                               .append(new KeyedCodec<>("Key", Codec.STRING), (plate, key) -> plate.key = key, plate -> plate.key)
+                                                                              .documentation("Translation key displayed above the entity.")
                                                                               .add()
+                                                                              .documentation("Stores a nameplate that is translated for each viewer.")
                                                                               .build();
 
     @Nonnull

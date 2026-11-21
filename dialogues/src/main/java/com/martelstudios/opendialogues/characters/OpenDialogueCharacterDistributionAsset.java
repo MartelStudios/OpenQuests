@@ -28,12 +28,15 @@ public class OpenDialogueCharacterDistributionAsset implements JsonAssetWithMap<
 
         public static final BuilderCodec<Entry> CODEC = BuilderCodec.builder(Entry.class, Entry::new)
                                                                     .append(new KeyedCodec<>("Weight", Codec.INTEGER), (entry, weight) -> entry.weight = weight, entry -> entry.weight)
+                                                                    .documentation("Relative chance of selecting this outcome, defaulting to 1.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("Character", OpenDialogueCharacterAsset.CONTAINED_CODEC), (entry, character) -> entry.character = character, entry -> entry.character)
+                                                                    .documentation("Identity asset ID or inline asset to assign, with omission representing a draw of no character.")
                                                                     .add()
                                                                     .validator((entry, results) -> {
                                                                         if (entry.weight <= 0) results.fail("Weight must be above 0");
                                                                     })
+                                                                    .documentation("Defines one weighted outcome in an NPC character draw.")
                                                                     .build();
 
         protected int weight = 1;
@@ -61,13 +64,18 @@ public class OpenDialogueCharacterDistributionAsset implements JsonAssetWithMap<
 
     public static final AssetBuilderCodec<String, OpenDialogueCharacterDistributionAsset> CODEC = AssetBuilderCodec.builder(OpenDialogueCharacterDistributionAsset.class, OpenDialogueCharacterDistributionAsset::new, Codec.STRING, (distribution, id) -> distribution.id = id, distribution -> distribution.id, (distribution, data) -> distribution.data = data, distribution -> distribution.data)
                                                                                                            .appendInherited(new KeyedCodec<>("Priority", Codec.INTEGER), (distribution, priority) -> distribution.priority = priority, distribution -> distribution.priority, (distribution, parent) -> distribution.priority = parent.priority)
+                                                                                                           .documentation("Higher values are tried first, ties sort by asset ID, and the default is zero.")
                                                                                                            .add()
                                                                                                            .appendInherited(new KeyedCodec<>("Filters", new ArrayCodec<>(CharacterFilter.CODEC, CharacterFilter[]::new)), (distribution, filters) -> distribution.filters = filters, distribution -> distribution.filters, (distribution, parent) -> distribution.filters = parent.filters)
+                                                                                                           .documentation("Tests that must all match the NPC, empty by default.")
                                                                                                            .add()
                                                                                                            .appendInherited(new KeyedCodec<>("Characters", new ArrayCodec<>(Entry.CODEC, Entry[]::new)), (distribution, entries) -> distribution.entries = entries, distribution -> distribution.entries, (distribution, parent) -> distribution.entries = parent.entries)
+                                                                                                           .documentation("Weighted outcomes available to matching NPCs, empty by default.")
                                                                                                            .add()
                                                                                                            .appendInherited(new KeyedCodec<>("OverrideInteraction", Codec.BOOLEAN), (distribution, override) -> distribution.overrideInteraction = override, distribution -> distribution.overrideInteraction, (distribution, parent) -> distribution.overrideInteraction = parent.overrideInteraction)
+                                                                                                           .documentation("Lets NPCs with their own interaction draw and use the character interaction instead, and defaults to false.")
                                                                                                            .add()
+                                                                                                           .documentation("Controls which NPCs can draw from a weighted pool of identities.")
                                                                                                            .build();
 
     protected String id;

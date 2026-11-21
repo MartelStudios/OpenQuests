@@ -23,9 +23,12 @@ public class OpenDialoguesCommandAction extends DialogueAction {
     public static final BuilderCodec<OpenDialoguesCommandAction> CODEC = BuilderCodec.builder(OpenDialoguesCommandAction.class, OpenDialoguesCommandAction::new, DialogueAction.BASE_CODEC)
                                                                                 .append(new KeyedCodec<>("Command", Codec.STRING), (action, command) -> action.command = command, action -> action.command)
                                                                                 .addValidator(Validators.nonNull())
+                                                                                .documentation("Command string to run when the player selects this answer.")
                                                                                 .add()
                                                                                 .append(new KeyedCodec<>("AsPlayer", Codec.BOOLEAN), (action, asPlayer) -> action.asPlayer = asPlayer, action -> action.asPlayer)
+                                                                                .documentation("Runs the operation as the player when true and defaults to running as the server console.")
                                                                                 .add()
+                                                                                .documentation("Runs a command while leaving the conversation open.")
                                                                                 .build();
 
     private String command;

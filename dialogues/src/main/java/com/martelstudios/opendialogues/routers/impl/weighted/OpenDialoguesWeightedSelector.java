@@ -26,7 +26,9 @@ public class OpenDialoguesWeightedSelector extends DialogueSelector {
 
     public static final BuilderCodec<OpenDialoguesWeightedSelector> CODEC = BuilderCodec.builder(OpenDialoguesWeightedSelector.class, OpenDialoguesWeightedSelector::new, DialogueSelector.BASE_CODEC)
                                                                            .append(new KeyedCodec<>("Entries", new ArrayCodec<>(OpenDialoguesWeightedEntry.CODEC, OpenDialoguesWeightedEntry[]::new)), (selector, entries) -> selector.entries = entries, selector -> selector.entries)
+                                                                           .documentation("Candidates for the weighted draw, empty by default.")
                                                                            .add()
+                                                                           .documentation("Randomly chooses a target from eligible entries using their relative weights.")
                                                                            .build();
 
     /**
@@ -36,14 +38,18 @@ public class OpenDialoguesWeightedSelector extends DialogueSelector {
 
         public static final BuilderCodec<OpenDialoguesWeightedEntry> CODEC = BuilderCodec.builder(OpenDialoguesWeightedEntry.class, OpenDialoguesWeightedEntry::new)
                                                                     .append(new KeyedCodec<>("Weight", Codec.INTEGER), (entry, weight) -> entry.weight = weight, entry -> entry.weight)
+                                                                    .documentation("Relative chance of choosing this candidate, defaulting to 1.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("When", DialogueCondition.CODEC), (entry, when) -> entry.when = when, entry -> entry.when)
+                                                                    .documentation("Condition that must hold to include this candidate, with no restriction by default.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("Then", OpenDialoguesTarget.CODEC, true), (entry, then) -> entry.then = then, entry -> entry.then)
+                                                                    .documentation("Dialogue or router to resolve if this candidate is drawn.")
                                                                     .add()
                                                                     .validator((entry, results) -> {
                                                                         if (entry.weight <= 0) results.fail("Weight must be above 0");
                                                                     })
+                                                                    .documentation("Defines one candidate for a weighted dialogue draw.")
                                                                     .build();
 
         protected int weight = 1;

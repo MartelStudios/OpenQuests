@@ -25,7 +25,9 @@ public class OpenDialoguesOpenBarterShopAction extends DialogueAction {
     public static final BuilderCodec<OpenDialoguesOpenBarterShopAction> CODEC = BuilderCodec.builder(OpenDialoguesOpenBarterShopAction.class, OpenDialoguesOpenBarterShopAction::new, DialogueAction.BASE_CODEC)
                                                                                      .append(new KeyedCodec<>("Shop", Codec.STRING), (action, shop) -> action.shop = shop, action -> action.shop)
                                                                                      .addValidator(Validators.nonNull())
+                                                                                     .documentation("ID of a shop under Server/BarterShops whose stock is shared with NPCs using it.")
                                                                                      .add()
+                                                                                     .documentation("Closes the current conversation and opens a barter shop.")
                                                                                      .build();
 
     private String shop;

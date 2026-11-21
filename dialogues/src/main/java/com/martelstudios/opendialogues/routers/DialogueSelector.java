@@ -25,7 +25,9 @@ public abstract class DialogueSelector {
     /**
      * Serializes the fields shared by every kind; concrete codecs chain from this.
      */
-    public static final BuilderCodec<DialogueSelector> BASE_CODEC = BuilderCodec.abstractBuilder(DialogueSelector.class).build();
+    public static final BuilderCodec<DialogueSelector> BASE_CODEC = BuilderCodec.abstractBuilder(DialogueSelector.class)
+                                                                                .documentation("Selects a dialogue for a player from the router's configured targets.")
+                                                                                .build();
 
     /**
      * A target the resolution leads nowhere from counts as a route that does not hold: pick on.
