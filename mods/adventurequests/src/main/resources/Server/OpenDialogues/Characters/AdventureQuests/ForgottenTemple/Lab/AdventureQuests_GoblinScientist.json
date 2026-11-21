@@ -1,7 +1,7 @@
 {
   "Name": "adventurequests.forgottentemple.character.goblin-scientist.name",
   "Epithet": "adventurequests.forgottentemple.character.goblin-scientist.epithet",
-  "Uniqueness": "Forever",
+  "Uniqueness": "Alive",
   "Scope": "Universe",
   "MapVisibility": "Always",
   "Traits": [
