@@ -2,6 +2,7 @@ chapter.name=The Forgotten Temple
 
 # Temple
 character.temple-merchant.epithet=Temple merchant
+character.temple-merchant.name=Ginkel
 dialogue.merchant-greeting.text=Back again, customer! I sell rations and hearty meals for anyone who needs to restock. Care to take a look?
 dialogue.merchant.trade=Show me your wares.
 dialogue.merchant.bye=Another time.
@@ -292,7 +293,3 @@ dialogue.sapling.bye=Take care.
 quest.meet-sapling.title=Meet the young Kweebec
 quest.meet-sapling.description=He flees when the goblins play their pranks.
 quest.meet-sapling.short=Talk to the young Kweebec
-character.temple-klops.name=Bramwell
-character.temple-klops.epithet=Klops trader
-dialogue.temple-klops.text=Kweebec sap seals a pipe better than anything the goblins make. If you pass a Kweebec merchant, tell them old Bramwell is still buying.
-dialogue.temple-klops.bye=I will.

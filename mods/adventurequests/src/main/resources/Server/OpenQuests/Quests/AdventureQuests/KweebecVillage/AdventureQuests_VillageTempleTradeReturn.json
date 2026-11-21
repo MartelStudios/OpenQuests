@@ -1,0 +1,28 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Life_Essence_Concentrated.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-temple-trade-return.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-temple-trade-return.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-temple-trade-return.short",
+  "Character": "AdventureQuests_KweebecTempleTrade",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Life_Essence_Concentrated"
+      },
+      "Quantity": 1
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Silver",
+      "Quantity": 10,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

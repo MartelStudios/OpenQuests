@@ -30,6 +30,18 @@
         }
       },
       {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_VillageTempleTradeReturn",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageTempleTradeReturnWaiting"
+        }
+      },
+      {
         "Then": {
           "Dialogue": "AdventureQuests_VillageTempleTradeThanks"
         }
