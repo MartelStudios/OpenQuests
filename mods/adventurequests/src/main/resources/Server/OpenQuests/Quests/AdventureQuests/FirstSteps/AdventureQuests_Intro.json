@@ -40,7 +40,7 @@
       "Type": "Command",
       "AutoClaim": true,
       "AsPlayer": true,
-      "Command": "/oquest abandon SkipIntro"
+      "Command": "/oquest abandon AdventureQuests_SkipIntro"
     },
     {
       "Type": "GrantQuest",
