@@ -20,10 +20,13 @@ public class MMOSkillTreeReputationReward extends KindReward {
                                                                            .append(new KeyedCodec<>("Reputation", Codec.STRING, true), (reward, reputation) -> reward.reputation = reputation, reward -> reward.reputation)
                                                                            .addValidator(Validators.nonNull())
                                                                            .addValidatorLate(() -> ReputationGroup.VALIDATOR_CACHE.getValidator().late())
+                                                                           .documentation("Asset ID of the group whose standing changes.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Amount", Codec.INTEGER, true), (reward, amount) -> reward.amount = amount, reward -> Integer.valueOf(reward.amount))
                                                                            .addValidator(Validators.notEqual(0))
+                                                                           .documentation("Change in standing, with a negative value subtracting points.")
                                                                            .add()
+                                                                           .documentation("Changes the player's standing with a reputation group.")
                                                                            .build();
 
     protected String reputation;

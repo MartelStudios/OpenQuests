@@ -20,10 +20,13 @@ public class MMOSkillTreeEffectReward extends KindReward {
                                                                        .append(new KeyedCodec<>("Effect", Codec.STRING, true), (reward, effect) -> reward.effect = effect, reward -> reward.effect)
                                                                        .addValidator(Validators.nonNull())
                                                                        .addValidatorLate(() -> EntityEffect.VALIDATOR_CACHE.getValidator().late())
+                                                                       .documentation("Entity effect asset ID to apply to the player.")
                                                                        .add()
                                                                        .append(new KeyedCodec<>("DurationSeconds", Codec.DOUBLE), (reward, seconds) -> reward.durationSeconds = seconds, reward -> reward.durationSeconds)
                                                                        .addValidator(Validators.greaterThan(0.0))
+                                                                       .documentation("How long the effect lasts in seconds, defaulting to the asset's own duration.")
                                                                        .add()
+                                                                       .documentation("Applies an entity effect to the player.")
                                                                        .build();
 
     protected String effect;

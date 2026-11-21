@@ -24,7 +24,9 @@ public class MMOSkillTreeLootableReward extends KindReward {
                                                                          .append(new KeyedCodec<>("Lootable", Codec.STRING, true), (reward, lootable) -> reward.lootable = lootable, reward -> reward.lootable)
                                                                          .addValidator(Validators.nonNull())
                                                                          .addValidatorLate(() -> LOOTABLES.getValidator().late())
+                                                                         .documentation("CommonLib loot table asset ID to roll.")
                                                                          .add()
+                                                                         .documentation("Rolls a CommonLib loot table when the reward is granted.")
                                                                          .build();
 
     protected String lootable;

@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 public class CompleteBountyQuestProgression extends MomentQuestProgression<CompleteBountyQuestProgression> {
 
     public static final BuilderCodec<CompleteBountyQuestProgression> CODEC = BuilderCodec.builder(CompleteBountyQuestProgression.class, CompleteBountyQuestProgression::new, MomentQuestProgression.BASE_CODEC)
+                                                                                         .documentation("Stores progress toward collecting MMO Skill Tree bounty rewards.")
                                                                                          .build();
 
     protected CompleteBountyQuestProgression() {}

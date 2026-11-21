@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 public class AbilityCastQuestProgression extends MomentQuestProgression<AbilityCastQuestProgression> {
 
     public static final BuilderCodec<AbilityCastQuestProgression> CODEC = BuilderCodec.builder(AbilityCastQuestProgression.class, AbilityCastQuestProgression::new, MomentQuestProgression.BASE_CODEC)
+                                                                                      .documentation("Stores progress toward casting MMO Skill Tree abilities.")
                                                                                       .build();
 
     protected AbilityCastQuestProgression() {}

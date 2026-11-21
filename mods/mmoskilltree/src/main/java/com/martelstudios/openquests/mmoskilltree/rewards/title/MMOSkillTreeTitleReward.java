@@ -24,7 +24,9 @@ public class MMOSkillTreeTitleReward extends KindReward {
                                                                       .append(new KeyedCodec<>("Title", Codec.STRING, true), (reward, title) -> reward.title = title, reward -> reward.title)
                                                                       .addValidator(Validators.nonNull())
                                                                       .addValidatorLate(() -> TITLES.getValidator().late())
+                                                                      .documentation("Asset ID of the title to unlock for the player.")
                                                                       .add()
+                                                                      .documentation("Unlocks a title the player can display by their name.")
                                                                       .build();
 
     protected String title;

@@ -28,7 +28,9 @@ public class OpenDialoguesAssignQuestAction extends DialogueAction {
     public static final BuilderCodec<OpenDialoguesAssignQuestAction> CODEC = BuilderCodec.builder(OpenDialoguesAssignQuestAction.class, OpenDialoguesAssignQuestAction::new, DialogueAction.BASE_CODEC)
                                                                                   .append(new KeyedCodec<>("Quest", new ContainedAssetCodec<>(OpenQuestAsset.class, OpenQuestAsset.CODEC)), (action, quest) -> action.quest = quest, action -> action.quest)
                                                                                   .addValidator(Validators.nonNull())
+                                                                                  .documentation("Quest asset ID or inline asset to assign to the player.")
                                                                                   .add()
+                                                                                  .documentation("Assigns a quest to the player when they select this response.")
                                                                                   .build();
 
     private String quest;

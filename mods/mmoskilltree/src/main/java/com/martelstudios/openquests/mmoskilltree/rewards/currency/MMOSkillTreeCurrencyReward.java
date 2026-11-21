@@ -25,10 +25,13 @@ public class MMOSkillTreeCurrencyReward extends KindReward {
                                                                          .append(new KeyedCodec<>("Currency", Codec.STRING, true), (reward, currency) -> reward.currency = currency, reward -> reward.currency)
                                                                          .addValidator(Validators.nonNull())
                                                                          .addValidatorLate(() -> CURRENCIES.getValidator().late())
+                                                                         .documentation("ID of the currency to grant.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Amount", Codec.LONG, true), (reward, amount) -> reward.amount = amount, reward -> Long.valueOf(reward.amount))
                                                                          .addValidator(Validators.greaterThan(0L))
+                                                                         .documentation("Number of units to grant.")
                                                                          .add()
+                                                                         .documentation("Grants the player a CommonLib currency reward.")
                                                                          .build();
 
     protected String currency;

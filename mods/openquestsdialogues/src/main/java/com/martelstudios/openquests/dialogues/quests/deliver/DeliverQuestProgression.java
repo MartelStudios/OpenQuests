@@ -19,7 +19,9 @@ public class DeliverQuestProgression extends QuantityQuestProgression<DeliverQue
 
     public static final BuilderCodec<DeliverQuestProgression> CODEC = BuilderCodec.builder(DeliverQuestProgression.class, DeliverQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                   .append(new KeyedCodec<>("Delivered", Codec.INT_ARRAY), (quest, delivered) -> quest.delivered = delivered, quest -> quest.delivered)
+                                                                                  .documentation("Counts already handed in for each requirement in asset order, empty by default.")
                                                                                   .add()
+                                                                                  .documentation("Stores the item counts handed in for a delivery quest.")
                                                                                   .build();
 
     int[] delivered = new int[0];

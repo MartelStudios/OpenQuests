@@ -28,6 +28,7 @@ public class OpenDialoguesRequiresQuestCondition extends DialogueCondition {
                                                                                                .append(new KeyedCodec<>("GivenBy", new EnumCodec<>(SourceScope.class)), (condition, givenBy) -> condition.givenBy = givenBy, condition -> condition.givenBy)
                                                                                                .documentation("Whose quests count: all of the player's, those given by the source's character, or by the source NPC alone, defaulting to Any.")
                                                                                                .add()
+                                                                                               .documentation("Checks whether the player has the required number of quests from an asset in the specified states.")
                                                                                                .build();
 
     @Nonnull

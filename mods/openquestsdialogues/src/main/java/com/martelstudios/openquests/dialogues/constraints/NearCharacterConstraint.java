@@ -39,10 +39,12 @@ public class NearCharacterConstraint extends QuestConstraint {
                                                                                   .add()
                                                                                   .append(new KeyedCodec<>("Radius", Codec.DOUBLE, true), (constraint, radius) -> constraint.radius = radius, constraint -> Double.valueOf(constraint.radius))
                                                                                   .addValidator(Validators.greaterThan(0.0))
+                                                                                  .documentation("Maximum distance in blocks from a matching NPC, including the boundary.")
                                                                                   .add()
                                                                                   .validator((constraint, results) -> {
                                                                                       if (constraint.target == TargetMode.Character && constraint.character == null) results.fail("Character is required with Target Character");
                                                                                   })
+                                                                                  .documentation("Allows quest progress only near an NPC carrying the specified character.")
                                                                                   .build();
 
     @Nullable

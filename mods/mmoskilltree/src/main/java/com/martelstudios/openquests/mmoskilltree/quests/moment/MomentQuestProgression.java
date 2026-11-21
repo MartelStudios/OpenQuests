@@ -18,9 +18,12 @@ public abstract class MomentQuestProgression<Q extends MomentQuestProgression<Q>
 
     public static final BuilderCodec<MomentQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(MomentQuestProgression.class, QuantityQuestProgression.BASE_CODEC)
                                                                                       .append(new KeyedCodec<>("Target", Codec.STRING), (quest, target) -> quest.target = target, quest -> quest.target)
+                                                                                      .documentation("Skill, ability, or board filter for this quest, defaulting to the asset's filter, with ALL accepting any value.")
                                                                                       .add()
                                                                                       .append(new KeyedCodec<>("Qualifier", Codec.STRING), (quest, qualifier) -> quest.qualifier = qualifier, quest -> quest.qualifier)
+                                                                                      .documentation("Secondary filter for this quest, defaulting to the asset's filter, with ALL accepting any value.")
                                                                                       .add()
+                                                                                      .documentation("Stores progress and per-instance filters for a quest tracking MMO Skill Tree activity.")
                                                                                       .build();
 
     /**

@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 public class GainXpQuestProgression extends MomentQuestProgression<GainXpQuestProgression> {
 
     public static final BuilderCodec<GainXpQuestProgression> CODEC = BuilderCodec.builder(GainXpQuestProgression.class, GainXpQuestProgression::new, MomentQuestProgression.BASE_CODEC)
+                                                                                 .documentation("Stores progress toward gaining MMO Skill Tree XP.")
                                                                                  .build();
 
     protected GainXpQuestProgression() {}

@@ -31,11 +31,14 @@ public class OpenDialoguesSetQuestStateAction extends DialogueAction {
     public static final BuilderCodec<OpenDialoguesSetQuestStateAction> CODEC = BuilderCodec.builder(OpenDialoguesSetQuestStateAction.class, OpenDialoguesSetQuestStateAction::new, DialogueAction.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("Quest", Codec.STRING), (action, quest) -> action.quest = quest, action -> action.quest)
                                                                                     .addValidator(Validators.nonNull())
+                                                                                    .documentation("Quest instance ID or asset ID identifying which of the player's quests to end.")
                                                                                     .add()
                                                                                     .append(new KeyedCodec<>("State", new EnumCodec<>(QuestState.class)), (action, state) -> action.state = state, action -> action.state)
                                                                                     .addValidator(Validators.nonNull())
                                                                                     .addValidator(Validators.notEqual(QuestState.IN_PROGRESS))
+                                                                                    .documentation("Final outcome to apply to the matching quests.")
                                                                                     .add()
+                                                                                    .documentation("Ends the player's matching quests with the specified outcome.")
                                                                                     .build();
 
     private String quest;
