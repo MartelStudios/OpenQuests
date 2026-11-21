@@ -14,6 +14,8 @@ import javax.annotation.Nullable;
  */
 public final class CharacterDeathAnnouncer {
 
+    private static final String DEATH_MESSAGE_COLOR = "#ff5555";
+
     private CharacterDeathAnnouncer() {}
 
     /**
@@ -48,7 +50,7 @@ public final class CharacterDeathAnnouncer {
         if (name == null && epithet == null) return null;
 
         String key = name == null ? "epithet" : epithet == null ? "name" : "named";
-        Message message = Message.translation("opendialogues.character.death." + key);
+        Message message = Message.translation("opendialogues.character.death." + key).color(DEATH_MESSAGE_COLOR);
         if (name != null) message.param("name", Message.translation(name));
         if (epithet != null) message.param("epithet", Message.translation(epithet));
         return message;
