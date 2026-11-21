@@ -10,9 +10,9 @@ import com.martelstudios.openquests.extension.listener.QuestListenerService;
 import javax.annotation.Nonnull;
 
 /**
- * Cover a distance at one of the three paces, or jump a number of times. Registered together
- * because one ticking system samples the player once and answers all of them; split apart they
- * would each read the same components again every tick.
+ * Cover a distance at one of the three paces, jump a number of times, or spend some time in game.
+ * Registered together because one ticking system samples the player once and answers all of them;
+ * split apart they would each read the same components again every tick.
  *
  * <p>The paces are the player's own: {@code Run} is what they travel at by default, {@code Walk}
  * the slower one they hold a key for, {@code Sprint} the faster. Naming them after the movement
@@ -23,6 +23,7 @@ public final class MovementFeature {
     public static final String RUN_TYPE_ID = "Run";
     public static final String SPRINT_TYPE_ID = "Sprint";
     public static final String JUMP_TYPE_ID = "Jump";
+    public static final String WAIT_TYPE_ID = "Wait";
 
     private static ComponentType<EntityStore, MovementQuestListener> listenerType;
 
@@ -43,9 +44,10 @@ public final class MovementFeature {
         service.registerQuestType(RUN_TYPE_ID, RunQuestAsset.class, RunQuestAsset.CODEC, RunQuestProgression.class, RunQuestProgression.CODEC);
         service.registerQuestType(SPRINT_TYPE_ID, SprintQuestAsset.class, SprintQuestAsset.CODEC, SprintQuestProgression.class, SprintQuestProgression.CODEC);
         service.registerQuestType(JUMP_TYPE_ID, JumpQuestAsset.class, JumpQuestAsset.CODEC, JumpQuestProgression.class, JumpQuestProgression.CODEC);
+        service.registerQuestType(WAIT_TYPE_ID, WaitQuestAsset.class, WaitQuestAsset.CODEC, WaitQuestProgression.class, WaitQuestProgression.CODEC);
 
         // Registered without a codec, so it stays out of the player's file, and on the base type,
-        // so the four of them share one component the way they share one system
+        // so all of them share one component the way they share one system
         listenerType = plugin.getEntityStoreRegistry().registerComponent(MovementQuestListener.class, MovementQuestListener::new);
         QuestListenerService.register(MovementQuestProgression.class, listenerType);
 
