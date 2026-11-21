@@ -3,13 +3,13 @@
 ## Identity
 
 - **Id:** `AdventureQuests_TempleMerchant` (AdventureQuests pack).
-- **Uniqueness:** `Forever`, **Scope:** `Universe`.
+- **Uniqueness:** `Alive`, **Scope:** `Universe`: the instance closes at each exit, `Forever` would fail his quests.
 - **Carrier:** `Temple_Kweebec_Merchant` (variant of `Kweebec_Merchant`), the rootling merchant of
   the temple, spawned by marker `Temple_Kweebec_Merchant_Static` after one game day.
 - **Distribution:** `AdventureQuests_TempleMerchant`, filters `Role` and `World`
   `instance-(forgotten-temple-goblins|Forgotten_Temple-.*)`, weight 1, no empty weight,
   `OverrideInteraction: true` since the role opens its barter shop on F.
-- **Name:** drawn from `AdventureQuests_KweebecNames`; epithet "Temple merchant" / "Marchand du
+- **Name:** fixed, Ginkel (`character.temple-merchant.name`); epithet "Temple merchant" / "Marchand du
   temple". The dialogues name `AdventureQuests_KweebecVillager` with `UseSourceCharacter`.
 
 ## Personality and voice
@@ -27,7 +27,7 @@ Real customers: adventurers who can survive the temple and come back to buy.
 
 ## Backstory and relations
 
-Keeps the stall near the temple entrance. Uses the temple's own trial to sort customers from
+Old master of `AdventureQuests_KweebecTempleTrade`, withdrew to the temple in old age like a monk; receives its sap since the sacred trees are never tapped, and sends back their life essence. Keeps the stall near the temple entrance. Uses the temple's own trial to sort customers from
 tourists, and fronts life essence to those who accept it.
 
 ## Quests and rewards
@@ -45,6 +45,8 @@ tourists, and fronts life essence to those who accept it.
 - `AdventureQuests_ReturnToMerchant`: `Dialogue` on `AdventureQuests_MerchantTrial`, answer `Accept`, where he
   describes each trial. Grants `AdventureQuests_TempleTrial` (sprint jumps within 12 blocks of his stall at
   4992.5 157 4987.5, the pillar course, a 20 second run); the same answer assigns it directly to a player without the return quest.
+
+Target of `AdventureQuests_VillageTempleTrade` (see `AdventureQuests_KweebecTempleTrade`): the delivery screen opens on F before his router.
 
 The router opens the dialogue of a running `AdventureQuests_TalkToRootlingMerchant` or
 `AdventureQuests_ReturnToMerchant` first, so a holder is never stuck on his greeting. Otherwise it opens his intro while neither `AdventureQuests_TempleStatue` nor `AdventureQuests_TempleTrial` was
@@ -71,3 +73,4 @@ assigned, otherwise his greeting. Every dialogue keeps a `Trade` answer opening 
   and the minute of exploring moved out of the trial into these quests (user).
 - 2026-11-10: the sprint jumps count within 12 blocks of his stall, measured in game, not of the rune altar
   17 blocks away; a running talk or return quest always gets its dialogue (tested in game).
+- 2026-11-21: fixed name Ginkel, old master of the village temple trade merchant, receiver of its sap (user). `Alive` instead of `Forever` since the instance closes at each exit (user).

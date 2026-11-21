@@ -20,11 +20,11 @@ To keep buying sap from the Kweebec merchants of the overworld.
 
 ## Backstory and relations
 
-Client of every Kweebec merchant carrying `AdventureQuests_KweebecTempleTrade`.
+Buys Kweebec sap, as his dialogue says; no quest links him to the village merchants any more.
 
 ## Quests and rewards
 
-Target of `AdventureQuests_VillageTempleTrade` (`Deliver` 8 tree sap), which takes over F while the quest runs. Gives no quest itself.
+Target of no quest and gives none: he has no spawn marker in `Forgotten_Temple_Goblins`, the temple the portal opens.
 
 ## Assets
 
