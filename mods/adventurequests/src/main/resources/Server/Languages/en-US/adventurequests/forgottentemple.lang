@@ -2,6 +2,7 @@ chapter.name=The Forgotten Temple
 
 # Temple
 character.temple-merchant.epithet=Temple merchant
+character.temple-merchant.name=Ginkel
 dialogue.merchant-greeting.text=Back again, customer! I sell rations and hearty meals for anyone who needs to restock. Care to take a look?
 dialogue.merchant.trade=Show me your wares.
 dialogue.merchant.bye=Another time.

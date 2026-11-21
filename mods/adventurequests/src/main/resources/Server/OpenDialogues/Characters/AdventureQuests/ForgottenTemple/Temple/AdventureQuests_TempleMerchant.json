@@ -1,4 +1,5 @@
 {
+  "Name": "adventurequests.forgottentemple.character.temple-merchant.name",
   "Epithet": "adventurequests.forgottentemple.character.temple-merchant.epithet",
   "Uniqueness": "Alive",
   "Scope": "Universe",
@@ -8,10 +9,6 @@
       "Dialogue": {
         "Router": "AdventureQuests_TempleMerchant"
       }
-    },
-    {
-      "Type": "Name",
-      "Names": "AdventureQuests_KweebecNames"
     }
   ]
 }

@@ -2,6 +2,7 @@ chapter.name=Le Temple de l'Oubli
 
 # Temple
 character.temple-merchant.epithet=Marchand du temple
+character.temple-merchant.name=Ginkel
 dialogue.merchant-greeting.text=Te revoilà, client ! Je vends des rations et de bons petits plats pour qui doit se ravitailler. Tu veux jeter un œil ?
 dialogue.merchant.trade=Montre-moi tes marchandises.
 dialogue.merchant.bye=Une autre fois.

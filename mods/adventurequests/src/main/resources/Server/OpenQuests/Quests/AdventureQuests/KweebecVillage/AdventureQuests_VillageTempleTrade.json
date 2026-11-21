@@ -7,7 +7,7 @@
   "TitleKey": "adventurequests.kweebecvillage.quest.village-temple-trade.title",
   "DescriptionKey": "adventurequests.kweebecvillage.quest.village-temple-trade.description",
   "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-temple-trade.short",
-  "Character": "AdventureQuests_TempleKlops",
+  "Character": "AdventureQuests_TempleMerchant",
   "Items": [
     {
       "Item": {
@@ -19,20 +19,15 @@
   "SuccessfulRewards": [
     {
       "Type": "Item",
-      "ItemId": "Ingredient_Salt",
-      "Quantity": 5,
+      "ItemId": "Ingredient_Life_Essence_Concentrated",
+      "Quantity": 1,
       "AutoClaim": true
     },
     {
-      "Type": "Item",
-      "ItemId": "Ingredient_Spices",
-      "Quantity": 5,
-      "AutoClaim": true
-    },
-    {
-      "Type": "Item",
-      "ItemId": "Ingredient_Bar_Silver",
-      "Quantity": 2,
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "AdventureQuests_VillageTempleTradeReturn"
+      ],
       "AutoClaim": true
     }
   ],
