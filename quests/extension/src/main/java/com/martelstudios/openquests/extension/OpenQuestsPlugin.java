@@ -24,6 +24,8 @@ import com.martelstudios.openquests.extension.quests.gather.GatherFeature;
 import com.martelstudios.openquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
 import com.martelstudios.openquests.extension.quests.kill.KillFeature;
 import com.martelstudios.openquests.extension.quests.movement.MovementFeature;
+import com.martelstudios.openquests.extension.quests.playertick.PlayerTickFeature;
+import com.martelstudios.openquests.extension.quests.wait.WaitFeature;
 import com.martelstudios.openquests.extension.quests.stat.LoseStatFeature;
 import com.martelstudios.openquests.extension.quests.noop.NoOpFeature;
 import com.martelstudios.openquests.extension.quests.pickupitem.PickupItemFeature;
@@ -129,6 +131,8 @@ public class OpenQuestsPlugin extends JavaPlugin {
         UseEntityFeature.register(this, services);
         QuestStateFeature.register(this, services);
         MovementFeature.register(this, services);
+        WaitFeature.register(this, services);
+        PlayerTickFeature.register(this, services);
         LoseStatFeature.register(this, services);
         QuantityFeature.register(this, services);
         NoOpFeature.register(this, services);

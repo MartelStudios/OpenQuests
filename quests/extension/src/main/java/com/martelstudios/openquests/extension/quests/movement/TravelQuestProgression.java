@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.quests.movement;
 
+import com.martelstudios.openquests.extension.quests.playertick.PlayerTickQuestProgression;
 import com.hypixel.hytale.protocol.MovementStates;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.extension.quests.movement.TravelQuestAsset.Measure;
@@ -12,7 +13,7 @@ import javax.annotation.Nonnull;
  *
  * @param <Q> the concrete quest type extending this class
  */
-public abstract class TravelQuestProgression<Q extends TravelQuestProgression<Q>> extends MovementQuestProgression<Q> {
+public abstract class TravelQuestProgression<Q extends TravelQuestProgression<Q>> extends PlayerTickQuestProgression<Q> {
 
     /**
      * @return whether the player moves at this quest's pace. Called once per tick per player

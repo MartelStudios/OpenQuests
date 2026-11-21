@@ -1,4 +1,4 @@
-package com.martelstudios.openquests.extension.quests.movement;
+package com.martelstudios.openquests.extension.quests.playertick;
 
 import com.hypixel.hytale.protocol.MovementStates;
 import com.martelstudios.openquests.core.visitors.QuestVisitor;
@@ -8,18 +8,16 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 /**
- * Carries one tick of movement to every quest counting it. Typed on the base rather than on each
- * concrete type so that walking, running and jumping are answered in a single pass over the
- * player's quests: the sample is the same for all three, only what they make of it differs.
+ * Carries the same player tick sample to time and movement quests in a single pass.
  */
-public class MovementQuestVisitor implements QuestVisitor<MovementQuestProgression<?>> {
+public class PlayerTickQuestVisitor implements QuestVisitor<PlayerTickQuestProgression<?>> {
 
     private final UUID playerId;
     private final MovementStates states;
     private final double metres;
     private final double seconds;
 
-    public MovementQuestVisitor(@Nonnull UUID playerId, @Nonnull MovementStates states, double metres, double seconds) {
+    public PlayerTickQuestVisitor(@Nonnull UUID playerId, @Nonnull MovementStates states, double metres, double seconds) {
         this.playerId = playerId;
         this.states = states;
         this.metres = metres;
@@ -27,7 +25,7 @@ public class MovementQuestVisitor implements QuestVisitor<MovementQuestProgressi
     }
 
     @Override
-    public void progress(MovementQuestProgression<?> quest) {
+    public void progress(PlayerTickQuestProgression<?> quest) {
         if (!quest.getPlayers().contains(playerId)) return;
         if (quest.isOver()) return;
 
@@ -38,8 +36,8 @@ public class MovementQuestVisitor implements QuestVisitor<MovementQuestProgressi
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class<MovementQuestProgression<?>> getQuestType() {
-        return (Class<MovementQuestProgression<?>>) (Class<?>) MovementQuestProgression.class;
+    public Class<PlayerTickQuestProgression<?>> getQuestType() {
+        return (Class<PlayerTickQuestProgression<?>>) (Class<?>) PlayerTickQuestProgression.class;
     }
 
     @Nonnull

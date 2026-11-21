@@ -351,11 +351,13 @@ classDiagram
         }
     }
 
-    namespace extension_movement {
-        class MovementQuestProgression~Q~ {
+    namespace extension_playertick {
+        class PlayerTickQuestProgression~Q~ {
             <<abstract>>
             double pending
         }
+    }
+    namespace extension_movement {
         class TravelQuestAsset {
             <<abstract>>
             Measure measure
@@ -373,6 +375,10 @@ classDiagram
         class JumpQuestProgression {
             boolean wasJumping
         }
+    }
+    namespace extension_wait {
+        class WaitQuestAsset
+        class WaitQuestProgression
     }
 
     namespace extension_stat {
@@ -464,9 +470,9 @@ classDiagram
     QuantityQuestAsset <|-- UseBlockQuestAsset
     QuantityQuestProgression <|-- UseBlockQuestProgression
 
-    QuantityQuestProgression <|-- MovementQuestProgression
+    QuantityQuestProgression <|-- PlayerTickQuestProgression
     QuantityQuestAsset <|-- TravelQuestAsset
-    MovementQuestProgression <|-- TravelQuestProgression
+    PlayerTickQuestProgression <|-- TravelQuestProgression
     TravelQuestAsset <|-- WalkQuestAsset
     TravelQuestProgression <|-- WalkQuestProgression
     TravelQuestAsset <|-- RunQuestAsset
@@ -474,7 +480,9 @@ classDiagram
     TravelQuestAsset <|-- SprintQuestAsset
     TravelQuestProgression <|-- SprintQuestProgression
     QuantityQuestAsset <|-- JumpQuestAsset
-    MovementQuestProgression <|-- JumpQuestProgression
+    PlayerTickQuestProgression <|-- JumpQuestProgression
+    QuantityQuestAsset <|-- WaitQuestAsset
+    PlayerTickQuestProgression <|-- WaitQuestProgression
     QuantityQuestAsset <|-- LoseStatQuestAsset
     QuantityQuestProgression <|-- LoseStatQuestProgression
 
@@ -517,7 +525,7 @@ classDiagram
      dirty, and on a quest other servers write too it is never written at all. They hold only
      before registration, like `setPersistHistory`, but nothing says or checks so.
 2. **Asset and progression trees do not mirror each other.** `JumpQuestProgression` sits under
-   `MovementQuestProgression`, `JumpQuestAsset` straight under `QuantityQuestAsset`. Block quests:
+   `PlayerTickQuestProgression`, `JumpQuestAsset` straight under `QuantityQuestAsset`. Block quests:
    break and place share `BlockAction`, use does not. Item quests: drop and pickup share
    `ItemExchange` (anti-abuse), gather, consume, craft and interactive pickup do not, although all
    six filter on a `QuestItemFilter`. Kill NPC and kill player share a death system and no base.
@@ -534,7 +542,7 @@ classDiagram
 5. **Two ways to move a quest.** A `QuestVisitor` per type, often a thin wrapper around `apply`,
    and `QuestOperation`. The visitor is not a GoF visitor (no double dispatch) but a command typed
    by quest class. Families share one (`BlockActionVisitor`, `ItemExchangeVisitor`,
-   `MovementQuestVisitor`), every other type has its own, gather and consume included although
+   `PlayerTickQuestVisitor`), every other type has its own, gather and consume included although
    they would fit the item family.
 6. **Naming.** `GatherEvents` next to `CompositeQuestEvents` and `EnterWorldQuestEvents`;
    `*EventSystem`, `*Systems`, `*DeathSystem` for the same role; validators only for composite and

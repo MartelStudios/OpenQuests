@@ -18,22 +18,17 @@
       "TargetQuantity": 5
     },
     {
-      "Type": "NoOp",
+      "Type": "Wait",
       "TitleKey": "adventurequests.forgottentemple.quest.temple-memories.hold.title",
       "DescriptionKey": "adventurequests.forgottentemple.quest.temple-memories.hold.description",
       "AnnounceOutcome": false,
-      "PersistProgression": false,
+      "TargetQuantity": 60,
       "Constraints": [
         {
           "Type": "InWorld",
           "DescriptionKey": "adventurequests.forgottentemple.quest.temple-memories.in-temple",
           "WorldNamePattern": "instance-(Forgotten_Temple-.*|forgotten-temple-goblins)",
           "OnLeave": "Pause"
-        },
-        {
-          "Type": "TimeLimit",
-          "Seconds": 60,
-          "OnExpire": "Successful"
         }
       ]
     }

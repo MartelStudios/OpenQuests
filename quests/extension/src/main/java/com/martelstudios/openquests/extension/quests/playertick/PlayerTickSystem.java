@@ -1,4 +1,4 @@
-package com.martelstudios.openquests.extension.quests.movement;
+package com.martelstudios.openquests.extension.quests.playertick;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -15,25 +15,21 @@ import com.martelstudios.openquests.core.services.QuestProgressionService;
 import javax.annotation.Nonnull;
 
 /**
- * Samples how a player is moving, once per tick, and hands it to the movement quests they are
- * running. Only players with one are in the query at all, and only those quests are walked.
- *
- * <p>Distance is the ground actually covered between two ticks. Owing nothing to the units a
- * velocity is expressed in, nor to which of the two a server holds for a player is the one driving
- * them, it is the only measure that answers in blocks without being told the scale.
+ * Collects the tick duration, movement state and distance travelled once per player tick.
+ * Players enter the query when they have a quest listening for these samples.
  */
-public class MovementTickingSystem extends EntityTickingSystem<EntityStore> {
+public class PlayerTickSystem extends EntityTickingSystem<EntityStore> {
 
     private final QuestProgressionService progression;
 
-    public MovementTickingSystem(@Nonnull QuestProgressionService progression) {
+    public PlayerTickSystem(@Nonnull QuestProgressionService progression) {
         this.progression = progression;
     }
 
     @Nonnull
     @Override
     public Query<EntityStore> getQuery() {
-        return Query.and(PlayerRef.getComponentType(), TransformComponent.getComponentType(), MovementStatesComponent.getComponentType(), MovementQuestListener.getComponentType());
+        return Query.and(PlayerRef.getComponentType(), TransformComponent.getComponentType(), MovementStatesComponent.getComponentType(), PlayerTickQuestListener.getComponentType());
     }
 
     @Override
@@ -41,7 +37,7 @@ public class MovementTickingSystem extends EntityTickingSystem<EntityStore> {
         var playerRef = archetypeChunk.getComponent(index, PlayerRef.getComponentType());
         var transform = archetypeChunk.getComponent(index, TransformComponent.getComponentType());
         var movementStates = archetypeChunk.getComponent(index, MovementStatesComponent.getComponentType());
-        var listener = archetypeChunk.getComponent(index, MovementQuestListener.getComponentType());
+        var listener = archetypeChunk.getComponent(index, PlayerTickQuestListener.getComponentType());
 
         if (playerRef == null || transform == null || movementStates == null || listener == null) return;
 
@@ -54,6 +50,6 @@ public class MovementTickingSystem extends EntityTickingSystem<EntityStore> {
         // where they were rather than from wherever they last happened to be counted
         double metres = listener.sampleTravel(position.x(), position.z());
 
-        progression.progress(new MovementQuestVisitor(playerRef.getUuid(), states, metres, dt), listener.getQuestIds());
+        progression.progress(new PlayerTickQuestVisitor(playerRef.getUuid(), states, metres, dt), listener.getQuestIds());
     }
 }
