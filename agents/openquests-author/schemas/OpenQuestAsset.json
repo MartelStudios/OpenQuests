@@ -1,0 +1,149 @@
+{
+  "$id": "OpenQuestAsset.json",
+  "title": "OpenQuestAsset",
+  "anyOf": [
+    {
+      "$ref": "common.json#/definitions/BreakBlockQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/CastSpellQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/CompositeQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/ConsumeItemQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/CraftQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/OpenQuestsDeliverAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/OpenQuestsDialogueAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/DropItemQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/EnterWorldQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/GatherQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/InteractivelyPickupQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/JumpQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/KillNpcQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/KillPlayerQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/LoseStatQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/MMOSkillTreeAbilityCastQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/MMOSkillTreeCompleteBountyQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/MMOSkillTreeGainXpQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/MMOSkillTreeReachLevelQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/NoOpQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/PickupItemQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/PlaceBlockQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/QuestStateQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/ReachLocationQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/ReachPathQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/ReachValueQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/RunQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/SprintQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/TriggerVolumeQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/UseBlockQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/UseEntityQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/WaitQuestAsset"
+    },
+    {
+      "$ref": "common.json#/definitions/WalkQuestAsset"
+    }
+  ],
+  "hytaleSchemaTypeField": {
+    "property": "Type",
+    "values": [
+      "BreakBlock",
+      "CastSpell",
+      "Composite",
+      "Consume",
+      "Craft",
+      "Deliver",
+      "Dialogue",
+      "DropItem",
+      "EnterWorld",
+      "Gather",
+      "InteractivelyPickup",
+      "Jump",
+      "KillNpc",
+      "KillPlayer",
+      "LoseStat",
+      "MMOSkillTreeAbilityCast",
+      "MMOSkillTreeCompleteBounty",
+      "MMOSkillTreeGainXp",
+      "MMOSkillTreeReachLevel",
+      "NoOp",
+      "PickupItem",
+      "PlaceBlock",
+      "QuestState",
+      "ReachLocation",
+      "ReachPath",
+      "ReachValue",
+      "Run",
+      "Sprint",
+      "TriggerVolume",
+      "UseBlock",
+      "UseEntity",
+      "Wait",
+      "Walk"
+    ],
+    "parentPropertyKey": "Parent"
+  },
+  "hytale": {
+    "path": "OpenQuests/Quests/",
+    "extension": ".json",
+    "mergesProperties": true
+  }
+}
