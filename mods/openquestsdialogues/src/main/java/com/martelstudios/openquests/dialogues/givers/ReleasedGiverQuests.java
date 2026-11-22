@@ -23,9 +23,11 @@ import com.martelstudios.openquests.dialogues.quests.dialogue.OpenQuestsDialogue
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 /**
  * Fails the quests aimed at their giver NPC once that NPC let its character go, whatever the
@@ -35,31 +37,33 @@ import java.util.function.Predicate;
 public final class ReleasedGiverQuests {
 
     private final QuestProgressionService progression;
-    private final Predicate<UUID> isReleased;
+    private final Function<UUID, Instant> releasedAt;
 
     /**
-     * @param isReleased whether an NPC let its character go, OpenDialogues' {@code CharacterService.isReleased}.
+     * @param releasedAt when an NPC last let its character go, OpenDialogues' {@code CharacterService.releasedAt}.
      */
-    public ReleasedGiverQuests(@Nonnull QuestProgressionService progression, @Nonnull Predicate<UUID> isReleased) {
+    public ReleasedGiverQuests(@Nonnull QuestProgressionService progression, @Nonnull Function<UUID, Instant> releasedAt) {
         this.progression = progression;
-        this.isReleased = isReleased;
+        this.releasedAt = releasedAt;
     }
 
     /**
      * Listens to NPCs releasing their character and to quests loading.
      */
     public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
-        ReleasedGiverQuests quests = new ReleasedGiverQuests(services.getQuestProgressionService(), OpenDialoguesPlugin.get().getCharacterService()::isReleased);
+        ReleasedGiverQuests quests = new ReleasedGiverQuests(services.getQuestProgressionService(), OpenDialoguesPlugin.get().getCharacterService()::releasedAt);
         plugin.getEventRegistry().registerGlobal(CharacterEvent.Released.class, quests::onReleased);
         plugin.getEventRegistry().registerGlobal(QuestLoadedEvent.class, quests::onLoaded);
         plugin.getEventRegistry().registerGlobal(EventPriority.LATE, QuestAddedToPlayerStoreEvent.class, quests::onAssigned);
     }
 
     /**
-     * @return whether a quest aimed at {@code aimedNpc} must fail now; one already over never does.
+     * A release counts even once the NPC carries a character again, as long as it came after the hand-out.
+     *
+     * @return whether a quest aimed at {@code aimed} must fail now; one already over never does.
      */
-    public static boolean shouldFail(@Nullable UUID aimedNpc, boolean over, @Nonnull Predicate<UUID> isReleased) {
-        return aimedNpc != null && !over && isReleased.test(aimedNpc);
+    public static boolean shouldFail(@Nullable Giver aimed, boolean over, @Nonnull Function<UUID, Instant> releasedAt) {
+        return aimed != null && !over && aimed.isReleased(releasedAt);
     }
 
     /**
@@ -76,21 +80,27 @@ public final class ReleasedGiverQuests {
     }
 
     /**
-     * @return the giver NPC the quest aims at, {@code null} when it aims elsewhere or no NPC handed it out.
+     * @return the giver the quest aims at alone, {@code null} when it aims elsewhere or no NPC handed it out.
      */
     @Nullable
-    public static UUID aimedNpc(@Nonnull AbstractQuestProgression<?> quest) {
-        if (!aimsAtGiverNpc(quest.getAsset())) return null;
-        Giver giver = Giver.of(quest);
-        return giver == null ? null : giver.npc();
+    public static Giver aimedGiver(@Nonnull AbstractQuestProgression<?> quest) {
+        return aimsAtGiverNpc(quest.getAsset()) ? Giver.of(quest) : null;
     }
 
     /**
      * Fails every live quest aimed at the released NPC.
      */
     public void onReleased(@Nonnull CharacterEvent.Released event) {
+        failAimedAt(Set.of(event.getUuid()));
+    }
+
+    /**
+     * Fails every live quest aimed at one of those released NPCs.
+     */
+    public void failAimedAt(@Nonnull Set<UUID> npcs) {
         for (AbstractQuestProgression<?> quest : List.copyOf(progression.getAllQuests())) {
-            if (!quest.isOver() && event.getUuid().equals(aimedNpc(quest))) failOnHolderThread(quest);
+            Giver aimed = quest.isOver() ? null : aimedGiver(quest);
+            if (aimed != null && npcs.contains(aimed.npc())) failOnHolderThread(quest);
         }
     }
 
@@ -100,7 +110,7 @@ public final class ReleasedGiverQuests {
      */
     public void onLoaded(@Nonnull QuestLoadedEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
-        if (!shouldFail(aimedNpc(quest), quest.isOver(), isReleased)) return;
+        if (!shouldFail(aimedGiver(quest), quest.isOver(), releasedAt)) return;
 
         UUID holder = quest.getPlayers().stream().findFirst().orElse(null);
         if (holder == null) return;
@@ -116,7 +126,7 @@ public final class ReleasedGiverQuests {
      */
     public void onAssigned(@Nonnull QuestAddedToPlayerStoreEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
-        if (!shouldFail(aimedNpc(quest), quest.isOver(), isReleased)) return;
+        if (!shouldFail(aimedGiver(quest), quest.isOver(), releasedAt)) return;
         EntityComponents.update(event.getPlayerId(), components -> fail(quest));
     }
 
@@ -131,6 +141,6 @@ public final class ReleasedGiverQuests {
     }
 
     private void fail(@Nonnull AbstractQuestProgression<?> quest) {
-        if (shouldFail(aimedNpc(quest), quest.isOver(), isReleased)) progression.progress(new SetStateVisitor(QuestState.FAILED), List.of(quest.getId()));
+        if (shouldFail(aimedGiver(quest), quest.isOver(), releasedAt)) progression.progress(new SetStateVisitor(QuestState.FAILED), List.of(quest.getId()));
     }
 }

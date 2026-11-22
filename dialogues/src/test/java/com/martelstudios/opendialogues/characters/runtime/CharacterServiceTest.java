@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import static com.martelstudios.opendialogues.characters.CharacterFixtures.kweebec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -98,26 +100,28 @@ class CharacterServiceTest {
         CharacterNpc npc = npc();
         service.give(npc, "Mira");
         boolean[] knownWhenHeard = {false};
-        bus.registerGlobal(CharacterEvent.Released.class, event -> knownWhenHeard[0] = service.isReleased(event.getUuid()));
+        bus.registerGlobal(CharacterEvent.Released.class, event -> knownWhenHeard[0] = service.releasedAt(event.getUuid()) != null);
 
-        assertFalse(service.isReleased(npc.uuid()));
+        assertNull(service.releasedAt(npc.uuid()));
         service.release(npc, ReleaseReason.Removed);
 
-        assertTrue(service.isReleased(npc.uuid()));
+        assertNotNull(service.releasedAt(npc.uuid()));
         assertTrue(knownWhenHeard[0]);
     }
 
     @Test
-    void npcDrawingAgainIsNoLongerReleased() {
+    void npcDrawingAgainKeepsItsReleaseDate() {
         character("Mira", "None", AB);
         CharacterService service = service();
         CharacterNpc npc = npc();
         service.give(npc, "Mira");
         service.release(npc, ReleaseReason.Removed);
 
+        Instant releasedAt = service.releasedAt(npc.uuid());
+
         assertTrue(service.give(npc, "Mira"));
 
-        assertFalse(service.isReleased(npc.uuid()));
+        assertEquals(releasedAt, service.releasedAt(npc.uuid()));
     }
 
     @Test

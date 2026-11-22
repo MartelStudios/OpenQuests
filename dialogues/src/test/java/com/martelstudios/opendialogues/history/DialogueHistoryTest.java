@@ -238,13 +238,26 @@ class DialogueHistoryTest {
         history.recordOpened("Farmer", kept, "Intro", Instant.EPOCH);
         history.recordOpened("Farmer", null, "Intro", Instant.EPOCH);
 
-        assertTrue(history.forgetNpcs(java.util.Set.of(A, B)::contains));
+        assertTrue(history.forgetNpcs(npc -> npc.equals(A) || npc.equals(B) ? Instant.EPOCH : null));
 
         assertEquals(0, history.count("Farmer", A, "Intro", null));
         assertEquals(1, history.count("Smith", null, "Intro", null));
         assertEquals(0, history.count("Smith", B, "Intro", null));
         assertEquals(1, history.count("Farmer", kept, "Intro", null));
         assertEquals(3, history.count("Farmer", null, "Intro", null));
-        assertFalse(history.forgetNpcs(java.util.Set.of(A, B)::contains));
+        assertFalse(history.forgetNpcs(npc -> npc.equals(A) || npc.equals(B) ? Instant.EPOCH : null));
+    }
+
+    @Test
+    void forgetNpcsKeepsOneMetAgainAfterItsRelease() {
+        Instant release = Instant.EPOCH.plusSeconds(10);
+        DialogueHistory history = new DialogueHistory();
+        history.recordOpened("Farmer", A, "Intro", Instant.EPOCH);
+        history.recordOpened("Smith", A, "Intro", release.plusSeconds(1));
+
+        assertTrue(history.forgetNpcs(npc -> release));
+
+        assertEquals(0, history.count("Farmer", A, "Intro", null));
+        assertEquals(1, history.count("Smith", A, "Intro", null));
     }
 }

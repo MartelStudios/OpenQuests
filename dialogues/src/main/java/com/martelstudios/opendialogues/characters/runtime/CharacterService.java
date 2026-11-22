@@ -186,7 +186,6 @@ public class CharacterService {
         if (character == null || !npc.unique().claimIfAvailable(characterId, npc.uuid(), assets::character)) return false;
 
         npc.identity().setCharacter(characterId);
-        released.get().remove(npc.uuid());
         stamp(npc, generation);
         CharacterContext context = context(npc, character);
         each(character, "onAssigned", trait -> trait.onAssigned(context));
@@ -539,10 +538,11 @@ public class CharacterService {
     }
 
     /**
-     * @return whether that NPC let its character go, whatever the reason, within the remembered window.
+     * @return when that NPC last let its character go, whatever the reason, {@code null} outside the remembered window.
      */
-    public boolean isReleased(@Nonnull UUID npc) {
-        return released.get().contains(npc);
+    @Nullable
+    public Instant releasedAt(@Nonnull UUID npc) {
+        return released.get().releasedAt(npc);
     }
 
     @Nullable

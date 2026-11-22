@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 /**
  * The one writer of {@link GiverQuestRecord}: keeps how the head quests an NPC handed out start
@@ -34,11 +34,11 @@ public final class GiverQuestRecorder {
     private static volatile ComponentType<EntityStore, GiverQuestRecord> registered;
 
     private final ComponentType<EntityStore, GiverQuestRecord> type;
-    private final Predicate<UUID> isReleased;
+    private final Function<UUID, Instant> releasedAt;
 
-    private GiverQuestRecorder(@Nonnull ComponentType<EntityStore, GiverQuestRecord> type, @Nonnull Predicate<UUID> isReleased) {
+    private GiverQuestRecorder(@Nonnull ComponentType<EntityStore, GiverQuestRecord> type, @Nonnull Function<UUID, Instant> releasedAt) {
         this.type = type;
-        this.isReleased = isReleased;
+        this.releasedAt = releasedAt;
     }
 
     /**
@@ -50,7 +50,7 @@ public final class GiverQuestRecorder {
     public static ComponentType<EntityStore, GiverQuestRecord> register(@Nonnull JavaPlugin plugin) {
         ComponentType<EntityStore, GiverQuestRecord> type = plugin.getEntityStoreRegistry().registerComponent(GiverQuestRecord.class, "OpenQuestsDialoguesGivers", GiverQuestRecord.CODEC);
         registered = type;
-        GiverQuestRecorder recorder = new GiverQuestRecorder(type, OpenDialoguesPlugin.get().getCharacterService()::isReleased);
+        GiverQuestRecorder recorder = new GiverQuestRecorder(type, OpenDialoguesPlugin.get().getCharacterService()::releasedAt);
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, recorder::onAdded);
         plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, recorder::onCompleted);
         plugin.getEventRegistry().registerGlobal(CharacterEvent.Released.class, recorder::onReleased);
@@ -69,7 +69,7 @@ public final class GiverQuestRecorder {
     private void onAdded(@Nonnull QuestAddedToPlayerStoreEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
         Giver giver = headGiver(quest);
-        if (!records(giver, isReleased)) return;
+        if (!records(giver, releasedAt)) return;
 
         Instant at = timeOr(quest.getStartedAt());
         String assetId = quest.getAssetId();
@@ -80,7 +80,7 @@ public final class GiverQuestRecorder {
         if (!event.isEndedHere()) return;
         AbstractQuestProgression<?> quest = event.getQuest();
         Giver giver = headGiver(quest);
-        if (!records(giver, isReleased)) return;
+        if (!records(giver, releasedAt)) return;
 
         Instant at = timeOr(quest.getCompletedAt());
         String assetId = quest.getAssetId();
@@ -95,7 +95,7 @@ public final class GiverQuestRecorder {
         for (PlayerRef player : Universe.get().getPlayers()) {
             EntityComponents.update(player.getUuid(), components -> {
                 GiverQuestRecord record = components.getComponent(type);
-                if (record != null) record.forgetNpc(npc);
+                if (record != null) record.forgetNpcs(id -> id.equals(npc) ? releasedAt.apply(id) : null);
             });
         }
     }
@@ -105,7 +105,7 @@ public final class GiverQuestRecorder {
      */
     private void onConnect(@Nonnull PlayerConnectEvent event) {
         GiverQuestRecord record = event.getHolder().getComponent(type);
-        if (record != null) record.forgetNpcs(isReleased);
+        if (record != null) record.forgetNpcs(releasedAt);
     }
 
     /**
@@ -114,8 +114,8 @@ public final class GiverQuestRecorder {
      *
      * @return whether outcomes of quests from that giver are kept.
      */
-    static boolean records(@Nullable Giver giver, @Nonnull Predicate<UUID> isReleased) {
-        return giver != null && !isReleased.test(giver.npc());
+    static boolean records(@Nullable Giver giver, @Nonnull Function<UUID, Instant> releasedAt) {
+        return giver != null && !giver.isReleased(releasedAt);
     }
 
     /**

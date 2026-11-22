@@ -6,6 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.opendialogues.characters.runtime.ReleasedNpcs;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Consumer;
 
@@ -240,25 +242,40 @@ public class DialogueHistory implements Component<EntityStore> {
      * @return whether that NPC had anything recorded.
      */
     public boolean forgetNpc(@Nonnull UUID npcId) {
-        return forgetNpcs(npcId::equals);
+        return forgetNpcs(npc -> npc.equals(npcId) ? Instant.MAX : null);
     }
 
     /**
-     * Forgets every NPC the predicate names, as {@link #forgetNpc} does for one.
+     * Forgets, as {@link #forgetNpc} does, each NPC released after everything had with it under a
+     * character: one met again since, carrying that character anew, is kept.
      *
+     * @param releasedAt when each NPC last let its character go, {@code null} for one not released.
      * @return whether anything was forgotten.
      */
-    public boolean forgetNpcs(@Nonnull Predicate<UUID> released) {
+    public boolean forgetNpcs(@Nonnull Function<UUID, Instant> releasedAt) {
         boolean forgotten = false;
         for (Map<String, Map<String, Entry>> npcs : characters.values()) {
             for (String key : List.copyOf(npcs.keySet())) {
-                if (!isNpc(key, released)) continue;
+                if (!isNpc(key, npc -> ReleasedNpcs.releasedSince(releasedAt.apply(npc), latest(npcs.get(key))))) continue;
                 Map<String, Entry> unknown = npcs.computeIfAbsent(NO_NPC, none -> new HashMap<>());
                 npcs.remove(key).forEach((dialogueId, entry) -> unknown.merge(dialogueId, entry, Entry::sum));
                 forgotten = true;
             }
         }
         return forgotten;
+    }
+
+    /**
+     * @return the latest opening or pick among those entries, {@code null} when none was timestamped.
+     */
+    @Nullable
+    private static Instant latest(@Nonnull Map<String, Entry> dialogues) {
+        long latest = Long.MIN_VALUE;
+        for (Entry entry : dialogues.values()) {
+            if (entry.lastOpenedAt != null) latest = Math.max(latest, entry.lastOpenedAt);
+            for (long at : entry.lastAnsweredAt.values()) latest = Math.max(latest, at);
+        }
+        return latest == Long.MIN_VALUE ? null : Instant.ofEpochMilli(latest);
     }
 
     /**

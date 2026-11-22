@@ -6,6 +6,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,21 +45,24 @@ public class ReleasedNpcs {
     }
 
     /**
-     * Forgets an NPC that carries a character again, so its new story is not swept as the old one.
+     * Kept when the NPC carries a character again: what was tied to it before is told apart by date.
+     *
+     * @return when that NPC last let its character go, {@code null} for one not remembered.
      */
-    public void remove(@Nonnull UUID npc) {
-        boolean changed;
-        synchronized (this) {
-            changed = npcs.remove(npc.toString()) != null;
-        }
-        if (changed) onChange.run();
+    @Nullable
+    public synchronized Instant releasedAt(@Nonnull UUID npc) {
+        Long millis = npcs.get(npc.toString());
+        return millis == null ? null : Instant.ofEpochMilli(millis);
     }
 
     /**
-     * @return whether that NPC let its character go and is still remembered.
+     * A release in the same millisecond counts, as the NPC may have let go before the tie was written.
+     *
+     * @param since when the thing was tied to the NPC, {@code null} for unknown, taken as before any release.
+     * @return whether a release at {@code releasedAt} came after the thing tied at {@code since}.
      */
-    public synchronized boolean contains(@Nonnull UUID npc) {
-        return npcs.containsKey(npc.toString());
+    public static boolean releasedSince(@Nullable Instant releasedAt, @Nullable Instant since) {
+        return releasedAt != null && (since == null || !releasedAt.isBefore(since));
     }
 
     /**

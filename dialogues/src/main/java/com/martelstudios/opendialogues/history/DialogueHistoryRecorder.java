@@ -21,7 +21,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * The one writer of {@link DialogueHistory}: counts what players open and answer as the events
@@ -86,16 +85,17 @@ public class DialogueHistoryRecorder {
     /**
      * Forgets a released NPC in the history of every online player, on their world thread.
      */
-    public void forgetNpc(@Nonnull UUID npc) {
-        for (PlayerRef player : Universe.get().getPlayers()) reset(player.getUuid(), history -> history != null && history.forgetNpc(npc), new CompletableFuture<>(), 3);
+    public void forgetNpc(@Nonnull UUID npc, @Nonnull Function<UUID, Instant> releasedAt) {
+        Function<UUID, Instant> thisOne = id -> id.equals(npc) ? releasedAt.apply(id) : null;
+        for (PlayerRef player : Universe.get().getPlayers()) reset(player.getUuid(), history -> history != null && history.forgetNpcs(thisOne), new CompletableFuture<>(), 3);
     }
 
     /**
      * Forgets the NPCs released while a connecting player was away, through their incoming holder.
      */
-    public void forgetReleased(@Nonnull Holder<EntityStore> holder, @Nonnull Predicate<UUID> released) {
+    public void forgetReleased(@Nonnull Holder<EntityStore> holder, @Nonnull Function<UUID, Instant> releasedAt) {
         DialogueHistory history = holder.getComponent(type);
-        if (history != null) history.forgetNpcs(released);
+        if (history != null) history.forgetNpcs(releasedAt);
     }
 
     /**

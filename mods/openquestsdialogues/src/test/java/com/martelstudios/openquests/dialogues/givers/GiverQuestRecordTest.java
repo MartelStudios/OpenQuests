@@ -87,11 +87,11 @@ class GiverQuestRecordTest {
         record.ended(B, "Q", QuestState.SUCCESSFUL, T1);
         record.ended(kept, "Q", QuestState.SUCCESSFUL, T1);
 
-        assertTrue(record.forgetNpcs(java.util.Set.of(A.npc(), B.npc())::contains));
+        assertTrue(record.forgetNpcs(npc -> npc.equals(A.npc()) || npc.equals(B.npc()) ? T1 : null));
 
         assertEquals(2, record.completions("Farmer", null, "Q").total());
         assertEquals(0, record.completions("Farmer", A.npc(), "Q").total());
         assertEquals(1, record.completions("Smith", kept.npc(), "Q").total());
-        assertFalse(record.forgetNpcs(java.util.Set.of(A.npc(), B.npc())::contains));
+        assertFalse(record.forgetNpcs(npc -> npc.equals(A.npc()) || npc.equals(B.npc()) ? T1 : null));
     }
 }

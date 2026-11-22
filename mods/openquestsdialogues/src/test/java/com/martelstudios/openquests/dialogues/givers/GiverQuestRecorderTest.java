@@ -55,8 +55,16 @@ class GiverQuestRecorderTest {
 
     @Test
     void aReleasedGiverIsNoLongerRecorded() {
-        assertTrue(GiverQuestRecorder.records(GIVER, npc -> false));
-        assertFalse(GiverQuestRecorder.records(GIVER, GIVER.npc()::equals));
-        assertFalse(GiverQuestRecorder.records(null, npc -> false));
+        assertTrue(GiverQuestRecorder.records(GIVER, npc -> null));
+        assertFalse(GiverQuestRecorder.records(GIVER, npc -> npc.equals(GIVER.npc()) ? Instant.EPOCH : null));
+        assertFalse(GiverQuestRecorder.records(null, npc -> null));
+    }
+
+    @Test
+    void aGiverHandingOutAfterItsReleaseIsRecorded() {
+        Instant release = Instant.ofEpochMilli(1_000);
+        Giver drawnAgain = new Giver("Farmer", GIVER.npc(), null, release.plusMillis(1));
+
+        assertTrue(GiverQuestRecorder.records(drawnAgain, npc -> release));
     }
 }

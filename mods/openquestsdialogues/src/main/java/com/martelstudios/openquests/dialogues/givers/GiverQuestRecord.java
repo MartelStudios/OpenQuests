@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import com.hypixel.hytale.component.Component;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.martelstudios.opendialogues.characters.runtime.ReleasedNpcs;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
 
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -94,25 +96,41 @@ public class GiverQuestRecord implements Component<EntityStore> {
      * @return whether that NPC had anything recorded.
      */
     public boolean forgetNpc(@Nonnull UUID npc) {
-        return forgetNpcs(npc::equals);
+        return forgetNpcs(id -> id.equals(npc) ? Instant.MAX : null);
     }
 
     /**
-     * Forgets every NPC the predicate names, as {@link #forgetNpc} does for one.
+     * Forgets, as {@link #forgetNpc} does, each NPC released after every quest it handed out under a
+     * character: one handing quests out again since, carrying that character anew, is kept.
      *
+     * @param releasedAt when each NPC last let its character go, {@code null} for one not released.
      * @return whether anything was forgotten.
      */
-    public boolean forgetNpcs(@Nonnull Predicate<UUID> released) {
+    public boolean forgetNpcs(@Nonnull Function<UUID, Instant> releasedAt) {
         boolean forgotten = false;
         for (Map<String, Map<String, QuestCompletions>> npcs : givers.values()) {
             for (String key : List.copyOf(npcs.keySet())) {
-                if (!isNpc(key, released)) continue;
+                if (!isNpc(key, npc -> ReleasedNpcs.releasedSince(releasedAt.apply(npc), latest(npcs.get(key))))) continue;
                 Map<String, QuestCompletions> unknown = npcs.computeIfAbsent(NO_NPC, none -> new HashMap<>());
                 npcs.remove(key).forEach((assetId, completions) -> unknown.merge(assetId, completions, GiverQuestRecord::sum));
                 forgotten = true;
             }
         }
         return forgotten;
+    }
+
+    /**
+     * @return the latest start or end among those outcomes, {@code null} when none is dated.
+     */
+    @Nullable
+    private static Instant latest(@Nonnull Map<String, QuestCompletions> outcomes) {
+        Instant latest = null;
+        for (QuestCompletions completions : outcomes.values()) {
+            for (Instant at : new Instant[] {completions.getLastStartedAt(), completions.getLastCompletedAt()}) {
+                if (at != null && (latest == null || at.isAfter(latest))) latest = at;
+            }
+        }
+        return latest;
     }
 
     /**

@@ -197,12 +197,14 @@ quest aimed at a `Forever` + `Universe` character fails once that character is l
 Forgotten Temple and Kweebec village characters in the Adventure Quests pack.
 
 A quest handed out by `AssignQuest` in a conversation with an NPC carries that NPC as its giver
-(tags `OpenQuestsDialogues.GiverCharacter`, `OpenQuestsDialogues.GiverNpc`, and `Text.giver` for its
+(tags `OpenQuestsDialogues.GiverCharacter`, `OpenQuestsDialogues.GiverNpc`, `OpenQuestsDialogues.GiverSince`, and `Text.giver` for its
 displayed name). `Dialogue`, `Deliver` and `NearCharacter` take `Target`: `Character` (default, the
 `Character` field, then required for `Deliver` and `NearCharacter`), `GiverCharacter` (any NPC of the
 giver's character) or `GiverNpc` (the giver alone). The `RequiresQuest` and `QuestCooldown`
 conditions take `GivenBy`: `Any` (default, all the player's quests), `Character` (those given by
 the conversation source's character) or `Npc` (by the source NPC alone).
+A quest aimed at `GiverNpc` fails once that NPC lets its character go after handing it out, even if
+the NPC carries a character again before the player comes back.
 
 ## Extending
 

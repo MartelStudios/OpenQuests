@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReleasedNpcsTest {
@@ -23,8 +25,8 @@ class ReleasedNpcsTest {
 
         released.pruneBefore(NOW.minusSeconds(10));
 
-        assertFalse(released.contains(old));
-        assertTrue(released.contains(recent));
+        assertNull(released.releasedAt(old));
+        assertEquals(NOW, released.releasedAt(recent));
     }
 
     @Test
@@ -35,9 +37,18 @@ class ReleasedNpcsTest {
 
         ReleasedNpcs read = CodecJson.roundTrip(ReleasedNpcs.CODEC, released);
 
-        assertTrue(read.contains(npc));
-        assertFalse(read.contains(UUID.randomUUID()));
+        assertEquals(NOW, read.releasedAt(npc));
+        assertNull(read.releasedAt(UUID.randomUUID()));
         read.pruneBefore(NOW.plusSeconds(1));
-        assertFalse(read.contains(npc));
+        assertNull(read.releasedAt(npc));
+    }
+
+    @Test
+    void releasedSinceCountsOnlyAReleaseAfterTheTie() {
+        assertTrue(ReleasedNpcs.releasedSince(NOW, NOW.minusSeconds(1)));
+        assertTrue(ReleasedNpcs.releasedSince(NOW, NOW));
+        assertTrue(ReleasedNpcs.releasedSince(NOW, null));
+        assertFalse(ReleasedNpcs.releasedSince(NOW, NOW.plusSeconds(1)));
+        assertFalse(ReleasedNpcs.releasedSince(null, NOW));
     }
 }

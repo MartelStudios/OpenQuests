@@ -12,9 +12,9 @@ import com.martelstudios.openquests.extension.quests.placeblock.PlaceBlockQuestA
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.Set;
+import java.time.Instant;
 import java.util.UUID;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,8 +25,9 @@ class ReleasedGiverQuestsTest {
         QuestConstraint.CODEC.register(NearCharacterFeature.TYPE_ID, NearCharacterConstraint.class, NearCharacterConstraint.CODEC);
     }
 
-    private static final UUID RELEASED = UUID.randomUUID();
-    private static final Predicate<UUID> IS_RELEASED = Set.of(RELEASED)::contains;
+    private static final Instant RELEASE = Instant.ofEpochMilli(10_000);
+    private static final Giver RELEASED = new Giver("Farmer", UUID.randomUUID(), null, RELEASE.minusMillis(1));
+    private static final Function<UUID, Instant> IS_RELEASED = npc -> npc.equals(RELEASED.npc()) ? RELEASE : null;
 
     private static <T> T decode(BuilderCodec<T> codec, String json) throws IOException {
         try (RawJsonReader reader = RawJsonReader.fromBuffer(json.toCharArray())) {
@@ -39,7 +40,7 @@ class ReleasedGiverQuestsTest {
         assertTrue(ReleasedGiverQuests.aimsAtGiverNpc(decode(OpenQuestsDeliverAsset.CODEC, "{\"Target\":\"GiverNpc\"}")));
         assertTrue(ReleasedGiverQuests.aimsAtGiverNpc(decode(OpenQuestsDialogueAsset.CODEC, "{\"Target\":\"GiverNpc\"}")));
         assertTrue(ReleasedGiverQuests.shouldFail(RELEASED, false, IS_RELEASED));
-        assertFalse(ReleasedGiverQuests.shouldFail(UUID.randomUUID(), false, IS_RELEASED));
+        assertFalse(ReleasedGiverQuests.shouldFail(new Giver("Farmer", UUID.randomUUID(), null), false, IS_RELEASED));
         assertFalse(ReleasedGiverQuests.shouldFail(null, false, IS_RELEASED));
     }
 
@@ -61,5 +62,12 @@ class ReleasedGiverQuestsTest {
         assertFalse(ReleasedGiverQuests.aimsAtGiverNpc(decode(OpenQuestsDeliverAsset.CODEC, "{\"Character\":\"Farmer\"}")));
         assertFalse(ReleasedGiverQuests.aimsAtGiverNpc(decode(PlaceBlockQuestAsset.CODEC, "{\"Constraints\":[{\"Type\":\"NearCharacter\",\"Radius\":20,\"Target\":\"GiverCharacter\"}]}")));
         assertFalse(ReleasedGiverQuests.aimsAtGiverNpc(null));
+    }
+
+    @Test
+    void questFromBeforeAReleaseFailsEvenOnceTheNpcDrewAgain() {
+        Giver drawnAgain = new Giver("Farmer", RELEASED.npc(), null, RELEASE.plusMillis(1));
+
+        assertFalse(ReleasedGiverQuests.shouldFail(drawnAgain, false, IS_RELEASED));
     }
 }
