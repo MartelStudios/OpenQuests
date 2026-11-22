@@ -31,7 +31,8 @@ import java.util.function.Function;
 
 /**
  * Fails the quests aimed at their giver NPC once that NPC let its character go, whatever the
- * reason: as it happens, and as each quest loads later, assigned anew or brought back by its holder.
+ * reason, its world closing included: as it happens, and as each quest loads later, assigned anew
+ * or brought back by its holder.
  * Mirrors {@link LostCharacterQuests}, which does the same for a character lost for good.
  */
 public final class ReleasedGiverQuests {
@@ -53,6 +54,7 @@ public final class ReleasedGiverQuests {
     public static void register(@Nonnull JavaPlugin plugin, @Nonnull OpenQuestsServices services) {
         ReleasedGiverQuests quests = new ReleasedGiverQuests(services.getQuestProgressionService(), OpenDialoguesPlugin.get().getCharacterService()::releasedAt);
         plugin.getEventRegistry().registerGlobal(CharacterEvent.Released.class, quests::onReleased);
+        plugin.getEventRegistry().registerGlobal(CharacterEvent.WorldReleased.class, event -> quests.failAimedAt(event.getNpcs()));
         plugin.getEventRegistry().registerGlobal(QuestLoadedEvent.class, quests::onLoaded);
         plugin.getEventRegistry().registerGlobal(EventPriority.LATE, QuestAddedToPlayerStoreEvent.class, quests::onAssigned);
     }

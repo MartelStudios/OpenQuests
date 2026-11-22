@@ -9,7 +9,10 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Hands out a world's {@link CharacterPositions} caught up with character resets, so no reader
@@ -55,5 +58,17 @@ public final class CharacterPositionsAccess {
         TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
         if (characterId == null || transform == null) return;
         positions(store).record(characterId, npc.uuid(), transform.getPosition(), characters.displayName(npc.identity()));
+    }
+
+    /**
+     * @return every NPC carrying a character in a world, loaded or not, readable from any thread.
+     */
+    @Nonnull
+    public Set<UUID> npcs(@Nonnull ComponentAccessor<EntityStore> store) {
+        Set<UUID> npcs = new HashSet<>();
+        for (Collection<CharacterPositions.Spot> spots : view(store).values()) {
+            for (CharacterPositions.Spot spot : spots) npcs.add(spot.npc());
+        }
+        return npcs;
     }
 }

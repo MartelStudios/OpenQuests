@@ -301,7 +301,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         getEventRegistry().registerGlobal(CharacterEvent.Released.class, CharacterDeathAnnouncer::onReleased);
         getEventRegistry().registerGlobal(CharacterEvent.Released.class, event -> historyRecorder.forgetNpc(event.getUuid(), characterService::releasedAt));
         getEventRegistry().registerGlobal(PlayerConnectEvent.class, event -> historyRecorder.forgetReleased(event.getHolder(), characterService::releasedAt));
-        getEventRegistry().registerGlobal(EventPriority.LAST, RemoveWorldEvent.class, characterService.worldClosing()::onRemoveWorld);
+        getEventRegistry().registerGlobal(EventPriority.LAST, RemoveWorldEvent.class, characterService.worldClosing(world -> positions.npcs(world.getEntityStore().getStore()))::onRemoveWorld);
 
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> characterMarkers.forget(event.getPlayerRef().getUuid()));

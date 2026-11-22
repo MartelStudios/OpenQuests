@@ -10,6 +10,7 @@ import com.martelstudios.opendialogues.characters.filters.FilterContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -232,6 +233,28 @@ public abstract class CharacterEvent {
         @Nonnull
         public Cause getCause() {
             return cause;
+        }
+    }
+
+    /**
+     * The NPCs carrying a character in a world closing for good, released all at once without an
+     * entity to name, so whatever was tied to one of them goes too. Fired on the thread removing the world.
+     */
+    public static final class WorldReleased extends CharacterEvent implements IEvent<Void> {
+
+        @Nonnull
+        private final Set<UUID> npcs;
+
+        public WorldReleased(@Nonnull Set<UUID> npcs) {
+            this.npcs = Set.copyOf(npcs);
+        }
+
+        /**
+         * @return the UUIDs of the NPCs released.
+         */
+        @Nonnull
+        public Set<UUID> getNpcs() {
+            return npcs;
         }
     }
 }

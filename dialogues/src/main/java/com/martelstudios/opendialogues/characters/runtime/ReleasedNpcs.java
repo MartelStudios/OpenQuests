@@ -8,6 +8,7 @@ import com.hypixel.hytale.codec.codecs.map.MapCodec;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -40,6 +41,16 @@ public class ReleasedNpcs {
     public void add(@Nonnull UUID npc, @Nonnull Instant at) {
         synchronized (this) {
             npcs.put(npc.toString(), at.toEpochMilli());
+        }
+        onChange.run();
+    }
+
+    /**
+     * Remembers that NPCs let their character go at that moment, saved once for them all.
+     */
+    public void addAll(@Nonnull Collection<UUID> released, @Nonnull Instant at) {
+        synchronized (this) {
+            for (UUID npc : released) npcs.put(npc.toString(), at.toEpochMilli());
         }
         onChange.run();
     }

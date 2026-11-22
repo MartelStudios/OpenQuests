@@ -12,6 +12,7 @@ import com.hypixel.hytale.server.core.modules.entity.component.Interactable;
 import com.hypixel.hytale.server.core.modules.entity.component.PersistentDisplayName;
 import com.hypixel.hytale.server.core.modules.interaction.Interactions;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.characters.CharacterAssets;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
@@ -477,11 +478,12 @@ public class CharacterService {
     }
 
     /**
-     * @return what settles the universe characters of a world closing for good, to listen to world removals.
+     * @param npcsOf the NPCs carrying a character in a world, loaded or not.
+     * @return what settles the characters of a world closing for good, to listen to world removals.
      */
     @Nonnull
-    public CharacterWorldClosing worldClosing() {
-        return new CharacterWorldClosing(universe, this::knownCharacter, events);
+    public CharacterWorldClosing worldClosing(@Nonnull Function<World, Set<UUID>> npcsOf) {
+        return new CharacterWorldClosing(universe, this::knownCharacter, released, npcsOf, events);
     }
 
     /**
