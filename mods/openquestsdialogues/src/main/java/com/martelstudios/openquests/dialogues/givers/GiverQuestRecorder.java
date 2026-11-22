@@ -1,7 +1,10 @@
 package com.martelstudios.openquests.dialogues.givers;
 
 import com.hypixel.hytale.component.ComponentType;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
@@ -12,7 +15,11 @@ import com.martelstudios.openquests.core.utils.EntityComponents;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * The one writer of {@link GiverQuestRecord}: keeps how the head quests an NPC handed out start
@@ -58,13 +65,9 @@ public final class GiverQuestRecorder {
 
         Instant at = timeOr(quest.getStartedAt());
         String assetId = quest.getAssetId();
-        EntityComponents.update(event.getPlayerId(), components -> components.ensureAndGetComponent(type).started(giver, assetId, at));
+        write(event.getPlayerId(), record -> record.started(giver, assetId, at));
     }
 
-    /**
-     * Counted as core counts its own tally: once, by the server ending the quest, those who gave
-     * it up as having abandoned it, so a player coming back and seeing it through counts once.
-     */
     private void onCompleted(@Nonnull QuestCompletedEvent event) {
         if (!event.isEndedHere()) return;
         AbstractQuestProgression<?> quest = event.getQuest();
@@ -73,12 +76,42 @@ public final class GiverQuestRecorder {
 
         Instant at = timeOr(quest.getCompletedAt());
         String assetId = quest.getAssetId();
-        for (UUID playerId : quest.getPlayers()) record(playerId, giver, assetId, event.getState(), at);
-        for (UUID playerId : quest.getAbandonedPlayers()) record(playerId, giver, assetId, QuestState.ABANDONED, at);
+        outcomes(event).forEach((playerId, state) -> write(playerId, record -> record.ended(giver, assetId, state, at)));
     }
 
-    private void record(@Nonnull UUID playerId, @Nonnull Giver giver, @Nonnull String assetId, @Nonnull QuestState state, @Nonnull Instant at) {
-        EntityComponents.update(playerId, components -> components.ensureAndGetComponent(type).ended(giver, assetId, state, at));
+    /**
+     * Counted as core counts its own tally: once, by the server ending the quest, for the team
+     * snapshot core took, those who gave it up as having abandoned it.
+     *
+     * @return the outcome to count for each player.
+     */
+    @Nonnull
+    static Map<UUID, QuestState> outcomes(@Nonnull QuestCompletedEvent event) {
+        AbstractQuestProgression<?> quest = event.getQuest();
+        Map<UUID, QuestState> outcomes = new HashMap<>();
+        for (UUID playerId : event.recipients(() -> Set.copyOf(quest.getPlayers()))) outcomes.put(playerId, event.getState());
+        for (UUID playerId : quest.getAbandonedPlayers()) outcomes.put(playerId, QuestState.ABANDONED);
+        return outcomes;
+    }
+
+    /**
+     * On the player's world thread the write is made at once, so a condition checked right after
+     * a quest ends in the same tick already reads it: the live tally no longer counts an ended quest.
+     */
+    private void write(@Nonnull UUID playerId, @Nonnull Consumer<GiverQuestRecord> action) {
+        PlayerRef online = Universe.get().getPlayer(playerId);
+        Ref<EntityStore> ref = online == null ? null : online.getReference();
+        GiverQuestRecord here = ref != null && ref.isValid() && ref.getStore().isInThread() ? ref.getStore().ensureAndGetComponent(ref, type) : null;
+        write(here, action, () -> EntityComponents.update(playerId, components -> action.accept(components.ensureAndGetComponent(type))));
+    }
+
+    /**
+     * @param here the record when it can be written from this thread, {@code null} otherwise.
+     * @param queue writes it later where it can.
+     */
+    static void write(@Nullable GiverQuestRecord here, @Nonnull Consumer<GiverQuestRecord> action, @Nonnull Runnable queue) {
+        if (here != null) action.accept(here);
+        else queue.run();
     }
 
     /**
