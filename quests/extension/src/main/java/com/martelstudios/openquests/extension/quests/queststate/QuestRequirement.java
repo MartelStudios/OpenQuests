@@ -71,6 +71,7 @@ public final class QuestRequirement {
     @Nonnull
     private static <T> BuilderCodec.Builder<T> appendBounds(@Nonnull BuilderCodec.Builder<T> builder, @Nonnull Function<T, QuestRequirement> requirement) {
         return builder.append(new KeyedCodec<>("States", QuestStates.CODEC), (owner, states) -> requirement.apply(owner).states = states, owner -> requirement.apply(owner).states)
+                      .addValidator(Validators.nonEmptyArray())
                       .addValidator(Validators.uniqueInArray())
                       .add()
                       .append(new KeyedCodec<>("Min", Codec.INTEGER), (owner, min) -> requirement.apply(owner).min = min, owner -> Integer.valueOf(requirement.apply(owner).min))

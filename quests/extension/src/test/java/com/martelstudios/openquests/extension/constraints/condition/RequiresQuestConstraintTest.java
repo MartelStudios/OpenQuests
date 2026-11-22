@@ -58,6 +58,7 @@ class RequiresQuestConstraintTest {
     @Test
     void aMissingQuestOrANegativeCountDoesNotDecode() {
         assertNull(tryDecode(RequiresQuestConstraint.CODEC, "{\"QuestAssetId\": \"Intro\", \"Min\": -1}"));
+        assertNull(tryDecode(RequiresQuestConstraint.CODEC, "{\"QuestAssetId\": \"Intro\", \"States\": []}"));
     }
 
     @Test
