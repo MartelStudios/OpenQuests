@@ -95,6 +95,11 @@ public class DialogueHistory implements Component<EntityStore> {
         recordOpened(characterId, dialogueId, Instant.now());
     }
 
+    /**
+     * Counts one more opening and keeps its time, unless a later one is already recorded.
+     *
+     * @param characterId {@code null} for a dialogue had without one.
+     */
     public void recordOpened(@Nullable String characterId, @Nonnull String dialogueId, @Nonnull Instant occurredAt) {
         Entry entry = entry(characterId, dialogueId);
         long millis = occurredAt.toEpochMilli();
@@ -118,6 +123,11 @@ public class DialogueHistory implements Component<EntityStore> {
         recordAnswer(characterId, dialogueId, answerKey, Instant.now());
     }
 
+    /**
+     * Counts one more pick of an answer and keeps its time, unless a later one is already recorded.
+     *
+     * @param characterId {@code null} for a dialogue had without one.
+     */
     public void recordAnswer(@Nullable String characterId, @Nonnull String dialogueId, @Nonnull String answerKey, @Nonnull Instant occurredAt) {
         Entry entry = entry(characterId, dialogueId);
         entry.answers.merge(answerKey, 1, Integer::sum);
