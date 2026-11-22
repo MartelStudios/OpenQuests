@@ -23,6 +23,8 @@
         "When": {
           "Type": "RequiresQuest",
           "QuestAssetIds": [
+            "AdventureQuests_FarmerBringHoe",
+            "AdventureQuests_FarmerBringBucket",
             "AdventureQuests_FarmerHarvestAubergine",
             "AdventureQuests_FarmerHarvestPumpkin"
           ],
@@ -33,6 +35,70 @@
         },
         "Then": {
           "Dialogue": "AdventureQuests_FarmerTier1Waiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerBringHoe",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerBringHoeIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerBringBucket",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerBringBucketIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
         }
       },
       {

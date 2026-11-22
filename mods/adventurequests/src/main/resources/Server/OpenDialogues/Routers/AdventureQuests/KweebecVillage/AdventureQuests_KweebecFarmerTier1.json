@@ -23,6 +23,8 @@
         "When": {
           "Type": "RequiresQuest",
           "QuestAssetIds": [
+            "AdventureQuests_FarmerBringHoe",
+            "AdventureQuests_FarmerBringBucket",
             "AdventureQuests_FarmerHarvestAubergine",
             "AdventureQuests_FarmerHarvestPumpkin"
           ],
@@ -33,6 +35,70 @@
         },
         "Then": {
           "Dialogue": "AdventureQuests_FarmerTier1Waiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerBringHoe",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerBringHoeIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerBringBucket",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerBringBucketIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
         }
       },
       {
@@ -227,6 +293,60 @@
           "Conditions": [
             {
               "Type": "Opened",
+              "Dialogue": "AdventureQuests_FarmerBringHoeIntro",
+              "With": "Npc"
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerBringHoe",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 0,
+              "Max": 0
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerBringHoeIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "Opened",
+              "Dialogue": "AdventureQuests_FarmerBringBucketIntro",
+              "With": "Npc"
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerBringBucket",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 0,
+              "Max": 0
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerBringBucketIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "Opened",
               "Dialogue": "AdventureQuests_FarmerHarvestAubergineIntro",
               "With": "Npc"
             },
@@ -275,65 +395,112 @@
         }
       },
       {
-        "When": {
-          "Type": "Composite",
-          "Operator": "And",
-          "Conditions": [
-            {
-              "Type": "NearBlock",
-              "Block": {
-                "ItemId": "Plant_Crop_Aubergine_Block"
-              },
-              "State": "StageFinal",
-              "Radius": 30,
-              "Min": 2
-            },
-            {
-              "Type": "RequiresQuest",
-              "QuestAssetId": "AdventureQuests_FarmerHarvestAubergine",
-              "States": [
-                "InProgress",
-                "Successful"
-              ],
-              "GivenBy": "Npc",
-              "Min": 0,
-              "Max": 0
-            }
-          ]
-        },
         "Then": {
-          "Dialogue": "AdventureQuests_FarmerHarvestAubergineIntro"
-        }
-      },
-      {
-        "When": {
-          "Type": "Composite",
-          "Operator": "And",
-          "Conditions": [
-            {
-              "Type": "NearBlock",
-              "Block": {
-                "ItemId": "Plant_Crop_Pumpkin_Block"
-              },
-              "State": "StageFinal",
-              "Radius": 30,
-              "Min": 2
-            },
-            {
-              "Type": "RequiresQuest",
-              "QuestAssetId": "AdventureQuests_FarmerHarvestPumpkin",
-              "States": [
-                "InProgress",
-                "Successful"
-              ],
-              "GivenBy": "Npc",
-              "Min": 0,
-              "Max": 0
+          "Router": {
+            "Selector": {
+              "Type": "Weighted",
+              "Entries": [
+                {
+                  "Weight": 1,
+                  "When": {
+                    "Type": "RequiresQuest",
+                    "QuestAssetId": "AdventureQuests_FarmerBringHoe",
+                    "States": [
+                      "InProgress",
+                      "Successful"
+                    ],
+                    "GivenBy": "Npc",
+                    "Min": 0,
+                    "Max": 0
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_FarmerBringHoeIntro"
+                  }
+                },
+                {
+                  "Weight": 1,
+                  "When": {
+                    "Type": "RequiresQuest",
+                    "QuestAssetId": "AdventureQuests_FarmerBringBucket",
+                    "States": [
+                      "InProgress",
+                      "Successful"
+                    ],
+                    "GivenBy": "Npc",
+                    "Min": 0,
+                    "Max": 0
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_FarmerBringBucketIntro"
+                  }
+                },
+                {
+                  "Weight": 1,
+                  "When": {
+                    "Type": "Composite",
+                    "Operator": "And",
+                    "Conditions": [
+                      {
+                        "Type": "NearBlock",
+                        "Block": {
+                          "ItemId": "Plant_Crop_Aubergine_Block"
+                        },
+                        "State": "StageFinal",
+                        "Radius": 30,
+                        "Min": 2
+                      },
+                      {
+                        "Type": "RequiresQuest",
+                        "QuestAssetId": "AdventureQuests_FarmerHarvestAubergine",
+                        "States": [
+                          "InProgress",
+                          "Successful"
+                        ],
+                        "GivenBy": "Npc",
+                        "Min": 0,
+                        "Max": 0
+                      }
+                    ]
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_FarmerHarvestAubergineIntro"
+                  }
+                },
+                {
+                  "Weight": 1,
+                  "When": {
+                    "Type": "Composite",
+                    "Operator": "And",
+                    "Conditions": [
+                      {
+                        "Type": "NearBlock",
+                        "Block": {
+                          "ItemId": "Plant_Crop_Pumpkin_Block"
+                        },
+                        "State": "StageFinal",
+                        "Radius": 30,
+                        "Min": 2
+                      },
+                      {
+                        "Type": "RequiresQuest",
+                        "QuestAssetId": "AdventureQuests_FarmerHarvestPumpkin",
+                        "States": [
+                          "InProgress",
+                          "Successful"
+                        ],
+                        "GivenBy": "Npc",
+                        "Min": 0,
+                        "Max": 0
+                      }
+                    ]
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_FarmerHarvestPumpkinIntro"
+                  }
+                }
+              ]
             }
-          ]
-        },
-        "Then": {
-          "Dialogue": "AdventureQuests_FarmerHarvestPumpkinIntro"
+          }
         }
       },
       {

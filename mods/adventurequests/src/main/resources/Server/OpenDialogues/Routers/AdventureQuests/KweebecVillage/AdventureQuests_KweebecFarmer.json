@@ -6,6 +6,8 @@
         "When": {
           "Type": "RequiresQuest",
           "QuestAssetIds": [
+            "AdventureQuests_FarmerBringHoe",
+            "AdventureQuests_FarmerBringBucket",
             "AdventureQuests_FarmerHarvestAubergine",
             "AdventureQuests_FarmerHarvestPumpkin"
           ],

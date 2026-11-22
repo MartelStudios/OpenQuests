@@ -38,6 +38,10 @@ Kweebec farmer (`AdventureQuests_KweebecFarmer`) is the worked example.
 
 ## Tiers and thresholds
 
+- Every tier needs at least as many quests that can always be offered as its threshold. A quest
+  gated by the world (ripe crops, a nearby block) only adds variety: in a village lacking it, the
+  tier would otherwise never open the next one.
+
 - Each tier lists its quests. Its threshold is `min(2, quests in the tier)`: a tier released with
   one quest opens the next one after that quest, and the batch adding its second quest raises it.
 - A tier counts its successes for this NPC with one `RequiresQuest` over the whole list
@@ -114,13 +118,14 @@ flowchart TD
 
 ## Farmer example
 
-- **Tier 1, harvest** (threshold 2): aubergine and pumpkin harvests, each offered only when its
-  crop is ripe around the player (`NearBlock` `StageFinal`, 2 within 30 blocks), else a dialogue
-  saying the garden is bare. `InteractivelyPickup` quests with a `NearCharacter` constraint on
-  `GiverNpc`.
+- **Tier 1, a helping hand** (threshold 2): a `Weighted` draw among two tool quests, always
+  offered (`Deliver` to `GiverNpc`: 4 logs and 3 stones for a hoe, 3 wood and 1 iron bar for a
+  bucket), and the aubergine and pumpkin harvests, offered only when their crop is ripe around the
+  player (`NearBlock` `StageFinal`, 2 within 30 blocks).
 - **Tier 2, planting** (threshold 2): a `Weighted` draw among potato, onion and cauliflower planting
   (`PlaceBlock` near the giver, seeds handed with the quest).
-- **Ongoing**: tier 1 quests weigh 1 (still only with ripe crops), tier 2 quests weigh 2.
+- **Ongoing**: the tier 1 harvests weigh 1 (still only with ripe crops), tier 2 quests weigh 2.
+  The tool quests are not offered again: the farmer has his tools.
 - A new tier adds its router, one entry route, its waiting and thanks routes in the shared head,
   and its quests to the ongoing draw.
 

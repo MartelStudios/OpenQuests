@@ -1,0 +1,40 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Container_Bucket.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.farmer.bring-bucket.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.bring-bucket.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.bring-bucket.short",
+  "Target": "GiverNpc",
+  "Items": [
+    {
+      "Item": {
+        "ResourceTypeId": "Wood_All"
+      },
+      "Quantity": 3
+    },
+    {
+      "Item": {
+        "ItemId": "Ingredient_Bar_Iron"
+      },
+      "Quantity": 1
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Plant_Seeds_Wheat_Eternal",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Food_Pie_Pumpkin",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

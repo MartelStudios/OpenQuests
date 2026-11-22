@@ -1,0 +1,40 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Tool_Hoe_Crude.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.farmer.bring-hoe.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.bring-hoe.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.bring-hoe.short",
+  "Target": "GiverNpc",
+  "Items": [
+    {
+      "Item": {
+        "ResourceTypeId": "Wood_Trunk"
+      },
+      "Quantity": 4
+    },
+    {
+      "Item": {
+        "ResourceTypeId": "Rock"
+      },
+      "Quantity": 3
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Plant_Seeds_Carrot_Eternal",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Food_Pie_Pumpkin",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}
