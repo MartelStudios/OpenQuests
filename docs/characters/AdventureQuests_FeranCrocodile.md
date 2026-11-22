@@ -19,14 +19,14 @@ A crocodile keeps the Feran away from the water of their oasis.
 
 ## Quests and rewards
 
-`AdventureQuests_CampCrocodile` (`KillNpc`: 1 of `Crocodile`, constraint `NearCharacter` on this character, radius 64).
+`AdventureQuests_CampCrocodile` (`KillNpc`: 1 of `Crocodile`, constraint `NearCharacter` on this character, radius 150).
 Reward: 3 `Ingredient_Hide_Heavy` and 2 `Ingredient_Bar_Gold`.
 
 ## Assets
 
 - `OpenDialogues/Characters/AdventureQuests/FeranCamp/AdventureQuests_FeranCrocodile.json`
-- `OpenDialogues/Routers/AdventureQuests/FeranCamp/AdventureQuests_FeranCrocodile.json`: intro when the quest is not started and role `Crocodile` is within 64 blocks; a short absent line otherwise; waiting while it runs; thanks after.
-- `OpenDialogues/Dialogues/AdventureQuests/FeranCamp/AdventureQuests_CampCrocodile{Intro,Absent,Waiting,Thanks}.json`: waiting offers to give up (`SetQuestState` `Abandoned`) when none is left within 64 blocks.
+- `OpenDialogues/Routers/AdventureQuests/FeranCamp/AdventureQuests_FeranCrocodile.json`: intro when the quest is not started and role `Crocodile` is within 150 blocks; a short absent line otherwise; waiting while it runs; thanks after.
+- `OpenDialogues/Dialogues/AdventureQuests/FeranCamp/AdventureQuests_CampCrocodile{Intro,Absent,Waiting,Thanks}.json`: waiting offers to give up (`SetQuestState` `Abandoned`) when none is left within 150 blocks.
 - `OpenQuests/Quests/AdventureQuests/FeranCamp/AdventureQuests_CampCrocodile.json`
 - `OpenDialogues/CharacterDistributions/AdventureQuests/FeranCamp/AdventureQuests_FeranCrocodile.json`
 - Lang keys `camp-crocodile` in `Languages/*/adventurequests/ferancamp.lang`.
@@ -34,4 +34,5 @@ Reward: 3 `Ingredient_Hide_Heavy` and 2 `Ingredient_Bar_Gold`.
 ## Decision log
 
 - 2026-11-18: one of the Feran camp stories, offered by the role that fits the task (user).
+- 2026-11-22: radius 150, since prey rarely comes within 64 or 100 blocks of a camp; a rare story is accepted (user).
 

@@ -20,7 +20,7 @@
             {
               "Type": "NearNpc",
               "Role": "Hyena",
-              "Radius": 100,
+              "Radius": 150,
               "Min": 1
             }
           ]

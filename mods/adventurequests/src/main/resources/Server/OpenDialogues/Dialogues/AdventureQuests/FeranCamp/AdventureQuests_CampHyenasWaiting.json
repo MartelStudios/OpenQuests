@@ -12,7 +12,7 @@
       "When": {
         "Type": "NearNpc",
         "Role": "Hyena",
-        "Radius": 100,
+        "Radius": 150,
         "Min": 0,
         "Max": 0
       },

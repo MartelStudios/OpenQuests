@@ -20,7 +20,7 @@
             {
               "Type": "NearNpc",
               "Role": "Crocodile",
-              "Radius": 64,
+              "Radius": 150,
               "Min": 1
             }
           ]
