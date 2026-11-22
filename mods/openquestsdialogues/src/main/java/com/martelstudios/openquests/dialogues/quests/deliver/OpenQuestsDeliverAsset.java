@@ -3,6 +3,7 @@ package com.martelstudios.openquests.dialogues.quests.deliver;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.schema.metadata.ui.UIEditor;
 import com.hypixel.hytale.codec.validation.Validators;
@@ -11,7 +12,9 @@ import com.martelstudios.openquests.extension.quests.item.QuestItemFilter;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestAsset;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.targets.QuestTarget;
+import com.martelstudios.openquests.dialogues.givers.TargetMode;
 import com.martelstudios.openquests.core.targets.TargetedQuest;
 
 import javax.annotation.Nonnull;
@@ -60,8 +63,11 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset implements Target
 
     public static final BuilderCodec<OpenQuestsDeliverAsset> CODEC =
         BuilderCodec.builder(OpenQuestsDeliverAsset.class, OpenQuestsDeliverAsset::new, QuantityQuestAsset.BASE_CODEC)
-                    .append(new KeyedCodec<>("Character", Codec.STRING, true), (asset, character) -> asset.character = character, asset -> asset.character)
-                    .addValidator(Validators.nonNull())
+                    .append(new KeyedCodec<>("Character", Codec.STRING), (asset, character) -> asset.character = character, asset -> asset.character)
+                    .documentation("ID of the character the items go to, required with Target Character.")
+                    .add()
+                    .append(new KeyedCodec<>("Target", new EnumCodec<>(TargetMode.class)), (asset, target) -> asset.target = target, asset -> asset.target)
+                    .documentation(TargetMode.DOCUMENTATION)
                     .add()
                     .append(new KeyedCodec<>("Items", new ArrayCodec<>(DeliverItem.CODEC, DeliverItem[]::new), true), (asset, items) -> asset.items = items, asset -> asset.items)
                     .addValidator(Validators.nonEmptyArray())
@@ -69,9 +75,16 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset implements Target
                     .append(new KeyedCodec<>("Dialogue", Codec.STRING), (asset, dialogue) -> asset.dialogue = dialogue, asset -> asset.dialogue)
                     .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
                     .add()
+                    .validator((asset, results) -> {
+                        if (asset.target == TargetMode.Character && asset.character == null) results.fail("Character is required with Target Character");
+                    })
                     .build();
 
+    @Nullable
     protected String character;
+
+    @Nonnull
+    protected TargetMode target = TargetMode.Character;
 
     protected DeliverItem[] items = new DeliverItem[0];
 
@@ -99,16 +112,31 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset implements Target
     }
 
     /**
-     * @return the id of the character the items go to.
+     * @return the id of the fixed character the items go to, {@code null} for a quest aimed at its giver.
      */
+    @Nullable
     public String getCharacter() {
-        return character;
+        return target == TargetMode.Character ? character : null;
+    }
+
+    /**
+     * @return whom the quest aims at.
+     */
+    @Nonnull
+    public TargetMode getTargetMode() {
+        return target;
     }
 
     @Nullable
     @Override
     public QuestTarget target() {
-        return character == null ? null : new QuestTarget.Character(character);
+        return getCharacter() == null ? null : new QuestTarget.Character(character);
+    }
+
+    @Nullable
+    @Override
+    public QuestTarget target(@Nonnull AbstractQuestProgression<?> quest) {
+        return target.resolve(character, quest);
     }
 
     /**

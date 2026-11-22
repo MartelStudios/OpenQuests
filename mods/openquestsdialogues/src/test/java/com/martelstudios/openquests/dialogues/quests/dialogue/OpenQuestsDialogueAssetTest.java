@@ -1,7 +1,12 @@
 package com.martelstudios.openquests.dialogues.quests.dialogue;
 
 import com.martelstudios.opendialogues.history.DialogueHistory;
+import com.martelstudios.openquests.core.targets.QuestTarget;
+import com.martelstudios.openquests.dialogues.givers.TargetMode;
 import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -95,5 +100,31 @@ class OpenQuestsDialogueAssetTest {
         assertEquals(1, asset("Farmer", null, null).countIn(history));
         assertEquals(2, asset(null, null, null).countIn(history));
         assertEquals(1, asset(null, null, "Bye").countIn(history));
+    }
+
+    @Test
+    void giverNpcTargetMatchesOnlyThatNpc() {
+        OpenQuestsDialogueAsset asset = asset(null, "Greeting", null);
+        asset.target = TargetMode.GiverNpc;
+        UUID giver = UUID.randomUUID();
+        QuestTarget target = new QuestTarget.Npc(giver, "Farmer");
+
+        assertTrue(asset.matches(target, "Farmer", giver, "Greeting", null));
+        assertFalse(asset.matches(target, "Farmer", UUID.randomUUID(), "Greeting", null));
+        assertFalse(asset.matches(null, "Farmer", giver, "Greeting", null));
+    }
+
+    @Test
+    void giverNpcTargetCountsThatNpcsHistory() {
+        OpenQuestsDialogueAsset asset = asset(null, "Greeting", null);
+        asset.target = TargetMode.GiverNpc;
+        UUID giver = UUID.randomUUID();
+        DialogueHistory history = new DialogueHistory();
+        history.recordOpened("Farmer", giver, "Greeting", Instant.now());
+        history.recordOpened("Farmer", UUID.randomUUID(), "Greeting", Instant.now());
+
+        assertEquals(1, asset.countIn(new QuestTarget.Npc(giver, "Farmer"), history));
+        assertEquals(2, asset.countIn(new QuestTarget.Character("Farmer"), history));
+        assertEquals(0, asset.countIn(null, history));
     }
 }

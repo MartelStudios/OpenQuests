@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * The character and the radius in whole blocks; no position, as every NPC carrying it counts.
+ * The character or giver and the radius in whole blocks; no position, as every NPC carrying it counts.
  */
 public final class NearCharacterRenderer implements QuestConstraintRenderer {
 
@@ -28,8 +28,10 @@ public final class NearCharacterRenderer implements QuestConstraintRenderer {
         if (QuestConstraintRenderer.isOver(quest)) return null;
 
         NearCharacterConstraint nearCharacter = (NearCharacterConstraint) constraint;
+        Message name = quest != null ? DialogueQuestProgression.targetName(quest, nearCharacter.getTargetMode(), nearCharacter.target(quest))
+                       : nearCharacter.getCharacter() != null ? DialogueQuestProgression.characterName(nearCharacter.getCharacter()) : null;
         return Line.of(Message.translation("openquestsdialogues.page.constraint.near-character")
                               .param("radius", Math.round(nearCharacter.getRadius()))
-                              .param("character", DialogueQuestProgression.characterName(nearCharacter.getCharacter())));
+                              .param("character", name != null ? name : Message.translation(DialogueQuestProgression.SOMEONE)));
     }
 }

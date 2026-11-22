@@ -74,6 +74,26 @@ public final class TurnInMarkers implements CharacterStatusProvider {
     }
 
     @Nonnull
+    @Override
+    public Map<UUID, CharacterMapStatus> npcStatusesFor(@Nonnull UUID playerId) {
+        QuestStoreComponent store = stores.apply(playerId);
+        return store == null ? Map.of() : npcStatuses(targets.runningFor(playerId, store.getQuestIds()));
+    }
+
+    /**
+     * @return one status per NPC a running quest leads to alone, on the compass if any such quest is tracked.
+     */
+    @Nonnull
+    public static Map<UUID, CharacterMapStatus> npcStatuses(@Nonnull List<QuestTargets.Running> running) {
+        Map<UUID, CharacterMapStatus> statuses = new HashMap<>();
+        for (QuestTargets.Running quest : running) {
+            if (!(quest.target() instanceof QuestTarget.Npc npc)) continue;
+            statuses.merge(npc.npc(), status(quest.tracked()), (known, added) -> status(known.onCompass() || added.onCompass()));
+        }
+        return statuses;
+    }
+
+    @Nonnull
     private static CharacterMapStatus status(boolean onCompass) {
         return new CharacterMapStatus(IMAGE, PRIORITY, onCompass);
     }

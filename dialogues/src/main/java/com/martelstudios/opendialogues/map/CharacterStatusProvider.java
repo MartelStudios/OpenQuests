@@ -16,4 +16,12 @@ public interface CharacterStatusProvider {
      */
     @Nonnull
     Map<String, CharacterMapStatus> statusesFor(@Nonnull UUID playerId);
+
+    /**
+     * @return a status per NPC UUID, shown on that NPC's marker alone, over its character's.
+     */
+    @Nonnull
+    default Map<UUID, CharacterMapStatus> npcStatusesFor(@Nonnull UUID playerId) {
+        return Map.of();
+    }
 }

@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,8 +66,15 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
      * @param positions the world's positions, {@code null} when the computation failed: kept until
      *                  the next invalidation rather than retried at every call.
      * @param decided   every character judged, shown or not; another one appearing calls for a recompute.
+     * @param npcShown  how NPCs with a status of their own show, over their character's look.
+     * @param npcUnplaced NPCs with a status of their own no position held when judged; one appearing calls for a recompute.
      */
-    record Seen(@Nonnull UUID world, @Nullable CharacterPositions positions, @Nonnull Set<String> decided, @Nonnull Map<String, Look> shown) {}
+    record Seen(@Nonnull UUID world, @Nullable CharacterPositions positions, @Nonnull Set<String> decided, @Nonnull Map<String, Look> shown, @Nonnull Map<UUID, Look> npcShown, @Nonnull Set<UUID> npcUnplaced) {
+
+        Seen(@Nonnull UUID world, @Nullable CharacterPositions positions, @Nonnull Set<String> decided, @Nonnull Map<String, Look> shown) {
+            this(world, positions, decided, shown, Map.of(), Set.of());
+        }
+    }
 
     /**
      * A player's markers, from one decision and one version of the positions.
@@ -246,7 +254,53 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
         CharacterPositions positions = this.positions.positions(world.getEntityStore().getStore());
         Set<String> decided = Set.copyOf(positions.view().keySet());
         DialogueHistory history = histories.apply(playerRef);
-        return new Seen(worldId, positions, decided, looks(decided, id -> history != null && history.count(id, null, null) > 0, statuses(playerId)));
+        Predicate<String> met = id -> history != null && history.count(id, null, null) > 0;
+        Map<String, List<CharacterMapStatus>> statuses = statuses(playerId);
+        Map<UUID, List<CharacterMapStatus>> npcStatuses = npcStatuses(playerId);
+        Map<String, Collection<CharacterPositions.Spot>> spots = positions.view();
+        Set<UUID> unplaced = new HashSet<>(npcStatuses.keySet());
+        spots.values().forEach(npcs -> npcs.forEach(spot -> unplaced.remove(spot.npc())));
+        return new Seen(worldId, positions, decided, looks(decided, met, statuses), npcLooks(spots, met, statuses, npcStatuses), Set.copyOf(unplaced));
+    }
+
+    /**
+     * A failing provider, often another mod's, must not take every marker away.
+     */
+    @Nonnull
+    private Map<UUID, List<CharacterMapStatus>> npcStatuses(@Nonnull UUID playerId) {
+        Map<UUID, List<CharacterMapStatus>> statuses = new HashMap<>();
+        for (CharacterStatusProvider provider : statusProviders) {
+            try {
+                provider.npcStatusesFor(playerId).forEach((npc, status) -> statuses.computeIfAbsent(npc, key -> new ArrayList<>()).add(status));
+            } catch (RuntimeException e) {
+                LOGGER.atWarning().withCause(e).log("Character status provider %s failed on NPC statuses.", provider.getClass().getName());
+            }
+        }
+        return statuses;
+    }
+
+    /**
+     * @param spots the NPCs of each character in the world, which tells each NPC's character.
+     * @return how each NPC with a status of its own shows, its character's statuses merged in.
+     */
+    @Nonnull
+    Map<UUID, Look> npcLooks(@Nonnull Map<String, Collection<CharacterPositions.Spot>> spots, @Nonnull Predicate<String> met, @Nonnull Map<String, List<CharacterMapStatus>> statuses, @Nonnull Map<UUID, List<CharacterMapStatus>> npcStatuses) {
+        if (npcStatuses.isEmpty()) return Map.of();
+
+        Map<UUID, Look> looks = new HashMap<>();
+        spots.forEach((characterId, npcs) -> {
+            OpenDialogueCharacterAsset character = assets.apply(characterId);
+            if (character == null) return;
+            for (CharacterPositions.Spot spot : npcs) {
+                List<CharacterMapStatus> own = npcStatuses.get(spot.npc());
+                if (own == null) continue;
+                List<CharacterMapStatus> all = new ArrayList<>(statuses.getOrDefault(characterId, List.of()));
+                all.addAll(own);
+                CharacterMarkerRule.Shown shown = CharacterMarkerRule.resolve(character.getMapVisibility(), character.getMapIcon(), met.test(characterId), CharacterMarkerRule.merge(all));
+                if (shown != null) looks.put(spot.npc(), new Look(shown, character.getEpithet(), character.getCompassRange()));
+            }
+        });
+        return Map.copyOf(looks);
     }
 
 
@@ -292,12 +346,13 @@ public final class CharacterMarkerProvider implements WorldMapManager.MarkerProv
         List<Near> near = new ArrayList<>();
         boolean undecided = false;
         for (Map.Entry<String, Collection<CharacterPositions.Spot>> entry : spots.entrySet()) {
-            Look look = seen.shown.get(entry.getKey());
-            if (look == null) {
-                undecided |= !seen.decided.contains(entry.getKey());
-                continue;
-            }
+            Look characterLook = seen.shown.get(entry.getKey());
+            if (characterLook == null) undecided |= !seen.decided.contains(entry.getKey());
             for (CharacterPositions.Spot spot : entry.getValue()) {
+                Look own = seen.npcShown.get(spot.npc());
+                if (own == null && seen.npcUnplaced.contains(spot.npc())) undecided = true;
+                Look look = own != null ? own : characterLook;
+                if (look == null) continue;
                 MapMarker marker = marker(spot, look, spot.name() != null ? spot.name() : look.epithet());
                 all.add(marker);
                 if (look.shown().onCompass()) compass.add(marker);

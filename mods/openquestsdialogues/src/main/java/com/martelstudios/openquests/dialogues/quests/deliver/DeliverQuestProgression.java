@@ -50,8 +50,9 @@ public class DeliverQuestProgression extends QuantityQuestProgression<DeliverQue
     @Override
     public Message getDefaultTitle() {
         var asset = getAsset();
-        if (asset == null || asset.getCharacter() == null) return super.getDefaultTitle();
-        return Message.translation("openquestsdialogues.quest.default.deliver").param("quantity", getTargetQuantity()).param("character", DialogueQuestProgression.characterName(asset.getCharacter()));
+        Message character = asset == null ? null : DialogueQuestProgression.targetName(this, asset.getTargetMode(), asset.target(this));
+        if (character == null) return super.getDefaultTitle();
+        return Message.translation("openquestsdialogues.quest.default.deliver").param("quantity", getTargetQuantity()).param("character", character);
     }
 
     /**
