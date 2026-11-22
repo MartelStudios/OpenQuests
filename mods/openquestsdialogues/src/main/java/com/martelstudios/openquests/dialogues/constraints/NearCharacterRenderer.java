@@ -4,7 +4,6 @@ import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
-import com.martelstudios.openquests.dialogues.givers.Giver;
 import com.martelstudios.openquests.dialogues.givers.TargetMode;
 import com.martelstudios.openquests.dialogues.quests.dialogue.DialogueQuestProgression;
 import com.martelstudios.openquests.extension.journal.QuestConstraintRenderer;
@@ -42,7 +41,7 @@ public final class NearCharacterRenderer implements QuestConstraintRenderer {
     @Nullable
     private static Message assetName(@Nonnull NearCharacterConstraint nearCharacter, @Nonnull OpenQuestAsset asset) {
         if (nearCharacter.getTargetMode() != TargetMode.Character) {
-            String name = DialogueQuestProgression.giverName(asset.getTagValues(Giver.NAME_TAG));
+            String name = DialogueQuestProgression.giverName(asset.getTagValues(DialogueQuestProgression.GIVER_TAG));
             return name != null ? Message.translation(name) : null;
         }
         return nearCharacter.getCharacter() != null ? DialogueQuestProgression.characterName(nearCharacter.getCharacter()) : null;

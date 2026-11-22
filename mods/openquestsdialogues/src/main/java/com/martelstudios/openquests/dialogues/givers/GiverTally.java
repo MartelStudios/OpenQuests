@@ -49,8 +49,8 @@ public final class GiverTally {
 
         UUID npc = scope.npc(source);
         List<? extends AbstractQuestProgression<?>> given = live.stream().filter(quest -> {
-            Giver giver = Giver.of(quest);
-            return giver != null && giver.character().equals(character) && (npc == null || giver.npc().equals(npc));
+            CharacterGiver giver = CharacterGiver.of(quest);
+            return giver != null && giver.getCharacter().equals(character) && (npc == null || giver.getNpc().equals(npc));
         }).toList();
         return QuestTally.of(record.completions(character, npc, assetId), playerId, given);
     }

@@ -2,7 +2,7 @@ package com.martelstudios.openquests.dialogues.quests;
 
 import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.util.RawJsonReader;
-import com.martelstudios.openquests.dialogues.givers.Giver;
+import com.martelstudios.openquests.dialogues.givers.CharacterGiver;
 import com.martelstudios.openquests.dialogues.givers.TestQuest;
 import com.martelstudios.openquests.dialogues.quests.deliver.OpenQuestsDeliverAsset;
 import com.martelstudios.openquests.dialogues.quests.dialogue.OpenQuestsDialogueAsset;
@@ -51,8 +51,7 @@ class LostCharacterQuestsTest {
 
     @Test
     void quest_aimed_at_its_giver_character_follows_that_character() throws IOException {
-        TestQuest quest = new TestQuest();
-        new Giver("Hero", UUID.randomUUID(), null).writeOn(quest);
+        TestQuest quest = TestQuest.givenBy(new TestQuest(), new CharacterGiver("Hero", UUID.randomUUID(), null));
 
         try (RawJsonReader dialogue = RawJsonReader.fromBuffer("{\"Target\":\"GiverCharacter\"}".toCharArray());
              RawJsonReader deliver = RawJsonReader.fromBuffer("{\"Target\":\"GiverCharacter\"}".toCharArray())) {

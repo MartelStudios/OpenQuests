@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GiverQuestRecorderTest {
 
-    private static final Giver GIVER = new Giver("Farmer", UUID.randomUUID(), null);
+    private static final CharacterGiver GIVER = new CharacterGiver("Farmer", UUID.randomUUID(), null);
 
     @Test
     void outcomesFollowTheRecipientsCoreCounted() {
@@ -40,7 +40,7 @@ class GiverQuestRecorderTest {
 
         GiverQuestRecorder.write(here, record -> record.ended(GIVER, "Q", QuestState.SUCCESSFUL, Instant.now()), () -> queued[0] = true);
 
-        assertEquals(1, here.completions("Farmer", GIVER.npc(), "Q").count(QuestState.SUCCESSFUL));
+        assertEquals(1, here.completions("Farmer", GIVER.getNpc(), "Q").count(QuestState.SUCCESSFUL));
         assertFalse(queued[0]);
     }
 
@@ -56,14 +56,14 @@ class GiverQuestRecorderTest {
     @Test
     void aReleasedGiverIsNoLongerRecorded() {
         assertTrue(GiverQuestRecorder.records(GIVER, npc -> null));
-        assertFalse(GiverQuestRecorder.records(GIVER, npc -> npc.equals(GIVER.npc()) ? Instant.EPOCH : null));
+        assertFalse(GiverQuestRecorder.records(GIVER, npc -> npc.equals(GIVER.getNpc()) ? Instant.EPOCH : null));
         assertFalse(GiverQuestRecorder.records(null, npc -> null));
     }
 
     @Test
     void aGiverHandingOutAfterItsReleaseIsRecorded() {
         Instant release = Instant.ofEpochMilli(1_000);
-        Giver drawnAgain = new Giver("Farmer", GIVER.npc(), null, release.plusMillis(1));
+        CharacterGiver drawnAgain = new CharacterGiver("Farmer", GIVER.getNpc(), null, release.plusMillis(1));
 
         assertTrue(GiverQuestRecorder.records(drawnAgain, npc -> release));
     }

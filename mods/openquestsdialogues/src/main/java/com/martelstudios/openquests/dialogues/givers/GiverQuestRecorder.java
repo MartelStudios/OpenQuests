@@ -68,7 +68,7 @@ public final class GiverQuestRecorder {
 
     private void onAdded(@Nonnull QuestAddedToPlayerStoreEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
-        Giver giver = headGiver(quest);
+        CharacterGiver giver = headGiver(quest);
         if (!records(giver, releasedAt)) return;
 
         Instant at = timeOr(quest.getStartedAt());
@@ -79,7 +79,7 @@ public final class GiverQuestRecorder {
     private void onCompleted(@Nonnull QuestCompletedEvent event) {
         if (!event.isEndedHere()) return;
         AbstractQuestProgression<?> quest = event.getQuest();
-        Giver giver = headGiver(quest);
+        CharacterGiver giver = headGiver(quest);
         if (!records(giver, releasedAt)) return;
 
         Instant at = timeOr(quest.getCompletedAt());
@@ -114,7 +114,7 @@ public final class GiverQuestRecorder {
      *
      * @return whether outcomes of quests from that giver are kept.
      */
-    static boolean records(@Nullable Giver giver, @Nonnull Function<UUID, Instant> releasedAt) {
+    static boolean records(@Nullable CharacterGiver giver, @Nonnull Function<UUID, Instant> releasedAt) {
         return giver != null && !giver.isReleased(releasedAt);
     }
 
@@ -157,8 +157,8 @@ public final class GiverQuestRecorder {
      * @return the giver of a head quest with an asset, {@code null} for a step or a quest no NPC handed out.
      */
     @Nullable
-    private static Giver headGiver(@Nonnull AbstractQuestProgression<?> quest) {
-        return quest.getParentId() == null && quest.getAssetId() != null ? Giver.of(quest) : null;
+    private static CharacterGiver headGiver(@Nonnull AbstractQuestProgression<?> quest) {
+        return quest.getParentId() == null && quest.getAssetId() != null ? CharacterGiver.of(quest) : null;
     }
 
     @Nonnull

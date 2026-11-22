@@ -196,9 +196,11 @@ quest aimed at a `Forever` + `Universe` character fails once that character is l
 `NearCharacter` constraint counts any quest's progress only near an NPC carrying a character. See the
 Forgotten Temple and Kweebec village characters in the Adventure Quests pack.
 
-A quest handed out by `AssignQuest` in a conversation with an NPC carries that NPC as its giver
-(tags `OpenQuestsDialogues.GiverCharacter`, `OpenQuestsDialogues.GiverNpc`, `OpenQuestsDialogues.GiverSince`, and `Text.giver` for its
-displayed name). `Dialogue`, `Deliver` and `NearCharacter` take `Target`: `Character` (default, the
+A quest handed out by `AssignQuest` in a conversation with an NPC carries that NPC as its giver:
+the quest's `Giver` field, of type `Character`, holding the NPC, its character, its displayed name
+(the `{giver}` text parameter) and when it took that character. `GrantQuest` follow-ups keep it. An
+asset's `Text.giver` tag is the name shown when the quest has no giver yet. `Dialogue`, `Deliver`
+and `NearCharacter` take `Target`: `Character` (default, the
 `Character` field, then required for `Deliver` and `NearCharacter`), `GiverCharacter` (any NPC of the
 giver's character) or `GiverNpc` (the giver alone). The `RequiresQuest` and `QuestCooldown`
 conditions take `GivenBy`: `Any` (default, all the player's quests), `Character` (those given by

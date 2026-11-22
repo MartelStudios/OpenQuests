@@ -16,9 +16,7 @@ class TargetModeTest {
     private static final UUID B = UUID.randomUUID();
 
     private static TestQuest givenBy(UUID npc) {
-        TestQuest quest = new TestQuest();
-        new Giver("Farmer", npc, null).writeOn(quest);
-        return quest;
+        return TestQuest.givenBy(new TestQuest(), new CharacterGiver("Farmer", npc, null));
     }
 
     @Test

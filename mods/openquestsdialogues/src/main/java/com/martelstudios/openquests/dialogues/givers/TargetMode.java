@@ -35,9 +35,9 @@ public enum TargetMode {
     public QuestTarget resolve(@Nullable String character, @Nonnull AbstractQuestProgression<?> quest) {
         if (this == Character) return character == null ? null : new QuestTarget.Character(character);
 
-        Giver giver = Giver.of(quest);
+        CharacterGiver giver = CharacterGiver.of(quest);
         if (giver == null) return null;
-        return this == GiverCharacter ? new QuestTarget.Character(giver.character()) : new QuestTarget.Npc(giver.npc(), giver.character());
+        return this == GiverCharacter ? new QuestTarget.Character(giver.getCharacter()) : new QuestTarget.Npc(giver.getNpc(), giver.getCharacter());
     }
 
     /**

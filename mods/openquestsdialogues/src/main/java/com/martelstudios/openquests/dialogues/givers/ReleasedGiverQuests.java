@@ -64,7 +64,7 @@ public final class ReleasedGiverQuests {
      *
      * @return whether a quest aimed at {@code aimed} must fail now; one already over never does.
      */
-    public static boolean shouldFail(@Nullable Giver aimed, boolean over, @Nonnull Function<UUID, Instant> releasedAt) {
+    public static boolean shouldFail(@Nullable CharacterGiver aimed, boolean over, @Nonnull Function<UUID, Instant> releasedAt) {
         return aimed != null && !over && aimed.isReleased(releasedAt);
     }
 
@@ -85,8 +85,8 @@ public final class ReleasedGiverQuests {
      * @return the giver the quest aims at alone, {@code null} when it aims elsewhere or no NPC handed it out.
      */
     @Nullable
-    public static Giver aimedGiver(@Nonnull AbstractQuestProgression<?> quest) {
-        return aimsAtGiverNpc(quest.getAsset()) ? Giver.of(quest) : null;
+    public static CharacterGiver aimedGiver(@Nonnull AbstractQuestProgression<?> quest) {
+        return aimsAtGiverNpc(quest.getAsset()) ? CharacterGiver.of(quest) : null;
     }
 
     /**
@@ -101,8 +101,8 @@ public final class ReleasedGiverQuests {
      */
     public void failAimedAt(@Nonnull Set<UUID> npcs) {
         for (AbstractQuestProgression<?> quest : List.copyOf(progression.getAllQuests())) {
-            Giver aimed = quest.isOver() ? null : aimedGiver(quest);
-            if (aimed != null && npcs.contains(aimed.npc())) failOnHolderThread(quest);
+            CharacterGiver aimed = quest.isOver() ? null : aimedGiver(quest);
+            if (aimed != null && npcs.contains(aimed.getNpc())) failOnHolderThread(quest);
         }
     }
 

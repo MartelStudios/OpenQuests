@@ -22,8 +22,7 @@ class GiverTallyTest {
     private static final DialogueSource MERCHANT = new DialogueSource(UUID.randomUUID(), "Merchant", null, null);
 
     private static TestQuest runningFrom(DialogueSource source) {
-        TestQuest quest = new TestQuest();
-        Giver.of(source).writeOn(quest);
+        TestQuest quest = TestQuest.givenBy(new TestQuest(), CharacterGiver.of(source));
         quest.apply(new AbstractQuestProgression.Join(PLAYER));
         return quest;
     }
@@ -39,7 +38,7 @@ class GiverTallyTest {
     @Test
     void endedQuestsComeFromTheRecord() {
         GiverQuestRecord record = new GiverQuestRecord();
-        record.ended(Giver.of(SOURCE_A), "Q", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000));
+        record.ended(CharacterGiver.of(SOURCE_A), "Q", QuestState.SUCCESSFUL, Instant.ofEpochMilli(1_000));
 
         assertEquals(1, GiverTally.of(SourceScope.Npc, SOURCE_A, PLAYER, "Q", record, List.of()).count(QuestState.SUCCESSFUL));
         assertEquals(0, GiverTally.of(SourceScope.Npc, SOURCE_B, PLAYER, "Q", record, List.of()).count(QuestState.SUCCESSFUL));

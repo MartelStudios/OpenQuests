@@ -57,8 +57,8 @@ public class GiverQuestRecord implements Component<EntityStore> {
     /**
      * Keeps when a quest from that giver started, unless a later start is already kept.
      */
-    public void started(@Nonnull Giver giver, @Nonnull String assetId, @Nonnull Instant at) {
-        assetsOf(giver.character(), giver.npc().toString()).compute(assetId, (id, current) -> {
+    public void started(@Nonnull CharacterGiver giver, @Nonnull String assetId, @Nonnull Instant at) {
+        assetsOf(giver.getCharacter(), giver.getNpc().toString()).compute(assetId, (id, current) -> {
             QuestCompletions now = current == null ? QuestCompletions.NONE : current;
             return QuestCompletions.of(now.count(QuestState.SUCCESSFUL), now.count(QuestState.FAILED), now.count(QuestState.ABANDONED), latest(now.getLastStartedAt(), at), now.getLastCompletedAt());
         });
@@ -67,8 +67,8 @@ public class GiverQuestRecord implements Component<EntityStore> {
     /**
      * Counts one more quest from that giver ended that way.
      */
-    public void ended(@Nonnull Giver giver, @Nonnull String assetId, @Nonnull QuestState state, @Nonnull Instant at) {
-        assetsOf(giver.character(), giver.npc().toString()).compute(assetId, (id, current) -> (current == null ? QuestCompletions.NONE : current).record(state, null, at));
+    public void ended(@Nonnull CharacterGiver giver, @Nonnull String assetId, @Nonnull QuestState state, @Nonnull Instant at) {
+        assetsOf(giver.getCharacter(), giver.getNpc().toString()).compute(assetId, (id, current) -> (current == null ? QuestCompletions.NONE : current).record(state, null, at));
     }
 
     /**

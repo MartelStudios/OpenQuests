@@ -10,7 +10,7 @@ import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.targets.QuestTarget;
 import com.martelstudios.openquests.core.targets.TargetedQuest;
-import com.martelstudios.openquests.dialogues.givers.Giver;
+import com.martelstudios.openquests.dialogues.givers.CharacterGiver;
 import com.martelstudios.openquests.dialogues.givers.ReleasedGiverQuests;
 import com.martelstudios.openquests.dialogues.givers.TargetMode;
 
@@ -81,8 +81,8 @@ public final class DialogueQuestDeathNotices {
         List<Holding> holdings = new ArrayList<>();
         for (AbstractQuestProgression<?> quest : progression.getAllQuests()) {
             QuestTarget target = quest.getAsset() instanceof TargetedQuest targeted ? targeted.target(quest) : null;
-            Giver aimed = target == null ? ReleasedGiverQuests.aimedGiver(quest) : null;
-            if (aimed != null) target = new QuestTarget.Npc(aimed.npc(), aimed.character());
+            CharacterGiver aimed = target == null ? ReleasedGiverQuests.aimedGiver(quest) : null;
+            if (aimed != null) target = new QuestTarget.Npc(aimed.getNpc(), aimed.getCharacter());
             if (target != null) holdings.add(new Holding(target, Set.copyOf(quest.getPlayers()), quest.isOver()));
         }
         return holdings;

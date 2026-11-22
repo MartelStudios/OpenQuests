@@ -26,8 +26,8 @@ class ReleasedGiverQuestsTest {
     }
 
     private static final Instant RELEASE = Instant.ofEpochMilli(10_000);
-    private static final Giver RELEASED = new Giver("Farmer", UUID.randomUUID(), null, RELEASE.minusMillis(1));
-    private static final Function<UUID, Instant> IS_RELEASED = npc -> npc.equals(RELEASED.npc()) ? RELEASE : null;
+    private static final CharacterGiver RELEASED = new CharacterGiver("Farmer", UUID.randomUUID(), null, RELEASE.minusMillis(1));
+    private static final Function<UUID, Instant> IS_RELEASED = npc -> npc.equals(RELEASED.getNpc()) ? RELEASE : null;
 
     private static <T> T decode(BuilderCodec<T> codec, String json) throws IOException {
         try (RawJsonReader reader = RawJsonReader.fromBuffer(json.toCharArray())) {
@@ -40,7 +40,7 @@ class ReleasedGiverQuestsTest {
         assertTrue(ReleasedGiverQuests.aimsAtGiverNpc(decode(OpenQuestsDeliverAsset.CODEC, "{\"Target\":\"GiverNpc\"}")));
         assertTrue(ReleasedGiverQuests.aimsAtGiverNpc(decode(OpenQuestsDialogueAsset.CODEC, "{\"Target\":\"GiverNpc\"}")));
         assertTrue(ReleasedGiverQuests.shouldFail(RELEASED, false, IS_RELEASED));
-        assertFalse(ReleasedGiverQuests.shouldFail(new Giver("Farmer", UUID.randomUUID(), null), false, IS_RELEASED));
+        assertFalse(ReleasedGiverQuests.shouldFail(new CharacterGiver("Farmer", UUID.randomUUID(), null), false, IS_RELEASED));
         assertFalse(ReleasedGiverQuests.shouldFail(null, false, IS_RELEASED));
     }
 
@@ -66,8 +66,16 @@ class ReleasedGiverQuestsTest {
 
     @Test
     void questFromBeforeAReleaseFailsEvenOnceTheNpcDrewAgain() {
-        Giver drawnAgain = new Giver("Farmer", RELEASED.npc(), null, RELEASE.plusMillis(1));
+        CharacterGiver drawnAgain = new CharacterGiver("Farmer", RELEASED.getNpc(), null, RELEASE.plusMillis(1));
 
         assertFalse(ReleasedGiverQuests.shouldFail(drawnAgain, false, IS_RELEASED));
+    }
+
+    @Test
+    void aGrantedFollowUpFailsWithItsGiver() {
+        TestQuest head = TestQuest.givenBy(new TestQuest(), RELEASED);
+        TestQuest followUp = TestQuest.givenBy(new TestQuest(), head.getGiver());
+
+        assertTrue(ReleasedGiverQuests.shouldFail(CharacterGiver.of(followUp), false, IS_RELEASED));
     }
 }

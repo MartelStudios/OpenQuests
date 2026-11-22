@@ -5,8 +5,8 @@ import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestGiver;
 import com.martelstudios.openquests.core.targets.QuestTarget;
-import com.martelstudios.openquests.dialogues.givers.Giver;
 import com.martelstudios.openquests.dialogues.givers.TargetMode;
 import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
@@ -24,6 +24,9 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
 
     /** Translation key of the name shown for no one known. */
     public static final String SOMEONE = "openquestsdialogues.quest.default.someone";
+
+    /** The tag an author writes the giver's fallback name in, read as the {@code {giver}} text parameter. */
+    public static final String GIVER_TAG = "Text.giver";
 
     protected DialogueQuestProgression() {}
 
@@ -53,16 +56,18 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
     }
 
     /**
-     * A quest aimed at its giver shows the giver's name as {@code Text.giver} holds it, the head's
-     * fallback first, then the step's own; otherwise the target character's name.
+     * A quest aimed at its giver shows the name its giver carries, else the {@code Text.giver} fallback
+     * of its head, then of the step; otherwise the target character's name.
      *
      * @return the name of whom the quest aims at, {@code null} for no one.
      */
     @Nullable
     public static Message targetName(@Nonnull AbstractQuestProgression<?> quest, @Nonnull TargetMode mode, @Nullable QuestTarget target) {
         if (mode != TargetMode.Character) {
-            String name = giverName(quest.getHead().getTagValues(Giver.NAME_TAG));
-            if (name == null) name = giverName(quest.getTagValues(Giver.NAME_TAG));
+            QuestGiver giver = quest.getHead().getGiver();
+            String name = giver != null ? giver.getNameKey() : null;
+            if (name == null) name = giverName(quest.getHead().getTagValues(GIVER_TAG));
+            if (name == null) name = giverName(quest.getTagValues(GIVER_TAG));
             if (name != null) return Message.translation(name);
         }
         String character = TargetMode.characterOf(target);

@@ -6,6 +6,7 @@ import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.dialogues.actions.QuestActionsFeature;
 import com.martelstudios.openquests.dialogues.conditions.QuestConditionsFeature;
 import com.martelstudios.openquests.dialogues.constraints.NearCharacterFeature;
+import com.martelstudios.openquests.dialogues.givers.CharacterGiver;
 import com.martelstudios.openquests.dialogues.givers.GiverQuestRecorder;
 import com.martelstudios.openquests.dialogues.givers.ReleasedGiverQuests;
 import com.martelstudios.openquests.dialogues.quests.LostCharacterQuests;
@@ -31,6 +32,8 @@ public class OpenQuestsDialoguesPlugin extends JavaPlugin {
 
         // Set up by OpenQuestsCore, which this plugin depends on and which sets up first
         OpenQuestsServices services = OpenQuestsServices.installed();
+
+        CharacterGiver.register();
 
         DialogueFeature.register(this, services);
         DeliverFeature.register(this, services);

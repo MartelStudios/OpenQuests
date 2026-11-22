@@ -3,6 +3,7 @@ package com.martelstudios.openquests.dialogues.givers;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.martelstudios.openquests.core.models.AbstractCompositeQuestProgression;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestGiver;
 
 import javax.annotation.Nullable;
 
@@ -15,6 +16,13 @@ public final class TestQuest extends AbstractQuestProgression<TestQuest> {
 
     @Nullable
     private AbstractCompositeQuestProgression<?> parent;
+
+    /**
+     * @return the quest built the way a giver hands it out, under asset {@code Q}.
+     */
+    public static <Q extends AbstractQuestProgression<Q>> Q givenBy(Q quest, @Nullable QuestGiver giver) {
+        return AbstractQuestProgression.Builder.of(quest, "Q").giver(giver).build();
+    }
 
     TestQuest stepOf(AbstractCompositeQuestProgression<?> parent) {
         this.parent = parent;
