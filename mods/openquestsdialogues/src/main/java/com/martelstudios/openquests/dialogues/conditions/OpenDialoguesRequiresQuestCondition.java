@@ -1,10 +1,15 @@
 package com.martelstudios.openquests.dialogues.conditions;
 
+import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
+import com.martelstudios.opendialogues.conditions.SourceScope;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.openquests.core.OpenQuestsServices;
+import com.martelstudios.openquests.core.models.QuestTally;
+import com.martelstudios.openquests.dialogues.givers.GiverTally;
 import com.martelstudios.openquests.extension.quests.queststate.QuestRequirement;
 
 import javax.annotation.Nonnull;
@@ -21,10 +26,15 @@ public class OpenDialoguesRequiresQuestCondition extends DialogueCondition {
 
     public static final BuilderCodec<OpenDialoguesRequiresQuestCondition> CODEC = QuestRequirement.appendFields(BuilderCodec.builder(OpenDialoguesRequiresQuestCondition.class, OpenDialoguesRequiresQuestCondition::new, DialogueCondition.BASE_CODEC),
                                                                                                              condition -> condition.requirement)
+                                                                                               .append(new KeyedCodec<>("GivenBy", new EnumCodec<>(SourceScope.class)), (condition, givenBy) -> condition.givenBy = givenBy, condition -> condition.givenBy)
+                                                                                               .documentation("Whose quests count: all of the player's, those given by the source's character, or by the source NPC alone, defaulting to Any.")
+                                                                                               .add()
                                                                                                .build();
 
     @Nonnull
     protected final QuestRequirement requirement = new QuestRequirement();
+    @Nonnull
+    protected SourceScope givenBy = SourceScope.Any;
 
     protected OpenDialoguesRequiresQuestCondition() {}
 
@@ -34,7 +44,9 @@ public class OpenDialoguesRequiresQuestCondition extends DialogueCondition {
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {
         if (context.player() == null) return false;
-        var tally = OpenQuestsServices.installed().getQuestPlayerStateService().getTally(context.player().getUuid(), requirement.getQuestAssetId());
+        QuestTally tally = givenBy == SourceScope.Any
+                           ? OpenQuestsServices.installed().getQuestPlayerStateService().getTally(context.player().getUuid(), requirement.getQuestAssetId())
+                           : GiverTally.read(givenBy, context, requirement.getQuestAssetId());
         return requirement.isMetBy(tally);
     }
 

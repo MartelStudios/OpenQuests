@@ -7,10 +7,12 @@ import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
+import com.martelstudios.opendialogues.conditions.SourceScope;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestTally;
+import com.martelstudios.openquests.dialogues.givers.GiverTally;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,6 +42,9 @@ public class OpenDialoguesQuestCooldownCondition extends DialogueCondition {
                                                                                 .addValidator(Validators.greaterThan(Duration.ZERO))
                                                                                 .documentation("Real-time delay in seconds, offline time included.")
                                                                                 .add()
+                                                                                .append(new KeyedCodec<>("GivenBy", new EnumCodec<>(SourceScope.class)), (condition, givenBy) -> condition.givenBy = givenBy, condition -> condition.givenBy)
+                                                                                .documentation("Whose quests count: all of the player's, those given by the source's character, or by the source NPC alone, defaulting to Any.")
+                                                                                .add()
                                                                                 .documentation("Holds before the player ever took the quest and once the delay after the last one ran out.")
                                                                                 .build();
 
@@ -55,6 +60,8 @@ public class OpenDialoguesQuestCooldownCondition extends DialogueCondition {
     @Nonnull
     protected Since since = Since.END;
     protected Duration duration;
+    @Nonnull
+    protected SourceScope givenBy = SourceScope.Any;
 
     protected OpenDialoguesQuestCooldownCondition() {}
 
@@ -64,7 +71,10 @@ public class OpenDialoguesQuestCooldownCondition extends DialogueCondition {
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {
         if (context.player() == null) return false;
-        return !isActive(OpenQuestsServices.installed().getQuestPlayerStateService().getTally(context.player().getUuid(), questAssetId), Instant.now());
+        QuestTally tally = givenBy == SourceScope.Any
+                           ? OpenQuestsServices.installed().getQuestPlayerStateService().getTally(context.player().getUuid(), questAssetId)
+                           : GiverTally.read(givenBy, context, questAssetId);
+        return !isActive(tally, Instant.now());
     }
 
     boolean isActive(@Nonnull QuestTally tally, @Nonnull Instant now) {

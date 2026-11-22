@@ -3,6 +3,7 @@ package com.martelstudios.openquests.dialogues.conditions;
 import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.exception.CodecException;
 import com.hypixel.hytale.codec.util.RawJsonReader;
+import com.martelstudios.opendialogues.conditions.SourceScope;
 import com.martelstudios.openquests.core.models.QuestCompletions;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.models.QuestTally;
@@ -13,6 +14,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -48,6 +50,12 @@ class OpenDialoguesQuestCooldownConditionTest {
 
         assertTrue(condition.isActive(DONE, START.plusSeconds(599)));
         assertFalse(condition.isActive(DONE, START.plusSeconds(600)));
+    }
+
+    @Test
+    void givenByDefaultsToAny() throws IOException {
+        assertEquals(SourceScope.Any, decode("{\"QuestAssetId\":\"ElderPotion\",\"Seconds\":60}").givenBy);
+        assertEquals(SourceScope.Character, decode("{\"QuestAssetId\":\"ElderPotion\",\"Seconds\":60,\"GivenBy\":\"Character\"}").givenBy);
     }
 
     @Test

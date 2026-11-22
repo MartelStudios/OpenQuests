@@ -20,6 +20,8 @@ import java.util.UUID;
  */
 public final class GiverQuestRecorder {
 
+    private static volatile ComponentType<EntityStore, GiverQuestRecord> registered;
+
     private final ComponentType<EntityStore, GiverQuestRecord> type;
 
     private GiverQuestRecorder(@Nonnull ComponentType<EntityStore, GiverQuestRecord> type) {
@@ -34,10 +36,19 @@ public final class GiverQuestRecorder {
     @Nonnull
     public static ComponentType<EntityStore, GiverQuestRecord> register(@Nonnull JavaPlugin plugin) {
         ComponentType<EntityStore, GiverQuestRecord> type = plugin.getEntityStoreRegistry().registerComponent(GiverQuestRecord.class, "OpenQuestsDialoguesGivers", GiverQuestRecord.CODEC);
+        registered = type;
         GiverQuestRecorder recorder = new GiverQuestRecorder(type);
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, recorder::onAdded);
         plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, recorder::onCompleted);
         return type;
+    }
+
+    /**
+     * @return the record's component type, {@code null} before the plugin set up.
+     */
+    @Nullable
+    public static ComponentType<EntityStore, GiverQuestRecord> type() {
+        return registered;
     }
 
     private void onAdded(@Nonnull QuestAddedToPlayerStoreEvent event) {

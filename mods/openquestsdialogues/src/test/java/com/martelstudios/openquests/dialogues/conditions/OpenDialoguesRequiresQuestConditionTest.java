@@ -2,6 +2,7 @@ package com.martelstudios.openquests.dialogues.conditions;
 
 import com.hypixel.hytale.codec.ExtraInfo;
 import com.hypixel.hytale.codec.util.RawJsonReader;
+import com.martelstudios.opendialogues.conditions.SourceScope;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -27,6 +28,12 @@ class OpenDialoguesRequiresQuestConditionTest {
 
         assertEquals("ElderPotion", condition.getRequirement().getQuestAssetId());
         assertNull(condition.validate(id -> null));
+    }
+
+    @Test
+    void givenByDefaultsToAny() throws IOException {
+        assertEquals(SourceScope.Any, decode("{\"QuestAssetId\":\"ElderPotion\"}").givenBy);
+        assertEquals(SourceScope.Npc, decode("{\"QuestAssetId\":\"ElderPotion\",\"GivenBy\":\"Npc\"}").givenBy);
     }
 
     @Test
