@@ -107,6 +107,15 @@ class FiltersTest {
     }
 
     @Test
+    void theDrawReadsTheRawNeighbourhoodSoNotIsAppliedOnce() {
+        OpenDialoguesNearCharacterFilter near = (OpenDialoguesNearCharacterFilter) filter("{ \"Type\": \"NearCharacter\", \"Characters\": [\"Farmer\"], \"Radius\": 16, \"Not\": true }");
+        Map<String, Collection<CharacterPositions.Spot>> close = Map.of("Farmer", List.of(spot(3, 64, 0)));
+
+        assertTrue(near.evaluateAt(close, new Vector3d(0, 64, 0)));
+        assertFalse(near.evaluateAt(Map.of(), new Vector3d(0, 64, 0)));
+    }
+
+    @Test
     void nearCharacterRequiresAPositiveRadius() {
         assertThrows(IllegalArgumentException.class, () -> filter("{ \"Type\": \"NearCharacter\", \"Characters\": [\"Farmer\"], \"Radius\": 0 }"));
     }

@@ -66,14 +66,21 @@ public class OpenDialoguesNearCharacterFilter extends CharacterFilter {
         // A draw sticks to the NPC, so it reads positions caught up with resets, safe on the world thread
         CharacterPositionsAccess access = plugin.getCharacterPositions();
         Map<String, Collection<CharacterPositions.Spot>> spots = context.accessor() instanceof Store<EntityStore> store ? access.positions(store).view() : access.view(context.accessor());
-        return holdsAt(spots, transform.getPosition());
+        return evaluateAt(spots, transform.getPosition());
+    }
+
+    /**
+     * @return whether one of the characters stands within the radius of the point, before {@code Not}.
+     */
+    public boolean evaluateAt(@Nonnull Map<String, Collection<CharacterPositions.Spot>> spots, @Nonnull Vector3d point) {
+        return anyWithin(spots, List.of(characters), point, radius);
     }
 
     /**
      * @return whether the filter holds, {@code Not} applied, for a candidate standing at that point.
      */
     public boolean holdsAt(@Nonnull Map<String, Collection<CharacterPositions.Spot>> spots, @Nonnull Vector3d point) {
-        return anyWithin(spots, List.of(characters), point, radius) != not;
+        return evaluateAt(spots, point) != not;
     }
 
     /**
