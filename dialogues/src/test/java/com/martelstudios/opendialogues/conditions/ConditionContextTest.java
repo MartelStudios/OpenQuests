@@ -2,6 +2,7 @@ package com.martelstudios.opendialogues.conditions;
 
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.martelstudios.opendialogues.history.DialogueHistory;
+import com.martelstudios.opendialogues.sessions.DialogueSource;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -34,5 +35,16 @@ class ConditionContextTest {
         assertNull(context.entity());
         assertNull(context.store());
         assertFalse(context.canReadEntity());
+    }
+
+    @Test
+    void withSourceKeepsEverythingElse() {
+        DialogueHistory history = new DialogueHistory();
+        DialogueSource source = new DialogueSource(UUID.randomUUID(), "Farmer", "npc.mira", "npc.farmer");
+
+        ConditionContext context = ConditionFixtures.context(history).withSource(source);
+
+        assertSame(source, context.source());
+        assertSame(history, context.history());
     }
 }

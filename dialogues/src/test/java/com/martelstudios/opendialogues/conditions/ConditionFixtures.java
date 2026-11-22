@@ -10,8 +10,10 @@ import com.martelstudios.opendialogues.conditions.impl.permission.OpenDialoguesH
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesOpenedCondition;
 import com.martelstudios.opendialogues.conditions.impl.logic.OpenDialoguesCompositeCondition;
 import com.martelstudios.opendialogues.history.DialogueHistory;
+import com.martelstudios.opendialogues.sessions.DialogueSource;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Registers the conditions tests read, once per run, as the plugin does at setup.
@@ -47,6 +49,11 @@ public final class ConditionFixtures {
 
     @Nonnull
     public static ConditionContext context(@Nonnull DialogueHistory history) {
-        return new ConditionContext(null, null, null, history);
+        return new ConditionContext(null, null, null, history, null);
+    }
+
+    @Nonnull
+    public static ConditionContext context(@Nonnull DialogueHistory history, @Nullable DialogueSource source) {
+        return new ConditionContext(null, null, null, history, source);
     }
 }

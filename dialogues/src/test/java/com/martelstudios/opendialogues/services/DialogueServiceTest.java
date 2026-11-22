@@ -7,6 +7,7 @@ import com.martelstudios.opendialogues.actions.impl.open.OpenDialoguesOpenAction
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.ConditionFixtures;
+import com.martelstudios.opendialogues.conditions.SourceRecordingCondition;
 import com.martelstudios.opendialogues.CodecJson;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialoguesResponse;
@@ -16,6 +17,8 @@ import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import com.martelstudios.opendialogues.displays.DisplayRules;
 import com.martelstudios.opendialogues.events.DialogueEvent;
 import com.martelstudios.opendialogues.history.DialogueHistory;
+import com.martelstudios.opendialogues.routers.OpenDialogueRouterAsset;
+import com.martelstudios.opendialogues.routers.impl.sequence.OpenDialoguesSequenceSelector;
 import com.martelstudios.opendialogues.services.DialogueService.AnswerResult;
 import com.martelstudios.opendialogues.sessions.DialogueSession;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
@@ -76,6 +79,7 @@ class DialogueServiceTest {
     private final ConditionContext context = ConditionFixtures.context(history);
     private final RecordingDisplay display = new RecordingDisplay();
     private final Map<String, OpenDialogueAsset> dialogues = new HashMap<>();
+    private final Map<String, OpenDialogueRouterAsset> routers = new HashMap<>();
     private final Map<String, OpenDialogueCharacterAsset> characters = new HashMap<>();
     private final EventBus bus = new EventBus(false);
     private final List<DialogueEvent> events = new ArrayList<>();
@@ -85,8 +89,10 @@ class DialogueServiceTest {
         DialogueRegistry registry = new DialogueRegistry();
         registry.registerAction(OpenDialoguesCloseAction.TYPE, OpenDialoguesCloseAction.class, OpenDialoguesCloseAction.CODEC);
         registry.registerAction(OpenDialoguesOpenAction.TYPE, OpenDialoguesOpenAction.class, OpenDialoguesOpenAction.CODEC);
+        registry.registerSelector(OpenDialoguesSequenceSelector.TYPE, OpenDialoguesSequenceSelector.class, OpenDialoguesSequenceSelector.CODEC);
+        registry.registerCondition(SourceRecordingCondition.TYPE, SourceRecordingCondition.class, SourceRecordingCondition.CODEC);
         registry.registerDisplay(DISPLAY, display);
-        DialogueResolver resolver = new DialogueResolver(dialogues::get, id -> null, new Random(0));
+        DialogueResolver resolver = new DialogueResolver(dialogues::get, routers::get, new Random(0));
         // No rule, so every dialogue falls back to the test display without asking the asset store for its pack
         DisplayRules rules = new DisplayRules() {
             @Override
@@ -106,6 +112,18 @@ class DialogueServiceTest {
 
     private static List<String> texts(DialogueSession session) {
         return session.responses().stream().map(OpenDialoguesResponse::getText).toList();
+    }
+
+    @Test
+    void routerSeesTheConversationSource() {
+        DialogueSource mira = new DialogueSource(UUID.randomUUID(), "Herbalist", "npc.mira", "npc.herbalist");
+        dialogues.put("Herbs", dialogue("Herbs", "{ \"Responses\": [ { \"Text\": \"bye\" } ] }"));
+        routers.put("Router", CodecJson.decode(OpenDialogueRouterAsset.BODY_CODEC, "{ \"Selector\": { \"Type\": \"Sequence\", \"Routes\": [ { \"When\": { \"Type\": \"TestRecordsSource\" }, \"Then\": { \"Dialogue\": \"Herbs\" } } ] } }"));
+        SourceRecordingCondition.SEEN.clear();
+
+        service.open(player, "Router", mira);
+
+        assertEquals(List.of(mira), SourceRecordingCondition.SEEN);
     }
 
     @Test
