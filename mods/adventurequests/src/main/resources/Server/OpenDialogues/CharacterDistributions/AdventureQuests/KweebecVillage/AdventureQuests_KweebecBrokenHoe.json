@@ -1,0 +1,19 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Kweebec_Sproutling"
+      ]
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_KweebecBrokenHoe",
+      "Weight": 1
+    },
+    {
+      "Weight": 13
+    }
+  ]
+}
