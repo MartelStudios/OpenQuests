@@ -5,7 +5,7 @@
 - **Id:** `AdventureQuests_KweebecFarmer` (AdventureQuests pack), epithet "Village farmer" / "Fermier du village".
 - **Uniqueness:** none: any number of NPCs may carry it, each NPC living its own story with each player.
 - **Carrier:** `Kweebec_Sproutling`, overworld only (no instance).
-- **Distribution:** `AdventureQuests_KweebecFarmer`: role filter, `World` `instance-.*` with `Not`, `NearCharacter` with `Not` on itself, `AdventureQuests_KweebecHeavyPumpkins`, `AdventureQuests_KweebecReplant` and `AdventureQuests_KweebecWheat` within 64 blocks, so a village gets at most one farmer. Weight 1 against an empty weight 1 (to tune in game).
+- **Distribution:** `AdventureQuests_KweebecFarmer`: role filter, `World` `instance-.*` with `Not`, `NearCharacter` with `Not` on itself, `AdventureQuests_KweebecHeavyPumpkins`, `AdventureQuests_KweebecReplant` and `AdventureQuests_KweebecWheat` within 64 blocks, so a village gets at most one tiered farmer and none next to an existing one-off farmer (the one-off distributions do not avoid it in return). Weight 1 against an empty weight 1 (to tune in game).
 - **Name:** drawn from `AdventureQuests_KweebecNames`.
 
 ## Personality and voice

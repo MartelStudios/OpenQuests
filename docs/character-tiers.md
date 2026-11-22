@@ -25,7 +25,8 @@ Kweebec farmer (`AdventureQuests_KweebecFarmer`) is the worked example.
 - Quest texts name the giver: titles use `{giver}`, and the asset declares a fallback for a giver
   with no drawn name, `"Tags": {"Text.giver": ["<pack>.<file>.farmer.someone"]}`.
 - When the NPC is released (death, removal, revocation), its running quests aimed at it fail and
-  its history leaves the players' saves: an NPC drawing the character later starts afresh.
+  its history and giver record move under the character's unknown-NPC key: `With: Npc` and
+  `GivenBy: Npc` start afresh for an NPC drawing the character later, `Character` counts keep them.
 - Distribution: the job's role, no instance (`World` `instance-.*` with `Not: true`), and a
   `NearCharacter` filter with `Not: true` listing the job and the one-off characters of the same
   theme, so one village gets at most one of them.
@@ -62,7 +63,7 @@ A `Sequence`:
 2. **Previous quest dropped** (its intro opened with this NPC, the quest neither running nor
    successful for this NPC): that intro again, so an abandoned tier is not skipped.
 3. **Thanks**: while the delay runs (`Cooldown` on `Accepted_T(N-1)`, `With: Npc`, `Not: true`),
-   or as long as this NPC never thanked the player (`Opened` `Thanks_T(N-1)` `Max: 0`), so a quest
+   or as long as this NPC never thanked the player (`Opened` `Thanks_T(N-1)` `Min: 0`, `Max: 0`), so a quest
    finished after the delay is still thanked once: `Thanks_T(N-1)`.
 4. **Pinned quest**: a route per quest `q` of tier N, `Opened` `Intro_q` `With: Npc`: `Intro_q`.
 5. **Draw**: `Weighted` among the tier's quests this NPC never gave (`RequiresQuest` `GivenBy: Npc`,
