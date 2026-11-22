@@ -47,6 +47,14 @@ public class OpenDialoguesNearCharacterFilter extends CharacterFilter {
     protected OpenDialoguesNearCharacterFilter() {}
 
     /**
+     * @return the character IDs looked for, read only.
+     */
+    @Nonnull
+    public List<String> getCharacters() {
+        return List.of(characters);
+    }
+
+    /**
      * A draw without a store or an NPC without position knows no neighbour, so the filter fails.
      */
     @Override

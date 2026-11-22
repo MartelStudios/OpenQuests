@@ -95,4 +95,15 @@ class ValidatorTest {
         distribution.id = id;
         return distribution;
     }
+
+    @Test
+    void nearCharacterFilterNamingUnknownCharacter() {
+        String hello = "{ \"Type\": \"Dialogue\", \"Dialogue\": { \"Dialogue\": \"Hello\" } }";
+        OpenDialogueCharacterDistributionAsset farm = CharacterFixtures.distribution("Farm", "{ \"Filters\": [ { \"Type\": \"NearCharacter\", \"Characters\": [ \"Farmer\", \"Famrer\" ], \"Radius\": 10 } ], \"Characters\": [ { \"Character\": \"Farmer\" } ] }");
+
+        List<String> problems = problems(Map.of("Farmer", character("Farmer", hello)), List.of(farm));
+
+        assertProblem(problems, "Farm", "Famrer");
+        assertTrue(problems.stream().noneMatch(problem -> problem.contains("'Farmer'")), problems.toString());
+    }
 }

@@ -1,5 +1,7 @@
 package com.martelstudios.opendialogues.characters;
 
+import com.martelstudios.opendialogues.characters.filters.CharacterFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesNearCharacterFilter;
 import com.martelstudios.opendialogues.characters.traits.CharacterTrait;
 
 import javax.annotation.Nonnull;
@@ -26,6 +28,12 @@ public final class CharacterValidator {
             for (OpenDialogueCharacterDistributionAsset.Entry entry : distribution.getEntries()) {
                 if (entry.getCharacter() != null && assets.character(entry.getCharacter()) == null) {
                     problems.add("Distribution '" + distribution.getId() + "' names an unknown character '" + entry.getCharacter() + "'.");
+                }
+            }
+            for (CharacterFilter filter : distribution.getFilters()) {
+                if (!(filter instanceof OpenDialoguesNearCharacterFilter near)) continue;
+                for (String character : near.getCharacters()) {
+                    if (assets.character(character) == null) problems.add("Distribution '" + distribution.getId() + "' looks for an unknown character '" + character + "' near its NPCs.");
                 }
             }
         }
