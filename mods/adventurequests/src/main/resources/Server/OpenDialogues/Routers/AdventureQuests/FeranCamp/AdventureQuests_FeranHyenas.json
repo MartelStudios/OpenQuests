@@ -1,0 +1,66 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_CampHyenas",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "NearNpc",
+              "Role": "Hyena",
+              "Radius": 100,
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampHyenasIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_CampHyenas",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampHyenasAbsent"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_CampHyenas",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampHyenasWaiting"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_CampHyenasThanks"
+        }
+      }
+    ]
+  }
+}

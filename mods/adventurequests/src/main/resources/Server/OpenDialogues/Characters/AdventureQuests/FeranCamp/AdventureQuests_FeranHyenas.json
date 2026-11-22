@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.ferancamp.character.camp-hyenas.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_FeranHyenas"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_FeranNames"
+    }
+  ]
+}
