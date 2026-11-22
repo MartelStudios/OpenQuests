@@ -24,10 +24,12 @@ import com.martelstudios.opendialogues.nameplates.TranslatedNameplate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
@@ -52,6 +54,7 @@ public class CharacterService {
     private final ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType;
     private final ResourceType<EntityStore, UniqueCharacters> uniqueType;
     private final Supplier<UniverseCharacters> universe;
+    private final Supplier<ReleasedNpcs> released;
     private static final CharacterAssigner.Draw NOTHING = new CharacterAssigner.Draw(List.of(), null, List.of());
 
     private final Set<String> reported = ConcurrentHashMap.newKeySet();
@@ -63,8 +66,9 @@ public class CharacterService {
      * @param eligibility how far an NPC may receive a character, so no mod's NPC is taken over.
      * @param warnings where a failing trait is reported, with its exception.
      * @param universe the registry of characters scoped to the universe, read once the universe is up.
+     * @param released the NPCs that let their character go, read once the universe is up.
      */
-    public CharacterService(@Nonnull CharacterAssets assets, @Nonnull BiFunction<ComponentAccessor<EntityStore>, Ref<EntityStore>, NpcEligibility> eligibility, @Nonnull IEventBus events, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings, ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, ResourceType<EntityStore, UniqueCharacters> uniqueType, @Nonnull Supplier<UniverseCharacters> universe) {
+    public CharacterService(@Nonnull CharacterAssets assets, @Nonnull BiFunction<ComponentAccessor<EntityStore>, Ref<EntityStore>, NpcEligibility> eligibility, @Nonnull IEventBus events, @Nonnull RandomGenerator random, @Nonnull BiConsumer<String, Throwable> warnings, ComponentType<EntityStore, OpenDialoguesNPCIdentity> identityType, ResourceType<EntityStore, UniqueCharacters> uniqueType, @Nonnull Supplier<UniverseCharacters> universe, @Nonnull Supplier<ReleasedNpcs> released) {
         this.assets = assets;
         this.eligibility = eligibility;
         this.events = events;
@@ -73,6 +77,7 @@ public class CharacterService {
         this.identityType = identityType;
         this.uniqueType = uniqueType;
         this.universe = universe;
+        this.released = released;
     }
 
     /**
@@ -466,6 +471,7 @@ public class CharacterService {
         npc.identity().setName(null);
         npc.identity().setEpithet(null);
         npc.identity().setNameplate(null);
+        released.get().add(npc.uuid(), Instant.now());
         events.dispatchFor(CharacterEvent.Released.class, characterId).dispatch(new CharacterEvent.Released(npc.ref(), npc.uuid(), characterId, name, epithet, reason));
         for (String id : lost) events.dispatchFor(CharacterEvent.Lost.class, id).dispatch(new CharacterEvent.Lost(id, CharacterEvent.Lost.Cause.Death));
     }
@@ -529,6 +535,13 @@ public class CharacterService {
      */
     public boolean isLost(@Nonnull String characterId) {
         return universe.get().isLost(characterId);
+    }
+
+    /**
+     * @return whether that NPC let its character go, whatever the reason, within the remembered window.
+     */
+    public boolean isReleased(@Nonnull UUID npc) {
+        return released.get().contains(npc);
     }
 
     @Nullable

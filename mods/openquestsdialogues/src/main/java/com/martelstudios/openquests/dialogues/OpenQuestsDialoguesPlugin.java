@@ -7,6 +7,7 @@ import com.martelstudios.openquests.dialogues.actions.QuestActionsFeature;
 import com.martelstudios.openquests.dialogues.conditions.QuestConditionsFeature;
 import com.martelstudios.openquests.dialogues.constraints.NearCharacterFeature;
 import com.martelstudios.openquests.dialogues.givers.GiverQuestRecorder;
+import com.martelstudios.openquests.dialogues.givers.ReleasedGiverQuests;
 import com.martelstudios.openquests.dialogues.quests.LostCharacterQuests;
 import com.martelstudios.openquests.dialogues.map.TurnInMarkers;
 import com.martelstudios.openquests.dialogues.quests.deliver.DeliverFeature;
@@ -34,6 +35,7 @@ public class OpenQuestsDialoguesPlugin extends JavaPlugin {
         DialogueFeature.register(this, services);
         DeliverFeature.register(this, services);
         LostCharacterQuests.register(this, services);
+        ReleasedGiverQuests.register(this, services);
         GiverQuestRecorder.register(this);
         TurnInMarkers.register(this, services);
         QuestActionsFeature.register();

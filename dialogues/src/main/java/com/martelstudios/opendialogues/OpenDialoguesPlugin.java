@@ -59,6 +59,7 @@ import com.martelstudios.opendialogues.dialogues.NothingToSay;
 import com.martelstudios.opendialogues.characters.runtime.CharacterTalkSystem;
 import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
 import com.martelstudios.opendialogues.characters.runtime.UniqueCharacters;
+import com.martelstudios.opendialogues.characters.runtime.ReleasedNpcs;
 import com.martelstudios.opendialogues.characters.runtime.UniverseCharacters;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesBiomeFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesGroupFilter;
@@ -106,6 +107,8 @@ import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.martelstudios.opendialogues.services.DialogueResolver;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -117,6 +120,9 @@ import java.util.random.RandomGenerator;
  * whichever display they name.
  */
 public class OpenDialoguesPlugin extends JavaPlugin {
+
+    /** How long a released NPC is remembered for players who were offline when it let its character go. */
+    public static final Duration RELEASED_NPC_RETENTION = Duration.ofDays(30);
 
     /**
      * Every world draws on its own thread, so each call asks that thread's generator.
@@ -148,6 +154,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     private ResourceType<EntityStore, UniqueCharacters> uniqueCharactersType;
     private UniverseResourceType<UniverseCharacters> universeCharactersType;
+    private UniverseResourceType<ReleasedNpcs> releasedNpcsType;
+    private volatile boolean releasedNpcsPruned;
 
     private DialogueHistoryRecorder historyRecorder;
 
@@ -221,8 +229,9 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new TranslatedNameplateRemoval(EntityTrackerSystems.Visible.getComponentType(), translatedNameplateType));
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         universeCharactersType = Universe.registerResource(UniverseCharacters.class, "OpenDialoguesUniqueCharacters", UniverseCharacters.CODEC);
+        releasedNpcsType = Universe.registerResource(ReleasedNpcs.class, "OpenDialoguesReleasedNpcs", ReleasedNpcs.CODEC);
         CharacterAssets characterAssets = CharacterAssets.live();
-        characterService = new CharacterService(characterAssets, NpcEligibility::of, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
+        characterService = new CharacterService(characterAssets, NpcEligibility::of, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters, this::releasedNpcs);
         ResourceType<EntityStore, CharacterPositions> positionsType = getEntityStoreRegistry().registerResource(CharacterPositions.class, "OpenDialoguesCharacterPositions", CharacterPositions.CODEC);
         CharacterPositionsAccess positions = characterPositions = new CharacterPositionsAccess(positionsType, characterService);
         characterMarkers = new CharacterMarkerProvider(positions, player -> historyRecorder.history(player), characterAssets::character);
@@ -410,6 +419,21 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         UniverseCharacters characters = Universe.get().getResource(universeCharactersType);
         characters.setOnChange(() -> Universe.get().flushResource(universeCharactersType));
         return characters;
+    }
+
+    /**
+     * Read like {@link #universeCharacters()}; releases older than the retention are dropped on the
+     * first read after the server starts, as players offline that long were swept or never met them.
+     */
+    @Nonnull
+    private ReleasedNpcs releasedNpcs() {
+        ReleasedNpcs released = Universe.get().getResource(releasedNpcsType);
+        released.setOnChange(() -> Universe.get().flushResource(releasedNpcsType));
+        if (!releasedNpcsPruned) {
+            releasedNpcsPruned = true;
+            released.pruneBefore(Instant.now().minus(RELEASED_NPC_RETENTION));
+        }
+        return released;
     }
 
     /**
