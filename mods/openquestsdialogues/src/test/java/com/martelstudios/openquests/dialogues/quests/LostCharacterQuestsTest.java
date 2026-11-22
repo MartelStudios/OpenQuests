@@ -1,10 +1,19 @@
 package com.martelstudios.openquests.dialogues.quests;
 
+import com.hypixel.hytale.codec.ExtraInfo;
+import com.hypixel.hytale.codec.util.RawJsonReader;
+import com.martelstudios.openquests.dialogues.givers.Giver;
+import com.martelstudios.openquests.dialogues.givers.TestQuest;
+import com.martelstudios.openquests.dialogues.quests.deliver.OpenQuestsDeliverAsset;
+import com.martelstudios.openquests.dialogues.quests.dialogue.OpenQuestsDialogueAsset;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Predicate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,6 +46,18 @@ class LostCharacterQuestsTest {
 
     @Test
     void other_quest_types_have_no_target() {
-        assertNull(LostCharacterQuests.targetOf(null));
+        assertNull(LostCharacterQuests.targetOf(null, new TestQuest()));
+    }
+
+    @Test
+    void quest_aimed_at_its_giver_character_follows_that_character() throws IOException {
+        TestQuest quest = new TestQuest();
+        new Giver("Hero", UUID.randomUUID(), null).writeOn(quest);
+
+        try (RawJsonReader dialogue = RawJsonReader.fromBuffer("{\"Target\":\"GiverCharacter\"}".toCharArray());
+             RawJsonReader deliver = RawJsonReader.fromBuffer("{\"Target\":\"GiverCharacter\"}".toCharArray())) {
+            assertEquals("Hero", LostCharacterQuests.targetOf(OpenQuestsDialogueAsset.CODEC.decodeJson(dialogue, new ExtraInfo()), quest));
+            assertEquals("Hero", LostCharacterQuests.targetOf(OpenQuestsDeliverAsset.CODEC.decodeJson(deliver, new ExtraInfo()), quest));
+        }
     }
 }

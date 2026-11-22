@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 /**
  * A quest off any store, its parent handed in since no store is there to look it up.
  */
-final class TestQuest extends AbstractQuestProgression<TestQuest> {
+public final class TestQuest extends AbstractQuestProgression<TestQuest> {
 
     static final BuilderCodec<TestQuest> CODEC = BuilderCodec.builder(TestQuest.class, TestQuest::new, AbstractQuestProgression.BASE_CODEC).build();
 

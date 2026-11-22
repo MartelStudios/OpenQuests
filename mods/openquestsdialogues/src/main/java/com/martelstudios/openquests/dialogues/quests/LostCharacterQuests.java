@@ -15,6 +15,7 @@ import com.martelstudios.openquests.core.models.OpenQuestAsset;
 import com.martelstudios.openquests.core.models.QuestState;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.visitors.SetStateVisitor;
+import com.martelstudios.openquests.dialogues.givers.TargetMode;
 import com.martelstudios.openquests.dialogues.quests.deliver.DeliverQuestProgression;
 import com.martelstudios.openquests.dialogues.quests.deliver.OpenQuestsDeliverAsset;
 import com.martelstudios.openquests.dialogues.quests.dialogue.DialogueQuestProgression;
@@ -61,12 +62,12 @@ public final class LostCharacterQuests {
     }
 
     /**
-     * @return the character a quest's asset aims at, {@code null} for another type or no target.
+     * @return the character a quest aims at, its giver's with a giver target, {@code null} for another type or no target.
      */
     @Nullable
-    public static String targetOf(@Nullable OpenQuestAsset asset) {
-        if (asset instanceof OpenQuestsDialogueAsset dialogue) return dialogue.getCharacter();
-        if (asset instanceof OpenQuestsDeliverAsset deliver) return deliver.getCharacter();
+    public static String targetOf(@Nullable OpenQuestAsset asset, @Nonnull AbstractQuestProgression<?> quest) {
+        if (asset instanceof OpenQuestsDialogueAsset dialogue) return TargetMode.characterOf(dialogue.target(quest));
+        if (asset instanceof OpenQuestsDeliverAsset deliver) return TargetMode.characterOf(deliver.target(quest));
         return null;
     }
 
@@ -77,7 +78,7 @@ public final class LostCharacterQuests {
         for (Class<? extends AbstractQuestProgression<?>> type : List.of(DialogueQuestProgression.class, DeliverQuestProgression.class)) {
             for (UUID questId : progression.getQuestIdsForType(type)) {
                 AbstractQuestProgression<?> quest = progression.getLiveQuest(questId);
-                if (quest != null && event.getCharacter().equals(targetOf(quest.getAsset()))) failOnHolderThread(quest);
+                if (quest != null && event.getCharacter().equals(targetOf(quest.getAsset(), quest))) failOnHolderThread(quest);
             }
         }
     }
@@ -88,13 +89,13 @@ public final class LostCharacterQuests {
      */
     public void onLoaded(@Nonnull QuestLoadedEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
-        if (!shouldFail(targetOf(quest.getAsset()), quest.isOver(), isLost)) return;
+        if (!shouldFail(targetOf(quest.getAsset(), quest), quest.isOver(), isLost)) return;
 
         UUID holder = quest.getPlayers().stream().findFirst().orElse(null);
         if (holder == null) return;
         EntityComponents.update(holder, components -> {
             QuestStoreComponent store = components.getComponent(QuestStoreComponent.getComponentType());
-            if (failsOnLoad(targetOf(quest.getAsset()), quest.isOver(), isLost, store != null && store.getQuestIds().contains(quest.getId()))) fail(quest);
+            if (failsOnLoad(targetOf(quest.getAsset(), quest), quest.isOver(), isLost, store != null && store.getQuestIds().contains(quest.getId()))) fail(quest);
         });
     }
 
@@ -104,7 +105,7 @@ public final class LostCharacterQuests {
      */
     public void onAssigned(@Nonnull QuestAddedToPlayerStoreEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
-        if (!shouldFail(targetOf(quest.getAsset()), quest.isOver(), isLost)) return;
+        if (!shouldFail(targetOf(quest.getAsset(), quest), quest.isOver(), isLost)) return;
         EntityComponents.update(event.getPlayerId(), components -> fail(quest));
     }
 
@@ -128,6 +129,6 @@ public final class LostCharacterQuests {
     }
 
     private void fail(@Nonnull AbstractQuestProgression<?> quest) {
-        if (shouldFail(targetOf(quest.getAsset()), quest.isOver(), isLost)) progression.progress(new SetStateVisitor(QuestState.FAILED), List.of(quest.getId()));
+        if (shouldFail(targetOf(quest.getAsset(), quest), quest.isOver(), isLost)) progression.progress(new SetStateVisitor(QuestState.FAILED), List.of(quest.getId()));
     }
 }
