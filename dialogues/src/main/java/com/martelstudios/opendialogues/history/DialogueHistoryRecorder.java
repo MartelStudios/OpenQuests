@@ -41,7 +41,7 @@ public class DialogueHistoryRecorder {
     public void onOpened(@Nonnull DialogueEvent.Opened event) {
         DialogueSession session = event.getSession();
         Instant occurredAt = Instant.now();
-        write(event.getPlayer(), history -> history.recordOpened(session.characterId(), session.dialogueId(), occurredAt));
+        write(event.getPlayer(), history -> history.recordOpened(session.characterId(), session.npcId(), session.dialogueId(), occurredAt));
     }
 
     /**
@@ -52,7 +52,7 @@ public class DialogueHistoryRecorder {
         OpenDialoguesResponse response = session.responses().get(event.getPosition() - 1);
         String answerKey = session.dialogue().answerKey(response);
         Instant occurredAt = Instant.now();
-        write(event.getPlayer(), history -> history.recordAnswer(session.characterId(), session.dialogueId(), answerKey, occurredAt));
+        write(event.getPlayer(), history -> history.recordAnswer(session.characterId(), session.npcId(), session.dialogueId(), answerKey, occurredAt));
     }
 
     /**

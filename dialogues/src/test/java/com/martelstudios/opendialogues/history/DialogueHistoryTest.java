@@ -4,6 +4,7 @@ import com.martelstudios.opendialogues.CodecJson;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -160,5 +161,70 @@ class DialogueHistoryTest {
         assertEquals(older, read.lastOccurrence("A", "Greeting", "Accept"));
         copy.clear("Greeting");
         assertNull(copy.lastOccurrence(null, "Greeting", "Accept"));
+    }
+
+    private static final UUID A = UUID.fromString("00000000-0000-0000-0000-00000000000a");
+    private static final UUID B = UUID.fromString("00000000-0000-0000-0000-00000000000b");
+
+    private static DialogueHistory openedWithTwoNpcs() {
+        DialogueHistory history = new DialogueHistory();
+        history.recordOpened("Farmer", A, "Intro", Instant.ofEpochMilli(1000));
+        history.recordOpened("Farmer", B, "Intro", Instant.ofEpochMilli(2000));
+        history.recordOpened("Farmer", B, "Intro", Instant.ofEpochMilli(3000));
+        history.recordAnswer("Farmer", A, "Intro", "Accept", Instant.ofEpochMilli(1500));
+        return history;
+    }
+
+    @Test
+    void npcCountsAreKeptApart() {
+        DialogueHistory history = openedWithTwoNpcs();
+
+        assertEquals(1, history.count("Farmer", A, "Intro", null));
+        assertEquals(2, history.count("Farmer", B, "Intro", null));
+        assertEquals(3, history.count("Farmer", null, "Intro", null));
+        assertEquals(1, history.count("Farmer", A, "Intro", "Accept"));
+        assertEquals(0, history.count("Farmer", B, "Intro", "Accept"));
+    }
+
+    @Test
+    void npcLevelSurvivesACodecRoundTrip() {
+        DialogueHistory read = CodecJson.roundTrip(DialogueHistory.CODEC, openedWithTwoNpcs());
+
+        assertEquals(1, read.count("Farmer", A, "Intro", null));
+        assertEquals(2, read.count("Farmer", B, "Intro", null));
+        assertEquals(3, read.count("Farmer", null, "Intro", null));
+        assertEquals(Instant.ofEpochMilli(1000), read.lastOccurrence("Farmer", A, "Intro", null));
+        assertEquals(Instant.ofEpochMilli(3000), read.lastOccurrence("Farmer", null, "Intro", null));
+        assertEquals(Instant.ofEpochMilli(1500), read.lastOccurrence("Farmer", A, "Intro", "Accept"));
+        assertNull(read.lastOccurrence("Farmer", B, "Intro", "Accept"));
+    }
+
+    @Test
+    void historySavedWithoutNpcCountsForAnyNpcOnly() {
+        DialogueHistory read = CodecJson.decodeUnvalidated(DialogueHistory.CODEC, "{\"Characters\":{\"Farmer\":{\"Intro\":{\"Opened\":2}}}}");
+
+        assertEquals(2, read.count("Farmer", null, "Intro", null));
+        assertEquals(0, read.count("Farmer", A, "Intro", null));
+    }
+
+    @Test
+    void forgettingAnNpcKeepsTheOthers() {
+        DialogueHistory history = openedWithTwoNpcs();
+
+        assertTrue(history.forgetNpc(A));
+        assertEquals(0, history.count("Farmer", A, "Intro", null));
+        assertEquals(2, history.count("Farmer", B, "Intro", null));
+        assertFalse(history.forgetNpc(A));
+    }
+
+    @Test
+    void aCloneKeepsNpcsApart() {
+        DialogueHistory history = openedWithTwoNpcs();
+
+        DialogueHistory copy = (DialogueHistory) history.clone();
+        copy.recordOpened("Farmer", A, "Intro", Instant.EPOCH);
+
+        assertEquals(1, history.count("Farmer", A, "Intro", null));
+        assertEquals(2, copy.count("Farmer", A, "Intro", null));
     }
 }

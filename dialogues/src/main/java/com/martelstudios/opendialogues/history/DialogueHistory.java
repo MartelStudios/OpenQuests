@@ -12,11 +12,13 @@ import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * What a player did with each dialogue: how often it opened and how often each answer was picked,
- * kept apart for each NPC character it was had with. Conditions read it to tell a first meeting
- * from the next ones.
+ * kept apart for each NPC character, and each NPC of it, it was had with. Conditions read it to
+ * tell a first meeting from the next ones.
  */
 public class DialogueHistory implements Component<EntityStore> {
 
@@ -58,22 +60,36 @@ public class DialogueHistory implements Component<EntityStore> {
      */
     private static final String NO_CHARACTER = "";
 
+    /**
+     * Key of the dialogues had without a known NPC, including those saved before NPCs were counted.
+     */
+    private static final String NO_NPC = "";
+
     private static final MapCodec<Entry, Map<String, Entry>> DIALOGUES_CODEC = new MapCodec<>(Entry.CODEC, HashMap<String, Entry>::new);
 
+    private static final MapCodec<Map<String, Entry>, Map<String, Map<String, Entry>>> KEYED_DIALOGUES_CODEC = new MapCodec<>(DIALOGUES_CODEC, HashMap<String, Map<String, Entry>>::new);
+
     public static final BuilderCodec<DialogueHistory> CODEC = BuilderCodec.builder(DialogueHistory.class, DialogueHistory::new)
-                                                                          .append(new KeyedCodec<>("Characters", new MapCodec<>(DIALOGUES_CODEC, HashMap<String, Map<String, Entry>>::new)), (history, characters) -> characters.forEach((character, dialogues) -> history.dialoguesOf(character).putAll(dialogues)), history -> history.characters)
+                                                                          .append(new KeyedCodec<>("Characters", KEYED_DIALOGUES_CODEC), (history, characters) -> characters.forEach((character, dialogues) -> history.dialoguesOf(character, NO_NPC).putAll(dialogues)), DialogueHistory::withoutNpc)
+                                                                          .documentation("Counts by character ID, then dialogue ID, for dialogues had without a known NPC. Empty key for no character.")
+                                                                          .add()
+                                                                          .append(new KeyedCodec<>("Npcs", new MapCodec<>(KEYED_DIALOGUES_CODEC, HashMap<String, Map<String, Map<String, Entry>>>::new)), (history, characters) -> characters.forEach((character, npcs) -> npcs.forEach((npc, dialogues) -> history.dialoguesOf(character, npc).putAll(dialogues))), DialogueHistory::withNpc)
+                                                                          .documentation("Counts by character ID, then NPC UUID, then dialogue ID, initially empty.")
                                                                           .add()
                                                                           // Histories saved before characters were counted, read as had without one.
-                                                                          .append(new KeyedCodec<>("Dialogues", DIALOGUES_CODEC), (history, dialogues) -> history.dialoguesOf(NO_CHARACTER).putAll(dialogues), history -> null)
+                                                                          .append(new KeyedCodec<>("Dialogues", DIALOGUES_CODEC), (history, dialogues) -> history.dialoguesOf(NO_CHARACTER, NO_NPC).putAll(dialogues), history -> null)
                                                                           .add()
                                                                           .build();
 
-    private final Map<String, Map<String, Entry>> characters = new HashMap<>();
+    /**
+     * Character key, then NPC key, then dialogue ID.
+     */
+    private final Map<String, Map<String, Map<String, Entry>>> characters = new HashMap<>();
 
     public DialogueHistory() {}
 
     private DialogueHistory(@Nonnull DialogueHistory other) {
-        other.characters.forEach((character, dialogues) -> dialogues.forEach((id, entry) -> dialoguesOf(character).put(id, new Entry(entry))));
+        other.characters.forEach((character, npcs) -> npcs.forEach((npc, dialogues) -> dialogues.forEach((id, entry) -> dialoguesOf(character, npc).put(id, new Entry(entry)))));
     }
 
     @Override
@@ -103,7 +119,16 @@ public class DialogueHistory implements Component<EntityStore> {
      * @param characterId {@code null} for a dialogue had without one.
      */
     public void recordOpened(@Nullable String characterId, @Nonnull String dialogueId, @Nonnull Instant occurredAt) {
-        Entry entry = entry(characterId, dialogueId);
+        recordOpened(characterId, null, dialogueId, occurredAt);
+    }
+
+    /**
+     * Counts one more opening under the character and NPC it was had with, keeping its time unless a later one is recorded.
+     *
+     * @param npcId {@code null} for a dialogue had without a known NPC.
+     */
+    public void recordOpened(@Nullable String characterId, @Nullable UUID npcId, @Nonnull String dialogueId, @Nonnull Instant occurredAt) {
+        Entry entry = entry(characterId, npcId, dialogueId);
         long millis = occurredAt.toEpochMilli();
         entry.opened++;
         if (entry.lastOpenedAt == null || millis > entry.lastOpenedAt) entry.lastOpenedAt = millis;
@@ -131,7 +156,16 @@ public class DialogueHistory implements Component<EntityStore> {
      * @param characterId {@code null} for a dialogue had without one.
      */
     public void recordAnswer(@Nullable String characterId, @Nonnull String dialogueId, @Nonnull String answerKey, @Nonnull Instant occurredAt) {
-        Entry entry = entry(characterId, dialogueId);
+        recordAnswer(characterId, null, dialogueId, answerKey, occurredAt);
+    }
+
+    /**
+     * Counts one more pick of an answer under the character and NPC it was had with, keeping its time unless a later one is recorded.
+     *
+     * @param npcId {@code null} for a dialogue had without a known NPC.
+     */
+    public void recordAnswer(@Nullable String characterId, @Nullable UUID npcId, @Nonnull String dialogueId, @Nonnull String answerKey, @Nonnull Instant occurredAt) {
+        Entry entry = entry(characterId, npcId, dialogueId);
         entry.answers.merge(answerKey, 1, Integer::sum);
         entry.lastAnsweredAt.merge(answerKey, occurredAt.toEpochMilli(), Math::max);
     }
@@ -142,15 +176,20 @@ public class DialogueHistory implements Component<EntityStore> {
      */
     @Nullable
     public Instant lastOccurrence(@Nullable String characterId, @Nonnull String dialogueId, @Nullable String answerKey) {
-        Long latest = null;
-        for (var character : characters.entrySet()) {
-            if (characterId != null && !characterId.equals(character.getKey())) continue;
-            Entry entry = character.getValue().get(dialogueId);
-            if (entry == null) continue;
+        return lastOccurrence(characterId, null, dialogueId, answerKey);
+    }
+
+    /**
+     * Latest timestamp for the dialogue or answer, a {@code null} character or NPC matching any.
+     */
+    @Nullable
+    public Instant lastOccurrence(@Nullable String characterId, @Nullable UUID npcId, @Nonnull String dialogueId, @Nullable String answerKey) {
+        long[] latest = {Long.MIN_VALUE};
+        forEachEntry(characterId, npcId, dialogueId, entry -> {
             Long time = answerKey == null ? entry.lastOpenedAt : entry.lastAnsweredAt.get(answerKey);
-            if (time != null && (latest == null || time > latest)) latest = time;
-        }
-        return latest == null ? null : Instant.ofEpochMilli(latest);
+            if (time != null && time > latest[0]) latest[0] = time;
+        });
+        return latest[0] == Long.MIN_VALUE ? null : Instant.ofEpochMilli(latest[0]);
     }
 
     /**
@@ -171,9 +210,25 @@ public class DialogueHistory implements Component<EntityStore> {
      */
     public boolean clear(@Nonnull String dialogueId) {
         boolean cleared = false;
-        for (Map<String, Entry> dialogues : characters.values()) cleared |= dialogues.remove(dialogueId) != null;
+        for (Map<String, Map<String, Entry>> npcs : characters.values()) {
+            for (Map<String, Entry> dialogues : npcs.values()) cleared |= dialogues.remove(dialogueId) != null;
+            npcs.values().removeIf(Map::isEmpty);
+        }
         characters.values().removeIf(Map::isEmpty);
         return cleared;
+    }
+
+    /**
+     * Forgets what the player did with one NPC, under every character.
+     *
+     * @return whether that NPC had anything recorded.
+     */
+    public boolean forgetNpc(@Nonnull UUID npcId) {
+        String key = npcId.toString();
+        boolean forgotten = false;
+        for (Map<String, Map<String, Entry>> npcs : characters.values()) forgotten |= npcs.remove(key) != null;
+        characters.values().removeIf(Map::isEmpty);
+        return forgotten;
     }
 
     /**
@@ -196,25 +251,59 @@ public class DialogueHistory implements Component<EntityStore> {
      * @param answerKey {@code null} counts openings, otherwise the picks of that answer.
      */
     public int count(@Nullable String characterId, @Nullable String dialogueId, @Nullable String answerKey) {
-        int total = 0;
-        for (Map.Entry<String, Map<String, Entry>> character : characters.entrySet()) {
+        return count(characterId, null, dialogueId, answerKey);
+    }
+
+    /**
+     * Sums what matches every filter given, {@code null} matching anything.
+     *
+     * @param answerKey {@code null} counts openings, otherwise the picks of that answer.
+     */
+    public int count(@Nullable String characterId, @Nullable UUID npcId, @Nullable String dialogueId, @Nullable String answerKey) {
+        int[] total = {0};
+        forEachEntry(characterId, npcId, dialogueId, entry -> total[0] += answerKey == null ? entry.opened : entry.answers.getOrDefault(answerKey, 0));
+        return total[0];
+    }
+
+    private void forEachEntry(@Nullable String characterId, @Nullable UUID npcId, @Nullable String dialogueId, @Nonnull Consumer<Entry> action) {
+        String npcKey = npcId == null ? null : npcId.toString();
+        for (Map.Entry<String, Map<String, Map<String, Entry>>> character : characters.entrySet()) {
             if (characterId != null && !characterId.equals(character.getKey())) continue;
-            for (Map.Entry<String, Entry> dialogue : character.getValue().entrySet()) {
-                if (dialogueId != null && !dialogueId.equals(dialogue.getKey())) continue;
-                Entry entry = dialogue.getValue();
-                total += answerKey == null ? entry.opened : entry.answers.getOrDefault(answerKey, 0);
+            for (Map.Entry<String, Map<String, Entry>> npc : character.getValue().entrySet()) {
+                if (npcKey != null && !npcKey.equals(npc.getKey())) continue;
+                for (Map.Entry<String, Entry> dialogue : npc.getValue().entrySet()) {
+                    if (dialogueId == null || dialogueId.equals(dialogue.getKey())) action.accept(dialogue.getValue());
+                }
             }
         }
-        return total;
     }
 
     @Nonnull
-    private Entry entry(@Nullable String characterId, @Nonnull String dialogueId) {
-        return dialoguesOf(characterId == null ? NO_CHARACTER : characterId).computeIfAbsent(dialogueId, id -> new Entry());
+    private Entry entry(@Nullable String characterId, @Nullable UUID npcId, @Nonnull String dialogueId) {
+        return dialoguesOf(characterId == null ? NO_CHARACTER : characterId, npcId == null ? NO_NPC : npcId.toString()).computeIfAbsent(dialogueId, id -> new Entry());
     }
 
     @Nonnull
-    private Map<String, Entry> dialoguesOf(@Nonnull String characterKey) {
-        return characters.computeIfAbsent(characterKey, key -> new HashMap<>());
+    private Map<String, Entry> dialoguesOf(@Nonnull String characterKey, @Nonnull String npcKey) {
+        return characters.computeIfAbsent(characterKey, key -> new HashMap<>()).computeIfAbsent(npcKey, key -> new HashMap<>());
+    }
+
+    @Nonnull
+    private Map<String, Map<String, Entry>> withoutNpc() {
+        Map<String, Map<String, Entry>> saved = new HashMap<>();
+        characters.forEach((character, npcs) -> {
+            Map<String, Entry> dialogues = npcs.get(NO_NPC);
+            if (dialogues != null) saved.put(character, dialogues);
+        });
+        return saved;
+    }
+
+    @Nonnull
+    private Map<String, Map<String, Map<String, Entry>>> withNpc() {
+        Map<String, Map<String, Map<String, Entry>>> saved = new HashMap<>();
+        characters.forEach((character, npcs) -> npcs.forEach((npc, dialogues) -> {
+            if (!npc.equals(NO_NPC)) saved.computeIfAbsent(character, key -> new HashMap<>()).put(npc, dialogues);
+        }));
+        return saved;
     }
 }

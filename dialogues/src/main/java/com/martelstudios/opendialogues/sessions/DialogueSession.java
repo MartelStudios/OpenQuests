@@ -8,6 +8,7 @@ import com.martelstudios.opendialogues.displays.DialogueDisplay;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * A dialogue open for one player. Keeps the answers as shown when it opened, so "answer 2" means
@@ -33,5 +34,13 @@ public record DialogueSession(@Nonnull OpenDialogueAsset dialogue, @Nonnull List
     @Nullable
     public String characterId() {
         return source == null ? null : source.character();
+    }
+
+    /**
+     * @return the NPC the conversation was opened from, {@code null} without one.
+     */
+    @Nullable
+    public UUID npcId() {
+        return source == null ? null : source.npc();
     }
 }
