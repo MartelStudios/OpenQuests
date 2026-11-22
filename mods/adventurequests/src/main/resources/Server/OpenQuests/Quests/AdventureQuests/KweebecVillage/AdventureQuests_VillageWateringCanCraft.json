@@ -1,0 +1,8 @@
+{
+  "Type": "Craft",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-watering-can.craft.title",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Tool_Watering_Can"
+  }
+}

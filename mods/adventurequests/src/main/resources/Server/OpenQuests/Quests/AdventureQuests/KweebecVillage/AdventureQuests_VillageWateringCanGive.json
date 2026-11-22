@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-watering-can.give.title",
+  "Character": "AdventureQuests_KweebecWateringCan",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Tool_Watering_Can"
+      },
+      "Quantity": 1
+    }
+  ]
+}
