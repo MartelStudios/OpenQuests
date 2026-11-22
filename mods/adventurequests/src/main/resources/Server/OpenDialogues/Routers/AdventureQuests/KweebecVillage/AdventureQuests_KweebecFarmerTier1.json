@@ -346,20 +346,35 @@
           "Operator": "And",
           "Conditions": [
             {
-              "Type": "Opened",
-              "Dialogue": "AdventureQuests_FarmerHarvestAubergineIntro",
-              "With": "Npc"
+              "Type": "NearBlock",
+              "Block": {
+                "ItemId": "Plant_Crop_Aubergine_Block"
+              },
+              "State": "StageFinal",
+              "Radius": 30,
+              "Min": 2
             },
             {
-              "Type": "RequiresQuest",
-              "QuestAssetId": "AdventureQuests_FarmerHarvestAubergine",
-              "States": [
-                "InProgress",
-                "Successful"
-              ],
-              "GivenBy": "Npc",
-              "Min": 0,
-              "Max": 0
+              "Type": "Composite",
+              "Operator": "And",
+              "Conditions": [
+                {
+                  "Type": "Opened",
+                  "Dialogue": "AdventureQuests_FarmerHarvestAubergineIntro",
+                  "With": "Npc"
+                },
+                {
+                  "Type": "RequiresQuest",
+                  "QuestAssetId": "AdventureQuests_FarmerHarvestAubergine",
+                  "States": [
+                    "InProgress",
+                    "Successful"
+                  ],
+                  "GivenBy": "Npc",
+                  "Min": 0,
+                  "Max": 0
+                }
+              ]
             }
           ]
         },
@@ -373,20 +388,35 @@
           "Operator": "And",
           "Conditions": [
             {
-              "Type": "Opened",
-              "Dialogue": "AdventureQuests_FarmerHarvestPumpkinIntro",
-              "With": "Npc"
+              "Type": "NearBlock",
+              "Block": {
+                "ItemId": "Plant_Crop_Pumpkin_Block"
+              },
+              "State": "StageFinal",
+              "Radius": 30,
+              "Min": 2
             },
             {
-              "Type": "RequiresQuest",
-              "QuestAssetId": "AdventureQuests_FarmerHarvestPumpkin",
-              "States": [
-                "InProgress",
-                "Successful"
-              ],
-              "GivenBy": "Npc",
-              "Min": 0,
-              "Max": 0
+              "Type": "Composite",
+              "Operator": "And",
+              "Conditions": [
+                {
+                  "Type": "Opened",
+                  "Dialogue": "AdventureQuests_FarmerHarvestPumpkinIntro",
+                  "With": "Npc"
+                },
+                {
+                  "Type": "RequiresQuest",
+                  "QuestAssetId": "AdventureQuests_FarmerHarvestPumpkin",
+                  "States": [
+                    "InProgress",
+                    "Successful"
+                  ],
+                  "GivenBy": "Npc",
+                  "Min": 0,
+                  "Max": 0
+                }
+              ]
             }
           ]
         },

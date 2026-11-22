@@ -85,7 +85,8 @@ success brings them straight back up, since the higher tiers still hold.
 ## Tier offer
 
 1. **Pinned quest**: per quest `q`, `Opened` `Intro_q` and `q` neither running nor succeeded:
-   `Intro_q`. A declined or failed quest is offered again.
+   `Intro_q`. A declined or failed quest is offered again. A harvest stays pinned only while its
+   crop is ripe nearby.
 2. **Draw**: `Weighted` among the tier's quests neither running nor succeeded. No fallback to the
    whole tier: the threshold is met before the tier runs out.
 3. Fallback: small talk.
@@ -133,6 +134,4 @@ flowchart TD
 
 - In the ongoing phase a quest succeeded long ago, offered again, accepted and failed, is thanked:
   `OpenedAfter` cannot tell this success from the earlier one.
-- A pinned intro stays pinned even when what it asks for vanished (the crops were picked by
-  someone else): the player waits for them to grow again.
 - Each tier's threshold is written by hand in the entry router.
