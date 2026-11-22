@@ -68,6 +68,31 @@ class HistoryConditionsTest {
     }
 
     @Test
+    void openedAfterComparesTheLatestOpenings() {
+        DialogueCondition after = condition("{ \"Type\": \"OpenedAfter\", \"Dialogue\": \"Intro\", \"Than\": \"Thanks\" }");
+        DialogueHistory history = new DialogueHistory();
+        assertFalse(after.test(context(history)));
+
+        history.recordOpened(null, "Intro", Instant.ofEpochSecond(10));
+        assertTrue(after.test(context(history)));
+
+        history.recordOpened(null, "Thanks", Instant.ofEpochSecond(20));
+        assertFalse(after.test(context(history)));
+
+        history.recordOpened(null, "Intro", Instant.ofEpochSecond(30));
+        assertTrue(after.test(context(history)));
+    }
+
+    @Test
+    void openedAfterValidationNamesAMissingDialogue() {
+        OpenDialogueAsset intro = CodecJson.decode(OpenDialogueAsset.BODY_CODEC, "{ \"Responses\": [ { \"Text\": \"a\", \"Id\": \"Accept\" } ] }");
+        Map<String, OpenDialogueAsset> dialogues = Map.of("Intro", intro);
+
+        assertNotNull(condition("{ \"Type\": \"OpenedAfter\", \"Dialogue\": \"Intro\", \"Than\": \"Nowhere\" }").validate(dialogues::get));
+        assertNull(condition("{ \"Type\": \"OpenedAfter\", \"Dialogue\": \"Intro\", \"Than\": \"Intro\" }").validate(dialogues::get));
+    }
+
+    @Test
     void answeredValidationNamesAMissingAnswer() {
         OpenDialogueAsset flowers = CodecJson.decode(OpenDialogueAsset.BODY_CODEC, "{ \"Responses\": [ { \"Text\": \"a\", \"Id\": \"Accept\" } ] }");
         Map<String, OpenDialogueAsset> dialogues = Map.of("Elder_Flowers", flowers);

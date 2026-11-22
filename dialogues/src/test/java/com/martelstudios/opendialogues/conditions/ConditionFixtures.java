@@ -6,6 +6,7 @@ import com.martelstudios.opendialogues.CodecJson;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesAnsweredCondition;
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesCooldownCondition;
+import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesOpenedAfterCondition;
 import com.martelstudios.opendialogues.conditions.impl.permission.OpenDialoguesHasPermissionCondition;
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesOpenedCondition;
 import com.martelstudios.opendialogues.conditions.impl.logic.OpenDialoguesCompositeCondition;
@@ -26,6 +27,7 @@ public final class ConditionFixtures {
         registry.registerCondition(OpenDialoguesOpenedCondition.TYPE, OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition.CODEC);
         registry.registerCondition(OpenDialoguesAnsweredCondition.TYPE, OpenDialoguesAnsweredCondition.class, OpenDialoguesAnsweredCondition.CODEC);
         registry.registerCondition(OpenDialoguesCooldownCondition.TYPE, OpenDialoguesCooldownCondition.class, OpenDialoguesCooldownCondition.CODEC);
+        registry.registerCondition(OpenDialoguesOpenedAfterCondition.TYPE, OpenDialoguesOpenedAfterCondition.class, OpenDialoguesOpenedAfterCondition.CODEC);
         registry.registerCondition(OpenDialoguesHasPermissionCondition.TYPE, OpenDialoguesHasPermissionCondition.class, OpenDialoguesHasPermissionCondition.CODEC);
         registry.registerCondition(OpenDialoguesNearNpcCondition.TYPE, OpenDialoguesNearNpcCondition.class, OpenDialoguesNearNpcCondition.CODEC);
         registry.registerCondition(OpenDialoguesNearBlockCondition.TYPE, OpenDialoguesNearBlockCondition.class, OpenDialoguesNearBlockCondition.CODEC);

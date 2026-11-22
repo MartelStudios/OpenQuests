@@ -97,6 +97,7 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Int
 
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesAnsweredCondition;
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesCooldownCondition;
+import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesOpenedAfterCondition;
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesOpenedCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.OpenDialoguesHoldingCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.OpenDialoguesInventoryCondition;
@@ -203,6 +204,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerCondition(OpenDialoguesOpenedCondition.TYPE, OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition.CODEC);
         registry.registerCondition(OpenDialoguesAnsweredCondition.TYPE, OpenDialoguesAnsweredCondition.class, OpenDialoguesAnsweredCondition.CODEC);
         registry.registerCondition(OpenDialoguesCooldownCondition.TYPE, OpenDialoguesCooldownCondition.class, OpenDialoguesCooldownCondition.CODEC);
+        registry.registerCondition(OpenDialoguesOpenedAfterCondition.TYPE, OpenDialoguesOpenedAfterCondition.class, OpenDialoguesOpenedAfterCondition.CODEC);
         registry.registerCondition(OpenDialoguesHoldingCondition.TYPE, OpenDialoguesHoldingCondition.class, OpenDialoguesHoldingCondition.CODEC);
         registry.registerCondition(OpenDialoguesInventoryCondition.TYPE, OpenDialoguesInventoryCondition.class, OpenDialoguesInventoryCondition.CODEC);
         registry.registerCondition(OpenDialoguesNearNpcCondition.TYPE, OpenDialoguesNearNpcCondition.class, OpenDialoguesNearNpcCondition.CODEC);

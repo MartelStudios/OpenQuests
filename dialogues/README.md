@@ -62,6 +62,7 @@ that does not hold, and the selector moves on. See `AdventureQuests_Plush` in th
 | --- | --- |
 | `Opened` | `Dialogue` was opened between `Min` (default 1) and `Max` (optional) times. |
 | `Answered` | `Answer` of `Dialogue` was picked between `Min` and `Max` times. |
+| `OpenedAfter` | `Dialogue` was last opened after `Than`, or `Than` was never opened: an offer made since the last thanks. |
 | `Holding` | The item in hand matches `Item`. |
 | `Inventory` | The inventory holds between `Min` and `Max` items matching `Item`. |
 | `NearNpc` | Between `Min` and `Max` living NPCs of `Role` or `Group` stand within `Radius` (at most 128) of the player. The NPC being talked to counts when it matches. |
@@ -70,7 +71,7 @@ that does not hold, and the selector moves on. See `AdventureQuests_Plush` in th
 
 Every condition also takes `Not`: when true, it holds exactly when it would not.
 
-`Opened`, `Answered` and `Cooldown` also take `With`: `Any` (default) counts every dialogue had,
+`Opened`, `Answered`, `OpenedAfter` and `Cooldown` also take `With`: `Any` (default) counts every dialogue had,
 `Character` only those had with any NPC of the speaking NPC's character, `Npc` only those had with
 the speaking NPC itself. With no speaking NPC (a command, an item), `Character` and `Npc` count
 nothing. `Cooldown` takes either `With` or its fixed `Character`, not both.
