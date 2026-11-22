@@ -24,6 +24,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.event.events.BootEvent;
+import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -296,6 +297,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         getEventRegistry().registerGlobal(DialogueEvent.Opened.class, historyRecorder::onOpened);
         getEventRegistry().registerGlobal(DialogueEvent.Answered.class, historyRecorder::onAnswered);
         getEventRegistry().registerGlobal(CharacterEvent.Released.class, CharacterDeathAnnouncer::onReleased);
+        getEventRegistry().registerGlobal(CharacterEvent.Released.class, event -> historyRecorder.forgetNpc(event.getUuid()));
+        getEventRegistry().registerGlobal(PlayerConnectEvent.class, event -> historyRecorder.forgetReleased(event.getHolder(), characterService::isReleased));
         getEventRegistry().registerGlobal(EventPriority.LAST, RemoveWorldEvent.class, characterService.worldClosing()::onRemoveWorld);
 
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));

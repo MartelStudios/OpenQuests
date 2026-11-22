@@ -52,4 +52,11 @@ class GiverQuestRecorderTest {
 
         assertTrue(queued[0]);
     }
+
+    @Test
+    void aReleasedGiverIsNoLongerRecorded() {
+        assertTrue(GiverQuestRecorder.records(GIVER, npc -> false));
+        assertFalse(GiverQuestRecorder.records(GIVER, GIVER.npc()::equals));
+        assertFalse(GiverQuestRecorder.records(null, npc -> false));
+    }
 }

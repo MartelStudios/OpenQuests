@@ -6,6 +6,9 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
+import com.martelstudios.opendialogues.OpenDialoguesPlugin;
+import com.martelstudios.opendialogues.characters.events.CharacterEvent;
 import com.martelstudios.openquests.core.events.QuestCompletedEvent;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.QuestState;
@@ -20,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * The one writer of {@link GiverQuestRecord}: keeps how the head quests an NPC handed out start
@@ -30,9 +34,11 @@ public final class GiverQuestRecorder {
     private static volatile ComponentType<EntityStore, GiverQuestRecord> registered;
 
     private final ComponentType<EntityStore, GiverQuestRecord> type;
+    private final Predicate<UUID> isReleased;
 
-    private GiverQuestRecorder(@Nonnull ComponentType<EntityStore, GiverQuestRecord> type) {
+    private GiverQuestRecorder(@Nonnull ComponentType<EntityStore, GiverQuestRecord> type, @Nonnull Predicate<UUID> isReleased) {
         this.type = type;
+        this.isReleased = isReleased;
     }
 
     /**
@@ -44,9 +50,11 @@ public final class GiverQuestRecorder {
     public static ComponentType<EntityStore, GiverQuestRecord> register(@Nonnull JavaPlugin plugin) {
         ComponentType<EntityStore, GiverQuestRecord> type = plugin.getEntityStoreRegistry().registerComponent(GiverQuestRecord.class, "OpenQuestsDialoguesGivers", GiverQuestRecord.CODEC);
         registered = type;
-        GiverQuestRecorder recorder = new GiverQuestRecorder(type);
+        GiverQuestRecorder recorder = new GiverQuestRecorder(type, OpenDialoguesPlugin.get().getCharacterService()::isReleased);
         plugin.getEventRegistry().registerGlobal(QuestAddedToPlayerStoreEvent.class, recorder::onAdded);
         plugin.getEventRegistry().registerGlobal(QuestCompletedEvent.class, recorder::onCompleted);
+        plugin.getEventRegistry().registerGlobal(CharacterEvent.Released.class, recorder::onReleased);
+        plugin.getEventRegistry().registerGlobal(PlayerConnectEvent.class, recorder::onConnect);
         return type;
     }
 
@@ -61,7 +69,7 @@ public final class GiverQuestRecorder {
     private void onAdded(@Nonnull QuestAddedToPlayerStoreEvent event) {
         AbstractQuestProgression<?> quest = event.getQuest();
         Giver giver = headGiver(quest);
-        if (giver == null) return;
+        if (!records(giver, isReleased)) return;
 
         Instant at = timeOr(quest.getStartedAt());
         String assetId = quest.getAssetId();
@@ -72,11 +80,42 @@ public final class GiverQuestRecorder {
         if (!event.isEndedHere()) return;
         AbstractQuestProgression<?> quest = event.getQuest();
         Giver giver = headGiver(quest);
-        if (giver == null) return;
+        if (!records(giver, isReleased)) return;
 
         Instant at = timeOr(quest.getCompletedAt());
         String assetId = quest.getAssetId();
         outcomes(event).forEach((playerId, state) -> write(playerId, record -> record.ended(giver, assetId, state, at)));
+    }
+
+    /**
+     * Drops a released NPC from the record of every online player, on their thread.
+     */
+    private void onReleased(@Nonnull CharacterEvent.Released event) {
+        UUID npc = event.getUuid();
+        for (PlayerRef player : Universe.get().getPlayers()) {
+            EntityComponents.update(player.getUuid(), components -> {
+                GiverQuestRecord record = components.getComponent(type);
+                if (record != null) record.forgetNpc(npc);
+            });
+        }
+    }
+
+    /**
+     * Drops the NPCs released while the player was away, through the incoming holder.
+     */
+    private void onConnect(@Nonnull PlayerConnectEvent event) {
+        GiverQuestRecord record = event.getHolder().getComponent(type);
+        if (record != null) record.forgetNpcs(isReleased);
+    }
+
+    /**
+     * A quest failing because its giver was released ends after the record was swept: it must not
+     * write that NPC back.
+     *
+     * @return whether outcomes of quests from that giver are kept.
+     */
+    static boolean records(@Nullable Giver giver, @Nonnull Predicate<UUID> isReleased) {
+        return giver != null && !isReleased.test(giver.npc());
     }
 
     /**

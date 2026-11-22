@@ -108,6 +108,19 @@ class CharacterServiceTest {
     }
 
     @Test
+    void npcDrawingAgainIsNoLongerReleased() {
+        character("Mira", "None", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.give(npc, "Mira");
+        service.release(npc, ReleaseReason.Removed);
+
+        assertTrue(service.give(npc, "Mira"));
+
+        assertFalse(service.isReleased(npc.uuid()));
+    }
+
+    @Test
     void secondReleaseIsNoOp() {
         character("Mira", "None", AB);
         CharacterService service = service();

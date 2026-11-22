@@ -227,4 +227,22 @@ class DialogueHistoryTest {
         assertEquals(1, history.count("Farmer", A, "Intro", null));
         assertEquals(2, copy.count("Farmer", A, "Intro", null));
     }
+
+    @Test
+    void forgetNpcsDropsEveryReleasedOne() {
+        UUID kept = UUID.randomUUID();
+        DialogueHistory history = new DialogueHistory();
+        history.recordOpened("Farmer", A, "Intro", Instant.EPOCH);
+        history.recordOpened("Smith", B, "Intro", Instant.EPOCH);
+        history.recordOpened("Farmer", kept, "Intro", Instant.EPOCH);
+        history.recordOpened("Farmer", null, "Intro", Instant.EPOCH);
+
+        assertTrue(history.forgetNpcs(java.util.Set.of(A, B)::contains));
+
+        assertEquals(0, history.count("Farmer", A, "Intro", null));
+        assertEquals(0, history.count("Smith", null, "Intro", null));
+        assertEquals(1, history.count("Farmer", kept, "Intro", null));
+        assertEquals(2, history.count("Farmer", null, "Intro", null));
+        assertFalse(history.forgetNpcs(java.util.Set.of(A, B)::contains));
+    }
 }

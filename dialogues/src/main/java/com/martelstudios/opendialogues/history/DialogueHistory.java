@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.function.Consumer;
 
 /**
@@ -229,6 +230,30 @@ public class DialogueHistory implements Component<EntityStore> {
         for (Map<String, Map<String, Entry>> npcs : characters.values()) forgotten |= npcs.remove(key) != null;
         characters.values().removeIf(Map::isEmpty);
         return forgotten;
+    }
+
+    /**
+     * Forgets what the player did with every NPC the predicate names, under every character.
+     *
+     * @return whether anything was forgotten.
+     */
+    public boolean forgetNpcs(@Nonnull Predicate<UUID> released) {
+        boolean forgotten = false;
+        for (Map<String, Map<String, Entry>> npcs : characters.values()) forgotten |= npcs.keySet().removeIf(key -> isNpc(key, released));
+        characters.values().removeIf(Map::isEmpty);
+        return forgotten;
+    }
+
+    /**
+     * @return whether the key names an NPC the predicate holds; the no-NPC key and malformed ones never do.
+     */
+    private static boolean isNpc(@Nonnull String key, @Nonnull Predicate<UUID> released) {
+        if (key.equals(NO_NPC)) return false;
+        try {
+            return released.test(UUID.fromString(key));
+        } catch (IllegalArgumentException malformed) {
+            return false;
+        }
     }
 
     /**

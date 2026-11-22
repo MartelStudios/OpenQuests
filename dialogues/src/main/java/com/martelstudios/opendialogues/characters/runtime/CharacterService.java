@@ -186,6 +186,7 @@ public class CharacterService {
         if (character == null || !npc.unique().claimIfAvailable(characterId, npc.uuid(), assets::character)) return false;
 
         npc.identity().setCharacter(characterId);
+        released.get().remove(npc.uuid());
         stamp(npc, generation);
         CharacterContext context = context(npc, character);
         each(character, "onAssigned", trait -> trait.onAssigned(context));

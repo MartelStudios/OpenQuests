@@ -78,4 +78,19 @@ class GiverQuestRecordTest {
         assertEquals(0, record.completions("Farmer", A.npc(), "Q").total());
         assertEquals(1, record.completions("Farmer", null, "Q").total());
     }
+
+    @Test
+    void forgetNpcsDropsEveryReleasedOne() {
+        Giver kept = new Giver("Smith", UUID.randomUUID(), null);
+        GiverQuestRecord record = new GiverQuestRecord();
+        record.ended(A, "Q", QuestState.SUCCESSFUL, T1);
+        record.ended(B, "Q", QuestState.SUCCESSFUL, T1);
+        record.ended(kept, "Q", QuestState.SUCCESSFUL, T1);
+
+        assertTrue(record.forgetNpcs(java.util.Set.of(A.npc(), B.npc())::contains));
+
+        assertEquals(0, record.completions("Farmer", null, "Q").total());
+        assertEquals(1, record.completions("Smith", kept.npc(), "Q").total());
+        assertFalse(record.forgetNpcs(java.util.Set.of(A.npc(), B.npc())::contains));
+    }
 }

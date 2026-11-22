@@ -44,6 +44,17 @@ public class ReleasedNpcs {
     }
 
     /**
+     * Forgets an NPC that carries a character again, so its new story is not swept as the old one.
+     */
+    public void remove(@Nonnull UUID npc) {
+        boolean changed;
+        synchronized (this) {
+            changed = npcs.remove(npc.toString()) != null;
+        }
+        if (changed) onChange.run();
+    }
+
+    /**
      * @return whether that NPC let its character go and is still remembered.
      */
     public synchronized boolean contains(@Nonnull UUID npc) {

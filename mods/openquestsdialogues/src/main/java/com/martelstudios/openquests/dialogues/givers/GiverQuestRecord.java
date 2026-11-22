@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 /**
  * How the quests each NPC handed a player ended, kept on the player because ended quests are
@@ -91,6 +92,26 @@ public class GiverQuestRecord implements Component<EntityStore> {
         boolean dropped = false;
         for (Map<String, Map<String, QuestCompletions>> npcs : givers.values()) {
             dropped |= npcs.remove(npc.toString()) != null;
+        }
+        givers.values().removeIf(Map::isEmpty);
+        return dropped;
+    }
+
+    /**
+     * Drops everything handed out by the NPCs the predicate names, under whichever character.
+     *
+     * @return whether anything was dropped.
+     */
+    public boolean forgetNpcs(@Nonnull Predicate<UUID> released) {
+        boolean dropped = false;
+        for (Map<String, Map<String, QuestCompletions>> npcs : givers.values()) {
+            dropped |= npcs.keySet().removeIf(key -> {
+                try {
+                    return released.test(UUID.fromString(key));
+                } catch (IllegalArgumentException malformed) {
+                    return false;
+                }
+            });
         }
         givers.values().removeIf(Map::isEmpty);
         return dropped;
