@@ -2,10 +2,17 @@ package com.martelstudios.opendialogues.characters;
 
 import com.martelstudios.opendialogues.characters.filters.CharacterFilter;
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesNearCharacterFilter;
+import com.martelstudios.opendialogues.characters.runtime.CharacterPositions;
 import com.hypixel.hytale.component.Ref;
+import org.joml.Vector3d;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.martelstudios.opendialogues.characters.CharacterFixtures.filter;
 import static com.martelstudios.opendialogues.characters.CharacterFixtures.kweebec;
@@ -71,6 +78,41 @@ class FiltersTest {
     @Test
     void aMalformedWorldPatternIsRefused() {
         assertThrows(IllegalArgumentException.class, () -> filter("{ \"Type\": \"World\", \"Worlds\": [\"(\"] }"));
+    }
+
+    @Test
+    void nearCharacterHoldsWithinRadius() {
+        Map<String, Collection<CharacterPositions.Spot>> spots = Map.of("Farmer", List.of(spot(10, 64, 0)));
+
+        assertTrue(OpenDialoguesNearCharacterFilter.anyWithin(spots, List.of("Farmer"), new Vector3d(0, 64, 0), 16));
+        assertFalse(OpenDialoguesNearCharacterFilter.anyWithin(spots, List.of("Farmer"), new Vector3d(0, 64, 0), 8));
+    }
+
+    @Test
+    void nearCharacterIgnoresOtherCharacters() {
+        Map<String, Collection<CharacterPositions.Spot>> spots = Map.of("Smith", List.of(spot(1, 64, 0)));
+
+        assertFalse(OpenDialoguesNearCharacterFilter.anyWithin(spots, List.of("Farmer"), new Vector3d(0, 64, 0), 16));
+    }
+
+    @Test
+    void notNearCharacterRefusesACandidateNextToOne() {
+        CharacterFilter filter = filter("{ \"Type\": \"NearCharacter\", \"Characters\": [\"Farmer\"], \"Radius\": 16, \"Not\": true }");
+        OpenDialoguesNearCharacterFilter near = (OpenDialoguesNearCharacterFilter) filter;
+
+        assertFalse(near.holdsAt(Map.of("Farmer", List.of(spot(3, 64, 0))), new Vector3d(0, 64, 0)));
+        assertTrue(near.holdsAt(Map.of("Farmer", List.of(spot(40, 64, 0))), new Vector3d(0, 64, 0)));
+        // Without a store no farmer is known, so the candidate is not near one
+        assertTrue(filter.test(kweebec("Zone1")));
+    }
+
+    @Test
+    void nearCharacterRequiresAPositiveRadius() {
+        assertThrows(IllegalArgumentException.class, () -> filter("{ \"Type\": \"NearCharacter\", \"Characters\": [\"Farmer\"], \"Radius\": 0 }"));
+    }
+
+    private static CharacterPositions.Spot spot(double x, double y, double z) {
+        return new CharacterPositions.Spot(UUID.randomUUID(), new Vector3d(x, y, z), null);
     }
 
     private static FilterContext inWorld(String world) {

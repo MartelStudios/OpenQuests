@@ -166,6 +166,7 @@ per NPC, such as a name. A text with no translation shows as is, so a name can b
 | `Zone` | The NPC stands in one of `Zones`, as the world generator names them. |
 | `Biome` | The NPC stands in one of `Biomes`. |
 | `Unobstructed` | No block hitbox (tall grass, a bush) overlaps the upper half of the NPC's hitbox, where it stands at the draw, so players can aim F at it. Suited to NPCs that do not move. |
+| `NearCharacter` | An NPC carrying one of `Characters` stands within `Radius` blocks, where it was last seen even in an unloaded chunk. With `Not: true`, keeps two farmers out of one village. |
 
 Every filter also takes `Not`. NPCs that already react to F (merchants, quest givers) are skipped, unless the distribution sets `OverrideInteraction`.
 

@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
+import com.hypixel.hytale.component.ComponentAccessor;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
@@ -42,7 +43,7 @@ public final class CharacterPositionsAccess {
      * shortcut: skips the reset catch-up, so a reset's NPCs linger until the next scan; catch up here if that shows.
      */
     @Nonnull
-    public Map<String, Collection<CharacterPositions.Spot>> view(@Nonnull Store<EntityStore> store) {
+    public Map<String, Collection<CharacterPositions.Spot>> view(@Nonnull ComponentAccessor<EntityStore> store) {
         return store.getResource(type).view();
     }
 
