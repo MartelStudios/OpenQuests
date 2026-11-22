@@ -19,14 +19,14 @@ Hyenas raid the food stores of a Feran camp every night.
 
 ## Quests and rewards
 
-`AdventureQuests_CampHyenas` (`KillNpc`: 3 of `Hyena`, constraint `NearCharacter` on this character, radius 150).
+`AdventureQuests_CampHyenas` (`KillNpc`: 3 of `Hyena`, constraint `NearCharacter` on this character, radius 128).
 Reward: 5 `Ingredient_Salt` and 3 `Ingredient_Hide_Medium`.
 
 ## Assets
 
 - `OpenDialogues/Characters/AdventureQuests/FeranCamp/AdventureQuests_FeranHyenas.json`
-- `OpenDialogues/Routers/AdventureQuests/FeranCamp/AdventureQuests_FeranHyenas.json`: intro when the quest is not started and role `Hyena` is within 150 blocks; a short absent line otherwise; waiting while it runs; thanks after.
-- `OpenDialogues/Dialogues/AdventureQuests/FeranCamp/AdventureQuests_CampHyenas{Intro,Absent,Waiting,Thanks}.json`: waiting offers to give up (`SetQuestState` `Abandoned`) when none is left within 150 blocks.
+- `OpenDialogues/Routers/AdventureQuests/FeranCamp/AdventureQuests_FeranHyenas.json`: intro when the quest is not started and role `Hyena` is within 128 blocks; a short absent line otherwise; waiting while it runs; thanks after.
+- `OpenDialogues/Dialogues/AdventureQuests/FeranCamp/AdventureQuests_CampHyenas{Intro,Absent,Waiting,Thanks}.json`: waiting offers to give up (`SetQuestState` `Abandoned`) when none is left within 128 blocks.
 - `OpenQuests/Quests/AdventureQuests/FeranCamp/AdventureQuests_CampHyenas.json`
 - `OpenDialogues/CharacterDistributions/AdventureQuests/FeranCamp/AdventureQuests_FeranHyenas.json`
 - Lang keys `camp-hyenas` in `Languages/*/adventurequests/ferancamp.lang`.
@@ -35,4 +35,4 @@ Reward: 5 `Ingredient_Salt` and 3 `Ingredient_Hide_Medium`.
 
 - 2026-11-18: one of the Feran camp stories, offered by the role that fits the task (user).
 - 2026-11-22: radius 150, since prey rarely comes within 64 or 100 blocks of a camp; a rare story is accepted (user).
-
+- 2026-11-22: radius 128, the most a `NearNpc` condition accepts: at 150 the router and waiting dialogue failed validation and the story never loaded.

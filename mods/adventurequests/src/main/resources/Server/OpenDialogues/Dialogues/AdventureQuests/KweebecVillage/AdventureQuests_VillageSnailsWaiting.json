@@ -1,0 +1,55 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-snails.waiting"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village.give",
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_VillageSnailsGive"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-snails.giveup",
+      "When": {
+        "Type": "NearBlock",
+        "Block": {
+          "ItemId": "Plant_Crop_Lettuce_Block"
+        },
+        "State": "StageFinal",
+        "Radius": 30,
+        "Min": 0,
+        "Max": 0
+      },
+      "Actions": [
+        {
+          "Type": "SetQuestState",
+          "Quest": "AdventureQuests_VillageSnails",
+          "State": "Abandoned"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village.later",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

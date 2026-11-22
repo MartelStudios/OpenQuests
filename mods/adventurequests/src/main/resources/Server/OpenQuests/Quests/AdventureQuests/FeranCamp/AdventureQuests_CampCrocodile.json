@@ -17,7 +17,7 @@
     {
       "Type": "NearCharacter",
       "Character": "AdventureQuests_FeranCrocodile",
-      "Radius": 150
+      "Radius": 128
     }
   ],
   "SuccessfulRewards": [

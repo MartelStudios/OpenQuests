@@ -1,0 +1,35 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-scarecrow.intro.page1"
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-scarecrow.intro.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village-scarecrow.accept",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_VillageScarecrow"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village.decline",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "Type": "PlaceBlock",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-scarecrow.place.title",
+  "TargetQuantity": 1,
+  "BlockToPlace": {
+    "ItemId": "Deco_Scarecrow"
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_KweebecScarecrow",
+      "Radius": 20
+    }
+  ]
+}

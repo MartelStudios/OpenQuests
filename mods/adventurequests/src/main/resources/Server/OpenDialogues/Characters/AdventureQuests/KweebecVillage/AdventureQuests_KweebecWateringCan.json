@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.kweebecvillage.character.village-watering-can.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_KweebecWateringCan"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}

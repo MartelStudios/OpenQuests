@@ -1,0 +1,29 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Tool_Watering_Can.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-watering-can.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-watering-can.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-watering-can.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageWateringCanCraft",
+    "AdventureQuests_VillageWateringCanGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Plant_Seeds_Tomato_Eternal",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Potion_Health",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

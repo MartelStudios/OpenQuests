@@ -12,7 +12,7 @@
       "When": {
         "Type": "NearNpc",
         "Role": "Crocodile",
-        "Radius": 150,
+        "Radius": 128,
         "Min": 0,
         "Max": 0
       },

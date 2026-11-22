@@ -1,0 +1,8 @@
+{
+  "Type": "Craft",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-broken-hoe.craft.title",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Tool_Hoe_Copper"
+  }
+}

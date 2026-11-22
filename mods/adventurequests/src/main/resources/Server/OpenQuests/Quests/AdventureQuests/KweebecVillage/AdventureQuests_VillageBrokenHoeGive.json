@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-broken-hoe.give.title",
+  "Character": "AdventureQuests_KweebecBrokenHoe",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Tool_Hoe_Copper"
+      },
+      "Quantity": 1
+    }
+  ]
+}
