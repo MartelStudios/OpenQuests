@@ -30,13 +30,17 @@ public class OpenDialoguesQuestCooldownCondition extends DialogueCondition {
                                                                                 .append(new KeyedCodec<>("QuestAssetId", Codec.STRING, true), (condition, assetId) -> condition.questAssetId = assetId, condition -> condition.questAssetId)
                                                                                 .addValidator(Validators.nonNull())
                                                                                 .addValidatorLate(() -> OpenQuestAsset.VALIDATOR_CACHE.getValidator().late())
+                                                                                .documentation("Asset ID of the quest whose last run starts the delay.")
                                                                                 .add()
                                                                                 .append(new KeyedCodec<>("Since", new EnumCodec<>(Since.class)), (condition, since) -> condition.since = since, condition -> condition.since)
+                                                                                .documentation("Whether the delay counts from the last start or the last end, success or failure, defaulting to End.")
                                                                                 .add()
                                                                                 .append(new KeyedCodec<>("Seconds", Codec.DURATION_SECONDS, true), (condition, duration) -> condition.duration = duration, condition -> condition.duration)
                                                                                 .addValidator(Validators.nonNull())
                                                                                 .addValidator(Validators.greaterThan(Duration.ZERO))
+                                                                                .documentation("Real-time delay in seconds, offline time included.")
                                                                                 .add()
+                                                                                .documentation("Holds before the player ever took the quest and once the delay after the last one ran out.")
                                                                                 .build();
 
     /**

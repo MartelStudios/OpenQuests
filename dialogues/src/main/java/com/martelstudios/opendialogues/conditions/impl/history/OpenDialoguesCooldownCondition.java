@@ -30,15 +30,20 @@ public class OpenDialoguesCooldownCondition extends DialogueCondition {
                                                                             .append(new KeyedCodec<>("Dialogue", Codec.STRING, true), (condition, dialogue) -> condition.dialogue = dialogue, condition -> condition.dialogue)
                                                                             .addValidator(Validators.nonNull())
                                                                             .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
+                                                                            .documentation("ID of the dialogue whose latest opening or answer starts the delay.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Answer", Codec.STRING), (condition, answer) -> condition.answer = answer, condition -> condition.answer)
+                                                                            .documentation("Answer ID that starts the delay when picked, the dialogue opening when unset.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Character", Codec.STRING), (condition, character) -> condition.character = character, condition -> condition.character)
+                                                                            .documentation("Character ID the dialogue must have been had with, any character when unset.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Seconds", Codec.DURATION_SECONDS, true), (condition, duration) -> condition.duration = duration, condition -> condition.duration)
                                                                             .addValidator(Validators.nonNull())
                                                                             .addValidator(Validators.greaterThan(Duration.ZERO))
+                                                                            .documentation("Real-time delay in seconds, offline time included.")
                                                                             .add()
+                                                                            .documentation("Holds before the dialogue interaction ever happened and once the delay after the latest one ran out.")
                                                                             .build();
 
     private String dialogue;

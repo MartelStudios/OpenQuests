@@ -31,8 +31,10 @@ public class DialogueHistory implements Component<EntityStore> {
                                                                     .append(new KeyedCodec<>("Answers", new MapCodec<>(Codec.INTEGER, HashMap<String, Integer>::new)), (entry, answers) -> entry.answers.putAll(answers), entry -> entry.answers)
                                                                     .add()
                                                                     .append(new KeyedCodec<>("LastOpenedAt", Codec.LONG), (entry, time) -> entry.lastOpenedAt = time, entry -> entry.lastOpenedAt)
+                                                                    .documentation("Epoch milliseconds of the latest opening, unset before any timestamped opening.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("LastAnsweredAt", new MapCodec<>(Codec.LONG, HashMap<String, Long>::new)), (entry, answers) -> entry.lastAnsweredAt.putAll(answers), entry -> entry.lastAnsweredAt)
+                                                                    .documentation("Epoch milliseconds of the latest pick by answer ID, initially empty.")
                                                                     .add()
                                                                     .build();
 
