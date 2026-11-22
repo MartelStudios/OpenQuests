@@ -30,6 +30,9 @@ public abstract class QuestGiver {
     /** The quest text parameter the giver's name fills. */
     public static final String NAME_PARAM = "giver";
 
+    /** Translation key of the name {@link #NAME_PARAM} shows for a quest with no named giver. */
+    public static final String SOMEONE = "openquests.quest.giver.someone";
+
     /**
      * Polymorphic dispatcher: concrete giver codecs register under a {@code "Type"} tag.
      */

@@ -25,9 +25,6 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
     /** Translation key of the name shown for no one known. */
     public static final String SOMEONE = "openquestsdialogues.quest.default.someone";
 
-    /** The tag an author writes the giver's fallback name in, read as the {@code {giver}} text parameter. */
-    public static final String GIVER_TAG = "Text.giver";
-
     protected DialogueQuestProgression() {}
 
     @Override
@@ -56,8 +53,7 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
     }
 
     /**
-     * A quest aimed at its giver shows the name its giver carries, else the {@code Text.giver} fallback
-     * of its head, then of the step; otherwise the target character's name.
+     * A quest aimed at its giver shows the name its giver carries; otherwise the target character's name.
      *
      * @return the name of whom the quest aims at, {@code null} for no one.
      */
@@ -65,21 +61,10 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
     public static Message targetName(@Nonnull AbstractQuestProgression<?> quest, @Nonnull TargetMode mode, @Nullable QuestTarget target) {
         if (mode != TargetMode.Character) {
             QuestGiver giver = quest.getHead().getGiver();
-            String name = giver != null ? giver.getNameKey() : null;
-            if (name == null) name = giverName(quest.getHead().getTagValues(GIVER_TAG));
-            if (name == null) name = giverName(quest.getTagValues(GIVER_TAG));
-            if (name != null) return Message.translation(name);
+            if (giver != null && giver.getNameKey() != null) return Message.translation(giver.getNameKey());
         }
         String character = TargetMode.characterOf(target);
         return character == null ? null : characterName(character);
-    }
-
-    /**
-     * @return the giver's name key in those {@code Text.giver} values, {@code null} for none.
-     */
-    @Nullable
-    public static String giverName(@Nullable String[] values) {
-        return values != null && values.length > 0 && !values[0].isEmpty() ? values[0] : null;
     }
 
     @Nonnull

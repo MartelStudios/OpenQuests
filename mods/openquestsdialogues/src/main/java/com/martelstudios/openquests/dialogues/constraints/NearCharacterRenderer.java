@@ -29,21 +29,18 @@ public final class NearCharacterRenderer implements QuestConstraintRenderer {
         if (QuestConstraintRenderer.isOver(quest)) return null;
 
         NearCharacterConstraint nearCharacter = (NearCharacterConstraint) constraint;
-        Message name = quest != null ? DialogueQuestProgression.targetName(quest, nearCharacter.getTargetMode(), nearCharacter.target(quest)) : assetName(nearCharacter, asset);
+        Message name = quest != null ? DialogueQuestProgression.targetName(quest, nearCharacter.getTargetMode(), nearCharacter.target(quest)) : assetName(nearCharacter);
         return Line.of(Message.translation("openquestsdialogues.page.constraint.near-character")
                               .param("radius", Math.round(nearCharacter.getRadius()))
                               .param("character", name != null ? name : Message.translation(DialogueQuestProgression.SOMEONE)));
     }
 
     /**
-     * Without a quest there is no giver yet: an asset aimed at one shows its {@code Text.giver} fallback.
+     * Without a quest there is no giver yet: an asset aimed at one names no one.
      */
     @Nullable
-    private static Message assetName(@Nonnull NearCharacterConstraint nearCharacter, @Nonnull OpenQuestAsset asset) {
-        if (nearCharacter.getTargetMode() != TargetMode.Character) {
-            String name = DialogueQuestProgression.giverName(asset.getTagValues(DialogueQuestProgression.GIVER_TAG));
-            return name != null ? Message.translation(name) : null;
-        }
-        return nearCharacter.getCharacter() != null ? DialogueQuestProgression.characterName(nearCharacter.getCharacter()) : null;
+    private static Message assetName(@Nonnull NearCharacterConstraint nearCharacter) {
+        if (nearCharacter.getTargetMode() != TargetMode.Character || nearCharacter.getCharacter() == null) return null;
+        return DialogueQuestProgression.characterName(nearCharacter.getCharacter());
     }
 }

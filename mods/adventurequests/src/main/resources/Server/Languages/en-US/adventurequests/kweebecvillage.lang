@@ -367,7 +367,6 @@ quest.village-snails.short=Pick 3 ripe lettuces near the young Kweebec and bring
 quest.village-snails.harvest.title=Pick 3 ripe lettuces
 quest.village-snails.give.title=Give the lettuces to the young Kweebec
 character.farmer.epithet=Village farmer
-farmer.someone=the farmer
 dialogue.farmer.harvest-aubergine.intro.page1=My aubergines are ripe, and my back is not what it was. Every row I bend over takes me a day to straighten up from.
 dialogue.farmer.harvest-aubergine.intro.page2=Could you pick 2 of them for me, here around my garden?
 dialogue.farmer.harvest-pumpkin.intro.page1=The pumpkins are ready, all at once, as usual. I can't pick them faster than they rot.

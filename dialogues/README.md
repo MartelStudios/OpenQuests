@@ -198,8 +198,7 @@ Forgotten Temple and Kweebec village characters in the Adventure Quests pack.
 
 A quest handed out by `AssignQuest` in a conversation with an NPC carries that NPC as its giver:
 the quest's `Giver` field, of type `Character`, holding the NPC, its character, its displayed name
-(the `{giver}` text parameter) and when it took that character. `GrantQuest` follow-ups keep it. An
-asset's `Text.giver` tag is the name shown when the quest has no giver yet. `Dialogue`, `Deliver`
+(the `{giver}` text parameter) and when it took that character. `GrantQuest` follow-ups keep it. `Dialogue`, `Deliver`
 and `NearCharacter` take `Target`: `Character` (default, the
 `Character` field, then required for `Deliver` and `NearCharacter`), `GiverCharacter` (any NPC of the
 giver's character) or `GiverNpc` (the giver alone). The `RequiresQuest` and `QuestCooldown`

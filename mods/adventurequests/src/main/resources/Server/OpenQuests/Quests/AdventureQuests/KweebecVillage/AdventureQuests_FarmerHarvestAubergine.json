@@ -4,11 +4,6 @@
   "Categories": [
     "AdventureQuests_SideQuest"
   ],
-  "Tags": {
-    "Text.giver": [
-      "adventurequests.kweebecvillage.farmer.someone"
-    ]
-  },
   "TitleKey": "adventurequests.kweebecvillage.quest.farmer.harvest-aubergine.title",
   "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-aubergine.description",
   "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-aubergine.short",

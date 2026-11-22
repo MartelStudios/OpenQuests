@@ -4,11 +4,6 @@
   "Categories": [
     "AdventureQuests_SideQuest"
   ],
-  "Tags": {
-    "Text.giver": [
-      "adventurequests.kweebecvillage.farmer.someone"
-    ]
-  },
   "TitleKey": "adventurequests.kweebecvillage.quest.farmer.plant-cauliflower.title",
   "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.plant-cauliflower.description",
   "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.plant-cauliflower.short",

@@ -1089,8 +1089,9 @@ quest reads "Gather 2 Sticks" on its own, the item naming itself through Hytale'
 pluralises where it needs to.
 
 A tag named `Text.<param>` fills `{<param>}` in the three texts with the translation of its first
-value. The asset declares a fallback in its `Tags` (`"Text.giver": ["farmers.someone"]`) and a tag
+value. The asset declares a fallback in its `Tags` (`"Text.crop": ["crops.onion"]`) and a tag
 written on the quest itself wins over it; steps of a composite read the tags of their head.
+`{giver}` is reserved: the core fills it with the name of the quest's typed giver, or "someone".
 
 Quest asset graphs are validated at boot: an unknown reference or a cycle between composite quests
 stops the server with an explicit reason rather than failing later at runtime.

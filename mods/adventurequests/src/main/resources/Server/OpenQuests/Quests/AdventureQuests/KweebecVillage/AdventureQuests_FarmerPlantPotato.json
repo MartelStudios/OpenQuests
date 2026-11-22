@@ -4,11 +4,6 @@
   "Categories": [
     "AdventureQuests_SideQuest"
   ],
-  "Tags": {
-    "Text.giver": [
-      "adventurequests.kweebecvillage.farmer.someone"
-    ]
-  },
   "TitleKey": "adventurequests.kweebecvillage.quest.farmer.plant-potato.title",
   "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.plant-potato.description",
   "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.plant-potato.short",

@@ -22,13 +22,15 @@ public final class QuestTextParams {
     private QuestTextParams() {}
 
     /**
+     * {@code giver} is never read from a tag: the core fills it from the quest's typed giver.
+     *
      * @return each text parameter with its translation key, tags without a first value skipped.
      */
     @Nonnull
     public static Map<String, String> of(@Nonnull Collection<String> tagNames, @Nonnull Function<String, String[]> values) {
         Map<String, String> params = new LinkedHashMap<>();
         for (String name : tagNames) {
-            if (!name.startsWith(PREFIX) || name.length() == PREFIX.length()) continue;
+            if (!name.startsWith(PREFIX) || name.length() == PREFIX.length() || name.equals(PREFIX + QuestGiver.NAME_PARAM)) continue;
             String[] tagValues = values.apply(name);
             if (tagValues == null || tagValues.length == 0 || tagValues[0] == null || tagValues[0].isEmpty()) continue;
             params.put(name.substring(PREFIX.length()), tagValues[0]);

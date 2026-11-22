@@ -22,8 +22,7 @@ Kweebec farmer (`AdventureQuests_KweebecFarmer`) is the worked example.
   `GivenBy: Npc`. `AssignQuest` writes the giver on the quest, so this needs nothing else.
 - Every quest aims at its giver: `NearCharacter` constraints, `Deliver` and `Dialogue` quests with
   `Target: GiverNpc`.
-- Quest texts name the giver: titles use `{giver}`, and the asset declares a fallback for a giver
-  with no drawn name, `"Tags": {"Text.giver": ["<pack>.<file>.farmer.someone"]}`.
+- Quest texts name the giver: titles use `{giver}`, filled with the name the NPC carries.
 - When the NPC is released (death, removal, revocation), its running quests aimed at it fail and
   its history and giver record move under the character's unknown-NPC key: `With: Npc` and
   `GivenBy: Npc` start afresh for an NPC drawing the character later, `Character` counts keep them.

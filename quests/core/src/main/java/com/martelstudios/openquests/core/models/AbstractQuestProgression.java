@@ -900,16 +900,22 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * The giver's own name wins over a {@code Text.giver} tag, which stays the authored fallback.
+     * The head's tags, its own winning over its asset's, and the name of its giver.
      */
     @Nonnull
     private static Map<String, String> headTextParams(@Nonnull AbstractQuestProgression<?> head) {
         Set<String> names = new HashSet<>(head.getTags().keySet());
         OpenQuestAsset headAsset = head.getAsset();
         if (headAsset != null) names.addAll(headAsset.getTagNames());
-        Map<String, String> params = new HashMap<>(QuestTextParams.of(names, head::getTagValues));
-        QuestGiver giver = head.getGiver();
-        if (giver != null && giver.getNameKey() != null) params.put(QuestGiver.NAME_PARAM, giver.getNameKey());
+        return withGiver(new HashMap<>(QuestTextParams.of(names, head::getTagValues)), head.getGiver());
+    }
+
+    /**
+     * A quest with no giver, or a nameless one, names "someone" rather than showing a raw {@code {giver}}.
+     */
+    @Nonnull
+    private static Map<String, String> withGiver(@Nonnull Map<String, String> params, @Nullable QuestGiver giver) {
+        params.put(QuestGiver.NAME_PARAM, giver != null && giver.getNameKey() != null ? giver.getNameKey() : QuestGiver.SOMEONE);
         return params;
     }
 
@@ -1116,7 +1122,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
 
     @Nonnull
     private static Map<String, String> textParamsOf(@Nonnull OpenQuestAsset asset) {
-        return QuestTextParams.of(asset.getTagNames(), asset::getTagValues);
+        return withGiver(new HashMap<>(QuestTextParams.of(asset.getTagNames(), asset::getTagValues)), null);
     }
 
     /**
