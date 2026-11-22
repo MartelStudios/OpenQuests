@@ -868,11 +868,19 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
-     * Text parameters from the head's {@code Text.<param>} tags, those written on it winning over its asset's.
+     * Text parameters from the head's {@code Text.<param>} tags, those written on it winning over its
+     * asset's; a step's own asset fills only those the head leaves out.
      */
     @Nonnull
     private Map<String, String> textParams() {
-        return headTextParams(getHead());
+        AbstractQuestProgression<?> head = getHead();
+        Map<String, String> params = headTextParams(head);
+        OpenQuestAsset asset = getAsset();
+        if (head == this || asset == null) return params;
+
+        Map<String, String> merged = new HashMap<>(QuestTextParams.of(asset.getTagNames(), asset::getTagValues));
+        merged.putAll(params);
+        return merged;
     }
 
     @Nonnull

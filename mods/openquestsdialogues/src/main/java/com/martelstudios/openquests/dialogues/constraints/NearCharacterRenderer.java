@@ -4,6 +4,8 @@ import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.dialogues.givers.Giver;
+import com.martelstudios.openquests.dialogues.givers.TargetMode;
 import com.martelstudios.openquests.dialogues.quests.dialogue.DialogueQuestProgression;
 import com.martelstudios.openquests.extension.journal.QuestConstraintRenderer;
 import com.martelstudios.openquests.extension.journal.QuestPageContext;
@@ -28,10 +30,21 @@ public final class NearCharacterRenderer implements QuestConstraintRenderer {
         if (QuestConstraintRenderer.isOver(quest)) return null;
 
         NearCharacterConstraint nearCharacter = (NearCharacterConstraint) constraint;
-        Message name = quest != null ? DialogueQuestProgression.targetName(quest, nearCharacter.getTargetMode(), nearCharacter.target(quest))
-                       : nearCharacter.getCharacter() != null ? DialogueQuestProgression.characterName(nearCharacter.getCharacter()) : null;
+        Message name = quest != null ? DialogueQuestProgression.targetName(quest, nearCharacter.getTargetMode(), nearCharacter.target(quest)) : assetName(nearCharacter, asset);
         return Line.of(Message.translation("openquestsdialogues.page.constraint.near-character")
                               .param("radius", Math.round(nearCharacter.getRadius()))
                               .param("character", name != null ? name : Message.translation(DialogueQuestProgression.SOMEONE)));
+    }
+
+    /**
+     * Without a quest there is no giver yet: an asset aimed at one shows its {@code Text.giver} fallback.
+     */
+    @Nullable
+    private static Message assetName(@Nonnull NearCharacterConstraint nearCharacter, @Nonnull OpenQuestAsset asset) {
+        if (nearCharacter.getTargetMode() != TargetMode.Character) {
+            String name = DialogueQuestProgression.giverName(asset.getTagValues(Giver.NAME_TAG));
+            return name != null ? Message.translation(name) : null;
+        }
+        return nearCharacter.getCharacter() != null ? DialogueQuestProgression.characterName(nearCharacter.getCharacter()) : null;
     }
 }

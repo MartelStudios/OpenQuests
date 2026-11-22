@@ -53,19 +53,28 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
     }
 
     /**
-     * A quest aimed at its giver shows the giver's name as {@code Text.giver} holds it, the asset's
-     * fallback included; otherwise the target character's name.
+     * A quest aimed at its giver shows the giver's name as {@code Text.giver} holds it, the head's
+     * fallback first, then the step's own; otherwise the target character's name.
      *
      * @return the name of whom the quest aims at, {@code null} for no one.
      */
     @Nullable
     public static Message targetName(@Nonnull AbstractQuestProgression<?> quest, @Nonnull TargetMode mode, @Nullable QuestTarget target) {
         if (mode != TargetMode.Character) {
-            String[] name = quest.getHead().getTagValues(Giver.NAME_TAG);
-            if (name != null && name.length > 0 && !name[0].isEmpty()) return Message.translation(name[0]);
+            String name = giverName(quest.getHead().getTagValues(Giver.NAME_TAG));
+            if (name == null) name = giverName(quest.getTagValues(Giver.NAME_TAG));
+            if (name != null) return Message.translation(name);
         }
         String character = TargetMode.characterOf(target);
         return character == null ? null : characterName(character);
+    }
+
+    /**
+     * @return the giver's name key in those {@code Text.giver} values, {@code null} for none.
+     */
+    @Nullable
+    public static String giverName(@Nullable String[] values) {
+        return values != null && values.length > 0 && !values[0].isEmpty() ? values[0] : null;
     }
 
     @Nonnull

@@ -69,4 +69,20 @@ class QuestTextParamsTest {
 
         assertEquals("farmers.mira", giverIn(AbstractQuestProgression.titleOf(step, composite)));
     }
+
+    @Test
+    void aLiveStepFallsBackOnItsOwnAssetOnlyWhereItsHeadIsSilent() {
+        QuestTreeTest.TestComposite composite = new QuestTreeTest.TestComposite();
+        TestQuestAsset stepAsset = new TestQuestAsset().titled("step.title").tagged(Map.of("Text.giver", new String[] {"farmers.someone"}, "Text.crop", new String[] {"crops.onion"}));
+        AbstractQuestProgression<?> step = new TestQuestProgression() {
+            @Override
+            public AbstractCompositeQuestProgression<?> getParent() {
+                return composite;
+            }
+        }.withAsset(stepAsset);
+        composite.apply(new AbstractQuestProgression.PutTag("Text.giver", new String[] {"farmers.mira"}));
+
+        assertEquals("farmers.mira", giverIn(step.getTitle()));
+        assertEquals("crops.onion", step.getTitle().getFormattedMessage().messageParams.get("crop").messageId);
+    }
 }
