@@ -1,0 +1,32 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Opened",
+          "Dialogue": "AdventureQuests_FarmerTier2Accepted",
+          "With": "Npc"
+        },
+        "Then": {
+          "Router": "AdventureQuests_KweebecFarmerTier3"
+        }
+      },
+      {
+        "When": {
+          "Type": "Opened",
+          "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+          "With": "Npc"
+        },
+        "Then": {
+          "Router": "AdventureQuests_KweebecFarmerTier2"
+        }
+      },
+      {
+        "Then": {
+          "Router": "AdventureQuests_KweebecFarmerTier1"
+        }
+      }
+    ]
+  }
+}

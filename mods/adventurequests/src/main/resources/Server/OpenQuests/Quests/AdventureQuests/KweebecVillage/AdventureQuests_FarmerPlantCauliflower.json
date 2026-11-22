@@ -1,0 +1,57 @@
+{
+  "Type": "PlaceBlock",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Cauliflower.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "Tags": {
+    "Text.giver": [
+      "adventurequests.kweebecvillage.farmer.someone"
+    ]
+  },
+  "TitleKey": "adventurequests.kweebecvillage.quest.farmer.plant-cauliflower.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.plant-cauliflower.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.plant-cauliflower.short",
+  "TargetQuantity": 4,
+  "BlockToPlace": {
+    "ItemId": "Plant_Seeds_Cauliflower"
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Target": "GiverNpc",
+      "Radius": 30
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Plant_Seeds_Cauliflower_Eternal",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Pie_Pumpkin",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 50
+          }
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}

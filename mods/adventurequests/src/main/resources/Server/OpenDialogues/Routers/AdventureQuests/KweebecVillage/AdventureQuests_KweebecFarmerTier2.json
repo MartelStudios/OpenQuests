@@ -1,0 +1,198 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "Or",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestAubergine",
+              "States": [
+                "InProgress"
+              ],
+              "GivenBy": "Npc"
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestPumpkin",
+              "States": [
+                "InProgress"
+              ],
+              "GivenBy": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Waiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "Opened",
+              "Dialogue": "AdventureQuests_FarmerHarvestAubergineIntro",
+              "With": "Npc"
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestAubergine",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 0,
+              "Max": 0
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerHarvestAubergineIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "Opened",
+              "Dialogue": "AdventureQuests_FarmerHarvestPumpkinIntro",
+              "With": "Npc"
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestPumpkin",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 0,
+              "Max": 0
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerHarvestPumpkinIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "Or",
+          "Conditions": [
+            {
+              "Type": "Cooldown",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "With": "Npc",
+              "Seconds": 1200,
+              "Not": true
+            },
+            {
+              "Type": "Opened",
+              "Dialogue": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc",
+              "Min": 0,
+              "Max": 0
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Opened",
+          "Dialogue": "AdventureQuests_FarmerPlantPotatoIntro",
+          "With": "Npc"
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerPlantPotatoIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "Opened",
+          "Dialogue": "AdventureQuests_FarmerPlantOnionIntro",
+          "With": "Npc"
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerPlantOnionIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "Opened",
+          "Dialogue": "AdventureQuests_FarmerPlantCauliflowerIntro",
+          "With": "Npc"
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerPlantCauliflowerIntro"
+        }
+      },
+      {
+        "Then": {
+          "Router": {
+            "Selector": {
+              "Type": "Weighted",
+              "Entries": [
+                {
+                  "Weight": 1,
+                  "When": {
+                    "Type": "RequiresQuest",
+                    "QuestAssetId": "AdventureQuests_FarmerPlantPotato",
+                    "GivenBy": "Npc",
+                    "Min": 0,
+                    "Max": 0
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_FarmerPlantPotatoIntro"
+                  }
+                },
+                {
+                  "Weight": 1,
+                  "When": {
+                    "Type": "RequiresQuest",
+                    "QuestAssetId": "AdventureQuests_FarmerPlantOnion",
+                    "GivenBy": "Npc",
+                    "Min": 0,
+                    "Max": 0
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_FarmerPlantOnionIntro"
+                  }
+                },
+                {
+                  "Weight": 1,
+                  "When": {
+                    "Type": "RequiresQuest",
+                    "QuestAssetId": "AdventureQuests_FarmerPlantCauliflower",
+                    "GivenBy": "Npc",
+                    "Min": 0,
+                    "Max": 0
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_FarmerPlantCauliflowerIntro"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerSmallTalk"
+        }
+      }
+    ]
+  }
+}

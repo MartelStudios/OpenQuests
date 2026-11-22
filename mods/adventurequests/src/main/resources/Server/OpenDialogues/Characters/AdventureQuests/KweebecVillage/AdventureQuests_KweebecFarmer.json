@@ -1,0 +1,16 @@
+{
+  "Epithet": "adventurequests.kweebecvillage.character.farmer.epithet",
+  "Uniqueness": "None",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_KweebecFarmer"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Kweebec_Sproutling"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-.*"
+      ],
+      "Not": true
+    },
+    {
+      "Type": "NearCharacter",
+      "Characters": [
+        "AdventureQuests_KweebecFarmer",
+        "AdventureQuests_KweebecHeavyPumpkins",
+        "AdventureQuests_KweebecReplant",
+        "AdventureQuests_KweebecWheat"
+      ],
+      "Radius": 64,
+      "Not": true
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_KweebecFarmer",
+      "Weight": 1
+    },
+    {
+      "Weight": 1
+    }
+  ]
+}

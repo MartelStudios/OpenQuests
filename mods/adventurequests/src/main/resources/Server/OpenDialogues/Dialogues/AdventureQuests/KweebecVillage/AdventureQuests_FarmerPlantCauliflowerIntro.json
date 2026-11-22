@@ -1,0 +1,40 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.farmer.plant-cauliflower.intro.page1"
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.farmer.plant-cauliflower.intro.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.farmer.tier2.accept",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_FarmerPlantCauliflower"
+        },
+        {
+          "Type": "Command",
+          "Command": "give {player} Plant_Seeds_Cauliflower --quantity=4"
+        },
+        {
+          "Type": "Open",
+          "Dialogue": "AdventureQuests_FarmerTier2Accepted"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village.decline",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}
