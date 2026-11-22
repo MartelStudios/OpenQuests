@@ -1,0 +1,15 @@
+{
+  "Type": "InteractivelyPickup",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-snails.harvest.title",
+  "TargetQuantity": 3,
+  "ItemToPickup": {
+    "ItemId": "Plant_Crop_Lettuce_Item"
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_KweebecSnails",
+      "Radius": 30
+    }
+  ]
+}

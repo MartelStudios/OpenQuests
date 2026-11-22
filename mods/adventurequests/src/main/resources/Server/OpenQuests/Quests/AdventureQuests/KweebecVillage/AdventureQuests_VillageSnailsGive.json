@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-snails.give.title",
+  "Character": "AdventureQuests_KweebecSnails",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Lettuce_Item"
+      },
+      "Quantity": 3
+    }
+  ]
+}

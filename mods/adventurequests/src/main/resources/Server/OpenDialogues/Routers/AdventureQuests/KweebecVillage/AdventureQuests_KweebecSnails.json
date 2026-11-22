@@ -1,0 +1,69 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_VillageSnails",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "NearBlock",
+              "Block": {
+                "ItemId": "Plant_Crop_Lettuce_Block"
+              },
+              "State": "StageFinal",
+              "Radius": 30,
+              "Min": 3
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSnailsIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_VillageSnails",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSnailsAbsent"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_VillageSnails",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSnailsWaiting"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSnailsThanks"
+        }
+      }
+    ]
+  }
+}
