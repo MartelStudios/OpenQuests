@@ -5,6 +5,7 @@ import com.martelstudios.opendialogues.conditions.ConditionFixtures;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.List;
 
 import static com.martelstudios.opendialogues.conditions.ConditionFixtures.context;
@@ -14,6 +15,21 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConditionalAnswersTest {
+
+    @Test
+    void invertedCooldownHidesTheTriggerResponseWhileWaiting() {
+        OpenDialogueAsset dialogue = dialogue("""
+                {"Text":"Come back later","Id":"Later","When":{
+                    "Type":"Cooldown","Dialogue":"Greeting","Answer":"Later","Seconds":600,"Not":true
+                }}
+                """);
+        DialogueHistory history = new DialogueHistory();
+        assertEquals(List.of("Come back later"), texts(dialogue.visibleResponses(context(history))));
+        history.recordAnswer(null, "Greeting", "Later", Instant.EPOCH);
+        assertEquals(List.of("Come back later"), texts(dialogue.visibleResponses(context(history))));
+        history.recordAnswer("Elder", "Greeting", "Later");
+        assertEquals(List.of(), texts(dialogue.visibleResponses(context(history))));
+    }
 
     private static final String SEEN_WELCOME = "\"When\": { \"Type\": \"Opened\", \"Dialogue\": \"Elder_Welcome\", \"Min\": 1 }";
 

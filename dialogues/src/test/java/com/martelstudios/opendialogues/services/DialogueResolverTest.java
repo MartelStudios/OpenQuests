@@ -11,6 +11,7 @@ import com.martelstudios.opendialogues.routers.impl.weighted.OpenDialoguesWeight
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -73,6 +74,24 @@ class DialogueResolverTest {
         history.recordOpened("Welcome");
 
         assertSame(again, resolve("Elder"));
+    }
+
+    @Test
+    void sequenceUsesTheFallbackWhileItsTriggerDialogueIsOnCooldown() {
+        var welcome = dialogue("Welcome");
+        var waiting = dialogue("Waiting");
+        router("Elder", """
+                {"Type":"Sequence","Routes":[
+                    {"When":{"Type":"Cooldown","Dialogue":"Welcome","Seconds":600,"Not":true},
+                     "Then":{"Dialogue":"Welcome"}}
+                ],"Default":{"Dialogue":"Waiting"}}
+                """);
+
+        assertSame(welcome, resolve("Elder"));
+        history.recordOpened("Elder", "Welcome", Instant.EPOCH);
+        assertSame(welcome, resolve("Elder"));
+        history.recordOpened("Elder", "Welcome");
+        assertSame(waiting, resolve("Elder"));
     }
 
     @Test
