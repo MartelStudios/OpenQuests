@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-soggy-hay.give.title",
+  "Character": "AdventureQuests_KweebecSoggyHay",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Hay"
+      },
+      "Quantity": 2
+    }
+  ]
+}
