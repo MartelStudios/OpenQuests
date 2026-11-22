@@ -5,11 +5,14 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.validation.Validators;
+import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.martelstudios.opendialogues.OpenDialoguesPlugin;
 import com.martelstudios.opendialogues.characters.filters.CharacterFilter;
 import com.martelstudios.opendialogues.characters.filters.FilterContext;
 import com.martelstudios.opendialogues.characters.runtime.CharacterPositions;
+import com.martelstudios.opendialogues.characters.runtime.CharacterPositionsAccess;
 import org.joml.Vector3d;
 
 import javax.annotation.Nonnull;
@@ -52,7 +55,10 @@ public class OpenDialoguesNearCharacterFilter extends CharacterFilter {
         if (context.accessor() == null || plugin == null) return false;
         TransformComponent transform = context.accessor().getComponent(context.npc(), TransformComponent.getComponentType());
         if (transform == null) return false;
-        return holdsAt(plugin.getCharacterPositions().view(context.accessor()), transform.getPosition());
+        // A draw sticks to the NPC, so it reads positions caught up with resets, safe on the world thread
+        CharacterPositionsAccess access = plugin.getCharacterPositions();
+        Map<String, Collection<CharacterPositions.Spot>> spots = context.accessor() instanceof Store<EntityStore> store ? access.positions(store).view() : access.view(context.accessor());
+        return holdsAt(spots, transform.getPosition());
     }
 
     /**
