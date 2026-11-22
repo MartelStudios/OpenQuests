@@ -1,0 +1,34 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Food_Salt.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.ferancamp.quest.camp-salt-road.title",
+  "DescriptionKey": "adventurequests.ferancamp.quest.camp-salt-road.description",
+  "ShortDescriptionKey": "adventurequests.ferancamp.quest.camp-salt-road.short",
+  "Character": "AdventureQuests_KweebecFeranFriend",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Salt"
+      },
+      "Quantity": 10
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Chitin_Sturdy",
+      "Quantity": 4,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Silver",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

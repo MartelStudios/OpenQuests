@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.ferancamp.character.kweebec-feran-friend.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_KweebecFeranFriend"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}
