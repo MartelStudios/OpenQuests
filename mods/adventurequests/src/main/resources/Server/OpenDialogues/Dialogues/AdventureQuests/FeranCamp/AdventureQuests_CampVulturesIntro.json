@@ -1,0 +1,35 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_FeranVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-vultures.intro.page1"
+    },
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-vultures.intro.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp.hunt",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_CampVultures"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp.decline",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

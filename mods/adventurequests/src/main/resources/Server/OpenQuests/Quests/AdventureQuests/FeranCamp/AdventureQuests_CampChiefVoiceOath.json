@@ -1,0 +1,8 @@
+{
+  "Type": "Dialogue",
+  "TitleKey": "adventurequests.ferancamp.quest.camp-chief-voice.oath.title",
+  "TargetQuantity": 1,
+  "Character": "AdventureQuests_FeranChiefVoice",
+  "Dialogue": "AdventureQuests_CampChiefVoiceWaiting",
+  "Answer": "Oath"
+}

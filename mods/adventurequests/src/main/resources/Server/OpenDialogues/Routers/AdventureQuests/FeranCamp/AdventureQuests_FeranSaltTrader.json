@@ -1,0 +1,39 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_CampSaltRoad",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampSaltRoadIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_CampSaltRoad",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampSaltRoadWaiting"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_CampSaltRoadThanks"
+        }
+      }
+    ]
+  }
+}

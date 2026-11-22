@@ -1,0 +1,66 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_CampCrocodile",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "NearNpc",
+              "Role": "Crocodile",
+              "Radius": 150,
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampCrocodileIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_CampCrocodile",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampCrocodileAbsent"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_CampCrocodile",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampCrocodileWaiting"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_CampCrocodileThanks"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-fresh-road.intro.page1"
+    },
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-fresh-road.intro.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-fresh-road.accept",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_CampFreshRoad"
+        },
+        {
+          "Type": "Command",
+          "Command": "give {player} Plant_Crop_Pumpkin_Item --quantity=4"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village.trade",
+      "Actions": [
+        {
+          "Type": "OpenBarterShop",
+          "Shop": "Kweebec_Merchant"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village.decline",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

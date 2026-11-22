@@ -1,0 +1,40 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_FeranVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-vultures.waiting"
+    }
+  ],
+  "Responses": [
+    {
+      "When": {
+        "Type": "NearNpc",
+        "Role": "Vulture",
+        "Radius": 150,
+        "Min": 0,
+        "Max": 0
+      },
+      "Text": "adventurequests.ferancamp.dialogue.camp.giveup",
+      "Actions": [
+        {
+          "Type": "SetQuestState",
+          "Quest": "AdventureQuests_CampVultures",
+          "State": "Abandoned"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp.later",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

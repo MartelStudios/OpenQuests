@@ -1,0 +1,35 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Chitin_Sturdy.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.ferancamp.quest.camp-chief-voice.title",
+  "DescriptionKey": "adventurequests.ferancamp.quest.camp-chief-voice.description",
+  "ShortDescriptionKey": "adventurequests.ferancamp.quest.camp-chief-voice.short",
+  "QuestAssetIds": [
+    "AdventureQuests_CampChiefVoiceGift",
+    "AdventureQuests_CampChiefVoiceOath"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Deco_Bone_Skulls_Feran",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Furniture_Feran_Torch",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

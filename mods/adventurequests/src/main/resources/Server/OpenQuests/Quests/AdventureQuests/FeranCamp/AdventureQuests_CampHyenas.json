@@ -1,0 +1,38 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Hide_Medium.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.ferancamp.quest.camp-hyenas.title",
+  "DescriptionKey": "adventurequests.ferancamp.quest.camp-hyenas.description",
+  "ShortDescriptionKey": "adventurequests.ferancamp.quest.camp-hyenas.short",
+  "TargetQuantity": 3,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Hyena"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_FeranHyenas",
+      "Radius": 150
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Salt",
+      "Quantity": 5,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Hide_Medium",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

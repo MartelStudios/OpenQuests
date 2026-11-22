@@ -1,0 +1,34 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Plant_Crop_Pumpkin.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.ferancamp.quest.camp-fresh-road.title",
+  "DescriptionKey": "adventurequests.ferancamp.quest.camp-fresh-road.description",
+  "ShortDescriptionKey": "adventurequests.ferancamp.quest.camp-fresh-road.short",
+  "Character": "AdventureQuests_FeranSaltTrader",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Plant_Crop_Pumpkin_Item"
+      },
+      "Quantity": 4
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Weapon_Sword_Bone",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

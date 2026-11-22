@@ -1,0 +1,38 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_FeranVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-chief-voice.intro.page1"
+    },
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-chief-voice.intro.page2"
+    },
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-chief-voice.intro.page3"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-chief-voice.accept",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_CampChiefVoice"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp.decline",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}
