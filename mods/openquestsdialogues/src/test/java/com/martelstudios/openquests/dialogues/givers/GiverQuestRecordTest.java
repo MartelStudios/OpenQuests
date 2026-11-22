@@ -76,7 +76,7 @@ class GiverQuestRecordTest {
         assertFalse(record.forgetNpc(A.npc()));
 
         assertEquals(0, record.completions("Farmer", A.npc(), "Q").total());
-        assertEquals(1, record.completions("Farmer", null, "Q").total());
+        assertEquals(2, record.completions("Farmer", null, "Q").total());
     }
 
     @Test
@@ -89,7 +89,8 @@ class GiverQuestRecordTest {
 
         assertTrue(record.forgetNpcs(java.util.Set.of(A.npc(), B.npc())::contains));
 
-        assertEquals(0, record.completions("Farmer", null, "Q").total());
+        assertEquals(2, record.completions("Farmer", null, "Q").total());
+        assertEquals(0, record.completions("Farmer", A.npc(), "Q").total());
         assertEquals(1, record.completions("Smith", kept.npc(), "Q").total());
         assertFalse(record.forgetNpcs(java.util.Set.of(A.npc(), B.npc())::contains));
     }

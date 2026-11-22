@@ -213,6 +213,7 @@ class DialogueHistoryTest {
 
         assertTrue(history.forgetNpc(A));
         assertEquals(0, history.count("Farmer", A, "Intro", null));
+        assertEquals(3, history.count("Farmer", null, "Intro", null));
         assertEquals(2, history.count("Farmer", B, "Intro", null));
         assertFalse(history.forgetNpc(A));
     }
@@ -240,9 +241,10 @@ class DialogueHistoryTest {
         assertTrue(history.forgetNpcs(java.util.Set.of(A, B)::contains));
 
         assertEquals(0, history.count("Farmer", A, "Intro", null));
-        assertEquals(0, history.count("Smith", null, "Intro", null));
+        assertEquals(1, history.count("Smith", null, "Intro", null));
+        assertEquals(0, history.count("Smith", B, "Intro", null));
         assertEquals(1, history.count("Farmer", kept, "Intro", null));
-        assertEquals(2, history.count("Farmer", null, "Intro", null));
+        assertEquals(3, history.count("Farmer", null, "Intro", null));
         assertFalse(history.forgetNpcs(java.util.Set.of(A, B)::contains));
     }
 }

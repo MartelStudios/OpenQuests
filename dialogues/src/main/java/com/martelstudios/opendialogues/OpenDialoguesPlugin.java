@@ -123,7 +123,7 @@ import java.util.random.RandomGenerator;
 public class OpenDialoguesPlugin extends JavaPlugin {
 
     /** How long a released NPC is remembered for players who were offline when it let its character go. */
-    public static final Duration RELEASED_NPC_RETENTION = Duration.ofDays(30);
+    public static final Duration RELEASED_NPC_RETENTION = Duration.ofDays(365);
 
     /**
      * Every world draws on its own thread, so each call asks that thread's generator.
@@ -426,7 +426,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     /**
      * Read like {@link #universeCharacters()}; releases older than the retention are dropped on the
-     * first read after the server starts, as players offline that long were swept or never met them.
+     * first read after the server starts. Kept long: a player away longer is never swept, and their
+     * quests aimed at such an NPC no longer fail on load.
      */
     @Nonnull
     private ReleasedNpcs releasedNpcs() {

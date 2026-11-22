@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -28,7 +29,7 @@ public class GiverQuestRecord implements Component<EntityStore> {
 
     public static final BuilderCodec<GiverQuestRecord> CODEC = BuilderCodec.builder(GiverQuestRecord.class, GiverQuestRecord::new)
                                                                            .append(new KeyedCodec<>("Givers", new MapCodec<>(NPCS_CODEC, HashMap<String, Map<String, Map<String, QuestCompletions>>>::new)), (record, givers) -> givers.forEach((character, npcs) -> npcs.forEach((npc, assets) -> assets.forEach((asset, completions) -> record.assetsOf(character, npc).put(asset, completions)))), record -> record.givers)
-                                                                           .documentation("Quest outcomes by giver character ID, then giver NPC UUID, then quest asset ID, initially empty.")
+                                                                           .documentation("Quest outcomes by giver character ID, then giver NPC UUID (empty key for NPCs since released), then quest asset ID, initially empty.")
                                                                            .add()
                                                                            .build();
 
@@ -36,6 +37,9 @@ public class GiverQuestRecord implements Component<EntityStore> {
      * Character ID, then NPC UUID, then quest asset ID. Counts are immutable, so a copy shares them.
      */
     private final Map<String, Map<String, Map<String, QuestCompletions>>> givers = new HashMap<>();
+
+    /** Key of the outcomes from NPCs since released, counted for their character alone. */
+    private static final String NO_NPC = "";
 
     public GiverQuestRecord() {}
 
@@ -78,43 +82,54 @@ public class GiverQuestRecord implements Component<EntityStore> {
         for (Map<String, QuestCompletions> assets : npcs.values()) {
             QuestCompletions one = assets.get(assetId);
             if (one == null) continue;
-            sum = sum == QuestCompletions.NONE ? one : QuestCompletions.of(sum.count(QuestState.SUCCESSFUL) + one.count(QuestState.SUCCESSFUL), sum.count(QuestState.FAILED) + one.count(QuestState.FAILED), sum.count(QuestState.ABANDONED) + one.count(QuestState.ABANDONED), latest(sum.getLastStartedAt(), one.getLastStartedAt()), latest(sum.getLastCompletedAt(), one.getLastCompletedAt()));
+            sum = sum == QuestCompletions.NONE ? one : sum(sum, one);
         }
         return sum;
     }
 
     /**
-     * Drops everything an NPC handed out, under whichever character.
+     * Forgets one NPC, under whichever character: its outcomes count for its character only, as
+     * handed by no known NPC, so conditions on the character keep their counts.
      *
-     * @return whether anything was dropped.
+     * @return whether that NPC had anything recorded.
      */
     public boolean forgetNpc(@Nonnull UUID npc) {
-        boolean dropped = false;
-        for (Map<String, Map<String, QuestCompletions>> npcs : givers.values()) {
-            dropped |= npcs.remove(npc.toString()) != null;
-        }
-        givers.values().removeIf(Map::isEmpty);
-        return dropped;
+        return forgetNpcs(npc::equals);
     }
 
     /**
-     * Drops everything handed out by the NPCs the predicate names, under whichever character.
+     * Forgets every NPC the predicate names, as {@link #forgetNpc} does for one.
      *
-     * @return whether anything was dropped.
+     * @return whether anything was forgotten.
      */
     public boolean forgetNpcs(@Nonnull Predicate<UUID> released) {
-        boolean dropped = false;
+        boolean forgotten = false;
         for (Map<String, Map<String, QuestCompletions>> npcs : givers.values()) {
-            dropped |= npcs.keySet().removeIf(key -> {
-                try {
-                    return released.test(UUID.fromString(key));
-                } catch (IllegalArgumentException malformed) {
-                    return false;
-                }
-            });
+            for (String key : List.copyOf(npcs.keySet())) {
+                if (!isNpc(key, released)) continue;
+                Map<String, QuestCompletions> unknown = npcs.computeIfAbsent(NO_NPC, none -> new HashMap<>());
+                npcs.remove(key).forEach((assetId, completions) -> unknown.merge(assetId, completions, GiverQuestRecord::sum));
+                forgotten = true;
+            }
         }
-        givers.values().removeIf(Map::isEmpty);
-        return dropped;
+        return forgotten;
+    }
+
+    /**
+     * @return whether the key names an NPC the predicate holds; the no-NPC key and malformed ones never do.
+     */
+    private static boolean isNpc(@Nonnull String key, @Nonnull Predicate<UUID> released) {
+        if (key.equals(NO_NPC)) return false;
+        try {
+            return released.test(UUID.fromString(key));
+        } catch (IllegalArgumentException malformed) {
+            return false;
+        }
+    }
+
+    @Nonnull
+    private static QuestCompletions sum(@Nonnull QuestCompletions first, @Nonnull QuestCompletions second) {
+        return QuestCompletions.of(first.count(QuestState.SUCCESSFUL) + second.count(QuestState.SUCCESSFUL), first.count(QuestState.FAILED) + second.count(QuestState.FAILED), first.count(QuestState.ABANDONED) + second.count(QuestState.ABANDONED), latest(first.getLastStartedAt(), second.getLastStartedAt()), latest(first.getLastCompletedAt(), second.getLastCompletedAt()));
     }
 
     @Nonnull
