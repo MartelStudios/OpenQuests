@@ -134,13 +134,14 @@ public final class GiverQuestRecorder {
     }
 
     /**
-     * On the player's world thread the write is made at once, so a condition checked right after
-     * a quest ends in the same tick already reads it: the live tally no longer counts an ended quest.
+     * On the player's world thread an existing record is written at once, so a condition checked
+     * right after a quest ends in the same tick already reads it. Adding a missing record is queued:
+     * a quest ending inside a system (a block placed) finds the store refusing any add.
      */
     private void write(@Nonnull UUID playerId, @Nonnull Consumer<GiverQuestRecord> action) {
         PlayerRef online = Universe.get().getPlayer(playerId);
         Ref<EntityStore> ref = online == null ? null : online.getReference();
-        GiverQuestRecord here = ref != null && ref.isValid() && ref.getStore().isInThread() ? ref.getStore().ensureAndGetComponent(ref, type) : null;
+        GiverQuestRecord here = ref != null && ref.isValid() && ref.getStore().isInThread() ? ref.getStore().getComponent(ref, type) : null;
         write(here, action, () -> EntityComponents.update(playerId, components -> action.accept(components.ensureAndGetComponent(type))));
     }
 
