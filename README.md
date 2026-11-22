@@ -46,7 +46,8 @@ A quest is handed out in one of three ways, and the prerequisites of a quest are
 - **As a reward**: the `GrantQuest` reward hands further quests over when a quest completes. This
   is how a chain is written: finishing A grants B. Each player paid gets their own, unless the
   reward is `Shared`: the quest then hands it on once, in its own scope, so a chain a world or the
-  universe shares goes on shared.
+  universe shares goes on shared. A follow-up keeps the giver of its chain, the NPC that handed
+  the first quest out, so its texts and targets still name that NPC.
 - **Explicitly**: `QuestProgressionService.assignQuest(asset, playerId)`, from a command or from
   your own plugin.
 
