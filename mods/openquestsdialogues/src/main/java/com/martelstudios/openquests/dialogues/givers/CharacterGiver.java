@@ -71,11 +71,13 @@ public final class CharacterGiver extends QuestGiver {
     }
 
     /**
+     * A damaged save missing the NPC or the character counts as no giver, never half a one.
+     *
      * @return the character giver of the quest's head, {@code null} for a quest no character NPC handed out.
      */
     @Nullable
     public static CharacterGiver of(@Nonnull AbstractQuestProgression<?> quest) {
-        return quest.getHead().getGiver() instanceof CharacterGiver giver ? giver : null;
+        return quest.getHead().getGiver() instanceof CharacterGiver giver && giver.getNpc() != null && giver.character != null ? giver : null;
     }
 
     /**

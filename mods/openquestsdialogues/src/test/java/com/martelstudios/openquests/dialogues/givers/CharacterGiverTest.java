@@ -50,6 +50,19 @@ class CharacterGiverTest {
     }
 
     @Test
+    void aGiverMissingItsCharacterOrNpcIsNoGiver() {
+        CharacterGiver.register();
+        TestQuest quest = TestQuest.givenBy(new TestQuest(), new CharacterGiver("Farmer", NPC, "names.mira", AT));
+        String json = CodecJson.encode(TestQuest.CODEC, quest);
+
+        TestQuest noCharacter = CodecJson.decode(TestQuest.CODEC, json.replace("\"Character\":", "\"Dropped\":"), "quest");
+        TestQuest noNpc = CodecJson.decode(TestQuest.CODEC, json.replace("\"Npc\"", "\"Dropped\""), "quest");
+
+        assertNull(CharacterGiver.of(noCharacter));
+        assertNull(CharacterGiver.of(noNpc));
+    }
+
+    @Test
     void roundTrip() {
         CharacterGiver.register();
         TestQuest quest = TestQuest.givenBy(new TestQuest(), new CharacterGiver("Farmer", NPC, "names.mira", AT));
