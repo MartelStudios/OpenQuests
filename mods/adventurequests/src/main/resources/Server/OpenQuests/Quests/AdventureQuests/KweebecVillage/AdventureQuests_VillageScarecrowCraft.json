@@ -1,0 +1,8 @@
+{
+  "Type": "Craft",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-scarecrow.craft.title",
+  "TargetQuantity": 1,
+  "ItemToCraft": {
+    "ItemId": "Deco_Scarecrow"
+  }
+}
