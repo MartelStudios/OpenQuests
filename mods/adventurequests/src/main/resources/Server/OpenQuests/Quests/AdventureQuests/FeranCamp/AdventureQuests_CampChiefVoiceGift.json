@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.ferancamp.quest.camp-chief-voice.gift.title",
+  "Character": "AdventureQuests_FeranChiefVoice",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Chitin_Sturdy"
+      },
+      "Quantity": 5
+    }
+  ]
+}

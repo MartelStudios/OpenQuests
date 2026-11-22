@@ -1,3 +1,16 @@
+character.camp-chief-voice.epithet=Voix du chef
+dialogue.camp-chief-voice.intro.page1=Tu es devant la hutte du chef. Le chef ne parle pas aux étrangers. Je parle pour le chef.
+dialogue.camp-chief-voice.intro.page2=Le chef t'a vu marcher sur notre sable. Un étranger qui le foule souvent doit devenir un ami, ou partir.
+dialogue.camp-chief-voice.intro.page3=Apporte cinq chitines robustes, prises aux Scarak, en cadeau. Puis prête le serment du sable, et le camp te reconnaîtra.
+dialogue.camp-chief-voice.accept=Je gagnerai la confiance du chef.
+dialogue.camp-chief-voice.waiting=D'abord le cadeau de chitine, ensuite le serment. Le chef écoute.
+dialogue.camp-chief-voice.oath=Je le jure par le sable : le sang Feran est mon sang, le sang Scarak est ma proie.
+dialogue.camp-chief-voice.thanks=Le chef te nomme ami du camp. Prends ceci, pour que chaque Feran qui entre chez toi le sache.
+quest.camp-chief-voice.title=La voix du chef
+quest.camp-chief-voice.description=Le chef d'un camp Feran ne parle que par une voix, et demande au joueur un cadeau et un serment.
+quest.camp-chief-voice.short=Apportez 5 chitines robustes à la voix du chef et prêtez le serment du sable
+quest.camp-chief-voice.gift.title=Donnez 5 chitines robustes à la voix du chef
+quest.camp-chief-voice.oath.title=Prêtez le serment du sable
 character.feran-villager.name=Feran
 character.camp-scarak-hunt.epithet=Chasseur de Scarak
 dialogue.camp-scarak-hunt.intro.page1=Tu sens ça ? Des Scarak. Leurs éclaireurs repèrent notre camp avant que l'essaim arrive.

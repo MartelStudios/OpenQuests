@@ -1,3 +1,16 @@
+character.camp-chief-voice.epithet=Voice of the chief
+dialogue.camp-chief-voice.intro.page1=You stand before the hut of the chief. The chief does not speak to strangers. I speak for the chief.
+dialogue.camp-chief-voice.intro.page2=The chief has watched you walk our sand. A stranger who walks it often should become a friend, or leave.
+dialogue.camp-chief-voice.intro.page3=Bring five sturdy chitin, taken from the Scarak, as a gift. Then swear the oath of the sand, and the camp will know you.
+dialogue.camp-chief-voice.accept=I will earn the trust of the chief.
+dialogue.camp-chief-voice.waiting=First the gift of chitin, then the oath. The chief listens.
+dialogue.camp-chief-voice.oath=I swear by the sand: Feran blood is my blood, Scarak blood is my prey.
+dialogue.camp-chief-voice.thanks=The chief names you friend of the camp. Take these, so every Feran who enters your home knows it.
+quest.camp-chief-voice.title=The voice of the chief
+quest.camp-chief-voice.description=The chief of a Feran camp speaks only through a voice, and asks the player for a gift and an oath.
+quest.camp-chief-voice.short=Bring 5 sturdy chitin to the voice of the chief and swear the oath of the sand
+quest.camp-chief-voice.gift.title=Give 5 sturdy chitin to the voice of the chief
+quest.camp-chief-voice.oath.title=Swear the oath of the sand
 character.feran-villager.name=Feran
 character.camp-scarak-hunt.epithet=Scarak hunter
 dialogue.camp-scarak-hunt.intro.page1=Smell that? Scarak. Their seekers scout our camp before the swarm comes.
