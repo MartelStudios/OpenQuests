@@ -91,7 +91,7 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
             // The group is what knows how a child it can no longer reach went, so it says so
             // before the line asks the journal, which cannot place that child at all
             if (child == null) {
-                context.marking(step.markFor(context.getViewer()), () -> renderChild(context, step.asset()));
+                context.marking(step.markFor(context.getViewer()), () -> renderChild(context, step.asset(), composite));
                 continue;
             }
 
@@ -120,9 +120,16 @@ public final class CompositeQuestPageRenderer implements QuestPageRenderer {
      * the player open a step the store no longer holds.
      */
     private void renderChild(@Nonnull QuestPageContext context, @Nullable OpenQuestAsset childAsset) {
+        renderChild(context, childAsset, null);
+    }
+
+    /**
+     * @param composite the group the child belongs to, whose text tags fill the child's title, {@code null} for a preview.
+     */
+    private void renderChild(@Nonnull QuestPageContext context, @Nullable OpenQuestAsset childAsset, @Nullable CompositeQuestProgression composite) {
         if (childAsset == null) return;
 
-        context.listing(childAsset.getId(), () -> QuestPageRows.appendLine(context, AbstractQuestProgression.titleOf(childAsset)));
+        context.listing(childAsset.getId(), () -> QuestPageRows.appendLine(context, composite == null ? AbstractQuestProgression.titleOf(childAsset) : AbstractQuestProgression.titleOf(childAsset, composite)));
     }
 
     private void renderPreview(@Nonnull QuestPageContext context, @Nonnull CompositeQuestAsset composite) {

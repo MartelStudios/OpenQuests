@@ -872,7 +872,11 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nonnull
     private Map<String, String> textParams() {
-        AbstractQuestProgression<?> head = getHead();
+        return headTextParams(getHead());
+    }
+
+    @Nonnull
+    private static Map<String, String> headTextParams(@Nonnull AbstractQuestProgression<?> head) {
         Set<String> names = new HashSet<>(head.getTags().keySet());
         OpenQuestAsset headAsset = head.getAsset();
         if (headAsset != null) names.addAll(headAsset.getTagNames());
@@ -1060,6 +1064,16 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         String titleKey = asset.getTitleKey();
 
         return QuestTextParams.apply(titleKey != null ? Message.translation(titleKey) : asset.create().getDefaultTitle(), textParamsOf(asset));
+    }
+
+    /**
+     * The title of a step asset with no progression left, its text parameters read from the composite it belongs to.
+     */
+    @Nonnull
+    public static Message titleOf(@Nonnull OpenQuestAsset asset, @Nonnull AbstractQuestProgression<?> composite) {
+        String titleKey = asset.getTitleKey();
+        Message title = titleKey != null ? Message.translation(titleKey) : asset.create().getDefaultTitle();
+        return QuestTextParams.apply(title, headTextParams(composite.getHead()));
     }
 
     @Nonnull

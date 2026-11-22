@@ -58,7 +58,7 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
             drawnOne = true;
 
             if (step.run() != null) QuestHudRows.render(context, step.run());
-            else renderArchivedChild(context, step);
+            else renderArchivedChild(context, composite, step);
         }
     }
 
@@ -67,9 +67,9 @@ public final class CompositeQuestHudRenderer implements QuestHudRenderer {
      * was would read as if it had never been asked for. The group remembers which way it went;
      * when even it cannot say, the line takes no mark, as in the journal.
      */
-    private void renderArchivedChild(@Nonnull QuestHudContext context, @Nonnull CompositeStep step) {
+    private void renderArchivedChild(@Nonnull QuestHudContext context, @Nonnull CompositeQuestProgression composite, @Nonnull CompositeStep step) {
         if (step.asset() == null) return;
 
-        QuestHudRows.appendRow(context, AbstractQuestProgression.titleOf(step.asset()), step.recorded());
+        QuestHudRows.appendRow(context, AbstractQuestProgression.titleOf(step.asset(), composite), step.recorded());
     }
 }

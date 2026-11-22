@@ -2,6 +2,7 @@ package com.martelstudios.openquests.core.models;
 
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.TestQuestAsset;
+import com.martelstudios.openquests.core.persistence.TestQuestProgression;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -42,5 +43,30 @@ class QuestTextParamsTest {
 
         assertEquals("farmers.mira", quest.getTitle().getFormattedMessage().messageParams.get("giver").messageId);
         assertEquals("farmers.mira", quest.getDescription().getFormattedMessage().messageParams.get("giver").messageId);
+    }
+
+    private static String giverIn(Message message) {
+        return message.getFormattedMessage().messageParams.get("giver").messageId;
+    }
+
+    @Test
+    void theAssetTagIsTheFallbackAndTheQuestTagWins() {
+        TestQuestAsset asset = new TestQuestAsset().titled("quest.title").tagged(Map.of("Text.giver", new String[] {"farmers.someone"}));
+        AbstractQuestProgression<?> silent = new TestQuestProgression().withAsset(asset);
+        AbstractQuestProgression<?> named = new TestQuestProgression().withAsset(asset);
+        named.apply(new AbstractQuestProgression.PutTag("Text.giver", new String[] {"farmers.mira"}));
+
+        assertEquals("farmers.someone", giverIn(silent.getTitle()));
+        assertEquals("farmers.mira", giverIn(named.getTitle()));
+        assertEquals("farmers.someone", giverIn(AbstractQuestProgression.titleOf(asset)));
+    }
+
+    @Test
+    void anArchivedStepReadsTheTagsOfItsComposite() {
+        TestQuestAsset step = new TestQuestAsset().titled("step.title");
+        AbstractQuestProgression<?> composite = new TestQuestAsset().create();
+        composite.apply(new AbstractQuestProgression.PutTag("Text.giver", new String[] {"farmers.mira"}));
+
+        assertEquals("farmers.mira", giverIn(AbstractQuestProgression.titleOf(step, composite)));
     }
 }
