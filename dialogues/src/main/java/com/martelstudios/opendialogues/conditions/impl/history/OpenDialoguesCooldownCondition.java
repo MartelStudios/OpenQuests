@@ -18,7 +18,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Function;
 
-/** Holds while the delay after the player's latest matching dialogue interaction is active. */
+/**
+ * Holds unless the delay after the player's latest matching dialogue interaction is running:
+ * before any such interaction and once the delay ran out.
+ */
 public class OpenDialoguesCooldownCondition extends DialogueCondition {
 
     public static final String TYPE = "Cooldown";
@@ -47,7 +50,7 @@ public class OpenDialoguesCooldownCondition extends DialogueCondition {
 
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {
-        return isActive(context.history(), Instant.now());
+        return !isActive(context.history(), Instant.now());
     }
 
     boolean isActive(@Nonnull DialogueHistory history, @Nonnull Instant now) {

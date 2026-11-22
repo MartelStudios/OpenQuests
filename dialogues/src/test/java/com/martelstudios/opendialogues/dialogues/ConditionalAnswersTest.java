@@ -17,10 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConditionalAnswersTest {
 
     @Test
-    void invertedCooldownHidesTheTriggerResponseWhileWaiting() {
+    void cooldownHidesTheTriggerResponseWhileWaiting() {
         OpenDialogueAsset dialogue = dialogue("""
                 {"Text":"Come back later","Id":"Later","When":{
-                    "Type":"Cooldown","Dialogue":"Greeting","Answer":"Later","Seconds":600,"Not":true
+                    "Type":"Cooldown","Dialogue":"Greeting","Answer":"Later","Seconds":600
                 }}
                 """);
         DialogueHistory history = new DialogueHistory();

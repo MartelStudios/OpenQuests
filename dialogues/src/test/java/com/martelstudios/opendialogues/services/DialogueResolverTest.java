@@ -82,7 +82,7 @@ class DialogueResolverTest {
         var waiting = dialogue("Waiting");
         router("Elder", """
                 {"Type":"Sequence","Routes":[
-                    {"When":{"Type":"Cooldown","Dialogue":"Welcome","Seconds":600,"Not":true},
+                    {"When":{"Type":"Cooldown","Dialogue":"Welcome","Seconds":600},
                      "Then":{"Dialogue":"Welcome"}}
                 ],"Default":{"Dialogue":"Waiting"}}
                 """);
