@@ -4,19 +4,36 @@
     "Routes": [
       {
         "When": {
-          "Type": "Opened",
-          "Dialogue": "AdventureQuests_FarmerTier2Accepted",
-          "With": "Npc"
+          "Type": "RequiresQuest",
+          "QuestAssetIds": [
+            "AdventureQuests_FarmerHarvestAubergine",
+            "AdventureQuests_FarmerHarvestPumpkin"
+          ],
+          "States": [
+            "Successful"
+          ],
+          "GivenBy": "Npc",
+          "Min": 0,
+          "Max": 1
         },
         "Then": {
-          "Router": "AdventureQuests_KweebecFarmerTier3"
+          "Router": "AdventureQuests_KweebecFarmerTier1"
         }
       },
       {
         "When": {
-          "Type": "Opened",
-          "Dialogue": "AdventureQuests_FarmerTier1Accepted",
-          "With": "Npc"
+          "Type": "RequiresQuest",
+          "QuestAssetIds": [
+            "AdventureQuests_FarmerPlantPotato",
+            "AdventureQuests_FarmerPlantOnion",
+            "AdventureQuests_FarmerPlantCauliflower"
+          ],
+          "States": [
+            "Successful"
+          ],
+          "GivenBy": "Npc",
+          "Min": 0,
+          "Max": 1
         },
         "Then": {
           "Router": "AdventureQuests_KweebecFarmerTier2"
@@ -24,7 +41,7 @@
       },
       {
         "Then": {
-          "Router": "AdventureQuests_KweebecFarmerTier1"
+          "Router": "AdventureQuests_KweebecFarmerOngoing"
         }
       }
     ]
