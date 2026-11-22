@@ -115,6 +115,12 @@ class DialogueHistoryTest {
         assertEquals(2, read.opened("Greeting"));
         assertEquals(1, read.answered("Greeting", "Bye"));
         assertEquals(0, read.count("Farmer", null, null));
+        assertEquals(null, read.lastOccurrence(null, "Greeting", null));
+        assertEquals(null, read.lastOccurrence(null, "Greeting", "Bye"));
+        var now = java.time.Instant.EPOCH;
+        read.recordOpened(null, "Greeting", now);
+        assertEquals(3, read.opened("Greeting"));
+        assertEquals(now, read.lastOccurrence(null, "Greeting", null));
     }
 
     @Test
@@ -127,5 +133,29 @@ class DialogueHistoryTest {
         assertTrue(history.clear("Greeting"));
         assertEquals(0, history.opened("Greeting"));
         assertEquals(1, history.count("Farmer", "Harvest", null));
+    }
+
+    @Test
+    void latestOccurrenceSurvivesSaveAndIsScoped() {
+        var older = java.time.Instant.ofEpochMilli(1000);
+        var newer = java.time.Instant.ofEpochMilli(2000);
+        var history = new DialogueHistory();
+        history.recordOpened("A", "Greeting", newer);
+        history.recordOpened("A", "Greeting", older);
+        history.recordAnswer("A", "Greeting", "Accept", older);
+        history.recordAnswer("B", "Greeting", "Accept", newer);
+        history.recordAnswer("A", "Greeting", "Decline", newer);
+
+        var read = CodecJson.roundTrip(DialogueHistory.CODEC, history);
+        assertEquals(newer, read.lastOccurrence(null, "Greeting", null));
+        assertEquals(2, read.opened("Greeting"));
+        assertEquals(newer, read.lastOccurrence(null, "Greeting", "Accept"));
+        assertEquals(older, read.lastOccurrence("A", "Greeting", "Accept"));
+        assertEquals(null, read.lastOccurrence("B", "Greeting", "Decline"));
+        var copy = (DialogueHistory) read.clone();
+        copy.recordAnswer("A", "Greeting", "Accept", newer);
+        assertEquals(older, read.lastOccurrence("A", "Greeting", "Accept"));
+        copy.clear("Greeting");
+        assertEquals(null, copy.lastOccurrence(null, "Greeting", "Accept"));
     }
 }

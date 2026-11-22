@@ -9,6 +9,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,16 +30,24 @@ public class DialogueHistory implements Component<EntityStore> {
                                                                     .add()
                                                                     .append(new KeyedCodec<>("Answers", new MapCodec<>(Codec.INTEGER, HashMap<String, Integer>::new)), (entry, answers) -> entry.answers.putAll(answers), entry -> entry.answers)
                                                                     .add()
+                                                                    .append(new KeyedCodec<>("LastOpenedAt", Codec.LONG), (entry, time) -> entry.lastOpenedAt = time, entry -> entry.lastOpenedAt)
+                                                                    .add()
+                                                                    .append(new KeyedCodec<>("LastAnsweredAt", new MapCodec<>(Codec.LONG, HashMap<String, Long>::new)), (entry, answers) -> entry.lastAnsweredAt.putAll(answers), entry -> entry.lastAnsweredAt)
+                                                                    .add()
                                                                     .build();
 
         private int opened;
         private final Map<String, Integer> answers = new HashMap<>();
+        private Long lastOpenedAt;
+        private final Map<String, Long> lastAnsweredAt = new HashMap<>();
 
         private Entry() {}
 
         private Entry(@Nonnull Entry other) {
             opened = other.opened;
             answers.putAll(other.answers);
+            lastOpenedAt = other.lastOpenedAt;
+            lastAnsweredAt.putAll(other.lastAnsweredAt);
         }
     }
 
@@ -83,7 +92,14 @@ public class DialogueHistory implements Component<EntityStore> {
      * @param characterId {@code null} for a dialogue had without one.
      */
     public void recordOpened(@Nullable String characterId, @Nonnull String dialogueId) {
-        entry(characterId, dialogueId).opened++;
+        recordOpened(characterId, dialogueId, Instant.now());
+    }
+
+    public void recordOpened(@Nullable String characterId, @Nonnull String dialogueId, @Nonnull Instant occurredAt) {
+        Entry entry = entry(characterId, dialogueId);
+        long millis = occurredAt.toEpochMilli();
+        entry.opened++;
+        if (entry.lastOpenedAt == null || millis > entry.lastOpenedAt) entry.lastOpenedAt = millis;
     }
 
     /**
@@ -99,7 +115,30 @@ public class DialogueHistory implements Component<EntityStore> {
      * @param characterId {@code null} for a dialogue had without one.
      */
     public void recordAnswer(@Nullable String characterId, @Nonnull String dialogueId, @Nonnull String answerKey) {
-        entry(characterId, dialogueId).answers.merge(answerKey, 1, Integer::sum);
+        recordAnswer(characterId, dialogueId, answerKey, Instant.now());
+    }
+
+    public void recordAnswer(@Nullable String characterId, @Nonnull String dialogueId, @Nonnull String answerKey, @Nonnull Instant occurredAt) {
+        Entry entry = entry(characterId, dialogueId);
+        entry.answers.merge(answerKey, 1, Integer::sum);
+        entry.lastAnsweredAt.merge(answerKey, occurredAt.toEpochMilli(), Math::max);
+    }
+
+    /**
+     * Latest timestamp for the dialogue or answer. A null character matches every character,
+     * including dialogues without one. A null answer matches openings.
+     */
+    @Nullable
+    public Instant lastOccurrence(@Nullable String characterId, @Nonnull String dialogueId, @Nullable String answerKey) {
+        Long latest = null;
+        for (var character : characters.entrySet()) {
+            if (characterId != null && !characterId.equals(character.getKey())) continue;
+            Entry entry = character.getValue().get(dialogueId);
+            if (entry == null) continue;
+            Long time = answerKey == null ? entry.lastOpenedAt : entry.lastAnsweredAt.get(answerKey);
+            if (time != null && (latest == null || time > latest)) latest = time;
+        }
+        return latest == null ? null : Instant.ofEpochMilli(latest);
     }
 
     /**

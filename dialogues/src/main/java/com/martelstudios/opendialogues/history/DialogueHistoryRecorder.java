@@ -16,6 +16,7 @@ import com.martelstudios.opendialogues.sessions.DialogueSession;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -39,7 +40,8 @@ public class DialogueHistoryRecorder {
      */
     public void onOpened(@Nonnull DialogueEvent.Opened event) {
         DialogueSession session = event.getSession();
-        write(event.getPlayer(), history -> history.recordOpened(session.characterId(), session.dialogueId()));
+        Instant occurredAt = Instant.now();
+        write(event.getPlayer(), history -> history.recordOpened(session.characterId(), session.dialogueId(), occurredAt));
     }
 
     /**
@@ -49,7 +51,8 @@ public class DialogueHistoryRecorder {
         DialogueSession session = event.getSession();
         OpenDialoguesResponse response = session.responses().get(event.getPosition() - 1);
         String answerKey = session.dialogue().answerKey(response);
-        write(event.getPlayer(), history -> history.recordAnswer(session.characterId(), session.dialogueId(), answerKey));
+        Instant occurredAt = Instant.now();
+        write(event.getPlayer(), history -> history.recordAnswer(session.characterId(), session.dialogueId(), answerKey, occurredAt));
     }
 
     /**
