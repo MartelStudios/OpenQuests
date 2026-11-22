@@ -3,13 +3,16 @@ package com.martelstudios.opendialogues.conditions.impl.history;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.schema.metadata.ui.UIEditor;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
+import com.martelstudios.opendialogues.conditions.SourceScope;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import com.martelstudios.opendialogues.sessions.DialogueSource;
 import com.martelstudios.opendialogues.history.DialogueHistory;
 
 import javax.annotation.Nonnull;
@@ -43,6 +46,9 @@ public class OpenDialoguesCooldownCondition extends DialogueCondition {
                                                                             .addValidator(Validators.greaterThan(Duration.ZERO))
                                                                             .documentation("Real-time delay in seconds, offline time included.")
                                                                             .add()
+                                                                            .append(new KeyedCodec<>("With", new EnumCodec<>(SourceScope.class)), (condition, with) -> condition.with = with, condition -> condition.with)
+                                                                            .documentation("Whose dialogues count: any NPC, the source's character, or the source NPC alone.")
+                                                                            .add()
                                                                             .documentation("Holds before the dialogue interaction ever happened and once the delay after the latest one ran out.")
                                                                             .build();
 
@@ -50,16 +56,24 @@ public class OpenDialoguesCooldownCondition extends DialogueCondition {
     private String answer;
     private String character;
     private Duration duration;
+    private SourceScope with = SourceScope.Any;
 
     protected OpenDialoguesCooldownCondition() {}
 
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {
-        return !isActive(context.history(), Instant.now());
+        return !isActive(context.history(), context.source(), Instant.now());
     }
 
     boolean isActive(@Nonnull DialogueHistory history, @Nonnull Instant now) {
-        Instant last = history.lastOccurrence(character, dialogue, answer);
+        return isActive(history, null, now);
+    }
+
+    boolean isActive(@Nonnull DialogueHistory history, @Nullable DialogueSource source, @Nonnull Instant now) {
+        if (with.blind(source)) return false;
+        Instant last = with == SourceScope.Any
+                       ? history.lastOccurrence(character, dialogue, answer)
+                       : history.lastOccurrence(with.character(source), with.npc(source), dialogue, answer);
         return last != null && Duration.between(last, now).compareTo(duration) < 0;
     }
 
@@ -74,6 +88,7 @@ public class OpenDialoguesCooldownCondition extends DialogueCondition {
                     @Nonnull Function<String, OpenDialogueCharacterAsset> characters) {
         if (duration == null || duration.compareTo(Duration.ZERO) <= 0) return "Seconds must be positive";
         if (dialogue == null || dialogue.isBlank()) return "Dialogue must be specified";
+        if (character != null && with != SourceScope.Any) return "Character and With cannot be set together";
         if (character != null && (character.isBlank() || characters.apply(character) == null)) {
             return "No character '" + character + "'";
         }

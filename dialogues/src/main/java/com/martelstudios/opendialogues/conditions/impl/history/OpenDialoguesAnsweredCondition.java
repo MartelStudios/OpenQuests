@@ -3,12 +3,15 @@ package com.martelstudios.opendialogues.conditions.impl.history;
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.codec.codecs.EnumCodec;
 import com.hypixel.hytale.codec.schema.metadata.ui.UIEditor;
 import com.martelstudios.opendialogues.api.DialogueRegistry;
 import com.martelstudios.opendialogues.conditions.CountBounds;
 import com.martelstudios.opendialogues.conditions.ConditionContext;
 import com.martelstudios.opendialogues.conditions.DialogueCondition;
+import com.martelstudios.opendialogues.conditions.SourceScope;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import com.martelstudios.opendialogues.sessions.DialogueSource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,6 +35,9 @@ public class OpenDialoguesAnsweredCondition extends DialogueCondition {
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Max", Codec.INTEGER), (condition, max) -> condition.max = max, condition -> condition.max)
                                                                             .add()
+                                                                            .append(new KeyedCodec<>("With", new EnumCodec<>(SourceScope.class)), (condition, with) -> condition.with = with, condition -> condition.with)
+                                                                            .documentation("Whose dialogues count: any NPC, the source's character, or the source NPC alone.")
+                                                                            .add()
                                                                             .build();
 
     protected String dialogue;
@@ -39,12 +45,15 @@ public class OpenDialoguesAnsweredCondition extends DialogueCondition {
     protected int min = 1;
     @Nullable
     protected Integer max;
+    protected SourceScope with = SourceScope.Any;
 
     protected OpenDialoguesAnsweredCondition() {}
 
     @Override
     protected boolean evaluate(@Nonnull ConditionContext context) {
-        return CountBounds.within(context.history().answered(dialogue, answer), min, max);
+        DialogueSource source = context.source();
+        int answered = with.blind(source) ? 0 : context.history().count(with.character(source), with.npc(source), dialogue, answer);
+        return CountBounds.within(answered, min, max);
     }
 
     @Nullable

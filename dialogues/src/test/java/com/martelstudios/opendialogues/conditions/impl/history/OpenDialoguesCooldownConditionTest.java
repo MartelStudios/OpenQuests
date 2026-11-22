@@ -3,9 +3,11 @@ package com.martelstudios.opendialogues.conditions.impl.history;
 import com.martelstudios.opendialogues.CodecJson;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
 import com.martelstudios.opendialogues.history.DialogueHistory;
+import com.martelstudios.opendialogues.sessions.DialogueSource;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -57,5 +59,33 @@ class OpenDialoguesCooldownConditionTest {
                 {"Dialogue":"Greeting","Seconds":0}
                 """);
         assertNotNull(zero.validate(id -> dialogue));
+    }
+
+    @Test
+    void cooldownWithNpcRunsPerNpc() {
+        var condition = CodecJson.decode(OpenDialoguesCooldownCondition.CODEC,
+                """
+                {"Dialogue":"Intro","With":"Npc","Seconds":60}
+                """);
+        var a = new DialogueSource(UUID.randomUUID(), "Farmer", null, null);
+        var b = new DialogueSource(UUID.randomUUID(), "Farmer", null, null);
+        var history = new DialogueHistory();
+        Instant now = Instant.EPOCH;
+        history.recordOpened("Farmer", a.npc(), "Intro", now);
+
+        assertTrue(condition.isActive(history, a, now));
+        assertFalse(condition.isActive(history, b, now));
+        assertFalse(condition.isActive(history, null, now));
+    }
+
+    @Test
+    void cooldownRejectsWithAndCharacterTogether() {
+        var condition = CodecJson.decodeUnvalidated(OpenDialoguesCooldownCondition.CODEC,
+                """
+                {"Dialogue":"Intro","Character":"Farmer","With":"Npc","Seconds":60}
+                """);
+        var dialogue = CodecJson.decode(OpenDialogueAsset.BODY_CODEC, "{}");
+
+        assertNotNull(condition.validate(id -> dialogue, id -> null));
     }
 }

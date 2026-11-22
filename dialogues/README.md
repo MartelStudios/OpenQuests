@@ -70,6 +70,11 @@ that does not hold, and the selector moves on. See `AdventureQuests_Plush` in th
 
 Every condition also takes `Not`: when true, it holds exactly when it would not.
 
+`Opened`, `Answered` and `Cooldown` also take `With`: `Any` (default) counts every dialogue had,
+`Character` only those had with any NPC of the speaking NPC's character, `Npc` only those had with
+the speaking NPC itself. With no speaking NPC (a command, an item), `Character` and `Npc` count
+nothing. `Cooldown` takes either `With` or its fixed `Character`, not both.
+
 `Item` takes an `ItemId`, a `ResourceTypeId`, a `BlockTag` or a bench `Category` (`GoblinLab_Runes`
 for any rune). An answer is named by its `Id`, or by
 its position in the file from 1 when it has none. Dialogues written inline count too: their
