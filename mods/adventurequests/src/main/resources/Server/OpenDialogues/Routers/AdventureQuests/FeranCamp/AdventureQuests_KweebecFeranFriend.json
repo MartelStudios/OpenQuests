@@ -5,6 +5,20 @@
       {
         "When": {
           "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_CampSaltRoad",
+          "States": [
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_CampFreshRoadBefore"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
           "QuestAssetId": "AdventureQuests_CampFreshRoad",
           "States": [
             "InProgress",

@@ -18,4 +18,4 @@ Send fresh produce to its friend the Feran salt trader, who sends salt back.
 ## Decision log
 
 - 2026-11-18: lang keys live in `ferancamp.lang` with the rest of the trade, so the branch touches no Kweebec lang line.
-
+- 2026-11-22: the pumpkins wait for a successful salt road; before it, a short line about the salt not having arrived yet (user).

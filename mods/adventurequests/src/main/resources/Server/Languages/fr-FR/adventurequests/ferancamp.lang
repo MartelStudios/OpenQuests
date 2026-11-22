@@ -90,6 +90,7 @@ quest.camp-salt-road.title=La route du sel
 quest.camp-salt-road.description=Un marchand de sel Feran envoie du sel à un marchand Kweebec de la forêt, loin du désert.
 quest.camp-salt-road.short=Apportez 10 sels à un marchand Kweebec ami des Feran
 character.kweebec-feran-friend.epithet=Ami des Feran
+dialogue.camp-fresh-road.before=Je commerce avec les Feran du désert. Leur sel n'est pas encore arrivé jusqu'à la forêt.
 dialogue.camp-fresh-road.intro.page1=Mon ami le marchand de sel vit dans un camp Feran, dans le désert. Rien de vert n'y pousse.
 dialogue.camp-fresh-road.intro.page2=Tu veux bien porter ces quatre citrouilles au marchand de sel ? Les Feran n'ont jamais goûté une tarte.
 dialogue.camp-fresh-road.accept=Je les emporte au désert.

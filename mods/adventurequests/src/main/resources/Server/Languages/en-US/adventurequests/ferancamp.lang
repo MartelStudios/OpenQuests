@@ -90,6 +90,7 @@ quest.camp-salt-road.title=The salt road
 quest.camp-salt-road.description=A Feran salt trader sends salt to a Kweebec merchant of the forest, far from the desert.
 quest.camp-salt-road.short=Bring 10 salt to a Kweebec merchant friend of the Feran
 character.kweebec-feran-friend.epithet=Friend of the Feran
+dialogue.camp-fresh-road.before=I trade with the Feran of the desert. Their salt has not reached the forest yet.
 dialogue.camp-fresh-road.intro.page1=My friend the salt trader lives in a Feran camp, out in the desert. Nothing green grows there.
 dialogue.camp-fresh-road.intro.page2=Will you carry these four pumpkins to the salt trader? The Feran have never tasted a pie.
 dialogue.camp-fresh-road.accept=I'll take them to the desert.
