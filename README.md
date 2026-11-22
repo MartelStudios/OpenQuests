@@ -1087,6 +1087,10 @@ quest reads "Gather 2 Sticks" on its own, the item naming itself through Hytale'
 `Item.getTranslationMessage()`. The templates live in the same files and use ICU, so a locale
 pluralises where it needs to.
 
+A tag named `Text.<param>` fills `{<param>}` in the three texts with the translation of its first
+value. The asset declares a fallback in its `Tags` (`"Text.giver": ["farmers.someone"]`) and a tag
+written on the quest itself wins over it; steps of a composite read the tags of their head.
+
 Quest asset graphs are validated at boot: an unknown reference or a cycle between composite quests
 stops the server with an explicit reason rather than failing later at runtime.
 

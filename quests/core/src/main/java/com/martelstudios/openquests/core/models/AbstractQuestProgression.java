@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -852,15 +853,30 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         OpenQuestAsset asset = getAsset();
         String titleKey = asset == null ? null : asset.getTitleKey();
 
-        return titleKey != null ? Message.translation(titleKey) : getDefaultTitle();
+        return QuestTextParams.apply(titleKey != null ? Message.translation(titleKey) : getDefaultTitle(), textParams());
     }
 
+    /**
+     * @return the description of the asset, or what the type makes of itself when the asset names none.
+     */
     @Nonnull
     public Message getDescription() {
         OpenQuestAsset asset = getAsset();
         String descriptionKey = asset == null ? null : asset.getDescriptionKey();
 
-        return descriptionKey != null ? Message.translation(descriptionKey) : getDefaultDescription();
+        return QuestTextParams.apply(descriptionKey != null ? Message.translation(descriptionKey) : getDefaultDescription(), textParams());
+    }
+
+    /**
+     * Text parameters from the head's {@code Text.<param>} tags, those written on it winning over its asset's.
+     */
+    @Nonnull
+    private Map<String, String> textParams() {
+        AbstractQuestProgression<?> head = getHead();
+        Set<String> names = new HashSet<>(head.getTags().keySet());
+        OpenQuestAsset headAsset = head.getAsset();
+        if (headAsset != null) names.addAll(headAsset.getTagNames());
+        return QuestTextParams.of(names, head::getTagValues);
     }
 
     /**
@@ -870,7 +886,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     @Nonnull
     public Message getShortDescription() {
         OpenQuestAsset asset = getAsset();
-        return asset == null ? Message.raw("") : shortDescriptionOf(asset);
+        String key = asset == null ? null : asset.getShortDescriptionKey();
+        return key == null ? Message.raw("") : QuestTextParams.apply(Message.translation(key), textParams());
     }
 
     /**
@@ -1042,7 +1059,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public static Message titleOf(@Nonnull OpenQuestAsset asset) {
         String titleKey = asset.getTitleKey();
 
-        return titleKey != null ? Message.translation(titleKey) : asset.create().getDefaultTitle();
+        return QuestTextParams.apply(titleKey != null ? Message.translation(titleKey) : asset.create().getDefaultTitle(), textParamsOf(asset));
+    }
+
+    @Nonnull
+    private static Map<String, String> textParamsOf(@Nonnull OpenQuestAsset asset) {
+        return QuestTextParams.of(asset.getTagNames(), asset::getTagValues);
     }
 
     /**
@@ -1053,7 +1075,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public static Message descriptionOf(@Nonnull OpenQuestAsset asset) {
         String descriptionKey = asset.getDescriptionKey();
 
-        return descriptionKey != null ? Message.translation(descriptionKey) : asset.create().getDefaultDescription();
+        return QuestTextParams.apply(descriptionKey != null ? Message.translation(descriptionKey) : asset.create().getDefaultDescription(), textParamsOf(asset));
     }
 
     /**
@@ -1063,6 +1085,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public static Message shortDescriptionOf(@Nonnull OpenQuestAsset asset) {
         String key = asset.getShortDescriptionKey();
 
-        return key != null ? Message.translation(key) : Message.raw("");
+        return key != null ? QuestTextParams.apply(Message.translation(key), textParamsOf(asset)) : Message.raw("");
     }
 }

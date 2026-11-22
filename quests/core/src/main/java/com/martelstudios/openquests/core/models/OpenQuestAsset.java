@@ -20,6 +20,7 @@ import com.martelstudios.openquests.core.rewards.QuestReward;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Defines the generic quest template configuration. Extend it to create new quest types or to add new serialized data.
@@ -163,6 +164,15 @@ public abstract class OpenQuestAsset implements JsonAssetWithMap<String, Default
 
         Map<String, String[]> tags = data.getRawTags();
         return tags != null && tags.containsKey(tag);
+    }
+
+    /**
+     * @return the names of the tags the asset declares, empty without any.
+     */
+    @Nonnull
+    public Set<String> getTagNames() {
+        Map<String, String[]> tags = data == null ? null : data.getRawTags();
+        return tags == null ? Set.of() : tags.keySet();
     }
 
     /**
