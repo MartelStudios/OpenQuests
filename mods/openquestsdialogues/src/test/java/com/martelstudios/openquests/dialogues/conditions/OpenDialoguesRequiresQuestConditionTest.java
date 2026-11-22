@@ -6,6 +6,7 @@ import com.martelstudios.opendialogues.conditions.SourceScope;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,6 +29,11 @@ class OpenDialoguesRequiresQuestConditionTest {
 
         assertEquals("ElderPotion", condition.getRequirement().getQuestAssetId());
         assertNull(condition.validate(id -> null));
+    }
+
+    @Test
+    void decodesAList() throws IOException {
+        assertEquals(List.of("A", "B"), decode("{\"QuestAssetIds\":[\"A\",\"B\"],\"GivenBy\":\"Npc\"}").getRequirement().getQuestAssetIds());
     }
 
     @Test

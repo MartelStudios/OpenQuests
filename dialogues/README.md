@@ -203,7 +203,8 @@ and `NearCharacter` take `Target`: `Character` (default, the
 `Character` field, then required for `Deliver` and `NearCharacter`), `GiverCharacter` (any NPC of the
 giver's character) or `GiverNpc` (the giver alone). The `RequiresQuest` and `QuestCooldown`
 conditions take `GivenBy`: `Any` (default, all the player's quests), `Character` (those given by
-the conversation source's character) or `Npc` (by the source NPC alone).
+the conversation source's character) or `Npc` (by the source NPC alone). `RequiresQuest` also
+takes `QuestAssetIds`, several quests whose counts add up, like the constraint.
 A quest aimed at `GiverNpc` fails once that NPC lets its character go after handing it out, even if
 the NPC carries a character again before the player comes back.
 
