@@ -6,6 +6,12 @@ the end.
 
 ## Core
 
+A quest says where it came from in three fields that coexist: `origin` (the assignment and occasion
+that opened its line), `grantedBy` (the quest whose completion handed it over) and `giver` (who
+handed it out in the world). `QuestGiver` is polymorphic: mods register their kinds on
+`QuestGiver.CODEC`, and a kind no installed mod registers loads as no giver. `GrantQuest` carries
+`origin` and `giver` down a chain, and the giver's name fills the `{giver}` text parameter.
+
 ```mermaid
 classDiagram
     direction LR
@@ -51,6 +57,7 @@ classDiagram
             QuestScope scope
             QuestOrigin origin
             UUID grantedBy
+            QuestGiver giver
             Map~String,String[]~ tags
             Boolean persistHistory
             QuestVisibility visibility
@@ -93,6 +100,12 @@ classDiagram
             WHEN_PROGRESSED
             WHEN_COMPLETED
             NEVER
+        }
+        class QuestGiver {
+            <<abstract>>
+            UUID npc
+            String nameKey
+            Instant since
         }
         class QuestOrigin {
             String assignmentId
@@ -194,6 +207,7 @@ classDiagram
     AbstractQuestProgression *-- QuestReplica
     AbstractQuestProgression o-- QuestScope
     AbstractQuestProgression *-- QuestOrigin
+    AbstractQuestProgression *-- QuestGiver
     AbstractQuestProgression ..> OpenQuestAsset : assetId
     AbstractQuestProgression ..> QuestOperation : apply
     AbstractQuestProgression ..> QuestVisitor : update

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -84,5 +85,31 @@ class QuestTextParamsTest {
 
         assertEquals("farmers.mira", giverIn(step.getTitle()));
         assertEquals("crops.onion", step.getTitle().getFormattedMessage().messageParams.get("crop").messageId);
+    }
+
+    @Test
+    void theGiverNameFillsTheGiverParam() {
+        QuestGiverTest.TestGiver.register();
+        TestQuestAsset asset = new TestQuestAsset().titled("quest.title");
+        AbstractQuestProgression<?> quest = asset.builder().giver(new QuestGiverTest.TestGiver(UUID.randomUUID(), "farmers.mira", null, null)).build();
+        quest.apply(new AbstractQuestProgression.PutTag("Text.giver", new String[] {"farmers.other"}));
+
+        assertEquals("farmers.mira", giverIn(quest.getTitle()));
+    }
+
+    @Test
+    void aStepReadsTheGiverOfItsHead() {
+        QuestGiverTest.TestGiver.register();
+        AbstractQuestProgression<?> composite = AbstractQuestProgression.Builder.of(new QuestTreeTest.TestComposite(), "composite").giver(new QuestGiverTest.TestGiver(UUID.randomUUID(), "farmers.mira", null, null)).build();
+        TestQuestAsset stepAsset = new TestQuestAsset().titled("step.title").tagged(Map.of("Text.giver", new String[] {"farmers.someone"}));
+        AbstractQuestProgression<?> step = new TestQuestProgression() {
+            @Override
+            public AbstractCompositeQuestProgression<?> getParent() {
+                return (AbstractCompositeQuestProgression<?>) composite;
+            }
+        }.withAsset(stepAsset);
+
+        assertEquals("farmers.mira", giverIn(step.getTitle()));
+        assertEquals("farmers.mira", giverIn(AbstractQuestProgression.titleOf(stepAsset, composite)));
     }
 }

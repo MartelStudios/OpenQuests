@@ -85,6 +85,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("GrantedBy", Codec.UUID_STRING), (quest, grantedBy) -> quest.grantedBy = grantedBy, quest -> quest.grantedBy)
                                                                                         .add()
+                                                                                        .append(new KeyedCodec<>("Giver", QuestGiver.LENIENT_CODEC), (quest, giver) -> quest.giver = giver, quest -> quest.giver)
+                                                                                        .add()
                                                                                         .append(TAGS_CODEC, TAGS_SETTER, TAGS_GETTER)
                                                                                         .add()
                                                                                         .build();
@@ -124,6 +126,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nullable
     private UUID grantedBy;
+
+    /**
+     * Who handed this line out in the world, carried down a chain; {@code null} for no one.
+     */
+    @Nullable
+    private QuestGiver giver;
 
     /**
      * Tags written on this instance, on top of those its asset declares, each with the values its
@@ -609,6 +617,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
+     * @return who handed this quest out in the world, set on the head of its line; {@code null} for no one.
+     */
+    @Nullable
+    public QuestGiver getGiver() {
+        return giver;
+    }
+
+    /**
      * @return how many players held the quest progression.
      */
     public int getHolderCount() {
@@ -883,12 +899,18 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         return merged;
     }
 
+    /**
+     * The giver's own name wins over a {@code Text.giver} tag, which stays the authored fallback.
+     */
     @Nonnull
     private static Map<String, String> headTextParams(@Nonnull AbstractQuestProgression<?> head) {
         Set<String> names = new HashSet<>(head.getTags().keySet());
         OpenQuestAsset headAsset = head.getAsset();
         if (headAsset != null) names.addAll(headAsset.getTagNames());
-        return QuestTextParams.of(names, head::getTagValues);
+        Map<String, String> params = new HashMap<>(QuestTextParams.of(names, head::getTagValues));
+        QuestGiver giver = head.getGiver();
+        if (giver != null && giver.getNameKey() != null) params.put(QuestGiver.NAME_PARAM, giver.getNameKey());
+        return params;
     }
 
     /**
@@ -1016,6 +1038,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
          */
         public B grantedBy(@Nullable UUID grantedBy) {
             base().grantedBy = grantedBy;
+            return self();
+        }
+
+        /**
+         * Who hands this quest out in the world, carried down a chain.
+         */
+        public B giver(@Nullable QuestGiver giver) {
+            base().giver = giver;
             return self();
         }
 
