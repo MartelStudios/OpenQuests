@@ -20,7 +20,7 @@
             {
               "Type": "NearNpc",
               "Role": "Vulture",
-              "Radius": 150,
+              "Radius": 128,
               "Min": 1
             }
           ]
