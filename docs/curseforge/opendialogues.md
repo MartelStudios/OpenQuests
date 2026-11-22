@@ -38,12 +38,14 @@ one or run a command.
 permission, or a choice made earlier. Otherwise it stays hidden.
 
 🧠 **A memory per player.** Every dialogue opened and every answer picked is saved with the player, so a character
-greets a newcomer and a regular differently.
+greets a newcomer and a regular differently. Memory can count what was said to any NPC, to one character, or to
+the very NPC being talked to, so two farmers each keep their own story with each player.
 
 🔀 **One character, many moods.** Routers pick the first dialogue whose condition holds, or one at random by weight.
 
 👥 **Characters for passive NPCs.** Villagers, children, even a stag get a name, a dialogue on F and a place in your
-quests. When a named character dies, word spreads in the chat.
+quests. When a named character dies, word spreads in the chat. A distribution filter keeps characters apart, such as
+one farmer per village.
 
 🗺️ **On the map.** Characters a player has met show on their world map with their name; one can show from the start,
 or never. A key character can also show on the compass of every player nearby.
@@ -99,6 +101,8 @@ other.
 |----------------------------------|-------------------------------------------------------------|
 | <code>Opened</code>              | A dialogue was opened a number of times                     |
 | <code>Answered</code>            | An answer of a dialogue was picked a number of times        |
+| <code>Cooldown</code>            | Enough real time went by since a dialogue was opened        |
+| <code>OpenedAfter</code>         | A dialogue was opened more recently than another            |
 | <code>Holding</code>             | The item in hand matches                                    |
 | <code>Inventory</code>           | The inventory holds enough of an item, a resource or a tag  |
 | <code>HasPermission</code>       | The player has a permission                                 |
