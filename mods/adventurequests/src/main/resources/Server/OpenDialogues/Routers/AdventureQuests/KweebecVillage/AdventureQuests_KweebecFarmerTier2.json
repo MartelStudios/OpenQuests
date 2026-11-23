@@ -26,7 +26,14 @@
             "AdventureQuests_FarmerBringHoe",
             "AdventureQuests_FarmerBringBucket",
             "AdventureQuests_FarmerHarvestAubergine",
-            "AdventureQuests_FarmerHarvestPumpkin"
+            "AdventureQuests_FarmerHarvestPumpkin",
+            "AdventureQuests_FarmerHarvestCauliflower",
+            "AdventureQuests_FarmerHarvestCarrot",
+            "AdventureQuests_FarmerHarvestCotton",
+            "AdventureQuests_FarmerHarvestLettuce",
+            "AdventureQuests_FarmerHarvestOnion",
+            "AdventureQuests_FarmerHarvestPotato",
+            "AdventureQuests_FarmerHarvestWheat"
           ],
           "States": [
             "InProgress"
@@ -150,6 +157,230 @@
             {
               "Type": "OpenedAfter",
               "Dialogue": "AdventureQuests_FarmerHarvestPumpkinIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestCauliflower",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerHarvestCauliflowerIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestCarrot",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerHarvestCarrotIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestCotton",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerHarvestCottonIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestLettuce",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerHarvestLettuceIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestOnion",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerHarvestOnionIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestPotato",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerHarvestPotatoIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestWheat",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerHarvestWheatIntro",
               "Than": "AdventureQuests_FarmerTier1Thanks",
               "With": "Npc"
             },

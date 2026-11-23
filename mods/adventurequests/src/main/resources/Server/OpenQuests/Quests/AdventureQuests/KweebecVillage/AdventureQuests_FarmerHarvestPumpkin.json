@@ -7,7 +7,7 @@
   "TitleKey": "adventurequests.kweebecvillage.quest.farmer.harvest-pumpkin.title",
   "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-pumpkin.description",
   "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-pumpkin.short",
-  "TargetQuantity": 2,
+  "TargetQuantity": 1,
   "ItemToPickup": {
     "ItemId": "Plant_Crop_Pumpkin_Item"
   },

@@ -7,7 +7,7 @@
   "TitleKey": "adventurequests.kweebecvillage.quest.farmer.harvest-aubergine.title",
   "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-aubergine.description",
   "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-aubergine.short",
-  "TargetQuantity": 2,
+  "TargetQuantity": 1,
   "ItemToPickup": {
     "ItemId": "Plant_Crop_Aubergine_Item"
   },

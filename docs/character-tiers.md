@@ -121,8 +121,9 @@ flowchart TD
 
 - **Tier 1, a helping hand** (threshold 2): a `Weighted` draw among two tool quests, always
   offered (`Deliver` to `GiverNpc`: 4 logs and 3 stones for a hoe, 3 wood and 1 iron bar for a
-  bucket), and the aubergine and pumpkin harvests, offered only when their crop is ripe around the
-  player (`NearBlock` `StageFinal`, 2 within 30 blocks).
+  bucket), and one harvest per crop found ripe in Kweebec village prefabs (9 crops, the quantity being the
+  median ripe count of a prefab holding that crop), each offered only when their crop is ripe around the
+  player (`NearBlock` `StageFinal`, as many as the quest asks within 30 blocks).
 - **Tier 2, planting** (threshold 2): a `Weighted` draw among potato, onion and cauliflower planting
   (`PlaceBlock` near the giver, seeds handed with the quest).
 - **Ongoing**: the tier 1 harvests weigh 1 (still only with ripe crops), tier 2 quests weigh 2.
