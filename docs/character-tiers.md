@@ -121,7 +121,7 @@ flowchart TD
 
 - **Tier 1, a helping hand** (threshold 2): a `Weighted` draw among two tool quests, always
   offered (`Deliver` to `GiverNpc`: 4 logs and 3 stones for a hoe, 3 wood and 1 iron bar for a
-  bucket), and the aubergine, pumpkin and cauliflower harvests, offered only when their crop is ripe around the
+  bucket), and one harvest per crop with an eternal seed (14 crops), each offered only when their crop is ripe around the
   player (`NearBlock` `StageFinal`, 2 within 30 blocks).
 - **Tier 2, planting** (threshold 2): a `Weighted` draw among potato, onion and cauliflower planting
   (`PlaceBlock` near the giver, seeds handed with the quest).

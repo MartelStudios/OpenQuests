@@ -10,7 +10,18 @@
             "AdventureQuests_FarmerBringBucket",
             "AdventureQuests_FarmerHarvestAubergine",
             "AdventureQuests_FarmerHarvestPumpkin",
-            "AdventureQuests_FarmerHarvestCauliflower"
+            "AdventureQuests_FarmerHarvestCauliflower",
+            "AdventureQuests_FarmerHarvestCarrot",
+            "AdventureQuests_FarmerHarvestChilli",
+            "AdventureQuests_FarmerHarvestCorn",
+            "AdventureQuests_FarmerHarvestCotton",
+            "AdventureQuests_FarmerHarvestLettuce",
+            "AdventureQuests_FarmerHarvestOnion",
+            "AdventureQuests_FarmerHarvestPotato",
+            "AdventureQuests_FarmerHarvestRice",
+            "AdventureQuests_FarmerHarvestTomato",
+            "AdventureQuests_FarmerHarvestTurnip",
+            "AdventureQuests_FarmerHarvestWheat"
           ],
           "States": [
             "Successful"

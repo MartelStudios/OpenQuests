@@ -23,7 +23,7 @@ The first tiered character (`docs/character-tiers.md`): each farmer NPC remember
 
 ## Quests and rewards
 
-- Tier 1, drawn among the quests not yet succeeded with this NPC: `AdventureQuests_FarmerBring{Hoe,Bucket}` (`Deliver`, always offered) and the harvests `AdventureQuests_FarmerHarvest{Aubergine,Pumpkin,Cauliflower}` (`InteractivelyPickup` 2 ripe crops, offered only with 2 ripe crops within 30 blocks; reward 1 eternal seed of the crop, plus 2 `Ingredient_Bar_Iron` for the aubergine, 1 `Food_Pie_Pumpkin` for the pumpkin and the cauliflower), else a bare-garden line.
+- Tier 1, drawn among the quests not yet succeeded with this NPC: `AdventureQuests_FarmerBring{Hoe,Bucket}` (`Deliver`, always offered) and one harvest per crop, `AdventureQuests_FarmerHarvest{Aubergine,Pumpkin,Cauliflower,Carrot,Chilli,Corn,Cotton,Lettuce,Onion,Potato,Rice,Tomato,Turnip,Wheat}` (`InteractivelyPickup` 2 ripe crops, offered only with 2 ripe crops within 30 blocks; reward 1 eternal seed of the crop, plus 2 `Ingredient_Bar_Iron` for the aubergine, 1 `Food_Pie_Pumpkin` for the others), else a bare-garden line.
 - Tier 2, 20 minutes (real time) after accepting tier 1, drawn at random: `AdventureQuests_FarmerPlant{Potato,Onion,Cauliflower}` (`PlaceBlock` 4 seeds, handed with the quest; reward 1 eternal seed of the crop and 2 `Food_Pie_Pumpkin` or 50 `Ingredient_Life_Essence`).
 - Every quest has a `NearCharacter` constraint on `GiverNpc` (radius 30) and a title naming the farmer (`{giver}`, fallback "the farmer").
 
@@ -33,7 +33,7 @@ The first tiered character (`docs/character-tiers.md`): each farmer NPC remember
 - `OpenDialogues/CharacterDistributions/AdventureQuests/KweebecVillage/AdventureQuests_KweebecFarmer.json`
 - `OpenDialogues/Routers/AdventureQuests/KweebecVillage/AdventureQuests_KweebecFarmer{,Tier1,Tier2,Tier3}.json`: entry, tier 1, tier 2, after tier 2.
 - `OpenDialogues/Dialogues/AdventureQuests/KweebecVillage/AdventureQuests_Farmer*.json`: one intro per quest, `BareGarden`, `Tier{1,2}{Accepted,Waiting,Thanks}`, `SmallTalk`.
-- `OpenQuests/Quests/AdventureQuests/KweebecVillage/AdventureQuests_Farmer{BringHoe,BringBucket,HarvestAubergine,HarvestPumpkin,HarvestCauliflower,PlantPotato,PlantOnion,PlantCauliflower}.json`
+- `OpenQuests/Quests/AdventureQuests/KweebecVillage/AdventureQuests_Farmer{BringHoe,BringBucket,Harvest*,PlantPotato,PlantOnion,PlantCauliflower}.json`
 - Lang keys `farmer` in `Languages/*/adventurequests/kweebecvillage.lang`.
 
 ## Decision log
