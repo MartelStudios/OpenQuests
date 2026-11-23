@@ -9,7 +9,8 @@
             "AdventureQuests_FarmerBringHoe",
             "AdventureQuests_FarmerBringBucket",
             "AdventureQuests_FarmerHarvestAubergine",
-            "AdventureQuests_FarmerHarvestPumpkin"
+            "AdventureQuests_FarmerHarvestPumpkin",
+            "AdventureQuests_FarmerHarvestCauliflower"
           ],
           "States": [
             "Successful"

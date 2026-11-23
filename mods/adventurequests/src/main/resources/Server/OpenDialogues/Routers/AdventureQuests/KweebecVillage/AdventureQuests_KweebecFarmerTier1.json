@@ -26,7 +26,8 @@
             "AdventureQuests_FarmerBringHoe",
             "AdventureQuests_FarmerBringBucket",
             "AdventureQuests_FarmerHarvestAubergine",
-            "AdventureQuests_FarmerHarvestPumpkin"
+            "AdventureQuests_FarmerHarvestPumpkin",
+            "AdventureQuests_FarmerHarvestCauliflower"
           ],
           "States": [
             "InProgress"
@@ -150,6 +151,38 @@
             {
               "Type": "OpenedAfter",
               "Dialogue": "AdventureQuests_FarmerHarvestPumpkinIntro",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
+              "Than": "AdventureQuests_FarmerTier1Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerHarvestCauliflower",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerHarvestCauliflowerIntro",
               "Than": "AdventureQuests_FarmerTier1Thanks",
               "With": "Npc"
             },
@@ -425,6 +458,48 @@
         }
       },
       {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "NearBlock",
+              "Block": {
+                "ItemId": "Plant_Crop_Cauliflower_Block"
+              },
+              "State": "StageFinal",
+              "Radius": 30,
+              "Min": 2
+            },
+            {
+              "Type": "Composite",
+              "Operator": "And",
+              "Conditions": [
+                {
+                  "Type": "Opened",
+                  "Dialogue": "AdventureQuests_FarmerHarvestCauliflowerIntro",
+                  "With": "Npc"
+                },
+                {
+                  "Type": "RequiresQuest",
+                  "QuestAssetId": "AdventureQuests_FarmerHarvestCauliflower",
+                  "States": [
+                    "InProgress",
+                    "Successful"
+                  ],
+                  "GivenBy": "Npc",
+                  "Min": 0,
+                  "Max": 0
+                }
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerHarvestCauliflowerIntro"
+        }
+      },
+      {
         "Then": {
           "Router": {
             "Selector": {
@@ -526,6 +601,38 @@
                   },
                   "Then": {
                     "Dialogue": "AdventureQuests_FarmerHarvestPumpkinIntro"
+                  }
+                },
+                {
+                  "Weight": 1,
+                  "When": {
+                    "Type": "Composite",
+                    "Operator": "And",
+                    "Conditions": [
+                      {
+                        "Type": "NearBlock",
+                        "Block": {
+                          "ItemId": "Plant_Crop_Cauliflower_Block"
+                        },
+                        "State": "StageFinal",
+                        "Radius": 30,
+                        "Min": 2
+                      },
+                      {
+                        "Type": "RequiresQuest",
+                        "QuestAssetId": "AdventureQuests_FarmerHarvestCauliflower",
+                        "States": [
+                          "InProgress",
+                          "Successful"
+                        ],
+                        "GivenBy": "Npc",
+                        "Min": 0,
+                        "Max": 0
+                      }
+                    ]
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_FarmerHarvestCauliflowerIntro"
                   }
                 }
               ]
