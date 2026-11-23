@@ -56,6 +56,6 @@ class OpenDialoguesHasPermissionConditionTest {
                 return granted.contains(permission);
             }
         };
-        return new ConditionContext(player, null, null, new DialogueHistory());
+        return new ConditionContext(player, null, null, new DialogueHistory(), null);
     }
 }

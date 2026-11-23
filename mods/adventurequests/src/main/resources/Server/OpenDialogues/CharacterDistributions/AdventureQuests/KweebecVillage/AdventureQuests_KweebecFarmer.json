@@ -1,0 +1,32 @@
+{
+  "Priority": 10,
+  "Filters": [
+    {
+      "Type": "Role",
+      "Roles": [
+        "Kweebec_Sproutling"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-.*"
+      ],
+      "Not": true
+    },
+    {
+      "Type": "NearCharacter",
+      "Characters": [
+        "AdventureQuests_KweebecFarmer"
+      ],
+      "Radius": 64,
+      "Not": true
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "AdventureQuests_KweebecFarmer",
+      "Weight": 1
+    }
+  ]
+}

@@ -69,7 +69,8 @@ public final class QuestTargets {
             }
             return;
         }
-        if (quest.getAsset() instanceof TargetedQuest targeted && targeted.target() != null) running.add(new Running(quest, targeted.target(), headTracked));
+        QuestTarget target = quest.getAsset() instanceof TargetedQuest targeted ? targeted.target(quest) : null;
+        if (target != null) running.add(new Running(quest, target, headTracked));
     }
 
     /**

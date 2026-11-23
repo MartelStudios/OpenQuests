@@ -35,7 +35,7 @@ public final class DialogueQuestEvents {
      * Counts an opening.
      */
     public void onOpened(@Nonnull DialogueEvent.Opened event) {
-        count(event.getPlayer(), event.getSession().characterId(), event.getSession().dialogueId(), null);
+        count(event.getPlayer(), event.getSession().characterId(), event.getSession().npcId(), event.getSession().dialogueId(), null);
     }
 
     /**
@@ -44,7 +44,7 @@ public final class DialogueQuestEvents {
     public void onAnswered(@Nonnull DialogueEvent.Answered event) {
         DialogueSession session = event.getSession();
         String answerKey = session.dialogue().answerKey(session.responses().get(event.getPosition() - 1));
-        count(event.getPlayer(), session.characterId(), session.dialogueId(), answerKey);
+        count(event.getPlayer(), session.characterId(), session.npcId(), session.dialogueId(), answerKey);
     }
 
     /**
@@ -55,27 +55,27 @@ public final class DialogueQuestEvents {
 
         EntityComponents.update(event.getPlayerId(), components -> {
             DialogueHistory history = components.getComponent(OpenDialoguesPlugin.get().getHistoryType());
-            if (history != null && !quest.isOver()) quest.apply(new HeldQuantityQuestProgression.Count(quest.getAsset().countIn(history)));
+            if (history != null && !quest.isOver()) quest.apply(new HeldQuantityQuestProgression.Count(quest.getAsset().countIn(quest.getAsset().target(quest), history)));
         });
     }
 
     /**
      * Runs on the player's world thread, where dialogue events are dispatched.
      */
-    private void count(@Nonnull PlayerRef player, @Nullable String characterId, @Nonnull String dialogueId, @Nullable String answerKey) {
+    private void count(@Nonnull PlayerRef player, @Nullable String characterId, @Nullable UUID npcId, @Nonnull String dialogueId, @Nullable String answerKey) {
         Ref<EntityStore> ref = player.getReference();
         if (ref == null || !ref.isValid()) return;
 
         var questStore = ref.getStore().getComponent(ref, QuestStoreComponent.getComponentType());
         if (questStore == null) return;
 
-        progression.progress(new Visitor(player.getUuid(), characterId, dialogueId, answerKey), questStore.getQuestIds());
+        progression.progress(new Visitor(player.getUuid(), characterId, npcId, dialogueId, answerKey), questStore.getQuestIds());
     }
 
-    private record Visitor(@Nonnull UUID playerId, @Nullable String characterId, @Nonnull String dialogueId, @Nullable String answerKey) implements QuestVisitor<DialogueQuestProgression> {
+    private record Visitor(@Nonnull UUID playerId, @Nullable String characterId, @Nullable UUID npcId, @Nonnull String dialogueId, @Nullable String answerKey) implements QuestVisitor<DialogueQuestProgression> {
         @Override
         public void progress(DialogueQuestProgression quest) {
-            if (quest.getPlayers().contains(playerId) && !quest.isOver() && quest.getAsset().matches(characterId, dialogueId, answerKey)) quest.apply(new QuantityQuestProgression.Add(1));
+            if (quest.getPlayers().contains(playerId) && !quest.isOver() && quest.getAsset().matches(quest.getAsset().target(quest), characterId, npcId, dialogueId, answerKey)) quest.apply(new QuantityQuestProgression.Add(1));
         }
 
         @Override

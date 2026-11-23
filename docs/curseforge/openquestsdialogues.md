@@ -33,6 +33,8 @@ character, wherever it stands: "plant 4 carrots here, in the village" works in e
 🗺️ **On the map.** While such a quest runs, its character shows on the map with a "to turn in" mark, and on the compass
 while the quest is tracked.
 
+👤 **Aimed at who gave it.** A quest handed out in a dialogue remembers the NPC who gave it, and shows its name. `Deliver` and `Dialogue` quests and `NearCharacter` constraints can aim at that very NPC (`GiverNpc`) or any NPC of its character (`GiverCharacter`). If that NPC dies or loses its character, the quest fails.
+
 ### 🎬 Answer actions
 
 📜 **Hand out a quest** (`AssignQuest`): named by id or written right there in the dialogue. The quest's own rules
@@ -41,9 +43,9 @@ still apply, so a daily quest stays daily.
 🏁 **End a quest** (`SetQuestState`): as completed, failed or abandoned, rewards included, as if the player had
 played it to the end.
 
-### 🔍 A dialogue condition
+### 🔍 Dialogue conditions
 
-🔒 **Check a quest** (`RequiresQuest`): holds while one of the player's quests stands as asked: running, done, failed, or never taken.
+🔒 **Check a quest** (`RequiresQuest`): holds while one of the player's quests, or a list of them, stands as asked: running, done, failed, or never taken. With `GivenBy`, only the quests given by the NPC being talked to count.
 Put it on an answer to show it only to the right players, or in a router so a character greets them according to
 their progress.
 
@@ -58,18 +60,20 @@ their progress.
 }
 ```
 
+⏳ **Wait after a quest** (`QuestCooldown`): holds once enough time went by since one of the player's quests ended.
+
 ### 🧸 An example to start from
 
 *The strange plush* chapter of
 **[Adventure Quests](https://www.curseforge.com/hytale/mods/adventure-quests)** uses all of it: a goblin plush
 that hands you its quest when you first talk to it, asks to be fed ore, and has new things to say once its belly is
-full.
+full. Its Kweebec farmers show the rest: one per village, each with its own story with each player.
 
 ***
 
 ## 🛠️ Installing
 
-Requires **OpenQuests** and **OpenQuests Core** 5.1.0 or newer, and **OpenDialogues** 2.2.0 or newer. CurseForge
+Requires **OpenQuests** and **OpenQuests Core** 5.4.0 or newer, and **OpenDialogues** 2.4.0 or newer. CurseForge
 installs them with it; by hand, drop them all in `mods/`.
 
 ***

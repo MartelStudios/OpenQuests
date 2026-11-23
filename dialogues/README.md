@@ -62,6 +62,7 @@ that does not hold, and the selector moves on. See `AdventureQuests_Plush` in th
 | --- | --- |
 | `Opened` | `Dialogue` was opened between `Min` (default 1) and `Max` (optional) times. |
 | `Answered` | `Answer` of `Dialogue` was picked between `Min` and `Max` times. |
+| `OpenedAfter` | `Dialogue` was last opened after `Than`, or `Than` was never opened: an offer made since the last thanks. |
 | `Holding` | The item in hand matches `Item`. |
 | `Inventory` | The inventory holds between `Min` and `Max` items matching `Item`. |
 | `NearNpc` | Between `Min` and `Max` living NPCs of `Role` or `Group` stand within `Radius` (at most 128) of the player. The NPC being talked to counts when it matches. |
@@ -69,6 +70,11 @@ that does not hold, and the selector moves on. See `AdventureQuests_Plush` in th
 | `Composite` | Every (`Operator` `And`, the default), or one (`Or`), of `Conditions` holds. |
 
 Every condition also takes `Not`: when true, it holds exactly when it would not.
+
+`Opened`, `Answered`, `OpenedAfter` and `Cooldown` also take `With`: `Any` (default) counts every dialogue had,
+`Character` only those had with any NPC of the speaking NPC's character, `Npc` only those had with
+the speaking NPC itself. With no speaking NPC (a command, an item), `Character` and `Npc` count
+nothing. `Cooldown` takes either `With` or its fixed `Character`, not both.
 
 `Item` takes an `ItemId`, a `ResourceTypeId`, a `BlockTag` or a bench `Category` (`GoblinLab_Runes`
 for any rune). An answer is named by its `Id`, or by
@@ -161,6 +167,7 @@ per NPC, such as a name. A text with no translation shows as is, so a name can b
 | `Zone` | The NPC stands in one of `Zones`, as the world generator names them. |
 | `Biome` | The NPC stands in one of `Biomes`. |
 | `Unobstructed` | No block hitbox (tall grass, a bush) overlaps the upper half of the NPC's hitbox, where it stands at the draw, so players can aim F at it. Suited to NPCs that do not move. |
+| `NearCharacter` | An NPC carrying one of `Characters` stands within `Radius` blocks, where it was last seen even in an unloaded chunk. With `Not: true`, keeps two farmers out of one village. |
 
 Every filter also takes `Not`. NPCs that already react to F (merchants, quest givers) are skipped, unless the distribution sets `OverrideInteraction`.
 
@@ -189,6 +196,18 @@ it, or pick an answer) and `Deliver` (bring it items, which takes over F while t
 quest aimed at a `Forever` + `Universe` character fails once that character is lost. The
 `NearCharacter` constraint counts any quest's progress only near an NPC carrying a character. See the
 Forgotten Temple and Kweebec village characters in the Adventure Quests pack.
+
+A quest handed out by `AssignQuest` in a conversation with an NPC carries that NPC as its giver:
+the quest's `Giver` field, of type `Character`, holding the NPC, its character, its displayed name
+(the `{giver}` text parameter) and when it took that character. `GrantQuest` follow-ups keep it. `Dialogue`, `Deliver`
+and `NearCharacter` take `Target`: `Character` (default, the
+`Character` field, then required for `Deliver` and `NearCharacter`), `GiverCharacter` (any NPC of the
+giver's character) or `GiverNpc` (the giver alone). The `RequiresQuest` and `QuestCooldown`
+conditions take `GivenBy`: `Any` (default, all the player's quests), `Character` (those given by
+the conversation source's character) or `Npc` (by the source NPC alone). `RequiresQuest` also
+takes `QuestAssetIds`, several quests whose counts add up, like the constraint.
+A quest aimed at `GiverNpc` fails once that NPC lets its character go after handing it out, even if
+the NPC carries a character again before the player comes back.
 
 ## Extending
 

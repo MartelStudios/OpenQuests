@@ -6,6 +6,8 @@ import com.martelstudios.openquests.core.models.QuestTally;
 import com.martelstudios.openquests.extension.quests.queststate.QuestRequirement;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.asset;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.decode;
 import static com.martelstudios.openquests.extension.constraints.ConstraintFixtures.tally;
@@ -55,8 +57,24 @@ class RequiresQuestConstraintTest {
 
     @Test
     void aMissingQuestOrANegativeCountDoesNotDecode() {
-        assertNull(tryDecode(RequiresQuestConstraint.CODEC, "{\"States\": [\"Successful\"]}"));
         assertNull(tryDecode(RequiresQuestConstraint.CODEC, "{\"QuestAssetId\": \"Intro\", \"Min\": -1}"));
+        assertNull(tryDecode(RequiresQuestConstraint.CODEC, "{\"QuestAssetId\": \"Intro\", \"States\": []}"));
+    }
+
+    @Test
+    void aListSumsTheTalliesOfItsQuests() {
+        QuestRequirement requirement = requirement("{\"QuestAssetIds\": [\"A\", \"B\"], \"States\": [\"Successful\"], \"Min\": 2}");
+        Map<String, QuestTally> tallies = Map.of("A", WON_ONCE, "B", WON_ONCE);
+
+        assertTrue(requirement.isMetBy(id -> tallies.getOrDefault(id, NOTHING)));
+        assertFalse(requirement.isMetBy(id -> id.equals("A") ? WON_ONCE : NOTHING));
+    }
+
+    @Test
+    void oneIdOrOneListIsRequired() {
+        assertNotNull(decode(RequiresQuestConstraint.CODEC, "{\"QuestAssetId\": \"A\", \"QuestAssetIds\": [\"B\"]}").validate(asset()));
+        assertNotNull(decode(RequiresQuestConstraint.CODEC, "{\"States\": [\"Successful\"]}").validate(asset()));
+        assertNull(decode(RequiresQuestConstraint.CODEC, "{\"QuestAssetIds\": [\"A\"]}").validate(asset()));
     }
 
     private static QuestRequirement requirement(String json) {

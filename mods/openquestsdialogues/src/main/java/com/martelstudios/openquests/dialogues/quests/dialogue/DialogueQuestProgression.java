@@ -4,6 +4,10 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.opendialogues.characters.OpenDialogueCharacterAsset;
 import com.martelstudios.opendialogues.dialogues.OpenDialogueAsset;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestGiver;
+import com.martelstudios.openquests.core.targets.QuestTarget;
+import com.martelstudios.openquests.dialogues.givers.TargetMode;
 import com.martelstudios.openquests.extension.quests.quantity.HeldQuantityQuestProgression;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
@@ -18,6 +22,9 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
     public static final BuilderCodec<DialogueQuestProgression> CODEC = BuilderCodec.builder(DialogueQuestProgression.class, DialogueQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                    .build();
 
+    /** Translation key of the name shown for no one known. */
+    public static final String SOMEONE = "openquestsdialogues.quest.default.someone";
+
     protected DialogueQuestProgression() {}
 
     @Override
@@ -31,7 +38,7 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
         var asset = getAsset();
         if (asset == null) return super.getDefaultTitle();
 
-        String character = asset.getCharacter();
+        Message character = targetName(this, asset.getTargetMode(), asset.target(this));
         String dialogue = asset.getDialogue();
         boolean answer = asset.getAnswer() != null;
         String key;
@@ -41,8 +48,23 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
 
         Message title = Message.translation("openquestsdialogues.quest.default." + key).param("quantity", getTargetQuantity());
         if (dialogue != null) title.param("dialogue", dialogueName(dialogue));
-        if (character != null) title.param("character", characterName(character));
+        if (character != null) title.param("character", character);
         return title;
+    }
+
+    /**
+     * A quest aimed at its giver shows the name its giver carries; otherwise the target character's name.
+     *
+     * @return the name of whom the quest aims at, {@code null} for no one.
+     */
+    @Nullable
+    public static Message targetName(@Nonnull AbstractQuestProgression<?> quest, @Nonnull TargetMode mode, @Nullable QuestTarget target) {
+        if (mode != TargetMode.Character) {
+            QuestGiver giver = quest.getHead().getGiver();
+            if (giver != null && giver.getNameKey() != null) return Message.translation(giver.getNameKey());
+        }
+        String character = TargetMode.characterOf(target);
+        return character == null ? null : characterName(character);
     }
 
     @Nonnull
@@ -67,6 +89,6 @@ public class DialogueQuestProgression extends HeldQuantityQuestProgression<Dialo
     static String characterNameKey(@Nullable OpenDialogueCharacterAsset character) {
         if (character != null && character.getName() != null) return character.getName();
         if (character != null && character.getEpithet() != null) return character.getEpithet();
-        return "openquestsdialogues.quest.default.someone";
+        return SOMEONE;
     }
 }

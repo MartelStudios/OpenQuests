@@ -109,7 +109,7 @@ public class DialogueService {
      * @return whether the id led to a dialogue.
      */
     public boolean open(@Nonnull PlayerRef player, @Nonnull String id, @Nullable DialogueSource source) {
-        return show(player, resolver.resolve(id, contexts.apply(player)), source);
+        return show(player, resolver.resolve(id, contexts.apply(player).withSource(source)), source);
     }
 
     /**
@@ -119,7 +119,7 @@ public class DialogueService {
      * @return whether the target led to a dialogue.
      */
     public boolean open(@Nonnull PlayerRef player, @Nonnull OpenDialoguesTarget target, @Nullable DialogueSource source) {
-        return show(player, resolver.resolve(target, contexts.apply(player)), source);
+        return show(player, resolver.resolve(target, contexts.apply(player).withSource(source)), source);
     }
 
     private boolean show(@Nonnull PlayerRef player, @Nullable OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
@@ -135,7 +135,7 @@ public class DialogueService {
      * as shown. Off the player's world thread, conditions see no history nor inventory.
      */
     public void open(@Nonnull PlayerRef player, @Nonnull OpenDialogueAsset dialogue, @Nullable DialogueSource source) {
-        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player)), displayFor(dialogue), source, SpeakerView.of(dialogue.getCharacterId(), dialogue.isUseSourceCharacter(), source, characters));
+        DialogueSession session = new DialogueSession(dialogue, dialogue.visibleResponses(contexts.apply(player).withSource(source)), displayFor(dialogue), source, SpeakerView.of(dialogue.getCharacterId(), dialogue.isUseSourceCharacter(), source, characters));
         DialogueSession replaced = sessions.put(player.getUuid(), session);
         if (replaced != null) closed(player, replaced);
         session.display().show(player, session);
@@ -148,7 +148,7 @@ public class DialogueService {
      * History does not count it as another opening.
      */
     private void refresh(@Nonnull PlayerRef player, @Nonnull DialogueSession stale) {
-        DialogueSession session = new DialogueSession(stale.dialogue(), stale.dialogue().visibleResponses(contexts.apply(player)), stale.display(), stale.source(), stale.speaker());
+        DialogueSession session = new DialogueSession(stale.dialogue(), stale.dialogue().visibleResponses(contexts.apply(player).withSource(stale.source())), stale.display(), stale.source(), stale.speaker());
         if (!sessions.replace(player.getUuid(), stale, session)) return;
         session.display().refresh(player, session);
         endIfUnanswerable(player, session);
@@ -176,7 +176,7 @@ public class DialogueService {
             return AnswerResult.NO_SUCH_ANSWER;
         }
         OpenDialoguesResponse response = session.responses().get(position - 1);
-        if (!response.isShownTo(contexts.apply(player))) {
+        if (!response.isShownTo(contexts.apply(player).withSource(session.source()))) {
             refresh(player, session);
             return AnswerResult.REFRESHED;
         }

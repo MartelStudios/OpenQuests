@@ -1,4 +1,5 @@
 quest.default.title = Untitled quest
+quest.giver.someone = someone
 commands.argtype.quest.name = Quest Asset
 commands.argtype.quest.usage = The id of an OpenQuests quest asset
 commands.argtype.team_type.name = Team Type

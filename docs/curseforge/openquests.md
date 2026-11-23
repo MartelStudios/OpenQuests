@@ -42,6 +42,8 @@ player picks their own.
 
 🌍 **Server-wide events.** "Kill 1,000,000 skeletons, together" is a single quest shared by the whole server.
 
+🏷️ **Texts that name who asked.** A quest remembers who handed it out: `{giver}` in its title shows that name, and a `Text.<name>` tag fills any other `{name}`, so one quest reads right for every farmer and every crop.
+
 🔔 **An ending you can hear.** A finished quest takes over the middle of the screen and plays the sound you choose.
 
 🈯 **English and French included.** Every line of text is translatable.
@@ -137,7 +139,7 @@ reward cannot be delivered (full inventory, player offline), it waits. Nothing i
 | <code>InWorld</code>          | Only counts in some worlds; leaving can fail the quest         |
 | <code>NearPosition</code>     | Only counts within a radius of a position                      |
 | <code>EntityCondition</code>  | Only counts while sprinting, out of combat, under an effect…   |
-| <code>RequiresQuest</code>    | Only counts once, or while, another quest stands as asked      |
+| <code>RequiresQuest</code>    | Only counts once, or while, other quests stand as asked        |
 | <code>MinPlayersOnline</code> | Only counts while enough players are online                    |
 | <code>FailOnDeath</code>      | Dying fails the quest                                          |
 | <code>Cooldown</code>         | At most once per period, a day for a daily quest               |

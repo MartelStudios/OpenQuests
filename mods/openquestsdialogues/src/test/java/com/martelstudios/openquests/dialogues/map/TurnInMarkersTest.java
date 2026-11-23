@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,6 +25,15 @@ class TurnInMarkersTest {
 
         assertEquals(new CharacterMapStatus(TurnInMarkers.IMAGE, TurnInMarkers.PRIORITY, true), statuses.get("farmer"));
         assertEquals(new CharacterMapStatus(TurnInMarkers.IMAGE, TurnInMarkers.PRIORITY, false), statuses.get("mage"));
+    }
+
+    @Test
+    void npcTargetsGiveNpcStatuses() {
+        UUID giver = UUID.randomUUID();
+        List<QuestTargets.Running> running = List.of(running(new QuestTarget.Npc(giver, "farmer"), false), running(new QuestTarget.Npc(giver, "farmer"), true));
+
+        assertEquals(Map.of(giver, new CharacterMapStatus(TurnInMarkers.IMAGE, TurnInMarkers.PRIORITY, true)), TurnInMarkers.npcStatuses(running));
+        assertTrue(TurnInMarkers.statuses(running).isEmpty());
     }
 
     @Test

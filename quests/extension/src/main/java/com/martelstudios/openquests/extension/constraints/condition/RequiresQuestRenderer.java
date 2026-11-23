@@ -10,6 +10,8 @@ import com.martelstudios.openquests.extension.quests.queststate.QuestRequirement
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The quest waited on, beside what is asked of it.
@@ -28,8 +30,17 @@ public final class RequiresQuestRenderer implements QuestConstraintRenderer {
         if (QuestConstraintRenderer.isOver(quest)) return null;
 
         QuestRequirement requirement = ((RequiresQuestConstraint) constraint).getRequirement();
-        OpenQuestAsset watched = OpenQuestAsset.getAsset(requirement.getQuestAssetId());
-        Message title = watched == null ? Message.raw(requirement.getQuestAssetId()) : AbstractQuestProgression.titleOf(watched);
-        return new Line(title, requirement.describe());
+        List<Message> titles = new ArrayList<>();
+        for (String assetId : requirement.getQuestAssetIds()) {
+            if (!titles.isEmpty()) titles.add(Message.raw(", "));
+            titles.add(titleOf(assetId));
+        }
+        return new Line(Message.join(titles.toArray(Message[]::new)), requirement.describe());
+    }
+
+    @Nonnull
+    private static Message titleOf(@Nonnull String assetId) {
+        OpenQuestAsset watched = OpenQuestAsset.getAsset(assetId);
+        return watched == null ? Message.raw(assetId) : AbstractQuestProgression.titleOf(watched);
     }
 }

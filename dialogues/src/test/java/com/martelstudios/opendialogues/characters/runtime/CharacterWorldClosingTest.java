@@ -11,10 +11,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CharacterWorldClosingTest {
@@ -28,9 +30,10 @@ class CharacterWorldClosingTest {
 
     private final Map<String, OpenDialogueCharacterAsset> characters = new HashMap<>();
     private final UniverseCharacters universe = new UniverseCharacters();
+    private final ReleasedNpcs released = new ReleasedNpcs();
     private final EventBus bus = new EventBus(false);
     private final List<CharacterEvent.Lost> lost = new ArrayList<>();
-    private final CharacterWorldClosing closing = new CharacterWorldClosing(() -> universe, characters::get, bus);
+    private final CharacterWorldClosing closing = new CharacterWorldClosing(() -> universe, characters::get, () -> released, world -> Set.of(), bus);
 
     @Test
     void closingFreesAliveAndLosesForever() {
@@ -38,7 +41,7 @@ class CharacterWorldClosingTest {
         claim("Hero", "Forever", WORLD_A);
         bus.registerGlobal(CharacterEvent.Lost.class, lost::add);
 
-        closing.close(WORLD_A);
+        closing.close(WORLD_A, Set.of());
 
         assertTrue(universe.isAvailable("Kid", characters::get));
         assertTrue(universe.isLost("Hero"));
@@ -53,7 +56,7 @@ class CharacterWorldClosingTest {
         claim("Hero", "Forever", WORLD_A);
         bus.registerGlobal(CharacterEvent.Lost.class, lost::add);
 
-        closing.close(WORLD_B);
+        closing.close(WORLD_B, Set.of());
 
         assertFalse(universe.isAvailable("Kid", characters::get));
         assertFalse(universe.isLost("Hero"));
@@ -63,5 +66,29 @@ class CharacterWorldClosingTest {
     private void claim(@Nonnull String id, @Nonnull String uniqueness, @Nonnull UUID world) {
         characters.put(id, CharacterFixtures.character(id, "{ \"Uniqueness\": \"" + uniqueness + "\", \"Scope\": \"Universe\" }"));
         universe.claimIfAvailable(id, UUID.randomUUID(), world, characters::get);
+    }
+
+    @Test
+    void closingReleasesEveryNpcOfTheWorld() {
+        UUID npc = UUID.randomUUID();
+        List<CharacterEvent.WorldReleased> heard = new ArrayList<>();
+        bus.registerGlobal(CharacterEvent.WorldReleased.class, event -> {
+            assertNotNull(released.releasedAt(npc));
+            heard.add(event);
+        });
+
+        closing.close(WORLD_A, Set.of(npc));
+
+        assertEquals(Set.of(npc), heard.getFirst().getNpcs());
+    }
+
+    @Test
+    void closingAWorldWithoutNpcsReleasesNothing() {
+        List<CharacterEvent.WorldReleased> heard = new ArrayList<>();
+        bus.registerGlobal(CharacterEvent.WorldReleased.class, heard::add);
+
+        closing.close(WORLD_A, Set.of());
+
+        assertTrue(heard.isEmpty());
     }
 }

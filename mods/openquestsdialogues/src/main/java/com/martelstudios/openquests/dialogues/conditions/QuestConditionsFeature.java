@@ -14,5 +14,6 @@ public final class QuestConditionsFeature {
      */
     public static void register() {
         OpenDialoguesPlugin.get().getRegistry().registerCondition(OpenDialoguesRequiresQuestCondition.TYPE, OpenDialoguesRequiresQuestCondition.class, OpenDialoguesRequiresQuestCondition.CODEC);
+        OpenDialoguesPlugin.get().getRegistry().registerCondition(OpenDialoguesQuestCooldownCondition.TYPE, OpenDialoguesQuestCooldownCondition.class, OpenDialoguesQuestCooldownCondition.CODEC);
     }
 }

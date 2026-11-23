@@ -1,0 +1,52 @@
+{
+  "Type": "PlaceBlock",
+  "Icon": "Icons/ItemsGenerated/Plant_Seeds_Potato.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.farmer.plant-potato.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.plant-potato.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.plant-potato.short",
+  "TargetQuantity": 4,
+  "BlockToPlace": {
+    "ItemId": "Plant_Seeds_Potato"
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Target": "GiverNpc",
+      "Radius": 30
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Plant_Seeds_Potato_Eternal",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Random",
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Food_Pie_Pumpkin",
+            "Quantity": 2
+          }
+        },
+        {
+          "Weight": 50,
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Life_Essence",
+            "Quantity": 50
+          }
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}

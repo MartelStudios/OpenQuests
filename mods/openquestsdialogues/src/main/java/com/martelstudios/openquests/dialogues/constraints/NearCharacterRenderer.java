@@ -4,6 +4,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.martelstudios.openquests.core.constraints.QuestConstraint;
 import com.martelstudios.openquests.core.models.AbstractQuestProgression;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.dialogues.givers.TargetMode;
 import com.martelstudios.openquests.dialogues.quests.dialogue.DialogueQuestProgression;
 import com.martelstudios.openquests.extension.journal.QuestConstraintRenderer;
 import com.martelstudios.openquests.extension.journal.QuestPageContext;
@@ -12,7 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * The character and the radius in whole blocks; no position, as every NPC carrying it counts.
+ * The character or giver and the radius in whole blocks; no position, as every NPC carrying it counts.
  */
 public final class NearCharacterRenderer implements QuestConstraintRenderer {
 
@@ -28,8 +29,18 @@ public final class NearCharacterRenderer implements QuestConstraintRenderer {
         if (QuestConstraintRenderer.isOver(quest)) return null;
 
         NearCharacterConstraint nearCharacter = (NearCharacterConstraint) constraint;
+        Message name = quest != null ? DialogueQuestProgression.targetName(quest, nearCharacter.getTargetMode(), nearCharacter.target(quest)) : assetName(nearCharacter);
         return Line.of(Message.translation("openquestsdialogues.page.constraint.near-character")
                               .param("radius", Math.round(nearCharacter.getRadius()))
-                              .param("character", DialogueQuestProgression.characterName(nearCharacter.getCharacter())));
+                              .param("character", name != null ? name : Message.translation(DialogueQuestProgression.SOMEONE)));
+    }
+
+    /**
+     * Without a quest there is no giver yet: an asset aimed at one names no one.
+     */
+    @Nullable
+    private static Message assetName(@Nonnull NearCharacterConstraint nearCharacter) {
+        if (nearCharacter.getTargetMode() != TargetMode.Character || nearCharacter.getCharacter() == null) return null;
+        return DialogueQuestProgression.characterName(nearCharacter.getCharacter());
     }
 }

@@ -2,7 +2,7 @@
 
 📦 **Over 200 quests, characters and dialogues for vanilla Hytale, ready the moment your server starts.**
 
-Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, Kweebec villagers with a favour to ask, characters who remember you, and feats for every way you move. [OpenQuests](https://www.curseforge.com/hytale/mods/openquests) ships with no quests of its own: this pack is the content. Works in multiplayer and singleplayer, on new or existing worlds.
+Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, a farmer in every Kweebec village, villagers with a favour to ask, characters who remember you, and feats for every way you move. [OpenQuests](https://www.curseforge.com/hytale/mods/openquests) ships with no quests of its own: this pack is the content. Works in multiplayer and singleplayer, on new or existing worlds.
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
 
@@ -12,7 +12,7 @@ Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: 
 
 ## ✨ What is inside
 
-Over 200 quests in English and French, across ten chapters and thirty-two village stories. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
+Over 200 quests in English and French, across ten chapters, thirty-two village stories and a farmer in every Kweebec village. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
 
 🖼️ **Every quest has its icon**, from a crude hatchet to the breach's portal key, so the journal and its chapter graphs read at a glance.
 
@@ -50,6 +50,8 @@ Over 200 quests in English and French, across ten chapters and thirty-two villag
   you back through with a fragment.
 
 ### 🏡 Kweebec villages
+
+🧑‍🌾 **A farmer in every village.** Each Kweebec village has its own farmer, with a name of his own. Bring him what he needs for a new hoe and a bucket, pick his ripe harvest, then sow his next crops. He thanks you for each job, and once he trusts you he keeps asking for a hand, offering a harvest only when the crops are ripe around him. Each farmer remembers what you did for him, not for the farmer of the next village.
 
 🌱 **About one villager in two has a story.** Saplings, sproutlings, Razorleaf guards and the merchant each live one small incident, ask for your help once, then go back to village life. Each gets a name of its own.
 
@@ -159,7 +161,7 @@ Almost every quest type, constraint and reward is in there, along with the four 
 
 ## 🛠️ Installing
 
-Requires **OpenQuests** and **OpenQuests Core** 5.3.0 or newer, **OpenDialogues** 2.3.0 or newer and **OpenQuests Dialogues** 1.2.0 or newer. CurseForge installs them with it.
+Requires **OpenQuests** and **OpenQuests Core** 5.4.0 or newer, **OpenDialogues** 2.4.0 or newer and **OpenQuests Dialogues** 1.3.0 or newer. CurseForge installs them with it.
 
 This pack carries no code of its own. By hand, drop the zip in `mods/`, and remove it whenever you want the quest list back to empty.
 

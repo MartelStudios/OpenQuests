@@ -59,6 +59,20 @@ public final class QuestCompletions {
     }
 
     /**
+     * Builds counts kept elsewhere, such as a mod's own tally by quest giver.
+     */
+    @Nonnull
+    public static QuestCompletions of(int successful, int failed, int abandoned, @Nullable Instant lastStartedAt, @Nullable Instant lastCompletedAt) {
+        QuestCompletions completions = new QuestCompletions();
+        completions.successful = successful;
+        completions.failed = failed;
+        completions.abandoned = abandoned;
+        completions.lastStartedAt = lastStartedAt;
+        completions.lastCompletedAt = lastCompletedAt;
+        return completions;
+    }
+
+    /**
      * Counts one more quest ended that way. The dates only move forward, so an older quest heard of
      * late cannot pass for the latest one.
      *

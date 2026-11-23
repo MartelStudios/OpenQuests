@@ -137,10 +137,11 @@ public class GrantQuestReward extends QuestReward {
     /**
      * Told where it came from before it is registered, so everything that hears of it already
      * knows which completion opened it: once two quests share an asset, nothing else could tell.
-     * It carries on the origin of the chain paying, being part of the line that occasion opened.
+     * It carries on the origin and the giver of the chain paying, being part of the line that
+     * occasion opened and that NPC handed out.
      */
     @Nonnull
-    private static AbstractQuestProgression<?> createFrom(@Nonnull OpenQuestAsset asset, @Nonnull UUID sourceQuestId, @Nullable AbstractQuestProgression<?> head) {
-        return asset.builder().grantedBy(sourceQuestId).origin(head == null ? null : head.getOrigin()).build();
+    static AbstractQuestProgression<?> createFrom(@Nonnull OpenQuestAsset asset, @Nonnull UUID sourceQuestId, @Nullable AbstractQuestProgression<?> head) {
+        return asset.builder().grantedBy(sourceQuestId).origin(head == null ? null : head.getOrigin()).giver(head == null ? null : head.getGiver()).build();
     }
 }

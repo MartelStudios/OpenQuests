@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import static com.martelstudios.opendialogues.characters.CharacterFixtures.kweebec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,6 +45,7 @@ class CharacterServiceTest {
     private final List<OpenDialogueCharacterDistributionAsset> distributions = new ArrayList<>();
     private final UniqueCharacters unique = new UniqueCharacters();
     private final UniverseCharacters universe = new UniverseCharacters();
+    private final ReleasedNpcs released = new ReleasedNpcs();
     private final List<OpenDialoguesNPCIdentity> saved = new ArrayList<>();
     private NpcEligibility eligible = NpcEligibility.Plain;
 
@@ -88,6 +91,37 @@ class CharacterServiceTest {
         assertNull(npc.identity().getCharacter());
         assertNull(npc.identity().getName());
         assertEquals(ReleaseReason.Death, ((CharacterEvent.Released) heard.getLast()).getReason());
+    }
+
+    @Test
+    void releaseRemembersTheNpcBeforeListenersHearIt() {
+        character("Mira", "None", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.give(npc, "Mira");
+        boolean[] knownWhenHeard = {false};
+        bus.registerGlobal(CharacterEvent.Released.class, event -> knownWhenHeard[0] = service.releasedAt(event.getUuid()) != null);
+
+        assertNull(service.releasedAt(npc.uuid()));
+        service.release(npc, ReleaseReason.Removed);
+
+        assertNotNull(service.releasedAt(npc.uuid()));
+        assertTrue(knownWhenHeard[0]);
+    }
+
+    @Test
+    void npcDrawingAgainKeepsItsReleaseDate() {
+        character("Mira", "None", AB);
+        CharacterService service = service();
+        CharacterNpc npc = npc();
+        service.give(npc, "Mira");
+        service.release(npc, ReleaseReason.Removed);
+
+        Instant releasedAt = service.releasedAt(npc.uuid());
+
+        assertTrue(service.give(npc, "Mira"));
+
+        assertEquals(releasedAt, service.releasedAt(npc.uuid()));
     }
 
     @Test
@@ -669,7 +703,7 @@ class CharacterServiceTest {
 
     @Nonnull
     private CharacterService service() {
-        return new CharacterService(CharacterFixtures.assets(characters, distributions, Map.of(), id -> true), (accessor, ref) -> eligible, bus, new SplittableRandom(1), (message, error) -> warnings.add(message), null, null, () -> universe);
+        return new CharacterService(CharacterFixtures.assets(characters, distributions, Map.of(), id -> true), (accessor, ref) -> eligible, bus, new SplittableRandom(1), (message, error) -> warnings.add(message), null, null, () -> universe, () -> released);
     }
 
     @Nonnull

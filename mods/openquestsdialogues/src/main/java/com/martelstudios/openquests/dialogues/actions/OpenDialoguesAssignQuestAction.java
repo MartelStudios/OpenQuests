@@ -9,12 +9,15 @@ import com.martelstudios.opendialogues.actions.DialogueAction;
 import com.martelstudios.opendialogues.api.DialogueContext;
 import com.martelstudios.openquests.core.OpenQuestsServices;
 import com.martelstudios.openquests.core.models.OpenQuestAsset;
+import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.dialogues.givers.CharacterGiver;
 
 import javax.annotation.Nonnull;
 
 /**
  * Hands the player a new quest from an asset, unless its constraints refuse them. It does not
  * check whether they already hold one: preventing a second grant is the constraints' business.
+ * A quest handed out by an NPC carries that NPC as its {@link CharacterGiver}.
  */
 public class OpenDialoguesAssignQuestAction extends DialogueAction {
 
@@ -37,6 +40,9 @@ public class OpenDialoguesAssignQuestAction extends DialogueAction {
             LOGGER.atWarning().log("Quest '%s' is not loaded, not assigned to %s.", quest, context.player().getUsername());
             return;
         }
-        OpenQuestsServices.installed().getQuestProgressionService().assignQuest(asset, context.player().getUuid());
+        QuestProgressionService progression = OpenQuestsServices.installed().getQuestProgressionService();
+        CharacterGiver giver = CharacterGiver.of(context.session().source());
+        if (giver == null) progression.assignQuest(asset, context.player().getUuid());
+        else progression.assignQuest(asset.builder().giver(giver).build(), context.player().getUuid());
     }
 }

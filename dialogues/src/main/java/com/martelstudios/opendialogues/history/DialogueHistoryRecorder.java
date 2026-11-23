@@ -16,6 +16,7 @@ import com.martelstudios.opendialogues.sessions.DialogueSession;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -39,7 +40,8 @@ public class DialogueHistoryRecorder {
      */
     public void onOpened(@Nonnull DialogueEvent.Opened event) {
         DialogueSession session = event.getSession();
-        write(event.getPlayer(), history -> history.recordOpened(session.characterId(), session.dialogueId()));
+        Instant occurredAt = Instant.now();
+        write(event.getPlayer(), history -> history.recordOpened(session.characterId(), session.npcId(), session.dialogueId(), occurredAt));
     }
 
     /**
@@ -49,7 +51,8 @@ public class DialogueHistoryRecorder {
         DialogueSession session = event.getSession();
         OpenDialoguesResponse response = session.responses().get(event.getPosition() - 1);
         String answerKey = session.dialogue().answerKey(response);
-        write(event.getPlayer(), history -> history.recordAnswer(session.characterId(), session.dialogueId(), answerKey));
+        Instant occurredAt = Instant.now();
+        write(event.getPlayer(), history -> history.recordAnswer(session.characterId(), session.npcId(), session.dialogueId(), answerKey, occurredAt));
     }
 
     /**
@@ -77,6 +80,22 @@ public class DialogueHistoryRecorder {
         Function<DialogueHistory, Boolean> clear = history -> history != null && (dialogueId == null ? history.clear() : history.clear(dialogueId));
         reset(playerId, clear, cleared, 3);
         return cleared;
+    }
+
+    /**
+     * Forgets a released NPC in the history of every online player, on their world thread.
+     */
+    public void forgetNpc(@Nonnull UUID npc, @Nonnull Function<UUID, Instant> releasedAt) {
+        Function<UUID, Instant> thisOne = id -> id.equals(npc) ? releasedAt.apply(id) : null;
+        for (PlayerRef player : Universe.get().getPlayers()) reset(player.getUuid(), history -> history != null && history.forgetNpcs(thisOne), new CompletableFuture<>(), 3);
+    }
+
+    /**
+     * Forgets the NPCs released while a connecting player was away, through their incoming holder.
+     */
+    public void forgetReleased(@Nonnull Holder<EntityStore> holder, @Nonnull Function<UUID, Instant> releasedAt) {
+        DialogueHistory history = holder.getComponent(type);
+        if (history != null) history.forgetNpcs(releasedAt);
     }
 
     /**

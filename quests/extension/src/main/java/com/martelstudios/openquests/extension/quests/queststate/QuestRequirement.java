@@ -2,6 +2,7 @@ package com.martelstudios.openquests.extension.quests.queststate;
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.codecs.array.ArrayCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.codec.validation.Validators;
 import com.hypixel.hytale.server.core.Message;
@@ -27,6 +28,9 @@ public final class QuestRequirement {
     @Nullable
     private String questAssetId;
 
+    @Nullable
+    private String[] questAssetIds;
+
     @Nonnull
     private QuestState[] states = QuestStates.ALL;
 
@@ -42,11 +46,31 @@ public final class QuestRequirement {
      */
     @Nonnull
     public static <T> BuilderCodec.Builder<T> appendFields(@Nonnull BuilderCodec.Builder<T> builder, @Nonnull Function<T, QuestRequirement> requirement) {
-        return builder.append(new KeyedCodec<>("QuestAssetId", Codec.STRING, true), (owner, assetId) -> requirement.apply(owner).questAssetId = assetId, owner -> requirement.apply(owner).questAssetId)
-                      .addValidator(Validators.nonNull())
-                      .addValidatorLate(() -> OpenQuestAsset.VALIDATOR_CACHE.getValidator().late())
-                      .add()
-                      .append(new KeyedCodec<>("States", QuestStates.CODEC), (owner, states) -> requirement.apply(owner).states = states, owner -> requirement.apply(owner).states)
+        return appendBounds(builder.append(new KeyedCodec<>("QuestAssetId", Codec.STRING, true), (owner, assetId) -> requirement.apply(owner).questAssetId = assetId, owner -> requirement.apply(owner).questAssetId)
+                                   .addValidator(Validators.nonNull())
+                                   .addValidatorLate(() -> OpenQuestAsset.VALIDATOR_CACHE.getValidator().late())
+                                   .add(), requirement);
+    }
+
+    /**
+     * The four fields of {@link #appendFields}, the watched quest given either alone or as a list of
+     * {@code QuestAssetIds} whose counts add up: for conditions read over several quests at once.
+     */
+    @Nonnull
+    public static <T> BuilderCodec.Builder<T> appendListFields(@Nonnull BuilderCodec.Builder<T> builder, @Nonnull Function<T, QuestRequirement> requirement) {
+        return appendBounds(builder.append(new KeyedCodec<>("QuestAssetId", Codec.STRING), (owner, assetId) -> requirement.apply(owner).questAssetId = assetId, owner -> requirement.apply(owner).questAssetId)
+                                   .addValidatorLate(() -> OpenQuestAsset.VALIDATOR_CACHE.getValidator().late())
+                                   .documentation("ID of the watched quest asset. Set this or QuestAssetIds.")
+                                   .add()
+                                   .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(Codec.STRING, String[]::new)), (owner, ids) -> requirement.apply(owner).questAssetIds = ids, owner -> requirement.apply(owner).questAssetIds)
+                                   .addValidatorLate(() -> OpenQuestAsset.VALIDATOR_CACHE.getArrayValidator().late())
+                                   .documentation("IDs of several watched quest assets whose counts add up. Set this or QuestAssetId.")
+                                   .add(), requirement);
+    }
+
+    @Nonnull
+    private static <T> BuilderCodec.Builder<T> appendBounds(@Nonnull BuilderCodec.Builder<T> builder, @Nonnull Function<T, QuestRequirement> requirement) {
+        return builder.append(new KeyedCodec<>("States", QuestStates.CODEC), (owner, states) -> requirement.apply(owner).states = states, owner -> requirement.apply(owner).states)
                       .addValidator(Validators.nonEmptyArray())
                       .addValidator(Validators.uniqueInArray())
                       .add()
@@ -62,7 +86,20 @@ public final class QuestRequirement {
      * @return whether the player's quests from the watched asset stand as asked.
      */
     public boolean isMetBy(@Nonnull QuestTally tally) {
-        int count = tally.count(states);
+        return isMet(tally.count(states));
+    }
+
+    /**
+     * @param tallies the player's tally of each watched asset, by id.
+     * @return whether the watched quests, counted together, stand as asked.
+     */
+    public boolean isMetBy(@Nonnull Function<String, QuestTally> tallies) {
+        int count = 0;
+        for (String assetId : getQuestAssetIds()) count += tallies.apply(assetId).count(states);
+        return isMet(count);
+    }
+
+    private boolean isMet(int count) {
         return count >= min && (max == null || count <= max);
     }
 
@@ -71,6 +108,9 @@ public final class QuestRequirement {
      */
     @Nullable
     public String findError() {
+        if (questAssetId != null && questAssetIds != null) return "Set QuestAssetId or QuestAssetIds, not both";
+        if (questAssetId == null && questAssetIds == null) return "QuestAssetId or QuestAssetIds is required";
+        if (questAssetIds != null && questAssetIds.length == 0) return "QuestAssetIds must list at least one quest";
         if (max != null && max < min) return "Max " + max + " is below Min " + min;
         if (min == 0 && max == null) return "Min 0 with no Max is met by anyone";
         return null;
@@ -79,6 +119,15 @@ public final class QuestRequirement {
     @Nullable
     public String getQuestAssetId() {
         return questAssetId;
+    }
+
+    /**
+     * @return the watched asset ids: the list, or the single id alone.
+     */
+    @Nonnull
+    public List<String> getQuestAssetIds() {
+        if (questAssetIds != null) return List.of(questAssetIds);
+        return questAssetId != null ? List.of(questAssetId) : List.of();
     }
 
     /**

@@ -1,5 +1,8 @@
 package com.martelstudios.openquests.core.targets;
 
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -12,4 +15,12 @@ public interface TargetedQuest {
      */
     @Nullable
     QuestTarget target();
+
+    /**
+     * @return where that quest from the asset leads, for an asset aiming at something written on the quest.
+     */
+    @Nullable
+    default QuestTarget target(@Nonnull AbstractQuestProgression<?> quest) {
+        return target();
+    }
 }

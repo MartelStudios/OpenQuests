@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,6 +85,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("GrantedBy", Codec.UUID_STRING), (quest, grantedBy) -> quest.grantedBy = grantedBy, quest -> quest.grantedBy)
                                                                                         .add()
+                                                                                        .append(new KeyedCodec<>("Giver", QuestGiver.LENIENT_CODEC), (quest, giver) -> quest.giver = giver, quest -> quest.giver)
+                                                                                        .add()
                                                                                         .append(TAGS_CODEC, TAGS_SETTER, TAGS_GETTER)
                                                                                         .add()
                                                                                         .build();
@@ -123,6 +126,12 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
      */
     @Nullable
     private UUID grantedBy;
+
+    /**
+     * Who handed this line out in the world, carried down a chain; {@code null} for no one.
+     */
+    @Nullable
+    private QuestGiver giver;
 
     /**
      * Tags written on this instance, on top of those its asset declares, each with the values its
@@ -608,6 +617,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     }
 
     /**
+     * @return who handed this quest out in the world, set on the head of its line; {@code null} for no one.
+     */
+    @Nullable
+    public QuestGiver getGiver() {
+        return giver;
+    }
+
+    /**
      * @return how many players held the quest progression.
      */
     public int getHolderCount() {
@@ -852,15 +869,54 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         OpenQuestAsset asset = getAsset();
         String titleKey = asset == null ? null : asset.getTitleKey();
 
-        return titleKey != null ? Message.translation(titleKey) : getDefaultTitle();
+        return QuestTextParams.apply(titleKey != null ? Message.translation(titleKey) : getDefaultTitle(), textParams());
     }
 
+    /**
+     * @return the description of the asset, or what the type makes of itself when the asset names none.
+     */
     @Nonnull
     public Message getDescription() {
         OpenQuestAsset asset = getAsset();
         String descriptionKey = asset == null ? null : asset.getDescriptionKey();
 
-        return descriptionKey != null ? Message.translation(descriptionKey) : getDefaultDescription();
+        return QuestTextParams.apply(descriptionKey != null ? Message.translation(descriptionKey) : getDefaultDescription(), textParams());
+    }
+
+    /**
+     * Text parameters from the head's {@code Text.<param>} tags, those written on it winning over its
+     * asset's; a step's own asset fills only those the head leaves out.
+     */
+    @Nonnull
+    private Map<String, String> textParams() {
+        AbstractQuestProgression<?> head = getHead();
+        Map<String, String> params = headTextParams(head);
+        OpenQuestAsset asset = getAsset();
+        if (head == this || asset == null) return params;
+
+        Map<String, String> merged = new HashMap<>(QuestTextParams.of(asset.getTagNames(), asset::getTagValues));
+        merged.putAll(params);
+        return merged;
+    }
+
+    /**
+     * The head's tags, its own winning over its asset's, and the name of its giver.
+     */
+    @Nonnull
+    private static Map<String, String> headTextParams(@Nonnull AbstractQuestProgression<?> head) {
+        Set<String> names = new HashSet<>(head.getTags().keySet());
+        OpenQuestAsset headAsset = head.getAsset();
+        if (headAsset != null) names.addAll(headAsset.getTagNames());
+        return withGiver(new HashMap<>(QuestTextParams.of(names, head::getTagValues)), head.getGiver());
+    }
+
+    /**
+     * A quest with no giver, or a nameless one, names "someone" rather than showing a raw {@code {giver}}.
+     */
+    @Nonnull
+    private static Map<String, String> withGiver(@Nonnull Map<String, String> params, @Nullable QuestGiver giver) {
+        params.put(QuestGiver.NAME_PARAM, giver != null && giver.getNameKey() != null ? giver.getNameKey() : QuestGiver.SOMEONE);
+        return params;
     }
 
     /**
@@ -870,7 +926,8 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     @Nonnull
     public Message getShortDescription() {
         OpenQuestAsset asset = getAsset();
-        return asset == null ? Message.raw("") : shortDescriptionOf(asset);
+        String key = asset == null ? null : asset.getShortDescriptionKey();
+        return key == null ? Message.raw("") : QuestTextParams.apply(Message.translation(key), textParams());
     }
 
     /**
@@ -991,6 +1048,14 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
         }
 
         /**
+         * Who hands this quest out in the world, carried down a chain.
+         */
+        public B giver(@Nullable QuestGiver giver) {
+            base().giver = giver;
+            return self();
+        }
+
+        /**
          * Hands the quest over, after which this builder refuses everything.
          *
          * @throws IllegalStateException for an override no quest could run with
@@ -1042,7 +1107,22 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public static Message titleOf(@Nonnull OpenQuestAsset asset) {
         String titleKey = asset.getTitleKey();
 
-        return titleKey != null ? Message.translation(titleKey) : asset.create().getDefaultTitle();
+        return QuestTextParams.apply(titleKey != null ? Message.translation(titleKey) : asset.create().getDefaultTitle(), textParamsOf(asset));
+    }
+
+    /**
+     * The title of a step asset with no progression left, its text parameters read from the composite it belongs to.
+     */
+    @Nonnull
+    public static Message titleOf(@Nonnull OpenQuestAsset asset, @Nonnull AbstractQuestProgression<?> composite) {
+        String titleKey = asset.getTitleKey();
+        Message title = titleKey != null ? Message.translation(titleKey) : asset.create().getDefaultTitle();
+        return QuestTextParams.apply(title, headTextParams(composite.getHead()));
+    }
+
+    @Nonnull
+    private static Map<String, String> textParamsOf(@Nonnull OpenQuestAsset asset) {
+        return withGiver(new HashMap<>(QuestTextParams.of(asset.getTagNames(), asset::getTagValues)), null);
     }
 
     /**
@@ -1053,7 +1133,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public static Message descriptionOf(@Nonnull OpenQuestAsset asset) {
         String descriptionKey = asset.getDescriptionKey();
 
-        return descriptionKey != null ? Message.translation(descriptionKey) : asset.create().getDefaultDescription();
+        return QuestTextParams.apply(descriptionKey != null ? Message.translation(descriptionKey) : asset.create().getDefaultDescription(), textParamsOf(asset));
     }
 
     /**
@@ -1063,6 +1143,6 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
     public static Message shortDescriptionOf(@Nonnull OpenQuestAsset asset) {
         String key = asset.getShortDescriptionKey();
 
-        return key != null ? Message.translation(key) : Message.raw("");
+        return key != null ? QuestTextParams.apply(Message.translation(key), textParamsOf(asset)) : Message.raw("");
     }
 }

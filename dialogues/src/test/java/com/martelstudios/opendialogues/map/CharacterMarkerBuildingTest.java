@@ -78,6 +78,37 @@ class CharacterMarkerBuildingTest {
         assertEquals(true, CharacterMarkerProvider.join(seen, positions.version(), positions.view()).undecided());
     }
 
+    @Test
+    void anNpcStatusShowsOnThatNpcAlone() {
+        positions.record("farmer", SORREL, new Vector3d(), null);
+        positions.record("farmer", TANSY, new Vector3d(), null);
+        Map<UUID, List<CharacterMapStatus>> npcStatuses = Map.of(SORREL, List.of(new CharacterMapStatus("TurnIn.png", 100, true)));
+
+        CharacterMarkerProvider.Built built = buildWithNpcs(npcStatuses);
+
+        assertEquals(List.of("OpenDialogues:" + SORREL), built.all().stream().map(marker -> marker.id).toList());
+        assertEquals("TurnIn.png", marker(built, SORREL).compassImage);
+        assertFalse(built.undecided());
+    }
+
+    @Test
+    void anNpcWithAStatusAppearingLaterAsksForARecompute() {
+        positions.record("farmer", TANSY, new Vector3d(), null);
+        CharacterMarkerProvider.Built before = buildWithNpcs(Map.of(SORREL, List.of(new CharacterMapStatus("TurnIn.png", 100, true))));
+        CharacterMarkerProvider.Seen seen = before.from();
+
+        positions.record("farmer", SORREL, new Vector3d(), null);
+
+        assertEquals(true, CharacterMarkerProvider.join(seen, positions.version(), positions.view()).undecided());
+    }
+
+    private CharacterMarkerProvider.Built buildWithNpcs(Map<UUID, List<CharacterMapStatus>> npcStatuses) {
+        var looks = provider.looks(positions.view().keySet(), id -> false, Map.of());
+        var npcLooks = provider.npcLooks(positions.view(), id -> false, Map.of(), npcStatuses);
+        var seen = new CharacterMarkerProvider.Seen(WORLD, positions, positions.view().keySet(), looks, npcLooks, npcStatuses.keySet());
+        return CharacterMarkerProvider.join(seen, positions.version(), positions.view());
+    }
+
     private CharacterMarkerProvider.Built build(String met, Map<String, List<CharacterMapStatus>> statuses) {
         return CharacterMarkerProvider.join(seen(provider.looks(positions.view().keySet(), met::equals, statuses)), positions.version(), positions.view());
     }

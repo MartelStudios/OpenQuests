@@ -24,6 +24,7 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.asset.HytaleAssetStore;
 import com.hypixel.hytale.server.core.event.events.BootEvent;
+import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerDisconnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -59,9 +60,11 @@ import com.martelstudios.opendialogues.dialogues.NothingToSay;
 import com.martelstudios.opendialogues.characters.runtime.CharacterTalkSystem;
 import com.martelstudios.opendialogues.characters.runtime.OpenDialoguesNPCIdentity;
 import com.martelstudios.opendialogues.characters.runtime.UniqueCharacters;
+import com.martelstudios.opendialogues.characters.runtime.ReleasedNpcs;
 import com.martelstudios.opendialogues.characters.runtime.UniverseCharacters;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesBiomeFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesGroupFilter;
+import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesNearCharacterFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesRoleFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesUnobstructedFilter;
 import com.martelstudios.opendialogues.characters.filters.impl.OpenDialoguesWorldFilter;
@@ -93,6 +96,8 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Int
 
 
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesAnsweredCondition;
+import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesCooldownCondition;
+import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesOpenedAfterCondition;
 import com.martelstudios.opendialogues.conditions.impl.history.OpenDialoguesOpenedCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.OpenDialoguesHoldingCondition;
 import com.martelstudios.opendialogues.conditions.impl.items.OpenDialoguesInventoryCondition;
@@ -105,6 +110,8 @@ import com.hypixel.hytale.assetstore.event.LoadedAssetsEvent;
 import com.martelstudios.opendialogues.services.DialogueResolver;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -116,6 +123,9 @@ import java.util.random.RandomGenerator;
  * whichever display they name.
  */
 public class OpenDialoguesPlugin extends JavaPlugin {
+
+    /** How long a released NPC is remembered for players who were offline when it let its character go. */
+    public static final Duration RELEASED_NPC_RETENTION = Duration.ofDays(365);
 
     /**
      * Every world draws on its own thread, so each call asks that thread's generator.
@@ -147,6 +157,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
 
     private ResourceType<EntityStore, UniqueCharacters> uniqueCharactersType;
     private UniverseResourceType<UniverseCharacters> universeCharactersType;
+    private UniverseResourceType<ReleasedNpcs> releasedNpcsType;
+    private volatile boolean releasedNpcsPruned;
 
     private DialogueHistoryRecorder historyRecorder;
 
@@ -191,6 +203,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerCondition(OpenDialoguesCompositeCondition.TYPE, OpenDialoguesCompositeCondition.class, OpenDialoguesCompositeCondition.CODEC);
         registry.registerCondition(OpenDialoguesOpenedCondition.TYPE, OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition.CODEC);
         registry.registerCondition(OpenDialoguesAnsweredCondition.TYPE, OpenDialoguesAnsweredCondition.class, OpenDialoguesAnsweredCondition.CODEC);
+        registry.registerCondition(OpenDialoguesCooldownCondition.TYPE, OpenDialoguesCooldownCondition.class, OpenDialoguesCooldownCondition.CODEC);
+        registry.registerCondition(OpenDialoguesOpenedAfterCondition.TYPE, OpenDialoguesOpenedAfterCondition.class, OpenDialoguesOpenedAfterCondition.CODEC);
         registry.registerCondition(OpenDialoguesHoldingCondition.TYPE, OpenDialoguesHoldingCondition.class, OpenDialoguesHoldingCondition.CODEC);
         registry.registerCondition(OpenDialoguesInventoryCondition.TYPE, OpenDialoguesInventoryCondition.class, OpenDialoguesInventoryCondition.CODEC);
         registry.registerCondition(OpenDialoguesNearNpcCondition.TYPE, OpenDialoguesNearNpcCondition.class, OpenDialoguesNearNpcCondition.CODEC);
@@ -203,6 +217,7 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         registry.registerFilter(OpenDialoguesZoneFilter.TYPE, OpenDialoguesZoneFilter.class, OpenDialoguesZoneFilter.CODEC);
         registry.registerFilter(OpenDialoguesBiomeFilter.TYPE, OpenDialoguesBiomeFilter.class, OpenDialoguesBiomeFilter.CODEC);
         registry.registerFilter(OpenDialoguesUnobstructedFilter.TYPE, OpenDialoguesUnobstructedFilter.class, OpenDialoguesUnobstructedFilter.CODEC);
+        registry.registerFilter(OpenDialoguesNearCharacterFilter.TYPE, OpenDialoguesNearCharacterFilter.class, OpenDialoguesNearCharacterFilter.CODEC);
 
         registry.registerTrait(OpenDialoguesDialogueTrait.TYPE, OpenDialoguesDialogueTrait.class, OpenDialoguesDialogueTrait.CODEC);
         registry.registerTrait(OpenDialoguesNameTrait.TYPE, OpenDialoguesNameTrait.class, OpenDialoguesNameTrait.CODEC);
@@ -219,8 +234,9 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         getEntityStoreRegistry().registerSystem(new TranslatedNameplateRemoval(EntityTrackerSystems.Visible.getComponentType(), translatedNameplateType));
         uniqueCharactersType = getEntityStoreRegistry().registerResource(UniqueCharacters.class, "OpenDialoguesUniqueCharacters", UniqueCharacters.CODEC);
         universeCharactersType = Universe.registerResource(UniverseCharacters.class, "OpenDialoguesUniqueCharacters", UniverseCharacters.CODEC);
+        releasedNpcsType = Universe.registerResource(ReleasedNpcs.class, "OpenDialoguesReleasedNpcs", ReleasedNpcs.CODEC);
         CharacterAssets characterAssets = CharacterAssets.live();
-        characterService = new CharacterService(characterAssets, NpcEligibility::of, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters);
+        characterService = new CharacterService(characterAssets, NpcEligibility::of, HytaleServer.get().getEventBus(), THREAD_RANDOM, (message, error) -> getLogger().atWarning().withCause(error).log("%s", message), identityType, uniqueCharactersType, this::universeCharacters, this::releasedNpcs);
         ResourceType<EntityStore, CharacterPositions> positionsType = getEntityStoreRegistry().registerResource(CharacterPositions.class, "OpenDialoguesCharacterPositions", CharacterPositions.CODEC);
         CharacterPositionsAccess positions = characterPositions = new CharacterPositionsAccess(positionsType, characterService);
         characterMarkers = new CharacterMarkerProvider(positions, player -> historyRecorder.history(player), characterAssets::character);
@@ -270,6 +286,8 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         onLoaded(OpenDialogueAsset.class, this::validateRouters);
         onLoaded(OpenDialogueAsset.class, this::validateAnswers);
         onLoaded(OpenDialogueRouterAsset.class, this::validateRouters);
+        onLoaded(OpenDialogueCharacterAsset.class, this::validateRouters);
+        onLoaded(OpenDialogueCharacterAsset.class, this::validateAnswers);
         onLoaded(OpenDialogueCharacterAsset.class, this::validateCharacters);
         onLoaded(OpenDialogueCharacterAsset.class, () -> characterService.forgetFailures());
         onLoaded(OpenDialogueCharacterDistributionAsset.class, this::validateCharacters);
@@ -283,7 +301,9 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         getEventRegistry().registerGlobal(DialogueEvent.Opened.class, historyRecorder::onOpened);
         getEventRegistry().registerGlobal(DialogueEvent.Answered.class, historyRecorder::onAnswered);
         getEventRegistry().registerGlobal(CharacterEvent.Released.class, CharacterDeathAnnouncer::onReleased);
-        getEventRegistry().registerGlobal(EventPriority.LAST, RemoveWorldEvent.class, characterService.worldClosing()::onRemoveWorld);
+        getEventRegistry().registerGlobal(CharacterEvent.Released.class, event -> historyRecorder.forgetNpc(event.getUuid(), characterService::releasedAt));
+        getEventRegistry().registerGlobal(PlayerConnectEvent.class, event -> historyRecorder.forgetReleased(event.getHolder(), characterService::releasedAt));
+        getEventRegistry().registerGlobal(EventPriority.LAST, RemoveWorldEvent.class, characterService.worldClosing(world -> positions.npcs(world.getEntityStore().getStore()))::onRemoveWorld);
 
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> dialogueService.forget(event.getPlayerRef()));
         getEventRegistry().registerGlobal(PlayerDisconnectEvent.class, event -> characterMarkers.forget(event.getPlayerRef().getUuid()));
@@ -406,6 +426,22 @@ public class OpenDialoguesPlugin extends JavaPlugin {
         UniverseCharacters characters = Universe.get().getResource(universeCharactersType);
         characters.setOnChange(() -> Universe.get().flushResource(universeCharactersType));
         return characters;
+    }
+
+    /**
+     * Read like {@link #universeCharacters()}; releases older than the retention are dropped on the
+     * first read after the server starts. Kept long: a player away longer is never swept, and their
+     * quests aimed at such an NPC no longer fail on load.
+     */
+    @Nonnull
+    private ReleasedNpcs releasedNpcs() {
+        ReleasedNpcs released = Universe.get().getResource(releasedNpcsType);
+        released.setOnChange(() -> Universe.get().flushResource(releasedNpcsType));
+        if (!releasedNpcsPruned) {
+            releasedNpcsPruned = true;
+            released.pruneBefore(Instant.now().minus(RELEASED_NPC_RETENTION));
+        }
+        return released;
     }
 
     /**

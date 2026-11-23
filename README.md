@@ -46,7 +46,8 @@ A quest is handed out in one of three ways, and the prerequisites of a quest are
 - **As a reward**: the `GrantQuest` reward hands further quests over when a quest completes. This
   is how a chain is written: finishing A grants B. Each player paid gets their own, unless the
   reward is `Shared`: the quest then hands it on once, in its own scope, so a chain a world or the
-  universe shares goes on shared.
+  universe shares goes on shared. A follow-up keeps the giver of its chain, the NPC that handed
+  the first quest out, so its texts and targets still name that NPC.
 - **Explicitly**: `QuestProgressionService.assignQuest(asset, playerId)`, from a command or from
   your own plugin.
 
@@ -841,9 +842,9 @@ malformed one stops the server with the asset named rather than failing the day 
 | `Within` | `Seconds` | Makes a counted quest a combo: the target is to be reached that long after the first action counted, or the count drops to zero and the next action starts again. The quest never fails for it. Only a quest counting actions takes it; one counting what the player holds (`Gather`, `ReachValue`, `Dialogue`, `MMOSkillTreeReachLevel`) is refused at boot. |
 | `InWorld` | `WorldNamePattern`, `OnLeave` | Counts progress only in a world whose whole name matches, the way `EnterWorld` reads its own. `"OnLeave": "Fail"` fails the quest when its player goes from a matching world to one that is not; logging out is not leaving. |
 | `NearPosition` | `Position`, `Radius`, `WorldNamePattern` | Counts progress only within the radius, its edge included. The pattern, optional, says which world the position is in. |
-| `NearCharacter` | `Character`, `Radius` | With the OpenQuestsDialogues bridge: counts progress only within the radius of an NPC carrying that OpenDialogues character, any of them in the player's world, its edge included. The NPC is followed where it stands now. |
+| `NearCharacter` | `Character`, `Target`, `Radius` | With the OpenQuestsDialogues bridge: counts progress only within the radius of an NPC carrying that OpenDialogues character, any of them in the player's world, its edge included, or of the quest's giver with `Target` `GiverCharacter` or `GiverNpc`. The NPC is followed where it stands now. |
 | `EntityCondition` | `Conditions` | Counts progress only while the player's entity meets every condition: the game's own, `Sprinting`, `OutOfCombat`, `HasEffect`…, so one another mod registers works too. |
-| `RequiresQuest` | `QuestAssetId`, `States`, `Min`, `Max` | Counts progress only while the acting player has between `Min` (1 by default) and `Max` (no limit by default) quests from `QuestAssetId` standing in the listed `States` (every state by default), running ones included: `["InProgress"]` while an escort runs, `["Successful"]` once a chapter is done, `"States": ["Failed"], "Min": 0, "Max": 0` as long as a trial was never failed. |
+| `RequiresQuest` | `QuestAssetId` or `QuestAssetIds`, `States`, `Min`, `Max` | Counts progress only while the acting player has between `Min` (1 by default) and `Max` (no limit by default) quests from `QuestAssetId` standing in the listed `States` (every state by default), running ones included: `["InProgress"]` while an escort runs, `["Successful"]` once a chapter is done, `"States": ["Failed"], "Min": 0, "Max": 0` as long as a trial was never failed. `QuestAssetIds` lists several quests whose counts add up: two of a pool done. |
 | `MinPlayersOnline` | `Count` | Counts progress only while that many players are on the server, the acting one included. |
 | `FailOnDeath` | none | Fails the quest the moment one of its players dies. A shared quest fails for everyone holding it. |
 | `Cooldown` | `Seconds`, `From` | Hands a quest from the asset out at most once per period: from the end of the last one, whichever way it ended, or from its start with `"From": "Start"`. |
@@ -1086,6 +1087,11 @@ All three are optional. Without a title a quest falls back to
 quest reads "Gather 2 Sticks" on its own, the item naming itself through Hytale's own
 `Item.getTranslationMessage()`. The templates live in the same files and use ICU, so a locale
 pluralises where it needs to.
+
+A tag named `Text.<param>` fills `{<param>}` in the three texts with the translation of its first
+value. The asset declares a fallback in its `Tags` (`"Text.crop": ["crops.onion"]`) and a tag
+written on the quest itself wins over it; steps of a composite read the tags of their head.
+`{giver}` is reserved: the core fills it with the name of the quest's typed giver, or "someone".
 
 Quest asset graphs are validated at boot: an unknown reference or a cycle between composite quests
 stops the server with an explicit reason rather than failing later at runtime.

@@ -2,6 +2,7 @@ package com.martelstudios.opendialogues.sessions;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -11,5 +12,14 @@ import java.util.UUID;
  * @param character the id of the character it carries.
  * @param name      the translation key of its display name, {@code null} for a nameless one.
  * @param epithet   the translation key of its display epithet, {@code null} for none.
+ * @param openedAt  when the conversation opened, the NPC carrying the character then.
  */
-public record DialogueSource(@Nonnull UUID npc, @Nonnull String character, @Nullable String name, @Nullable String epithet) {}
+public record DialogueSource(@Nonnull UUID npc, @Nonnull String character, @Nullable String name, @Nullable String epithet, @Nonnull Instant openedAt) {
+
+    /**
+     * A conversation opening now.
+     */
+    public DialogueSource(@Nonnull UUID npc, @Nonnull String character, @Nullable String name, @Nullable String epithet) {
+        this(npc, character, name, epithet, Instant.now());
+    }
+}

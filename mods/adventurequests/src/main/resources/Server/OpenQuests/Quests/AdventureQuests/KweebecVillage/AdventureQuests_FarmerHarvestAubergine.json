@@ -1,0 +1,36 @@
+{
+  "Type": "InteractivelyPickup",
+  "Icon": "Icons/ItemsGenerated/Plant_Crop_Aubergine.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.farmer.harvest-aubergine.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-aubergine.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-aubergine.short",
+  "TargetQuantity": 2,
+  "ItemToPickup": {
+    "ItemId": "Plant_Crop_Aubergine_Item"
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Target": "GiverNpc",
+      "Radius": 30
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Plant_Seeds_Aubergine_Eternal",
+      "Quantity": 1,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Iron",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

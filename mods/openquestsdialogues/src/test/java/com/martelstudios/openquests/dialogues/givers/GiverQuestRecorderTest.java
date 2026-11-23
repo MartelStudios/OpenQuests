@@ -1,0 +1,70 @@
+package com.martelstudios.openquests.dialogues.givers;
+
+import com.martelstudios.openquests.core.events.QuestCompletedEvent;
+import com.martelstudios.openquests.core.models.AbstractQuestProgression;
+import com.martelstudios.openquests.core.models.QuestState;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class GiverQuestRecorderTest {
+
+    private static final CharacterGiver GIVER = new CharacterGiver("Farmer", UUID.randomUUID(), null);
+
+    @Test
+    void outcomesFollowTheRecipientsCoreCounted() {
+        UUID counted = UUID.randomUUID();
+        UUID joinedSince = UUID.randomUUID();
+        UUID gaveUp = UUID.randomUUID();
+        TestQuest quest = new TestQuest();
+        quest.apply(new AbstractQuestProgression.Join(joinedSince));
+        quest.apply(new AbstractQuestProgression.Join(gaveUp));
+        quest.apply(new AbstractQuestProgression.Abandon(gaveUp));
+        QuestCompletedEvent event = new QuestCompletedEvent(quest, QuestState.SUCCESSFUL, 1, true);
+        event.recipients(() -> Set.of(counted));
+
+        assertEquals(Map.of(counted, QuestState.SUCCESSFUL, gaveUp, QuestState.ABANDONED), GiverQuestRecorder.outcomes(event));
+    }
+
+    @Test
+    void aRecordReadableHereIsWrittenAtOnce() {
+        GiverQuestRecord here = new GiverQuestRecord();
+        boolean[] queued = {false};
+
+        GiverQuestRecorder.write(here, record -> record.ended(GIVER, "Q", QuestState.SUCCESSFUL, Instant.now()), () -> queued[0] = true);
+
+        assertEquals(1, here.completions("Farmer", GIVER.getNpc(), "Q").count(QuestState.SUCCESSFUL));
+        assertFalse(queued[0]);
+    }
+
+    @Test
+    void aRecordOutOfReachIsQueued() {
+        boolean[] queued = {false};
+
+        GiverQuestRecorder.write(null, record -> {}, () -> queued[0] = true);
+
+        assertTrue(queued[0]);
+    }
+
+    @Test
+    void aReleasedGiverIsNoLongerRecorded() {
+        assertTrue(GiverQuestRecorder.records(GIVER, npc -> null));
+        assertFalse(GiverQuestRecorder.records(GIVER, npc -> npc.equals(GIVER.getNpc()) ? Instant.EPOCH : null));
+        assertFalse(GiverQuestRecorder.records(null, npc -> null));
+    }
+
+    @Test
+    void aGiverHandingOutAfterItsReleaseIsRecorded() {
+        Instant release = Instant.ofEpochMilli(1_000);
+        CharacterGiver drawnAgain = new CharacterGiver("Farmer", GIVER.getNpc(), null, release.plusMillis(1));
+
+        assertTrue(GiverQuestRecorder.records(drawnAgain, npc -> release));
+    }
+}

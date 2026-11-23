@@ -17,7 +17,7 @@ import java.util.UUID;
  */
 public class RequiresQuestConstraint extends QuestConstraint {
 
-    public static final BuilderCodec<RequiresQuestConstraint> CODEC = QuestRequirement.appendFields(BuilderCodec.builder(RequiresQuestConstraint.class, RequiresQuestConstraint::new, QuestConstraint.BASE_CODEC),
+    public static final BuilderCodec<RequiresQuestConstraint> CODEC = QuestRequirement.appendListFields(BuilderCodec.builder(RequiresQuestConstraint.class, RequiresQuestConstraint::new, QuestConstraint.BASE_CODEC),
                                                                                                     constraint -> constraint.requirement)
                                                                                       .build();
 
@@ -28,7 +28,7 @@ public class RequiresQuestConstraint extends QuestConstraint {
 
     @Override
     public boolean allowsProgress(@Nonnull AbstractQuestProgression<?> quest, @Nonnull UUID actorId) {
-        return requirement.isMetBy(quest.environment().services().getQuestPlayerStateService().getTally(actorId, requirement.getQuestAssetId()));
+        return requirement.isMetBy(assetId -> quest.environment().services().getQuestPlayerStateService().getTally(actorId, assetId));
     }
 
     @Nullable

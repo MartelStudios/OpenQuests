@@ -10,6 +10,8 @@ import com.martelstudios.opendialogues.routers.OpenDialoguesTarget;
 import com.martelstudios.opendialogues.sessions.DialogueSource;
 import com.martelstudios.opendialogues.triggers.DialogueTriggers;
 import com.martelstudios.openquests.core.services.QuestProgressionService;
+import com.martelstudios.openquests.core.targets.QuestTarget;
+import com.martelstudios.openquests.dialogues.givers.TargetMode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,17 +46,17 @@ public final class DeliveryTakeOver {
         if (quests.isEmpty()) return;
         DeliveryInventory inventory = DeliveryInventory.of(ref.getStore(), ref);
 
-        List<String> characters = new ArrayList<>();
+        List<QuestTarget> targets = new ArrayList<>();
         List<int[]> missing = new ArrayList<>();
         List<int[]> carried = new ArrayList<>();
         for (DeliverQuestProgression quest : quests) {
             OpenQuestsDeliverAsset asset = quest.getAsset();
-            characters.add(asset.getCharacter());
+            targets.add(asset.target(quest));
             missing.add(Deliveries.missing(quest));
             carried.add(inventory.carried(asset.getItems()));
         }
 
-        int picked = pick(characters, missing, carried, event.getCharacter());
+        int picked = pick(targets, missing, carried, event.getCharacter(), event.getUuid());
         if (picked < 0) return;
         event.setCancelled(true);
 
@@ -66,11 +68,12 @@ public final class DeliveryTakeOver {
     }
 
     /**
-     * Lets the character answer F while some delivery to it runs, so a name only character can receive one.
+     * Lets the character answer F while some delivery to it, or to one of its NPCs, runs, so a name
+     * only character can receive one.
      */
     public boolean demanded(@Nonnull String characterId) {
         for (UUID questId : progression.getQuestIdsForType(DeliverQuestProgression.class)) {
-            if (progression.getLiveQuest(questId) instanceof DeliverQuestProgression quest && !quest.isOver() && quest.getAsset() != null && characterId.equals(quest.getAsset().getCharacter())) return true;
+            if (progression.getLiveQuest(questId) instanceof DeliverQuestProgression quest && !quest.isOver() && quest.getAsset() != null && characterId.equals(TargetMode.characterOf(quest.getAsset().target(quest)))) return true;
         }
         return false;
     }
@@ -78,12 +81,12 @@ public final class DeliveryTakeOver {
     /**
      * @param missing per quest, what each item still misses.
      * @param carried per quest, how many of each item the player carries.
-     * @return the index of the first quest aimed at the character with an item both missing and
+     * @return the index of the first quest aimed at that NPC with an item both missing and
      * carried, -1 for none.
      */
-    static int pick(@Nonnull List<String> characters, @Nonnull List<int[]> missing, @Nonnull List<int[]> carried, @Nonnull String characterId) {
-        for (int quest = 0; quest < characters.size(); quest++) {
-            if (!characterId.equals(characters.get(quest))) continue;
+    static int pick(@Nonnull List<QuestTarget> targets, @Nonnull List<int[]> missing, @Nonnull List<int[]> carried, @Nonnull String characterId, @Nonnull UUID npc) {
+        for (int quest = 0; quest < targets.size(); quest++) {
+            if (!TargetMode.accepts(targets.get(quest), characterId, npc)) continue;
             int[] questMissing = missing.get(quest);
             int[] questCarried = carried.get(quest);
             for (int item = 0; item < questMissing.length; item++) {

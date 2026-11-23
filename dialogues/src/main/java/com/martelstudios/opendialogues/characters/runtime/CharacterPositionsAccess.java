@@ -1,5 +1,6 @@
 package com.martelstudios.opendialogues.characters.runtime;
 
+import com.hypixel.hytale.component.ComponentAccessor;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.ResourceType;
 import com.hypixel.hytale.component.Store;
@@ -8,7 +9,10 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Hands out a world's {@link CharacterPositions} caught up with character resets, so no reader
@@ -42,7 +46,7 @@ public final class CharacterPositionsAccess {
      * shortcut: skips the reset catch-up, so a reset's NPCs linger until the next scan; catch up here if that shows.
      */
     @Nonnull
-    public Map<String, Collection<CharacterPositions.Spot>> view(@Nonnull Store<EntityStore> store) {
+    public Map<String, Collection<CharacterPositions.Spot>> view(@Nonnull ComponentAccessor<EntityStore> store) {
         return store.getResource(type).view();
     }
 
@@ -54,5 +58,17 @@ public final class CharacterPositionsAccess {
         TransformComponent transform = store.getComponent(ref, TransformComponent.getComponentType());
         if (characterId == null || transform == null) return;
         positions(store).record(characterId, npc.uuid(), transform.getPosition(), characters.displayName(npc.identity()));
+    }
+
+    /**
+     * @return every NPC carrying a character in a world, loaded or not, readable from any thread.
+     */
+    @Nonnull
+    public Set<UUID> npcs(@Nonnull ComponentAccessor<EntityStore> store) {
+        Set<UUID> npcs = new HashSet<>();
+        for (Collection<CharacterPositions.Spot> spots : view(store).values()) {
+            for (CharacterPositions.Spot spot : spots) npcs.add(spot.npc());
+        }
+        return npcs;
     }
 }
