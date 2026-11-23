@@ -7,7 +7,7 @@
   "TitleKey": "adventurequests.kweebecvillage.quest.farmer.harvest-onion.title",
   "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-onion.description",
   "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-onion.short",
-  "TargetQuantity": 2,
+  "TargetQuantity": 1,
   "ItemToPickup": {
     "ItemId": "Plant_Crop_Onion_Item"
   },

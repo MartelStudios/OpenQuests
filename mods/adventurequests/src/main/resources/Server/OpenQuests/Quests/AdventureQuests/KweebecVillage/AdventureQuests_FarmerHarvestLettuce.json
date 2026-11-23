@@ -7,7 +7,7 @@
   "TitleKey": "adventurequests.kweebecvillage.quest.farmer.harvest-lettuce.title",
   "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-lettuce.description",
   "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.harvest-lettuce.short",
-  "TargetQuantity": 2,
+  "TargetQuantity": 1,
   "ItemToPickup": {
     "ItemId": "Plant_Crop_Lettuce_Item"
   },

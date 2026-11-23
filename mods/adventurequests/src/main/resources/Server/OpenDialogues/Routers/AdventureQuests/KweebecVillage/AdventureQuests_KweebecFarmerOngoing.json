@@ -29,15 +29,10 @@
             "AdventureQuests_FarmerHarvestPumpkin",
             "AdventureQuests_FarmerHarvestCauliflower",
             "AdventureQuests_FarmerHarvestCarrot",
-            "AdventureQuests_FarmerHarvestChilli",
-            "AdventureQuests_FarmerHarvestCorn",
             "AdventureQuests_FarmerHarvestCotton",
             "AdventureQuests_FarmerHarvestLettuce",
             "AdventureQuests_FarmerHarvestOnion",
             "AdventureQuests_FarmerHarvestPotato",
-            "AdventureQuests_FarmerHarvestRice",
-            "AdventureQuests_FarmerHarvestTomato",
-            "AdventureQuests_FarmerHarvestTurnip",
             "AdventureQuests_FarmerHarvestWheat"
           ],
           "States": [
@@ -248,70 +243,6 @@
           "Conditions": [
             {
               "Type": "RequiresQuest",
-              "QuestAssetId": "AdventureQuests_FarmerHarvestChilli",
-              "States": [
-                "Successful"
-              ],
-              "GivenBy": "Npc",
-              "Min": 1
-            },
-            {
-              "Type": "OpenedAfter",
-              "Dialogue": "AdventureQuests_FarmerHarvestChilliIntro",
-              "Than": "AdventureQuests_FarmerTier1Thanks",
-              "With": "Npc"
-            },
-            {
-              "Type": "OpenedAfter",
-              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
-              "Than": "AdventureQuests_FarmerTier1Thanks",
-              "With": "Npc"
-            }
-          ]
-        },
-        "Then": {
-          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
-        }
-      },
-      {
-        "When": {
-          "Type": "Composite",
-          "Operator": "And",
-          "Conditions": [
-            {
-              "Type": "RequiresQuest",
-              "QuestAssetId": "AdventureQuests_FarmerHarvestCorn",
-              "States": [
-                "Successful"
-              ],
-              "GivenBy": "Npc",
-              "Min": 1
-            },
-            {
-              "Type": "OpenedAfter",
-              "Dialogue": "AdventureQuests_FarmerHarvestCornIntro",
-              "Than": "AdventureQuests_FarmerTier1Thanks",
-              "With": "Npc"
-            },
-            {
-              "Type": "OpenedAfter",
-              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
-              "Than": "AdventureQuests_FarmerTier1Thanks",
-              "With": "Npc"
-            }
-          ]
-        },
-        "Then": {
-          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
-        }
-      },
-      {
-        "When": {
-          "Type": "Composite",
-          "Operator": "And",
-          "Conditions": [
-            {
-              "Type": "RequiresQuest",
               "QuestAssetId": "AdventureQuests_FarmerHarvestCotton",
               "States": [
                 "Successful"
@@ -418,102 +349,6 @@
             {
               "Type": "OpenedAfter",
               "Dialogue": "AdventureQuests_FarmerHarvestPotatoIntro",
-              "Than": "AdventureQuests_FarmerTier1Thanks",
-              "With": "Npc"
-            },
-            {
-              "Type": "OpenedAfter",
-              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
-              "Than": "AdventureQuests_FarmerTier1Thanks",
-              "With": "Npc"
-            }
-          ]
-        },
-        "Then": {
-          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
-        }
-      },
-      {
-        "When": {
-          "Type": "Composite",
-          "Operator": "And",
-          "Conditions": [
-            {
-              "Type": "RequiresQuest",
-              "QuestAssetId": "AdventureQuests_FarmerHarvestRice",
-              "States": [
-                "Successful"
-              ],
-              "GivenBy": "Npc",
-              "Min": 1
-            },
-            {
-              "Type": "OpenedAfter",
-              "Dialogue": "AdventureQuests_FarmerHarvestRiceIntro",
-              "Than": "AdventureQuests_FarmerTier1Thanks",
-              "With": "Npc"
-            },
-            {
-              "Type": "OpenedAfter",
-              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
-              "Than": "AdventureQuests_FarmerTier1Thanks",
-              "With": "Npc"
-            }
-          ]
-        },
-        "Then": {
-          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
-        }
-      },
-      {
-        "When": {
-          "Type": "Composite",
-          "Operator": "And",
-          "Conditions": [
-            {
-              "Type": "RequiresQuest",
-              "QuestAssetId": "AdventureQuests_FarmerHarvestTomato",
-              "States": [
-                "Successful"
-              ],
-              "GivenBy": "Npc",
-              "Min": 1
-            },
-            {
-              "Type": "OpenedAfter",
-              "Dialogue": "AdventureQuests_FarmerHarvestTomatoIntro",
-              "Than": "AdventureQuests_FarmerTier1Thanks",
-              "With": "Npc"
-            },
-            {
-              "Type": "OpenedAfter",
-              "Dialogue": "AdventureQuests_FarmerTier1Accepted",
-              "Than": "AdventureQuests_FarmerTier1Thanks",
-              "With": "Npc"
-            }
-          ]
-        },
-        "Then": {
-          "Dialogue": "AdventureQuests_FarmerTier1Thanks"
-        }
-      },
-      {
-        "When": {
-          "Type": "Composite",
-          "Operator": "And",
-          "Conditions": [
-            {
-              "Type": "RequiresQuest",
-              "QuestAssetId": "AdventureQuests_FarmerHarvestTurnip",
-              "States": [
-                "Successful"
-              ],
-              "GivenBy": "Npc",
-              "Min": 1
-            },
-            {
-              "Type": "OpenedAfter",
-              "Dialogue": "AdventureQuests_FarmerHarvestTurnipIntro",
               "Than": "AdventureQuests_FarmerTier1Thanks",
               "With": "Npc"
             },
@@ -701,7 +536,7 @@
                         },
                         "State": "StageFinal",
                         "Radius": 30,
-                        "Min": 2
+                        "Min": 1
                       },
                       {
                         "Type": "RequiresQuest",
@@ -732,7 +567,7 @@
                         },
                         "State": "StageFinal",
                         "Radius": 30,
-                        "Min": 2
+                        "Min": 1
                       },
                       {
                         "Type": "RequiresQuest",
@@ -821,68 +656,6 @@
                       {
                         "Type": "NearBlock",
                         "Block": {
-                          "ItemId": "Plant_Crop_Chilli_Block"
-                        },
-                        "State": "StageFinal",
-                        "Radius": 30,
-                        "Min": 2
-                      },
-                      {
-                        "Type": "RequiresQuest",
-                        "QuestAssetId": "AdventureQuests_FarmerHarvestChilli",
-                        "States": [
-                          "InProgress"
-                        ],
-                        "GivenBy": "Npc",
-                        "Min": 0,
-                        "Max": 0
-                      }
-                    ]
-                  },
-                  "Then": {
-                    "Dialogue": "AdventureQuests_FarmerHarvestChilliIntro"
-                  }
-                },
-                {
-                  "Weight": 1,
-                  "When": {
-                    "Type": "Composite",
-                    "Operator": "And",
-                    "Conditions": [
-                      {
-                        "Type": "NearBlock",
-                        "Block": {
-                          "ItemId": "Plant_Crop_Corn_Block"
-                        },
-                        "State": "StageFinal",
-                        "Radius": 30,
-                        "Min": 2
-                      },
-                      {
-                        "Type": "RequiresQuest",
-                        "QuestAssetId": "AdventureQuests_FarmerHarvestCorn",
-                        "States": [
-                          "InProgress"
-                        ],
-                        "GivenBy": "Npc",
-                        "Min": 0,
-                        "Max": 0
-                      }
-                    ]
-                  },
-                  "Then": {
-                    "Dialogue": "AdventureQuests_FarmerHarvestCornIntro"
-                  }
-                },
-                {
-                  "Weight": 1,
-                  "When": {
-                    "Type": "Composite",
-                    "Operator": "And",
-                    "Conditions": [
-                      {
-                        "Type": "NearBlock",
-                        "Block": {
                           "ItemId": "Plant_Crop_Cotton_Block"
                         },
                         "State": "StageFinal",
@@ -918,7 +691,7 @@
                         },
                         "State": "StageFinal",
                         "Radius": 30,
-                        "Min": 2
+                        "Min": 1
                       },
                       {
                         "Type": "RequiresQuest",
@@ -949,7 +722,7 @@
                         },
                         "State": "StageFinal",
                         "Radius": 30,
-                        "Min": 2
+                        "Min": 1
                       },
                       {
                         "Type": "RequiresQuest",
@@ -980,7 +753,7 @@
                         },
                         "State": "StageFinal",
                         "Radius": 30,
-                        "Min": 2
+                        "Min": 3
                       },
                       {
                         "Type": "RequiresQuest",
@@ -996,99 +769,6 @@
                   },
                   "Then": {
                     "Dialogue": "AdventureQuests_FarmerHarvestPotatoIntro"
-                  }
-                },
-                {
-                  "Weight": 1,
-                  "When": {
-                    "Type": "Composite",
-                    "Operator": "And",
-                    "Conditions": [
-                      {
-                        "Type": "NearBlock",
-                        "Block": {
-                          "ItemId": "Plant_Crop_Rice_Block"
-                        },
-                        "State": "StageFinal",
-                        "Radius": 30,
-                        "Min": 2
-                      },
-                      {
-                        "Type": "RequiresQuest",
-                        "QuestAssetId": "AdventureQuests_FarmerHarvestRice",
-                        "States": [
-                          "InProgress"
-                        ],
-                        "GivenBy": "Npc",
-                        "Min": 0,
-                        "Max": 0
-                      }
-                    ]
-                  },
-                  "Then": {
-                    "Dialogue": "AdventureQuests_FarmerHarvestRiceIntro"
-                  }
-                },
-                {
-                  "Weight": 1,
-                  "When": {
-                    "Type": "Composite",
-                    "Operator": "And",
-                    "Conditions": [
-                      {
-                        "Type": "NearBlock",
-                        "Block": {
-                          "ItemId": "Plant_Crop_Tomato_Block"
-                        },
-                        "State": "StageFinal",
-                        "Radius": 30,
-                        "Min": 2
-                      },
-                      {
-                        "Type": "RequiresQuest",
-                        "QuestAssetId": "AdventureQuests_FarmerHarvestTomato",
-                        "States": [
-                          "InProgress"
-                        ],
-                        "GivenBy": "Npc",
-                        "Min": 0,
-                        "Max": 0
-                      }
-                    ]
-                  },
-                  "Then": {
-                    "Dialogue": "AdventureQuests_FarmerHarvestTomatoIntro"
-                  }
-                },
-                {
-                  "Weight": 1,
-                  "When": {
-                    "Type": "Composite",
-                    "Operator": "And",
-                    "Conditions": [
-                      {
-                        "Type": "NearBlock",
-                        "Block": {
-                          "ItemId": "Plant_Crop_Turnip_Block"
-                        },
-                        "State": "StageFinal",
-                        "Radius": 30,
-                        "Min": 2
-                      },
-                      {
-                        "Type": "RequiresQuest",
-                        "QuestAssetId": "AdventureQuests_FarmerHarvestTurnip",
-                        "States": [
-                          "InProgress"
-                        ],
-                        "GivenBy": "Npc",
-                        "Min": 0,
-                        "Max": 0
-                      }
-                    ]
-                  },
-                  "Then": {
-                    "Dialogue": "AdventureQuests_FarmerHarvestTurnipIntro"
                   }
                 },
                 {
