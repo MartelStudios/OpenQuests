@@ -8,7 +8,9 @@
           "QuestAssetIds": [
             "AdventureQuests_FarmerPlantPotato",
             "AdventureQuests_FarmerPlantOnion",
-            "AdventureQuests_FarmerPlantCauliflower"
+            "AdventureQuests_FarmerPlantCauliflower",
+            "AdventureQuests_VillageReplant",
+            "AdventureQuests_VillageSeeds"
           ],
           "States": [
             "InProgress"
@@ -477,6 +479,70 @@
             {
               "Type": "OpenedAfter",
               "Dialogue": "AdventureQuests_FarmerPlantCauliflowerIntro",
+              "Than": "AdventureQuests_FarmerTier2Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier2Accepted",
+              "Than": "AdventureQuests_FarmerTier2Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier2Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_VillageReplant",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_VillageReplantIntro",
+              "Than": "AdventureQuests_FarmerTier2Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier2Accepted",
+              "Than": "AdventureQuests_FarmerTier2Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier2Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_VillageSeeds",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_VillageSeedsIntro",
               "Than": "AdventureQuests_FarmerTier2Thanks",
               "With": "Npc"
             },

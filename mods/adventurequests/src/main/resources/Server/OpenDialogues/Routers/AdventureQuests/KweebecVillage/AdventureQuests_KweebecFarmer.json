@@ -35,7 +35,9 @@
           "QuestAssetIds": [
             "AdventureQuests_FarmerPlantPotato",
             "AdventureQuests_FarmerPlantOnion",
-            "AdventureQuests_FarmerPlantCauliflower"
+            "AdventureQuests_FarmerPlantCauliflower",
+            "AdventureQuests_VillageReplant",
+            "AdventureQuests_VillageSeeds"
           ],
           "States": [
             "Successful"

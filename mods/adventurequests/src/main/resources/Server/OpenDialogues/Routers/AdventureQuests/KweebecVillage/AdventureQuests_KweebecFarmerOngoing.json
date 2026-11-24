@@ -8,7 +8,9 @@
           "QuestAssetIds": [
             "AdventureQuests_FarmerPlantPotato",
             "AdventureQuests_FarmerPlantOnion",
-            "AdventureQuests_FarmerPlantCauliflower"
+            "AdventureQuests_FarmerPlantCauliflower",
+            "AdventureQuests_VillageReplant",
+            "AdventureQuests_VillageSeeds"
           ],
           "States": [
             "InProgress"
@@ -495,6 +497,70 @@
       {
         "When": {
           "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_VillageReplant",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_VillageReplantIntro",
+              "Than": "AdventureQuests_FarmerTier2Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier2Accepted",
+              "Than": "AdventureQuests_FarmerTier2Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier2Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_VillageSeeds",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_VillageSeedsIntro",
+              "Than": "AdventureQuests_FarmerTier2Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier2Accepted",
+              "Than": "AdventureQuests_FarmerTier2Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier2Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
           "Operator": "Or",
           "Conditions": [
             {
@@ -848,6 +914,38 @@
                   },
                   "Then": {
                     "Dialogue": "AdventureQuests_FarmerPlantCauliflowerIntro"
+                  }
+                },
+                {
+                  "Weight": 2,
+                  "When": {
+                    "Type": "RequiresQuest",
+                    "QuestAssetId": "AdventureQuests_VillageReplant",
+                    "States": [
+                      "InProgress"
+                    ],
+                    "GivenBy": "Npc",
+                    "Min": 0,
+                    "Max": 0
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_VillageReplantIntro"
+                  }
+                },
+                {
+                  "Weight": 2,
+                  "When": {
+                    "Type": "RequiresQuest",
+                    "QuestAssetId": "AdventureQuests_VillageSeeds",
+                    "States": [
+                      "InProgress"
+                    ],
+                    "GivenBy": "Npc",
+                    "Min": 0,
+                    "Max": 0
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_VillageSeedsIntro"
                   }
                 }
               ]

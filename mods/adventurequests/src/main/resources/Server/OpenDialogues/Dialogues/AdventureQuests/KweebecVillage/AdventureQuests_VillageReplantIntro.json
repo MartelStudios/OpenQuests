@@ -23,7 +23,8 @@
           "Command": "give {player} Plant_Seeds_Carrot --quantity=4"
         },
         {
-          "Type": "Close"
+          "Type": "Open",
+          "Dialogue": "AdventureQuests_FarmerTier2Accepted"
         }
       ]
     },

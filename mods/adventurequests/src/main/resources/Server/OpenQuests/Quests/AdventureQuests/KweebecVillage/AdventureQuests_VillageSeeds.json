@@ -7,7 +7,7 @@
   "TitleKey": "adventurequests.kweebecvillage.quest.village-seeds.title",
   "DescriptionKey": "adventurequests.kweebecvillage.quest.village-seeds.description",
   "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-seeds.short",
-  "Character": "AdventureQuests_KweebecSeeds",
+  "Target": "GiverNpc",
   "Items": [
     {
       "Item": {
