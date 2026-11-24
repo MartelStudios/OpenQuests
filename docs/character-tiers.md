@@ -124,8 +124,9 @@ flowchart TD
   bucket), and one harvest per crop found ripe in Kweebec village prefabs (9 crops, the quantity being the
   median ripe count of a prefab holding that crop), each offered only when their crop is ripe around the
   player (`NearBlock` `StageFinal`, as many as the quest asks within 30 blocks).
-- **Tier 2, planting** (threshold 2): a `Weighted` draw among potato, onion and cauliflower planting
-  (`PlaceBlock` near the giver, seeds handed with the quest).
+- **Tier 2, sowing** (threshold 2): a `Weighted` draw among potato, onion, cauliflower and carrot
+  planting (`PlaceBlock` near the giver, seeds handed with the quest) and a seed delivery
+  (`Deliver` to `GiverNpc`). The last two moved from one-off characters, keeping their quest ids.
 - **Ongoing**: the tier 1 harvests weigh 1 (still only with ripe crops), tier 2 quests weigh 2.
   The tool quests are not offered again: the farmer has his tools.
 - A new tier adds its router, one entry route, its waiting and thanks routes in the shared head,
