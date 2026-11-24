@@ -1,12 +1,7 @@
 {
   "$Comment": "Matches the Living World Events roles for DrillScarakRoles.",
   "IncludeRoles": [
-    "LWE_Scarak_Attacker_Called_Louse",
-    "LWE_Scarak_Attacker_Defender",
-    "LWE_Scarak_Attacker_Fighter",
-    "LWE_Scarak_Attacker_Hunter",
-    "LWE_Scarak_Attacker_Larva",
-    "LWE_Scarak_Attacker_Louse",
-    "LWE_Scarak_Attacker_Seeker"
+    "LWE_Scarak_Attacker_*",
+    "LWE_Scarak_Burrower*"
   ]
 }

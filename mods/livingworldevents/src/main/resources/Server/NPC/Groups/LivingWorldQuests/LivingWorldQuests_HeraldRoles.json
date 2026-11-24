@@ -1,6 +1,6 @@
 {
   "$Comment": "Matches the Living World Events roles for HeraldRoles.",
   "IncludeRoles": [
-    "LWE_Crimson_Herald_Phase2"
+    "LWE_Crimson_Herald_Phase2*"
   ]
 }
