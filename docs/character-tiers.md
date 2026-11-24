@@ -128,10 +128,11 @@ flowchart TD
   planting (`PlaceBlock` near the giver, seeds handed with the quest) and a seed delivery
   (`Deliver` to `GiverNpc`). The last two moved from one-off characters, keeping their quest ids.
 - **Tier 3, tools** (threshold 2): chapters that craft something for the farmer, then deliver or
-  place it near him: hay bales, a scarecrow, a watering can. A chapter's steps read the giver of
+  place it near him: hay bales, a scarecrow, a watering can; and ten planters bought back after
+  something smashed them in the night. A chapter's steps read the giver of
   the chapter, so its `Deliver` step and its `NearCharacter` constraint aim at `GiverNpc` too.
 - **Ongoing**: each quest weighs its tier number (harvests still only with ripe crops). Tools made
-  once (hoe, bucket, scarecrow, watering can) are not offered again: the farmer has them.
+  once (hoe, bucket, scarecrow, watering can, the planters) are not offered again.
 - A new tier adds its router, one entry route, its waiting and thanks routes in the shared head,
   and its quests to the ongoing draw.
 

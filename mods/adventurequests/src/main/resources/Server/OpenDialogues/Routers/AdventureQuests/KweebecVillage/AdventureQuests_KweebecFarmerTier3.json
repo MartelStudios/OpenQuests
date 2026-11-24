@@ -8,7 +8,8 @@
           "QuestAssetIds": [
             "AdventureQuests_VillageSoggyHay",
             "AdventureQuests_VillageScarecrow",
-            "AdventureQuests_VillageWateringCan"
+            "AdventureQuests_VillageWateringCan",
+            "AdventureQuests_FarmerSmashedPlanters"
           ],
           "States": [
             "InProgress"
@@ -674,6 +675,38 @@
       {
         "When": {
           "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerSmashedPlanters",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerSmashedPlantersIntro",
+              "Than": "AdventureQuests_FarmerTier3Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier3Accepted",
+              "Than": "AdventureQuests_FarmerTier3Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier3Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
           "Operator": "Or",
           "Conditions": [
             {
@@ -785,6 +818,33 @@
         }
       },
       {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "Opened",
+              "Dialogue": "AdventureQuests_FarmerSmashedPlantersIntro",
+              "With": "Npc"
+            },
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_FarmerSmashedPlanters",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 0,
+              "Max": 0
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerSmashedPlantersIntro"
+        }
+      },
+      {
         "Then": {
           "Router": {
             "Selector": {
@@ -839,6 +899,23 @@
                   },
                   "Then": {
                     "Dialogue": "AdventureQuests_VillageWateringCanIntro"
+                  }
+                },
+                {
+                  "Weight": 1,
+                  "When": {
+                    "Type": "RequiresQuest",
+                    "QuestAssetId": "AdventureQuests_FarmerSmashedPlanters",
+                    "States": [
+                      "InProgress",
+                      "Successful"
+                    ],
+                    "GivenBy": "Npc",
+                    "Min": 0,
+                    "Max": 0
+                  },
+                  "Then": {
+                    "Dialogue": "AdventureQuests_FarmerSmashedPlantersIntro"
                   }
                 }
               ]

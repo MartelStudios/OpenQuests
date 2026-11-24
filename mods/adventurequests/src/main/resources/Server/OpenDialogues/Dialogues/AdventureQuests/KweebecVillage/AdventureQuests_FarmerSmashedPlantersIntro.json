@@ -1,0 +1,36 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_KweebecVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.farmer.smashed-planters.intro.page1"
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.farmer.smashed-planters.intro.page2"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.farmer.smashed-planters.accept",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "AdventureQuests_FarmerSmashedPlanters"
+        },
+        {
+          "Type": "Open",
+          "Dialogue": "AdventureQuests_FarmerTier3Accepted"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.kweebecvillage.dialogue.village.decline",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

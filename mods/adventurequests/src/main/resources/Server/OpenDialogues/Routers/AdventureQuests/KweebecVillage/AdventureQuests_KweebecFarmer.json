@@ -56,7 +56,8 @@
           "QuestAssetIds": [
             "AdventureQuests_VillageSoggyHay",
             "AdventureQuests_VillageScarecrow",
-            "AdventureQuests_VillageWateringCan"
+            "AdventureQuests_VillageWateringCan",
+            "AdventureQuests_FarmerSmashedPlanters"
           ],
           "States": [
             "Successful"
