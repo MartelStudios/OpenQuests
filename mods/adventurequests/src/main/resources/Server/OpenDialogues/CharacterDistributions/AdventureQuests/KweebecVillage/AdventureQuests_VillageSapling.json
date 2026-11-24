@@ -17,10 +17,6 @@
       "Weight": 1
     },
     {
-      "Character": "AdventureQuests_KweebecSeeds",
-      "Weight": 1
-    },
-    {
       "Character": "AdventureQuests_KweebecRuinedHarvest",
       "Weight": 1
     },
@@ -29,15 +25,11 @@
       "Weight": 1
     },
     {
-      "Character": "AdventureQuests_KweebecReplant",
-      "Weight": 1
-    },
-    {
       "Character": "AdventureQuests_KweebecSpiders",
       "Weight": 1
     },
     {
-      "Weight": 7
+      "Weight": 5
     }
   ]
 }

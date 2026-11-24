@@ -7,7 +7,7 @@
   "TitleKey": "adventurequests.kweebecvillage.quest.village-seeds.title",
   "DescriptionKey": "adventurequests.kweebecvillage.quest.village-seeds.description",
   "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-seeds.short",
-  "Character": "AdventureQuests_KweebecSeeds",
+  "Target": "GiverNpc",
   "Items": [
     {
       "Item": {
@@ -31,39 +31,15 @@
   "SuccessfulRewards": [
     {
       "Type": "Item",
-      "ItemId": "Plant_Crop_Carrot_Item",
+      "ItemId": "Furniture_Village_Planter",
       "Quantity": 4,
       "AutoClaim": true
     },
     {
-      "Type": "Random",
-      "AutoClaim": true,
-      "Rewards": [
-        {
-          "Weight": 34,
-          "Reward": {
-            "Type": "Item",
-            "ItemId": "Plant_Seeds_Carrot_Eternal",
-            "Quantity": 1
-          }
-        },
-        {
-          "Weight": 33,
-          "Reward": {
-            "Type": "Item",
-            "ItemId": "Plant_Seeds_Lettuce_Eternal",
-            "Quantity": 1
-          }
-        },
-        {
-          "Weight": 33,
-          "Reward": {
-            "Type": "Item",
-            "ItemId": "Plant_Seeds_Pumpkin_Eternal",
-            "Quantity": 1
-          }
-        }
-      ]
+      "Type": "Item",
+      "ItemId": "Ingredient_Life_Essence",
+      "Quantity": 50,
+      "AutoClaim": true
     }
   ],
   "AutoTrack": true

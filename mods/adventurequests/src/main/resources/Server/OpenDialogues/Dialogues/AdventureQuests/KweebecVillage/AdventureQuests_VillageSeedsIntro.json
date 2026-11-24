@@ -19,7 +19,8 @@
           "Quest": "AdventureQuests_VillageSeeds"
         },
         {
-          "Type": "Close"
+          "Type": "Open",
+          "Dialogue": "AdventureQuests_FarmerTier2Accepted"
         }
       ]
     },

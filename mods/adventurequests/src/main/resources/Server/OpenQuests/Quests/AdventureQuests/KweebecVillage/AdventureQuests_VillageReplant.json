@@ -14,8 +14,8 @@
   "Constraints": [
     {
       "Type": "NearCharacter",
-      "Character": "AdventureQuests_KweebecReplant",
-      "Radius": 20
+      "Target": "GiverNpc",
+      "Radius": 30
     }
   ],
   "SuccessfulRewards": [
