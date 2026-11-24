@@ -1,0 +1,28 @@
+{
+  "Type": "Deliver",
+  "Icon": "Icons/ItemsGenerated/Furniture_Village_Planter.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.farmer.smashed-planters.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.farmer.smashed-planters.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.farmer.smashed-planters.short",
+  "Target": "GiverNpc",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Furniture_Village_Planter"
+      },
+      "Quantity": 10
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Iron",
+      "Quantity": 50,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

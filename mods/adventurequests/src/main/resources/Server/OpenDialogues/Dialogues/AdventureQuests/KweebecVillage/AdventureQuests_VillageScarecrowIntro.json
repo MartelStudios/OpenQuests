@@ -19,7 +19,8 @@
           "Quest": "AdventureQuests_VillageScarecrow"
         },
         {
-          "Type": "Close"
+          "Type": "Open",
+          "Dialogue": "AdventureQuests_FarmerTier3Accepted"
         }
       ]
     },

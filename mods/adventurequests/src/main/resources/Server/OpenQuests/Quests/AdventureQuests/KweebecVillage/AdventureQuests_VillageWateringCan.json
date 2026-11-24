@@ -20,8 +20,8 @@
     },
     {
       "Type": "Item",
-      "ItemId": "Potion_Health",
-      "Quantity": 1,
+      "ItemId": "Ingredient_Bar_Copper",
+      "Quantity": 3,
       "AutoClaim": true
     }
   ],

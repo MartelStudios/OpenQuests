@@ -14,14 +14,14 @@
   "SuccessfulRewards": [
     {
       "Type": "Item",
-      "ItemId": "Plant_Seeds_Wheat_Eternal",
+      "ItemId": "Plant_Seeds_Corn_Eternal",
       "Quantity": 1,
       "AutoClaim": true
     },
     {
       "Type": "Item",
-      "ItemId": "Food_Pie_Pumpkin",
-      "Quantity": 2,
+      "ItemId": "Ingredient_Bar_Copper",
+      "Quantity": 3,
       "AutoClaim": true
     }
   ],

@@ -19,7 +19,8 @@
           "Quest": "AdventureQuests_VillageSoggyHay"
         },
         {
-          "Type": "Close"
+          "Type": "Open",
+          "Dialogue": "AdventureQuests_FarmerTier3Accepted"
         }
       ]
     },

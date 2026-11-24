@@ -51,6 +51,26 @@
         }
       },
       {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetIds": [
+            "AdventureQuests_VillageSoggyHay",
+            "AdventureQuests_VillageScarecrow",
+            "AdventureQuests_VillageWateringCan",
+            "AdventureQuests_FarmerSmashedPlanters"
+          ],
+          "States": [
+            "Successful"
+          ],
+          "GivenBy": "Npc",
+          "Min": 0,
+          "Max": 1
+        },
+        "Then": {
+          "Router": "AdventureQuests_KweebecFarmerTier3"
+        }
+      },
+      {
         "Then": {
           "Router": "AdventureQuests_KweebecFarmerOngoing"
         }

@@ -127,8 +127,12 @@ flowchart TD
 - **Tier 2, sowing** (threshold 2): a `Weighted` draw among potato, onion, cauliflower and carrot
   planting (`PlaceBlock` near the giver, seeds handed with the quest) and a seed delivery
   (`Deliver` to `GiverNpc`). The last two moved from one-off characters, keeping their quest ids.
-- **Ongoing**: the tier 1 harvests weigh 1 (still only with ripe crops), tier 2 quests weigh 2.
-  The tool quests are not offered again: the farmer has his tools.
+- **Tier 3, tools** (threshold 2): chapters that craft something for the farmer, then deliver or
+  place it near him: hay bales, a scarecrow, a watering can; and ten planters bought back after
+  something smashed them in the night. A chapter's steps read the giver of
+  the chapter, so its `Deliver` step and its `NearCharacter` constraint aim at `GiverNpc` too.
+- **Ongoing**: each quest weighs its tier number (harvests still only with ripe crops). Tools made
+  once (hoe, bucket, scarecrow, watering can, the planters) are not offered again.
 - A new tier adds its router, one entry route, its waiting and thanks routes in the shared head,
   and its quests to the ongoing draw.
 

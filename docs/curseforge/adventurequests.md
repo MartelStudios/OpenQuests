@@ -12,7 +12,7 @@ Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: 
 
 ## ✨ What is inside
 
-Over 200 quests in English and French, across ten chapters, thirty village stories and a farmer in every Kweebec village. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
+Over 200 quests in English and French, across ten chapters, twenty-seven village stories and a farmer in every Kweebec village. A whole campaign through the Goblin Breach, a trial inside the Forgotten Temple, villagers in need, a tutorial, a hunt, a daily chore, a server event, a talking plush and a few secrets.
 
 🖼️ **Every quest has its icon**, from a crude hatchet to the breach's portal key, so the journal and its chapter graphs read at a glance.
 
@@ -51,7 +51,7 @@ Over 200 quests in English and French, across ten chapters, thirty village stori
 
 ### 🏡 Kweebec villages
 
-🧑‍🌾 **A farmer in every village.** Each Kweebec village has its own farmer, with a name of his own. Bring him what he needs for a new hoe and a bucket, pick his ripe harvest, then sow his next crops. He thanks you for each job, and once he trusts you he keeps asking for a hand, offering a harvest only when the crops are ripe around him. Each farmer remembers what you did for him, not for the farmer of the next village.
+🧑‍🌾 **A farmer in every village.** Each Kweebec village has its own farmer, with a name of his own. Bring him what he needs for a new hoe and a bucket, pick his ripe harvest, sow his next crops, then make him hay, a scarecrow and a watering can. He thanks you for each job, and once he trusts you he keeps asking for a hand, offering a harvest only when the crops are ripe around him. Each farmer remembers what you did for him, not for the farmer of the next village.
 
 🌱 **About one villager in two has a story.** Saplings, sproutlings, Razorleaf guards and the merchant each live one small incident, ask for your help once, then go back to village life. Each gets a name of its own.
 
