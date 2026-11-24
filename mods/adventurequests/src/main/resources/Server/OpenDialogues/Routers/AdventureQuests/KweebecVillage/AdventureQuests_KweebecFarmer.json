@@ -71,6 +71,24 @@
         }
       },
       {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetIds": [
+            "AdventureQuests_VillageRuinedHarvest",
+            "AdventureQuests_VillageBurrows"
+          ],
+          "States": [
+            "Successful"
+          ],
+          "GivenBy": "Npc",
+          "Min": 0,
+          "Max": 1
+        },
+        "Then": {
+          "Router": "AdventureQuests_KweebecFarmerTier4"
+        }
+      },
+      {
         "Then": {
           "Router": "AdventureQuests_KweebecFarmerOngoing"
         }

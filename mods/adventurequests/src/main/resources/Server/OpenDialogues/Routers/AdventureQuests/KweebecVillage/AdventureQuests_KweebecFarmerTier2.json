@@ -6,6 +6,22 @@
         "When": {
           "Type": "RequiresQuest",
           "QuestAssetIds": [
+            "AdventureQuests_VillageRuinedHarvest",
+            "AdventureQuests_VillageBurrows"
+          ],
+          "States": [
+            "InProgress"
+          ],
+          "GivenBy": "Npc"
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier4Waiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetIds": [
             "AdventureQuests_VillageSoggyHay",
             "AdventureQuests_VillageScarecrow",
             "AdventureQuests_VillageWateringCan",
@@ -707,6 +723,70 @@
       {
         "When": {
           "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_VillageRuinedHarvest",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_VillageRuinedHarvestIntro",
+              "Than": "AdventureQuests_FarmerTier4Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier4Accepted",
+              "Than": "AdventureQuests_FarmerTier4Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier4Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "AdventureQuests_VillageBurrows",
+              "States": [
+                "Successful"
+              ],
+              "GivenBy": "Npc",
+              "Min": 1
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_VillageBurrowsIntro",
+              "Than": "AdventureQuests_FarmerTier4Thanks",
+              "With": "Npc"
+            },
+            {
+              "Type": "OpenedAfter",
+              "Dialogue": "AdventureQuests_FarmerTier4Accepted",
+              "Than": "AdventureQuests_FarmerTier4Thanks",
+              "With": "Npc"
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_FarmerTier4Thanks"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
           "Operator": "Or",
           "Conditions": [
             {
@@ -726,6 +806,13 @@
             {
               "Type": "Cooldown",
               "Dialogue": "AdventureQuests_FarmerTier3Accepted",
+              "With": "Npc",
+              "Seconds": 1200,
+              "Not": true
+            },
+            {
+              "Type": "Cooldown",
+              "Dialogue": "AdventureQuests_FarmerTier4Accepted",
               "With": "Npc",
               "Seconds": 1200,
               "Not": true
