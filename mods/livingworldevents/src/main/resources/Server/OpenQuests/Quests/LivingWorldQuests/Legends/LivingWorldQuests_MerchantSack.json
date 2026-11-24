@@ -1,0 +1,26 @@
+{
+  "$Comment": "A commission offered by Mado.",
+  "Type": "Deliver",
+  "Character": "LivingWorldQuests_RobbedMerchant",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "LWE_Stolen_Sack"
+      },
+      "Quantity": 1
+    }
+  ],
+  "Dialogue": "LivingWorldQuests_MerchantSackHandoff",
+  "TitleKey": "livingworldquests.quest.merchant-sack.title",
+  "ShortDescriptionKey": "livingworldquests.quest.merchant-sack.short",
+  "DescriptionKey": "livingworldquests.quest.merchant-sack.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 4,
+      "AutoClaim": true
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "$Comment": "A commission offered by Yselle.",
+  "Type": "Deliver",
+  "Character": "LivingWorldQuests_NightChronicler",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "LWE_Herald_Ichor"
+      },
+      "Quantity": 1
+    }
+  ],
+  "Dialogue": "LivingWorldQuests_ChroniclerIchorHandoff",
+  "TitleKey": "livingworldquests.quest.chronicler-ichor.title",
+  "ShortDescriptionKey": "livingworldquests.quest.chronicler-ichor.short",
+  "DescriptionKey": "livingworldquests.quest.chronicler-ichor.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
+}

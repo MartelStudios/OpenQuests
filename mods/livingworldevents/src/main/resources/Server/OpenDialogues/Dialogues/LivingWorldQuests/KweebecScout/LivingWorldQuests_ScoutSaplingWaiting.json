@@ -1,0 +1,20 @@
+{
+  "$Comment": "Dialogue for Brindle at this stage of the commission.",
+  "Character": "LivingWorldQuests_KweebecScout",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.scout-sapling-waiting.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.scout-sapling-waiting.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

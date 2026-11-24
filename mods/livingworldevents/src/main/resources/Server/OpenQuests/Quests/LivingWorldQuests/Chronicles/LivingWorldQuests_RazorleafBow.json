@@ -1,0 +1,12 @@
+{
+  "$Comment": "Craft a Razorleaf Bow.",
+  "Type": "Craft",
+  "ItemToCraft": {
+    "ItemId": "LWE_Razorleaf_Bow"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.razorleaf-bow.title",
+  "ShortDescriptionKey": "livingworldquests.quest.razorleaf-bow.short",
+  "DescriptionKey": "livingworldquests.quest.razorleaf-bow.description",
+  "AutoTrack": false
+}

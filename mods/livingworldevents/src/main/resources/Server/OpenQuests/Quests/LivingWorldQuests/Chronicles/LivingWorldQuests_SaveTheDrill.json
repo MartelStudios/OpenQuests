@@ -1,0 +1,21 @@
+{
+  "$Comment": "Obtain a Mini Drill.",
+  "Type": "Gather",
+  "ItemToGather": {
+    "ItemId": "LWE_Mini_Drill"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.save-the-drill.title",
+  "ShortDescriptionKey": "livingworldquests.quest.save-the-drill.short",
+  "DescriptionKey": "livingworldquests.quest.save-the-drill.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "LivingWorldQuests_TinkerersFlare"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "$Comment": "A commission offered by Rivet.",
+  "Type": "Deliver",
+  "Character": "LivingWorldQuests_VillageMechanic",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "LWE_Brood_Gland"
+      },
+      "Quantity": 1
+    }
+  ],
+  "Dialogue": "LivingWorldQuests_MechanicGlandHandoff",
+  "TitleKey": "livingworldquests.quest.mechanic-gland.title",
+  "ShortDescriptionKey": "livingworldquests.quest.mechanic-gland.short",
+  "DescriptionKey": "livingworldquests.quest.mechanic-gland.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ]
+}

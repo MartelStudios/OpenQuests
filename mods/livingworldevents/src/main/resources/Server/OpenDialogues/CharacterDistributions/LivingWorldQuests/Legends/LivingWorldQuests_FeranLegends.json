@@ -1,0 +1,43 @@
+{
+  "$Comment": "Draws unique quest characters on compatible village NPCs outside instances.",
+  "Filters": [
+    {
+      "Type": "Group",
+      "Groups": [
+        "Feran_Civilian"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-.*"
+      ],
+      "Not": true
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "LivingWorldQuests_NightChronicler",
+      "Weight": 1
+    },
+    {
+      "Character": "LivingWorldQuests_VillageMechanic",
+      "Weight": 1
+    },
+    {
+      "Character": "LivingWorldQuests_RobbedMerchant",
+      "Weight": 1
+    },
+    {
+      "Character": "LivingWorldQuests_RoadVeteran",
+      "Weight": 1
+    },
+    {
+      "Character": "LivingWorldQuests_Armorer",
+      "Weight": 1
+    },
+    {
+      "Weight": 4
+    }
+  ]
+}

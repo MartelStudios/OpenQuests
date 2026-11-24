@@ -1,0 +1,20 @@
+{
+  "$Comment": "Obtain a Potted Sapling.",
+  "Type": "Gather",
+  "ItemToGather": {
+    "ItemId": "LWE_Potted_Sapling"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.all-saplings-home.title",
+  "ShortDescriptionKey": "livingworldquests.quest.all-saplings-home.short",
+  "DescriptionKey": "livingworldquests.quest.all-saplings-home.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Iron",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ]
+}

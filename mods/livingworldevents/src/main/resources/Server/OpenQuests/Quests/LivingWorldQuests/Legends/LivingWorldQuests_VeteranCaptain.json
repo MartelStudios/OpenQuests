@@ -1,0 +1,18 @@
+{
+  "$Comment": "A commission offered by Tavin.",
+  "Type": "KillNpc",
+  "NpcGroupId": "LivingWorldQuests_AmbushCaptainRoles",
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.veteran-captain.title",
+  "ShortDescriptionKey": "livingworldquests.quest.veteran-captain.short",
+  "DescriptionKey": "livingworldquests.quest.veteran-captain.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
+}

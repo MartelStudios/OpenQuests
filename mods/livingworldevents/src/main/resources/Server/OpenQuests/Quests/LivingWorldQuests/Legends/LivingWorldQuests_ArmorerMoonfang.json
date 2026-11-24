@@ -1,0 +1,26 @@
+{
+  "$Comment": "A commission offered by Sena.",
+  "Type": "Deliver",
+  "Character": "LivingWorldQuests_Armorer",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "LWE_Moonfang_Staff"
+      },
+      "Quantity": 1
+    }
+  ],
+  "Dialogue": "LivingWorldQuests_ArmorerMoonfangHandoff",
+  "TitleKey": "livingworldquests.quest.armorer-moonfang.title",
+  "ShortDescriptionKey": "livingworldquests.quest.armorer-moonfang.short",
+  "DescriptionKey": "livingworldquests.quest.armorer-moonfang.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "$Comment": "Opens offers, progress reminders and completed dialogue for Yselle.",
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "LivingWorldQuests_ChroniclerSkull",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "Inventory",
+              "Item": {
+                "ItemId": "LWE_Tyrants_Skull"
+              },
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerSkullReady"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerSkull",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerSkullOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerSkull",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerSkullWaiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "LivingWorldQuests_ChroniclerIchor",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "Inventory",
+              "Item": {
+                "ItemId": "LWE_Herald_Ichor"
+              },
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerIchorReady"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerIchor",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerIchorOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerIchor",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerIchorWaiting"
+        }
+      }
+    ],
+    "Default": {
+      "Dialogue": "LivingWorldQuests_ChroniclerIchorThanks"
+    }
+  }
+}

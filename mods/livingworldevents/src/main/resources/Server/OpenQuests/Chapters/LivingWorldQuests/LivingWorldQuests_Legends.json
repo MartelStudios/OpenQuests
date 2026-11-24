@@ -1,0 +1,78 @@
+{
+  "$Comment": "Shows the Legends quests in the journal.",
+  "NameKey": "livingworldquests.chapter.legends.name",
+  "Group": "LivingWorldQuests_Events",
+  "Order": 2,
+  "Quests": [
+    {
+      "Quest": "LivingWorldQuests_ChroniclerSkull",
+      "Position": {
+        "X": 0,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ChroniclerIchor",
+      "Position": {
+        "X": 1,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_MechanicGland",
+      "Position": {
+        "X": 0,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_MechanicFlare",
+      "Position": {
+        "X": 1,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_MerchantGold",
+      "Position": {
+        "X": 0,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_MerchantSack",
+      "Position": {
+        "X": 1,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_VeteranCaptain",
+      "Position": {
+        "X": 0,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ArmorerWarlord",
+      "Position": {
+        "X": 0,
+        "Y": 4
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ArmorerMoonfang",
+      "Position": {
+        "X": 1,
+        "Y": 4
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ScoutSapling",
+      "Position": {
+        "X": 0,
+        "Y": 5
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "$Comment": "A commission offered by Rivet.",
+  "Type": "Deliver",
+  "Character": "LivingWorldQuests_VillageMechanic",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "LWE_Tinkerers_Flare"
+      },
+      "Quantity": 1
+    }
+  ],
+  "Dialogue": "LivingWorldQuests_MechanicFlareHandoff",
+  "TitleKey": "livingworldquests.quest.mechanic-flare.title",
+  "ShortDescriptionKey": "livingworldquests.quest.mechanic-flare.short",
+  "DescriptionKey": "livingworldquests.quest.mechanic-flare.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Deep_Ore",
+      "Quantity": 8,
+      "AutoClaim": true
+    }
+  ]
+}

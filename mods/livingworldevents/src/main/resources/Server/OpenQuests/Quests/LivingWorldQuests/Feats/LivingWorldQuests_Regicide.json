@@ -1,0 +1,20 @@
+{
+  "$Comment": "Obtain a Tyrant’s Skull.",
+  "Type": "Gather",
+  "ItemToGather": {
+    "ItemId": "LWE_Tyrants_Skull"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.regicide.title",
+  "ShortDescriptionKey": "livingworldquests.quest.regicide.short",
+  "DescriptionKey": "livingworldquests.quest.regicide.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Iron",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ]
+}

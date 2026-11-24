@@ -1,0 +1,5 @@
+{
+  "$Comment": "Groups the three Living World Events chapters in the journal.",
+  "NameKey": "livingworldquests.chapter-group.events.name",
+  "Order": 20
+}

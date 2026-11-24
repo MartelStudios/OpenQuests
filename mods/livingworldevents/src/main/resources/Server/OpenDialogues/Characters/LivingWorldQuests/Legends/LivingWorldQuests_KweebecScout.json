@@ -1,0 +1,15 @@
+{
+  "$Comment": "A persistent village character with a quest router.",
+  "Name": "livingworldquests.character.kweebec-scout.name",
+  "Epithet": "livingworldquests.character.kweebec-scout.epithet",
+  "Uniqueness": "Alive",
+  "Scope": "Universe",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "LivingWorldQuests_KweebecScout"
+      }
+    }
+  ]
+}

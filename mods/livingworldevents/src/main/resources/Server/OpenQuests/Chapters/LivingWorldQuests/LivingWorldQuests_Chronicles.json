@@ -1,0 +1,99 @@
+{
+  "$Comment": "Shows the Living World Chronicles quests in the journal.",
+  "NameKey": "livingworldquests.chapter.chronicles.name",
+  "Group": "LivingWorldQuests_Events",
+  "Order": 1,
+  "Quests": [
+    {
+      "Quest": "LivingWorldQuests_RedNights",
+      "Position": {
+        "X": 0,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_BloodCharm",
+      "Position": {
+        "X": 1,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_BloodMoonOmen",
+      "Position": {
+        "X": 2,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_DrillScaraks",
+      "Position": {
+        "X": 0,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_SaveTheDrill",
+      "Position": {
+        "X": 1,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_TinkerersFlare",
+      "Position": {
+        "X": 2,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_IronAndMoon",
+      "Position": {
+        "X": 0,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_RoadBandits",
+      "Position": {
+        "X": 0,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_RoadCaptain",
+      "Position": {
+        "X": 1,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_TrophySatchel",
+      "Position": {
+        "X": 0,
+        "Y": 4
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_Accessory",
+      "Position": {
+        "X": 1,
+        "Y": 4
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_Pathfinder",
+      "Position": {
+        "X": 0,
+        "Y": 5
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_RazorleafBow",
+      "Position": {
+        "X": 1,
+        "Y": 5
+      }
+    }
+  ]
+}

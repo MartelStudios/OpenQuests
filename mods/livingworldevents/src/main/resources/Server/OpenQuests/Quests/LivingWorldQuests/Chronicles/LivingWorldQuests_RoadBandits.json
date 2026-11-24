@@ -1,0 +1,19 @@
+{
+  "$Comment": "Kill 8 ambush bandits.",
+  "Type": "KillNpc",
+  "NpcGroupId": "LivingWorldQuests_AmbushBanditRoles",
+  "TargetQuantity": 8,
+  "TitleKey": "livingworldquests.quest.road-bandits.title",
+  "ShortDescriptionKey": "livingworldquests.quest.road-bandits.short",
+  "DescriptionKey": "livingworldquests.quest.road-bandits.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "LivingWorldQuests_RoadCaptain"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}
