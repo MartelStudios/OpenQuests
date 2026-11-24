@@ -14,7 +14,7 @@
   "SuccessfulRewards": [
     {
       "Type": "Item",
-      "ItemId": "Plant_Seeds_Pumpkin_Eternal",
+      "ItemId": "Plant_Seeds_Turnip_Eternal",
       "Quantity": 1,
       "AutoClaim": true
     },

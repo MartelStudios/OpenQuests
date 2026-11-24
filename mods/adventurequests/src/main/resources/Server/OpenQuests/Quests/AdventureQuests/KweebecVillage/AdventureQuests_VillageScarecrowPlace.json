@@ -8,8 +8,8 @@
   "Constraints": [
     {
       "Type": "NearCharacter",
-      "Character": "AdventureQuests_KweebecScarecrow",
-      "Radius": 20
+      "Target": "GiverNpc",
+      "Radius": 30
     }
   ]
 }

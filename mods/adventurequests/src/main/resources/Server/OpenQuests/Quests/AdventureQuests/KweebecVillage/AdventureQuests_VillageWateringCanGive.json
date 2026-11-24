@@ -1,7 +1,7 @@
 {
   "Type": "Deliver",
   "TitleKey": "adventurequests.kweebecvillage.quest.village-watering-can.give.title",
-  "Character": "AdventureQuests_KweebecWateringCan",
+  "Target": "GiverNpc",
   "Items": [
     {
       "Item": {
