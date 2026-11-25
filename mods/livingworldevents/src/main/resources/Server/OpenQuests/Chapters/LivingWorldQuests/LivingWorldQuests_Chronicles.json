@@ -2,10 +2,12 @@
   "$Comment": "Shows the Living World Chronicles quests in the journal.",
   "NameKey": "livingworldquests.chapter.chronicles.name",
   "Group": "LivingWorldQuests_Events",
+  "Icon": "Icons/ItemsGenerated/LWE_BloodMoon_Omen.png",
   "Order": 1,
   "Quests": [
     {
       "Quest": "LivingWorldQuests_RedNights",
+      "Icon": "Icons/ItemsGenerated/LWE_Blood_Shard.png",
       "Position": {
         "X": 0,
         "Y": 0
@@ -13,6 +15,7 @@
     },
     {
       "Quest": "LivingWorldQuests_BloodCharm",
+      "Icon": "Icons/ItemsGenerated/LWE_Blood_Charm.png",
       "Position": {
         "X": 1,
         "Y": 0
@@ -20,6 +23,7 @@
     },
     {
       "Quest": "LivingWorldQuests_BloodMoonOmen",
+      "Icon": "Icons/ItemsGenerated/LWE_BloodMoon_Omen.png",
       "Position": {
         "X": 2,
         "Y": 0
@@ -27,6 +31,7 @@
     },
     {
       "Quest": "LivingWorldQuests_DrillScaraks",
+      "Icon": "Icons/ItemsGenerated/LWE_Chitin_Plate.png",
       "Position": {
         "X": 0,
         "Y": 1
@@ -34,6 +39,7 @@
     },
     {
       "Quest": "LivingWorldQuests_SaveTheDrill",
+      "Icon": "Icons/ItemsGenerated/LWE_Mini_Drill.png",
       "Position": {
         "X": 1,
         "Y": 1
@@ -41,6 +47,7 @@
     },
     {
       "Quest": "LivingWorldQuests_TinkerersFlare",
+      "Icon": "Icons/ItemsGenerated/LWE_Tinkerers_Flare.png",
       "Position": {
         "X": 2,
         "Y": 1
@@ -48,6 +55,7 @@
     },
     {
       "Quest": "LivingWorldQuests_IronAndMoon",
+      "Icon": "Icons/ItemsGenerated/LWE_Warlord_Early_Chest.png",
       "Position": {
         "X": 0,
         "Y": 2
@@ -55,6 +63,7 @@
     },
     {
       "Quest": "LivingWorldQuests_RoadBandits",
+      "Icon": "Icons/ItemsGenerated/Weapon_Daggers_Iron.png",
       "Position": {
         "X": 0,
         "Y": 3
@@ -62,6 +71,7 @@
     },
     {
       "Quest": "LivingWorldQuests_RoadCaptain",
+      "Icon": "Icons/ItemsGenerated/Weapon_Battleaxe_Iron.png",
       "Position": {
         "X": 1,
         "Y": 3
@@ -69,6 +79,7 @@
     },
     {
       "Quest": "LivingWorldQuests_TrophySatchel",
+      "Icon": "Icons/ItemsGenerated/LWE_Trophy_Satchel.png",
       "Position": {
         "X": 0,
         "Y": 4
@@ -76,6 +87,7 @@
     },
     {
       "Quest": "LivingWorldQuests_Accessory",
+      "Icon": "Icons/ItemsGenerated/LWE_Moonstone_Pendant.png",
       "Position": {
         "X": 1,
         "Y": 4
@@ -83,6 +95,7 @@
     },
     {
       "Quest": "LivingWorldQuests_Pathfinder",
+      "Icon": "Icons/ItemsGenerated/LWE_Pathfinder_Early_Head.png",
       "Position": {
         "X": 0,
         "Y": 5
@@ -90,6 +103,7 @@
     },
     {
       "Quest": "LivingWorldQuests_RazorleafBow",
+      "Icon": "Icons/ItemsGenerated/LWE_Razorleaf_Bow.png",
       "Position": {
         "X": 1,
         "Y": 5
