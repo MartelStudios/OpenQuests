@@ -55,9 +55,18 @@ dependencies {
     devPacks("curse.maven:mmo-skill-tree-mastery-pack-1551899:9216039@zip")
 }
 
+// Staged only with -PwithMmoSkillTree; any staged copy is dropped first, so a run without it stays clean.
+val devModsDirectory = rootProject.layout.projectDirectory.dir("run/mods")
+
+val unstageDevPacks by tasks.registering(Delete::class) {
+    delete(provider { devModsDirectory.asFile.listFiles { file -> file.name.startsWith("mmo-skill-tree-mastery-pack-") }.orEmpty() })
+}
+
 val stageDevPacks by tasks.registering(Copy::class) {
+    dependsOn(unstageDevPacks)
+    enabled = providers.gradleProperty("withMmoSkillTree").isPresent
     from(devPacks)
-    into(rootProject.layout.projectDirectory.dir("run/mods"))
+    into(devModsDirectory)
 }
 
 rootProject.tasks.matching { it.name == "runAllMods" }.configureEach {

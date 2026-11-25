@@ -9,8 +9,13 @@ tasks.withType<Javadoc>().configureEach {
 
 group = project.property("group").toString()
 
+// Integrations join the dev run only on request, so each one can be tried alone or all together:
+// -PwithMmoSkillTree and -PwithLivingWorldQuests.
+val withMmoSkillTree = providers.gradleProperty("withMmoSkillTree").isPresent
+
 hytaleWorkspace {
-    modProjects = listOf(":quests:core", ":quests:extension", ":dialogues", ":mods:mmoskilltree", ":mods:openquestsdialogues")
+    modProjects = listOf(":quests:core", ":quests:extension", ":dialogues", ":mods:openquestsdialogues") +
+        listOfNotNull(":mods:mmoskilltree".takeIf { withMmoSkillTree })
     hostProject = ":quests:extension"
 
     // Shared
