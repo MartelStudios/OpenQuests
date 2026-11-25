@@ -4,12 +4,12 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "livingworldquests.dialogue.chronicler-ichor-thanks.page1"
+      "Text": "livingworldquests.dialogue.chronicler-lamp-thanks.page1"
     }
   ],
   "Responses": [
     {
-      "Text": "livingworldquests.dialogue.chronicler-ichor-thanks.bye",
+      "Text": "livingworldquests.dialogue.chronicler-lamp-thanks.bye",
       "Actions": [
         {
           "Type": "Close"

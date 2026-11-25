@@ -112,10 +112,65 @@
         "Then": {
           "Dialogue": "LivingWorldQuests_ChroniclerIchorWaiting"
         }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "LivingWorldQuests_ChroniclerLamp",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "Inventory",
+              "Item": {
+                "ItemId": "LWE_Tinkerers_Lamp"
+              },
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerLampReady"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerLamp",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerLampOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerLamp",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerLampWaiting"
+        }
       }
     ],
     "Default": {
-      "Dialogue": "LivingWorldQuests_ChroniclerIchorThanks"
+      "Dialogue": "LivingWorldQuests_ChroniclerLampThanks"
     }
   }
 }

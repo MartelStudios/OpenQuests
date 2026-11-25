@@ -1,0 +1,26 @@
+{
+  "$Comment": "A commission offered by Yselle.",
+  "Type": "Deliver",
+  "Character": "LivingWorldQuests_NightChronicler",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "LWE_Tinkerers_Lamp"
+      },
+      "Quantity": 1
+    }
+  ],
+  "Dialogue": "LivingWorldQuests_ChroniclerLampHandoff",
+  "TitleKey": "livingworldquests.quest.chronicler-lamp.title",
+  "ShortDescriptionKey": "livingworldquests.quest.chronicler-lamp.short",
+  "DescriptionKey": "livingworldquests.quest.chronicler-lamp.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ]
+}
