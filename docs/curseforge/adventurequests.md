@@ -2,7 +2,7 @@
 
 📦 **Over 200 quests, characters and dialogues for vanilla Hytale, ready the moment your server starts.**
 
-Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, a farmer in every Kweebec village, villagers with a favour to ask, characters who remember you, and feats for every way you move. [OpenQuests](https://www.curseforge.com/hytale/mods/openquests) ships with no quests of its own: this pack is the content. Works in multiplayer and singleplayer, on new or existing worlds.
+Vanilla Hytale leaves you wondering what to do next. This pack gives you goals: a campaign through the Goblin Breach, a trial in the Forgotten Temple, a farmer in every Kweebec village, villagers with a favour to ask, characters who remember you, and achievements for every way you move. [OpenQuests](https://www.curseforge.com/hytale/mods/openquests) ships with no quests of its own: this pack is the content. Works in multiplayer and singleplayer, on new or existing worlds.
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/vtgfpA9nPQ) [![GitHub](https://img.shields.io/badge/GitHub-Source-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MartelStudios/OpenQuests)
 
@@ -135,7 +135,7 @@ Five quests told entirely through dialogues, with no NPC at all: the chapter tha
 
 ***
 
-## 🏆 Feats
+## 🏆 Achievements
 
 🏃 **Athletics:** three quiet chains of three, **run**, **sprint** and **jump**, each a secret until you cover the first distance. Then the next rung waits in the journal, ten times further. **Silent step** does the same at a walk.
 
