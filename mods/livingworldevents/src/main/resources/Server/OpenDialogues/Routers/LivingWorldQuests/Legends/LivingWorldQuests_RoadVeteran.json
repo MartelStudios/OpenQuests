@@ -6,6 +6,18 @@
       {
         "When": {
           "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerPage",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerPageTavin"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
           "QuestAssetId": "LivingWorldQuests_VeteranCaptain",
           "States": [
             "InProgress",
@@ -28,6 +40,18 @@
         },
         "Then": {
           "Dialogue": "LivingWorldQuests_VeteranCaptainWaiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerLamp",
+          "States": [
+            "Successful"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_VeteranLampThanks"
         }
       }
     ],

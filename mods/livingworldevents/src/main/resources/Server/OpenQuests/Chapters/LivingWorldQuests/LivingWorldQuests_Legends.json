@@ -22,11 +22,27 @@
       }
     },
     {
+      "Quest": "LivingWorldQuests_ChroniclerPage",
+      "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
+      "Position": {
+        "X": 2,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ChroniclerKnock",
+      "Icon": "Icons/ItemsGenerated/Furniture_Feran_Door.png",
+      "Position": {
+        "X": 2,
+        "Y": 2
+      }
+    },
+    {
       "Quest": "LivingWorldQuests_ChroniclerLamp",
       "Icon": "Icons/ItemsGenerated/LWE_Tinkerers_Lamp.png",
       "Position": {
         "X": 2,
-        "Y": 2
+        "Y": 3
       }
     },
     {

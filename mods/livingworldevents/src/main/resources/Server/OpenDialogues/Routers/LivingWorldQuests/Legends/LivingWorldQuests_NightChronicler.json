@@ -115,6 +115,45 @@
       },
       {
         "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerPage",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerPageOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerPage",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerPageWaiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerKnock",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerKnockReport"
+        }
+      },
+      {
+        "When": {
           "Type": "Composite",
           "Operator": "And",
           "Conditions": [
