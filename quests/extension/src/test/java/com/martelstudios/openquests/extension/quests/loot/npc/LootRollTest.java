@@ -1,5 +1,6 @@
 package com.martelstudios.openquests.extension.quests.loot.npc;
 
+import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -77,6 +78,43 @@ class LootRollTest {
     @Test
     void singleNeedOfOneGetsOne() {
         assertEquals(1, LootRoll.roll(List.of(candidate(1, 1, 1, 3)), new Scripted(0.1)));
+    }
+
+    @Test
+    void aFinishedStepNeverWinsTheRoll() {
+        assertEquals(0, LootRoll.roll(List.of(candidate(0, 0.9, 1, 1), candidate(5, 0.1, 1, 1)), new Scripted(0.5)));
+    }
+
+    @Test
+    void aFinishedStepNeverForcesTheRoll() {
+        LootRoll.Candidate finished = new LootRoll.Candidate(0, 0.1, 1, 1, 9, 4);
+
+        assertEquals(0, LootRoll.roll(List.of(finished, candidate(5, 0.1, 1, 1)), new Scripted(0.5)));
+    }
+
+    @Test
+    void aHitResetsAfterCreditingAtMostTheNeed() {
+        var operations = LootRoll.outcome(1, 2, 3, true);
+
+        assertEquals(2, operations.size());
+        assertEquals(2, ((QuantityQuestProgression.Add) operations.get(0)).amount());
+        assertEquals(new LootNpcQuestProgression.ResetMisses(1), operations.get(1));
+    }
+
+    @Test
+    void aLostDropIsAMiss() {
+        assertEquals(List.of(new LootNpcQuestProgression.Miss(1)), LootRoll.outcome(1, 2, 3, false));
+    }
+
+    @Test
+    void aMissIsAMiss() {
+        assertEquals(List.of(new LootNpcQuestProgression.Miss(0)), LootRoll.outcome(0, 2, 0, false));
+    }
+
+    @Test
+    void aFinishedStepTakesNothing() {
+        assertEquals(List.of(), LootRoll.outcome(0, 0, 3, true));
+        assertEquals(List.of(), LootRoll.outcome(0, 0, 0, false));
     }
 
     @Test

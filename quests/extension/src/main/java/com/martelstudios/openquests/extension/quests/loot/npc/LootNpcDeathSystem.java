@@ -18,7 +18,6 @@ import com.martelstudios.openquests.core.services.QuestProgressionService;
 import com.martelstudios.openquests.core.stores.QuestStoreComponent;
 import com.martelstudios.openquests.core.utils.EntityComponents;
 import com.martelstudios.openquests.extension.quests.kill.KillDeathSystem;
-import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 import com.martelstudios.openquests.extension.rewards.item.ItemReward;
 import org.joml.Vector3d;
 
@@ -73,14 +72,8 @@ public class LootNpcDeathSystem extends KillDeathSystem {
             boolean received = quantity > 0 && give(store, victimRef, killerRef, entry.getKey(), quantity);
 
             for (var found : entry.getValue()) {
-                var forQuest = operations.computeIfAbsent(found.quest().getId(), id -> new ArrayList<>());
-                if (received) {
-                    forQuest.add(new QuantityQuestProgression.Add(Math.min(quantity, found.quest().getRemaining())));
-                    forQuest.add(new LootNpcQuestProgression.ResetMisses(found.entry()));
-                } else {
-                    // A drop lost to a full inventory counts as a miss, so the guarantee still comes
-                    forQuest.add(new LootNpcQuestProgression.Miss(found.entry()));
-                }
+                var outcome = LootRoll.outcome(found.entry(), found.quest().getRemaining(), quantity, received);
+                if (!outcome.isEmpty()) operations.computeIfAbsent(found.quest().getId(), id -> new ArrayList<>()).addAll(outcome);
             }
         }
 
