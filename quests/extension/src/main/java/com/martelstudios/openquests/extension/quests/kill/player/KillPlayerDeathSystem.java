@@ -30,7 +30,7 @@ public class KillPlayerDeathSystem extends KillDeathSystem {
     }
 
     @Override
-    protected void onKill(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> victimRef, @Nonnull UUID killerId, @Nonnull QuestStoreComponent killerQuests) {
+    protected void onKill(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> victimRef, @Nonnull Ref<EntityStore> killerRef, @Nonnull UUID killerId, @Nonnull QuestStoreComponent killerQuests) {
         var victim = store.getComponent(victimRef, PlayerRef.getComponentType());
         if (victim == null) return;
 

@@ -516,6 +516,7 @@ comes from.
 | `UseEntity` | Interacting with NPCs of a group a number of times. |
 | `KillNpc` | Killing NPCs of a group, either an existing one or one written inline. |
 | `KillPlayer` | Killing players, optionally a designated one. |
+| `LootNpc` | Receiving a quantity of `ItemId` that NPCs drop only for this step. Each entry of `Drops` names a `NpcGroupId` and may set `Chance` (1 by default), `Min` and `Max` (1 by default) and `GuaranteedAfter`, the kill in a row without a drop that is forced to drop. The item flies from the corpse straight into the killer's inventory, so nobody else can take it, and the drops stop once the step has its quantity. Several running steps wanting the same item from the same victim share one roll, at the highest chance; each drop is announced in gold in the chat, and a drop lost to a full inventory is announced in red and counts as a miss. Only these drops count: combine it with a `PickupItem` under a `Composite` with `"Operator": "Or"` to accept other sources. See below. |
 | `ReachLocation` | Entering a radius around a position. Shown on the map, and on the compass while tracked, unless `"ShowOnMap": false`. `Marker` names a particle system (`Drop_Uncommon` is the green glow of a dropped item) shown on the spot to its players while they run it; `Sound` plays to whoever reaches it, at `SoundPitch` (1 by default). |
 | `ReachPath` | Reaching every spot of `Locations`, each written like a `ReachLocation` (`Position`, `Radius`, `Marker`, `Sound`), in the order listed unless `"Ordered": false`. Only the spots still awaited show their marker. `ResetOn` lists what sends the count back to zero: `Skip`, reaching a spot ahead of the next one, and `Landing`, standing on solid ground outside every spot. `ResetSound` plays then. |
 | `EnterWorld` | Entering a world whose name matches a regular expression. |
@@ -1065,6 +1066,18 @@ asset of its own:
 
 ```json
 { "Type": "KillNpc", "NpcGroupId": { "IncludeRoles": ["Golem_Crystal_*"] }, "TargetQuantity": 3 }
+```
+
+A loot quest names its sources the same way. Here Trorks drop the spears half the time, and the
+fourth kill in a row without one always does:
+
+```json
+{
+  "Type": "LootNpc",
+  "ItemId": "Weapon_Spear_Crude",
+  "TargetQuantity": 3,
+  "Drops": [{ "NpcGroupId": "Trork", "Chance": 0.5, "GuaranteedAfter": 4 }]
+}
 ```
 
 Each entry of `QuestAssetIds` is either the id of an existing asset or an inline definition, which

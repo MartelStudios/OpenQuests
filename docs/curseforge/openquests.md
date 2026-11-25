@@ -96,6 +96,7 @@ the chapter's file is written for you.
 | <code>UseEntity</code>                                   | Interacting with NPCs of a group                                   |
 | <code>KillNpc</code>                                     | Killing NPCs of a group                                            |
 | <code>KillPlayer</code>                                  | Killing players, optionally a designated one                       |
+| <code>LootNpc</code>                                     | Receiving an item that NPCs drop only for the quest                |
 | <code>ReachLocation</code>                               | Entering a radius around a position, shown on the map and compass  |
 | <code>ReachPath</code>                                   | Reaching a series of spots, in order or not: a parkour, a course   |
 | <code>EnterWorld</code>                                  | Entering a world whose name matches a pattern                      |

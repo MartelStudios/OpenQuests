@@ -23,6 +23,7 @@ import com.martelstudios.openquests.extension.quests.enterworld.EnterWorldFeatur
 import com.martelstudios.openquests.extension.quests.gather.GatherFeature;
 import com.martelstudios.openquests.extension.quests.interactivelypickup.InteractivelyPickupFeature;
 import com.martelstudios.openquests.extension.quests.kill.KillFeature;
+import com.martelstudios.openquests.extension.quests.loot.LootFeature;
 import com.martelstudios.openquests.extension.quests.movement.MovementFeature;
 import com.martelstudios.openquests.extension.quests.playertick.PlayerTickFeature;
 import com.martelstudios.openquests.extension.quests.wait.WaitFeature;
@@ -122,6 +123,7 @@ public class OpenQuestsPlugin extends JavaPlugin {
         map = new MapFeature(this, services, tracks);
         FeedbackFeature.register(this, services);
         KillFeature.register(this, services);
+        LootFeature.register(this, services);
         CraftFeature.register(this, services);
         UseBlockFeature.register(this, services);
         BreakBlockFeature.register(this, services);
