@@ -111,7 +111,7 @@ val generateAssetSchemas by tasks.registering(JavaExec::class) {
     }
 }
 
-// This content pack also needs the external LWE mod, so opt in on a server with that mod installed.
+// This content pack needs a third-party mod, so it is linked only with -PwithLivingWorldQuests.
 val linkLivingWorldQuests by tasks.registering(Exec::class) {
     val link = layout.projectDirectory.dir("run/mods/LivingWorldQuests").asFile
     val target = project(":mods:livingworldevents").file("src/main/resources")
