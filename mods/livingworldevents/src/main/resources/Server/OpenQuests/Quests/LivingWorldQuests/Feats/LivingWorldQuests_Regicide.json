@@ -12,8 +12,8 @@
   "SuccessfulRewards": [
     {
       "Type": "Item",
-      "ItemId": "Ingredient_Bar_Iron",
-      "Quantity": 1,
+      "ItemId": "LWE_Moonstone",
+      "Quantity": 2,
       "AutoClaim": true
     }
   ]

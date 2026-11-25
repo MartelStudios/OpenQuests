@@ -8,5 +8,20 @@
   "TitleKey": "livingworldquests.quest.blood-moon-omen.title",
   "ShortDescriptionKey": "livingworldquests.quest.blood-moon-omen.short",
   "DescriptionKey": "livingworldquests.quest.blood-moon-omen.description",
-  "AutoTrack": false
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "LivingWorldQuests_BladesOfTheRedMoon"
+      ],
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Cobalt",
+      "Quantity": 5,
+      "AutoClaim": true
+    }
+  ]
 }

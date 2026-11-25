@@ -1,19 +1,8 @@
 {
-  "$Comment": "Craft a Blood Charm, Moonstone Pendant, Chitin Bracer or Tinkerer’s Lamp.",
+  "$Comment": "Craft a Moonstone Pendant, Chitin Bracer or Tinkerer’s Lamp.",
   "Type": "Composite",
   "Operator": "Or",
   "QuestAssetIds": [
-    {
-      "$Comment": "Craft a Blood Charm.",
-      "Type": "Craft",
-      "ItemToCraft": {
-        "ItemId": "LWE_Blood_Charm"
-      },
-      "TargetQuantity": 1,
-      "TitleKey": "livingworldquests.quest.accessory-blood-charm.title",
-      "ShortDescriptionKey": "livingworldquests.quest.accessory-blood-charm.short",
-      "DescriptionKey": "livingworldquests.quest.accessory-blood-charm.description"
-    },
     {
       "$Comment": "Craft a Moonstone Pendant.",
       "Type": "Craft",
@@ -51,5 +40,13 @@
   "TitleKey": "livingworldquests.quest.accessory.title",
   "ShortDescriptionKey": "livingworldquests.quest.accessory.short",
   "DescriptionKey": "livingworldquests.quest.accessory.description",
-  "AutoTrack": false
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Chitin_Plate",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
 }

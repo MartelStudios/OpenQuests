@@ -16,6 +16,12 @@
         "LivingWorldQuests_BloodMoonOmen"
       ],
       "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Moonstone",
+      "Quantity": 2,
+      "AutoClaim": true
     }
   ]
 }

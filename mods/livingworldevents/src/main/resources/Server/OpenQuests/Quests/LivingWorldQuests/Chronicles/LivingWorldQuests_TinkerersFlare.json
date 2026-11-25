@@ -8,5 +8,20 @@
   "TitleKey": "livingworldquests.quest.tinkerers-flare.title",
   "ShortDescriptionKey": "livingworldquests.quest.tinkerers-flare.short",
   "DescriptionKey": "livingworldquests.quest.tinkerers-flare.description",
-  "AutoTrack": false
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "LivingWorldQuests_BroodSting"
+      ],
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Thorium",
+      "Quantity": 5,
+      "AutoClaim": true
+    }
+  ]
 }

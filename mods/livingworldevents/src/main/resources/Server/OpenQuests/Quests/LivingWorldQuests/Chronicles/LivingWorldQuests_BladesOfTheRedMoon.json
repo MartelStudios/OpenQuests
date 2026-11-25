@@ -1,0 +1,41 @@
+{
+  "$Comment": "Craft a Moonfang Staff or a Bloodletter.",
+  "Type": "Composite",
+  "Operator": "Or",
+  "QuestAssetIds": [
+    {
+      "$Comment": "Craft a Moonfang Staff.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Moonfang_Staff"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.blades-red-moon-moonfang-staff.title",
+      "ShortDescriptionKey": "livingworldquests.quest.blades-red-moon-moonfang-staff.short",
+      "DescriptionKey": "livingworldquests.quest.blades-red-moon-moonfang-staff.description"
+    },
+    {
+      "$Comment": "Craft a Bloodletter.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Bloodletter"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.blades-red-moon-bloodletter.title",
+      "ShortDescriptionKey": "livingworldquests.quest.blades-red-moon-bloodletter.short",
+      "DescriptionKey": "livingworldquests.quest.blades-red-moon-bloodletter.description"
+    }
+  ],
+  "TitleKey": "livingworldquests.quest.blades-red-moon.title",
+  "ShortDescriptionKey": "livingworldquests.quest.blades-red-moon.short",
+  "DescriptionKey": "livingworldquests.quest.blades-red-moon.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Moonstone",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
+}

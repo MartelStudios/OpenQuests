@@ -8,5 +8,13 @@
   "TitleKey": "livingworldquests.quest.razorleaf-bow.title",
   "ShortDescriptionKey": "livingworldquests.quest.razorleaf-bow.short",
   "DescriptionKey": "livingworldquests.quest.razorleaf-bow.description",
-  "AutoTrack": false
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
 }

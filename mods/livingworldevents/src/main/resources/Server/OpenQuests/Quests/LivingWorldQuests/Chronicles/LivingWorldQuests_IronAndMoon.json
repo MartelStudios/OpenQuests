@@ -51,5 +51,13 @@
   "TitleKey": "livingworldquests.quest.iron-and-moon.title",
   "ShortDescriptionKey": "livingworldquests.quest.iron-and-moon.short",
   "DescriptionKey": "livingworldquests.quest.iron-and-moon.description",
-  "AutoTrack": false
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Mithril",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ]
 }

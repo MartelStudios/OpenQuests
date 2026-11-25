@@ -4,6 +4,7 @@
     "Type": "PlayerConnect"
   },
   "QuestAssetIds": [
-    "LivingWorldQuests_AllSaplingsHome"
+    "LivingWorldQuests_AllSaplingsHome",
+    "LivingWorldQuests_FriendInPot"
   ]
 }

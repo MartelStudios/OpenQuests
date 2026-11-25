@@ -3,7 +3,7 @@
   "NameKey": "livingworldquests.chapter.legends.name",
   "Group": "LivingWorldQuests_Events",
   "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
-  "Order": 2,
+  "Order": 1,
   "Quests": [
     {
       "Quest": "LivingWorldQuests_ChroniclerSkull",
