@@ -1,6 +1,6 @@
 {
   "$Comment": "Matches the Living World Events roles for BroodmotherRoles.",
   "IncludeRoles": [
-    "LWE_Broodmother_Phase3"
+    "LWE_Broodmother_Phase3*"
   ]
 }
