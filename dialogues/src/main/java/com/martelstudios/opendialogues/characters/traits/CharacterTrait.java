@@ -31,7 +31,9 @@ public abstract class CharacterTrait {
     /**
      * Base every concrete codec chains from.
      */
-    public static final BuilderCodec<CharacterTrait> BASE_CODEC = BuilderCodec.abstractBuilder(CharacterTrait.class).build();
+    public static final BuilderCodec<CharacterTrait> BASE_CODEC = BuilderCodec.abstractBuilder(CharacterTrait.class)
+                                                                              .documentation("Adds behavior or presentation to an NPC character.")
+                                                                              .build();
 
     /**
      * Once, when the NPC receives the character: the place for draws that must stick.

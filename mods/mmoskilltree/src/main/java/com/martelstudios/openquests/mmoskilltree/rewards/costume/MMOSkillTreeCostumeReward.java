@@ -29,10 +29,13 @@ public class MMOSkillTreeCostumeReward extends KindReward {
                                                                         .append(new KeyedCodec<>("Costume", Codec.STRING, true), (reward, costume) -> reward.costume = costume, reward -> reward.costume)
                                                                         .addValidator(Validators.nonNull())
                                                                         .addValidatorLate(() -> EntityEffect.VALIDATOR_CACHE.getValidator().late())
+                                                                        .documentation("Entity effect asset ID that changes the player's appearance.")
                                                                         .add()
                                                                         .append(new KeyedCodec<>("FallbackLootable", Codec.STRING), (reward, lootable) -> reward.fallbackLootable = lootable, reward -> reward.fallbackLootable)
                                                                         .addValidatorLate(() -> LOOTABLES.getValidator().late())
+                                                                        .documentation("CommonLib loot table ID to roll if the player cannot wear the outfit, with no fallback by default.")
                                                                         .add()
+                                                                        .documentation("Applies a costume or rolls the fallback loot table if the costume cannot be worn.")
                                                                         .build();
 
     protected String costume;

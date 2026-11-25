@@ -13,7 +13,9 @@ public class CraftQuestProgression extends QuantityQuestProgression<CraftQuestPr
 
     public static final BuilderCodec<CraftQuestProgression> CODEC = BuilderCodec.builder(CraftQuestProgression.class, CraftQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                 .append(new KeyedCodec<>("ItemToCraft", QuestItemFilter.CODEC), (quest, item) -> quest.itemToCraft = item, quest -> quest.itemToCraft)
+                                                                                .documentation("Overrides the item filter for this instance, falling back to the asset when omitted.")
                                                                                 .add()
+                                                                                .documentation("Stores progress for a quest about crafting items.")
                                                                                 .build();
 
     /**

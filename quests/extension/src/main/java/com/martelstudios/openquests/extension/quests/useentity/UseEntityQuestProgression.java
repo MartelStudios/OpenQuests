@@ -15,7 +15,9 @@ public class UseEntityQuestProgression extends QuantityQuestProgression<UseEntit
 
     public static final BuilderCodec<UseEntityQuestProgression> CODEC = BuilderCodec.builder(UseEntityQuestProgression.class, UseEntityQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("NpcGroupId", Codec.STRING), (quest, groupId) -> quest.npcGroupId = groupId, quest -> quest.npcGroupId)
+                                                                                    .documentation("Overrides the NPC group for this instance, falling back to the asset when omitted.")
                                                                                     .add()
+                                                                                    .documentation("Stores progress for a quest about interacting with NPCs.")
                                                                                     .build();
 
     /**

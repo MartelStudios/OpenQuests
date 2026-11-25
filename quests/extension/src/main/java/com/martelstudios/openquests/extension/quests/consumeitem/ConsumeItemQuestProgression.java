@@ -13,7 +13,9 @@ public class ConsumeItemQuestProgression extends QuantityQuestProgression<Consum
 
     public static final BuilderCodec<ConsumeItemQuestProgression> CODEC = BuilderCodec.builder(ConsumeItemQuestProgression.class, ConsumeItemQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                       .append(new KeyedCodec<>("ItemToConsume", QuestItemFilter.CODEC), (quest, item) -> quest.itemToConsume = item, quest -> quest.itemToConsume)
+                                                                                      .documentation("Overrides the item filter for this instance, falling back to the asset when omitted.")
                                                                                       .add()
+                                                                                      .documentation("Stores progress for a quest about consuming items.")
                                                                                       .build();
 
     /**

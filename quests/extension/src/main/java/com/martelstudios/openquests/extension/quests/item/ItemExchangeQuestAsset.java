@@ -14,7 +14,9 @@ public abstract class ItemExchangeQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<ItemExchangeQuestAsset> BASE_CODEC = BuilderCodec.abstractBuilder(ItemExchangeQuestAsset.class, QuantityQuestAsset.BASE_CODEC)
                                                                                       .append(new KeyedCodec<>("AntiAbuse", Codec.BOOLEAN), (asset, antiAbuse) -> asset.antiAbuse = antiAbuse, asset -> asset.antiAbuse)
+                                                                                      .documentation("Prevents a player's own dropped items from counting on pickup or after recovery and redrop, false by default.")
                                                                                       .add()
+                                                                                      .documentation("Defines shared settings for quests that count dropped or picked-up items.")
                                                                                       .build();
 
     protected boolean antiAbuse;

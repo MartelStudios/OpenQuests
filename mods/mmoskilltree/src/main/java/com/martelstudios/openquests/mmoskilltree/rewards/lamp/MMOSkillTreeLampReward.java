@@ -19,13 +19,17 @@ public class MMOSkillTreeLampReward extends KindReward {
     public static final BuilderCodec<MMOSkillTreeLampReward> CODEC = BuilderCodec.builder(MMOSkillTreeLampReward.class, MMOSkillTreeLampReward::new, KindReward.BASE_CODEC)
                                                                      .append(new KeyedCodec<>("Amount", Codec.LONG, true), (reward, amount) -> reward.amount = amount, reward -> Long.valueOf(reward.amount))
                                                                      .addValidator(Validators.greaterThan(0L))
+                                                                     .documentation("XP the lamp grants.")
                                                                      .add()
                                                                      .append(new KeyedCodec<>("Picks", Codec.INTEGER), (reward, picks) -> reward.picks = picks, reward -> Integer.valueOf(reward.picks))
                                                                      .addValidator(Validators.greaterThan(0))
+                                                                     .documentation("Number of skill selections the lamp allows, defaulting to 1.")
                                                                      .add()
                                                                      .append(new KeyedCodec<>("Skills", Codec.STRING), (reward, skills) -> reward.skills = skills, reward -> reward.skills)
                                                                      .metadata(DataSets.SKILL_POOL_DROPDOWN)
+                                                                     .documentation("Skill or category the player can choose from, defaulting to ALL.")
                                                                      .add()
+                                                                     .documentation("Grants a lamp that lets the player choose where to apply skill XP.")
                                                                      .build();
 
     protected long amount;

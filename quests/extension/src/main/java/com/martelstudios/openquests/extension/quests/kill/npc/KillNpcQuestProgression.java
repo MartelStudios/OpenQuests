@@ -15,7 +15,9 @@ public class KillNpcQuestProgression extends QuantityQuestProgression<KillNpcQue
 
     public static final BuilderCodec<KillNpcQuestProgression> CODEC = BuilderCodec.builder(KillNpcQuestProgression.class, KillNpcQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                   .append(new KeyedCodec<>("NpcGroupId", Codec.STRING), (quest, groupId) -> quest.npcGroupId = groupId, quest -> quest.npcGroupId)
+                                                                                  .documentation("Overrides the NPC group for this instance, falling back to the asset when omitted.")
                                                                                   .add()
+                                                                                  .documentation("Stores progress for a quest about killing NPCs.")
                                                                                   .build();
 
     /**

@@ -11,6 +11,7 @@ public class SprintQuestAsset extends TravelQuestAsset {
 
     public static final BuilderCodec<SprintQuestAsset> CODEC =
         BuilderCodec.builder(SprintQuestAsset.class, SprintQuestAsset::new, TravelQuestAsset.BASE_CODEC)
+                    .documentation("Counts movement at the sprinting pace.")
                     .build();
 
     private SprintQuestAsset() {}

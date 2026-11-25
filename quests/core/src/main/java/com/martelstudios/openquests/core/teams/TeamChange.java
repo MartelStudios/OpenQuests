@@ -25,15 +25,19 @@ public final class TeamChange {
 
     public static final BuilderCodec<TeamChange> CODEC = BuilderCodec.builder(TeamChange.class, TeamChange::new)
                                                                      .append(new KeyedCodec<>("Type", Codec.STRING), (change, type) -> change.type = type, change -> change.type)
+                                                                     .documentation("Team type asset ID affected by the membership change.")
                                                                      .add()
                                                                      .append(new KeyedCodec<>("From", Codec.UUID_STRING), (change, from) -> change.from = from, change -> change.from)
+                                                                     .documentation("UUID of the previous team, when there is one.")
                                                                      .add()
                                                                      .append(new KeyedCodec<>("To", Codec.UUID_STRING), (change, to) -> change.to = to, change -> change.to)
+                                                                     .documentation("UUID of the destination team, when there is one.")
                                                                      .add()
-                                                                     .append(new KeyedCodec<>("Revision", Codec.LONG), (change, revision) -> change.revision = revision, change -> change.revision).add()
-                                                                     .append(new KeyedCodec<>("Sources", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new)), (change, sources) -> change.sources = List.of(sources), change -> change.sources.toArray(UUID[]::new)).add()
-                                                                     .append(new KeyedCodec<>("Copies", new ArrayCodec<>(QuestProgressionRecord.CODEC, QuestProgressionRecord[]::new)), (change, copies) -> change.copies = List.of(copies), change -> change.copies.toArray(QuestProgressionRecord[]::new)).add()
-                                                                     .append(new KeyedCodec<>("Assignments", AssignmentRecords.MAP_CODEC), (change, records) -> change.assignments = records, change -> change.assignments).add()
+                                                                     .append(new KeyedCodec<>("Revision", Codec.LONG), (change, revision) -> change.revision = revision, change -> change.revision).documentation("Version used to order membership changes, initially zero.").add()
+                                                                     .append(new KeyedCodec<>("Sources", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new)), (change, sources) -> change.sources = List.of(sources), change -> change.sources.toArray(UUID[]::new)).documentation("Source quest instance UUIDs associated with the change, empty by default.").add()
+                                                                     .append(new KeyedCodec<>("Copies", new ArrayCodec<>(QuestProgressionRecord.CODEC, QuestProgressionRecord[]::new)), (change, copies) -> change.copies = List.of(copies), change -> change.copies.toArray(QuestProgressionRecord[]::new)).documentation("Quest records copied as part of the change, empty by default.").add()
+                                                                     .append(new KeyedCodec<>("Assignments", AssignmentRecords.MAP_CODEC), (change, records) -> change.assignments = records, change -> change.assignments).documentation("Assignment records carried with the change, empty by default.").add()
+                                                                     .documentation("Carries a team membership change and its quest data to a player.")
                                                                      .build();
 
     private String type;

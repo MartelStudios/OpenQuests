@@ -23,7 +23,9 @@ public abstract class BlockActionQuestProgression<Q extends BlockActionQuestProg
 
     public static final BuilderCodec<BlockActionQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(BlockActionQuestProgression.class, QuantityQuestProgression.BASE_CODEC)
                                                                                            .append(new KeyedCodec<>("Recovered", new MapCodec<>(Codec.INTEGER, HashMap::new)), (quest, counts) -> quest.recoveries.recovered.putAll(counts), quest -> quest.recoveries.recovered.isEmpty() ? null : new HashMap<>(quest.recoveries.recovered))
+                                                                                           .documentation("Counts of recovered player-placed blocks by item ID, initially empty.")
                                                                                            .add()
+                                                                                           .documentation("Stores anti-abuse bookkeeping for quests that count block actions.")
                                                                                            .build();
 
     BlockRecoveries recoveries = new BlockRecoveries();

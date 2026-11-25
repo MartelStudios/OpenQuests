@@ -15,7 +15,9 @@ public class DropItemQuestProgression extends ItemExchangeQuestProgression<DropI
 
     public static final BuilderCodec<DropItemQuestProgression> CODEC = BuilderCodec.builder(DropItemQuestProgression.class, DropItemQuestProgression::new, ItemExchangeQuestProgression.BASE_CODEC)
                                                                               .append(new KeyedCodec<>("ItemToDrop", QuestItemFilter.CODEC), (quest, item) -> quest.itemToDrop = item, quest -> quest.itemToDrop)
+                                                                              .documentation("Overrides the item filter for this instance, falling back to the asset when omitted.")
                                                                               .add()
+                                                                              .documentation("Stores progress for a quest about dropping items from the inventory.")
                                                                               .build();
 
     @Nullable

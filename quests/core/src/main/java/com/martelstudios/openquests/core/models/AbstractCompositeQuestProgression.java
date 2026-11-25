@@ -26,7 +26,9 @@ public abstract class AbstractCompositeQuestProgression<Q extends AbstractCompos
      */
     public static final BuilderCodec<AbstractCompositeQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(AbstractCompositeQuestProgression.class, AbstractQuestProgression.BASE_CODEC)
                                                                                                  .append(new KeyedCodec<>("QuestIds", new ArrayCodec<>(Codec.UUID_STRING, UUID[]::new)), (quest, ids) -> quest.childIds = ids, quest -> quest.childIds)
+                                                                                                 .documentation("Child quest instance UUIDs, initially empty.")
                                                                                                  .add()
+                                                                                                 .documentation("Stores the child quest links shared by composite quest instances.")
                                                                                                  .build();
 
     /**

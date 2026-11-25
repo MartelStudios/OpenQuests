@@ -13,6 +13,7 @@ public class QuestStateQuestAsset extends OpenQuestAsset {
 
     public static final BuilderCodec<QuestStateQuestAsset> CODEC = QuestRequirement.appendFields(BuilderCodec.builder(QuestStateQuestAsset.class, QuestStateQuestAsset::new, OpenQuestAsset.BASE_CODEC),
                                                                                                  asset -> asset.requirement)
+                                                                                   .documentation("Checks whether enough of the player's quests from another asset are in the specified states.")
                                                                                    .build();
 
     @Nonnull

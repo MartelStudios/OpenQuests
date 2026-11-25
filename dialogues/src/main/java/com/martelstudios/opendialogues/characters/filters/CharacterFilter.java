@@ -24,7 +24,9 @@ public abstract class CharacterFilter {
      */
     public static final BuilderCodec<CharacterFilter> BASE_CODEC = BuilderCodec.abstractBuilder(CharacterFilter.class)
                                                                        .append(new KeyedCodec<>("Not", Codec.BOOLEAN), (filter, not) -> filter.not = not, filter -> filter.not)
+                                                                       .documentation("Inverts the match when true and defaults to false.")
                                                                        .add()
+                                                                       .documentation("Tests whether an NPC qualifies for a character distribution.")
                                                                        .build();
 
     protected boolean not;

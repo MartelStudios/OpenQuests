@@ -22,9 +22,12 @@ public class OpenDialoguesCompositeCondition extends DialogueCondition {
 
     public static final BuilderCodec<OpenDialoguesCompositeCondition> CODEC = BuilderCodec.builder(OpenDialoguesCompositeCondition.class, OpenDialoguesCompositeCondition::new, DialogueCondition.BASE_CODEC)
                                                                              .append(new KeyedCodec<>("Operator", new EnumCodec<>(Operator.class)), (condition, operator) -> condition.operator = operator, condition -> condition.operator)
+                                                                             .documentation("Combines tests with And for all or Or for any, defaulting to And.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("Conditions", new ArrayCodec<>(DialogueCondition.CODEC, DialogueCondition[]::new)), (condition, conditions) -> condition.conditions = conditions, condition -> condition.conditions)
+                                                                             .documentation("Tests to combine, empty by default.")
                                                                              .add()
+                                                                             .documentation("Combines several tests into one condition.")
                                                                              .build();
 
     protected Operator operator = Operator.AND;

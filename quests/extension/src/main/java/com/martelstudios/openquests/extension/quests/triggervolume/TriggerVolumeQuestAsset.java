@@ -26,9 +26,12 @@ public class TriggerVolumeQuestAsset extends QuantityQuestAsset {
         BuilderCodec.builder(TriggerVolumeQuestAsset.class, TriggerVolumeQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("VolumeNamePattern", WorldNamePattern.CODEC, true), (asset, pattern) -> asset.volumeNamePattern = pattern, asset -> asset.volumeNamePattern)
                     .addValidator(Validators.nonNull())
+                    .documentation("Regular expression matched against the entire trigger volume name.")
                     .add()
                     .append(new KeyedCodec<>("TriggerEventType", TriggerEventType.CODEC), (asset, type) -> asset.triggerEventType = type, asset -> asset.triggerEventType)
+                    .documentation("Volume event to count, defaulting to Enter with Exit also supported.")
                     .add()
+                    .documentation("Counts events from named trigger volumes.")
                     .build();
 
     protected WorldNamePattern volumeNamePattern;

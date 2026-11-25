@@ -27,7 +27,9 @@ public class OpenDialoguesOpenInteraction extends SimpleInstantInteraction {
                                                                                        .append(new KeyedCodec<>("Dialogue", Codec.STRING, true), (interaction, dialogue) -> interaction.dialogue = dialogue, interaction -> interaction.dialogue)
                                                                                        .addValidator(Validators.nonEmptyString())
                                                                                        .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
+                                                                                       .documentation("ID of the dialogue or router to open.")
                                                                                        .add()
+                                                                                       .documentation("Opens a dialogue or router when the player uses this interaction.")
                                                                                        .build();
 
     @Nullable

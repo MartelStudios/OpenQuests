@@ -11,7 +11,9 @@ public class GatherQuestAsset extends HeldQuantityQuestAsset {
     public static final BuilderCodec<GatherQuestAsset> CODEC =
         BuilderCodec.builder(GatherQuestAsset.class, GatherQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
             .append(new KeyedCodec<>("ItemToGather", QuestItemFilter.CODEC), (asset, item) -> asset.itemToGather = item, asset -> asset.itemToGather)
+            .documentation("Filter for items counted in the player's inventory.")
             .add()
+            .documentation("Defines a quest for holding a target quantity of items.")
             .build();
 
     protected QuestItemFilter itemToGather;

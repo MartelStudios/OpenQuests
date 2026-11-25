@@ -15,7 +15,9 @@ public class KillNpcQuestAsset extends QuantityQuestAsset {
         BuilderCodec.builder(KillNpcQuestAsset.class, KillNpcQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("NpcGroupId", NPCGroup.CHILD_ASSET_CODEC, true), (asset, groupId) -> asset.npcGroupId = groupId, asset -> asset.npcGroupId)
                     .addValidator(Validators.nonNull())
+                    .documentation("NPC group whose members count when killed.")
                     .add()
+                    .documentation("Defines a quest for killing NPCs.")
                     .build();
 
     protected String npcGroupId;

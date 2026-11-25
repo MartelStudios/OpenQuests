@@ -20,7 +20,9 @@ public class OpenDialoguesNameTrait extends CharacterTrait {
 
     public static final BuilderCodec<OpenDialoguesNameTrait> CODEC = BuilderCodec.builder(OpenDialoguesNameTrait.class, OpenDialoguesNameTrait::new, CharacterTrait.BASE_CODEC)
                                                                                  .append(new KeyedCodec<>("Names", OpenDialogueTextListAsset.CONTAINED_CODEC), (trait, names) -> trait.names = names, trait -> trait.names)
+                                                                                 .documentation("Text list asset ID or inline list to draw the NPC's personal name from.")
                                                                                  .add()
+                                                                                 .documentation("Draws a personal name for each NPC carrying the character.")
                                                                                  .build();
 
     @Nullable

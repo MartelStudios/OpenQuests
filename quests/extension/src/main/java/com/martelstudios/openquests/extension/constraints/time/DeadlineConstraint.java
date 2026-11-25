@@ -21,7 +21,9 @@ public class DeadlineConstraint extends ExpiringConstraint {
     public static final BuilderCodec<DeadlineConstraint> CODEC = BuilderCodec.builder(DeadlineConstraint.class, DeadlineConstraint::new, ExpiringConstraint.BASE_CODEC)
                                                                              .append(new KeyedCodec<>("At", Codec.INSTANT, true), (constraint, at) -> constraint.at = at, constraint -> constraint.at)
                                                                              .addValidator(Validators.nonNull())
+                                                                             .documentation("Expiration instant in ISO 8601 format, after which the quest can no longer be assigned.")
                                                                              .add()
+                                                                             .documentation("Sets a fixed expiration time for quests from the asset.")
                                                                              .build();
 
     protected Instant at;

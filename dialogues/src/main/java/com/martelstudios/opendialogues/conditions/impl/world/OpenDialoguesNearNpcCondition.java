@@ -34,21 +34,27 @@ public class OpenDialoguesNearNpcCondition extends DialogueCondition {
 
     public static final BuilderCodec<OpenDialoguesNearNpcCondition> CODEC = BuilderCodec.builder(OpenDialoguesNearNpcCondition.class, OpenDialoguesNearNpcCondition::new, DialogueCondition.BASE_CODEC)
                                                                                        .append(new KeyedCodec<>("Role", Codec.STRING), (condition, role) -> condition.role = role, condition -> condition.role)
+                                                                                       .documentation("NPC role to count.")
                                                                                        .add()
                                                                                        .append(new KeyedCodec<>("Group", Codec.STRING), (condition, group) -> condition.group = group, condition -> condition.group)
                                                                                        .addValidator(NPCGroup.VALIDATOR_CACHE.getValidator())
+                                                                                       .documentation("NPC role group to count.")
                                                                                        .add()
                                                                                        .append(new KeyedCodec<>("Radius", Codec.DOUBLE, true), (condition, radius) -> condition.radius = radius, condition -> condition.radius)
+                                                                                       .documentation("Search distance from the player in blocks, up to 128.")
                                                                                        .add()
                                                                                        .append(new KeyedCodec<>("Min", Codec.INTEGER), (condition, min) -> condition.min = min, condition -> condition.min)
+                                                                                       .documentation("Minimum matching NPC count, defaulting to 1.")
                                                                                        .add()
                                                                                        .append(new KeyedCodec<>("Max", Codec.INTEGER), (condition, max) -> condition.max = max, condition -> condition.max)
+                                                                                       .documentation("Maximum matching NPC count, with no upper limit by default.")
                                                                                        .add()
                                                                                        .validator((condition, results) -> {
                                                                                            if ((condition.role == null) == (condition.group == null)) results.fail("Exactly one of Role or Group must be set");
                                                                                            String radius = NearbyCount.validateRadius(condition.radius);
                                                                                            if (radius != null) results.fail(radius);
                                                                                        })
+                                                                                       .documentation("Tests for living NPCs near the player, including the conversation source if it matches.")
                                                                                        .build();
 
     @Nullable

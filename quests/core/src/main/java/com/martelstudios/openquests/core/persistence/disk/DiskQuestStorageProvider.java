@@ -15,7 +15,9 @@ public class DiskQuestStorageProvider implements QuestStorageProvider {
 
     public static final BuilderCodec<DiskQuestStorageProvider> CODEC = BuilderCodec.builder(DiskQuestStorageProvider.class, DiskQuestStorageProvider::new)
                                                                                    .append(new KeyedCodec<>("Path", Codec.STRING), (provider, path) -> provider.path = path, provider -> provider.path)
+                                                                                   .documentation("Directory for quest data, defaulting to quests inside the plugin data directory.")
                                                                                    .add()
+                                                                                   .documentation("Stores quest data in files on disk.")
                                                                                    .build();
 
     /**

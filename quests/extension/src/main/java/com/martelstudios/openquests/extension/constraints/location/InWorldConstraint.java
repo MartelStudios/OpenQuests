@@ -23,9 +23,12 @@ public class InWorldConstraint extends QuestConstraint {
     public static final BuilderCodec<InWorldConstraint> CODEC = BuilderCodec.builder(InWorldConstraint.class, InWorldConstraint::new, QuestConstraint.BASE_CODEC)
                                                                             .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC, true), (constraint, pattern) -> constraint.worldNamePattern = pattern, constraint -> constraint.worldNamePattern)
                                                                             .addValidator(Validators.nonNull())
+                                                                            .documentation("Regular expression matched against the entire name of a world where progress is allowed.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("OnLeave", new EnumCodec<>(OnLeave.class)), (constraint, onLeave) -> constraint.onLeave = onLeave, constraint -> constraint.onLeave)
+                                                                            .documentation("Controls what happens when the player leaves a matching world, defaulting to Pause.")
                                                                             .add()
+                                                                            .documentation("Restricts progress to matching worlds and can fail a quest on departure.")
                                                                             .build();
 
     protected WorldNamePattern worldNamePattern;

@@ -20,7 +20,9 @@ public class OpenDialoguesEpithetTrait extends CharacterTrait {
 
     public static final BuilderCodec<OpenDialoguesEpithetTrait> CODEC = BuilderCodec.builder(OpenDialoguesEpithetTrait.class, OpenDialoguesEpithetTrait::new, CharacterTrait.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("Epithets", OpenDialogueTextListAsset.CONTAINED_CODEC), (trait, epithets) -> trait.epithets = epithets, trait -> trait.epithets)
+                                                                                    .documentation("Text list asset ID or inline list to draw the NPC's title from.")
                                                                                     .add()
+                                                                                    .documentation("Draws a title for each NPC carrying the character.")
                                                                                     .build();
 
     @Nullable

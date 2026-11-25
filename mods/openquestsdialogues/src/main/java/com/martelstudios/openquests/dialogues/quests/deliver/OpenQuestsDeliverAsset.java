@@ -34,10 +34,13 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset implements Target
         public static final BuilderCodec<DeliverItem> CODEC = BuilderCodec.builder(DeliverItem.class, DeliverItem::new)
                                                                            .append(new KeyedCodec<>("Item", QuestItemFilter.CODEC, true), (item, filter) -> item.item = filter, item -> item.item)
                                                                            .addValidator(Validators.nonNull())
+                                                                           .documentation("Criteria for inventory items that can satisfy this delivery requirement.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Quantity", Codec.INTEGER, true), (item, quantity) -> item.quantity = quantity, item -> item.quantity)
                                                                            .addValidator(Validators.min(1))
+                                                                           .documentation("Number of matching items to deliver, defaulting to 1.")
                                                                            .add()
+                                                                           .documentation("Defines which items to deliver and how many.")
                                                                            .build();
 
         protected QuestItemFilter item;
@@ -71,13 +74,16 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset implements Target
                     .add()
                     .append(new KeyedCodec<>("Items", new ArrayCodec<>(DeliverItem.CODEC, DeliverItem[]::new), true), (asset, items) -> asset.items = items, asset -> asset.items)
                     .addValidator(Validators.nonEmptyArray())
+                    .documentation("Item requirements the player must fulfill to complete the delivery.")
                     .add()
                     .append(new KeyedCodec<>("Dialogue", Codec.STRING), (asset, dialogue) -> asset.dialogue = dialogue, asset -> asset.dialogue)
                     .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
+                    .documentation("Custom dialogue asset ID for the handoff, with a generated delivery screen by default.")
                     .add()
                     .validator((asset, results) -> {
                         if (asset.target == TargetMode.Character && asset.character == null) results.fail("Character is required with Target Character");
                     })
+                    .documentation("Defines a quest to bring items to an OpenDialogues NPC picked by Target.")
                     .build();
 
     @Nullable

@@ -18,7 +18,9 @@ public class OpenDialoguesHoldingCondition extends DialogueCondition {
 
     public static final BuilderCodec<OpenDialoguesHoldingCondition> CODEC = BuilderCodec.builder(OpenDialoguesHoldingCondition.class, OpenDialoguesHoldingCondition::new, DialogueCondition.BASE_CODEC)
                                                                            .append(new KeyedCodec<>("Item", OpenDialoguesItemFilter.CODEC, true), (condition, item) -> condition.item = item, condition -> condition.item)
+                                                                           .documentation("Criteria the item in the player's hand must match.")
                                                                            .add()
+                                                                           .documentation("Tests the item the player is holding.")
                                                                            .build();
 
     protected OpenDialoguesItemFilter item;

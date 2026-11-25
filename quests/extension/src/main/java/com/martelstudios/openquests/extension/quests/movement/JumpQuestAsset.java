@@ -11,6 +11,7 @@ public class JumpQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<JumpQuestAsset> CODEC =
         BuilderCodec.builder(JumpQuestAsset.class, JumpQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
+                    .documentation("Counts jumps toward a target.")
                     .build();
 
     private JumpQuestAsset() {}

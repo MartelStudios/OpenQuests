@@ -20,9 +20,12 @@ public class MMOSkillTreeCompleteBountyQuestAsset extends MMOSkillTreeMomentQues
         BuilderCodec.builder(MMOSkillTreeCompleteBountyQuestAsset.class, MMOSkillTreeCompleteBountyQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("Board", Codec.STRING), (asset, board) -> asset.board = board, asset -> asset.board)
                     .metadata(DataSets.BOARD_OR_ALL_DROPDOWN)
+                    .documentation("ID of the bounty board whose collected rewards count, defaulting to ALL.")
                     .add()
                     .append(new KeyedCodec<>("Difficulty", Codec.STRING), (asset, difficulty) -> asset.difficulty = difficulty, asset -> asset.difficulty)
+                    .documentation("Difficulty band whose bounties count, such as easy or elite, with any difficulty accepted by default.")
                     .add()
+                    .documentation("Defines a quest that counts MMO Skill Tree bounties when the player collects their rewards.")
                     .build();
 
     @Nullable

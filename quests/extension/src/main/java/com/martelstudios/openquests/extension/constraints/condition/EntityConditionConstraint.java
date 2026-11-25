@@ -27,7 +27,9 @@ public class EntityConditionConstraint extends QuestConstraint {
     public static final BuilderCodec<EntityConditionConstraint> CODEC = BuilderCodec.builder(EntityConditionConstraint.class, EntityConditionConstraint::new, QuestConstraint.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("Conditions", new ArrayCodec<>(Condition.CODEC, Condition[]::new), true), (constraint, conditions) -> constraint.conditions = conditions, constraint -> constraint.conditions)
                                                                                     .addValidator(Validators.nonEmptyArray())
+                                                                                    .documentation("Entity conditions that must all pass for the player's progress to count.")
                                                                                     .add()
+                                                                                    .documentation("Allows progress only while the acting player meets every configured entity condition.")
                                                                                     .build();
 
     protected Condition[] conditions;

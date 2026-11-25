@@ -23,7 +23,9 @@ public class OpenDialogueTextListAsset implements JsonAssetWithMap<String, Defau
 
     public static final AssetBuilderCodec<String, OpenDialogueTextListAsset> CODEC = AssetBuilderCodec.builder(OpenDialogueTextListAsset.class, OpenDialogueTextListAsset::new, Codec.STRING, (list, id) -> list.id = id, list -> list.id, (list, data) -> list.data = data, list -> list.data)
                                                                                                        .appendInherited(new KeyedCodec<>("Texts", new ArrayCodec<>(Codec.STRING, String[]::new)), (list, texts) -> list.texts = texts, list -> list.texts, (list, parent) -> list.texts = parent.texts)
+                                                                                                       .documentation("Translation keys or literal values to draw from, empty by default.")
                                                                                                        .add()
+                                                                                                       .documentation("Defines a pool of text entries for character traits to draw from.")
                                                                                                        .build();
 
     /**

@@ -19,7 +19,9 @@ public class ReachLevelQuestProgression extends HeldQuantityQuestProgression<Rea
 
     public static final BuilderCodec<ReachLevelQuestProgression> CODEC = BuilderCodec.builder(ReachLevelQuestProgression.class, ReachLevelQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                      .append(new KeyedCodec<>("Skill", Codec.STRING), (quest, skill) -> quest.skill = skill, quest -> quest.skill)
+                                                                                     .documentation("Overrides which skill this quest tracks, defaulting to the skill set on the asset.")
                                                                                      .add()
+                                                                                     .documentation("Stores progress toward reaching a level in an MMO Skill Tree skill.")
                                                                                      .build();
 
     /**

@@ -27,12 +27,16 @@ public class NearPositionConstraint extends QuestConstraint {
     public static final BuilderCodec<NearPositionConstraint> CODEC = BuilderCodec.builder(NearPositionConstraint.class, NearPositionConstraint::new, QuestConstraint.BASE_CODEC)
                                                                                  .append(new KeyedCodec<>("Position", Vector3dUtil.CODEC, true), (constraint, position) -> constraint.position = position, constraint -> constraint.position)
                                                                                  .addValidator(Validators.nonNull())
+                                                                                 .documentation("Coordinates of the center of the allowed area.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("Radius", Codec.DOUBLE, true), (constraint, radius) -> constraint.radius = radius, constraint -> Double.valueOf(constraint.radius))
                                                                                  .addValidator(Validators.greaterThan(0.0))
+                                                                                 .documentation("Maximum distance from the center where progress counts, including the boundary.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC), (constraint, pattern) -> constraint.worldNamePattern = pattern, constraint -> constraint.worldNamePattern)
+                                                                                 .documentation("Regular expression restricting eligible worlds by name, with any world allowed by default.")
                                                                                  .add()
+                                                                                 .documentation("Allows progress within a fixed radius of a position.")
                                                                                  .build();
 
     protected Vector3d position;

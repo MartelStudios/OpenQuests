@@ -24,10 +24,13 @@ public class MMOSkillTreeXpReward extends QuestReward implements SkillReference 
                                                                    .append(new KeyedCodec<>("Skill", Codec.STRING, true), (reward, skill) -> reward.skill = skill, reward -> reward.skill)
                                                                    .addValidator(Validators.nonNull())
                                                                    .metadata(DataSets.SKILL_DROPDOWN)
+                                                                   .documentation("ID of the MMO Skill Tree skill that receives XP.")
                                                                    .add()
                                                                    .append(new KeyedCodec<>("Amount", Codec.LONG, true), (reward, amount) -> reward.amount = amount, reward -> Long.valueOf(reward.amount))
                                                                    .addValidator(Validators.greaterThan(0L))
+                                                                   .documentation("Base XP to award before applicable multipliers.")
                                                                    .add()
+                                                                   .documentation("Awards XP in an MMO Skill Tree skill.")
                                                                    .build();
 
     protected String skill;

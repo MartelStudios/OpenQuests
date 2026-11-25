@@ -24,7 +24,9 @@ public class MMOSkillTreeAbilityModReward extends KindReward {
                                                                            .append(new KeyedCodec<>("ModId", Codec.STRING, true), (reward, modId) -> reward.modId = modId, reward -> reward.modId)
                                                                            .addValidator(Validators.nonNull())
                                                                            .addValidatorLate(() -> MODS.getValidator().late())
+                                                                           .documentation("ID of the ability mod to grant.")
                                                                            .add()
+                                                                           .documentation("Grants an MMO Skill Tree ability mod.")
                                                                            .build();
 
     protected String modId;

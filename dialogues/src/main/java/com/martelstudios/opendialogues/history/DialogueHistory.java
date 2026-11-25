@@ -33,8 +33,10 @@ public class DialogueHistory implements Component<EntityStore> {
 
         public static final BuilderCodec<Entry> CODEC = BuilderCodec.builder(Entry.class, Entry::new)
                                                                     .append(new KeyedCodec<>("Opened", Codec.INTEGER), (entry, opened) -> entry.opened = opened, entry -> entry.opened)
+                                                                    .documentation("Number of times the dialogue was opened, initially zero.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("Answers", new MapCodec<>(Codec.INTEGER, HashMap<String, Integer>::new)), (entry, answers) -> entry.answers.putAll(answers), entry -> entry.answers)
+                                                                    .documentation("Counts by answer ID, initially empty.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("LastOpenedAt", Codec.LONG), (entry, time) -> entry.lastOpenedAt = time, entry -> entry.lastOpenedAt)
                                                                     .documentation("Epoch milliseconds of the latest opening, unset before any timestamped opening.")
@@ -42,6 +44,7 @@ public class DialogueHistory implements Component<EntityStore> {
                                                                     .append(new KeyedCodec<>("LastAnsweredAt", new MapCodec<>(Codec.LONG, HashMap<String, Long>::new)), (entry, answers) -> entry.lastAnsweredAt.putAll(answers), entry -> entry.lastAnsweredAt)
                                                                     .documentation("Epoch milliseconds of the latest pick by answer ID, initially empty.")
                                                                     .add()
+                                                                    .documentation("Records how often a player opened and answered a particular dialogue.")
                                                                     .build();
 
         private int opened;
@@ -95,7 +98,9 @@ public class DialogueHistory implements Component<EntityStore> {
                                                                           .add()
                                                                           // Histories saved before characters were counted, read as had without one.
                                                                           .append(new KeyedCodec<>("Dialogues", DIALOGUES_CODEC), (history, dialogues) -> history.dialoguesOf(NO_CHARACTER, NO_NPC).putAll(dialogues), history -> null)
+                                                                          .documentation("Legacy history by dialogue ID, imported as conversations without a character.")
                                                                           .add()
+                                                                          .documentation("Stores one player's conversation history.")
                                                                           .build();
 
     /**

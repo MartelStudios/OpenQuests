@@ -26,7 +26,9 @@ public class OpenDialoguesDeliverAction extends DialogueAction {
     public static final BuilderCodec<OpenDialoguesDeliverAction> CODEC = BuilderCodec.builder(OpenDialoguesDeliverAction.class, OpenDialoguesDeliverAction::new, DialogueAction.BASE_CODEC)
                                                                               .append(new KeyedCodec<>("Quest", Codec.STRING), (action, quest) -> action.quest = quest, action -> action.quest)
                                                                               .addValidator(Validators.nonNull())
+                                                                              .documentation("Asset ID of the active delivery objective that receives the items.")
                                                                               .add()
+                                                                              .documentation("Hands in as many of the player's outstanding delivery items as they carry.")
                                                                               .build();
 
     private String quest;

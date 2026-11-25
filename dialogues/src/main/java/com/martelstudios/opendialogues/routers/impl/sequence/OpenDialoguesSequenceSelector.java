@@ -25,9 +25,12 @@ public class OpenDialoguesSequenceSelector extends DialogueSelector {
 
     public static final BuilderCodec<OpenDialoguesSequenceSelector> CODEC = BuilderCodec.builder(OpenDialoguesSequenceSelector.class, OpenDialoguesSequenceSelector::new, DialogueSelector.BASE_CODEC)
                                                                            .append(new KeyedCodec<>("Routes", new ArrayCodec<>(OpenDialoguesRoute.CODEC, OpenDialoguesRoute[]::new)), (selector, routes) -> selector.routes = routes, selector -> selector.routes)
+                                                                           .documentation("Candidates checked in order, empty by default.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("Default", OpenDialoguesTarget.CODEC), (selector, fallback) -> selector.fallback = fallback, selector -> selector.fallback)
+                                                                           .documentation("Target to resolve if no route succeeds, with no fallback by default.")
                                                                            .add()
+                                                                           .documentation("Tries routes in order and uses a fallback if none resolves.")
                                                                            .build();
 
     /**
@@ -37,9 +40,12 @@ public class OpenDialoguesSequenceSelector extends DialogueSelector {
 
         public static final BuilderCodec<OpenDialoguesRoute> CODEC = BuilderCodec.builder(OpenDialoguesRoute.class, OpenDialoguesRoute::new)
                                                                     .append(new KeyedCodec<>("When", DialogueCondition.CODEC), (route, when) -> route.when = when, route -> route.when)
+                                                                    .documentation("Test that must pass before trying this route.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("Then", OpenDialoguesTarget.CODEC, true), (route, then) -> route.then = then, route -> route.then)
+                                                                    .documentation("Dialogue or router to resolve when the test passes.")
                                                                     .add()
+                                                                    .documentation("Pairs a condition with a target in an ordered router.")
                                                                     .build();
 
         @Nullable

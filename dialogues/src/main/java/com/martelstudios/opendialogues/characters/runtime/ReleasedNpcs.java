@@ -23,6 +23,7 @@ public class ReleasedNpcs {
                                                                        .append(new KeyedCodec<>("Npcs", new MapCodec<>(Codec.LONG, HashMap<String, Long>::new)), ReleasedNpcs::putAll, ReleasedNpcs::snapshot)
                                                                        .documentation("Epoch milliseconds of each release by NPC UUID, initially empty.")
                                                                        .add()
+                                                                       .documentation("Persists the NPCs that let their character go, so ties to them are dropped even for offline players.")
                                                                        .build();
 
     private final Map<String, Long> npcs = new HashMap<>();

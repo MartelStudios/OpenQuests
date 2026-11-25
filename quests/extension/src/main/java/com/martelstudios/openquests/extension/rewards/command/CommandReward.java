@@ -22,9 +22,12 @@ public class CommandReward extends QuestReward {
     public static final BuilderCodec<CommandReward> CODEC = BuilderCodec.builder(CommandReward.class, CommandReward::new, QuestReward.BASE_CODEC)
                                                                         .append(new KeyedCodec<>("Command", Codec.STRING, true), (reward, command) -> reward.command = command, reward -> reward.command)
                                                                         .addValidator(Validators.nonNull())
+                                                                        .documentation("Command to run, with the player's username substituted for the {player} placeholder.")
                                                                         .add()
                                                                         .append(new KeyedCodec<>("AsPlayer", Codec.BOOLEAN), (reward, asPlayer) -> reward.asPlayer = asPlayer, reward -> Boolean.valueOf(reward.asPlayer))
+                                                                        .documentation("Runs with the player's permissions when true, and defaults to running as the console.")
                                                                         .add()
+                                                                        .documentation("Runs a command when granted.")
                                                                         .build();
 
     protected String command;

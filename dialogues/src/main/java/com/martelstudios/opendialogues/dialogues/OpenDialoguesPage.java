@@ -14,7 +14,9 @@ public class OpenDialoguesPage {
 
     public static final BuilderCodec<OpenDialoguesPage> CODEC = BuilderCodec.builder(OpenDialoguesPage.class, OpenDialoguesPage::new)
                                                                        .append(new KeyedCodec<>("Text", Codec.STRING), (page, text) -> page.text = text, page -> page.text)
+                                                                       .documentation("Content shown on this page, empty by default.")
                                                                        .add()
+                                                                       .documentation("Defines one page in a dialogue.")
                                                                        .build();
 
     private String text = "";

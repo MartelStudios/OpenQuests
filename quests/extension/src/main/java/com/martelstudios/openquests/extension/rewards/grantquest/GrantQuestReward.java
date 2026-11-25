@@ -35,9 +35,12 @@ public class GrantQuestReward extends QuestReward {
                     .append(new KeyedCodec<>("QuestAssetIds", new ArrayCodec<>(new ContainedAssetCodec<>(OpenQuestAsset.class, OpenQuestAsset.CODEC), String[]::new)), (reward, ids) -> reward.questAssetIds = ids, reward -> reward.questAssetIds)
                     .addValidator(Validators.nonEmptyArray())
                     .addValidator(Validators.uniqueInArray())
+                    .documentation("IDs of quests to hand out, empty by default.")
                     .add()
                     .append(new KeyedCodec<>("Shared", Codec.BOOLEAN), (reward, shared) -> reward.shared = shared, reward -> reward.shared ? Boolean.TRUE : null)
+                    .documentation("Grants quests once in the ending quest's scope when true, and defaults to granting them separately to each recipient.")
                     .add()
+                    .documentation("Hands out further quests when this reward is granted.")
                     .build();
 
     protected String[] questAssetIds = new String[0];

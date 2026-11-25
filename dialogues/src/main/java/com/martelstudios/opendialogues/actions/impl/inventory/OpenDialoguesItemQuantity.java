@@ -16,10 +16,13 @@ public class OpenDialoguesItemQuantity {
     public static final BuilderCodec<OpenDialoguesItemQuantity> CODEC = BuilderCodec.builder(OpenDialoguesItemQuantity.class, OpenDialoguesItemQuantity::new)
                                                                                 .append(new KeyedCodec<>("Item", OpenDialoguesItemFilter.CODEC, true), (entry, item) -> entry.item = item, entry -> entry.item)
                                                                                 .addValidator(Validators.nonNull())
+                                                                                .documentation("Criteria for inventory items that can satisfy this requirement.")
                                                                                 .add()
                                                                                 .append(new KeyedCodec<>("Quantity", Codec.INTEGER), (entry, quantity) -> entry.quantity = quantity, entry -> entry.quantity)
                                                                                 .addValidator(Validators.min(1))
+                                                                                .documentation("Number of matching items to remove, defaulting to 1.")
                                                                                 .add()
+                                                                                .documentation("Defines which inventory items to remove and how many.")
                                                                                 .build();
 
     protected OpenDialoguesItemFilter item;

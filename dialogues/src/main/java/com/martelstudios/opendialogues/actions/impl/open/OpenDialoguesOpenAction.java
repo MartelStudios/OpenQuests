@@ -22,14 +22,17 @@ public class OpenDialoguesOpenAction extends DialogueAction {
 
     public static final BuilderCodec<OpenDialoguesOpenAction> CODEC = BuilderCodec.builder(OpenDialoguesOpenAction.class, OpenDialoguesOpenAction::new, DialogueAction.BASE_CODEC)
                                                                              .append(new KeyedCodec<>("Dialogue", OpenDialogueAsset.CONTAINED_CODEC), (action, dialogue) -> action.dialogue = dialogue, action -> action.dialogue)
+                                                                             .documentation("Dialogue asset ID or inline asset to open directly.")
                                                                              .add()
                                                                              .append(new KeyedCodec<>("Router", OpenDialogueRouterAsset.CONTAINED_CODEC), (action, router) -> action.router = router, action -> action.router)
+                                                                             .documentation("Router asset ID or inline asset to resolve for the next conversation.")
                                                                              .add()
                                                                              .validator((action, results) -> {
                                                                                  if ((action.dialogue == null) == (action.router == null)) {
                                                                                      results.fail("Exactly one of Dialogue or Router must be set");
                                                                                  }
                                                                              })
+                                                                             .documentation("Replaces the current conversation with another dialogue or the result of a router.")
                                                                              .build();
 
     @Nullable

@@ -14,7 +14,9 @@ public class PlayerConnectTrigger extends AssignmentTrigger {
 
     public static final String TYPE = "PlayerConnect";
 
-    public static final BuilderCodec<PlayerConnectTrigger> CODEC = BuilderCodec.builder(PlayerConnectTrigger.class, PlayerConnectTrigger::new, AssignmentTrigger.BASE_CODEC).build();
+    public static final BuilderCodec<PlayerConnectTrigger> CODEC = BuilderCodec.builder(PlayerConnectTrigger.class, PlayerConnectTrigger::new, AssignmentTrigger.BASE_CODEC)
+                                                                               .documentation("Offers quests when a player connects to the server.")
+                                                                               .build();
 
     @Nonnull
     @Override

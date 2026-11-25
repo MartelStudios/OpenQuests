@@ -31,13 +31,18 @@ public class OpenQuestsConfig {
 
     public static final BuilderCodec<OpenQuestsConfig> CODEC = BuilderCodec.builder(OpenQuestsConfig.class, OpenQuestsConfig::new)
                                                                            .append(new KeyedCodec<>("Storage", QuestStorageProvider.CODEC), (config, storage) -> config.storage = storage, config -> config.storage)
+                                                                           .documentation("Backend for saved quest data, defaulting to disk storage.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("SaveIntervalMinutes", Codec.INTEGER), (config, minutes) -> config.saveIntervalMinutes = minutes, config -> Integer.valueOf(config.saveIntervalMinutes))
+                                                                           .documentation("Minutes between periodic disk saves, defaulting to five.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("SyncSeconds", Codec.INTEGER), (config, seconds) -> config.syncSeconds = seconds, config -> Integer.valueOf(config.syncSeconds))
+                                                                           .documentation("Seconds between shared storage synchronization passes, defaulting to five.")
                                                                            .add()
                                                                            .append(new KeyedCodec<>("TeamInvitationHours", Codec.INTEGER), (config, hours) -> config.teamInvitationHours = hours, config -> Integer.valueOf(config.teamInvitationHours))
+                                                                           .documentation("Hours before a team invitation expires, defaulting to 24.")
                                                                            .add()
+                                                                           .documentation("Configures quest storage, persistence intervals, and team invitation lifetime.")
                                                                            .build();
 
     private QuestStorageProvider storage = new DiskQuestStorageProvider();

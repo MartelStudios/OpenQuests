@@ -20,10 +20,13 @@ public class MMOSkillTreeAbilityCastQuestAsset extends MMOSkillTreeMomentQuestAs
         BuilderCodec.builder(MMOSkillTreeAbilityCastQuestAsset.class, MMOSkillTreeAbilityCastQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("Ability", Codec.STRING), (asset, ability) -> asset.ability = ability, asset -> asset.ability)
                     .metadata(DataSets.ABILITY_OR_ALL_DROPDOWN)
+                    .documentation("ID of the ability whose casts count, defaulting to ALL.")
                     .add()
                     .append(new KeyedCodec<>("Skill", Codec.STRING), (asset, skill) -> asset.skill = skill, asset -> asset.skill)
                     .metadata(DataSets.SKILL_OR_ALL_DROPDOWN)
+                    .documentation("ID of the skill whose abilities count, defaulting to ALL.")
                     .add()
+                    .documentation("Defines a quest to cast MMO Skill Tree abilities a specified number of times.")
                     .build();
 
     @Nullable

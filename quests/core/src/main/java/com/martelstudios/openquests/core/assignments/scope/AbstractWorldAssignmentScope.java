@@ -20,7 +20,9 @@ public abstract class AbstractWorldAssignmentScope extends AssignmentScope {
      */
     public static final BuilderCodec<AbstractWorldAssignmentScope> BASE_CODEC = BuilderCodec.abstractBuilder(AbstractWorldAssignmentScope.class, AssignmentScope.BASE_CODEC)
                                                                                             .append(new KeyedCodec<>("WorldNamePattern", WorldNamePattern.CODEC), (scope, pattern) -> scope.worldNamePattern = pattern, scope -> scope.worldNamePattern)
+                                                                                            .documentation("Regular expression selecting eligible world names, with worlds supplied by the trigger when omitted.")
                                                                                             .add()
+                                                                                            .documentation("Defines world selection for assignments that share quests in worlds.")
                                                                                             .build();
 
     @Nullable

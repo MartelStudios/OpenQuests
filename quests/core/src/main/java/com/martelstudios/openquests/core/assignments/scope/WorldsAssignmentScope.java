@@ -18,7 +18,9 @@ public class WorldsAssignmentScope extends AbstractWorldAssignmentScope {
 
     public static final String TYPE = "Worlds";
 
-    public static final BuilderCodec<WorldsAssignmentScope> CODEC = BuilderCodec.builder(WorldsAssignmentScope.class, WorldsAssignmentScope::new, AbstractWorldAssignmentScope.BASE_CODEC).build();
+    public static final BuilderCodec<WorldsAssignmentScope> CODEC = BuilderCodec.builder(WorldsAssignmentScope.class, WorldsAssignmentScope::new, AbstractWorldAssignmentScope.BASE_CODEC)
+                                                                                .documentation("Shares one quest instance among players across a group of eligible worlds.")
+                                                                                .build();
 
     public WorldsAssignmentScope() {}
 

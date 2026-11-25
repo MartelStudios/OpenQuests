@@ -21,12 +21,16 @@ public class ChapterQuest {
                                                                        .append(new KeyedCodec<>("Quest", Codec.STRING), (entry, quest) -> entry.quest = quest, entry -> entry.quest)
                                                                        .addValidator(Validators.nonNull())
                                                                        .addValidator(OpenQuestAsset.VALIDATOR_CACHE.getValidator())
+                                                                       .documentation("Asset ID of the quest included in this chapter.")
                                                                        .add()
                                                                        .append(new KeyedCodec<>("Position", Vector2iUtil.CODEC), (entry, position) -> entry.position = position, entry -> entry.position)
+                                                                       .documentation("Grid column and row counted from the top left, placed automatically when omitted.")
                                                                        .add()
                                                                        .append(new KeyedCodec<>("Icon", Codec.STRING), (entry, icon) -> entry.icon = icon, entry -> entry.icon)
                                                                        .addValidator(OpenQuestAsset.ICON_VALIDATOR)
+                                                                       .documentation("Image path under Common/Icons for this entry, falling back to the quest's image when omitted.")
                                                                        .add()
+                                                                       .documentation("Places a quest in a chapter and optionally overrides its graph layout.")
                                                                        .build();
 
     private String quest;

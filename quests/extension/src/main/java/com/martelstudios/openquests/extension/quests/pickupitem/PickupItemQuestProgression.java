@@ -15,7 +15,9 @@ public class PickupItemQuestProgression extends ItemExchangeQuestProgression<Pic
 
     public static final BuilderCodec<PickupItemQuestProgression> CODEC = BuilderCodec.builder(PickupItemQuestProgression.class, PickupItemQuestProgression::new, ItemExchangeQuestProgression.BASE_CODEC)
                                                                               .append(new KeyedCodec<>("ItemToPickup", QuestItemFilter.CODEC), (quest, item) -> quest.itemToPickup = item, quest -> quest.itemToPickup)
+                                                                              .documentation("Overrides the item filter for this instance, falling back to the asset when omitted.")
                                                                               .add()
+                                                                              .documentation("Stores progress for a quest about picking up items.")
                                                                               .build();
 
     @Nullable

@@ -23,7 +23,9 @@ public class TeamAssignmentScope extends AssignmentScope {
                                                                               .append(new KeyedCodec<>("TeamType", Codec.STRING), (scope, type) -> scope.teamType = type, scope -> scope.teamType)
                                                                               .addValidator(Validators.nonNull())
                                                                               .addValidator(OpenQuestTeamType.VALIDATOR_CACHE.getValidator())
+                                                                              .documentation("Asset ID of the team type eligible for the assignment.")
                                                                               .add()
+                                                                              .documentation("Shares one quest instance among the members of each eligible team.")
                                                                               .build();
 
     protected String teamType;

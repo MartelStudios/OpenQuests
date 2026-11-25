@@ -28,14 +28,18 @@ public class OpenDialoguesOpenedCondition extends DialogueCondition {
     public static final BuilderCodec<OpenDialoguesOpenedCondition> CODEC = BuilderCodec.builder(OpenDialoguesOpenedCondition.class, OpenDialoguesOpenedCondition::new, DialogueCondition.BASE_CODEC)
                                                                         .append(new KeyedCodec<>("Dialogue", Codec.STRING, true), (condition, dialogue) -> condition.dialogue = dialogue, condition -> condition.dialogue)
                                                                         .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
+                                                                        .documentation("ID of the conversation to check in the player's history.")
                                                                         .add()
                                                                         .append(new KeyedCodec<>("Min", Codec.INTEGER), (condition, min) -> condition.min = min, condition -> condition.min)
+                                                                        .documentation("Minimum number of openings required, defaulting to 1.")
                                                                         .add()
                                                                         .append(new KeyedCodec<>("Max", Codec.INTEGER), (condition, max) -> condition.max = max, condition -> condition.max)
+                                                                        .documentation("Maximum number of openings allowed, with no upper limit by default.")
                                                                         .add()
                                                                         .append(new KeyedCodec<>("With", new EnumCodec<>(SourceScope.class)), (condition, with) -> condition.with = with, condition -> condition.with)
                                                                         .documentation("Whose dialogues count: any NPC, the source's character, or the source NPC alone.")
                                                                         .add()
+                                                                        .documentation("Tests how often the player opened a dialogue.")
                                                                         .build();
 
     protected String dialogue;

@@ -12,7 +12,9 @@ public class UseBlockQuestProgression extends QuantityQuestProgression<UseBlockQ
 
     public static final BuilderCodec<UseBlockQuestProgression> CODEC = BuilderCodec.builder(UseBlockQuestProgression.class, UseBlockQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                    .append(new KeyedCodec<>("BlockToUse", QuestItemFilter.CODEC), (quest, block) -> quest.blockToUse = block, quest -> quest.blockToUse)
+                                                                                   .documentation("Overrides the block filter for this instance, falling back to the asset when omitted.")
                                                                                    .add()
+                                                                                   .documentation("Stores progress for a quest about interacting with blocks.")
                                                                                    .build();
 
     /**

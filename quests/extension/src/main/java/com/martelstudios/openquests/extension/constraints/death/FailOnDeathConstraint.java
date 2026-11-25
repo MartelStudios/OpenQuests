@@ -10,6 +10,7 @@ import com.martelstudios.openquests.core.constraints.QuestConstraint;
 public class FailOnDeathConstraint extends QuestConstraint {
 
     public static final BuilderCodec<FailOnDeathConstraint> CODEC = BuilderCodec.builder(FailOnDeathConstraint.class, FailOnDeathConstraint::new, QuestConstraint.BASE_CODEC)
+                                                                                .documentation("Fails the quest when one of its holders dies.")
                                                                                 .build();
 
     protected FailOnDeathConstraint() {}

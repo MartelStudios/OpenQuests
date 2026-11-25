@@ -22,9 +22,12 @@ public class DisplayRules {
 
     public static final BuilderCodec<DisplayRules> CODEC = BuilderCodec.builder(DisplayRules.class, DisplayRules::new)
                                                                        .append(new KeyedCodec<>("Default", Codec.STRING), (rules, display) -> rules.defaultDisplay = display, rules -> rules.defaultDisplay)
+                                                                       .documentation("Registered display used when no earlier choice applies, initially Default.")
                                                                        .add()
                                                                        .append(new KeyedCodec<>("Rules", new ArrayCodec<>(DisplayRule.CODEC, DisplayRule[]::new)), (rules, list) -> rules.rules = list, rules -> rules.rules)
+                                                                       .documentation("Ordered display overrides, empty by default.")
                                                                        .add()
+                                                                       .documentation("Configures the server's fallback display and per-dialogue overrides.")
                                                                        .build();
 
     /**

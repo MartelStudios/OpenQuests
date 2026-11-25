@@ -35,11 +35,15 @@ public class OpenQuestCategory implements JsonAssetWithMap<String, DefaultAssetM
     public static final AssetBuilderCodec<String, OpenQuestCategory> CODEC = AssetBuilderCodec.builder(OpenQuestCategory.class, OpenQuestCategory::new, Codec.STRING, (category, id) -> category.id = id, category -> category.id, (category, data) -> category.data = data, category -> category.data)
                                                                                               .append(new KeyedCodec<>("NameKey", Codec.STRING), (category, key) -> category.nameKey = key, category -> category.nameKey)
                                                                                               .addValidator(Validators.nonNull())
+                                                                                              .documentation("Translation key for the journal label.")
                                                                                               .add()
                                                                                               .append(new KeyedCodec<>("BackgroundColor", ProtocolCodecs.COLOR), (category, color) -> category.backgroundColor = color, category -> category.backgroundColor)
+                                                                                              .documentation("Label background tint, defaulting to the journal's own color.")
                                                                                               .add()
                                                                                               .append(new KeyedCodec<>("TextColor", ProtocolCodecs.COLOR), (category, color) -> category.textColor = color, category -> category.textColor)
+                                                                                              .documentation("Label text tint, defaulting to the journal's own color.")
                                                                                               .add()
+                                                                                              .documentation("Defines a label and its colors for quests in the journal.")
                                                                                               .build();
 
     protected String id;

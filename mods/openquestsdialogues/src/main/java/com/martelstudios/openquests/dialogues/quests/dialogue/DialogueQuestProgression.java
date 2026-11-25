@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 public class DialogueQuestProgression extends HeldQuantityQuestProgression<DialogueQuestProgression> {
 
     public static final BuilderCodec<DialogueQuestProgression> CODEC = BuilderCodec.builder(DialogueQuestProgression.class, DialogueQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
+                                                                                   .documentation("Stores progress toward opening dialogues or selecting responses.")
                                                                                    .build();
 
     /** Translation key of the name shown for no one known. */

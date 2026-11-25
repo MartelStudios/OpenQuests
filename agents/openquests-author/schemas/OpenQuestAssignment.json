@@ -1,0 +1,251 @@
+{
+  "type": "object",
+  "$id": "OpenQuestAssignment.json",
+  "title": "OpenQuestAssignment",
+  "description": "Defines when, to whom, and how often quests are handed out.",
+  "markdownDescription": "Defines when, to whom, and how often quests are handed out.",
+  "hytale": {
+    "type": "object",
+    "path": "OpenQuests/Assignments/",
+    "extension": ".json",
+    "mergesProperties": true
+  },
+  "properties": {
+    "Parent": {
+      "type": "string",
+      "description": "When set this asset will inherit properties from the named asset.\n\nWhen inheriting from another OpenQuestAssignment most properties will simply be copied from the parent asset to this asset. In the case where both child and parent provide a field the child field will simply replace the value provided by the parent, in the case of nested structures this will apply to the fields within the structure. In some cases the field may decide to act differently, for example: by merging the parent and child fields together.",
+      "markdownDescription": "When set this asset will inherit properties from the named asset.\n\nWhen inheriting from another **OpenQuestAssignment** most properties will simply be copied from the parent asset to this asset. In the case where both child and parent provide a field the child field will simply replace the value provided by the parent, in the case of nested structures this will apply to the fields within the structure. In some cases the field may decide to act differently, for example: by merging the parent and child fields together.",
+      "hytaleParent": {
+        "type": "OpenQuestAssignment"
+      },
+      "hytale": {
+        "type": "string"
+      }
+    },
+    "$Title": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$Comment": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$Author": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$TODO": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$Position": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$FloatingFunctionNodes": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$Groups": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$WorkspaceID": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$NodeId": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$NodeEditorMetadata": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "Tags": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "title": "Map",
+      "description": "Tags are a general way to describe an asset that can be interpreted by other systems in a way they see fit.\n\nFor example you could tag something with a Material tag with the values Solid and Stone, And another single tag Ore.\n\nTags will be expanded into a single list of tags automatically. Using the above example with Material and Ore the end result would be the following list of tags: Ore, Material, Solid, Stone, Material=Solid and Material=Stone.",
+      "markdownDescription": "Tags are a general way to describe an asset that can be interpreted by other systems in a way they see fit.\n\nFor example you could tag something with a **Material** tag with the values **Solid** and **Stone**, And another single tag **Ore**.\n\nTags will be expanded into a single list of tags automatically. Using the above example with **Material** and **Ore** the end result would be the following list of tags: **Ore**, **Material**, **Solid**, **Stone**, **Material=Solid** and **Material=Stone**.",
+      "hytale": {
+        "type": "object",
+        "inheritsProperty": true
+      },
+      "additionalProperties": {
+        "type": "array",
+        "hytale": {
+          "type": "array"
+        },
+        "items": {
+          "type": "string",
+          "hytale": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Trigger": {
+      "title": "Type Selector",
+      "description": "Event or schedule that creates an occasion to offer the quests.",
+      "markdownDescription": "Event or schedule that creates an occasion to offer the quests.",
+      "anyOf": [
+        {
+          "$ref": "common.json#/definitions/PlayerConnectTrigger"
+        },
+        {
+          "$ref": "common.json#/definitions/PlayerEnterWorldTrigger"
+        },
+        {
+          "$ref": "common.json#/definitions/ScheduleTrigger"
+        }
+      ],
+      "hytaleSchemaTypeField": {
+        "property": "Type",
+        "values": [
+          "PlayerConnect",
+          "PlayerEnterWorld",
+          "Schedule"
+        ]
+      },
+      "hytale": {
+        "mergesProperties": true
+      }
+    },
+    "Scope": {
+      "description": "Recipients who receive or share each quest, defaulting to Player.",
+      "markdownDescription": "Recipients who receive or share each quest, defaulting to Player.",
+      "anyOf": [
+        {
+          "title": "Type Selector",
+          "anyOf": [
+            {
+              "$ref": "common.json#/definitions/PlayerAssignmentScope"
+            },
+            {
+              "$ref": "common.json#/definitions/TeamAssignmentScope"
+            },
+            {
+              "$ref": "common.json#/definitions/UniverseAssignmentScope"
+            },
+            {
+              "$ref": "common.json#/definitions/WorldAssignmentScope"
+            },
+            {
+              "$ref": "common.json#/definitions/WorldsAssignmentScope"
+            }
+          ],
+          "hytaleSchemaTypeField": {
+            "property": "Type",
+            "values": [
+              "Player",
+              "Team",
+              "Universe",
+              "World",
+              "Worlds"
+            ]
+          },
+          "hytale": {
+            "mergesProperties": true
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Repeat": {
+      "description": "Rule for handing out a quest again, defaulting to Once.",
+      "markdownDescription": "Rule for handing out a quest again, defaulting to Once.",
+      "anyOf": [
+        {
+          "title": "Type Selector",
+          "anyOf": [
+            {
+              "$ref": "common.json#/definitions/AfterEndRepeat"
+            },
+            {
+              "$ref": "common.json#/definitions/OnceRepeat"
+            },
+            {
+              "$ref": "common.json#/definitions/ReplaceRepeat"
+            }
+          ],
+          "hytaleSchemaTypeField": {
+            "property": "Type",
+            "values": [
+              "AfterEnd",
+              "Once",
+              "Replace"
+            ]
+          },
+          "hytale": {
+            "mergesProperties": true
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "QuestAssetIds": {
+      "type": "array",
+      "description": "Quest asset IDs offered by this assignment, empty by default.",
+      "markdownDescription": "Quest asset IDs offered by this assignment, empty by default.",
+      "hytale": {
+        "type": "array"
+      },
+      "items": {
+        "type": "string",
+        "hytaleAssetRef": "OpenQuestAsset",
+        "hytale": {
+          "type": "string"
+        }
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false
+}

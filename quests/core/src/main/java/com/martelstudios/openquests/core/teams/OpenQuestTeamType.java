@@ -26,9 +26,12 @@ public class OpenQuestTeamType implements JsonAssetWithMap<String, DefaultAssetM
     public static final AssetBuilderCodec<String, OpenQuestTeamType> CODEC = AssetBuilderCodec.builder(OpenQuestTeamType.class, OpenQuestTeamType::new, Codec.STRING, (type, id) -> type.id = id, type -> type.id, (type, data) -> type.data = data, type -> type.data)
                                                                                               .append(new KeyedCodec<>("NameKey", Codec.STRING), (type, key) -> type.nameKey = key, type -> type.nameKey)
                                                                                               .addValidator(Validators.nonNull())
+                                                                                              .documentation("Translation key for the team type label.")
                                                                                               .add()
                                                                                               .append(new KeyedCodec<>("PersonalTeam", Codec.BOOLEAN), (type, personal) -> type.personalTeam = personal, type -> type.personalTeam)
+                                                                                              .documentation("Ensures every player has a team of this type when true, and defaults to false.")
                                                                                               .add()
+                                                                                              .documentation("Defines a team type that can share assigned quests.")
                                                                                               .build();
 
     protected String id;

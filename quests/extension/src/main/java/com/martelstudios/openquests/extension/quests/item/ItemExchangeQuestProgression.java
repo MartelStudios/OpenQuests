@@ -27,9 +27,12 @@ public abstract class ItemExchangeQuestProgression<Q extends ItemExchangeQuestPr
 
     public static final BuilderCodec<ItemExchangeQuestProgression> BASE_CODEC = BuilderCodec.abstractBuilder(ItemExchangeQuestProgression.class, QuantityQuestProgression.BASE_CODEC)
                                                                                             .append(new KeyedCodec<>("Thrown", COUNTS), (quest, counts) -> quest.counters.thrown.putAll(counts), quest -> savedCounts(quest.counters.thrown))
+                                                                                            .documentation("Quantities thrown by the player by item ID, initially empty.")
                                                                                             .add()
                                                                                             .append(new KeyedCodec<>("Recovered", COUNTS), (quest, counts) -> quest.counters.recovered.putAll(counts), quest -> savedCounts(quest.counters.recovered))
+                                                                                            .documentation("Quantities recovered after throwing by item ID, initially empty.")
                                                                                             .add()
+                                                                                            .documentation("Stores anti-abuse bookkeeping for item drop and pickup quests.")
                                                                                             .build();
 
     ExchangeCounters counters = new ExchangeCounters();

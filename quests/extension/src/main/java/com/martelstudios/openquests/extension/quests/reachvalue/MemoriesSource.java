@@ -25,7 +25,9 @@ public class MemoriesSource extends ValueSource {
         BuilderCodec.builder(MemoriesSource.class, MemoriesSource::new)
                     .append(new KeyedCodec<>("Measure", new EnumCodec<>(Measure.class), true), (source, measure) -> source.measure = measure, source -> source.measure)
                     .addValidator(Validators.nonNull())
+                    .documentation("Selects which memory value to read, such as carried or restored memories.")
                     .add()
+                    .documentation("Reads a world or player memory value for a quest.")
                     .build();
 
     private Measure measure;

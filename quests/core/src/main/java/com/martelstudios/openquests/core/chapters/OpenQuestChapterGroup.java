@@ -29,12 +29,16 @@ public class OpenQuestChapterGroup implements JsonAssetWithMap<String, DefaultAs
     public static final AssetBuilderCodec<String, OpenQuestChapterGroup> CODEC = AssetBuilderCodec.builder(OpenQuestChapterGroup.class, OpenQuestChapterGroup::new, Codec.STRING, (group, id) -> group.id = id, group -> group.id, (group, data) -> group.data = data, group -> group.data)
                                                                                                   .append(new KeyedCodec<>("NameKey", Codec.STRING), (group, key) -> group.nameKey = key, group -> group.nameKey)
                                                                                                   .addValidator(Validators.nonNull())
+                                                                                                  .documentation("Translation key for the chapter group label.")
                                                                                                   .add()
                                                                                                   .append(new KeyedCodec<>("Order", Codec.INTEGER), (group, order) -> group.order = order, group -> group.order)
+                                                                                                  .documentation("Sort priority for the group, defaulting to zero with ties sorted by asset ID.")
                                                                                                   .add()
                                                                                                   .append(new KeyedCodec<>("Icon", Codec.STRING), (group, icon) -> group.icon = icon, group -> group.icon)
                                                                                                   .addValidator(OpenQuestAsset.ICON_VALIDATOR)
+                                                                                                  .documentation("Optional image path under Common/Icons for the group.")
                                                                                                   .add()
+                                                                                                  .documentation("Defines a group of chapters in the quest journal.")
                                                                                                   .build();
 
     protected String id;

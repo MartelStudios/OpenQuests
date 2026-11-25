@@ -11,6 +11,7 @@ public class RunQuestAsset extends TravelQuestAsset {
 
     public static final BuilderCodec<RunQuestAsset> CODEC =
         BuilderCodec.builder(RunQuestAsset.class, RunQuestAsset::new, TravelQuestAsset.BASE_CODEC)
+                    .documentation("Counts movement at the normal running pace.")
                     .build();
 
     private RunQuestAsset() {}

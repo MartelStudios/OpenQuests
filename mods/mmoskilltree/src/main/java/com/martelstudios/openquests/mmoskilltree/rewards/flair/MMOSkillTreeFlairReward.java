@@ -18,7 +18,9 @@ public class MMOSkillTreeFlairReward extends KindReward {
     public static final BuilderCodec<MMOSkillTreeFlairReward> CODEC = BuilderCodec.builder(MMOSkillTreeFlairReward.class, MMOSkillTreeFlairReward::new, KindReward.BASE_CODEC)
                                                                       .append(new KeyedCodec<>("Flair", Codec.STRING, true), (reward, flair) -> reward.flair = flair, reward -> reward.flair)
                                                                       .addValidator(Validators.nonNull())
+                                                                      .documentation("ID of the configured CommonLib flair to unlock.")
                                                                       .add()
+                                                                      .documentation("Unlocks a flair for the player.")
                                                                       .build();
 
     protected String flair;

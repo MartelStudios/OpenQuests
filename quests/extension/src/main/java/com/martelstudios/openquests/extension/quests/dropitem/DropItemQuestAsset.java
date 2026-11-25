@@ -13,7 +13,9 @@ public class DropItemQuestAsset extends ItemExchangeQuestAsset {
     public static final BuilderCodec<DropItemQuestAsset> CODEC =
         BuilderCodec.builder(DropItemQuestAsset.class, DropItemQuestAsset::new, ItemExchangeQuestAsset.BASE_CODEC)
             .append(new KeyedCodec<>("ItemToDrop", QuestItemFilter.CODEC), (asset, item) -> asset.itemToDrop = item, asset -> asset.itemToDrop)
+            .documentation("Filter for items that count when thrown from the inventory.")
             .add()
+            .documentation("Defines a quest for dropping items from the inventory.")
             .build();
 
     protected QuestItemFilter itemToDrop;

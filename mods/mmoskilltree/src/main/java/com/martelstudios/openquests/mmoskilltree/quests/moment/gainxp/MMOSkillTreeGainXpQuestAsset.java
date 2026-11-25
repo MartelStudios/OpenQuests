@@ -21,7 +21,9 @@ public class MMOSkillTreeGainXpQuestAsset extends MMOSkillTreeMomentQuestAsset i
         BuilderCodec.builder(MMOSkillTreeGainXpQuestAsset.class, MMOSkillTreeGainXpQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("Skill", Codec.STRING), (asset, skill) -> asset.skill = skill, asset -> asset.skill)
                     .metadata(DataSets.SKILL_OR_ALL_DROPDOWN)
+                    .documentation("ID of the skill whose earned XP counts, defaulting to ALL.")
                     .add()
+                    .documentation("Defines a quest to gain a specified amount of MMO Skill Tree XP.")
                     .build();
 
     @Nullable

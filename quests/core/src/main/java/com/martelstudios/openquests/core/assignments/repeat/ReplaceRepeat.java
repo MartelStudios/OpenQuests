@@ -12,7 +12,9 @@ public class ReplaceRepeat extends AssignmentRepeat {
 
     public static final String TYPE = "Replace";
 
-    public static final BuilderCodec<ReplaceRepeat> CODEC = BuilderCodec.builder(ReplaceRepeat.class, ReplaceRepeat::new, AssignmentRepeat.BASE_CODEC).build();
+    public static final BuilderCodec<ReplaceRepeat> CODEC = BuilderCodec.builder(ReplaceRepeat.class, ReplaceRepeat::new, AssignmentRepeat.BASE_CODEC)
+                                                                        .documentation("Hands out a new quest on each new occasion and fails the previous chain if it is still running.")
+                                                                        .build();
 
     @Nonnull
     @Override

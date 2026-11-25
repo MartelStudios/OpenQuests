@@ -26,10 +26,13 @@ public class MMOSkillTreeLevelReward extends QuestReward implements SkillReferen
                                                                       .append(new KeyedCodec<>("Skill", Codec.STRING, true), (reward, skill) -> reward.skill = skill, reward -> reward.skill)
                                                                       .addValidator(Validators.nonNull())
                                                                       .metadata(DataSets.SKILL_DROPDOWN)
+                                                                      .documentation("ID of the MMO Skill Tree skill to advance.")
                                                                       .add()
                                                                       .append(new KeyedCodec<>("Levels", Codec.INTEGER), (reward, levels) -> reward.levels = levels, reward -> Integer.valueOf(reward.levels))
                                                                       .addValidator(Validators.greaterThan(0))
+                                                                      .documentation("Number of whole levels to advance from the player's current level, defaulting to 1.")
                                                                       .add()
+                                                                      .documentation("Awards the XP needed to advance an MMO Skill Tree skill by a number of levels.")
                                                                       .build();
 
     /**

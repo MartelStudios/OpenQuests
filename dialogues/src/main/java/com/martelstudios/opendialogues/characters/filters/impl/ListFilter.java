@@ -22,7 +22,9 @@ abstract class ListFilter extends CharacterFilter {
     static <T extends ListFilter> BuilderCodec<T> codec(@Nonnull Class<T> filterClass, @Nonnull Supplier<T> constructor, @Nonnull String key) {
         return BuilderCodec.builder(filterClass, constructor, CharacterFilter.BASE_CODEC)
                            .append(new KeyedCodec<>(key, new ArrayCodec<>(Codec.STRING, String[]::new)), (filter, values) -> filter.values = values, filter -> filter.values)
+                           .documentation("Accepted NPC roles, groups, zones, or biomes depending on the filter type, with an empty list by default.")
                            .add()
+                           .documentation("Matches an NPC against a configured list of accepted values.")
                            .build();
     }
 

@@ -13,7 +13,9 @@ public abstract class BlockActionQuestAsset extends QuantityQuestAsset {
 
     public static final BuilderCodec<BlockActionQuestAsset> BASE_CODEC = BuilderCodec.abstractBuilder(BlockActionQuestAsset.class, QuantityQuestAsset.BASE_CODEC)
                                                                                      .append(new KeyedCodec<>("AntiAbuse", Codec.BOOLEAN), (asset, antiAbuse) -> asset.antiAbuse = antiAbuse, asset -> asset.antiAbuse)
+                                                                                     .documentation("Prevents placed blocks from counting when broken and recovered player placements from counting when placed again, false by default.")
                                                                                      .add()
+                                                                                     .documentation("Defines shared settings for quests that count block placement or breaking.")
                                                                                      .build();
 
     protected boolean antiAbuse;

@@ -18,7 +18,9 @@ public abstract class ExpiringConstraint extends QuestConstraint {
 
     public static final BuilderCodec<ExpiringConstraint> BASE_CODEC = BuilderCodec.abstractBuilder(ExpiringConstraint.class, QuestConstraint.BASE_CODEC)
                                                                                   .append(new KeyedCodec<>("OnExpire", new EnumCodec<>(QuestState.class)), (constraint, state) -> constraint.onExpire = state, constraint -> constraint.onExpire)
+                                                                                  .documentation("Outcome applied when the quest runs out of time, defaulting to Failed.")
                                                                                   .add()
+                                                                                  .documentation("Defines the outcome shared by rules that end a quest at a deadline.")
                                                                                   .build();
 
     @Nonnull

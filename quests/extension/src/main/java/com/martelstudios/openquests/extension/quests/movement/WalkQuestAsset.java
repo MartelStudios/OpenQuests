@@ -11,6 +11,7 @@ public class WalkQuestAsset extends TravelQuestAsset {
 
     public static final BuilderCodec<WalkQuestAsset> CODEC =
         BuilderCodec.builder(WalkQuestAsset.class, WalkQuestAsset::new, TravelQuestAsset.BASE_CODEC)
+                    .documentation("Counts movement at the walking pace.")
                     .build();
 
     private WalkQuestAsset() {}

@@ -19,6 +19,7 @@ public class WaitQuestProgression extends PlayerTickQuestProgression<WaitQuestPr
 
     public static final BuilderCodec<WaitQuestProgression> CODEC =
         BuilderCodec.builder(WaitQuestProgression.class, WaitQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
+                    .documentation("Stores progress toward a waiting duration.")
                     .build();
 
     /**

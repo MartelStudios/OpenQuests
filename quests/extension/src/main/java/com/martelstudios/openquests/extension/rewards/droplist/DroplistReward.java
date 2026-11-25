@@ -39,14 +39,19 @@ public class DroplistReward extends QuestReward {
                                                                          .append(new KeyedCodec<>("Droplist", Codec.STRING, true), (reward, droplist) -> reward.droplist = droplist, reward -> reward.droplist)
                                                                          .addValidator(Validators.nonNull())
                                                                          .addValidatorLate(() -> ItemDropList.VALIDATOR_CACHE.getValidator().late())
+                                                                         .documentation("Asset ID of the drop list to roll.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Rolls", Codec.INTEGER), (reward, rolls) -> reward.rolls = rolls, reward -> Integer.valueOf(reward.rolls))
                                                                          .addValidator(Validators.greaterThan(0))
+                                                                         .documentation("Number of independent draws from the list, defaulting to one.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("DropOnGround", Codec.BOOLEAN), (reward, onGround) -> reward.dropOnGround = onGround, reward -> Boolean.valueOf(reward.dropOnGround))
+                                                                         .documentation("Spawns loot on the ground when true, and defaults to giving it through the inventory.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Position", Vector3dUtil.CODEC), (reward, position) -> reward.position = position, reward -> reward.position)
+                                                                         .documentation("Position where ground loot spawns in the player's world, defaulting to the player's feet.")
                                                                          .add()
+                                                                         .documentation("Rolls a drop list and gives the resulting loot.")
                                                                          .build();
 
     protected String droplist;

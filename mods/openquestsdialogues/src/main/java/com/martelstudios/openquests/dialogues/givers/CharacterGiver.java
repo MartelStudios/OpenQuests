@@ -26,7 +26,9 @@ public final class CharacterGiver extends QuestGiver {
 
     public static final BuilderCodec<CharacterGiver> CODEC = BuilderCodec.builder(CharacterGiver.class, CharacterGiver::new, QuestGiver.BASE_CODEC)
                                                                           .append(new KeyedCodec<>("Character", Codec.STRING), (giver, character) -> giver.character = character, giver -> giver.character)
+                                                                          .documentation("Character ID the giver NPC carried when it handed the quest out.")
                                                                           .add()
+                                                                          .documentation("Records an NPC that handed a quest out in dialogue, with the character it carried then.")
                                                                           .build();
 
     private static boolean registered;

@@ -1580,13 +1580,18 @@ public class QuestPage extends InteractiveCustomUIPage<QuestPage.QuestPageEventD
 
         public static final BuilderCodec<QuestPageEventData> CODEC = BuilderCodec.builder(QuestPageEventData.class, QuestPageEventData::new)
                                                                                  .append(new KeyedCodec<>(KEY_ACTION, Codec.STRING), (data, value) -> data.action = value, data -> data.action)
+                                                                                 .documentation("Action requested by the journal control.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>(KEY_TARGET, Codec.STRING), (data, value) -> data.target = value, data -> data.target)
+                                                                                 .documentation("Identifier of the item the action applies to, when applicable.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>(KEY_MARK, Codec.STRING), (data, value) -> data.mark = value, data -> data.mark)
+                                                                                 .documentation("Additional marker supplied by the journal control, when applicable.")
                                                                                  .add()
                                                                                  .append(new KeyedCodec<>(KEY_VALUE, Codec.STRING), (data, value) -> data.value = value, data -> data.value)
+                                                                                 .documentation("Value supplied by the journal control, when applicable.")
                                                                                  .add()
+                                                                                 .documentation("Carries an interaction from the quest journal.")
                                                                                  .build();
 
         private String action;

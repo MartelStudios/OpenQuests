@@ -13,7 +13,9 @@ public class CraftQuestAsset extends QuantityQuestAsset {
     public static final BuilderCodec<CraftQuestAsset> CODEC =
         BuilderCodec.builder(CraftQuestAsset.class, CraftQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("ItemToCraft", QuestItemFilter.CODEC), (asset, item) -> asset.itemToCraft = item, asset -> asset.itemToCraft)
+                    .documentation("Filter for crafting outputs that count, regardless of the recipe used.")
                     .add()
+                    .documentation("Defines a quest for crafting items.")
                     .build();
 
     protected QuestItemFilter itemToCraft;

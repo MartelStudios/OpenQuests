@@ -13,7 +13,9 @@ public abstract class QuantityQuestAsset extends OpenQuestAsset {
 
     public static final BuilderCodec<QuantityQuestAsset> BASE_CODEC = BuilderCodec.abstractBuilder(QuantityQuestAsset.class, OpenQuestAsset.BASE_CODEC)
                                                                                   .append(new KeyedCodec<>("TargetQuantity", Codec.INTEGER), (asset, quantity) -> asset.targetQuantity = quantity, asset -> Integer.valueOf(asset.targetQuantity))
+                                                                                  .documentation("Amount needed to complete the quest, defaulting to zero or to one for a value-reading quest.")
                                                                                   .add()
+                                                                                  .documentation("Defines the target for quests that measure progress numerically.")
                                                                                   .build();
 
     protected int targetQuantity;

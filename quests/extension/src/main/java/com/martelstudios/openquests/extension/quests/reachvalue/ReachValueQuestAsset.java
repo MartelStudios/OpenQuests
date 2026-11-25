@@ -18,9 +18,12 @@ public class ReachValueQuestAsset extends HeldQuantityQuestAsset {
         BuilderCodec.builder(ReachValueQuestAsset.class, ReachValueQuestAsset::new, QuantityQuestAsset.BASE_CODEC)
                     .append(new KeyedCodec<>("Source", ValueSource.CODEC, true), (asset, source) -> asset.source = source, asset -> asset.source)
                     .addValidator(Validators.nonNull())
+                    .documentation("Game value to read, such as a flag level or memory count.")
                     .add()
                     .append(new KeyedCodec<>("Relative", Codec.BOOLEAN), (asset, relative) -> asset.relative = relative, asset -> asset.relative)
+                    .documentation("Measures gains since the quest started when true, and defaults to using the current absolute value.")
                     .add()
+                    .documentation("Completes when a sampled game value reaches the quest target.")
                     .build();
 
     private ValueSource source;

@@ -19,7 +19,9 @@ public class ReachValueQuestProgression extends HeldQuantityQuestProgression<Rea
     public static final BuilderCodec<ReachValueQuestProgression> CODEC =
         BuilderCodec.builder(ReachValueQuestProgression.class, ReachValueQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                     .append(new KeyedCodec<>("Baseline", Codec.INTEGER), (quest, baseline) -> quest.baseline = baseline, quest -> quest.baseline)
+                    .documentation("Starting value used to measure gains on a relative quest, unset until sampled.")
                     .add()
+                    .documentation("Stores progress toward a target game value.")
                     .build();
 
     /**

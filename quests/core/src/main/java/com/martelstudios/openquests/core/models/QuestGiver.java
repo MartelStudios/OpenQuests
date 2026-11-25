@@ -43,11 +43,15 @@ public abstract class QuestGiver {
      */
     public static final BuilderCodec<QuestGiver> BASE_CODEC = BuilderCodec.abstractBuilder(QuestGiver.class)
                                                                           .append(new KeyedCodec<>("Npc", Codec.UUID_STRING), (giver, npc) -> giver.npc = npc, giver -> giver.npc)
+                                                                          .documentation("UUID of the NPC that handed the quest out.")
                                                                           .add()
                                                                           .append(new KeyedCodec<>("Name", Codec.STRING), (giver, name) -> giver.nameKey = name, giver -> giver.nameKey)
+                                                                          .documentation("Translation key of the giver's displayed name, unset for a nameless giver.")
                                                                           .add()
                                                                           .append(new KeyedCodec<>("Since", Codec.LONG), (giver, millis) -> giver.since = Instant.ofEpochMilli(millis), giver -> giver.since == null ? null : Long.valueOf(giver.since.toEpochMilli()))
+                                                                          .documentation("Epoch milliseconds when the NPC was last known in the role it handed the quest out in, unset when unknown.")
                                                                           .add()
+                                                                          .documentation("Identifies who handed a quest out in the world.")
                                                                           .build();
 
     /**

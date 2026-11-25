@@ -23,6 +23,7 @@ public class OpenDialoguesUnobstructedFilter extends CharacterFilter {
     public static final String TYPE = "Unobstructed";
 
     public static final BuilderCodec<OpenDialoguesUnobstructedFilter> CODEC = BuilderCodec.builder(OpenDialoguesUnobstructedFilter.class, OpenDialoguesUnobstructedFilter::new, CharacterFilter.BASE_CODEC)
+                                                                                         .documentation("Matches NPCs whose upper hitbox does not overlap any block hitbox at the time of the draw.")
                                                                                          .build();
 
     protected OpenDialoguesUnobstructedFilter() {}

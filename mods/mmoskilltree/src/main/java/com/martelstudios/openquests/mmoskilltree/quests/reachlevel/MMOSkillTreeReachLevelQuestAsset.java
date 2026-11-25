@@ -20,7 +20,9 @@ public class MMOSkillTreeReachLevelQuestAsset extends HeldQuantityQuestAsset imp
                     .append(new KeyedCodec<>("Skill", Codec.STRING, true), (asset, skill) -> asset.skill = skill, asset -> asset.skill)
                     .addValidator(Validators.nonNull())
                     .metadata(DataSets.SKILL_DROPDOWN)
+                    .documentation("ID of the MMO Skill Tree skill that must reach the required level.")
                     .add()
+                    .documentation("Defines a quest to reach a specified level in an MMO Skill Tree skill.")
                     .build();
 
     protected String skill;

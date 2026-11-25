@@ -58,3 +58,55 @@ val linkAdventureQuests by tasks.registering(Exec::class) {
 tasks.matching { it.name == "runAllMods" }.configureEach {
     dependsOn(linkAdventureQuests)
 }
+
+// The server needs the game's Assets.zip, which CI does not have: run this locally after a codec change and
+// commit the result. Only our schemas are kept, with the shared definitions they reference.
+val assetSchemaDir = layout.projectDirectory.dir("agents/openquests-author/schemas")
+val generateAssetSchemas by tasks.registering(JavaExec::class) {
+    group = "hytale"
+    description = "Writes the JSON schemas of the OpenQuests and OpenDialogues assets."
+    // runAllMods replaces its args on exec, so this borrows its setup instead of reusing the task
+    val run = tasks.named<com.azuredoom.gradle.hytale.RunAllModsTask>("runAllMods").get()
+    dependsOn(run.dependsOn)
+    classpath = run.classpath
+    mainClass = run.mainClass
+    jvmArgs = run.jvmArgs
+    workingDir = run.runDirectory.get().asFile
+    val raw = layout.buildDirectory.dir("asset-schemas").get().asFile
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--assets=" + run.fallbackAssetsZip.get().asFile.absolutePath, "--bare", "--disable-sentry", "--generate-asset-schema", raw.absolutePath)
+    })
+    doFirst { raw.deleteRecursively() }
+    doLast {
+        val slurper = groovy.json.JsonSlurper()
+        val source = raw.resolve("Schema")
+        @Suppress("UNCHECKED_CAST")
+        val definitions = (slurper.parse(source.resolve("common.json")) as Map<String, Any?>)["definitions"] as Map<String, Any?>
+        val kept = sortedMapOf<String, Any?>()
+        val files = source.listFiles { file -> file.name.startsWith("Open") }!!.map { it.name }.toMutableSet()
+        val pending = ArrayDeque(files)
+        fun walk(node: Any?) {
+            when (node) {
+                is Map<*, *> -> node.forEach { (key, value) ->
+                    if (key == "\$ref" && value is String) {
+                        val file = value.substringBefore("#")
+                        val name = value.substringAfter("#/definitions/", "")
+                        if (name.isNotEmpty()) {
+                            if (kept.put(name, definitions[name]) == null) walk(definitions[name])
+                        } else if (file.isNotEmpty() && files.add(file)) pending.add(file)
+                    } else walk(value)
+                }
+                is List<*> -> node.forEach(::walk)
+            }
+        }
+        val target = assetSchemaDir.asFile
+        target.deleteRecursively()
+        target.mkdirs()
+        while (pending.isNotEmpty()) {
+            val file = source.resolve(pending.removeFirst())
+            walk(slurper.parse(file))
+            file.copyTo(target.resolve(file.name))
+        }
+        target.resolve("common.json").writeText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(mapOf("definitions" to kept))) + "\n")
+    }
+}

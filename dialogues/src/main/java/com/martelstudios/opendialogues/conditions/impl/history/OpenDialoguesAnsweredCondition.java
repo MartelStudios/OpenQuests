@@ -28,16 +28,21 @@ public class OpenDialoguesAnsweredCondition extends DialogueCondition {
     public static final BuilderCodec<OpenDialoguesAnsweredCondition> CODEC = BuilderCodec.builder(OpenDialoguesAnsweredCondition.class, OpenDialoguesAnsweredCondition::new, DialogueCondition.BASE_CODEC)
                                                                             .append(new KeyedCodec<>("Dialogue", Codec.STRING, true), (condition, dialogue) -> condition.dialogue = dialogue, condition -> condition.dialogue)
                                                                             .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
+                                                                            .documentation("ID of the conversation to check in the player's history.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Answer", Codec.STRING, true), (condition, answer) -> condition.answer = answer, condition -> condition.answer)
+                                                                            .documentation("Identifier of the choice, using its one-based position if it has no explicit identifier.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Min", Codec.INTEGER), (condition, min) -> condition.min = min, condition -> condition.min)
+                                                                            .documentation("Minimum number of selections required, defaulting to 1.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("Max", Codec.INTEGER), (condition, max) -> condition.max = max, condition -> condition.max)
+                                                                            .documentation("Maximum number of selections allowed, with no upper limit by default.")
                                                                             .add()
                                                                             .append(new KeyedCodec<>("With", new EnumCodec<>(SourceScope.class)), (condition, with) -> condition.with = with, condition -> condition.with)
                                                                             .documentation("Whose dialogues count: any NPC, the source's character, or the source NPC alone.")
                                                                             .add()
+                                                                            .documentation("Tests how often the player chose a particular answer.")
                                                                             .build();
 
     protected String dialogue;

@@ -13,7 +13,9 @@ public class KillPlayerQuestProgression extends QuantityQuestProgression<KillPla
 
     public static final BuilderCodec<KillPlayerQuestProgression> CODEC = BuilderCodec.builder(KillPlayerQuestProgression.class, KillPlayerQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                      .append(new KeyedCodec<>("PlayerToKill", Codec.STRING), (quest, player) -> quest.playerToKill = player, quest -> quest.playerToKill)
+                                                                                     .documentation("Overrides the target player for this instance, falling back to the asset when omitted.")
                                                                                      .add()
+                                                                                     .documentation("Stores progress for a quest about killing players.")
                                                                                      .build();
 
     /**

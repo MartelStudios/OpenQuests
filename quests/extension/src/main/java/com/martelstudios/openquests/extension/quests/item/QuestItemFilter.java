@@ -27,14 +27,18 @@ public class QuestItemFilter {
 
     public static final BuilderCodec<QuestItemFilter> CODEC = BuilderCodec.builder(QuestItemFilter.class, QuestItemFilter::new)
                                                                           .append(new KeyedCodec<>("BlockTag", Codec.STRING), (filter, tag) -> filter.blockTag = tag, filter -> filter.blockTag)
+                                                                          .documentation("Matches items carrying this asset tag.")
                                                                           .add()
                                                                           .append(new KeyedCodec<>("Category", Codec.STRING), (filter, category) -> filter.category = category, filter -> filter.category)
+                                                                          .documentation("Matches items whose own recipes appear in this crafting category.")
                                                                           .add()
                                                                           .append(new KeyedCodec<>("ItemId", Codec.STRING), (filter, id) -> filter.itemId = id, filter -> filter.itemId)
                                                                           .addValidator(Item.VALIDATOR_CACHE.getValidator())
+                                                                          .documentation("Matches a single item asset by ID.")
                                                                           .add()
                                                                           .append(new KeyedCodec<>("ResourceTypeId", Codec.STRING), (filter, id) -> filter.resourceTypeId = id, filter -> filter.resourceTypeId)
                                                                           .addValidator(ResourceType.VALIDATOR_CACHE.getValidator())
+                                                                          .documentation("Matches items belonging to this resource family.")
                                                                           .add()
                                                                           .validator((filter, results) -> {
                                                                               if (filter.blockTag == null && filter.category == null && filter.itemId == null && filter.resourceTypeId == null) {
@@ -44,6 +48,7 @@ public class QuestItemFilter {
                                                                           .afterDecode(filter -> {
                                                                               if (filter.blockTag != null) filter.blockTagIndex = AssetRegistry.getOrCreateTagIndex(filter.blockTag);
                                                                           })
+                                                                          .documentation("Accepts items or blocks matching any configured criterion, with at least one criterion required.")
                                                                           .build();
 
     @Nullable

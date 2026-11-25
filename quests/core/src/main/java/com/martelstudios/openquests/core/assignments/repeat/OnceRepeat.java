@@ -12,7 +12,9 @@ public class OnceRepeat extends AssignmentRepeat {
 
     public static final String TYPE = "Once";
 
-    public static final BuilderCodec<OnceRepeat> CODEC = BuilderCodec.builder(OnceRepeat.class, OnceRepeat::new, AssignmentRepeat.BASE_CODEC).build();
+    public static final BuilderCodec<OnceRepeat> CODEC = BuilderCodec.builder(OnceRepeat.class, OnceRepeat::new, AssignmentRepeat.BASE_CODEC)
+                                                                     .documentation("Hands out a quest once per occasion.")
+                                                                     .build();
 
     @Nonnull
     @Override

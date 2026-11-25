@@ -23,7 +23,9 @@ public class WithinConstraint extends QuestConstraint {
                                                                            .append(new KeyedCodec<>("Seconds", Codec.DURATION_SECONDS, true), (constraint, window) -> constraint.window = window, constraint -> constraint.window)
                                                                            .addValidator(Validators.nonNull())
                                                                            .addValidator(Validators.greaterThan(Duration.ZERO))
+                                                                           .documentation("Seconds from the first counted action before an unfinished combo resets.")
                                                                            .add()
+                                                                           .documentation("Requires counted actions to reach the target within one combo window.")
                                                                            .build();
 
     protected Duration window;

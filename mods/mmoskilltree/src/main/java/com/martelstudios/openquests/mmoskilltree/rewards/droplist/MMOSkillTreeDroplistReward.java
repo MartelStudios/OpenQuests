@@ -19,10 +19,13 @@ public class MMOSkillTreeDroplistReward extends KindReward {
                                                                          .append(new KeyedCodec<>("Droplist", Codec.STRING, true), (reward, droplist) -> reward.droplist = droplist, reward -> reward.droplist)
                                                                          .addValidator(Validators.nonNull())
                                                                          .addValidatorLate(() -> ItemDropList.VALIDATOR_CACHE.getValidator().late())
+                                                                         .documentation("Game drop list asset ID to roll for loot.")
                                                                          .add()
                                                                          .append(new KeyedCodec<>("Rolls", Codec.INTEGER), (reward, rolls) -> reward.rolls = rolls, reward -> Integer.valueOf(reward.rolls))
                                                                          .addValidator(Validators.greaterThan(0))
+                                                                         .documentation("Number of times to roll the drop list, defaulting to 1.")
                                                                          .add()
+                                                                         .documentation("Rolls a game drop list to grant loot to the player.")
                                                                          .build();
 
     protected String droplist;

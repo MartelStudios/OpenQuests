@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 public class TriggerVolumeQuestProgression extends QuantityQuestProgression<TriggerVolumeQuestProgression> {
 
     public static final BuilderCodec<TriggerVolumeQuestProgression> CODEC = BuilderCodec.builder(TriggerVolumeQuestProgression.class, TriggerVolumeQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
+                                                                                        .documentation("Stores progress toward a count of matching trigger volume events.")
                                                                                         .build();
 
     protected TriggerVolumeQuestProgression() {}

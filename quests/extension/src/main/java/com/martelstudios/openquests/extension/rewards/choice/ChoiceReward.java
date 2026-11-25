@@ -28,10 +28,13 @@ public class ChoiceReward extends QuestReward {
     public static final BuilderCodec<ChoiceReward> CODEC = BuilderCodec.builder(ChoiceReward.class, ChoiceReward::new, QuestReward.BASE_CODEC)
                                                                        .append(new KeyedCodec<>("Choices", Codec.INTEGER), (reward, choices) -> reward.choices = choices, reward -> Integer.valueOf(reward.choices))
                                                                        .addValidator(Validators.min(1))
+                                                                       .documentation("Number of picks the player can make, defaulting to one.")
                                                                        .add()
                                                                        .append(new KeyedCodec<>("Rewards", new ArrayCodec<>(Entry.CODEC, Entry[]::new), true), (reward, entries) -> reward.entries = entries, reward -> reward.entries)
                                                                        .addValidator(Validators.nonEmptyArray())
+                                                                       .documentation("Entries offered to the player, empty by default.")
                                                                        .add()
+                                                                       .documentation("Lets the player choose rewards from a list.")
                                                                        .build();
 
     protected int choices = 1;
@@ -100,10 +103,13 @@ public class ChoiceReward extends QuestReward {
         public static final BuilderCodec<Entry> CODEC = BuilderCodec.builder(Entry.class, Entry::new)
                                                                     .append(new KeyedCodec<>("Reward", QuestReward.CODEC, true), (entry, reward) -> entry.reward = reward, entry -> entry.reward)
                                                                     .addValidator(Validators.nonNull())
+                                                                    .documentation("Reward granted each time this entry is picked.")
                                                                     .add()
                                                                     .append(new KeyedCodec<>("Count", Codec.INTEGER), (entry, count) -> entry.count = count, entry -> Integer.valueOf(entry.count))
                                                                     .addValidator(Validators.min(1))
+                                                                    .documentation("Maximum number of times this entry can be picked, defaulting to one.")
                                                                     .add()
+                                                                    .documentation("Defines a selectable reward and its pick limit.")
                                                                     .build();
 
         protected QuestReward reward;

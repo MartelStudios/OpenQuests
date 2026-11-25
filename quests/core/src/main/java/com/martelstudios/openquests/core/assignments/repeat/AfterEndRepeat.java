@@ -12,7 +12,9 @@ public class AfterEndRepeat extends AssignmentRepeat {
 
     public static final String TYPE = "AfterEnd";
 
-    public static final BuilderCodec<AfterEndRepeat> CODEC = BuilderCodec.builder(AfterEndRepeat.class, AfterEndRepeat::new, AssignmentRepeat.BASE_CODEC).build();
+    public static final BuilderCodec<AfterEndRepeat> CODEC = BuilderCodec.builder(AfterEndRepeat.class, AfterEndRepeat::new, AssignmentRepeat.BASE_CODEC)
+                                                                         .documentation("Hands out another quest on a later occasion after the previous quest chain ends.")
+                                                                         .build();
 
     @Nonnull
     @Override

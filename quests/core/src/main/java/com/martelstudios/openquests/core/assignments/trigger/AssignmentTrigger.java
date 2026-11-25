@@ -27,7 +27,9 @@ public abstract class AssignmentTrigger {
     /**
      * Serializes the fields shared by every kind; concrete codecs chain from this.
      */
-    public static final BuilderCodec<AssignmentTrigger> BASE_CODEC = BuilderCodec.abstractBuilder(AssignmentTrigger.class).build();
+    public static final BuilderCodec<AssignmentTrigger> BASE_CODEC = BuilderCodec.abstractBuilder(AssignmentTrigger.class)
+                                                                                 .documentation("Defines when an assignment has an occasion to offer quests.")
+                                                                                 .build();
 
     /**
      * @param player the connecting player's holder: they are not online yet

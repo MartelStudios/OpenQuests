@@ -13,7 +13,9 @@ public class QuestProgressionRecord {
 
     public static final BuilderCodec<QuestProgressionRecord> CODEC = BuilderCodec.builder(QuestProgressionRecord.class, QuestProgressionRecord::new)
                                                                                  .append(new KeyedCodec<>("Quest", AbstractQuestProgression.CODEC), (record, quest) -> record.quest = quest, record -> record.quest)
+                                                                                 .documentation("Quest instance and its saved progress.")
                                                                                  .add()
+                                                                                 .documentation("Wraps a quest instance for storage.")
                                                                                  .build();
 
     public AbstractQuestProgression<?> quest;

@@ -29,19 +29,26 @@ public class ReachLocationQuestAsset extends OpenQuestAsset implements TargetedQ
     public static final BuilderCodec<ReachLocationQuestAsset> CODEC =
         BuilderCodec.builder(ReachLocationQuestAsset.class, ReachLocationQuestAsset::new, OpenQuestAsset.BASE_CODEC)
             .append(new KeyedCodec<>("Position", Vector3dUtil.CODEC), (asset, position) -> asset.position = position, asset -> asset.position)
+            .documentation("Coordinates of the center of the destination.")
             .add()
             .append(new KeyedCodec<>("Radius", Codec.DOUBLE), (asset, radius) -> asset.radius = radius, asset -> Double.valueOf(asset.radius))
+            .documentation("Distance from the center within which the destination counts as reached.")
             .add()
             .append(new KeyedCodec<>("ShowOnMap", Codec.BOOLEAN), (asset, show) -> asset.showOnMap = show, asset -> asset.showOnMap)
+            .documentation("Shows the location on the map and on the compass while tracked, true by default.")
             .add()
             .append(new KeyedCodec<>("Marker", Codec.STRING), (asset, marker) -> asset.marker = marker, asset -> asset.marker)
             .addValidator(ParticleSystem.VALIDATOR_CACHE.getValidator())
+            .documentation("Particle system asset ID shown at the destination while it is active, with no particles by default.")
             .add()
             .append(new KeyedCodec<>("Sound", Codec.STRING), (asset, sound) -> asset.sound = sound, asset -> asset.sound)
             .addValidator(SoundEvent.VALIDATOR_CACHE.getValidator())
+            .documentation("Sound event played to the player upon reaching the destination, with no sound by default.")
             .add()
             .append(new KeyedCodec<>("SoundPitch", Codec.FLOAT), (asset, pitch) -> asset.soundPitch = pitch, asset -> Float.valueOf(asset.soundPitch))
+            .documentation("Playback pitch of the arrival sound, defaulting to one.")
             .add()
+            .documentation("Defines a location to reach and its optional markers and sound.")
             .build();
 
     protected Vector3d position;

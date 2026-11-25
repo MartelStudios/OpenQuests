@@ -24,7 +24,9 @@ public abstract class QuestScope {
     /**
      * Serializes the fields shared by every kind; concrete codecs chain from this.
      */
-    public static final BuilderCodec<QuestScope> BASE_CODEC = BuilderCodec.abstractBuilder(QuestScope.class).build();
+    public static final BuilderCodec<QuestScope> BASE_CODEC = BuilderCodec.abstractBuilder(QuestScope.class)
+                                                                          .documentation("Identifies who shares a saved quest instance.")
+                                                                          .build();
 
     /**
      * @return whether anything holding the quest is there to share another one with: a world

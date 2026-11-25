@@ -20,7 +20,9 @@ public class MinPlayersOnlineConstraint extends QuestConstraint {
     public static final BuilderCodec<MinPlayersOnlineConstraint> CODEC = BuilderCodec.builder(MinPlayersOnlineConstraint.class, MinPlayersOnlineConstraint::new, QuestConstraint.BASE_CODEC)
                                                                                      .append(new KeyedCodec<>("Count", Codec.INTEGER, true), (constraint, count) -> constraint.count = count, constraint -> Integer.valueOf(constraint.count))
                                                                                      .addValidator(Validators.min(1))
+                                                                                     .documentation("Minimum number of online players required, including the acting player.")
                                                                                      .add()
+                                                                                     .documentation("Allows progress only when enough players are online.")
                                                                                      .build();
 
     protected int count;

@@ -38,10 +38,13 @@ public class OpenQuestsDialogueAsset extends HeldQuantityQuestAsset implements T
                     .add()
                     .append(new KeyedCodec<>("Dialogue", Codec.STRING), (asset, dialogue) -> asset.dialogue = dialogue, asset -> asset.dialogue)
                     .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))
+                    .documentation("Dialogue asset ID to match, with any conversation eligible by default.")
                     .add()
                     .append(new KeyedCodec<>("Answer", Codec.STRING), (asset, answer) -> asset.answer = answer, asset -> asset.answer)
+                    .documentation("Response ID or one-based position within a specified dialogue, with openings counted by default.")
                     .add()
                     .append(new KeyedCodec<>("UseHistory", Codec.BOOLEAN), (asset, useHistory) -> asset.useHistory = useHistory, asset -> asset.useHistory)
+                    .documentation("Counts matching interactions from before the quest when true, and defaults to false.")
                     .add()
                     .validator((asset, results) -> {
                         // A position only means something inside one dialogue.
@@ -49,6 +52,7 @@ public class OpenQuestsDialogueAsset extends HeldQuantityQuestAsset implements T
                             results.fail("Answer without Dialogue must be an answer Id, not a position");
                         }
                     })
+                    .documentation("Defines a quest that counts dialogue openings or response selections.")
                     .build();
 
     /**

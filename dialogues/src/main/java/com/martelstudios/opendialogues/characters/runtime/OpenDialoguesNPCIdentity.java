@@ -23,19 +23,27 @@ public class OpenDialoguesNPCIdentity implements Component<EntityStore> {
 
     public static final BuilderCodec<OpenDialoguesNPCIdentity> CODEC = BuilderCodec.builder(OpenDialoguesNPCIdentity.class, OpenDialoguesNPCIdentity::new)
                                                                                    .append(new KeyedCodec<>("Character", Codec.STRING), (identity, character) -> identity.character = character, identity -> identity.character)
+                                                                                   .documentation("ID of the assigned identity, absent for an unassigned NPC.")
                                                                                    .add()
                                                                                    .append(new KeyedCodec<>("Name", Codec.STRING), (identity, name) -> identity.name = name, identity -> identity.name)
+                                                                                   .documentation("Personal name drawn for this entity, if any.")
                                                                                    .add()
                                                                                    .append(new KeyedCodec<>("Epithet", Codec.STRING), (identity, epithet) -> identity.epithet = epithet, identity -> identity.epithet)
+                                                                                   .documentation("Title drawn for this entity, if any.")
                                                                                    .add()
                                                                                    .append(new KeyedCodec<>("Nameplate", Codec.STRING), (identity, nameplate) -> identity.nameplate = nameplate, identity -> identity.nameplate)
+                                                                                   .documentation("Translation key last applied to the entity's overhead label, if any.")
                                                                                    .add()
                                                                                    .append(new KeyedCodec<>("Draws", new ArrayCodec<>(Codec.STRING, String[]::new)), (identity, draws) -> identity.draws.addAll(List.of(draws)), identity -> identity.draws.toArray(String[]::new))
+                                                                                   .documentation("IDs of distributions already resolved for the entity, initially empty.")
                                                                                    .add()
                                                                                    .append(new KeyedCodec<>("UniverseGeneration", Codec.INTEGER), (identity, generation) -> identity.universeGeneration = generation, identity -> identity.universeGeneration)
+                                                                                   .documentation("Universe reset counter when the entity drew its identity, initially zero.")
                                                                                    .add()
                                                                                    .append(new KeyedCodec<>("WorldGeneration", Codec.INTEGER), (identity, generation) -> identity.worldGeneration = generation, identity -> identity.worldGeneration)
+                                                                                   .documentation("World reset counter when the entity drew its identity, initially zero.")
                                                                                    .add()
+                                                                                   .documentation("Persists the character assignment and drawn presentation of an NPC.")
                                                                                    .build();
 
     private int universeGeneration;

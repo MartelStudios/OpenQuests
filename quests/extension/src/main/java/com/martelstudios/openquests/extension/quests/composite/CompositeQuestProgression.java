@@ -33,9 +33,12 @@ public class CompositeQuestProgression extends AbstractCompositeQuestProgression
 
     public static final BuilderCodec<CompositeQuestProgression> CODEC = BuilderCodec.builder(CompositeQuestProgression.class, CompositeQuestProgression::new, AbstractCompositeQuestProgression.BASE_CODEC)
                                                                                     .append(new KeyedCodec<>("ChildOutcomes", new MapCodec<>(new EnumCodec<>(QuestState.class), HashMap<String, QuestState>::new)), CompositeQuestProgression::decodeOutcomes, CompositeQuestProgression::encodeOutcomes)
+                                                                                    .documentation("Last recorded status by child quest instance UUID, initially empty.")
                                                                                     .add()
                                                                                     .append(new KeyedCodec<>("ChildTransitions", new MapCodec<>(Codec.INTEGER, HashMap<String, Integer>::new)), CompositeQuestProgression::decodeVersions, CompositeQuestProgression::encodeVersions)
+                                                                                    .documentation("Last processed transition number by child quest instance UUID, initially empty.")
                                                                                     .add()
+                                                                                    .documentation("Stores the observed outcomes and revisions of a composite quest's children.")
                                                                                     .build();
 
     /**

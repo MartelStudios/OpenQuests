@@ -1,0 +1,318 @@
+{
+  "type": "object",
+  "$id": "OpenDialogueCharacterAsset.json",
+  "title": "OpenDialogueCharacterAsset",
+  "description": "Defines an NPC identity and the traits that control its presentation and behavior.",
+  "markdownDescription": "Defines an NPC identity and the traits that control its presentation and behavior.",
+  "hytale": {
+    "type": "object",
+    "path": "OpenDialogues/Characters/",
+    "extension": ".json",
+    "mergesProperties": true
+  },
+  "properties": {
+    "Parent": {
+      "type": "string",
+      "description": "When set this asset will inherit properties from the named asset.\n\nWhen inheriting from another OpenDialogueCharacterAsset most properties will simply be copied from the parent asset to this asset. In the case where both child and parent provide a field the child field will simply replace the value provided by the parent, in the case of nested structures this will apply to the fields within the structure. In some cases the field may decide to act differently, for example: by merging the parent and child fields together.",
+      "markdownDescription": "When set this asset will inherit properties from the named asset.\n\nWhen inheriting from another **OpenDialogueCharacterAsset** most properties will simply be copied from the parent asset to this asset. In the case where both child and parent provide a field the child field will simply replace the value provided by the parent, in the case of nested structures this will apply to the fields within the structure. In some cases the field may decide to act differently, for example: by merging the parent and child fields together.",
+      "hytaleParent": {
+        "type": "OpenDialogueCharacterAsset"
+      },
+      "hytale": {
+        "type": "string"
+      }
+    },
+    "$Title": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$Comment": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$Author": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$TODO": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$Position": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$FloatingFunctionNodes": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$Groups": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$WorkspaceID": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$NodeId": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "$NodeEditorMetadata": {
+      "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+      "doNotSuggest": true,
+      "hytale": {
+        "uiDisplayMode": "Hidden",
+        "uiPropertyTitle": "Comment"
+      }
+    },
+    "Tags": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "title": "Map",
+      "description": "Tags are a general way to describe an asset that can be interpreted by other systems in a way they see fit.\n\nFor example you could tag something with a Material tag with the values Solid and Stone, And another single tag Ore.\n\nTags will be expanded into a single list of tags automatically. Using the above example with Material and Ore the end result would be the following list of tags: Ore, Material, Solid, Stone, Material=Solid and Material=Stone.",
+      "markdownDescription": "Tags are a general way to describe an asset that can be interpreted by other systems in a way they see fit.\n\nFor example you could tag something with a **Material** tag with the values **Solid** and **Stone**, And another single tag **Ore**.\n\nTags will be expanded into a single list of tags automatically. Using the above example with **Material** and **Ore** the end result would be the following list of tags: **Ore**, **Material**, **Solid**, **Stone**, **Material=Solid** and **Material=Stone**.",
+      "hytale": {
+        "type": "object",
+        "inheritsProperty": true
+      },
+      "additionalProperties": {
+        "type": "array",
+        "hytale": {
+          "type": "array"
+        },
+        "items": {
+          "type": "string",
+          "hytale": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Uniqueness": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "Uniqueness",
+      "description": "Controls whether this identity can be shared, held by one living NPC, or used only once, defaulting to None.",
+      "markdownDescription": "Controls whether this identity can be shared, held by one living NPC, or used only once, defaulting to None.",
+      "enumDescriptions": [
+        "",
+        "",
+        ""
+      ],
+      "markdownEnumDescriptions": [
+        "",
+        "",
+        ""
+      ],
+      "hytale": {
+        "type": "Enum",
+        "inheritsProperty": true
+      },
+      "enum": [
+        "None",
+        "Alive",
+        "Forever"
+      ],
+      "default": "None"
+    },
+    "Scope": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "CharacterScope",
+      "description": "Applies uniqueness per world or across the universe, defaulting to World.",
+      "markdownDescription": "Applies uniqueness per world or across the universe, defaulting to World.",
+      "enumDescriptions": [
+        "",
+        ""
+      ],
+      "markdownEnumDescriptions": [
+        "",
+        ""
+      ],
+      "hytale": {
+        "type": "Enum",
+        "inheritsProperty": true
+      },
+      "enum": [
+        "World",
+        "Universe"
+      ],
+      "default": "World"
+    },
+    "Traits": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "Behaviors and text draws attached to this identity, empty by default.",
+      "markdownDescription": "Behaviors and text draws attached to this identity, empty by default.",
+      "hytale": {
+        "type": "array",
+        "inheritsProperty": true
+      },
+      "items": {
+        "title": "Type Selector",
+        "anyOf": [
+          {
+            "$ref": "common.json#/definitions/OpenDialoguesDialogueTrait"
+          },
+          {
+            "$ref": "common.json#/definitions/OpenDialoguesEpithetTrait"
+          },
+          {
+            "$ref": "common.json#/definitions/OpenDialoguesNameTrait"
+          }
+        ],
+        "hytaleSchemaTypeField": {
+          "property": "Type",
+          "values": [
+            "Dialogue",
+            "Epithet",
+            "Name"
+          ]
+        },
+        "hytale": {
+          "mergesProperties": true
+        }
+      }
+    },
+    "MapVisibility": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "title": "MapVisibility",
+      "description": "Controls when the NPC appears on a player's map, defaulting to WhenMet for conversations or active quests.",
+      "markdownDescription": "Controls when the NPC appears on a player's map, defaulting to WhenMet for conversations or active quests.",
+      "enumDescriptions": [
+        "",
+        "",
+        ""
+      ],
+      "markdownEnumDescriptions": [
+        "",
+        "",
+        ""
+      ],
+      "hytale": {
+        "type": "Enum",
+        "inheritsProperty": true
+      },
+      "enum": [
+        "Never",
+        "WhenMet",
+        "Always"
+      ],
+      "default": "WhenMet"
+    },
+    "MapIcon": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Image path under UI/WorldMap/MapMarkers/, defaulting to Coordinate.png.",
+      "markdownDescription": "Image path under UI/WorldMap/MapMarkers/, defaulting to Coordinate.png.",
+      "hytale": {
+        "type": "string",
+        "inheritsProperty": true
+      }
+    },
+    "CompassRange": {
+      "type": "number",
+      "description": "Distance in blocks for showing this map marker on the compass, defaulting to zero so only a tracked quest can show it.",
+      "markdownDescription": "Distance in blocks for showing this map marker on the compass, defaulting to zero so only a tracked quest can show it.",
+      "hytale": {
+        "type": "number",
+        "inheritsProperty": true
+      },
+      "default": 0.0
+    },
+    "Name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Fixed speaker and nameplate translation key, overridden by a drawn name.",
+      "markdownDescription": "Fixed speaker and nameplate translation key, overridden by a drawn name.",
+      "hytale": {
+        "type": "string",
+        "inheritsProperty": true
+      }
+    },
+    "Epithet": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Fixed title translation key also used by quests, overridden by a drawn epithet.",
+      "markdownDescription": "Fixed title translation key also used by quests, overridden by a drawn epithet.",
+      "hytale": {
+        "type": "string",
+        "inheritsProperty": true
+      }
+    },
+    "Portrait": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Speaker image path under Icons relative to Common, with no image by default.",
+      "markdownDescription": "Speaker image path under Icons relative to Common, with no image by default.",
+      "hytale": {
+        "type": "string",
+        "inheritsProperty": true
+      },
+      "hytaleCommonAsset": {
+        "requiredRoots": [
+          "Icons/"
+        ],
+        "requiredExtension": "png",
+        "isUIAsset": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

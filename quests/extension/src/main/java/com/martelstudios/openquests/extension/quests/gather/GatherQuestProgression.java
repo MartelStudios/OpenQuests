@@ -18,7 +18,9 @@ public class GatherQuestProgression extends HeldQuantityQuestProgression<GatherQ
 
     public static final BuilderCodec<GatherQuestProgression> CODEC = BuilderCodec.builder(GatherQuestProgression.class, GatherQuestProgression::new, QuantityQuestProgression.BASE_CODEC)
                                                                                  .append(new KeyedCodec<>("ItemToGather", QuestItemFilter.CODEC), (quest, item) -> quest.itemToGather = item, quest -> quest.itemToGather)
+                                                                                 .documentation("Overrides the item filter for this instance, falling back to the asset when omitted.")
                                                                                  .add()
+                                                                                 .documentation("Stores progress for a quest about holding a target quantity of items.")
                                                                                  .build();
 
     @Nullable

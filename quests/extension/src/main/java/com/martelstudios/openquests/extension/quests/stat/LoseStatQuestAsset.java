@@ -21,7 +21,9 @@ public class LoseStatQuestAsset extends QuantityQuestAsset {
                     .append(new KeyedCodec<>("Stat", Codec.STRING), (asset, stat) -> asset.stat = stat, asset -> asset.stat)
                     .addValidator(Validators.nonNull())
                     .addValidator(EntityStatType.VALIDATOR_CACHE.getValidator())
+                    .documentation("Name of the entity stat whose decreases count, such as Stamina.")
                     .add()
+                    .documentation("Counts points spent or lost from an entity stat.")
                     .build();
 
     private String stat;
