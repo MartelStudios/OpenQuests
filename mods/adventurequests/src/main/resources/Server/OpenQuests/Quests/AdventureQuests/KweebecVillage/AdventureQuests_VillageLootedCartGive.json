@@ -9,5 +9,14 @@
       },
       "Quantity": 3
     }
+  ],
+  "Constraints": [
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "AdventureQuests_VillageLootedCartLoot",
+      "States": [
+        "Successful"
+      ]
+    }
   ]
 }
