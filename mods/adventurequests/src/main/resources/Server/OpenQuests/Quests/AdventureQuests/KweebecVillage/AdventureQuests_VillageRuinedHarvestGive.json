@@ -1,7 +1,7 @@
 {
   "Type": "Deliver",
   "TitleKey": "adventurequests.kweebecvillage.quest.village-ruined-harvest.give.title",
-  "Character": "AdventureQuests_KweebecRuinedHarvest",
+  "Target": "GiverNpc",
   "Items": [
     {
       "Item": {

@@ -131,6 +131,8 @@ flowchart TD
   place it near him: hay bales, a scarecrow, a watering can; and ten planters bought back after
   something smashed them in the night. A chapter's steps read the giver of
   the chapter, so its `Deliver` step and its `NearCharacter` constraint aim at `GiverNpc` too.
+- **Tier 4, the great blight** (threshold 2): longer chapters that save the village's food: pick
+  what the boars left and bring it back, or hunt a fox off the burrows and feed the rabbits.
 - **Ongoing**: each quest weighs its tier number (harvests still only with ripe crops). Tools made
   once (hoe, bucket, scarecrow, watering can, the planters) are not offered again.
 - A new tier adds its router, one entry route, its waiting and thanks routes in the shared head,

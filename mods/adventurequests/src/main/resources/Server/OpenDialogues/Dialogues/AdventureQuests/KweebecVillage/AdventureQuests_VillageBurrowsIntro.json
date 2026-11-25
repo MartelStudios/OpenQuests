@@ -19,7 +19,8 @@
           "Quest": "AdventureQuests_VillageBurrows"
         },
         {
-          "Type": "Close"
+          "Type": "Open",
+          "Dialogue": "AdventureQuests_FarmerTier4Accepted"
         }
       ]
     },

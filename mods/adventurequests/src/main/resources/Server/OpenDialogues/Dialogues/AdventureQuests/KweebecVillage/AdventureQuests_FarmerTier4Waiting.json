@@ -4,12 +4,12 @@
   "UseSourceCharacter": true,
   "Pages": [
     {
-      "Text": "adventurequests.kweebecvillage.dialogue.village-ruined-harvest.thanks"
+      "Text": "adventurequests.kweebecvillage.dialogue.farmer.tier4.waiting"
     }
   ],
   "Responses": [
     {
-      "Text": "adventurequests.kweebecvillage.dialogue.village.bye",
+      "Text": "adventurequests.kweebecvillage.dialogue.village.later",
       "Actions": [
         {
           "Type": "Close"
