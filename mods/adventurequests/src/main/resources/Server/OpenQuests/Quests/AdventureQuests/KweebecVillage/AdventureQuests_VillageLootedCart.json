@@ -1,0 +1,48 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Furniture_Village_Crate.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-looted-cart.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-looted-cart.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-looted-cart.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageLootedCartLoot",
+    "AdventureQuests_VillageLootedCartGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Choice",
+      "Choices": 1,
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Bar_Silver",
+            "Quantity": 3
+          },
+          "Count": 1
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Potion_Health_Greater",
+            "Quantity": 1
+          },
+          "Count": 1
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Ingredient_Powder_Boom",
+            "Quantity": 2
+          },
+          "Count": 1
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}
