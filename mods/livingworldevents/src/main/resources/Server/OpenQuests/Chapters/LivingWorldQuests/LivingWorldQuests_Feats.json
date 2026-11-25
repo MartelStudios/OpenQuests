@@ -2,31 +2,40 @@
   "$Comment": "Shows the Feats quests in the journal.",
   "NameKey": "livingworldquests.chapter.feats.name",
   "Group": "LivingWorldQuests_Events",
+  "Icon": "Icons/ItemsGenerated/LWE_Tyrants_Skull.png",
   "Order": 0,
   "Quests": [
     {
-      "Quest": "LivingWorldQuests_Regicide"
+      "Quest": "LivingWorldQuests_Regicide",
+      "Icon": "Icons/ItemsGenerated/LWE_Tyrants_Skull.png"
     },
     {
-      "Quest": "LivingWorldQuests_CrimsonHerald"
+      "Quest": "LivingWorldQuests_CrimsonHerald",
+      "Icon": "Icons/ItemsGenerated/LWE_Crimson_Herald_Scythe.png"
     },
     {
-      "Quest": "LivingWorldQuests_TreasureGoblin"
+      "Quest": "LivingWorldQuests_TreasureGoblin",
+      "Icon": "Icons/ItemsGenerated/Furniture_Goblin_ChestStolen_Small.png"
     },
     {
-      "Quest": "LivingWorldQuests_StolenSack"
+      "Quest": "LivingWorldQuests_StolenSack",
+      "Icon": "Icons/ItemsGenerated/LWE_Stolen_Sack.png"
     },
     {
-      "Quest": "LivingWorldQuests_DrillTrophy"
+      "Quest": "LivingWorldQuests_DrillTrophy",
+      "Icon": "Icons/ItemsGenerated/LWE_Drill_Gear.png"
     },
     {
-      "Quest": "LivingWorldQuests_Broodmother"
+      "Quest": "LivingWorldQuests_Broodmother",
+      "Icon": "Icons/ItemsGenerated/LWE_Brood_Egg.png"
     },
     {
-      "Quest": "LivingWorldQuests_Awakening"
+      "Quest": "LivingWorldQuests_Awakening",
+      "Icon": "Icons/ItemsGenerated/LWE_Bloodletter_Awakened.png"
     },
     {
-      "Quest": "LivingWorldQuests_AllSaplingsHome"
+      "Quest": "LivingWorldQuests_AllSaplingsHome",
+      "Icon": "Icons/ItemsGenerated/LWE_Potted_Sapling.png"
     }
   ]
 }
