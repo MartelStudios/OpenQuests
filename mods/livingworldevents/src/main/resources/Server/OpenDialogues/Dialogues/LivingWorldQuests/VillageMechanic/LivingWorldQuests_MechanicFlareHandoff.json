@@ -16,7 +16,8 @@
           "Quest": "LivingWorldQuests_MechanicFlare"
         },
         {
-          "Type": "Close"
+          "Type": "Open",
+          "Router": "LivingWorldQuests_VillageMechanic"
         }
       ]
     },

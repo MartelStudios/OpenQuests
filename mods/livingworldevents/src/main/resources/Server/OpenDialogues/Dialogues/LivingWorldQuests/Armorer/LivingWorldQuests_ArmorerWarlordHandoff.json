@@ -16,7 +16,8 @@
           "Quest": "LivingWorldQuests_ArmorerWarlord"
         },
         {
-          "Type": "Close"
+          "Type": "Open",
+          "Router": "LivingWorldQuests_Armorer"
         }
       ]
     },

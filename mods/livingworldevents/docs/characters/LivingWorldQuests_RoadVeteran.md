@@ -24,4 +24,4 @@ The character and router share its ID. The distribution is `LivingWorldQuests_Fe
 
 ## Decisions
 
-Use a persistent village identity and show the next offer after the preceding commission succeeds. Delivery offers acknowledge carried items; the handoff accepts what the player has brought.
+Use a persistent village identity and show the next offer after the preceding commission succeeds. Delivery offers acknowledge carried items; the handoff accepts what the player has brought, then reopens the router so the next stage follows at once.

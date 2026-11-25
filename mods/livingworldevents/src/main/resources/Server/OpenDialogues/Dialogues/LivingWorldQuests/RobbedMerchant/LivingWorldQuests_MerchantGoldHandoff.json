@@ -16,7 +16,8 @@
           "Quest": "LivingWorldQuests_MerchantGold"
         },
         {
-          "Type": "Close"
+          "Type": "Open",
+          "Router": "LivingWorldQuests_RobbedMerchant"
         }
       ]
     },
