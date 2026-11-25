@@ -1,0 +1,62 @@
+{
+  "$Comment": "Opens offers, progress reminders and completed dialogue for Tavin.",
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerPage",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ChroniclerPageTavin"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_VeteranCaptain",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_VeteranCaptainOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_VeteranCaptain",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_VeteranCaptainWaiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ChroniclerLamp",
+          "States": [
+            "Successful"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_VeteranLampThanks"
+        }
+      }
+    ],
+    "Default": {
+      "Dialogue": "LivingWorldQuests_VeteranCaptainThanks"
+    }
+  }
+}

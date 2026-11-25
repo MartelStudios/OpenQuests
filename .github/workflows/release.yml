@@ -26,6 +26,10 @@ on:
         description: 'Version of the OpenQuests MMOSkillTree pack to publish with it, or empty to leave the pack out'
         required: false
         default: ''
+      livingworldquests_version:
+        description: 'Version of the Living World Quests pack to publish, or empty to leave it out'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -48,6 +52,7 @@ jobs:
           BRIDGE_VERSION: ${{ inputs.openquestsdialogues_version }}
           ADVENTUREQUESTS_VERSION: ${{ inputs.adventurequests_version }}
           PACK_VERSION: ${{ inputs.mmoskilltree_version }}
+          LIVINGWORLDQUESTS_VERSION: ${{ inputs.livingworldquests_version }}
         run: |
           FILES=""
           TAGS=()
@@ -70,6 +75,10 @@ jobs:
           if [[ -n "$PACK_VERSION" ]]; then
             TAGS+=("mmoskilltree-v$PACK_VERSION")
             FILES+=$'mods/mmoskilltree/build/libs/*.jar\n'
+          fi
+          if [[ -n "$LIVINGWORLDQUESTS_VERSION" ]]; then
+            TAGS+=("livingworldquests-v$LIVINGWORLDQUESTS_VERSION")
+            FILES+=$'mods/livingworldevents/build/distributions/*.zip\n'
           fi
           if [[ ${#TAGS[@]} -eq 0 ]]; then
             echo "::error::Give at least one version to release."
@@ -109,6 +118,7 @@ jobs:
           BRIDGE_VERSION: ${{ inputs.openquestsdialogues_version }}
           ADVENTUREQUESTS_VERSION: ${{ inputs.adventurequests_version }}
           PACK_VERSION: ${{ inputs.mmoskilltree_version }}
+          LIVINGWORLDQUESTS_VERSION: ${{ inputs.livingworldquests_version }}
         run: |
           if [[ -n "$VERSION" ]]; then
             sed -i "s/^version = .*/version = $VERSION/" gradle.properties
@@ -124,6 +134,9 @@ jobs:
           fi
           if [[ -n "$PACK_VERSION" ]]; then
             sed -i "s/^mmoskilltree_version = .*/mmoskilltree_version = $PACK_VERSION/" mods/mmoskilltree/gradle.properties
+          fi
+          if [[ -n "$LIVINGWORLDQUESTS_VERSION" ]]; then
+            sed -i "s/^livingworldevents_version = .*/livingworldevents_version = $LIVINGWORLDQUESTS_VERSION/" mods/livingworldevents/gradle.properties
           fi
 
       # Regenerates every manifest.json from the property, so the tag carries a coherent tree
@@ -206,6 +219,12 @@ jobs:
             file: mods/mmoskilltree/build/libs/OpenQuestsMMOSkillTree-*.jar
             # Versioned on its own, and only published when a version is given for it
             version_input: mmoskilltree_version
+          - name: Living World Quests
+            relations: living-world-events:requiredDependency,openquests:requiredDependency,opendialogues:requiredDependency,openquests-dialogues:requiredDependency
+            project_id: '1831460'
+            changelog: livingworldquests
+            file: mods/livingworldevents/build/distributions/LivingWorldQuests-*.zip
+            version_input: livingworldquests_version
 
     steps:
       # At the tag, so the changelog published is the one reviewed with the release

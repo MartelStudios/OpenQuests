@@ -1,0 +1,121 @@
+{
+  "$Comment": "Opens offers, progress reminders and completed dialogue for Rivet.",
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "LivingWorldQuests_MechanicGland",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "Inventory",
+              "Item": {
+                "ItemId": "LWE_Brood_Gland"
+              },
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MechanicGlandReady"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_MechanicGland",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MechanicGlandOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_MechanicGland",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MechanicGlandWaiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "LivingWorldQuests_MechanicFlare",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "Inventory",
+              "Item": {
+                "ItemId": "LWE_Tinkerers_Flare"
+              },
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MechanicFlareReady"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_MechanicFlare",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MechanicFlareOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_MechanicFlare",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MechanicFlareWaiting"
+        }
+      }
+    ],
+    "Default": {
+      "Dialogue": "LivingWorldQuests_MechanicFlareThanks"
+    }
+  }
+}

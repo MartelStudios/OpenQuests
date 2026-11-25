@@ -1,0 +1,12 @@
+{
+  "$Comment": "The player tells Yselle that Tavin knocked.",
+  "Type": "Dialogue",
+  "Character": "LivingWorldQuests_NightChronicler",
+  "Dialogue": "LivingWorldQuests_ChroniclerKnockReport",
+  "Answer": "Report",
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.chronicler-knock.title",
+  "ShortDescriptionKey": "livingworldquests.quest.chronicler-knock.short",
+  "DescriptionKey": "livingworldquests.quest.chronicler-knock.description",
+  "AutoTrack": false
+}

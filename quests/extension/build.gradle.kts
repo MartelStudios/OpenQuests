@@ -71,20 +71,23 @@ val verifyReleaseArtifacts by tasks.registering {
     group = "verification"
     description = "Checks the jars and the quest content pack that the release publishes."
 
-    dependsOn(":quests:core:jar", tasks.named("jar"), ":mods:adventurequests:packZip", ":mods:mmoskilltree:jar")
+    dependsOn(":quests:core:jar", tasks.named("jar"), ":mods:adventurequests:packZip", ":mods:livingworldevents:packZip", ":mods:mmoskilltree:jar")
 
     val modVersion = project.property("version").toString()
     // Read late: the packs are configured after this project and carry a version of their own
     val adventureQuestsVersion = provider { project(":mods:adventurequests").version.toString() }
+    val livingWorldQuestsVersion = provider { project(":mods:livingworldevents").version.toString() }
     val packVersion = provider { project(":mods:mmoskilltree").version.toString() }
     val coreJars = fileTree(project(":quests:core").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val extensionJars = fileTree(layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val contentPacks = fileTree(project(":mods:adventurequests").layout.buildDirectory.dir("distributions").get().asFile) { include("*.zip") }
+    val livingWorldPacks = fileTree(project(":mods:livingworldevents").layout.buildDirectory.dir("distributions").get().asFile) { include("*.zip") }
     val packJars = fileTree(project(":mods:mmoskilltree").layout.buildDirectory.dir("libs").get().asFile) { include("*.jar") }
     val published = mapOf(
         "quests/core/build/libs/*.jar" to (coreJars to provider { modVersion }),
         "quests/extension/build/libs/*.jar" to (extensionJars to provider { modVersion }),
         "mods/adventurequests/build/distributions/*.zip" to (contentPacks to adventureQuestsVersion),
+        "mods/livingworldevents/build/distributions/*.zip" to (livingWorldPacks to livingWorldQuestsVersion),
         "mods/mmoskilltree/build/libs/*.jar" to (packJars to packVersion)
     )
 
@@ -116,20 +119,22 @@ val verifyReleaseArtifacts by tasks.registering {
         }
 
         // AssetModule skips a pack with no manifest.json of its own, and only warns about it
-        val pack = contentPacks.singleFile
-        if (!archiveEntries(pack).contains("manifest.json")) {
-            throw GradleException("${pack.name} has no manifest.json, the server would skip it.")
-        }
+        for ((packs, version) in listOf(contentPacks to adventureQuestsVersion, livingWorldPacks to livingWorldQuestsVersion)) {
+            val pack = packs.singleFile
+            if (!archiveEntries(pack).contains("manifest.json")) {
+                throw GradleException("${pack.name} has no manifest.json, the server would skip it.")
+            }
 
-        // A content pack has no plugin class: a Main, even blank, makes the server look for one
-        val manifest = ZipFile(pack).use { zip ->
-            groovy.json.JsonSlurper().parse(zip.getInputStream(zip.getEntry("manifest.json"))) as Map<*, *>
-        }
-        if (manifest.containsKey("Main")) {
-            throw GradleException("${pack.name} declares a Main in its manifest.json.")
-        }
-        if (manifest["Version"] != adventureQuestsVersion.get()) {
-            throw GradleException("${pack.name} has manifest version ${manifest["Version"]}, not ${adventureQuestsVersion.get()}.")
+            // A content pack has no plugin class: a Main, even blank, makes the server look for one
+            val manifest = ZipFile(pack).use { zip ->
+                groovy.json.JsonSlurper().parse(zip.getInputStream(zip.getEntry("manifest.json"))) as Map<*, *>
+            }
+            if (manifest.containsKey("Main")) {
+                throw GradleException("${pack.name} declares a Main in its manifest.json.")
+            }
+            if (manifest["Version"] != version.get()) {
+                throw GradleException("${pack.name} has manifest version ${manifest["Version"]}, not ${version.get()}.")
+            }
         }
     }
 }

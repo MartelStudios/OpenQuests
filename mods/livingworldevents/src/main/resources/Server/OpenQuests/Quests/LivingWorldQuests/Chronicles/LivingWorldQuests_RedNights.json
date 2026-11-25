@@ -1,0 +1,27 @@
+{
+  "$Comment": "Collect 10 Blood Shards.",
+  "Type": "Gather",
+  "ItemToGather": {
+    "ItemId": "LWE_Blood_Shard"
+  },
+  "TargetQuantity": 20,
+  "TitleKey": "livingworldquests.quest.red-nights.title",
+  "ShortDescriptionKey": "livingworldquests.quest.red-nights.short",
+  "DescriptionKey": "livingworldquests.quest.red-nights.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "LivingWorldQuests_BloodCharm"
+      ],
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Moonstone",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
+}

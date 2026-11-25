@@ -9,8 +9,13 @@ tasks.withType<Javadoc>().configureEach {
 
 group = project.property("group").toString()
 
+// Integrations join the dev run only on request, so each one can be tried alone or all together:
+// -PwithMmoSkillTree and -PwithLivingWorldQuests.
+val withMmoSkillTree = providers.gradleProperty("withMmoSkillTree").isPresent
+
 hytaleWorkspace {
-    modProjects = listOf(":quests:core", ":quests:extension", ":dialogues", ":mods:mmoskilltree", ":mods:openquestsdialogues")
+    modProjects = listOf(":quests:core", ":quests:extension", ":dialogues", ":mods:openquestsdialogues") +
+        listOfNotNull(":mods:mmoskilltree".takeIf { withMmoSkillTree })
     hostProject = ":quests:extension"
 
     // Shared
@@ -109,4 +114,24 @@ val generateAssetSchemas by tasks.registering(JavaExec::class) {
         }
         target.resolve("common.json").writeText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(mapOf("definitions" to kept))) + "\n")
     }
+}
+
+// This content pack needs a third-party mod, so it is linked only with -PwithLivingWorldQuests.
+val linkLivingWorldQuests by tasks.registering(Exec::class) {
+    val link = layout.projectDirectory.dir("run/mods/LivingWorldQuests").asFile
+    val target = project(":mods:livingworldevents").file("src/main/resources")
+    dependsOn(":mods:livingworldevents:updatePluginManifest")
+    mustRunAfter("stageAllModAssets")
+    // rmdir without /s only drops a junction or an empty folder, never the files behind it
+    val removeLink = "(if exist \"$link\" rmdir \"$link\")"
+    val command = if (providers.gradleProperty("withLivingWorldQuests").isPresent) {
+        "$removeLink && mklink /J \"$link\" \"$target\""
+    } else {
+        removeLink
+    }
+    commandLine("cmd", "/c", command)
+}
+
+tasks.matching { it.name == "runAllMods" }.configureEach {
+    dependsOn(linkLivingWorldQuests)
 }

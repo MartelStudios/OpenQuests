@@ -1,0 +1,32 @@
+{
+  "$Comment": "A commission offered by Brindle.",
+  "Type": "Deliver",
+  "Character": "LivingWorldQuests_KweebecScout",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "LWE_Living_Sap"
+      },
+      "Quantity": 5
+    },
+    {
+      "Item": {
+        "ItemId": "LWE_Potted_Sapling"
+      },
+      "Quantity": 1
+    }
+  ],
+  "Dialogue": "LivingWorldQuests_ScoutSaplingHandoff",
+  "TitleKey": "livingworldquests.quest.scout-sapling.title",
+  "ShortDescriptionKey": "livingworldquests.quest.scout-sapling.short",
+  "DescriptionKey": "livingworldquests.quest.scout-sapling.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
+}

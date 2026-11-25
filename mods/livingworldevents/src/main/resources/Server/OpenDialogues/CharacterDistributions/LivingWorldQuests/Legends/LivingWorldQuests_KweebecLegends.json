@@ -1,0 +1,27 @@
+{
+  "$Comment": "Draws unique quest characters on compatible village NPCs outside instances.",
+  "Filters": [
+    {
+      "Type": "Group",
+      "Groups": [
+        "Kweebec_Civilian"
+      ]
+    },
+    {
+      "Type": "World",
+      "Worlds": [
+        "instance-.*"
+      ],
+      "Not": true
+    }
+  ],
+  "Characters": [
+    {
+      "Character": "LivingWorldQuests_KweebecScout",
+      "Weight": 1
+    },
+    {
+      "Weight": 4
+    }
+  ]
+}

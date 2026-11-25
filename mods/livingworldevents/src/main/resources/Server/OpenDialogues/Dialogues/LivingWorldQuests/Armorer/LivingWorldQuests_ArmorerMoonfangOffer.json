@@ -1,0 +1,35 @@
+{
+  "$Comment": "Dialogue for Sena at this stage of the commission.",
+  "Character": "LivingWorldQuests_Armorer",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.armorer-moonfang-offer.previous"
+    },
+    {
+      "Text": "livingworldquests.dialogue.armorer-moonfang-offer.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.armorer-moonfang-offer.act",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "LivingWorldQuests_ArmorerMoonfang"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.armorer-moonfang-offer.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

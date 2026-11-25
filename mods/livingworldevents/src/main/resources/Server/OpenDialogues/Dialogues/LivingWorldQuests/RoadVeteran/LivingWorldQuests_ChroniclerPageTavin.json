@@ -1,0 +1,38 @@
+{
+  "$Comment": "Tavin tells what he saw on the night Yselle blew out the last lantern.",
+  "Character": "LivingWorldQuests_RoadVeteran",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-tavin.page1"
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-tavin.page2"
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-tavin.page3"
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-tavin.page4"
+    }
+  ],
+  "Responses": [
+    {
+      "Id": "Tell",
+      "Text": "livingworldquests.dialogue.chronicler-page-tavin.act",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-tavin.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

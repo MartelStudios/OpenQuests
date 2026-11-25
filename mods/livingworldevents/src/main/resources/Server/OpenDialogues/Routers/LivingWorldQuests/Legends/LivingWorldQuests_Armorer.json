@@ -1,0 +1,148 @@
+{
+  "$Comment": "Opens offers, progress reminders and completed dialogue for Sena.",
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "LivingWorldQuests_ArmorerWarlord",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "Composite",
+              "Operator": "Or",
+              "Conditions": [
+                {
+                  "Type": "Inventory",
+                  "Item": {
+                    "ItemId": "LWE_Warlord_Early_Head"
+                  },
+                  "Min": 1
+                },
+                {
+                  "Type": "Inventory",
+                  "Item": {
+                    "ItemId": "LWE_Warlord_Early_Chest"
+                  },
+                  "Min": 1
+                },
+                {
+                  "Type": "Inventory",
+                  "Item": {
+                    "ItemId": "LWE_Warlord_Early_Hands"
+                  },
+                  "Min": 1
+                },
+                {
+                  "Type": "Inventory",
+                  "Item": {
+                    "ItemId": "LWE_Warlord_Early_Legs"
+                  },
+                  "Min": 1
+                }
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ArmorerWarlordReady"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ArmorerWarlord",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ArmorerWarlordOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ArmorerWarlord",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ArmorerWarlordWaiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "LivingWorldQuests_ArmorerMoonfang",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "Inventory",
+              "Item": {
+                "ItemId": "LWE_Moonfang_Staff"
+              },
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ArmorerMoonfangReady"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ArmorerMoonfang",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ArmorerMoonfangOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ArmorerMoonfang",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ArmorerMoonfangWaiting"
+        }
+      }
+    ],
+    "Default": {
+      "Dialogue": "LivingWorldQuests_ArmorerMoonfangThanks"
+    }
+  }
+}

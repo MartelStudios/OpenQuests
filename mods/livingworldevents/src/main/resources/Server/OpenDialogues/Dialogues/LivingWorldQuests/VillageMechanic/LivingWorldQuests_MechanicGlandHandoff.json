@@ -1,0 +1,33 @@
+{
+  "$Comment": "Dialogue for Rivet at this stage of the commission.",
+  "Character": "LivingWorldQuests_VillageMechanic",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.mechanic-gland-handoff.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.mechanic-gland-handoff.act",
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "LivingWorldQuests_MechanicGland"
+        },
+        {
+          "Type": "Open",
+          "Router": "LivingWorldQuests_VillageMechanic"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.mechanic-gland-handoff.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

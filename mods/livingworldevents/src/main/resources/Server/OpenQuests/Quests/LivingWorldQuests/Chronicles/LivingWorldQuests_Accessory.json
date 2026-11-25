@@ -1,0 +1,52 @@
+{
+  "$Comment": "Craft a Moonstone Pendant, Chitin Bracer or Tinkerer’s Lamp.",
+  "Type": "Composite",
+  "Operator": "Or",
+  "QuestAssetIds": [
+    {
+      "$Comment": "Craft a Moonstone Pendant.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Moonstone_Pendant"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.accessory-moonstone-pendant.title",
+      "ShortDescriptionKey": "livingworldquests.quest.accessory-moonstone-pendant.short",
+      "DescriptionKey": "livingworldquests.quest.accessory-moonstone-pendant.description"
+    },
+    {
+      "$Comment": "Craft a Chitin Bracer.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Chitin_Bracer"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.accessory-chitin-bracer.title",
+      "ShortDescriptionKey": "livingworldquests.quest.accessory-chitin-bracer.short",
+      "DescriptionKey": "livingworldquests.quest.accessory-chitin-bracer.description"
+    },
+    {
+      "$Comment": "Craft a Tinkerer’s Lamp.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Tinkerers_Lamp"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.accessory-tinkerers-lamp.title",
+      "ShortDescriptionKey": "livingworldquests.quest.accessory-tinkerers-lamp.short",
+      "DescriptionKey": "livingworldquests.quest.accessory-tinkerers-lamp.description"
+    }
+  ],
+  "TitleKey": "livingworldquests.quest.accessory.title",
+  "ShortDescriptionKey": "livingworldquests.quest.accessory.short",
+  "DescriptionKey": "livingworldquests.quest.accessory.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Chitin_Plate",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
+}

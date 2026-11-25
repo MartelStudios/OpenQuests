@@ -1,0 +1,20 @@
+{
+  "$Comment": "Obtain the Crimson Scythe.",
+  "Type": "Gather",
+  "ItemToGather": {
+    "ItemId": "LWE_Weapon_Battleaxe_Crimson_Scythe"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.torn-from-herald.title",
+  "ShortDescriptionKey": "livingworldquests.quest.torn-from-herald.short",
+  "DescriptionKey": "livingworldquests.quest.torn-from-herald.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Herald_Ichor",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ]
+}

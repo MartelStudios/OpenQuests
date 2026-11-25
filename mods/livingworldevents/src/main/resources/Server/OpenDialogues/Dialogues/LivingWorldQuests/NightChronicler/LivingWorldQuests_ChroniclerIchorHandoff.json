@@ -1,0 +1,33 @@
+{
+  "$Comment": "Dialogue for Yselle at this stage of the commission.",
+  "Character": "LivingWorldQuests_NightChronicler",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.chronicler-ichor-handoff.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.chronicler-ichor-handoff.act",
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "LivingWorldQuests_ChroniclerIchor"
+        },
+        {
+          "Type": "Open",
+          "Router": "LivingWorldQuests_NightChronicler"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-ichor-handoff.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

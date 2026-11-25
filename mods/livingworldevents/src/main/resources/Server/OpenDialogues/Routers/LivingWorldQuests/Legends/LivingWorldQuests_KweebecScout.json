@@ -1,0 +1,79 @@
+{
+  "$Comment": "Opens offers, progress reminders and completed dialogue for Brindle.",
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "LivingWorldQuests_ScoutSapling",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "Composite",
+              "Operator": "Or",
+              "Conditions": [
+                {
+                  "Type": "Inventory",
+                  "Item": {
+                    "ItemId": "LWE_Living_Sap"
+                  },
+                  "Min": 1
+                },
+                {
+                  "Type": "Inventory",
+                  "Item": {
+                    "ItemId": "LWE_Potted_Sapling"
+                  },
+                  "Min": 1
+                }
+              ]
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ScoutSaplingReady"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ScoutSapling",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ScoutSaplingOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_ScoutSapling",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_ScoutSaplingWaiting"
+        }
+      }
+    ],
+    "Default": {
+      "Dialogue": "LivingWorldQuests_ScoutSaplingThanks"
+    }
+  }
+}

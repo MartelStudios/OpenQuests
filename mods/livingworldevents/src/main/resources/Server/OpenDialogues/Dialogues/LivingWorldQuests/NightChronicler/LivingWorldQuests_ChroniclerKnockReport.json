@@ -1,0 +1,30 @@
+{
+  "$Comment": "The player tells Yselle who knocked.",
+  "Character": "LivingWorldQuests_NightChronicler",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.chronicler-knock-report.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Id": "Report",
+      "Text": "livingworldquests.dialogue.chronicler-knock-report.act",
+      "Actions": [
+        {
+          "Type": "Open",
+          "Router": "LivingWorldQuests_NightChronicler"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-knock-report.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

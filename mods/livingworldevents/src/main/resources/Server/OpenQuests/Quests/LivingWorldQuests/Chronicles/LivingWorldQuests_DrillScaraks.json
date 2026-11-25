@@ -1,0 +1,25 @@
+{
+  "$Comment": "Kill 8 Scaraks at Sprocket’s drill.",
+  "Type": "KillNpc",
+  "NpcGroupId": "LivingWorldQuests_DrillScarakRoles",
+  "TargetQuantity": 8,
+  "TitleKey": "livingworldquests.quest.drill-scaraks.title",
+  "ShortDescriptionKey": "livingworldquests.quest.drill-scaraks.short",
+  "DescriptionKey": "livingworldquests.quest.drill-scaraks.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "LivingWorldQuests_SaveTheDrill"
+      ],
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Deep_Ore",
+      "Quantity": 10,
+      "AutoClaim": true
+    }
+  ]
+}

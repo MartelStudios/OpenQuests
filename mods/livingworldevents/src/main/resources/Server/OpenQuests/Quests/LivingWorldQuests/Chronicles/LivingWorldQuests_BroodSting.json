@@ -1,0 +1,20 @@
+{
+  "$Comment": "Craft a Brood Stinger.",
+  "Type": "Craft",
+  "ItemToCraft": {
+    "ItemId": "LWE_Brood_Stinger"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.brood-sting.title",
+  "ShortDescriptionKey": "livingworldquests.quest.brood-sting.short",
+  "DescriptionKey": "livingworldquests.quest.brood-sting.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Deep_Ore",
+      "Quantity": 10,
+      "AutoClaim": true
+    }
+  ]
+}

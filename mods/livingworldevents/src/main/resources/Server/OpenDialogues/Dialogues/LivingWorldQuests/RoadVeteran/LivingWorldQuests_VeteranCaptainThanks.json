@@ -1,0 +1,20 @@
+{
+  "$Comment": "Dialogue for Tavin at this stage of the commission.",
+  "Character": "LivingWorldQuests_RoadVeteran",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.veteran-captain-thanks.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.veteran-captain-thanks.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

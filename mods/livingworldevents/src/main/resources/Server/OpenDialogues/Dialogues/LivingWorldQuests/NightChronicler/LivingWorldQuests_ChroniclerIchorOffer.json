@@ -1,0 +1,35 @@
+{
+  "$Comment": "Dialogue for Yselle at this stage of the commission.",
+  "Character": "LivingWorldQuests_NightChronicler",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.chronicler-ichor-offer.previous"
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-ichor-offer.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.chronicler-ichor-offer.act",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "LivingWorldQuests_ChroniclerIchor"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-ichor-offer.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

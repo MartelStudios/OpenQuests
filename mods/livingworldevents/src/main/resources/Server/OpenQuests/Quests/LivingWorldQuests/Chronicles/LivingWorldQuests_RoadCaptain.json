@@ -1,0 +1,18 @@
+{
+  "$Comment": "Kill an ambush bandit captain.",
+  "Type": "KillNpc",
+  "NpcGroupId": "LivingWorldQuests_AmbushCaptainRoles",
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.road-captain.title",
+  "ShortDescriptionKey": "livingworldquests.quest.road-captain.short",
+  "DescriptionKey": "livingworldquests.quest.road-captain.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ]
+}

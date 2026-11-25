@@ -1,0 +1,27 @@
+{
+  "$Comment": "Craft a Blood Charm.",
+  "Type": "Craft",
+  "ItemToCraft": {
+    "ItemId": "LWE_Blood_Charm"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.blood-charm.title",
+  "ShortDescriptionKey": "livingworldquests.quest.blood-charm.short",
+  "DescriptionKey": "livingworldquests.quest.blood-charm.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "LivingWorldQuests_BloodMoonOmen"
+      ],
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Moonstone",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
+}

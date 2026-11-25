@@ -1,0 +1,7 @@
+{
+  "$Comment": "Matches the Living World Events roles for AmbushBanditRoles.",
+  "IncludeRoles": [
+    "LWE_Outlander_Bandit_*",
+    "LWE_Bandit_*"
+  ]
+}

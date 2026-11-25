@@ -1,0 +1,113 @@
+{
+  "$Comment": "Shows the Legends quests in the journal.",
+  "NameKey": "livingworldquests.chapter.legends.name",
+  "Group": "LivingWorldQuests_Events",
+  "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
+  "Order": 1,
+  "Quests": [
+    {
+      "Quest": "LivingWorldQuests_ChroniclerSkull",
+      "Icon": "Icons/ItemsGenerated/LWE_Tyrants_Skull.png",
+      "Position": {
+        "X": 0,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ChroniclerIchor",
+      "Icon": "Icons/ItemsGenerated/LWE_Herald_Ichor.png",
+      "Position": {
+        "X": 0,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ChroniclerPage",
+      "Icon": "Icons/ItemsGenerated/Deco_Scroll.png",
+      "Position": {
+        "X": 2,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ChroniclerKnock",
+      "Icon": "Icons/ItemsGenerated/Furniture_Feran_Door.png",
+      "Position": {
+        "X": 2,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ChroniclerLamp",
+      "Icon": "Icons/ItemsGenerated/LWE_Tinkerers_Lamp.png",
+      "Position": {
+        "X": 2,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_MechanicGland",
+      "Icon": "Icons/ItemsGenerated/LWE_Brood_Gland.png",
+      "Position": {
+        "X": 4,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_MechanicFlare",
+      "Icon": "Icons/ItemsGenerated/LWE_Tinkerers_Flare.png",
+      "Position": {
+        "X": 4,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_MerchantGold",
+      "Icon": "Icons/ItemsGenerated/Ingredient_Bar_Gold.png",
+      "Position": {
+        "X": 0,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_MerchantSack",
+      "Icon": "Icons/ItemsGenerated/LWE_Stolen_Sack.png",
+      "Position": {
+        "X": 1,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_VeteranCaptain",
+      "Icon": "Icons/ItemsGenerated/Weapon_Battleaxe_Iron.png",
+      "Position": {
+        "X": 2,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ArmorerWarlord",
+      "Icon": "Icons/ItemsGenerated/LWE_Warlord_Early_Chest.png",
+      "Position": {
+        "X": 4,
+        "Y": 2
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ArmorerMoonfang",
+      "Icon": "Icons/ItemsGenerated/LWE_Moonfang_Staff.png",
+      "Position": {
+        "X": 3,
+        "Y": 3
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_ScoutSapling",
+      "Icon": "Icons/ItemsGenerated/LWE_Potted_Sapling.png",
+      "Position": {
+        "X": 2,
+        "Y": 4
+      }
+    }
+  ]
+}

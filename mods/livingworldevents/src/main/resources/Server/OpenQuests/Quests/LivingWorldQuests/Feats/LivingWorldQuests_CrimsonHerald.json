@@ -1,0 +1,18 @@
+{
+  "$Comment": "Defeat the Crimson Herald in its final form.",
+  "Type": "KillNpc",
+  "NpcGroupId": "LivingWorldQuests_HeraldRoles",
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.crimson-herald.title",
+  "ShortDescriptionKey": "livingworldquests.quest.crimson-herald.short",
+  "DescriptionKey": "livingworldquests.quest.crimson-herald.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Moonstone",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ]
+}

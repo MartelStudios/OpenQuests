@@ -1,0 +1,70 @@
+{
+  "$Comment": "Craft all 4 early Pathfinder armor pieces.",
+  "Type": "Composite",
+  "Operator": "And",
+  "QuestAssetIds": [
+    {
+      "$Comment": "Craft a Pathfinder Hood.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Pathfinder_Early_Head"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.pathfinder-pathfinder-early-head.title",
+      "ShortDescriptionKey": "livingworldquests.quest.pathfinder-pathfinder-early-head.short",
+      "DescriptionKey": "livingworldquests.quest.pathfinder-pathfinder-early-head.description"
+    },
+    {
+      "$Comment": "Craft a Pathfinder Jerkin.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Pathfinder_Early_Chest"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.pathfinder-pathfinder-early-chest.title",
+      "ShortDescriptionKey": "livingworldquests.quest.pathfinder-pathfinder-early-chest.short",
+      "DescriptionKey": "livingworldquests.quest.pathfinder-pathfinder-early-chest.description"
+    },
+    {
+      "$Comment": "Craft Pathfinder Gloves.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Pathfinder_Early_Hands"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.pathfinder-pathfinder-early-hands.title",
+      "ShortDescriptionKey": "livingworldquests.quest.pathfinder-pathfinder-early-hands.short",
+      "DescriptionKey": "livingworldquests.quest.pathfinder-pathfinder-early-hands.description"
+    },
+    {
+      "$Comment": "Craft Pathfinder Leggings.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Pathfinder_Early_Legs"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.pathfinder-pathfinder-early-legs.title",
+      "ShortDescriptionKey": "livingworldquests.quest.pathfinder-pathfinder-early-legs.short",
+      "DescriptionKey": "livingworldquests.quest.pathfinder-pathfinder-early-legs.description"
+    }
+  ],
+  "TitleKey": "livingworldquests.quest.pathfinder.title",
+  "ShortDescriptionKey": "livingworldquests.quest.pathfinder.short",
+  "DescriptionKey": "livingworldquests.quest.pathfinder.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "LivingWorldQuests_RazorleafBow"
+      ],
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Living_Sap",
+      "Quantity": 10,
+      "AutoClaim": true
+    }
+  ]
+}

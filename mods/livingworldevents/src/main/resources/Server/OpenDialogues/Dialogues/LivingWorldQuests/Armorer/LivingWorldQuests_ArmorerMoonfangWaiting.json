@@ -1,0 +1,20 @@
+{
+  "$Comment": "Dialogue for Sena at this stage of the commission.",
+  "Character": "LivingWorldQuests_Armorer",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.armorer-moonfang-waiting.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.armorer-moonfang-waiting.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

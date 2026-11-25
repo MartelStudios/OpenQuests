@@ -1,0 +1,7 @@
+{
+  "$Comment": "Matches the Living World Events roles for DrillScarakRoles.",
+  "IncludeRoles": [
+    "LWE_Scarak_Attacker_*",
+    "LWE_Scarak_Burrower*"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "$Comment": "Obtain a Stolen Sack.",
+  "Type": "Gather",
+  "ItemToGather": {
+    "ItemId": "LWE_Stolen_Sack"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.stolen-sack.title",
+  "ShortDescriptionKey": "livingworldquests.quest.stolen-sack.short",
+  "DescriptionKey": "livingworldquests.quest.stolen-sack.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ]
+}

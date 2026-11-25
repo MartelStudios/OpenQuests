@@ -1,0 +1,20 @@
+{
+  "$Comment": "Obtain a Sapling Buddy Pot.",
+  "Type": "Gather",
+  "ItemToGather": {
+    "ItemId": "LWE_Sapling_Buddy_Pot"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.friend-in-pot.title",
+  "ShortDescriptionKey": "livingworldquests.quest.friend-in-pot.short",
+  "DescriptionKey": "livingworldquests.quest.friend-in-pot.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Living_Sap",
+      "Quantity": 10,
+      "AutoClaim": true
+    }
+  ]
+}

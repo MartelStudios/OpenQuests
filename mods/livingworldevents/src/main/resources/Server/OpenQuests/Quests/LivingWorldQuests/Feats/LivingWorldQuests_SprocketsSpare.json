@@ -1,0 +1,20 @@
+{
+  "$Comment": "Obtain Sprocket’s Drill.",
+  "Type": "Gather",
+  "ItemToGather": {
+    "ItemId": "LWE_Sprockets_Drill"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.sprockets-spare.title",
+  "ShortDescriptionKey": "livingworldquests.quest.sprockets-spare.short",
+  "DescriptionKey": "livingworldquests.quest.sprockets-spare.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Mithril",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ]
+}

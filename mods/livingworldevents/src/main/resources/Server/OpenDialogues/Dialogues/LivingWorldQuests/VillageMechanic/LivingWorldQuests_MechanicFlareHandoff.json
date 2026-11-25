@@ -1,0 +1,33 @@
+{
+  "$Comment": "Dialogue for Rivet at this stage of the commission.",
+  "Character": "LivingWorldQuests_VillageMechanic",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.mechanic-flare-handoff.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.mechanic-flare-handoff.act",
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "LivingWorldQuests_MechanicFlare"
+        },
+        {
+          "Type": "Open",
+          "Router": "LivingWorldQuests_VillageMechanic"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.mechanic-flare-handoff.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}
