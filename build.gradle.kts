@@ -110,3 +110,23 @@ val generateAssetSchemas by tasks.registering(JavaExec::class) {
         target.resolve("common.json").writeText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(mapOf("definitions" to kept))) + "\n")
     }
 }
+
+// This content pack also needs the external LWE mod, so opt in on a server with that mod installed.
+val linkLivingWorldQuests by tasks.registering(Exec::class) {
+    val link = layout.projectDirectory.dir("run/mods/LivingWorldQuests").asFile
+    val target = project(":mods:livingworldevents").file("src/main/resources")
+    dependsOn(":mods:livingworldevents:updatePluginManifest")
+    mustRunAfter("stageAllModAssets")
+    // rmdir without /s only drops a junction or an empty folder, never the files behind it
+    val removeLink = "(if exist \"$link\" rmdir \"$link\")"
+    val command = if (providers.gradleProperty("withLivingWorldQuests").isPresent) {
+        "$removeLink && mklink /J \"$link\" \"$target\""
+    } else {
+        removeLink
+    }
+    commandLine("cmd", "/c", command)
+}
+
+tasks.matching { it.name == "runAllMods" }.configureEach {
+    dependsOn(linkLivingWorldQuests)
+}

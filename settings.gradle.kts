@@ -14,4 +14,4 @@ plugins {
 }
 
 rootProject.name = "OpenQuests"
-include("quests:core", "quests:extension", "dialogues", "mods:mmoskilltree", "mods:openquestsdialogues", "mods:adventurequests")
+include("quests:core", "quests:extension", "dialogues", "mods:mmoskilltree", "mods:openquestsdialogues", "mods:adventurequests", "mods:livingworldevents")

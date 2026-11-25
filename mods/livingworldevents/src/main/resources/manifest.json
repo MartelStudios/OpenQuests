@@ -1,0 +1,21 @@
+{
+    "Group": "MartelStudios",
+    "Name": "LivingWorldQuests",
+    "Version": "1.0.0",
+    "Description": "Quests and characters for Living World Events.",
+    "Authors": [
+        {
+            "Name": "Hazard4U"
+        }
+    ],
+    "Website": "https://github.com/MartelStudios/OpenQuests",
+    "ServerVersion": "^0.7.0",
+    "Dependencies": {
+        "MartelStudios:OpenQuests": "^5.4.0",
+        "MartelStudios:OpenDialogues": "^2.4.0",
+        "MartelStudios:OpenQuestsDialogues": "^1.3.0",
+        "NoeKing:LivingWorldEvents": "^1.9.5"
+    },
+    "DisabledByDefault": false,
+    "IncludesAssetPack": true
+}
