@@ -92,9 +92,17 @@ public class LootNpcQuestProgression extends QuantityQuestProgression<LootNpcQue
      */
     @Nullable
     private static String npcNameKey(@Nonnull LootNpcDrop[] drops) {
-        if (drops.length != 1) return null;
+        return drops.length == 1 ? roleNameKey(drops[0].getNpcGroupId()) : null;
+    }
 
-        String key = "server.npcRoles." + drops[0].getNpcGroupId() + ".name";
+    /**
+     * @return the translation key of that role's name, {@code null} when the game has none.
+     */
+    @Nullable
+    static String roleNameKey(@Nullable String roleId) {
+        if (roleId == null) return null;
+
+        String key = "server.npcRoles." + roleId + ".name";
         return I18nModule.get().getMessage(I18nModule.DEFAULT_LANGUAGE, key) != null ? key : null;
     }
 

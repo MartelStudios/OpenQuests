@@ -36,6 +36,9 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class LootNpcDeathSystem extends KillDeathSystem {
 
+    private static final String COLOR_DROPPED = "#E8A93B";
+    private static final String COLOR_MISSED = "#E05A4F";
+
     private final QuestProgressionService progression;
 
     public LootNpcDeathSystem(@Nonnull QuestProgressionService progression) {
@@ -69,7 +72,7 @@ public class LootNpcDeathSystem extends KillDeathSystem {
             }
 
             int quantity = LootRoll.roll(candidates, ThreadLocalRandom.current());
-            boolean received = quantity > 0 && give(store, victimRef, killerRef, entry.getKey(), quantity);
+            boolean received = quantity > 0 && give(store, victimRef, victim, killerRef, entry.getKey(), quantity);
 
             for (var found : entry.getValue()) {
                 var outcome = LootRoll.outcome(found.entry(), found.quest().getRemaining(), quantity, received);
@@ -86,16 +89,26 @@ public class LootNpcDeathSystem extends KillDeathSystem {
      *
      * @return whether the killer got the items.
      */
-    private static boolean give(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> victimRef, @Nonnull Ref<EntityStore> killerRef, @Nonnull String itemId, int quantity) {
+    private static boolean give(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> victimRef, @Nonnull NPCEntity victim, @Nonnull Ref<EntityStore> killerRef, @Nonnull String itemId, int quantity) {
         EntityComponents killer = EntityComponents.of(killerRef);
         ItemContainer inventory = killer == null ? null : ItemReward.inventoryOf(killer);
         if (inventory == null) return false;
 
+        Item item = Item.getAssetMap().getAsset(itemId);
+        Message itemName = item == null ? Message.raw(itemId) : item.getTranslationMessage();
+
         ItemStack stack = new ItemStack(itemId, quantity);
         if (!inventory.addItemStack(stack, true, false, ItemContainer.DEFAULT_FILTER).succeeded()) {
-            tellInventoryFull(store, killerRef, itemId);
+            tell(store, killerRef, Message.translation("openquests.loot.inventory_full").param("item", itemName).color(COLOR_MISSED));
             return false;
         }
+
+        String npcKey = LootNpcQuestProgression.roleNameKey(victim.getRoleName());
+        Message dropped = Message.translation(npcKey == null ? "openquests.loot.received" : "openquests.loot.dropped")
+                                 .param("quantity", quantity)
+                                 .param("item", itemName);
+        if (npcKey != null) dropped = dropped.param("npc", Message.translation(npcKey));
+        tell(store, killerRef, dropped.color(COLOR_DROPPED));
 
         TransformComponent corpse = store.getComponent(victimRef, TransformComponent.getComponentType());
         if (corpse == null) return true;
@@ -108,11 +121,8 @@ public class LootNpcDeathSystem extends KillDeathSystem {
         return true;
     }
 
-    private static void tellInventoryFull(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> killerRef, @Nonnull String itemId) {
+    private static void tell(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> killerRef, @Nonnull Message message) {
         PlayerRef player = store.getComponent(killerRef, PlayerRef.getComponentType());
-        Item item = Item.getAssetMap().getAsset(itemId);
-        if (player == null || item == null) return;
-
-        player.sendMessage(Message.translation("openquests.loot.inventory_full").param("item", item.getTranslationMessage()));
+        if (player != null) player.sendMessage(message);
     }
 }
