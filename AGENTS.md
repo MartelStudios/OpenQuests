@@ -7,6 +7,7 @@ Hytale quest and dialogue mods by MartelStudios (OpenQuests, OpenDialogues and t
 - Gradle modules: `quests:core`, `quests:extension`, `dialogues`, `mods:<mod>` (integration packs and bridges).
 - `./gradlew build` before every push or merge; add `clean` when release artifacts look stale (`verifyReleaseArtifacts` fails on old jars).
 - `runAllMods` rebuilds `run/mods/`, so files a mod writes there (such as `hud.json`) reset on each run.
+- Integrations join `runAllMods` only on request: `-PwithMmoSkillTree`, `-PwithLivingWorldQuests` (downloads the pinned Living World Events jar), or both.
 - PostgreSQL tests: `docker compose -f docker/postgres.yml up -d`, then the `-Popenquests.jdbc.*` properties from the README (port 5433).
 
 ## More detail
