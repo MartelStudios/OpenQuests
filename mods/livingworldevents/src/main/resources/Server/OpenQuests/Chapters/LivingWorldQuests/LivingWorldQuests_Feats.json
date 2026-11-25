@@ -3,7 +3,7 @@
   "NameKey": "livingworldquests.chapter.feats.name",
   "Group": "LivingWorldQuests_Events",
   "Icon": "Icons/ItemsGenerated/LWE_Tyrants_Skull.png",
-  "Order": 0,
+  "Order": 2,
   "Quests": [
     {
       "Quest": "LivingWorldQuests_Regicide",
@@ -14,8 +14,16 @@
       }
     },
     {
-      "Quest": "LivingWorldQuests_CrimsonHerald",
+      "Quest": "LivingWorldQuests_TornFromHerald",
       "Icon": "Icons/ItemsGenerated/LWE_Crimson_Herald_Scythe.png",
+      "Position": {
+        "X": 3,
+        "Y": 0
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_CrimsonHerald",
+      "Icon": "Icons/ItemsGenerated/LWE_Herald_Ichor.png",
       "Position": {
         "X": 1,
         "Y": 2
@@ -38,8 +46,8 @@
       }
     },
     {
-      "Quest": "LivingWorldQuests_DrillTrophy",
-      "Icon": "Icons/ItemsGenerated/LWE_Drill_Gear.png",
+      "Quest": "LivingWorldQuests_SprocketsSpare",
+      "Icon": "Icons/ItemsGenerated/LWE_Sprockets_Drill.png",
       "Position": {
         "X": 0,
         "Y": 3
@@ -66,6 +74,14 @@
       "Icon": "Icons/ItemsGenerated/LWE_Potted_Sapling.png",
       "Position": {
         "X": 2,
+        "Y": 4
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_FriendInPot",
+      "Icon": "Icons/ItemsGenerated/LWE_Sapling_Buddy_Pot.png",
+      "Position": {
+        "X": 3,
         "Y": 4
       }
     }

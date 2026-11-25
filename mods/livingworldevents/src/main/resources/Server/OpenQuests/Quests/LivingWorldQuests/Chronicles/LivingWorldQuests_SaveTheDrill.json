@@ -16,6 +16,12 @@
         "LivingWorldQuests_TinkerersFlare"
       ],
       "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Chitin_Plate",
+      "Quantity": 2,
+      "AutoClaim": true
     }
   ]
 }

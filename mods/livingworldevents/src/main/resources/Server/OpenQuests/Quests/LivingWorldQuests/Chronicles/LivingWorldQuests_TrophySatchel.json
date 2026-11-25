@@ -1,5 +1,5 @@
 {
-  "$Comment": "Craft a Trophy Satchel.",
+  "$Comment": "Craft an Accessory Pouch.",
   "Type": "Craft",
   "ItemToCraft": {
     "ItemId": "LWE_Trophy_Satchel"
@@ -15,6 +15,12 @@
       "QuestAssetIds": [
         "LivingWorldQuests_Accessory"
       ],
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 1,
       "AutoClaim": true
     }
   ]

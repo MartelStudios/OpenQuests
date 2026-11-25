@@ -59,6 +59,12 @@
         "LivingWorldQuests_RazorleafBow"
       ],
       "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "LWE_Living_Sap",
+      "Quantity": 10,
+      "AutoClaim": true
     }
   ]
 }

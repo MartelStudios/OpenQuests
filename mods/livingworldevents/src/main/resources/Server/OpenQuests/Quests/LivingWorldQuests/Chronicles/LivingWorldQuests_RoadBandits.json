@@ -14,6 +14,12 @@
         "LivingWorldQuests_RoadCaptain"
       ],
       "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 1,
+      "AutoClaim": true
     }
   ]
 }

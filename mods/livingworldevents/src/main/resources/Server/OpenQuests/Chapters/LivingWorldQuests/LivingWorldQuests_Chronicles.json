@@ -3,7 +3,7 @@
   "NameKey": "livingworldquests.chapter.chronicles.name",
   "Group": "LivingWorldQuests_Events",
   "Icon": "Icons/ItemsGenerated/LWE_BloodMoon_Omen.png",
-  "Order": 1,
+  "Order": 0,
   "Quests": [
     {
       "Quest": "LivingWorldQuests_RedNights",
@@ -30,6 +30,14 @@
       }
     },
     {
+      "Quest": "LivingWorldQuests_BladesOfTheRedMoon",
+      "Icon": "Icons/ItemsGenerated/LWE_Moonfang_Staff.png",
+      "Position": {
+        "X": 3,
+        "Y": 0
+      }
+    },
+    {
       "Quest": "LivingWorldQuests_DrillScaraks",
       "Icon": "Icons/ItemsGenerated/LWE_Chitin_Plate.png",
       "Position": {
@@ -50,6 +58,14 @@
       "Icon": "Icons/ItemsGenerated/LWE_Tinkerers_Flare.png",
       "Position": {
         "X": 2,
+        "Y": 1
+      }
+    },
+    {
+      "Quest": "LivingWorldQuests_BroodSting",
+      "Icon": "Icons/ItemsGenerated/LWE_Brood_Stinger.png",
+      "Position": {
+        "X": 3,
         "Y": 1
       }
     },
