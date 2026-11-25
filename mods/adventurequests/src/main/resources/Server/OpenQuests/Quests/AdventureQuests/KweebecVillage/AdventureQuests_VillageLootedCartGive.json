@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-looted-cart.give.title",
+  "Character": "AdventureQuests_KweebecLootedCart",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Furniture_Village_Crate"
+      },
+      "Quantity": 3
+    }
+  ]
+}
