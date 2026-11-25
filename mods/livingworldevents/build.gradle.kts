@@ -57,3 +57,28 @@ val packZip by tasks.registering(Zip::class) {
 tasks.named("assemble") {
     dependsOn(packZip)
 }
+
+// The required mod itself, pinned to the version the pack is tested against, for the dev run.
+val devMods by configurations.creating
+
+dependencies {
+    devMods("curse.maven:living-world-events-1761204:${property("lwe_dev_file")}")
+}
+
+// Staged only with -PwithLivingWorldQuests; any staged copy is dropped first, so a run without it stays clean.
+val devModsDirectory = rootProject.layout.projectDirectory.dir("run/mods")
+
+val unstageDevMods by tasks.registering(Delete::class) {
+    delete(provider { devModsDirectory.asFile.listFiles { file -> file.name.startsWith("living-world-events-1761204-") }.orEmpty() })
+}
+
+val stageDevMods by tasks.registering(Copy::class) {
+    dependsOn(unstageDevMods)
+    enabled = providers.gradleProperty("withLivingWorldQuests").isPresent
+    from(devMods)
+    into(devModsDirectory)
+}
+
+rootProject.tasks.matching { it.name == "runAllMods" }.configureEach {
+    dependsOn(stageDevMods)
+}
