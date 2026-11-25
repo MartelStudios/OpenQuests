@@ -7,11 +7,13 @@ import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.asset.type.item.config.Item;
+import com.hypixel.hytale.server.core.modules.i18n.I18nModule;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.martelstudios.openquests.core.models.QuestOperation;
 import com.martelstudios.openquests.extension.quests.quantity.QuantityQuestProgression;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 
 /**
@@ -76,9 +78,24 @@ public class LootNpcQuestProgression extends QuantityQuestProgression<LootNpcQue
         Item item = asset == null ? null : Item.getAssetMap().getAsset(asset.getItemId());
         if (item == null) return super.getDefaultTitle();
 
-        return Message.translation("openquests.quest.default.loot")
-                      .param("quantity", getTargetQuantity())
-                      .param("item", item.getTranslationMessage());
+        String npcKey = npcNameKey(asset.getDrops());
+        Message title = Message.translation(npcKey == null ? "openquests.quest.default.loot" : "openquests.quest.default.loot-from")
+                               .param("quantity", getTargetQuantity())
+                               .param("item", item.getTranslationMessage());
+
+        return npcKey == null ? title : title.param("npc", Message.translation(npcKey));
+    }
+
+    /**
+     * Groups have no name of their own, but one named after a role can borrow that role's. Several
+     * sources, or an inline group with a generated id, name nobody.
+     */
+    @Nullable
+    private static String npcNameKey(@Nonnull LootNpcDrop[] drops) {
+        if (drops.length != 1) return null;
+
+        String key = "server.npcRoles." + drops[0].getNpcGroupId() + ".name";
+        return I18nModule.get().getMessage(I18nModule.DEFAULT_LANGUAGE, key) != null ? key : null;
     }
 
     private boolean moveMisses(int entry, int value) {
