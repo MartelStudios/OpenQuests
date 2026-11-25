@@ -417,6 +417,13 @@ classDiagram
         class KillPlayerQuestProgression {
             String playerToKill
         }
+        class LootNpcQuestAsset {
+            String itemId
+            LootNpcDrop[] drops
+        }
+        class LootNpcQuestProgression {
+            int[] misses
+        }
     }
 
     namespace extension_other {
@@ -504,6 +511,8 @@ classDiagram
     QuantityQuestProgression <|-- KillNpcQuestProgression
     QuantityQuestAsset <|-- KillPlayerQuestAsset
     QuantityQuestProgression <|-- KillPlayerQuestProgression
+    QuantityQuestAsset <|-- LootNpcQuestAsset
+    QuantityQuestProgression <|-- LootNpcQuestProgression
 
     OpenQuestAsset <|-- CompositeQuestAsset
     AbstractCompositeQuestProgression <|-- CompositeQuestProgression
