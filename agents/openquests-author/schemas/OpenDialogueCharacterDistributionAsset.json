@@ -158,6 +158,9 @@
             "$ref": "common.json#/definitions/OpenDialoguesGroupFilter"
           },
           {
+            "$ref": "common.json#/definitions/OpenDialoguesNearCharacterFilter"
+          },
+          {
             "$ref": "common.json#/definitions/OpenDialoguesRoleFilter"
           },
           {
@@ -175,6 +178,7 @@
           "values": [
             "Biome",
             "Group",
+            "NearCharacter",
             "Role",
             "Unobstructed",
             "World",

@@ -18714,8 +18714,8 @@
         "NearCharacterConstraint": {
             "type": "object",
             "title": "NearCharacterConstraint",
-            "description": "Allows quest progress only near an NPC carrying the specified character.",
-            "markdownDescription": "Allows quest progress only near an NPC carrying the specified character.",
+            "description": "Allows quest progress only near an NPC picked by Target.",
+            "markdownDescription": "Allows quest progress only near an NPC picked by Target.",
             "hytale": {
                 "type": "object",
                 "mergesProperties": true
@@ -18822,12 +18822,43 @@
                     }
                 },
                 "Character": {
-                    "type": "string",
-                    "description": "OpenDialogues character ID that a nearby NPC must carry.",
-                    "markdownDescription": "OpenDialogues character ID that a nearby NPC must carry.",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "ID of the character whose NPCs progress happens around, required with Target Character.",
+                    "markdownDescription": "ID of the character whose NPCs progress happens around, required with Target Character.",
                     "hytale": {
                         "type": "string"
                     }
+                },
+                "Target": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "title": "TargetMode",
+                    "description": "Whom the quest aims at: the Character field, every NPC of the giver's character, or the giver NPC alone, defaulting to Character.",
+                    "markdownDescription": "Whom the quest aims at: the Character field, every NPC of the giver's character, or the giver NPC alone, defaulting to Character.",
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "markdownEnumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "hytale": {
+                        "type": "Enum"
+                    },
+                    "enum": [
+                        "Character",
+                        "GiverCharacter",
+                        "GiverNpc"
+                    ],
+                    "default": "Character"
                 },
                 "Radius": {
                     "type": "number",
@@ -20087,6 +20118,34 @@
                     "hytale": {
                         "type": "integer"
                     }
+                },
+                "With": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "title": "SourceScope",
+                    "description": "Whose dialogues count: any NPC, the source's character, or the source NPC alone.",
+                    "markdownDescription": "Whose dialogues count: any NPC, the source's character, or the source NPC alone.",
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "markdownEnumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "hytale": {
+                        "type": "Enum"
+                    },
+                    "enum": [
+                        "Any",
+                        "Character",
+                        "Npc"
+                    ],
+                    "default": "Any"
                 }
             },
             "additionalProperties": false
@@ -20712,6 +20771,9 @@
                                 "$ref": "common.json#/definitions/OpenDialoguesCompositeCondition"
                             },
                             {
+                                "$ref": "common.json#/definitions/OpenDialoguesCooldownCondition"
+                            },
+                            {
                                 "$ref": "common.json#/definitions/OpenDialoguesHasPermissionCondition"
                             },
                             {
@@ -20730,6 +20792,12 @@
                                 "$ref": "common.json#/definitions/OpenDialoguesOpenedCondition"
                             },
                             {
+                                "$ref": "common.json#/definitions/OpenDialoguesOpenedAfterCondition"
+                            },
+                            {
+                                "$ref": "common.json#/definitions/OpenDialoguesQuestCooldownCondition"
+                            },
+                            {
                                 "$ref": "common.json#/definitions/OpenDialoguesRequiresQuestCondition"
                             }
                         ],
@@ -20738,12 +20806,15 @@
                             "values": [
                                 "Answered",
                                 "Composite",
+                                "Cooldown",
                                 "HasPermission",
                                 "Holding",
                                 "Inventory",
                                 "NearBlock",
                                 "NearNpc",
                                 "Opened",
+                                "OpenedAfter",
+                                "QuestCooldown",
                                 "RequiresQuest"
                             ]
                         },
@@ -20865,6 +20936,187 @@
                         "$ref": "common.json#/definitions/OpenDialoguesItemQuantity"
                     },
                     "minItems": 1
+                }
+            },
+            "additionalProperties": false
+        },
+        "OpenDialoguesCooldownCondition": {
+            "type": "object",
+            "title": "OpenDialoguesCooldownCondition",
+            "description": "Holds before the dialogue interaction ever happened and once the delay after the latest one ran out.",
+            "markdownDescription": "Holds before the dialogue interaction ever happened and once the delay after the latest one ran out.",
+            "hytale": {
+                "type": "object",
+                "mergesProperties": true
+            },
+            "properties": {
+                "Type": {
+                    "type": "string",
+                    "description": "This field controls the type, it must be set to the constant value \"Cooldown\" to function as this type.",
+                    "markdownDescription": "This field controls the type, it must be set to the constant value \"Cooldown\" to function as this type.",
+                    "hytale": {
+                        "type": "string"
+                    },
+                    "const": "Cooldown"
+                },
+                "$Title": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Comment": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Author": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$TODO": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Position": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$FloatingFunctionNodes": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Groups": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$WorkspaceID": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$NodeId": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$NodeEditorMetadata": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "Not": {
+                    "type": "boolean",
+                    "description": "Inverts the test result when true and defaults to false.",
+                    "markdownDescription": "Inverts the test result when true and defaults to false.",
+                    "hytale": {
+                        "type": "boolean"
+                    },
+                    "default": false
+                },
+                "Dialogue": {
+                    "type": "string",
+                    "description": "ID of the dialogue whose latest opening or answer starts the delay.",
+                    "markdownDescription": "ID of the dialogue whose latest opening or answer starts the delay.",
+                    "hytale": {
+                        "type": "string",
+                        "uiEditorComponent": {
+                            "component": "Text",
+                            "dataSet": "opendialogues:dialogues"
+                        }
+                    }
+                },
+                "Answer": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Answer ID that starts the delay when picked, the dialogue opening when unset.",
+                    "markdownDescription": "Answer ID that starts the delay when picked, the dialogue opening when unset.",
+                    "hytale": {
+                        "type": "string"
+                    }
+                },
+                "Character": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Character ID the dialogue must have been had with, any character when unset.",
+                    "markdownDescription": "Character ID the dialogue must have been had with, any character when unset.",
+                    "hytale": {
+                        "type": "string"
+                    }
+                },
+                "Seconds": {
+                    "type": "number",
+                    "description": "Real-time delay in seconds, offline time included.",
+                    "markdownDescription": "Real-time delay in seconds, offline time included.",
+                    "hytale": {
+                        "type": "number"
+                    }
+                },
+                "With": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "title": "SourceScope",
+                    "description": "Whose dialogues count: any NPC, the source's character, or the source NPC alone.",
+                    "markdownDescription": "Whose dialogues count: any NPC, the source's character, or the source NPC alone.",
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "markdownEnumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "hytale": {
+                        "type": "Enum"
+                    },
+                    "enum": [
+                        "Any",
+                        "Character",
+                        "Npc"
+                    ],
+                    "default": "Any"
                 }
             },
             "additionalProperties": false
@@ -22268,6 +22520,142 @@
             },
             "additionalProperties": false
         },
+        "OpenDialoguesNearCharacterFilter": {
+            "type": "object",
+            "title": "OpenDialoguesNearCharacterFilter",
+            "description": "Matches NPCs standing within the radius of an NPC carrying one of the listed characters, at its last recorded position.",
+            "markdownDescription": "Matches NPCs standing within the radius of an NPC carrying one of the listed characters, at its last recorded position.",
+            "hytale": {
+                "type": "object",
+                "mergesProperties": true
+            },
+            "properties": {
+                "Type": {
+                    "type": "string",
+                    "description": "This field controls the type, it must be set to the constant value \"NearCharacter\" to function as this type.",
+                    "markdownDescription": "This field controls the type, it must be set to the constant value \"NearCharacter\" to function as this type.",
+                    "hytale": {
+                        "type": "string"
+                    },
+                    "const": "NearCharacter"
+                },
+                "$Title": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Comment": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Author": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$TODO": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Position": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$FloatingFunctionNodes": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Groups": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$WorkspaceID": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$NodeId": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$NodeEditorMetadata": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "Not": {
+                    "type": "boolean",
+                    "description": "Inverts the match when true and defaults to false.",
+                    "markdownDescription": "Inverts the match when true and defaults to false.",
+                    "hytale": {
+                        "type": "boolean"
+                    },
+                    "default": false
+                },
+                "Characters": {
+                    "type": "array",
+                    "description": "Character IDs whose claimed NPCs are looked for.",
+                    "markdownDescription": "Character IDs whose claimed NPCs are looked for.",
+                    "hytale": {
+                        "type": "array"
+                    },
+                    "items": {
+                        "type": "string",
+                        "hytale": {
+                            "type": "string"
+                        }
+                    },
+                    "minItems": 1
+                },
+                "Radius": {
+                    "type": "number",
+                    "description": "Distance in blocks from the candidate NPC.",
+                    "markdownDescription": "Distance in blocks from the candidate NPC.",
+                    "hytale": {
+                        "type": "number"
+                    },
+                    "exclusiveMinimum": 0.0,
+                    "default": 0.0
+                }
+            },
+            "additionalProperties": false
+        },
         "OpenDialoguesNearNpcCondition": {
             "type": "object",
             "title": "OpenDialoguesNearNpcCondition",
@@ -22688,6 +23076,169 @@
             },
             "additionalProperties": false
         },
+        "OpenDialoguesOpenedAfterCondition": {
+            "type": "object",
+            "title": "OpenDialoguesOpenedAfterCondition",
+            "description": "Holds when Dialogue was last opened after Than, or Than was never opened.",
+            "markdownDescription": "Holds when Dialogue was last opened after Than, or Than was never opened.",
+            "hytale": {
+                "type": "object",
+                "mergesProperties": true
+            },
+            "properties": {
+                "Type": {
+                    "type": "string",
+                    "description": "This field controls the type, it must be set to the constant value \"OpenedAfter\" to function as this type.",
+                    "markdownDescription": "This field controls the type, it must be set to the constant value \"OpenedAfter\" to function as this type.",
+                    "hytale": {
+                        "type": "string"
+                    },
+                    "const": "OpenedAfter"
+                },
+                "$Title": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Comment": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Author": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$TODO": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Position": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$FloatingFunctionNodes": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Groups": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$WorkspaceID": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$NodeId": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$NodeEditorMetadata": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "Not": {
+                    "type": "boolean",
+                    "description": "Inverts the test result when true and defaults to false.",
+                    "markdownDescription": "Inverts the test result when true and defaults to false.",
+                    "hytale": {
+                        "type": "boolean"
+                    },
+                    "default": false
+                },
+                "Dialogue": {
+                    "type": "string",
+                    "description": "ID of the dialogue whose latest opening must be the more recent.",
+                    "markdownDescription": "ID of the dialogue whose latest opening must be the more recent.",
+                    "hytale": {
+                        "type": "string",
+                        "uiEditorComponent": {
+                            "component": "Text",
+                            "dataSet": "opendialogues:dialogues"
+                        }
+                    }
+                },
+                "Than": {
+                    "type": "string",
+                    "description": "ID of the dialogue opened earlier, or never.",
+                    "markdownDescription": "ID of the dialogue opened earlier, or never.",
+                    "hytale": {
+                        "type": "string",
+                        "uiEditorComponent": {
+                            "component": "Text",
+                            "dataSet": "opendialogues:dialogues"
+                        }
+                    }
+                },
+                "With": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "title": "SourceScope",
+                    "description": "Whose dialogues count: any NPC, the source's character, or the source NPC alone.",
+                    "markdownDescription": "Whose dialogues count: any NPC, the source's character, or the source NPC alone.",
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "markdownEnumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "hytale": {
+                        "type": "Enum"
+                    },
+                    "enum": [
+                        "Any",
+                        "Character",
+                        "Npc"
+                    ],
+                    "default": "Any"
+                }
+            },
+            "additionalProperties": false
+        },
         "OpenDialoguesOpenedCondition": {
             "type": "object",
             "title": "OpenDialoguesOpenedCondition",
@@ -22827,6 +23378,34 @@
                     "hytale": {
                         "type": "integer"
                     }
+                },
+                "With": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "title": "SourceScope",
+                    "description": "Whose dialogues count: any NPC, the source's character, or the source NPC alone.",
+                    "markdownDescription": "Whose dialogues count: any NPC, the source's character, or the source NPC alone.",
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "markdownEnumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "hytale": {
+                        "type": "Enum"
+                    },
+                    "enum": [
+                        "Any",
+                        "Character",
+                        "Npc"
+                    ],
+                    "default": "Any"
                 }
             },
             "additionalProperties": false
@@ -22932,6 +23511,187 @@
                         "type": "string"
                     },
                     "default": ""
+                }
+            },
+            "additionalProperties": false
+        },
+        "OpenDialoguesQuestCooldownCondition": {
+            "type": "object",
+            "title": "OpenDialoguesQuestCooldownCondition",
+            "description": "Holds before the player ever took the quest and once the delay after the last one ran out.",
+            "markdownDescription": "Holds before the player ever took the quest and once the delay after the last one ran out.",
+            "hytale": {
+                "type": "object",
+                "mergesProperties": true
+            },
+            "properties": {
+                "Type": {
+                    "type": "string",
+                    "description": "This field controls the type, it must be set to the constant value \"QuestCooldown\" to function as this type.",
+                    "markdownDescription": "This field controls the type, it must be set to the constant value \"QuestCooldown\" to function as this type.",
+                    "hytale": {
+                        "type": "string"
+                    },
+                    "const": "QuestCooldown"
+                },
+                "$Title": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Comment": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Author": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$TODO": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Position": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$FloatingFunctionNodes": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$Groups": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$WorkspaceID": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$NodeId": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "$NodeEditorMetadata": {
+                    "description": "Comments don't have any function other than allowing users to add certain internal comments or notes to an asset",
+                    "doNotSuggest": true,
+                    "hytale": {
+                        "uiDisplayMode": "Hidden",
+                        "uiPropertyTitle": "Comment"
+                    }
+                },
+                "Not": {
+                    "type": "boolean",
+                    "description": "Inverts the test result when true and defaults to false.",
+                    "markdownDescription": "Inverts the test result when true and defaults to false.",
+                    "hytale": {
+                        "type": "boolean"
+                    },
+                    "default": false
+                },
+                "QuestAssetId": {
+                    "type": "string",
+                    "description": "Asset ID of the quest whose last run starts the delay.",
+                    "markdownDescription": "Asset ID of the quest whose last run starts the delay.",
+                    "hytaleAssetRef": "OpenQuestAsset",
+                    "hytale": {
+                        "type": "string"
+                    }
+                },
+                "Since": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "title": "Since",
+                    "description": "Whether the delay counts from the last start or the last end, success or failure, defaulting to End.",
+                    "markdownDescription": "Whether the delay counts from the last start or the last end, success or failure, defaulting to End.",
+                    "enumDescriptions": [
+                        "",
+                        ""
+                    ],
+                    "markdownEnumDescriptions": [
+                        "",
+                        ""
+                    ],
+                    "hytale": {
+                        "type": "Enum"
+                    },
+                    "enum": [
+                        "Start",
+                        "End"
+                    ],
+                    "default": "End"
+                },
+                "Seconds": {
+                    "type": "number",
+                    "description": "Real-time delay in seconds, offline time included.",
+                    "markdownDescription": "Real-time delay in seconds, offline time included.",
+                    "hytale": {
+                        "type": "number"
+                    }
+                },
+                "GivenBy": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "title": "SourceScope",
+                    "description": "Whose quests count: all of the player's, those given by the source's character, or by the source NPC alone, defaulting to Any.",
+                    "markdownDescription": "Whose quests count: all of the player's, those given by the source's character, or by the source NPC alone, defaulting to Any.",
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "markdownEnumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "hytale": {
+                        "type": "Enum"
+                    },
+                    "enum": [
+                        "Any",
+                        "Character",
+                        "Npc"
+                    ],
+                    "default": "Any"
                 }
             },
             "additionalProperties": false
@@ -23045,12 +23805,33 @@
                     "default": false
                 },
                 "QuestAssetId": {
-                    "type": "string",
-                    "description": "Asset ID of the quests to count.",
-                    "markdownDescription": "Asset ID of the quests to count.",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "ID of the watched quest asset. Set this or QuestAssetIds.",
+                    "markdownDescription": "ID of the watched quest asset. Set this or QuestAssetIds.",
                     "hytaleAssetRef": "OpenQuestAsset",
                     "hytale": {
                         "type": "string"
+                    }
+                },
+                "QuestAssetIds": {
+                    "type": [
+                        "array",
+                        "null"
+                    ],
+                    "description": "IDs of several watched quest assets whose counts add up. Set this or QuestAssetId.",
+                    "markdownDescription": "IDs of several watched quest assets whose counts add up. Set this or QuestAssetId.",
+                    "hytale": {
+                        "type": "array"
+                    },
+                    "items": {
+                        "type": "string",
+                        "hytaleAssetRef": "OpenQuestAsset",
+                        "hytale": {
+                            "type": "string"
+                        }
                     }
                 },
                 "States": {
@@ -23106,6 +23887,34 @@
                         "type": "integer"
                     },
                     "minimum": 0
+                },
+                "GivenBy": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "title": "SourceScope",
+                    "description": "Whose quests count: all of the player's, those given by the source's character, or by the source NPC alone, defaulting to Any.",
+                    "markdownDescription": "Whose quests count: all of the player's, those given by the source's character, or by the source NPC alone, defaulting to Any.",
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "markdownEnumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "hytale": {
+                        "type": "Enum"
+                    },
+                    "enum": [
+                        "Any",
+                        "Character",
+                        "Npc"
+                    ],
+                    "default": "Any"
                 }
             },
             "additionalProperties": false
@@ -23346,6 +24155,9 @@
                                     "$ref": "common.json#/definitions/OpenDialoguesCompositeCondition"
                                 },
                                 {
+                                    "$ref": "common.json#/definitions/OpenDialoguesCooldownCondition"
+                                },
+                                {
                                     "$ref": "common.json#/definitions/OpenDialoguesHasPermissionCondition"
                                 },
                                 {
@@ -23364,6 +24176,12 @@
                                     "$ref": "common.json#/definitions/OpenDialoguesOpenedCondition"
                                 },
                                 {
+                                    "$ref": "common.json#/definitions/OpenDialoguesOpenedAfterCondition"
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/OpenDialoguesQuestCooldownCondition"
+                                },
+                                {
                                     "$ref": "common.json#/definitions/OpenDialoguesRequiresQuestCondition"
                                 }
                             ],
@@ -23372,12 +24190,15 @@
                                 "values": [
                                     "Answered",
                                     "Composite",
+                                    "Cooldown",
                                     "HasPermission",
                                     "Holding",
                                     "Inventory",
                                     "NearBlock",
                                     "NearNpc",
                                     "Opened",
+                                    "OpenedAfter",
+                                    "QuestCooldown",
                                     "RequiresQuest"
                                 ]
                             },
@@ -23625,6 +24446,9 @@
                                     "$ref": "common.json#/definitions/OpenDialoguesCompositeCondition"
                                 },
                                 {
+                                    "$ref": "common.json#/definitions/OpenDialoguesCooldownCondition"
+                                },
+                                {
                                     "$ref": "common.json#/definitions/OpenDialoguesHasPermissionCondition"
                                 },
                                 {
@@ -23643,6 +24467,12 @@
                                     "$ref": "common.json#/definitions/OpenDialoguesOpenedCondition"
                                 },
                                 {
+                                    "$ref": "common.json#/definitions/OpenDialoguesOpenedAfterCondition"
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/OpenDialoguesQuestCooldownCondition"
+                                },
+                                {
                                     "$ref": "common.json#/definitions/OpenDialoguesRequiresQuestCondition"
                                 }
                             ],
@@ -23651,12 +24481,15 @@
                                 "values": [
                                     "Answered",
                                     "Composite",
+                                    "Cooldown",
                                     "HasPermission",
                                     "Holding",
                                     "Inventory",
                                     "NearBlock",
                                     "NearNpc",
                                     "Opened",
+                                    "OpenedAfter",
+                                    "QuestCooldown",
                                     "RequiresQuest"
                                 ]
                             },
@@ -24427,6 +25260,9 @@
                                     "$ref": "common.json#/definitions/OpenDialoguesCompositeCondition"
                                 },
                                 {
+                                    "$ref": "common.json#/definitions/OpenDialoguesCooldownCondition"
+                                },
+                                {
                                     "$ref": "common.json#/definitions/OpenDialoguesHasPermissionCondition"
                                 },
                                 {
@@ -24445,6 +25281,12 @@
                                     "$ref": "common.json#/definitions/OpenDialoguesOpenedCondition"
                                 },
                                 {
+                                    "$ref": "common.json#/definitions/OpenDialoguesOpenedAfterCondition"
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/OpenDialoguesQuestCooldownCondition"
+                                },
+                                {
                                     "$ref": "common.json#/definitions/OpenDialoguesRequiresQuestCondition"
                                 }
                             ],
@@ -24453,12 +25295,15 @@
                                 "values": [
                                     "Answered",
                                     "Composite",
+                                    "Cooldown",
                                     "HasPermission",
                                     "Holding",
                                     "Inventory",
                                     "NearBlock",
                                     "NearNpc",
                                     "Opened",
+                                    "OpenedAfter",
+                                    "QuestCooldown",
                                     "RequiresQuest"
                                 ]
                             },
@@ -24861,8 +25706,8 @@
         "OpenQuestsDeliverAsset": {
             "type": "object",
             "title": "OpenQuestsDeliverAsset",
-            "description": "Defines a quest to bring items to an OpenDialogues character.",
-            "markdownDescription": "Defines a quest to bring items to an OpenDialogues character.",
+            "description": "Defines a quest to bring items to an OpenDialogues NPC picked by Target.",
+            "markdownDescription": "Defines a quest to bring items to an OpenDialogues NPC picked by Target.",
             "oneOf": [
                 {
                     "required": [
@@ -25569,12 +26414,43 @@
                     "default": 0
                 },
                 "Character": {
-                    "type": "string",
-                    "description": "OpenDialogues character ID of the recipient.",
-                    "markdownDescription": "OpenDialogues character ID of the recipient.",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "ID of the character the items go to, required with Target Character.",
+                    "markdownDescription": "ID of the character the items go to, required with Target Character.",
                     "hytale": {
                         "type": "string"
                     }
+                },
+                "Target": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "title": "TargetMode",
+                    "description": "Whom the quest aims at: the Character field, every NPC of the giver's character, or the giver NPC alone, defaulting to Character.",
+                    "markdownDescription": "Whom the quest aims at: the Character field, every NPC of the giver's character, or the giver NPC alone, defaulting to Character.",
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "markdownEnumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "hytale": {
+                        "type": "Enum"
+                    },
+                    "enum": [
+                        "Character",
+                        "GiverCharacter",
+                        "GiverNpc"
+                    ],
+                    "default": "Character"
                 },
                 "Items": {
                     "type": "array",
@@ -26346,11 +27222,39 @@
                         "string",
                         "null"
                     ],
-                    "description": "NPC character ID to match, with no character restriction by default.",
-                    "markdownDescription": "NPC character ID to match, with no character restriction by default.",
+                    "description": "ID of the character the conversation must be had with, read with Target Character; unset for any or none.",
+                    "markdownDescription": "ID of the character the conversation must be had with, read with Target Character; unset for any or none.",
                     "hytale": {
                         "type": "string"
                     }
+                },
+                "Target": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "title": "TargetMode",
+                    "description": "Whom the quest aims at: the Character field, every NPC of the giver's character, or the giver NPC alone, defaulting to Character.",
+                    "markdownDescription": "Whom the quest aims at: the Character field, every NPC of the giver's character, or the giver NPC alone, defaulting to Character.",
+                    "enumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "markdownEnumDescriptions": [
+                        "",
+                        "",
+                        ""
+                    ],
+                    "hytale": {
+                        "type": "Enum"
+                    },
+                    "enum": [
+                        "Character",
+                        "GiverCharacter",
+                        "GiverNpc"
+                    ],
+                    "default": "Character"
                 },
                 "Dialogue": {
                     "type": [
@@ -32267,12 +33171,33 @@
                     }
                 },
                 "QuestAssetId": {
-                    "type": "string",
-                    "description": "Asset ID of the quests to count.",
-                    "markdownDescription": "Asset ID of the quests to count.",
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "ID of the watched quest asset. Set this or QuestAssetIds.",
+                    "markdownDescription": "ID of the watched quest asset. Set this or QuestAssetIds.",
                     "hytaleAssetRef": "OpenQuestAsset",
                     "hytale": {
                         "type": "string"
+                    }
+                },
+                "QuestAssetIds": {
+                    "type": [
+                        "array",
+                        "null"
+                    ],
+                    "description": "IDs of several watched quest assets whose counts add up. Set this or QuestAssetId.",
+                    "markdownDescription": "IDs of several watched quest assets whose counts add up. Set this or QuestAssetId.",
+                    "hytale": {
+                        "type": "array"
+                    },
+                    "items": {
+                        "type": "string",
+                        "hytaleAssetRef": "OpenQuestAsset",
+                        "hytale": {
+                            "type": "string"
+                        }
                     }
                 },
                 "States": {
