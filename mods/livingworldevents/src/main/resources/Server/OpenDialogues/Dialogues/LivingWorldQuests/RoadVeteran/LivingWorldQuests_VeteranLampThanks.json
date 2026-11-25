@@ -1,0 +1,20 @@
+{
+  "$Comment": "Tavin once the lamp burns on the square.",
+  "Character": "LivingWorldQuests_RoadVeteran",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.veteran-lamp-thanks.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.veteran-lamp-thanks.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

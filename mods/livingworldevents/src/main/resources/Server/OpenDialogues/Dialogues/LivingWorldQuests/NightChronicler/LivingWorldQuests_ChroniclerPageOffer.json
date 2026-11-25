@@ -1,0 +1,44 @@
+{
+  "$Comment": "Yselle confesses the unsigned account.",
+  "Character": "LivingWorldQuests_NightChronicler",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-offer.previous"
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-offer.page1"
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-offer.page2"
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-offer.page3"
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-offer.page4"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-offer.act",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "LivingWorldQuests_ChroniclerPage"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-offer.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

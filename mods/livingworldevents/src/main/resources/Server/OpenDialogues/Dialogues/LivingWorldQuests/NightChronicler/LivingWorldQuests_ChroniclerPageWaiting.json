@@ -1,0 +1,20 @@
+{
+  "$Comment": "Yselle waits for what Tavin saw.",
+  "Character": "LivingWorldQuests_NightChronicler",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-waiting.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.chronicler-page-waiting.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

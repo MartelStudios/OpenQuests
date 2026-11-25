@@ -13,10 +13,13 @@ Sample line: “Look for the brute who calls the charge. Drop that one, and the 
 - Gives directions by what a driver can see from the seat. Short orders, the reason only if asked.
 - Rode escort for Mado. Sena repairs his old harness and leaves the buckle where his stiff hand can reach it.
 - Misses the easy stretches where he took the reins while Mado ate, the only miles when neither had much to say.
+- On the last Blood Moon he ran for the last lit window, Yselle’s, as it went out. He knocked, nobody opened, and he spent the night in the ditch under it: hence the ditch side and the stiff hand. He thought the house was empty and blames no one.
 
 ## Commissions
 
 - `LivingWorldQuests_VeteranCaptain` Kill an ambush bandit captain for Tavin. Reward: 2 × `Ingredient_Bar_Gold`.
+
+During Yselle’s `LivingWorldQuests_ChroniclerPage` his router opens his account of that night first. Once her lamp burns on the square, his closing line says he walks the middle of the road again.
 
 ## Assets
 
