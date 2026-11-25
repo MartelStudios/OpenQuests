@@ -31,8 +31,8 @@ public abstract class KillDeathSystem extends DeathSystems.OnDeathSystem {
         var killerQuests = store.getComponent(killerRef, QuestStoreComponent.getComponentType());
         if (killerPlayerRef == null || killerQuests == null) return;
 
-        onKill(store, victimRef, killerPlayerRef.getUuid(), killerQuests);
+        onKill(store, victimRef, killerRef, killerPlayerRef.getUuid(), killerQuests);
     }
 
-    protected abstract void onKill(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> victimRef, @Nonnull UUID killerId, @Nonnull QuestStoreComponent killerQuests);
+    protected abstract void onKill(@Nonnull Store<EntityStore> store, @Nonnull Ref<EntityStore> victimRef, @Nonnull Ref<EntityStore> killerRef, @Nonnull UUID killerId, @Nonnull QuestStoreComponent killerQuests);
 }
