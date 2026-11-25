@@ -16,7 +16,8 @@
           "Quest": "LivingWorldQuests_MerchantSack"
         },
         {
-          "Type": "Close"
+          "Type": "Open",
+          "Router": "LivingWorldQuests_RobbedMerchant"
         }
       ]
     },

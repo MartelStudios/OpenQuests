@@ -16,7 +16,8 @@
           "Quest": "LivingWorldQuests_ChroniclerSkull"
         },
         {
-          "Type": "Close"
+          "Type": "Open",
+          "Router": "LivingWorldQuests_NightChronicler"
         }
       ]
     },
