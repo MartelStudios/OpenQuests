@@ -101,6 +101,7 @@ public abstract class AbstractQuestProgression<Q extends AbstractQuestProgressio
                                                                                         .documentation("UUID of the quest instance whose reward granted this quest, unset by default.")
                                                                                         .add()
                                                                                         .append(new KeyedCodec<>("Giver", QuestGiver.LENIENT_CODEC), (quest, giver) -> quest.giver = giver, quest -> quest.giver)
+                                                                                        .documentation("NPC that handed the quest out, set on the head of its line and unset otherwise.")
                                                                                         .add()
                                                                                         .append(TAGS_CODEC, TAGS_SETTER, TAGS_GETTER)
                                                                                         .documentation("Per-instance tag values that override matching asset tags, empty by default.")

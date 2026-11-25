@@ -35,7 +35,6 @@ public class OpenQuestsDialogueAsset extends HeldQuantityQuestAsset implements T
                     .add()
                     .append(new KeyedCodec<>("Target", new EnumCodec<>(TargetMode.class)), (asset, target) -> asset.target = target, asset -> asset.target)
                     .documentation(TargetMode.DOCUMENTATION)
-                    .documentation("NPC character ID to match, with no character restriction by default.")
                     .add()
                     .append(new KeyedCodec<>("Dialogue", Codec.STRING), (asset, dialogue) -> asset.dialogue = dialogue, asset -> asset.dialogue)
                     .metadata(new UIEditor(new UIEditor.TextField(DialogueRegistry.DIALOGUES_DATA_SET)))

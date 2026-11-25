@@ -33,6 +33,7 @@ public class GiverQuestRecord implements Component<EntityStore> {
                                                                            .append(new KeyedCodec<>("Givers", new MapCodec<>(NPCS_CODEC, HashMap<String, Map<String, Map<String, QuestCompletions>>>::new)), (record, givers) -> givers.forEach((character, npcs) -> npcs.forEach((npc, assets) -> assets.forEach((asset, completions) -> record.assetsOf(character, npc).put(asset, completions)))), record -> record.givers)
                                                                            .documentation("Quest outcomes by giver character ID, then giver NPC UUID (empty key for NPCs since released), then quest asset ID, initially empty.")
                                                                            .add()
+                                                                           .documentation("Stores how the quests each NPC handed a player ended.")
                                                                            .build();
 
     /**

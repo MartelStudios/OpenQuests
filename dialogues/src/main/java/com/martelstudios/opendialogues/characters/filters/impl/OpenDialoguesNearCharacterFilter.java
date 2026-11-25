@@ -39,6 +39,7 @@ public class OpenDialoguesNearCharacterFilter extends CharacterFilter {
                                                                                            .addValidator(Validators.greaterThan(0.0))
                                                                                            .documentation("Distance in blocks from the candidate NPC.")
                                                                                            .add()
+                                                                                           .documentation("Matches NPCs standing within the radius of an NPC carrying one of the listed characters, at its last recorded position.")
                                                                                            .build();
 
     protected String[] characters = new String[0];

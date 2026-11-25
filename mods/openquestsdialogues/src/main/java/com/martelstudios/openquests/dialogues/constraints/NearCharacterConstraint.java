@@ -44,7 +44,7 @@ public class NearCharacterConstraint extends QuestConstraint {
                                                                                   .validator((constraint, results) -> {
                                                                                       if (constraint.target == TargetMode.Character && constraint.character == null) results.fail("Character is required with Target Character");
                                                                                   })
-                                                                                  .documentation("Allows quest progress only near an NPC carrying the specified character.")
+                                                                                  .documentation("Allows quest progress only near an NPC picked by Target.")
                                                                                   .build();
 
     @Nullable

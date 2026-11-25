@@ -83,7 +83,7 @@ public class OpenQuestsDeliverAsset extends QuantityQuestAsset implements Target
                     .validator((asset, results) -> {
                         if (asset.target == TargetMode.Character && asset.character == null) results.fail("Character is required with Target Character");
                     })
-                    .documentation("Defines a quest to bring items to an OpenDialogues character.")
+                    .documentation("Defines a quest to bring items to an OpenDialogues NPC picked by Target.")
                     .build();
 
     @Nullable
