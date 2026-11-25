@@ -6,6 +6,14 @@ Brindle scouts paths between the village and its young trees. He measures distan
 
 Sample line: “The turn in the path needs shade. Living sap will help the roots settle, and a potted sapling can put down the first ones.”
 
+## Personality
+
+- Wants the little trees to learn the way home by the places they like to stop.
+- Walks at a scout’s pace when worried, then has to go back for everyone.
+- Measures a stretch in shade: “two shades”, “one long sun”. With little ones along, the count includes the rests.
+- Borrows Rivet’s tools and brings them back clean, with a twig through each handle for the next trip.
+- Has already picked a spot to sit at the bare turn once the leaves grow over it.
+
 ## Commissions
 
 - `LivingWorldQuests_ScoutSapling` Deliver 5 Living Sap and a Potted Sapling to Brindle. Reward: 2 × `Ingredient_Bar_Gold`.

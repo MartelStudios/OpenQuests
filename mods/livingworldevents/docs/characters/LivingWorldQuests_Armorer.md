@@ -6,6 +6,14 @@ Sena repairs traveling gear. She notices how metal bends, where people carry the
 
 Sample line: “I want to see how a complete Warlord suit sits on the stand. The last piece I saw had deep ore worked right into the plate.”
 
+## Personality
+
+- Wants a repair to feel so natural that its owner forgets to favor the sore shoulder.
+- Can spend half a morning on a clever joint while the traveler who needs it waits on the stool.
+- Asks people to put their gear on before she asks where it hurts. Her first question is “Where does it pull?”
+- Reads tool marks for Yselle, and asks for the metal itself because a sketch leaves out how deep a mark goes.
+- Keeps her first walking staff under the bench. Its grip wore smooth a finger below the wrap.
+
 ## Commissions
 
 - `LivingWorldQuests_ArmorerWarlord` Deliver the 4 early Warlord armor pieces to Sena. Reward: 4 × `Ingredient_Bar_Gold`.

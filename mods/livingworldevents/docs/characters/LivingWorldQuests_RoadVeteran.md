@@ -6,6 +6,14 @@ Tavin used to escort wagons, including Mado’s. He gives advice in short, pract
 
 Sample line: “Look for the brute who calls the charge. Drop that one, and the next wagon has a chance.”
 
+## Personality
+
+- Wants drivers to worry about axles and weather again, not ambushes.
+- Still walks on the ditch side of any path, and still checks the road before noon out of habit.
+- Gives directions by what a driver can see from the seat. Short orders, the reason only if asked.
+- Rode escort for Mado. Sena repairs his old harness and leaves the buckle where his stiff hand can reach it.
+- Misses the easy stretches where he took the reins while Mado ate, the only miles when neither had much to say.
+
 ## Commissions
 
 - `LivingWorldQuests_VeteranCaptain` Kill an ambush bandit captain for Tavin. Reward: 2 × `Ingredient_Bar_Gold`.
