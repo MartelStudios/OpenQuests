@@ -12,7 +12,7 @@ Sample line: “My cousin Sprocket says a queen sleeps underneath his drills. Wh
 - A rattle worries him, silence worries him more. He leaves a meal half eaten over a sound nobody else heard.
 - Taps worn drill heads with a knuckle and calls a thin note “hollow underneath”, about metal or about a shaft.
 - Lent Brindle tools for the path. Brindle returns them clean, and Rivet always crouches to look at the roots Brindle reports.
-- Once ran toward a quiet drill without a lamp. He keeps a flare by the door since.
+- Once a drill went quiet and he had no way to call Sprocket. A Tinkerer’s Flare is the signal Sprocket watches for above the treetops; he wants one by his door.
 
 ## Commissions
 
