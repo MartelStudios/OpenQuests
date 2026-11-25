@@ -1,0 +1,32 @@
+{
+  "$Comment": "Dialogue for Rivet at this stage of the commission.",
+  "Character": "LivingWorldQuests_VillageMechanic",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.mechanic-gland-offer.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.mechanic-gland-offer.act",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "LivingWorldQuests_MechanicGland"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.mechanic-gland-offer.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

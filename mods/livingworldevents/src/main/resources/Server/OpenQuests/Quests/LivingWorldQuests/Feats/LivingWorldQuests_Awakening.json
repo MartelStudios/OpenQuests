@@ -1,0 +1,63 @@
+{
+  "$Comment": "Craft any awakened weapon.",
+  "Type": "Composite",
+  "Operator": "Or",
+  "QuestAssetIds": [
+    {
+      "$Comment": "Craft an awakened Bloodletter.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Bloodletter_Awakened"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.awakening-bloodletter-awakened.title",
+      "ShortDescriptionKey": "livingworldquests.quest.awakening-bloodletter-awakened.short",
+      "DescriptionKey": "livingworldquests.quest.awakening-bloodletter-awakened.description"
+    },
+    {
+      "$Comment": "Craft an awakened Moonfang Staff.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Moonfang_Staff_Awakened"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.awakening-moonfang-staff-awakened.title",
+      "ShortDescriptionKey": "livingworldquests.quest.awakening-moonfang-staff-awakened.short",
+      "DescriptionKey": "livingworldquests.quest.awakening-moonfang-staff-awakened.description"
+    },
+    {
+      "$Comment": "Craft an awakened Brood Stinger.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Brood_Stinger_Awakened"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.awakening-brood-stinger-awakened.title",
+      "ShortDescriptionKey": "livingworldquests.quest.awakening-brood-stinger-awakened.short",
+      "DescriptionKey": "livingworldquests.quest.awakening-brood-stinger-awakened.description"
+    },
+    {
+      "$Comment": "Craft Sprocket’s awakened drill.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Sprockets_Drill_Awakened"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.awakening-sprockets-drill-awakened.title",
+      "ShortDescriptionKey": "livingworldquests.quest.awakening-sprockets-drill-awakened.short",
+      "DescriptionKey": "livingworldquests.quest.awakening-sprockets-drill-awakened.description"
+    }
+  ],
+  "TitleKey": "livingworldquests.quest.awakening.title",
+  "ShortDescriptionKey": "livingworldquests.quest.awakening.short",
+  "DescriptionKey": "livingworldquests.quest.awakening.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Iron",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ]
+}

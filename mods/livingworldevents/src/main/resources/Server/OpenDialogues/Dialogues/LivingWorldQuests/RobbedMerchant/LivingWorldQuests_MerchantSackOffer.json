@@ -1,0 +1,35 @@
+{
+  "$Comment": "Dialogue for Mado at this stage of the commission.",
+  "Character": "LivingWorldQuests_RobbedMerchant",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.merchant-sack-offer.previous"
+    },
+    {
+      "Text": "livingworldquests.dialogue.merchant-sack-offer.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.merchant-sack-offer.act",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "LivingWorldQuests_MerchantSack"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.merchant-sack-offer.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

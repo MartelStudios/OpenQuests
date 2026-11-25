@@ -1,0 +1,15 @@
+{
+  "$Comment": "A persistent village character with a quest router.",
+  "Name": "livingworldquests.character.night-chronicler.name",
+  "Epithet": "livingworldquests.character.night-chronicler.epithet",
+  "Uniqueness": "Alive",
+  "Scope": "Universe",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "LivingWorldQuests_NightChronicler"
+      }
+    }
+  ]
+}

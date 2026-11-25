@@ -1,0 +1,121 @@
+{
+  "$Comment": "Opens offers, progress reminders and completed dialogue for Mado.",
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "LivingWorldQuests_MerchantGold",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "Inventory",
+              "Item": {
+                "ItemId": "Ingredient_Bar_Gold"
+              },
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MerchantGoldReady"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_MerchantGold",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MerchantGoldOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_MerchantGold",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MerchantGoldWaiting"
+        }
+      },
+      {
+        "When": {
+          "Type": "Composite",
+          "Operator": "And",
+          "Conditions": [
+            {
+              "Type": "RequiresQuest",
+              "QuestAssetId": "LivingWorldQuests_MerchantSack",
+              "States": [
+                "InProgress",
+                "Successful"
+              ],
+              "Min": 0,
+              "Max": 0
+            },
+            {
+              "Type": "Inventory",
+              "Item": {
+                "ItemId": "LWE_Stolen_Sack"
+              },
+              "Min": 1
+            }
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MerchantSackReady"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_MerchantSack",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MerchantSackOffer"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "LivingWorldQuests_MerchantSack",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "LivingWorldQuests_MerchantSackWaiting"
+        }
+      }
+    ],
+    "Default": {
+      "Dialogue": "LivingWorldQuests_MerchantSackThanks"
+    }
+  }
+}

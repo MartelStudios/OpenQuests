@@ -1,0 +1,9 @@
+{
+  "$Comment": "Matches the Living World Events roles for AmbushCaptainRoles.",
+  "IncludeRoles": [
+    "LWE_Outlander_Bandit_Brute_Early",
+    "LWE_Outlander_Bandit_Brute_Final",
+    "LWE_Outlander_Bandit_Brute_Late",
+    "LWE_Outlander_Bandit_Brute_Mid"
+  ]
+}

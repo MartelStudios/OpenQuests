@@ -1,0 +1,35 @@
+{
+  "$Comment": "Dialogue for Brindle at this stage of the commission.",
+  "Character": "LivingWorldQuests_KweebecScout",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.scout-sapling-ready.context"
+    },
+    {
+      "Text": "livingworldquests.dialogue.scout-sapling-ready.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.scout-sapling-ready.act",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "LivingWorldQuests_ScoutSapling"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.scout-sapling-ready.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

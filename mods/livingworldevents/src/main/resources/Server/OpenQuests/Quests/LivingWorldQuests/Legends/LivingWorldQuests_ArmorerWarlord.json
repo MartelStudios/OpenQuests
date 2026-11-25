@@ -1,0 +1,44 @@
+{
+  "$Comment": "A commission offered by Sena.",
+  "Type": "Deliver",
+  "Character": "LivingWorldQuests_Armorer",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "LWE_Warlord_Early_Head"
+      },
+      "Quantity": 1
+    },
+    {
+      "Item": {
+        "ItemId": "LWE_Warlord_Early_Chest"
+      },
+      "Quantity": 1
+    },
+    {
+      "Item": {
+        "ItemId": "LWE_Warlord_Early_Hands"
+      },
+      "Quantity": 1
+    },
+    {
+      "Item": {
+        "ItemId": "LWE_Warlord_Early_Legs"
+      },
+      "Quantity": 1
+    }
+  ],
+  "Dialogue": "LivingWorldQuests_ArmorerWarlordHandoff",
+  "TitleKey": "livingworldquests.quest.armorer-warlord.title",
+  "ShortDescriptionKey": "livingworldquests.quest.armorer-warlord.short",
+  "DescriptionKey": "livingworldquests.quest.armorer-warlord.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Gold",
+      "Quantity": 4,
+      "AutoClaim": true
+    }
+  ]
+}

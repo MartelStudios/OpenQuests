@@ -1,0 +1,20 @@
+{
+  "$Comment": "Dialogue for Rivet at this stage of the commission.",
+  "Character": "LivingWorldQuests_VillageMechanic",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.mechanic-gland-waiting.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.mechanic-gland-waiting.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

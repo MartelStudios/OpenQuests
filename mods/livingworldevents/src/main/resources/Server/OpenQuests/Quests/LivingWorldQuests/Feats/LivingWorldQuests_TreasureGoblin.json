@@ -1,0 +1,18 @@
+{
+  "$Comment": "Kill a Treasure Goblin.",
+  "Type": "KillNpc",
+  "NpcGroupId": "LivingWorldQuests_TreasureGoblinRoles",
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.treasure-goblin.title",
+  "ShortDescriptionKey": "livingworldquests.quest.treasure-goblin.short",
+  "DescriptionKey": "livingworldquests.quest.treasure-goblin.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Iron",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ]
+}

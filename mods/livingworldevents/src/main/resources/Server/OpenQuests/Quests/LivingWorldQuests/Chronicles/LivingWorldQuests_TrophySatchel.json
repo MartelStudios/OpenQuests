@@ -1,0 +1,21 @@
+{
+  "$Comment": "Craft a Trophy Satchel.",
+  "Type": "Craft",
+  "ItemToCraft": {
+    "ItemId": "LWE_Trophy_Satchel"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.trophy-satchel.title",
+  "ShortDescriptionKey": "livingworldquests.quest.trophy-satchel.short",
+  "DescriptionKey": "livingworldquests.quest.trophy-satchel.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "GrantQuest",
+      "QuestAssetIds": [
+        "LivingWorldQuests_Accessory"
+      ],
+      "AutoClaim": true
+    }
+  ]
+}

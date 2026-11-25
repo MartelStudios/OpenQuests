@@ -1,0 +1,32 @@
+{
+  "$Comment": "Dialogue for Mado at this stage of the commission.",
+  "Character": "LivingWorldQuests_RobbedMerchant",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.merchant-gold-handoff.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.merchant-gold-handoff.act",
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "LivingWorldQuests_MerchantGold"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.merchant-gold-handoff.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

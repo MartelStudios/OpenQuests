@@ -1,0 +1,18 @@
+{
+  "$Comment": "Defeat the Broodmother in her final form.",
+  "Type": "KillNpc",
+  "NpcGroupId": "LivingWorldQuests_BroodmotherRoles",
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.broodmother.title",
+  "ShortDescriptionKey": "livingworldquests.quest.broodmother.short",
+  "DescriptionKey": "livingworldquests.quest.broodmother.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Iron",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ]
+}

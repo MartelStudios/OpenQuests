@@ -1,0 +1,9 @@
+{
+  "$Comment": "Matches the Living World Events roles for TreasureGoblinRoles.",
+  "IncludeRoles": [
+    "LWE_TreasureGoblinEarly",
+    "LWE_TreasureGoblinFinal",
+    "LWE_TreasureGoblinLate",
+    "LWE_TreasureGoblinMid"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "$Comment": "Dialogue for Sena at this stage of the commission.",
+  "Character": "LivingWorldQuests_Armorer",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.armorer-warlord-offer.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.armorer-warlord-offer.act",
+      "Actions": [
+        {
+          "Type": "AssignQuest",
+          "Quest": "LivingWorldQuests_ArmorerWarlord"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "livingworldquests.dialogue.armorer-warlord-offer.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

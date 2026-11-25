@@ -1,0 +1,55 @@
+{
+  "$Comment": "Craft all 4 early Warlord armor pieces.",
+  "Type": "Composite",
+  "Operator": "And",
+  "QuestAssetIds": [
+    {
+      "$Comment": "Craft a Warlord Helm.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Warlord_Early_Head"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.iron-and-moon-warlord-early-head.title",
+      "ShortDescriptionKey": "livingworldquests.quest.iron-and-moon-warlord-early-head.short",
+      "DescriptionKey": "livingworldquests.quest.iron-and-moon-warlord-early-head.description"
+    },
+    {
+      "$Comment": "Craft a Warlord Cuirass.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Warlord_Early_Chest"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.iron-and-moon-warlord-early-chest.title",
+      "ShortDescriptionKey": "livingworldquests.quest.iron-and-moon-warlord-early-chest.short",
+      "DescriptionKey": "livingworldquests.quest.iron-and-moon-warlord-early-chest.description"
+    },
+    {
+      "$Comment": "Craft Warlord Gauntlets.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Warlord_Early_Hands"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.iron-and-moon-warlord-early-hands.title",
+      "ShortDescriptionKey": "livingworldquests.quest.iron-and-moon-warlord-early-hands.short",
+      "DescriptionKey": "livingworldquests.quest.iron-and-moon-warlord-early-hands.description"
+    },
+    {
+      "$Comment": "Craft Warlord Greaves.",
+      "Type": "Craft",
+      "ItemToCraft": {
+        "ItemId": "LWE_Warlord_Early_Legs"
+      },
+      "TargetQuantity": 1,
+      "TitleKey": "livingworldquests.quest.iron-and-moon-warlord-early-legs.title",
+      "ShortDescriptionKey": "livingworldquests.quest.iron-and-moon-warlord-early-legs.short",
+      "DescriptionKey": "livingworldquests.quest.iron-and-moon-warlord-early-legs.description"
+    }
+  ],
+  "TitleKey": "livingworldquests.quest.iron-and-moon.title",
+  "ShortDescriptionKey": "livingworldquests.quest.iron-and-moon.short",
+  "DescriptionKey": "livingworldquests.quest.iron-and-moon.description",
+  "AutoTrack": false
+}

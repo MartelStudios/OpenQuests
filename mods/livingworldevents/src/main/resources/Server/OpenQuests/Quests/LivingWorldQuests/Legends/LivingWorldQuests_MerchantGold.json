@@ -1,0 +1,26 @@
+{
+  "$Comment": "A commission offered by Mado.",
+  "Type": "Deliver",
+  "Character": "LivingWorldQuests_RobbedMerchant",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Bar_Gold"
+      },
+      "Quantity": 3
+    }
+  ],
+  "Dialogue": "LivingWorldQuests_MerchantGoldHandoff",
+  "TitleKey": "livingworldquests.quest.merchant-gold.title",
+  "ShortDescriptionKey": "livingworldquests.quest.merchant-gold.short",
+  "DescriptionKey": "livingworldquests.quest.merchant-gold.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Iron",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "$Comment": "Shows the Feats quests in the journal.",
+  "NameKey": "livingworldquests.chapter.feats.name",
+  "Group": "LivingWorldQuests_Events",
+  "Order": 0,
+  "Quests": [
+    {
+      "Quest": "LivingWorldQuests_Regicide"
+    },
+    {
+      "Quest": "LivingWorldQuests_CrimsonHerald"
+    },
+    {
+      "Quest": "LivingWorldQuests_TreasureGoblin"
+    },
+    {
+      "Quest": "LivingWorldQuests_StolenSack"
+    },
+    {
+      "Quest": "LivingWorldQuests_DrillTrophy"
+    },
+    {
+      "Quest": "LivingWorldQuests_Broodmother"
+    },
+    {
+      "Quest": "LivingWorldQuests_Awakening"
+    },
+    {
+      "Quest": "LivingWorldQuests_AllSaplingsHome"
+    }
+  ]
+}

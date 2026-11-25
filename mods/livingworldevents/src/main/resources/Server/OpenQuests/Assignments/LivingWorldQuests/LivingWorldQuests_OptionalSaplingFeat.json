@@ -1,0 +1,9 @@
+{
+  "$Comment": "Offers these independent objectives once per player on connection.",
+  "Trigger": {
+    "Type": "PlayerConnect"
+  },
+  "QuestAssetIds": [
+    "LivingWorldQuests_AllSaplingsHome"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "$Comment": "Dialogue for Tavin at this stage of the commission.",
+  "Character": "LivingWorldQuests_RoadVeteran",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "livingworldquests.dialogue.veteran-captain-waiting.page1"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "livingworldquests.dialogue.veteran-captain-waiting.bye",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}

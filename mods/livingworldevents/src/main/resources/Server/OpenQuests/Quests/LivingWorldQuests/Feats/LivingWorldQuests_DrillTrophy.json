@@ -1,0 +1,20 @@
+{
+  "$Comment": "Obtain a Mini Drill.",
+  "Type": "Gather",
+  "ItemToGather": {
+    "ItemId": "LWE_Mini_Drill"
+  },
+  "TargetQuantity": 1,
+  "TitleKey": "livingworldquests.quest.drill-trophy.title",
+  "ShortDescriptionKey": "livingworldquests.quest.drill-trophy.short",
+  "DescriptionKey": "livingworldquests.quest.drill-trophy.description",
+  "AutoTrack": false,
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Bar_Iron",
+      "Quantity": 1,
+      "AutoClaim": true
+    }
+  ]
+}
