@@ -22,6 +22,14 @@
       }
     },
     {
+      "Quest": "LivingWorldQuests_ChroniclerLamp",
+      "Icon": "Icons/ItemsGenerated/LWE_Tinkerers_Lamp.png",
+      "Position": {
+        "X": 2,
+        "Y": 2
+      }
+    },
+    {
       "Quest": "LivingWorldQuests_MechanicGland",
       "Icon": "Icons/ItemsGenerated/LWE_Brood_Gland.png",
       "Position": {
