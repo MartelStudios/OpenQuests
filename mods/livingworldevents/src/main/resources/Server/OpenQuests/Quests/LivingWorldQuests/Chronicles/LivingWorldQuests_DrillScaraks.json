@@ -1,5 +1,5 @@
 {
-  "$Comment": "Kill 8 Drill Scaraks.",
+  "$Comment": "Kill 8 Scaraks at Sprocket’s drill.",
   "Type": "KillNpc",
   "NpcGroupId": "LivingWorldQuests_DrillScarakRoles",
   "TargetQuantity": 8,
