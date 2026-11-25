@@ -6,6 +6,14 @@ Yselle keeps a ledger of the red nights. She speaks in images from her notes, an
 
 Sample line: “At the far end of the red night, the Tyrant waits for the last lantern to go out. Bring me a skull for the ledger, and I’ll give that story a date.”
 
+## Personality
+
+- Wants the people who sat up through a red night to recognize it when the account is read aloud.
+- Distrusts a story that sounds too clean, her own notes included. Once a sentence sounds right, she makes herself check where it came from.
+- Asks which lamp was burning before she asks what anyone saw. Writes what the light did first and the hour in the margin later.
+- Brings old metal to Sena and asks which marks came from a hammer and which from a blow.
+- One of the red-night accounts in the ledger is hers. She left her name off: she remembers the sound at the door more clearly than opening it.
+
 ## Commissions
 
 - `LivingWorldQuests_ChroniclerSkull` Deliver a Tyrant’s Skull to Yselle. Reward: 1 × `Ingredient_Bar_Gold`.

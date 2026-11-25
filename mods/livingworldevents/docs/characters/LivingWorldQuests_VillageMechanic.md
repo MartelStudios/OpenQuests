@@ -6,6 +6,14 @@ Rivet is Sprocket’s cousin. He learned to diagnose a drill by ear and still wo
 
 Sample line: “My cousin Sprocket says a queen sleeps underneath his drills. When she wakes, the whole shaft rattles. I need a look at one of her glands.”
 
+## Personality
+
+- Wants Sprocket to come home early once in a while, with a working drill and daylight left to eat outside.
+- A rattle worries him, silence worries him more. He leaves a meal half eaten over a sound nobody else heard.
+- Taps worn drill heads with a knuckle and calls a thin note “hollow underneath”, about metal or about a shaft.
+- Lent Brindle tools for the path. Brindle returns them clean, and Rivet always crouches to look at the roots Brindle reports.
+- Once ran toward a quiet drill without a lamp. He keeps a flare by the door since.
+
 ## Commissions
 
 - `LivingWorldQuests_MechanicGland` Deliver a Brood Gland to Rivet. Reward: 1 × `Ingredient_Bar_Gold`.
