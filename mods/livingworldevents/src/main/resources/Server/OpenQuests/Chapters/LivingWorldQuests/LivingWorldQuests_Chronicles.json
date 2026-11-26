@@ -108,22 +108,6 @@
         "X": 1,
         "Y": 4
       }
-    },
-    {
-      "Quest": "LivingWorldQuests_Pathfinder",
-      "Icon": "Icons/ItemsGenerated/LWE_Pathfinder_Early_Head.png",
-      "Position": {
-        "X": 0,
-        "Y": 5
-      }
-    },
-    {
-      "Quest": "LivingWorldQuests_RazorleafBow",
-      "Icon": "Icons/ItemsGenerated/LWE_Razorleaf_Bow.png",
-      "Position": {
-        "X": 1,
-        "Y": 5
-      }
     }
   ]
 }
