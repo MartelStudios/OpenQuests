@@ -1,0 +1,13 @@
+{
+  "Type": "LootNpc",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-outlander-map.loot.title",
+  "ItemId": "Deco_Map",
+  "TargetQuantity": 1,
+  "Drops": [
+    {
+      "NpcGroupId": "Outlander",
+      "Chance": 0.3,
+      "GuaranteedAfter": 5
+    }
+  ]
+}
