@@ -68,22 +68,6 @@
         "X": 0,
         "Y": 2
       }
-    },
-    {
-      "Quest": "LivingWorldQuests_AllSaplingsHome",
-      "Icon": "Icons/ItemsGenerated/LWE_Potted_Sapling.png",
-      "Position": {
-        "X": 2,
-        "Y": 4
-      }
-    },
-    {
-      "Quest": "LivingWorldQuests_FriendInPot",
-      "Icon": "Icons/ItemsGenerated/LWE_Sapling_Buddy_Pot.png",
-      "Position": {
-        "X": 3,
-        "Y": 4
-      }
     }
   ]
 }

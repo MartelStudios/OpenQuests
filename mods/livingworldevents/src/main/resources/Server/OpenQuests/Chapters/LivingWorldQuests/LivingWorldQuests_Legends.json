@@ -100,14 +100,6 @@
         "X": 3,
         "Y": 3
       }
-    },
-    {
-      "Quest": "LivingWorldQuests_ScoutSapling",
-      "Icon": "Icons/ItemsGenerated/LWE_Potted_Sapling.png",
-      "Position": {
-        "X": 2,
-        "Y": 4
-      }
     }
   ]
 }
