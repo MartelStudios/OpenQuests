@@ -1,0 +1,56 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Bolt_Silk.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-silk-loom.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-silk-loom.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-silk-loom.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageSilkLoomLoot",
+    "AdventureQuests_VillageSilkLoomGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Choice",
+      "Choices": 1,
+      "AutoClaim": true,
+      "Rewards": [
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Armor_Cloth_Silk_Head",
+            "Quantity": 1
+          },
+          "Count": 1
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Armor_Cloth_Silk_Chest",
+            "Quantity": 1
+          },
+          "Count": 1
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Armor_Cloth_Silk_Hands",
+            "Quantity": 1
+          },
+          "Count": 1
+        },
+        {
+          "Reward": {
+            "Type": "Item",
+            "ItemId": "Armor_Cloth_Silk_Legs",
+            "Quantity": 1
+          },
+          "Count": 1
+        }
+      ]
+    }
+  ],
+  "AutoTrack": true
+}

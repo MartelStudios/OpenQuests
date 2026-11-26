@@ -1,0 +1,13 @@
+{
+  "Type": "LootNpc",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-silk-loom.loot.title",
+  "ItemId": "Ingredient_Bolt_Silk",
+  "TargetQuantity": 3,
+  "Drops": [
+    {
+      "NpcGroupId": "Spiders",
+      "Chance": 0.35,
+      "GuaranteedAfter": 4
+    }
+  ]
+}

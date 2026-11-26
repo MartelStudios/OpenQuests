@@ -1,0 +1,15 @@
+{
+  "Epithet": "adventurequests.kweebecvillage.character.village-outlander-map.epithet",
+  "Traits": [
+    {
+      "Type": "Dialogue",
+      "Dialogue": {
+        "Router": "AdventureQuests_KweebecOutlanderMap"
+      }
+    },
+    {
+      "Type": "Name",
+      "Names": "AdventureQuests_KweebecNames"
+    }
+  ]
+}

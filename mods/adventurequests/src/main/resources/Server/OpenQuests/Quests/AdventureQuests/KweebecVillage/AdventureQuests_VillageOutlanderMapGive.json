@@ -1,0 +1,22 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-outlander-map.give.title",
+  "Character": "AdventureQuests_KweebecOutlanderMap",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Deco_Map"
+      },
+      "Quantity": 1
+    }
+  ],
+  "Constraints": [
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "AdventureQuests_VillageOutlanderMapLoot",
+      "States": [
+        "Successful"
+      ]
+    }
+  ]
+}

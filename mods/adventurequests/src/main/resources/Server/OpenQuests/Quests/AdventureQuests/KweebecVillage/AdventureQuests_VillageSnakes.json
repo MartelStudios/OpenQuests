@@ -1,0 +1,38 @@
+{
+  "Type": "KillNpc",
+  "Icon": "Icons/ItemsGenerated/Ingredient_Hide_Scaled.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-snakes.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-snakes.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-snakes.short",
+  "TargetQuantity": 3,
+  "NpcGroupId": {
+    "IncludeRoles": [
+      "Snake_*"
+    ]
+  },
+  "Constraints": [
+    {
+      "Type": "NearCharacter",
+      "Character": "AdventureQuests_KweebecSnakes",
+      "Radius": 100
+    }
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Potion_Antidote",
+      "Quantity": 2,
+      "AutoClaim": true
+    },
+    {
+      "Type": "Item",
+      "ItemId": "Ingredient_Hide_Scaled",
+      "Quantity": 2,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}
