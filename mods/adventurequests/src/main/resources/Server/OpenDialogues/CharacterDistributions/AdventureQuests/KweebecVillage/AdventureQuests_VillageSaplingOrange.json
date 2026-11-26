@@ -21,7 +21,11 @@
       "Weight": 1
     },
     {
-      "Weight": 3
+      "Character": "AdventureQuests_KweebecSnakes",
+      "Weight": 1
+    },
+    {
+      "Weight": 4
     }
   ]
 }
