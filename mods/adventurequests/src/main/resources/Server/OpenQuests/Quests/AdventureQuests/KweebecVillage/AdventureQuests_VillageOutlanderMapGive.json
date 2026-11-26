@@ -9,5 +9,14 @@
       },
       "Quantity": 1
     }
+  ],
+  "Constraints": [
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "AdventureQuests_VillageOutlanderMapLoot",
+      "States": [
+        "Successful"
+      ]
+    }
   ]
 }
