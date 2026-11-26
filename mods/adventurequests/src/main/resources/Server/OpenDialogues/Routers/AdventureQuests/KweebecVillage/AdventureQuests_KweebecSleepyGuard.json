@@ -1,0 +1,39 @@
+{
+  "Selector": {
+    "Type": "Sequence",
+    "Routes": [
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_VillageSleepyGuard",
+          "States": [
+            "InProgress",
+            "Successful"
+          ],
+          "Min": 0,
+          "Max": 0
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSleepyGuardIntro"
+        }
+      },
+      {
+        "When": {
+          "Type": "RequiresQuest",
+          "QuestAssetId": "AdventureQuests_VillageSleepyGuard",
+          "States": [
+            "InProgress"
+          ]
+        },
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSleepyGuardWaiting"
+        }
+      },
+      {
+        "Then": {
+          "Dialogue": "AdventureQuests_VillageSleepyGuardThanks"
+        }
+      }
+    ]
+  }
+}

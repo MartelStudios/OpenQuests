@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-sleepy-guard.give.title",
+  "Character": "AdventureQuests_KweebecSleepyGuard",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Weapon_Spear_Crude"
+      },
+      "Quantity": 3
+    }
+  ]
+}

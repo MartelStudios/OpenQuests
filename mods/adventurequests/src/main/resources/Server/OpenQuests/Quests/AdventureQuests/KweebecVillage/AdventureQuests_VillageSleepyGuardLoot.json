@@ -1,0 +1,13 @@
+{
+  "Type": "LootNpc",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-sleepy-guard.loot.title",
+  "ItemId": "Weapon_Spear_Crude",
+  "TargetQuantity": 3,
+  "Drops": [
+    {
+      "NpcGroupId": "Trork",
+      "Chance": 0.5,
+      "GuaranteedAfter": 3
+    }
+  ]
+}
