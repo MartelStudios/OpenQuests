@@ -1,0 +1,13 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-silk-loom.give.title",
+  "Character": "AdventureQuests_KweebecSilkLoom",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Ingredient_Bolt_Silk"
+      },
+      "Quantity": 3
+    }
+  ]
+}
