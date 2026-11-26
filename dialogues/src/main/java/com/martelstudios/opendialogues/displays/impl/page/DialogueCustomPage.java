@@ -226,7 +226,10 @@ public class DialogueCustomPage extends InteractiveCustomUIPage<DialogueCustomPa
 
     @Override
     public void onDismiss(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store) {
-        leaveDialogue();
+        if (left) return;
+        left = true;
+        // The page is gone already: sending a close here would land on whatever page replaced it
+        dialogues.close(playerRef, session.dialogueId());
     }
 
     private void leaveDialogue() {
