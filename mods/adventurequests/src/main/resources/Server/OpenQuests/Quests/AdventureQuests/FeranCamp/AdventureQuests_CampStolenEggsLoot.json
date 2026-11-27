@@ -1,0 +1,13 @@
+{
+  "Type": "LootNpc",
+  "TitleKey": "adventurequests.ferancamp.quest.camp-stolen-eggs.loot.title",
+  "ItemId": "Food_Egg",
+  "TargetQuantity": 5,
+  "Drops": [
+    {
+      "NpcGroupId": "Scarak",
+      "Chance": 0.5,
+      "GuaranteedAfter": 3
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "Type": "LootNpc",
+  "TitleKey": "adventurequests.ferancamp.quest.camp-ancestor-skulls.loot.title",
+  "ItemId": "Deco_Bone_Skulls_Feran",
+  "TargetQuantity": 3,
+  "Drops": [
+    {
+      "NpcGroupId": "Skeleton",
+      "Chance": 0.4,
+      "GuaranteedAfter": 4
+    }
+  ]
+}

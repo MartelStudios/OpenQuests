@@ -1,0 +1,22 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.ferancamp.quest.camp-ancestor-skulls.give.title",
+  "Character": "AdventureQuests_FeranAncestorSkulls",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Deco_Bone_Skulls_Feran"
+      },
+      "Quantity": 3
+    }
+  ],
+  "Constraints": [
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "AdventureQuests_CampAncestorSkullsLoot",
+      "States": [
+        "Successful"
+      ]
+    }
+  ]
+}

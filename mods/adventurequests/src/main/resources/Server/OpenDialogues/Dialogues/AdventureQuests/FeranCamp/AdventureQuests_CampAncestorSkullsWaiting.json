@@ -1,0 +1,32 @@
+{
+  "Display": "Cinematic",
+  "Character": "AdventureQuests_FeranVillager",
+  "UseSourceCharacter": true,
+  "Pages": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp-ancestor-skulls.waiting"
+    }
+  ],
+  "Responses": [
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp.give",
+      "Actions": [
+        {
+          "Type": "Deliver",
+          "Quest": "AdventureQuests_CampAncestorSkullsGive"
+        },
+        {
+          "Type": "Close"
+        }
+      ]
+    },
+    {
+      "Text": "adventurequests.ferancamp.dialogue.camp.later",
+      "Actions": [
+        {
+          "Type": "Close"
+        }
+      ]
+    }
+  ]
+}
