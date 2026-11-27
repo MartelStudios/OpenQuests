@@ -63,7 +63,7 @@ Over 200 quests in English and French, across ten chapters, dozens of village st
 
 🦊 **Some Ferans have a story.** Civilians and windwalkers in the desert camps each live one small incident, ask for your help once, then go back to camp life. Each gets a Feran name.
 
-⚔️ **Nine camp stories.** Drive off the hyenas digging under the stores, the vultures diving on the drying meat, the crocodile holding the oasis or the sand skeletons. Hunt Scaraks, bring venom for a windwalker's darts, bone fragments for a carver, sturdy chitin for the voice of the chief.
+⚔️ **Twelve camp stories.** Drive off the hyenas digging under the stores, the vultures diving on the drying meat, the crocodile holding the oasis or the sand skeletons. Hunt Scaraks, bring venom for a windwalker's darts, bone fragments for a carver, sturdy chitin for the voice of the chief. Recover ancestors' skulls from skeletons and bring a Feran breeder's stolen eggs back from the Scaraks.
 
 🧂 **A salt road to the forest.** A salt trader sends you to a Kweebec friend with salt, and the Kweebec sends pumpkins back.
 
