@@ -55,7 +55,7 @@ Over 200 quests in English and French, across ten chapters, dozens of village st
 
 🌱 **About one villager in two has a story.** Saplings, sproutlings, Razorleaf guards and the merchant each live one small incident, ask for your help once, then go back to village life. Each gets a name of its own.
 
-🥕 **Dozens of stories, each tied to who tells it.** A hungry sapling wants a ripe carrot from the garden, a would-be guard dreams of a crude sword, goblins ran off with the merchant's cart, the smith's forge has gone cold, the alchemist's still just cracked, foxes scare the rabbits from their burrows, crows no longer fear an old scarecrow. You pick crops, craft, hunt and deliver.
+🥕 **Dozens of stories, each tied to who tells it.** A hungry sapling wants a ripe carrot from the garden, a would-be guard dreams of a crude sword, goblins ran off with the merchant's cart, mice raided the baker's pantry, the smith's forge has gone cold, the alchemist's still just cracked, foxes scare the rabbits from their burrows, crows no longer fear an old scarecrow. You pick crops, craft, hunt and deliver.
 
 🎁 **Rewards that fit the story:** potions from the alchemist, an iron sword or axe from the smith, eternal seeds from the farmer, recipes from the cook and the merchant. The merchant's stall still opens on request.
 
