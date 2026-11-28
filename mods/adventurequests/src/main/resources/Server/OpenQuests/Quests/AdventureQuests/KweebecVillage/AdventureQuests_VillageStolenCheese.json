@@ -1,0 +1,23 @@
+{
+  "Type": "Composite",
+  "Icon": "Icons/ItemsGenerated/Food_Cheese.png",
+  "Categories": [
+    "AdventureQuests_SideQuest"
+  ],
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-stolen-cheese.title",
+  "DescriptionKey": "adventurequests.kweebecvillage.quest.village-stolen-cheese.description",
+  "ShortDescriptionKey": "adventurequests.kweebecvillage.quest.village-stolen-cheese.short",
+  "QuestAssetIds": [
+    "AdventureQuests_VillageStolenCheeseLoot",
+    "AdventureQuests_VillageStolenCheeseGive"
+  ],
+  "SuccessfulRewards": [
+    {
+      "Type": "Item",
+      "ItemId": "Food_Pie_Apple",
+      "Quantity": 3,
+      "AutoClaim": true
+    }
+  ],
+  "AutoTrack": true
+}

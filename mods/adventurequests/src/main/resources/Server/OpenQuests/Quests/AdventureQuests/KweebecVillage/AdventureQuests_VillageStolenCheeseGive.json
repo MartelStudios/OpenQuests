@@ -1,0 +1,22 @@
+{
+  "Type": "Deliver",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-stolen-cheese.give.title",
+  "Character": "AdventureQuests_KweebecStolenCheese",
+  "Items": [
+    {
+      "Item": {
+        "ItemId": "Food_Cheese"
+      },
+      "Quantity": 4
+    }
+  ],
+  "Constraints": [
+    {
+      "Type": "RequiresQuest",
+      "QuestAssetId": "AdventureQuests_VillageStolenCheeseLoot",
+      "States": [
+        "Successful"
+      ]
+    }
+  ]
+}
