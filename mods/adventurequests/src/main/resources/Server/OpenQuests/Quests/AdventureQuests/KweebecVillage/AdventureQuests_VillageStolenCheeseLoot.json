@@ -1,0 +1,13 @@
+{
+  "Type": "LootNpc",
+  "TitleKey": "adventurequests.kweebecvillage.quest.village-stolen-cheese.loot.title",
+  "ItemId": "Food_Cheese",
+  "TargetQuantity": 4,
+  "Drops": [
+    {
+      "NpcGroupId": "Mouse",
+      "Chance": 0.5,
+      "GuaranteedAfter": 3
+    }
+  ]
+}
